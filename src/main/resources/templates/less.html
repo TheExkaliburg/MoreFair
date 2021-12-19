@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Add CSS and JS to Thymeleaf</title>
+    <link th:href="@{/styles/spectre/spectre.css}" rel="stylesheet" />
+    <script defer type="text/javascript" th:src="@{/js/actions.js}"></script>
+    <script defer src="//unpkg.com/cross-fetch/dist/cross-fetch.js"></script>
+</head>
+<body>
+<table id="ladder" class = "table table-striped">
+    <thead id="ladderHead">
+    <tr>
+        <th>#</th>
+        <th>username</th>
+        <th>points</th>
+    </tr>
+    </thead>
+    <tbody id="ladderBody">
+    <tr th:each="user: ${users}">
+        <td th:text="${user.position}">1</td>
+        <td th:text="${user.username}">user</td>
+        <td th:text="${user.points}">0</td>
+    </tr>
+    </tbody>
+</table>
+<button class="btn" id="newUser">Click Me</button>
+<script>
+    let data = {username: 'test', position: 99, points: 5};
+    document.getElementById("newUser").addEventListener("click", () => {
+        postJSON('/user', data, req => {
+            if(req.status === 201){
+                getJSON('/ladder', req => {
+                    reloadLadder(req.response);
+                })
+            }else{
+                return;
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
