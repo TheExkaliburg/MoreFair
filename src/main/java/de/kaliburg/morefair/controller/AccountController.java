@@ -1,24 +1,25 @@
 package de.kaliburg.morefair.controller;
 
+import com.google.gson.Gson;
 import de.kaliburg.morefair.entity.Account;
 import de.kaliburg.morefair.entity.Ranker;
 import de.kaliburg.morefair.exceptions.InvalidArgumentsException;
 import de.kaliburg.morefair.service.AccountService;
 import de.kaliburg.morefair.service.LadderService;
 import de.kaliburg.morefair.service.RankerService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Controller
+@Slf4j
 public class AccountController
 {
     private final AccountService accountService;
@@ -34,25 +35,32 @@ public class AccountController
     }
 
     @GetMapping("/")
-    public String styled(Model model){
-        model.addAttribute("users", accountService.getUsers());
+    public String getIndex(){
+        // model.addAttribute("users", accountService.getUsers());
         return "less";
     }
 
-    @PostMapping(path = "/user", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<List<Account>> create(@RequestBody Account newUser){
-        accountService.saveUser(newUser);
+    @PostMapping(path = "/login", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Account> postLogin(@RequestBody UUID uuid){
+        Account account = accountService.findAccountByUUID(uuid);
+        if(account == null) return new ResponseEntity<>(accountService.createNewAccount(), HttpStatus.CREATED);
 
-        return new ResponseEntity<>(accountService.getUsers(), HttpStatus.CREATED);
+        return new ResponseEntity<>(account, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/ladder", produces = "application/json")
-    public ResponseEntity<List<Ranker>> styled(){
-        try{
-            return new ResponseEntity<>(rankerService.findAllRankerForHighestLadderAreaForAccount(new Account()), HttpStatus.OK);
-        }catch(InvalidArgumentsException e){
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
+    @PostMapping(value = "/ladder", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<List<Ranker>> postLadder(@RequestBody UUID uuid){
+        System.out.println(uuid);
+        Account account = accountService.findAccountByUUID(uuid);
+        System.out.println(account);
+        if(account == null) account = accountService.createNewAccount();
+
+        return new ResponseEntity<>(rankerService.findAllRankerForHighestLadderAreaForAccount(account), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/register", produces = "application/json")
+    public ResponseEntity<Account> getRegister() {
+        return new ResponseEntity<>(accountService.createNewAccount(), HttpStatus.CREATED);
     }
 
 }

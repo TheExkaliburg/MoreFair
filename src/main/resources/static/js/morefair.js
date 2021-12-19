@@ -1,7 +1,7 @@
 let ladder = {data:[], fromPosition: 1};
 
-function getLadder(){
-    getJSON('/ladder', req => {
+function getLadder(uuid){
+    postJSON('/ladder', uuid, req => {
         ladder.data = req.response;
         reloadLadder();
     });

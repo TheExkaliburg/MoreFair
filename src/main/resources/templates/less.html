@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <title>Add CSS and JS to Thymeleaf</title>
     <link th:href="@{/styles/spectre/spectre.css}" rel="stylesheet" />
-    <script type="text/javascript" th:src="@{/js/morefair.js}"></script>
     <script type="text/javascript" th:src="@{/js/http-request.js}"></script>
+    <script type="text/javascript" th:src="@{/js/cookie.js}"></script>
+    <script type="text/javascript" th:src="@{/js/morefair.js}"></script>
 </head>
 <body>
-<table class = "table table-striped">
+<table size="0.5" class = "table table-striped">
     <thead>
     <tr>
         <th>#</th>
@@ -26,19 +27,12 @@
 </table>
 <button class="btn" id="newUser">Click Me</button>
 <script>
-    let testUser = {username: 'test', rank:ladder.data.length+1, points:0};
-    document.getElementById("newUser").addEventListener("click", () => {
-        postJSON('/user', testUser, req => {
-            if(req.status === 201){
-                getLadder();
-            }else{
-                return;
-            }
-        });
-    });
+    checkCookie()
+    let uuid = getCookie("_uuid");
 
-    getLadder();
+    getLadder(uuid);
     window.setInterval(calculatePoints,1000);
+    window.setInterval(getLadder,10000, uuid);
 </script>
 </body>
 </html>

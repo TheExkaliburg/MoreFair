@@ -28,10 +28,6 @@ public class RankerService
     }
 
     public List<Ranker> findAllRankerForHighestLadderAreaForAccount(Account account) {
-        if(account == null) {
-            throw new InvalidArgumentsException("account should not be empty");
-        }
-
         Ranker currentRanker = findHighestRankerByAccount(account);
         Ladder currentLadder = currentRanker.getLadder();
 
@@ -43,7 +39,9 @@ public class RankerService
     }
 
     public Ranker findHighestRankerByAccount(Account account){
-        return rankerRepository.findHighestByAccount(account);
+        List<Ranker> temp = rankerRepository.findHighestByAccount(account);
+        System.out.println(temp);
+        return temp.get(0);
     }
 
     public List<Ranker> findAllRankerForLadder(Ladder ladder){

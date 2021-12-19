@@ -3,6 +3,7 @@ package de.kaliburg.morefair.entity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.UUID;
 @Entity
 @Data
 @NoArgsConstructor
+@RequiredArgsConstructor
 public class Ladder
 {
     @Id
@@ -21,9 +23,9 @@ public class Ladder
     private UUID uuid;
     @NonNull
     private int number;
-    @OneToOne
+    @OneToOne(optional = true)
     private Ladder nextLadder;
-    @OneToOne
+    @OneToOne(optional = true)
     private Ladder pastLadder;
     @OneToMany
     private List<Ranker> rankers = new ArrayList<>();
