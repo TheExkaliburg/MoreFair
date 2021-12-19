@@ -4,7 +4,6 @@ function postJSON(url, data, onLoad = () => {}){
     req.setRequestHeader('Content-Type', 'application/json');
     req.addEventListener("error", err => console.error(err.toString()))
     req.addEventListener("load", (req) => onLoad(req.target));
-    //req.responseType = "json";
     req.send(JSON.stringify(data));
 }
 

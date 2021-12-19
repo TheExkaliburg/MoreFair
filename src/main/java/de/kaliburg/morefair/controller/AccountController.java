@@ -36,12 +36,12 @@ public class AccountController
 
     @GetMapping("/")
     public String getIndex(){
-        // model.addAttribute("users", accountService.getUsers());
         return "less";
     }
 
     @PostMapping(path = "/login", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Account> postLogin(@RequestBody UUID uuid){
+        log.debug("POST /login" + uuid);
         Account account = accountService.findAccountByUUID(uuid);
         if(account == null) return new ResponseEntity<>(accountService.createNewAccount(), HttpStatus.CREATED);
 
@@ -50,9 +50,8 @@ public class AccountController
 
     @PostMapping(value = "/ladder", consumes = "application/json", produces = "application/json")
     public ResponseEntity<List<Ranker>> postLadder(@RequestBody UUID uuid){
-        System.out.println(uuid);
+        log.debug("POST /ladder" + uuid);
         Account account = accountService.findAccountByUUID(uuid);
-        System.out.println(account);
         if(account == null) account = accountService.createNewAccount();
 
         return new ResponseEntity<>(rankerService.findAllRankerForHighestLadderAreaForAccount(account), HttpStatus.OK);
@@ -60,6 +59,7 @@ public class AccountController
 
     @GetMapping(value = "/register", produces = "application/json")
     public ResponseEntity<Account> getRegister() {
+        log.debug("GET /register");
         return new ResponseEntity<>(accountService.createNewAccount(), HttpStatus.CREATED);
     }
 

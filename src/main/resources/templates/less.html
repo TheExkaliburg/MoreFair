@@ -28,11 +28,10 @@
 <button class="btn" id="newUser">Click Me</button>
 <script>
     checkCookie()
-    let uuid = getCookie("_uuid");
 
-    getLadder(uuid);
+    getLadder();
     window.setInterval(calculatePoints,1000);
-    window.setInterval(getLadder,10000, uuid);
+    window.setInterval(getLadder,10000, getCookie("_uuid"));
 </script>
 </body>
 </html>

@@ -21,10 +21,10 @@ function getCookie(cname) {
     return "";
 }
 
-function checkCookie() {
+async function checkCookie() {
     let uuid = getCookie("_uuid");
-    if (uuid !== "") {
-        postJSON("/login", uuid, req => {
+    if (uuid !== "" && uuid !== null && uuid !== undefined) {
+        await postJSON("/login", uuid, req => {
             if(req.status === 200 || req.status === 201){
                 uuid = req.response.uuid
             }

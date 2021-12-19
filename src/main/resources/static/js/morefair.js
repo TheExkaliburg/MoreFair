@@ -1,7 +1,7 @@
-let ladder = {data:[], fromPosition: 1};
+let ladder = {data:[{}, {}], fromPosition: 1};
 
 function getLadder(uuid){
-    postJSON('/ladder', uuid, req => {
+    postJSON('/ladder', getCookie("_uuid"), req => {
         ladder.data = req.response;
         reloadLadder();
     });
