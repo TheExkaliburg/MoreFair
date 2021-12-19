@@ -1,5 +1,3 @@
-let ladder = {};
-
 function postJSON(url, data, onLoad = () => {}){
     let req = new XMLHttpRequest();
     req.open('POST', url);
@@ -17,20 +15,4 @@ function getJSON(url, onLoad = () => {}){
     req.addEventListener("load", (req) => onLoad(req.target));
     req.responseType = "json";
     req.send();
-}
-
-function reloadLadder(data){
-    ladder = data;
-    let body = document.getElementById("ladderBody");
-    body.innerHTML = "";
-    data.forEach(item => {
-        let row = body.insertRow();
-        row.insertCell(0).innerHTML = item.position;
-        row.insertCell(1).innerHTML = item.username;
-        row.insertCell(2).innerHTML = item.points;
-    })
-}
-
-function calculatePoints(){
-
 }
