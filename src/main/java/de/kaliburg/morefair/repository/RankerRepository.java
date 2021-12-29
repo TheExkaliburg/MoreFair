@@ -4,8 +4,8 @@ import de.kaliburg.morefair.entity.Account;
 import de.kaliburg.morefair.entity.Ladder;
 import de.kaliburg.morefair.entity.Ranker;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
@@ -20,5 +20,15 @@ public interface RankerRepository extends JpaRepository<Ranker, Long>
     List<Ranker> findHighestByAccount(@Param("account") Account account);
 
     @Query("SELECT r FROM Ranker r WHERE r.ladder = :ladder")
-    List<Ranker> findAllRankerForLadder(@Param("ladder") Ladder ladder);
+    List<Ranker> findAllRankerByLadder(@Param("ladder") Ladder ladder);
+
+    @Query("SELECT COUNT(r) FROM Ranker r WHERE r.ladder = :ladder")
+    Integer countRankerByLadder(@Param("ladder") Ladder ladder);
+
+    @Query("SELECT r FROM Ranker r WHERE r.ladder = :ladder ORDER BY r.points DESC")
+    List<Ranker> findAllRankerByLadderOrderedByPoints(@Param("ladder") Ladder ladder);
+
+    @Modifying(clearAutomatically=true)
+    @Query("UPDATE Ranker r SET r.points = :points, r.power = :power WHERE r.id = :id")
+    void updateRankerStatsById(@Param("id")Long id, @Param("points") Long points, @Param("power") Long power);
 }

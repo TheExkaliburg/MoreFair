@@ -1,9 +1,8 @@
 package de.kaliburg.morefair.entity;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import de.kaliburg.morefair.dto.LadderDTO;
+import lombok.*;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -11,22 +10,30 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Data
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = "uuid")})
+@Getter
+@Setter
+@Accessors(chain = true)
 @NoArgsConstructor
 @RequiredArgsConstructor
-public class Ladder
-{
+public class Ladder {
     @Id
     @GeneratedValue
     private Long id;
     @NonNull
+    @Column(nullable = false)
     private UUID uuid;
     @NonNull
-    private int number;
-    @OneToOne(optional = true)
+    @Column(nullable = false)
+    private Integer number;
+    @OneToOne
     private Ladder nextLadder;
-    @OneToOne(optional = true)
+    @OneToOne
     private Ladder pastLadder;
     @OneToMany
     private List<Ranker> rankers = new ArrayList<>();
+
+    public LadderDTO dto() {
+        return new LadderDTO(this);
+    }
 }

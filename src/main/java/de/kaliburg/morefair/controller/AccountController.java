@@ -1,66 +1,41 @@
 package de.kaliburg.morefair.controller;
 
-import com.google.gson.Gson;
+import de.kaliburg.morefair.dto.AccountDetailsDTO;
 import de.kaliburg.morefair.entity.Account;
-import de.kaliburg.morefair.entity.Ranker;
-import de.kaliburg.morefair.exceptions.InvalidArgumentsException;
 import de.kaliburg.morefair.service.AccountService;
-import de.kaliburg.morefair.service.LadderService;
-import de.kaliburg.morefair.service.RankerService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
 
-import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
 
 @Controller
-@Slf4j
-public class AccountController
-{
+@Log4j2
+public class AccountController {
     private final AccountService accountService;
-    private final LadderService ladderService;
-    private final RankerService rankerService;
 
-    public AccountController(AccountService accountService, LadderService ladderService,
-            RankerService rankerService)
-    {
+    public AccountController(AccountService accountService) {
         this.accountService = accountService;
-        this.ladderService = ladderService;
-        this.rankerService = rankerService;
     }
 
-    @GetMapping("/")
-    public String getIndex(){
-        return "less";
-    }
+    @PostMapping(path = "/fair/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = "application/json")
+    public ResponseEntity<AccountDetailsDTO> postLogin(String uuid, HttpServletRequest request) {
+        log.debug("POST /fair/login {}", uuid);
+        if (uuid.isBlank()) return new ResponseEntity<>(accountService.createNewAccount(), HttpStatus.CREATED);
+        try {
+            Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
+            if (account == null)
+                return new ResponseEntity<>(accountService.createNewAccount(), HttpStatus.CREATED);
 
-    @PostMapping(path = "/login", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Account> postLogin(@RequestBody UUID uuid){
-        log.debug("POST /login" + uuid);
-        Account account = accountService.findAccountByUUID(uuid);
-        if(account == null) return new ResponseEntity<>(accountService.createNewAccount(), HttpStatus.CREATED);
-
-        return new ResponseEntity<>(account, HttpStatus.OK);
-    }
-
-    @PostMapping(value = "/ladder", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<List<Ranker>> postLadder(@RequestBody UUID uuid){
-        log.debug("POST /ladder" + uuid);
-        Account account = accountService.findAccountByUUID(uuid);
-        if(account == null) account = accountService.createNewAccount();
-
-        return new ResponseEntity<>(rankerService.findAllRankerForHighestLadderAreaForAccount(account), HttpStatus.OK);
-    }
-
-    @GetMapping(value = "/register", produces = "application/json")
-    public ResponseEntity<Account> getRegister() {
-        log.debug("GET /register");
-        return new ResponseEntity<>(accountService.createNewAccount(), HttpStatus.CREATED);
+            return new ResponseEntity<>(account.dto(), HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            log.error("Couldn't parse the UUID from {} using 'POST /fair/login {}'", request.getRemoteAddr(), uuid);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
 }

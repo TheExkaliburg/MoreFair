@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Fair Game</title>
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script type="text/javascript" th:src="@{/fair/js/cookie.js}"></script>
+    <script type="text/javascript" th:src="@{/fair/js/morefair.js}"></script>
+</head>
+<body>
+<table size="0.5" class = "table table-striped">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>Username</th>
+        <th>Bias/Multiplier</th>
+        <th>Points</th>
+        <th>Power</th>
+    </tr>
+    </thead>
+    <tbody id="ladderBody">
+    </tbody>
+</table>
+<button class="btn" id="newUser">Click Me</button>
+<script>
+    setup();
+</script>
+</body>
+</html>
