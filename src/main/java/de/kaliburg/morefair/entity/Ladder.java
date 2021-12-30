@@ -1,6 +1,5 @@
 package de.kaliburg.morefair.entity;
 
-import com.sun.istack.NotNull;
 import de.kaliburg.morefair.dto.LadderDTO;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -33,10 +32,10 @@ public class Ladder {
     private Ladder pastLadder;
     @OneToMany
     private List<Ranker> rankers = new ArrayList<>();
-    @NotNull
+    @NonNull
     @Column(nullable = false)
     private Integer size = 0;
-    @NotNull
+    @NonNull
     @Column(nullable = false)
     private Integer growingRankerCount = 0;
 
