@@ -10,6 +10,7 @@ import de.kaliburg.morefair.repository.RankerRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.Random;
 import java.util.UUID;
 
@@ -28,6 +29,13 @@ public class AccountService {
         this.rankerRepository = rankerRepository;
     }
 
+    @PostConstruct
+    public void init() {
+        for (int i = 0; i < 50; i++) {
+            createNewAccount();
+        }
+    }
+
     public AccountDetailsDTO createNewAccount() {
         Account result = new Account(UUID.randomUUID(), "");
         Ladder l1 = ladderRepository.findByNumber(1);
@@ -36,16 +44,23 @@ public class AccountService {
         result = accountRepository.save(result);
         result.setUsername("Mystery Guest " + result.getId());
         result = accountRepository.save(result);
-        rankerRepository.save(ranker);
-        log.info("Created a new Account with the uuid {}", result.getUuid().toString());
-        return result.dto();
-    }
 
-    public String generateNewUsername() {
-        return "Mystery Guest " + random.nextLong(9999999);
+        l1.setSize(l1.getSize() + 1);
+        l1.setGrowingRankerCount(l1.getGrowingRankerCount() + 1);
+        ladderRepository.save(l1);
+
+        rankerRepository.save(ranker);
+
+        log.info("Created a new Account with the uuid {} ({}).", result.getUuid().toString(), result.getId());
+        return result.dto();
     }
 
     public Account findAccountByUUID(UUID uuid) {
         return accountRepository.findByUUID(uuid);
+    }
+    
+    public void updateUsername(Account account, String username) {
+        account.setUsername(username);
+        accountRepository.save(account);
     }
 }

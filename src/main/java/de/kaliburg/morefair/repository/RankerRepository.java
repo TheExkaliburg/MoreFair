@@ -10,13 +10,13 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface RankerRepository extends JpaRepository<Ranker, Long>
-{
+public interface RankerRepository extends JpaRepository<Ranker, Long> {
     @Query("SELECT r FROM Ranker r WHERE r.account = :account")
     List<Ranker> findByAccount(@Param("account") Account account);
 
     // SELECT * from demo t WHERE t.id = (SELECT Max(r.id) as max_id FROM demo r WHERE r.Name = "SQL");
-    @Query("SELECT r FROM Ranker r WHERE r.ladder.number = (SELECT Max(r.ladder.number) FROM Ranker r WHERE r.account = :account)")
+    @Query("SELECT r FROM Ranker r WHERE r.account = :account AND " +
+            "r.ladder.number = (SELECT Max(r.ladder.number) FROM Ranker r WHERE r.account = :account)")
     List<Ranker> findHighestByAccount(@Param("account") Account account);
 
     @Query("SELECT r FROM Ranker r WHERE r.ladder = :ladder")
@@ -28,7 +28,11 @@ public interface RankerRepository extends JpaRepository<Ranker, Long>
     @Query("SELECT r FROM Ranker r WHERE r.ladder = :ladder ORDER BY r.points DESC")
     List<Ranker> findAllRankerByLadderOrderedByPoints(@Param("ladder") Ladder ladder);
 
-    @Modifying(clearAutomatically=true)
-    @Query("UPDATE Ranker r SET r.points = :points, r.power = :power WHERE r.id = :id")
-    void updateRankerStatsById(@Param("id")Long id, @Param("points") Long points, @Param("power") Long power);
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE Ranker r SET r.rank = :rank, r.points = :points, r.power = :power WHERE r.id = :id")
+    void updateRankerStatsById(@Param("id") Long id, @Param("rank") Integer rank, @Param("points") Long points, @Param("power") Long power);
+
+    @Query("SELECT r FROM Ranker r WHERE r.ladder = :ladder AND " +
+            "r.points = (SELECT Max(r.points) FROM Ranker r WHERE r.ladder = :ladder)")
+    List<Ranker> findHighestPointsByLadder(@Param("ladder") Ladder ladder);
 }

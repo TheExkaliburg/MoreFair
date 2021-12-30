@@ -27,7 +27,7 @@ public class Ranker {
     private Long points = 0L;
     @NonNull
     @Column(nullable = false)
-    private Long power = 0L;
+    private Long power = 1L;
     @NonNull
     @Column(nullable = false)
     private Integer bias = 0;

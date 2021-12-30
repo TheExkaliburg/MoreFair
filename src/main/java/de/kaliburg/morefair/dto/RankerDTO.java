@@ -11,6 +11,7 @@ public class RankerDTO {
     private Long power;
     private Integer bias;
     private Integer multiplier;
+    private boolean isYou = false;
 
     public RankerDTO(Ranker ranker) {
         this.username = ranker.getAccount().getUsername();

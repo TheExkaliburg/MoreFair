@@ -25,4 +25,8 @@ public class LadderService {
     public List<Ladder> findAllLadders() {
         return ladderRepository.findAll();
     }
+
+    public void save(Ladder ladder) {
+        ladderRepository.save(ladder);
+    }
 }
