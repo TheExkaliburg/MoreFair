@@ -44,7 +44,8 @@ public class LadderCalculator {
                         Ranker currentRanker = rankers.get(i);
                         if (currentRanker.isGrowing()) {
                             growingRankerCount++;
-                            currentRanker.addPower((i + currentRanker.getBias()) * currentRanker.getMultiplier());
+                            if (currentRanker.getRank() != 1)
+                                currentRanker.addPower((i + currentRanker.getBias()) * currentRanker.getMultiplier());
                             currentRanker.addPoints(currentRanker.getPower());
 
                             for (int j = i - 1; j >= 0; j--) {                                                      //      O(r/2) worst case; probably more of O(1)

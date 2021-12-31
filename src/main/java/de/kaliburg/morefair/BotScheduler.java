@@ -7,6 +7,8 @@ import de.kaliburg.morefair.service.RankerService;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 @EnableScheduling
 public class BotScheduler {
     private final LadderService ladderService;
@@ -22,7 +24,8 @@ public class BotScheduler {
     @Scheduled(initialDelay = 30000, fixedDelay = 5000)
     public void update() {
         DatabaseWriteSemaphore.getInstance().aquireAndAutoReleaseSilent(() -> {
-            if (rankerService.findAllRankerByLadder(ladderService.findAllLadders().get(0)).size() < 50)
+            if (rankerService.findAllRankerByLadder(ladderService.findAllLadders().get(0)).size() < 10
+                    && ThreadLocalRandom.current().nextInt(0, 10) == 0)
                 accountService.createNewAccount();
         });
     }
