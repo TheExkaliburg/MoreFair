@@ -1,1 +1,1 @@
-web: java -jar target/morefair-1.0.jar
+web: java -jar target/morefair-1.0.jar $JAVA_OPTS -Dserver.port=$PORT
