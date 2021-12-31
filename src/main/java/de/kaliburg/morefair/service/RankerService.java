@@ -105,7 +105,7 @@ public class RankerService {
         long cost = Math.round(Math.pow(ranker.getLadder().getNumber() + 1, ranker.getBias()));
         if (ranker.getPoints() >= cost) {
             ranker.setPoints(0L);
-            ranker.setPower(0L);
+            //ranker.setPower(0L);
             ranker.setBias(ranker.getBias() + 1);
             rankerRepository.save(ranker);
             updateRankerRankByLadder(ranker.getLadder());

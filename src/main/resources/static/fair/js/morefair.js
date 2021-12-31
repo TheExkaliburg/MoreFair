@@ -14,8 +14,18 @@ const LADDER_AREA_SIZE = 10;
 let biasButton;
 let multiButton
 
+let numberFormatter;
+
 
 async function setup() {
+    numberFormatter = new numberformat.Formatter({
+        format: 'hybrid',
+        sigfigs: 15,
+        flavor: 'short',
+        minSuffix: 1e15,
+        maxSmall: 0
+    });
+
     biasButton = document.getElementById("biasButton");
     multiButton = document.getElementById("multiButton");
 
@@ -129,7 +139,7 @@ async function reloadLadder(forcedReload = false) {
     }
 
     let biasCost = getCost(yourRanker.bias + 1);
-    biasButton.innerHTML = "+1 Bias<br>(" + biasCost + " Points)"
+    biasButton.innerHTML = "+1 Bias<br>(" + numberFormatter.format(biasCost) + " Points)";
     if (yourRanker.points > biasCost) {
         biasButton.disabled = false;
     } else {
@@ -137,7 +147,7 @@ async function reloadLadder(forcedReload = false) {
     }
 
     let multiCost = getCost(yourRanker.multiplier + 1);
-    multiButton.innerHTML = "+1 Multi<br>(" + multiCost + " Power)"
+    multiButton.innerHTML = "+1 Multi<br>(" + numberFormatter.format(multiCost) + " Power)";
     if (yourRanker.power > multiCost) {
         multiButton.disabled = false;
     } else {
@@ -163,9 +173,9 @@ function writeNewRow(body, ranker) {
     let row = body.insertRow();
     row.insertCell(0).innerHTML = ranker.rank;
     row.insertCell(1).innerHTML = ranker.username;
-    row.insertCell(2).innerHTML = ranker.power;
+    row.insertCell(2).innerHTML = numberFormatter.format(ranker.power);
     row.cells[2].classList.add('text-end');
-    row.insertCell(3).innerHTML = ranker.points;
+    row.insertCell(3).innerHTML = numberFormatter.format(ranker.points);
     row.cells[3].classList.add('text-end');
     if (ranker.you) row.classList.add('table-active');
 }
@@ -208,7 +218,11 @@ async function sortLadder(forcedReload = false) {
 
 function getCost(level) {
     return Math.round(Math.pow(data.currentLadder.number + 1, level));
+}
 
+
+function format(number) {
+    return numberFormatter.format(number);
 }
 
 async function promptNameChange() {

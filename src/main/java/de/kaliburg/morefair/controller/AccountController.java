@@ -5,7 +5,6 @@ import de.kaliburg.morefair.entity.Account;
 import de.kaliburg.morefair.multithreading.DatabaseWriteSemaphore;
 import de.kaliburg.morefair.service.AccountService;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +26,6 @@ public class AccountController {
 
     @PostMapping(path = "/fair/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = "application/json")
     public ResponseEntity<AccountDetailsDTO> postLogin(String uuid, HttpServletRequest request) {
-        uuid = StringEscapeUtils.escapeJava(uuid);
         log.debug("POST /fair/login {}", uuid);
         if (uuid.isBlank()) return new ResponseEntity<>(accountService.createNewAccount(), HttpStatus.CREATED);
         try {
@@ -51,8 +49,6 @@ public class AccountController {
 
     @PutMapping(path = "/fair/account", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = "application/json")
     public ResponseEntity<Void> changeUsername(String uuid, String username) {
-        uuid = StringEscapeUtils.escapeJava(uuid);
-        username = StringEscapeUtils.escapeJava(username);
         log.debug("PUT /fair/account {} {}", uuid, username);
         try {
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));

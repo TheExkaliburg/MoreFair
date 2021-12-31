@@ -2,6 +2,7 @@ package de.kaliburg.morefair.dto;
 
 import de.kaliburg.morefair.entity.Ranker;
 import lombok.Data;
+import org.springframework.web.util.HtmlUtils;
 
 @Data
 public class RankerDTO {
@@ -14,7 +15,7 @@ public class RankerDTO {
     private boolean isYou = false;
 
     public RankerDTO(Ranker ranker) {
-        this.username = ranker.getAccount().getUsername();
+        this.username = HtmlUtils.htmlEscape(ranker.getAccount().getUsername());
         this.rank = ranker.getRank();
         this.points = ranker.getPoints();
         this.power = ranker.getPower();
