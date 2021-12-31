@@ -16,9 +16,10 @@ import java.util.UUID;
 @Accessors(chain = true)
 @NoArgsConstructor
 @RequiredArgsConstructor
+@SequenceGenerator(name = "seq_ladder", sequenceName = "seq_ladder", allocationSize = 1)
 public class Ladder {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_ladder")
     private Long id;
     @NonNull
     @Column(nullable = false)

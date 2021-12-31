@@ -14,10 +14,11 @@ import java.util.UUID;
 @Accessors(chain = true)
 @NoArgsConstructor
 @RequiredArgsConstructor
+@SequenceGenerator(name = "seq_rank", sequenceName = "seq_rank", allocationSize = 1)
 public class Ranker {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_rank")
     private Long id;
     @NonNull
     @Column(nullable = false)

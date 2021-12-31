@@ -162,7 +162,7 @@ function reloadInformation() {
 
     document.getElementById("usernameLink").innerHTML = yourRanker.username;
     document.getElementById("usernameText").innerHTML =
-        " (+" + yourRanker.bias + " | x" + yourRanker.multiplier + ")";
+        "+" + yourRanker.bias + "   x" + yourRanker.multiplier;
 
     document.getElementById("rankerCount").innerHTML =
         "Active Rankers: " + data.currentLadder.growingRankerCount + "/" + data.currentLadder.size;
