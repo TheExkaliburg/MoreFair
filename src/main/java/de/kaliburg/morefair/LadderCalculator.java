@@ -27,12 +27,6 @@ public class LadderCalculator {
         this.accountService = accountService;
     }
 
-    @Scheduled(initialDelay = 1000, fixedDelay = 1000)
-    public void init() {
-        if (rankerService.findAllRankerByLadder(ladderService.findAllLadders().get(0)).size() < 100)
-            accountService.createNewAccount();
-    }
-
     // TODO: Change the algorithm, that it only needs to read from the DB when theres an update to one of the Rankers
     //  That way i would get rid of the O(r log r);
     // O(l * (r log r + (r * r/2) + r)) = O ( l * r * r)

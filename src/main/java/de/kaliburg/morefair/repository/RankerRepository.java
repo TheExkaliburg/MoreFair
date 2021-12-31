@@ -14,10 +14,24 @@ public interface RankerRepository extends JpaRepository<Ranker, Long> {
     @Query("SELECT r FROM Ranker r WHERE r.account = :account")
     List<Ranker> findByAccount(@Param("account") Account account);
 
-    // SELECT * from demo t WHERE t.id = (SELECT Max(r.id) as max_id FROM demo r WHERE r.Name = "SQL");
-    @Query("SELECT r FROM Ranker r WHERE r.account = :account AND " +
-            "r.ladder.number = (SELECT Max(r.ladder.number) FROM Ranker r WHERE r.account = :account)")
-    List<Ranker> findHighestByAccount(@Param("account") Account account);
+    /*  SELECT ranker.* FROM ranker
+        INNER JOIN ladder ON ranker.ladder_id = ladder.id
+        WHERE ranker.account_id = ?
+        GROUP BY ranker.id, ladder.number
+        HAVING ladder.number = (
+	        SELECT  MAX(ladder.number) FROM ranker INNER JOIN ladder
+	        ON ranker.ladder_id = ladder.id
+	        WHERE ranker.account_id = ?);
+     */
+    @Query("SELECT r FROM Ranker r " +
+            "INNER JOIN Ladder l ON r.ladder = l " +
+            "WHERE r.account = :account " +
+            "GROUP BY r.id, l.number " +
+            "HAVING l.number = (" +
+            "   SELECT MAX(l.number) FROM Ranker r " +
+            "   INNER JOIN Ladder l ON r.ladder = l " +
+            "   WHERE r.account = :account)")
+    List<Ranker> findHighestRankerByAccount(@Param("account") Account account);
 
     @Query("SELECT r FROM Ranker r WHERE r.ladder = :ladder")
     List<Ranker> findAllRankerByLadder(@Param("ladder") Ladder ladder);

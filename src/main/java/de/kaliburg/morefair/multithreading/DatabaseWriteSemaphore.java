@@ -33,4 +33,17 @@ public class DatabaseWriteSemaphore {
     public boolean tryAcquire(long timeout, TimeUnit unit) throws InterruptedException {
         return semaphore.tryAcquire(timeout, unit);
     }
+
+    public void aquireAndAutoReleaseSilent(UninteruptableFunction f) {
+        try {
+            this.acquire();
+            try {
+                f.run();
+            } finally {
+                this.release();
+            }
+        } catch (InterruptedException e) {
+
+        }
+    }
 }

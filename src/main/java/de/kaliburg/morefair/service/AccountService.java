@@ -10,7 +10,6 @@ import de.kaliburg.morefair.repository.RankerRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.Random;
 import java.util.UUID;
 
@@ -27,13 +26,6 @@ public class AccountService {
         this.accountRepository = accountRepository;
         this.ladderRepository = ladderRepository;
         this.rankerRepository = rankerRepository;
-    }
-
-    @PostConstruct
-    public void init() {
-        for (int i = 0; i < 50; i++) {
-            createNewAccount();
-        }
     }
 
     public AccountDetailsDTO createNewAccount() {
@@ -58,7 +50,7 @@ public class AccountService {
     public Account findAccountByUUID(UUID uuid) {
         return accountRepository.findByUUID(uuid);
     }
-    
+
     public void updateUsername(Account account, String username) {
         account.setUsername(username);
         accountRepository.save(account);

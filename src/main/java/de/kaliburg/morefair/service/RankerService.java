@@ -43,7 +43,7 @@ public class RankerService {
     }
 
     public Ranker findHighestRankerByAccount(Account account) {
-        List<Ranker> temp = rankerRepository.findHighestByAccount(account);
+        List<Ranker> temp = rankerRepository.findHighestRankerByAccount(account);
 
         assert (temp.size() == 1);
 
