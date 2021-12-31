@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 @Slf4j
-public class MoreController {
-    @GetMapping("/fair")
-    public String getIndex(){
+public class FairController {
+    @GetMapping("/")
+    public String getIndex() {
         return "fair";
     }
 }

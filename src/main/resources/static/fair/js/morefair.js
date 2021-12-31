@@ -139,7 +139,7 @@ async function reloadLadder(forcedReload = false) {
     }
 
     let biasCost = getCost(yourRanker.bias + 1);
-    biasButton.innerHTML = "+1 Bias<br>(" + numberFormatter.format(biasCost) + " Points)";
+    biasButton.innerHTML = "+1 Bias<br>(" + numberFormatter.format(biasCost) + ")";
     if (yourRanker.points > biasCost) {
         biasButton.disabled = false;
     } else {
@@ -147,7 +147,7 @@ async function reloadLadder(forcedReload = false) {
     }
 
     let multiCost = getCost(yourRanker.multiplier + 1);
-    multiButton.innerHTML = "+1 Multi<br>(" + numberFormatter.format(multiCost) + " Power)";
+    multiButton.innerHTML = "+1 Multi<br>(" + numberFormatter.format(multiCost) + ")";
     if (yourRanker.power > multiCost) {
         multiButton.disabled = false;
     } else {
@@ -227,7 +227,7 @@ function format(number) {
 
 async function promptNameChange() {
     let newUsername = window.prompt("What shall be your new name?", yourRanker.username);
-    if (newUsername !== yourRanker.username) {
+    if (newUsername !== yourRanker.username && (newUsername)) {
         try {
             const response = await axios.put('/fair/account', new URLSearchParams({
                 uuid: getCookie("_uuid"),
