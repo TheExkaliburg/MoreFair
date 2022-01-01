@@ -21,12 +21,12 @@
 </head>
 <script>
     $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
+        $('[data-toggle="tooltip"]').tooltip();
     })
 </script>
 <body>
-<div class="m-1" style="overflow-y: auto; overflow-x: auto">
-    <table class="table table-sm caption-top table-borderless">
+<div class="m-2" style="overflow-y: auto; overflow-x:hidden; border: 1px solid red">
+    <table class="table table-sm caption-top table-borderless" style="border: 0px solid yellow">
         <caption>
             <nav class="navbar navbar-light bg-light" style="border: 0px solid green">
                 <div class="container-fluid" style="border: 0px solid yellow">
@@ -53,18 +53,50 @@
         <tbody class="" id="ladderBody">
         </tbody>
     </table>
+    <div class="container-fluid"></div>
+    <div class="container-fluid" style="height:30vh; border: 1px solid black ;overflow-y:auto; overflow-x: hidden">
+        <table class="table table-sm table-borderless"
+               style="border: 0px solid red; table-layout: fixed">
+            <thead>
+            <tr>
+                <th class="col-2"></th>
+                <th class="col-10"></th>
+            </tr>
+            </thead>
+            <tbody class="" id="MessageBody" style="border: 0px solid yellow">
+            <tr>
+                <td>Username:</td>
+                <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque et feugiat odio. Quisque vitae
+                    dolor
+                    finibus, tempor felis at, sagittis elit. Sed velit justo, rutrum et nibh sed, dignissim fringilla
+                    eros. Orci
+                    varius natoque penatibus et magnis dis parturient montes.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<nav class="navbar navbar-light bg-light fixed-bottom">
-    <div class="container-fluid">
-    </div>
-    <div class="container-fluid">
+<a aria-controls="offcanvasExample" class="btn btn-primary" data-bs-toggle="offcanvas" href="#offcanvasExample"
+   role="button">
+    Link with href
+</a>
+<button aria-controls="offcanvasExample" class="btn btn-primary" data-bs-target="#offcanvasExample"
+        data-bs-toggle="offcanvas"
+        type="button">
+    Button with data-bs-target
+</button>
+
+<nav class="navbar navbar-light bg-light fixed-bottom container-fluid">
+    <div class="container-fluid" style="border: 0px solid red">
         <form class="col-9">
             <div class="input-group">
                 <span class="input-group-text" id="basic-addon1">
                      <a class=link-secondary href="#" id="usernameLink" onclick="promptNameChange()"></a>
                 </span>
                 <input aria-describedby="basic-addon1" aria-label="Username" class="form-control shadow-none"
+                       maxlength="512"
                        placeholder="Chad is listening..."
                        type="text">
                 <button class="btn btn-primary shadow-none" type="submit">Send</button>
@@ -81,7 +113,6 @@
                 +1 Bias
             </button>
         </div>
-
     </div>
 </nav>
 <script>

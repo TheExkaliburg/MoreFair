@@ -1,4 +1,4 @@
-let rankerTemplate = {username: "", points: 0, power: 0, bias: 0, multiplier: 0, you: true}
+let rankerTemplate = {username: "", points: 0, power: 0, bias: 0, multiplier: 0, you: false}
 let ladderData = {
     rankers: [rankerTemplate],
     currentLadder: {number: 0, size: 1, growingRankerCount: 1},
@@ -69,8 +69,8 @@ async function buyBias() {
         try {
             const response = await axios.post('/fair/ranker/bias', new URLSearchParams({uuid: getCookie("_uuid")}));
             if (response.status === 200) {
-                updateSteps = UPDATE_STEPS_BEFORE_SYNC;
-                // await reloadLadder();
+                updateSteps = 0;
+                await getLadder();
             }
         } catch (err) {
             if (err.response.status === 403) {
@@ -91,8 +91,8 @@ async function buyMulti() {
         try {
             const response = await axios.post('/fair/ranker/multiplier', new URLSearchParams({uuid: getCookie("_uuid")}));
             if (response.status === 200) {
-                updateSteps = UPDATE_STEPS_BEFORE_SYNC;
-                // await reloadLadder();
+                updateSteps = 0;
+                await getLadder();
             }
         } catch (err) {
             if (err.response.status === 403) {
@@ -150,6 +150,12 @@ async function reloadLadder(forcedReload = false) {
         if ((ranker.rank >= startRank && ranker.rank <= endRank)) writeNewRow(body, ranker);
     }
 
+    // if we dont have enough Ranker yet, fill the table with filler rows
+    for (let i = body.rows.length; i < 10; i++) {
+        writeNewRow(body, rankerTemplate);
+        body.rows[i].style.visibility = 'hidden';
+    }
+
     let biasCost = getCost(yourRanker.bias + 1);
     //biasButton.innerHTML = "+1 Bias<br>(" + numberFormatter.format(biasCost) + ")";
     if (yourRanker.points > biasCost) {
@@ -185,6 +191,7 @@ function writeNewRow(body, ranker) {
     let row = body.insertRow();
     row.insertCell(0).innerHTML = ranker.rank;
     row.insertCell(1).innerHTML = ranker.username;
+    row.cells[1].style.overflow = "hidden";
     row.insertCell(2).innerHTML = numberFormatter.format(ranker.power);
     row.cells[2].classList.add('text-end');
     row.insertCell(3).innerHTML = numberFormatter.format(ranker.points);
@@ -238,15 +245,22 @@ function format(number) {
 }
 
 async function promptNameChange() {
-    let newUsername = window.prompt("What shall be your new name?", yourRanker.username);
-    if (newUsername !== yourRanker.username && (newUsername)) {
+    let newUsername = window.prompt("What shall be your new name? (max. 64 characters)", yourRanker.username);
+    if (newUsername && newUsername.length > 64) {
+        let temp = newUsername.substring(0, 64);
+        alert('The maximum number of characters in your username is 64, not ' + newUsername.length + '!');
+        newUsername = temp;
+    }
+
+    if (newUsername && newUsername !== yourRanker.username) {
         try {
             const response = await axios.put('/fair/account', new URLSearchParams({
                 uuid: getCookie("_uuid"),
                 username: newUsername
             }));
             if (response.status === 200) {
-                updateSteps = UPDATE_STEPS_BEFORE_SYNC;
+                updateSteps = 0;
+                await getLadder();
             }
         } catch (err) {
             if (err.response.status === 403) {
