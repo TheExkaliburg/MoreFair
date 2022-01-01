@@ -1,5 +1,5 @@
 package de.kaliburg.morefair.multithreading;
 
 public interface UninteruptableFunction {
-    void run();
+    void run(Object... params);
 }

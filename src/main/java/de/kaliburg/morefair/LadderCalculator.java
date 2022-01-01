@@ -33,44 +33,42 @@ public class LadderCalculator {
     @Scheduled(fixedRate = 1000)
     public void calc() {
         List<Ladder> ladders = ladderService.findAllLadders();
-        for (Ladder ladder : ladders) {                                                                 //O(l)
-            try {
-                DatabaseWriteSemaphore.getInstance().acquire();
-                try {
-                    // Read from DB here
-                    List<Ranker> rankers = rankerService.findAllRankerByLadderOrderedByPoints(ladder);          //  O(r log r)
-                    int growingRankerCount = 0;
-                    for (int i = 0; i < rankers.size(); i++) {                                                      //  O(r)
-                        Ranker currentRanker = rankers.get(i);
-                        if (currentRanker.isGrowing()) {
-                            growingRankerCount++;
-                            if (currentRanker.getRank() != 1)
-                                currentRanker.addPower((i + currentRanker.getBias()) * currentRanker.getMultiplier());
-                            currentRanker.addPoints(currentRanker.getPower());
+        for (Ladder ladder : ladders) {        //O(l)
+            DatabaseWriteSemaphore.getInstance().aquireAndAutoReleaseSilent(() -> {
+                // Read from DB here
+                List<Ranker> rankers = rankerService.findAllRankerByLadderOrderedByPoints(ladder);          //  O(r log r)
+                int growingRankerCount = 0;
+                for (int i = 0; i < rankers.size(); i++) {                                                      //  O(r)
+                    Ranker currentRanker = rankers.get(i);
+                    // if the ranker is currently still on the ladder
+                    if (currentRanker.isGrowing()) {
+                        growingRankerCount++;
 
-                            for (int j = i - 1; j >= 0; j--) {                                                      //      O(r/2) worst case; probably more of O(1)
-                                // If one of the already calculated Rankers have less points than this ranker
-                                // swap these in the list... This way we keep the list sorted, theoretically
-                                if (currentRanker.getPoints() > rankers.get(j).getPoints()) {
-                                    rankers.set(j + 1, rankers.get(j));
-                                    rankers.get(j + 1).setRank(j + 2);
-                                    currentRanker.setRank(j + 1);
-                                    rankers.set(j, currentRanker);
-                                } else {
-                                    break;
-                                }
+                        // Calculating points & Power
+                        if (currentRanker.getRank() != 1)
+                            currentRanker.addPower((i + currentRanker.getBias()) * currentRanker.getMultiplier());
+                        currentRanker.addPoints(currentRanker.getPower());
+
+
+                        for (int j = i - 1; j >= 0; j--) {                                                      //      O(r/2) worst case; probably more of O(1)
+                            // If one of the already calculated Rankers have less points than this ranker
+                            // swap these in the list... This way we keep the list sorted, theoretically
+                            if (currentRanker.getPoints() > rankers.get(j).getPoints()) {
+                                rankers.set(j + 1, rankers.get(j));
+                                rankers.get(j + 1).setRank(j + 2);
+                                currentRanker.setRank(j + 1);
+                                rankers.set(j, currentRanker);
+                            } else {
+                                break;
                             }
                         }
                     }
-                    // Write to database here
-                    rankerService.updateAllRankerStats(rankers);
-                    ladderService.save(ladder.setSize(rankers.size()).setGrowingRankerCount(growingRankerCount));
-                } finally {
-                    DatabaseWriteSemaphore.getInstance().release();
                 }
-            } catch (InterruptedException ignored) {
-
-            }
+                // Write to database here
+                rankerService.updateAllRankerStats(rankers);
+                ladderService.save(ladder.setSize(rankers.size()).setGrowingRankerCount(growingRankerCount));
+            });
         }
     }
 }
+

@@ -46,4 +46,17 @@ public class DatabaseWriteSemaphore {
 
         }
     }
+
+    public void aquireAndAutoReleaseSilent(UninteruptableFunctionVoid f) {
+        try {
+            this.acquire();
+            try {
+                f.run();
+            } finally {
+                this.release();
+            }
+        } catch (InterruptedException e) {
+
+        }
+    }
 }
