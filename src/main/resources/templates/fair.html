@@ -80,29 +80,25 @@
 
 <nav class="navbar navbar-light bg-light fixed-bottom container-fluid">
     <div class="container-fluid" style="border: 0px solid red">
-        <form class="col-9">
-            <div class="input-group">
+        <div class="input-group">
                 <span class="input-group-text" id="basic-addon1">
                      <a class=link-secondary href="#" id="usernameLink" onclick="promptNameChange()"></a>
                 </span>
-                <input aria-describedby="basic-addon1" aria-label="Username" class="form-control shadow-none"
-                       maxlength="512"
-                       placeholder="Chad is listening..."
-                       type="text">
-                <button class="btn btn-primary shadow-none" type="submit">Send</button>
-            </div>
-        </form>
+            <input class="form-control shadow-none" id="messageInput" maxlength="280"
+                   placeholder="Chad is listening..." type="text">
+            <button class="btn btn-primary shadow-none" href="#" id="sendButton" onclick="postChat()">Send</button>
+        </div>
         <div class="col-1" data-toggle="tooltip"
              id="multiTooltip">
             <button class="col-12 btn btn-outline-dark btn shadow-none text-center"
-                    id="multiButton">
+                    id="multiButton" onclick="buyMulti()">
                 +1 Multi
             </button>
         </div>
         <div class="col-1" data-toggle="tooltip"
              id="biasTooltip">
             <button class="col-12 btn btn-outline-dark btn shadow-none text-center"
-                    id="biasButton">
+                    id="biasButton" onclick="buyBias()">
                 +1 Bias
             </button>
         </div>

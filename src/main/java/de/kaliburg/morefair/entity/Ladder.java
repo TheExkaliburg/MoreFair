@@ -1,6 +1,8 @@
 package de.kaliburg.morefair.entity;
 
 import de.kaliburg.morefair.dto.LadderDTO;
+import de.kaliburg.morefair.dto.chat.ChatDTO;
+import de.kaliburg.morefair.entity.chat.Message;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -31,7 +33,7 @@ public class Ladder {
     private Ladder nextLadder;
     @OneToOne
     private Ladder pastLadder;
-    @OneToMany
+    @OneToMany(mappedBy = "ladder", fetch = FetchType.LAZY)
     private List<Ranker> rankers = new ArrayList<>();
     @NonNull
     @Column(nullable = false)
@@ -39,8 +41,14 @@ public class Ladder {
     @NonNull
     @Column(nullable = false)
     private Integer growingRankerCount = 0;
+    @OneToMany(mappedBy = "ladder", fetch = FetchType.LAZY)
+    private List<Message> messages = new ArrayList<>();
 
-    public LadderDTO dto() {
+    public LadderDTO convertToLadderDTO() {
         return new LadderDTO(this);
+    }
+
+    public ChatDTO convertToChatDTO() {
+        return new ChatDTO(this);
     }
 }

@@ -26,6 +26,6 @@ public class LadderViewDTO {
             this.rankers.add(dto);
             if (ranker.getRank() < startRank) startRank = ranker.getRank();
         }
-        this.currentLadder = currentLadder.dto();
+        this.currentLadder = currentLadder.convertToLadderDTO();
     }
 }

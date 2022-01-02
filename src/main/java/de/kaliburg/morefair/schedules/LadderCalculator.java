@@ -1,4 +1,4 @@
-package de.kaliburg.morefair;
+package de.kaliburg.morefair.schedules;
 
 import de.kaliburg.morefair.entity.Ladder;
 import de.kaliburg.morefair.entity.Ranker;
@@ -30,7 +30,7 @@ public class LadderCalculator {
     // TODO: Change the algorithm, that it only needs to read from the DB when theres an update to one of the Rankers
     //  That way i would get rid of the O(r log r);
     // O(l * (r log r + (r * r/2) + r)) = O ( l * r * r)
-    @Scheduled(fixedRate = 1000)
+    @Scheduled(initialDelay = 15000, fixedRate = 1000)
     public void calc() {
         List<Ladder> ladders = ladderService.findAllLadders();
         for (Ladder ladder : ladders) {        //O(l)

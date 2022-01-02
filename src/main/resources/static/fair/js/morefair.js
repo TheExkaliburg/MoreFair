@@ -12,17 +12,19 @@ let messageTemplate = {
     message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque et feugiat odio. Quisque vitae dolor finibus, tempor felis at, sagittis elit. Sed velit justo, rutrum et nibh sed, dignissim fringilla eros. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nam interdum nisl lorem, et sagittis libero."
 }
 let chatData = {
-    messages: [messageTemplate, messageTemplate, messageTemplate]
+    messages: [messageTemplate, messageTemplate, messageTemplate],
+    currentChatNumber: 1
 }
 
 
-let updateSteps = 0;
-const UPDATE_STEPS_BEFORE_SYNC = 10;
-const SYNC_STEPS_BEFORE_CHAT = 3;
+let updateLadderSteps = 0;
+let updateChatSteps = 0;
+const UPDATE_LADDER_STEPS_BEFORE_SYNC = 10;
+const UPDATE_CHAT_STEPS_BEFORE_SYNC = 10;
 const LADDER_AREA_SIZE = 10;
 
 let biasButton;
-let multiButton
+let multiButton;
 
 let numberFormatter;
 
@@ -36,27 +38,29 @@ async function setup() {
         maxSmall: 0
     });
 
-
     biasButton = document.getElementById("biasButton");
     multiButton = document.getElementById("multiButton");
 
     await checkCookie();
     await getLadder();
-
-    biasButton.addEventListener("click", buyBias)
-
-    multiButton.addEventListener("click", buyMulti)
+    await getChat(ladderData.currentLadder.number);
 
     window.setInterval(update, 1000);
 }
 
 async function update() {
-    updateSteps++;
-    if (updateSteps < UPDATE_STEPS_BEFORE_SYNC) {
+    updateLadderSteps++;
+    if (updateLadderSteps < UPDATE_LADDER_STEPS_BEFORE_SYNC) {
         await calculatePoints();
     } else {
         await getLadder();
-        updateSteps = 0;
+        updateLadderSteps = 0;
+    }
+
+    updateChatSteps++;
+    if (updateChatSteps >= UPDATE_CHAT_STEPS_BEFORE_SYNC) {
+        await getChat(chatData.currentChatNumber);
+        updateChatSteps = 0;
     }
 }
 
@@ -66,9 +70,9 @@ async function buyBias() {
     let cost = getCost(yourRanker.bias + 1);
     if (yourRanker.points > cost) {
         try {
-            const response = await axios.post('/fair/ranker/bias', new URLSearchParams({uuid: getCookie("_uuid")}));
+            const response = await axios.post('/fair/ranker/bias');
             if (response.status === 200) {
-                updateSteps = 0;
+                updateLadderSteps = 0;
                 await getLadder();
             }
         } catch (err) {
@@ -88,9 +92,9 @@ async function buyMulti() {
     let cost = getCost(yourRanker.multiplier + 1);
     if (yourRanker.power > cost) {
         try {
-            const response = await axios.post('/fair/ranker/multiplier', new URLSearchParams({uuid: getCookie("_uuid")}));
+            const response = await axios.post('/fair/ranker/multiplier');
             if (response.status === 200) {
-                updateSteps = 0;
+                updateLadderSteps = 0;
                 await getLadder();
             }
         } catch (err) {
@@ -105,7 +109,7 @@ async function buyMulti() {
 
 async function getLadder(forcedReload = false) {
     try {
-        const response = await axios.get("/fair/ranker?uuid=" + getCookie("_uuid"));
+        const response = await axios.get("/fair/ranker");
         ladderData = response.data;
         yourRanker = ladderData.rankers.filter(r => {
             return r.you === true;
@@ -137,7 +141,7 @@ async function reloadLadder(forcedReload = false) {
 
     if (!forcedReload && (ladderData.rankers[0].rank > startRank || ladderData.rankers[ladderData.rankers.length - 1].rank < endRank)) {
         await getLadder(true)
-        updateSteps = 0;
+        updateLadderSteps = 0;
         return;
     }
 
@@ -229,7 +233,7 @@ async function sortLadder(forcedReload = false) {
     // then force reloading
     if (!forcedReload && ladderData.rankers[0].points > ladderData.firstRanker.points) {
         await getLadder(true)
-        updateSteps = 0;
+        updateLadderSteps = 0;
     }
 }
 
@@ -253,11 +257,10 @@ async function promptNameChange() {
     if (newUsername && newUsername !== yourRanker.username) {
         try {
             const response = await axios.put('/fair/account', new URLSearchParams({
-                uuid: getCookie("_uuid"),
                 username: newUsername
             }));
             if (response.status === 200) {
-                updateSteps = 0;
+                updateLadderSteps = 0;
                 await getLadder();
             }
         } catch (err) {
@@ -272,11 +275,26 @@ async function promptNameChange() {
 
 async function getChat(ladderNum) {
     try {
-        const response = await axios.get("/fair/chat", new URLSearchParams({
-            uuid: getCookie("_uuid"),
-            ladder: ladderNum
-        }));
+        const response = await axios.get("/fair/chat?ladder=" + ladderNum);
 
+        if (response.status === 200) {
+            chatData = response.data;
+        }
+    } catch (err) {
+
+    }
+
+
+}
+
+async function postChat() {
+
+    let message = $('#messageInput');
+    try {
+        const response = await axios.post('/fair/chat', new URLSearchParams({
+            ladder: chatData.currentChatNumber,
+            message: message.value
+        }));
         if (response.status === 200) {
             chatData = response.data;
         }
@@ -284,4 +302,5 @@ async function getChat(ladderNum) {
     } catch (err) {
 
     }
+    message.val("");
 }

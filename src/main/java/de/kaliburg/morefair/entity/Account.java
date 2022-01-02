@@ -17,8 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @SequenceGenerator(name = "seq_acc", sequenceName = "seq_acc", allocationSize = 1)
-public class Account
-{
+public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_acc")
     private Long id;
@@ -28,10 +27,10 @@ public class Account
     @NonNull
     @Column(nullable = false)
     private String username;
-    @OneToMany
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
     private List<Ranker> rankers = new ArrayList<>();
 
-    public AccountDetailsDTO dto(){
+    public AccountDetailsDTO dto() {
         return new AccountDetailsDTO(this);
     }
 }

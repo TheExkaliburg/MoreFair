@@ -37,10 +37,12 @@ public class Ranker {
     private Integer multiplier = 1;
     private boolean isGrowing = true;
     @NonNull
-    @ManyToOne(optional = false)
+    @ManyToOne
+    @JoinColumn(name = "ladder_id", nullable = false)
     private Ladder ladder;
     @NonNull
-    @ManyToOne(optional = false)
+    @ManyToOne
+    @JoinColumn(name = "account_id", nullable = false)
     private Account account;
     @NonNull
     @Column(nullable = false)

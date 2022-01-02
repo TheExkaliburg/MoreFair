@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
@@ -48,7 +49,7 @@ public class AccountController {
     }
 
     @PutMapping(path = "/fair/account", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = "application/json")
-    public ResponseEntity<Void> changeUsername(String uuid, String username) {
+    public ResponseEntity<Void> changeUsername(String username, @CookieValue(name = "_uuid", defaultValue = "") String uuid) {
         log.debug("PUT /fair/account {} {}", uuid, username);
         try {
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));

@@ -11,9 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
@@ -30,9 +30,9 @@ public class RankerController {
     }
 
     @GetMapping(value = "/fair/ranker", produces = "application/json")
-    public ResponseEntity<LadderViewDTO> postLadder(@RequestParam String uuid, HttpServletRequest request) {
+    public ResponseEntity<LadderViewDTO> getLadder(@CookieValue(name = "_uuid", defaultValue = "") String uuid, HttpServletRequest request) {
         uuid = StringEscapeUtils.escapeJava(uuid);
-        log.debug("GET /fair/rankers?uuid={}", uuid);
+        log.debug("GET /fair/rankers from {}", uuid);
         try {
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -43,10 +43,10 @@ public class RankerController {
         }
     }
 
-    @PostMapping(value = "/fair/ranker/bias", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = "application/json")
-    public ResponseEntity<Void> buyBias(String uuid, HttpServletRequest request) {
+    @PostMapping(value = "/fair/ranker/bias", produces = "application/json")
+    public ResponseEntity<Void> buyBias(@CookieValue(name = "_uuid", defaultValue = "") String uuid, HttpServletRequest request) {
         uuid = StringEscapeUtils.escapeJava(uuid);
-        log.debug("POST /fair/ranker/buy from {}", uuid);
+        log.info("POST /fair/ranker/buy from {}", uuid);
         try {
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -70,7 +70,7 @@ public class RankerController {
     }
 
     @PostMapping(value = "/fair/ranker/multiplier", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = "application/json")
-    public ResponseEntity<Void> buyMulti(String uuid, HttpServletRequest request) {
+    public ResponseEntity<Void> buyMulti(@CookieValue(name = "_uuid", defaultValue = "") String uuid, HttpServletRequest request) {
         uuid = StringEscapeUtils.escapeJava(uuid);
         log.debug("POST /fair/ranker/multiplier from {}", uuid);
         try {

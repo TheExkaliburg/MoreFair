@@ -18,8 +18,9 @@ public class LadderService {
 
     @PostConstruct
     public void init() {
-        if (ladderRepository.findByNumber(1) == null)
+        if (ladderRepository.findByNumber(1) == null) {
             ladderRepository.save(new Ladder(UUID.randomUUID(), 1));
+        }
     }
 
     public List<Ladder> findAllLadders() {

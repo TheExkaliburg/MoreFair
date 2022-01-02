@@ -1,4 +1,4 @@
-package de.kaliburg.morefair;
+package de.kaliburg.morefair.schedules;
 
 import de.kaliburg.morefair.multithreading.DatabaseWriteSemaphore;
 import de.kaliburg.morefair.service.AccountService;
