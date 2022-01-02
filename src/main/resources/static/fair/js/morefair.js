@@ -36,16 +36,15 @@ async function setup() {
         maxSmall: 0
     });
 
+
     biasButton = document.getElementById("biasButton");
     multiButton = document.getElementById("multiButton");
 
     await checkCookie();
     await getLadder();
 
-    //biasButton.innerHTML = "+1 Bias<br>(2 Points)"
     biasButton.addEventListener("click", buyBias)
 
-    //multiButton.innerHTML = "+1 Multi<br>(4 Power)"
     multiButton.addEventListener("click", buyMulti)
 
     window.setInterval(update, 1000);
@@ -63,7 +62,7 @@ async function update() {
 
 async function buyBias() {
     biasButton.disabled = true;
-    $('#buyButtonGroup').tooltip('hide');
+    $('#biasTooltip').tooltip('hide');
     let cost = getCost(yourRanker.bias + 1);
     if (yourRanker.points > cost) {
         try {
@@ -85,7 +84,7 @@ async function buyBias() {
 
 async function buyMulti() {
     multiButton.disabled = true;
-    $('#buyButtonGroup').tooltip('hide');
+    $('#biasButton').tooltip('hide');
     let cost = getCost(yourRanker.multiplier + 1);
     if (yourRanker.power > cost) {
         try {
@@ -157,20 +156,19 @@ async function reloadLadder(forcedReload = false) {
     }
 
     let biasCost = getCost(yourRanker.bias + 1);
-    //biasButton.innerHTML = "+1 Bias<br>(" + numberFormatter.format(biasCost) + ")";
     if (yourRanker.points > biasCost) {
         biasButton.disabled = false;
     } else {
         biasButton.disabled = true;
     }
     let multiCost = getCost(yourRanker.multiplier + 1);
-    //multiButton.innerHTML = "+1 Multi<br>(" + numberFormatter.format(multiCost) + ")";
     if (yourRanker.power > multiCost) {
         multiButton.disabled = false;
     } else {
         multiButton.disabled = true;
     }
-    $('#buyButtonGroup').attr('data-original-title', 'Multi: ' + numberFormatter.format(multiCost) + "<br>Bias: " + numberFormatter.format(biasCost));
+    $('#biasTooltip').attr('data-bs-original-title', numberFormatter.format(biasCost) + ' Points');
+    $('#multiTooltip').attr('data-bs-original-title', numberFormatter.format(multiCost) + ' Power');
 }
 
 function reloadInformation() {
