@@ -8,7 +8,6 @@ import de.kaliburg.morefair.service.RankerService;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -69,7 +68,7 @@ public class RankerController {
         }
     }
 
-    @PostMapping(value = "/fair/ranker/multiplier", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = "application/json")
+    @PostMapping(value = "/fair/ranker/multiplier", produces = "application/json")
     public ResponseEntity<Void> buyMulti(@CookieValue(name = "_uuid", defaultValue = "") String uuid, HttpServletRequest request) {
         uuid = StringEscapeUtils.escapeJava(uuid);
         log.debug("POST /fair/ranker/multiplier from {}", uuid);

@@ -7,14 +7,12 @@ import org.springframework.web.util.HtmlUtils;
 import org.springframework.web.util.JavaScriptUtils;
 
 @Data
-public class MessageDTO
-{
+public class MessageDTO {
     private final String message;
     private final String username;
 
-    public MessageDTO(Message message)
-    {
-        this.message = HtmlUtils.htmlEscape(JavaScriptUtils.javaScriptEscape(message.getMessage()));
+    public MessageDTO(Message message) {
+        this.message = HtmlUtils.htmlEscape(JavaScriptUtils.javaScriptEscape(StringEscapeUtils.unescapeJava(message.getMessage())));
         this.username = HtmlUtils.htmlEscape(JavaScriptUtils.javaScriptEscape(
                 StringEscapeUtils.unescapeJava(message.getAccount().getUsername())));
     }

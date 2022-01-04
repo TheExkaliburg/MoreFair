@@ -1,7 +1,7 @@
 function setCookie(cName, cValue, expDays) {
     const d = new Date();
-    d.setTime(d.getTime() + (expDays*24*60*60*1000));
-    let expires = "expires="+ d.toUTCString();
+    d.setTime(d.getTime() + (expDays * 24 * 60 * 60 * 1000));
+    let expires = "expires=" + d.toUTCString();
     document.cookie = cName + "=" + cValue + ";" + expires + ";path=/";
 }
 
@@ -9,7 +9,7 @@ function getCookie(cname) {
     let name = cname + "=";
     let decodedCookie = decodeURIComponent(document.cookie);
     let ca = decodedCookie.split(';');
-    for(let i = 0; i <ca.length; i++) {
+    for (let i = 0; i < ca.length; i++) {
         let c = ca[i];
         while (c.charAt(0) === ' ') {
             c = c.substring(1);
@@ -23,11 +23,11 @@ function getCookie(cname) {
 
 async function checkCookie() {
     let uuid = getCookie("_uuid");
-    try{
-        const response = await axios.post('/fair/login', new URLSearchParams({uuid: uuid}));
+    try {
+        const response = await axios.post('/fair/loginc', new URLSearchParams({uuid: uuid}));
         uuid = response.data.uuid;
         setCookie("_uuid", uuid, 365 * 5);
-    }catch(err){
+    } catch (err) {
         console.error(err)
     }
 }

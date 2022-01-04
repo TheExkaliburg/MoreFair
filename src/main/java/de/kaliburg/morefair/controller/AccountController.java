@@ -48,7 +48,7 @@ public class AccountController {
         }
     }
 
-    @PostMapping(path = "/fair/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = "application/json")
+    @PostMapping(path = "/fair/loginc", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = "application/json")
     public ResponseEntity<AccountDetailsDTO> postLogin(String uuid, HttpServletRequest request) {
         log.debug("POST /fair/login {}", uuid);
         if (uuid.isBlank()) {
