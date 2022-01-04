@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Fair Game</title>
-    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" rel="stylesheet">
+    <link crossorigin="anonymous"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+          rel="stylesheet">
     <link th:src="@{/fair/styles/style.css}">
     <script crossorigin="anonymous"
             integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
@@ -24,8 +26,8 @@
         setup();
     });
 </script>
-<body>
-<div class="m-2" style="overflow-y: auto; overflow-x:hidden; border: 0px solid red">
+<body style="overflow-y: hidden">
+<div class="m-1" style="overflow-y: hidden; overflow-x:hidden; border: 0px solid red">
     <table class="table table-sm caption-top table-borderless" style="border: 0px solid yellow">
         <caption>
             <nav class="navbar navbar-light bg-light" style="border: 0px solid green">
@@ -54,7 +56,8 @@
         </tbody>
     </table>
     <div class="container-fluid"></div>
-    <div class="container-fluid" style="height:30vh; border: 1px solid black ;overflow-y:auto; overflow-x: hidden">
+    <div class="container-fluid"
+         style="height:50vh; border: 0px solid black ;overflow-y:auto; overflow-x: hidden">
         <table class="table table-sm table-borderless"
                style="border: 0px solid red; table-layout: fixed">
             <thead>
@@ -63,16 +66,7 @@
                 <th class="col-10"></th>
             </tr>
             </thead>
-            <tbody class="" id="MessageBody" style="border: 0px solid yellow">
-            <tr>
-                <td>Username:</td>
-                <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque et feugiat odio. Quisque vitae
-                    dolor
-                    finibus, tempor felis at, sagittis elit. Sed velit justo, rutrum et nibh sed, dignissim fringilla
-                    eros. Orci
-                    varius natoque penatibus et magnis dis parturient montes.
-                </td>
-            </tr>
+            <tbody class="" id="messagesBody" style="border: 0px solid yellow">
             </tbody>
         </table>
     </div>
@@ -80,13 +74,18 @@
 
 <nav class="navbar navbar-light bg-light fixed-bottom container-fluid">
     <div class="container-fluid" style="border: 0px solid red">
-        <div class="input-group">
+        <div class="col-9">
+            <div class="input-group">
                 <span class="input-group-text" id="basic-addon1">
-                     <a class=link-secondary href="#" id="usernameLink" onclick="promptNameChange()"></a>
+                     <a class=link-secondary href="#" id="usernameLink"
+                        onclick="promptNameChange()"></a>
                 </span>
-            <input class="form-control shadow-none" id="messageInput" maxlength="280"
-                   placeholder="Chad is listening..." type="text">
-            <button class="btn btn-primary shadow-none" href="#" id="sendButton" onclick="postChat()">Send</button>
+                <input class="form-control shadow-none" id="messageInput" maxlength="280"
+                       placeholder="Chad is listening..." type="text">
+                <button class="btn btn-primary shadow-none" href="#" id="sendButton"
+                        onclick="postChat()">Send
+                </button>
+            </div>
         </div>
         <div class="col-1" data-toggle="tooltip"
              id="multiTooltip">
@@ -102,12 +101,14 @@
                 +1 Bias
             </button>
         </div>
-        <button aria-controls="offcanvasNavbar" class="navbar-toggler" data-bs-target="#offcanvasNavbar"
+        <button aria-controls="offcanvasNavbar" class="navbar-toggler"
+                data-bs-target="#offcanvasNavbar"
                 data-bs-toggle="offcanvas"
-                type="button">
+                type="button col">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div aria-labelledby="offcanvasNavbarLabel" class="offcanvas offcanvas-end" id="offcanvasNavbar" tabindex="-1">
+        <div aria-labelledby="offcanvasNavbarLabel" class="offcanvas offcanvas-end"
+             id="offcanvasNavbar" tabindex="-1">
             <div class="offcanvas-header">
                 <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Offcanvas</h5>
                 <button aria-label="Close" class="btn-close text-reset" data-bs-dismiss="offcanvas"
@@ -122,7 +123,8 @@
                         <a class="nav-link" href="#">Link</a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"
+                        <a aria-expanded="false" class="nav-link dropdown-toggle"
+                           data-bs-toggle="dropdown" href="#"
                            id="offcanvasNavbarDropdown" role="button">
                             Dropdown
                         </a>
@@ -137,7 +139,8 @@
                     </li>
                 </ul>
                 <form class="d-flex">
-                    <input aria-label="Search" class="form-control me-2" placeholder="Search" type="search">
+                    <input aria-label="Search" class="form-control me-2" placeholder="Search"
+                           type="search">
                     <button class="btn btn-outline-success" type="submit">Search</button>
                 </form>
             </div>

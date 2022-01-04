@@ -21,7 +21,10 @@ public class ChatService {
     }
 
     public ChatDTO getChat(int ladderNum) {
-        return ladderRepository.findByNumber(ladderNum).convertToChatDTO();
+        Ladder ladder = ladderRepository.findByNumber(ladderNum);
+        ladder.setMessages(messageRepository.findTop30ByLadderOrderByCreatedOnDesc(ladder));
+
+        return ladder.convertToChatDTO();
     }
 
     public void writeMessage(Account account, Integer ladderNum, String messageString) {

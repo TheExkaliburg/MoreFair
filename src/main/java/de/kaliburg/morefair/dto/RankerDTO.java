@@ -2,20 +2,25 @@ package de.kaliburg.morefair.dto;
 
 import de.kaliburg.morefair.entity.Ranker;
 import lombok.Data;
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.web.util.HtmlUtils;
+import org.springframework.web.util.JavaScriptUtils;
 
 @Data
-public class RankerDTO {
-    private String username;
-    private Integer rank;
+public class RankerDTO
+{
+    private Integer bias;
+    private boolean isYou = false;
+    private Integer multiplier;
     private Long points;
     private Long power;
-    private Integer bias;
-    private Integer multiplier;
-    private boolean isYou = false;
+    private Integer rank;
+    private String username;
 
-    public RankerDTO(Ranker ranker) {
-        this.username = HtmlUtils.htmlEscape(ranker.getAccount().getUsername());
+    public RankerDTO(Ranker ranker)
+    {
+        this.username = HtmlUtils.htmlEscape(JavaScriptUtils.javaScriptEscape(
+                StringEscapeUtils.unescapeJava(ranker.getAccount().getUsername())));
         this.rank = ranker.getRank();
         this.points = ranker.getPoints();
         this.power = ranker.getPower();

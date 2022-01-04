@@ -16,6 +16,7 @@ public class ChatDTO {
         currentChatNumber = ladder.getNumber();
         List<Message> sortedMessages = ladder.getMessages();
         sortedMessages.sort((o1, o2) -> o2.getCreatedOn().compareTo(o1.getCreatedOn()));
+        sortedMessages = sortedMessages.subList(0, Math.min(30, sortedMessages.size()));
         for (Message m : sortedMessages) {
             messages.add(m.dto());
         }

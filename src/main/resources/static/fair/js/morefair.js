@@ -20,7 +20,7 @@ let chatData = {
 let updateLadderSteps = 0;
 let updateChatSteps = 0;
 const UPDATE_LADDER_STEPS_BEFORE_SYNC = 10;
-const UPDATE_CHAT_STEPS_BEFORE_SYNC = 10;
+const UPDATE_CHAT_STEPS_BEFORE_SYNC = 30;
 const LADDER_AREA_SIZE = 10;
 
 let biasButton;
@@ -38,8 +38,17 @@ async function setup() {
         maxSmall: 0
     });
 
-    biasButton = document.getElementById("biasButton");
-    multiButton = document.getElementById("multiButton");
+    biasButton = $('#biasButton')[0];
+    multiButton = $('#multiButton')[0];
+
+    $('#messageInput')[0].addEventListener("keyup", event => {
+        if (event.key === "Enter") {
+            // Cancel the default action, if needed
+            event.preventDefault();
+            // Trigger the button element with a click
+            postChat();
+        }
+    });
 
     await checkCookie();
     await getLadder();
@@ -247,10 +256,10 @@ function format(number) {
 }
 
 async function promptNameChange() {
-    let newUsername = window.prompt("What shall be your new name? (max. 64 characters)", yourRanker.username);
-    if (newUsername && newUsername.length > 64) {
-        let temp = newUsername.substring(0, 64);
-        alert('The maximum number of characters in your username is 64, not ' + newUsername.length + '!');
+    let newUsername = window.prompt("What shall be your new name? (max. 32 characters)", yourRanker.username);
+    if (newUsername && newUsername.length > 32) {
+        let temp = newUsername.substring(0, 32);
+        alert('The maximum number of characters in your username is 32, not ' + newUsername.length + '!');
         newUsername = temp;
     }
 
@@ -261,7 +270,9 @@ async function promptNameChange() {
             }));
             if (response.status === 200) {
                 updateLadderSteps = 0;
+                updateChatSteps = 0;
                 await getLadder();
+                await getChat();
             }
         } catch (err) {
             if (err.response.status === 403) {
@@ -284,23 +295,35 @@ async function getChat(ladderNum) {
 
     }
 
+    let body = $('#messagesBody')[0];
+    body.innerHTML = "";
+    for (let i = 0; i < chatData.messages.length; i++) {
+        let message = chatData.messages[i];
+        let row = body.insertRow();
+        row.insertCell(0).innerHTML = message.username;
+        row.cells[0].classList.add('overflow-hidden')
+        row.cells[0].style.whiteSpace = 'nowrap';
+        row.insertCell(1).innerHTML = message.message;
+    }
 
 }
 
 async function postChat() {
-
-    let message = $('#messageInput');
+    let message = $('#messageInput')[0];
+    if (message.value === "") return;
     try {
         const response = await axios.post('/fair/chat', new URLSearchParams({
             ladder: chatData.currentChatNumber,
             message: message.value
         }));
+        message.value = "";
         if (response.status === 200) {
             chatData = response.data;
         }
-
+        updateChatSteps = 0;
+        await getChat(chatData.currentChatNumber);
     } catch (err) {
 
     }
-    message.val("");
+    message.value = "";
 }

@@ -46,7 +46,7 @@ public class RankerController {
     @PostMapping(value = "/fair/ranker/bias", produces = "application/json")
     public ResponseEntity<Void> buyBias(@CookieValue(name = "_uuid", defaultValue = "") String uuid, HttpServletRequest request) {
         uuid = StringEscapeUtils.escapeJava(uuid);
-        log.info("POST /fair/ranker/buy from {}", uuid);
+        log.debug("POST /fair/ranker/buy from {}", uuid);
         try {
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);

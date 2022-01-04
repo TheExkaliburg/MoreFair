@@ -48,7 +48,7 @@ public class ChatController {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
         } catch (IllegalArgumentException e) {
-            log.error("Couldn't parse the UUID {} using 'GET /fair/chat from {}", uuid, request.getRemoteAddr());
+            log.warn("Couldn't parse the UUID {} using 'GET /fair/chat from {}", uuid, request.getRemoteAddr());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -59,7 +59,8 @@ public class ChatController {
 
     @PostMapping(value = "/fair/chat", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> postChat(Integer ladder, String message, @CookieValue(name = "_uuid", defaultValue = "") String uuid, HttpServletRequest request) {
-        log.info("POST /fair/chat from {} with message {} for ladder number {}", uuid, message, ladder);
+        log.debug("POST /fair/chat from {} with message {} for ladder number {}", uuid, message, ladder);
+        message = message.substring(0, Math.min(280, message.length()));
         uuid = StringEscapeUtils.escapeJava(uuid);
         message = StringEscapeUtils.escapeJava(message);
         try {
