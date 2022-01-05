@@ -14,6 +14,7 @@ public class RankerDTO {
     private Long power;
     private Integer rank;
     private String username;
+    private boolean isGrowing;
 
     public RankerDTO(Ranker ranker) {
         this.username = HtmlUtils.htmlEscape(StringEscapeUtils.unescapeJava(ranker.getAccount().getUsername()));
@@ -22,5 +23,6 @@ public class RankerDTO {
         this.power = ranker.getPower();
         this.bias = ranker.getBias();
         this.multiplier = ranker.getMultiplier();
+        this.isGrowing = ranker.isGrowing();
     }
 }

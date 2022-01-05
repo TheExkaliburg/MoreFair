@@ -93,4 +93,32 @@ public class RankerController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PostMapping(value = "/fair/ranker/promote", produces = "application/json")
+    public ResponseEntity<Void> promote(@CookieValue(name = "_uuid", defaultValue = "") String uuid, HttpServletRequest request) {
+        uuid = StringEscapeUtils.escapeJava(uuid);
+        log.debug("POST /fair/ranker/promote from {}", uuid);
+        try {
+            Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
+            if (account == null) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+            DatabaseWriteSemaphore.getInstance().acquire();
+            try {
+                if (rankerService.promote(account)) {
+                    return new ResponseEntity<>(HttpStatus.OK);
+                }
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            } finally {
+                DatabaseWriteSemaphore.getInstance().release();
+            }
+        } catch (InterruptedException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 }

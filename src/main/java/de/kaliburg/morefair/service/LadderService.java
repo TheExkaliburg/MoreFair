@@ -10,6 +10,8 @@ import java.util.UUID;
 
 @Service
 public class LadderService {
+
+
     private final LadderRepository ladderRepository;
 
     public LadderService(LadderRepository ladderRepository) {

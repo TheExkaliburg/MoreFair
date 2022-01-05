@@ -10,7 +10,6 @@ import de.kaliburg.morefair.repository.RankerRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
-import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -19,7 +18,6 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final LadderRepository ladderRepository;
     private final RankerRepository rankerRepository;
-    private final Random random = new Random();
 
     public AccountService(AccountRepository accountRepository, LadderRepository ladderRepository,
                           RankerRepository rankerRepository) {

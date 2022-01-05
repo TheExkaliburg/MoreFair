@@ -1,4 +1,4 @@
-let rankerTemplate = {username: "", points: 0, power: 0, bias: 0, multiplier: 0, you: false}
+let rankerTemplate = {username: "", points: 0, power: 0, bias: 0, multiplier: 0, you: false, growing: true}
 let ladderData = {
     rankers: [rankerTemplate],
     currentLadder: {number: 0, size: 1, growingRankerCount: 1},
@@ -16,18 +16,32 @@ let chatData = {
     currentChatNumber: 1
 }
 
+let infoData = {
+    updateLadderStepsBeforeSync: 10,
+    updateChatStepsBeforeSync: 30,
+    ladderAreaSize: 10,
+    pointsForPromote: 1000,
+    peopleForPromote: 1000
+}
 
 let updateLadderSteps = 0;
 let updateChatSteps = 0;
-const UPDATE_LADDER_STEPS_BEFORE_SYNC = 10;
-const UPDATE_CHAT_STEPS_BEFORE_SYNC = 30;
-const LADDER_AREA_SIZE = 10;
 
 let biasButton;
 let multiButton;
 
 let numberFormatter;
 
+
+async function getInfo() {
+    try {
+        const response = await axios.get("/fair/info");
+        if (response.status === 200)
+            infoData = response.data;
+    } catch (err) {
+
+    }
+}
 
 async function setup() {
     numberFormatter = new numberformat.Formatter({
@@ -37,6 +51,8 @@ async function setup() {
         minSuffix: 1e15,
         maxSmall: 0
     });
+
+    getInfo();
 
     biasButton = $('#biasButton')[0];
     multiButton = $('#multiButton')[0];
@@ -59,7 +75,7 @@ async function setup() {
 
 async function update() {
     updateLadderSteps++;
-    if (updateLadderSteps < UPDATE_LADDER_STEPS_BEFORE_SYNC) {
+    if (updateLadderSteps < infoData.updateLadderStepsBeforeSync) {
         await calculatePoints();
     } else {
         await getLadder();
@@ -67,7 +83,7 @@ async function update() {
     }
 
     updateChatSteps++;
-    if (updateChatSteps >= UPDATE_CHAT_STEPS_BEFORE_SYNC) {
+    if (updateChatSteps >= infoData.updateChatStepsBeforeSync) {
         await getChat(chatData.currentChatNumber);
         updateChatSteps = 0;
     }
@@ -131,17 +147,17 @@ async function getLadder(forcedReload = false) {
 async function reloadLadder(forcedReload = false) {
     let size = ladderData.currentLadder.size;
     let rank = yourRanker.rank;
-    let startRank = rank + 1 - Math.round(LADDER_AREA_SIZE / 2);
-    let endRank = rank + Math.round(LADDER_AREA_SIZE / 2) - 1;
+    let startRank = rank + 1 - Math.round(infoData.ladderAreaSize / 2);
+    let endRank = rank + Math.round(infoData.ladderAreaSize / 2) - 1;
 
     if (endRank >= size) {
-        startRank = size + 2 - LADDER_AREA_SIZE;
+        startRank = size + 2 - infoData.ladderAreaSize;
         endRank = size;
     }
 
     if (startRank <= 1) {
         startRank = 1;
-        endRank = Math.min(LADDER_AREA_SIZE, size);
+        endRank = Math.min(infoData.ladderAreaSize, size);
     }
 
     if (!forcedReload && (ladderData.rankers[0].rank > startRank || ladderData.rankers[ladderData.rankers.length - 1].rank < endRank)) {
@@ -178,10 +194,20 @@ async function reloadLadder(forcedReload = false) {
     }
     $('#biasTooltip').attr('data-bs-original-title', numberFormatter.format(biasCost) + ' Points');
     $('#multiTooltip').attr('data-bs-original-title', numberFormatter.format(multiCost) + ' Power');
+
+    if (canPromote()) {
+        $('#promoteButton').show()
+        $('#ladderNumber').hide()
+    } else {
+        $('#promoteButton').hide()
+        $('#ladderNumber').show()
+    }
 }
 
 function canPromote() {
-    return Math.round(Math.random());
+    if (ladderData.firstRanker.you && ladderData.currentLadder.size >= infoData.peopleForPromote && ladderData.firstRanker.points >= infoData.pointsForPromote)
+        return true;
+    return false;
 }
 
 function reloadInformation() {
@@ -196,28 +222,6 @@ function reloadInformation() {
     document.getElementById("rankerCount").innerHTML =
         "Rankers: " + ladderData.currentLadder.growingRankerCount + "/" + ladderData.currentLadder.size;
     document.getElementById("ladderNumber").innerHTML = "Ladder # " + ladderData.currentLadder.number;
-
-    if (canPromote()) {
-        let gem = $(document.createElement('i')).prop({
-            class: 'bi bi-gem'
-        }).prop('outerHTML');
-        let promoteButton = $(document.createElement('button')).prop({
-            type: 'button',
-            innerHTML: gem + '&emsp; &emsp; &emsp;' + (1 + ladderData.currentLadder.number) + '&emsp; &emsp; &emsp;' + gem,
-            class: 'btn btn-secondary col',
-            id: 'promoteButton'
-        })
-        $('#ladderNumber').replaceWith(promoteButton)
-    } else {
-        // <p class="h5" href="#" id="ladderNumber"></p>
-        let ladderNumber = $(document.createElement('p')).prop({
-            class: 'h5',
-            href: '#',
-            id: 'ladderNumber'
-        })
-        $('#promoteButton').replaceWith(ladderNumber)
-    }
-
 }
 
 function writeNewRow(body, ranker) {
@@ -236,8 +240,10 @@ function writeNewRow(body, ranker) {
 // TODO: BREAK Infinity
 async function calculatePoints() {
     ladderData.rankers.forEach(ranker => {
-        ranker.power += ranker.rank !== 1 ? Math.round(((ranker.rank - 1) + ranker.bias) * ranker.multiplier) : 0;
-        ranker.points += ranker.power;
+        if (ranker.growing) {
+            ranker.power += ranker.rank !== 1 ? Math.round(((ranker.rank - 1) + ranker.bias) * ranker.multiplier) : 0;
+            ranker.points += ranker.power;
+        }
     });
 
     if (ladderData.startRank > 1) {
@@ -348,4 +354,18 @@ async function postChat() {
 
     }
     message.value = "";
+}
+
+async function promote() {
+    try {
+        const response = await axios.post('/fair/ranker/promote');
+        if (response.status === 200) {
+            updateLadderSteps = 0;
+            await getLadder();
+            updateChatSteps = 0;
+            await getChat(chatData.currentChatNumber + 1);
+        }
+    } catch (err) {
+
+    }
 }
