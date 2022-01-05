@@ -5,7 +5,8 @@ let rankerTemplate = {
     bias: 0,
     multiplier: 0,
     you: false,
-    growing: true
+    growing: true,
+    asshole: false
 }
 let ladderData = {
     rankers: [rankerTemplate],
@@ -29,7 +30,8 @@ let infoData = {
     updateChatStepsBeforeSync: 30,
     ladderAreaSize: 10,
     pointsForPromote: new Decimal(1000),
-    peopleForPromote: 10
+    peopleForPromote: 10,
+    assholeLadder: 15
 }
 
 let updateLadderSteps = 0;
@@ -46,7 +48,7 @@ async function getInfo() {
         const response = await axios.get("/fair/info");
         if (response.status === 200) {
             infoData = response.data;
-            infoData.pointsForPromote = new Decimal(infoData.peopleForPromote)
+            infoData.pointsForPromote = new Decimal(infoData.pointsForPromote)
         }
     } catch (err) {
 
@@ -211,20 +213,29 @@ async function reloadLadder(forcedReload = false) {
     }
     $('#biasTooltip').attr('data-bs-original-title', numberFormatter.format(biasCost) + ' Points');
     $('#multiTooltip').attr('data-bs-original-title', numberFormatter.format(multiCost) + ' Power');
-
-    if (canPromote()) {
-        $('#promoteButton').show()
-        $('#ladderNumber').hide()
-    } else {
-        $('#promoteButton').hide()
-        $('#ladderNumber').show()
-    }
+    showPromote();
 }
 
-function canPromote() {
-    if (ladderData.firstRanker.you && ladderData.currentLadder.size >= infoData.peopleForPromote && ladderData.firstRanker.points.cmp(infoData.pointsForPromote) >= 0)
-        return true;
-    return false;
+function showPromote() {
+    let promoteButton = $('#promoteButton');
+    let assholeButton = $('#assholeButton');
+    let ladderNumber = $('#ladderNumber');
+
+    if (ladderData.firstRanker.you && ladderData.currentLadder.size >= infoData.peopleForPromote && ladderData.firstRanker.points.cmp(infoData.pointsForPromote) >= 0) {
+        if (ladderData.currentLadder.number === infoData.assholeLadder) {
+            promoteButton.hide()
+            ladderNumber.hide()
+            assholeButton.show()
+        } else {
+            assholeButton.hide()
+            ladderNumber.hide()
+            promoteButton.show()
+        }
+    } else {
+        assholeButton.hide()
+        promoteButton.hide()
+        ladderNumber.show()
+    }
 }
 
 function reloadInformation() {
@@ -410,5 +421,21 @@ async function promote() {
         }
     } catch (err) {
 
+    }
+}
+
+async function beAsshole() {
+    if (confirm("Do you really wanna be an Asshole?!")) {
+        try {
+            const response = await axios.post('fair/ranker/asshole');
+            if (response.status === 200) {
+                updateLadderSteps = 0;
+                await getLadder();
+                updateChatSteps = 0;
+                await getChat(chatData.currentChatNumber + 1);
+            }
+        } catch (err) {
+            return;
+        }
     }
 }

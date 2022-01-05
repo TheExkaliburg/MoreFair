@@ -120,5 +120,31 @@ public class RankerController {
         }
     }
 
+    @PostMapping(value = "/fair/ranker/asshole", produces = "application/json")
+    public ResponseEntity<Void> beAsshole(@CookieValue(name = "_uuid", defaultValue = "") String uuid, HttpServletRequest request) {
+        uuid = StringEscapeUtils.escapeJava(uuid);
+        log.debug("POST /fair/ranker/asshole from {}", uuid);
+        try {
+            Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
+            if (account == null) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+            DatabaseWriteSemaphore.getInstance().acquire();
+            try {
+                if (rankerService.beAsshole(account)) {
+                    return new ResponseEntity<>(HttpStatus.OK);
+                }
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            } finally {
+                DatabaseWriteSemaphore.getInstance().release();
+            }
+        } catch (InterruptedException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
 }

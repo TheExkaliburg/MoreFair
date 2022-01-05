@@ -10,6 +10,8 @@ import java.util.UUID;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
+    Integer countAccountByIsAsshole(Boolean isAsshole);
+
     @Query("SELECT a FROM Account a WHERE a.uuid = :uuid")
     Account findByUUID(@Param("uuid") UUID uuid);
 }

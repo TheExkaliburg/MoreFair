@@ -10,6 +10,8 @@ import de.kaliburg.morefair.repository.RankerRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -29,7 +31,7 @@ public class AccountService {
     public AccountDetailsDTO createNewAccount() {
         Account result = new Account(UUID.randomUUID(), "");
         Ladder l1 = ladderRepository.findByNumber(1);
-        Ranker ranker = new Ranker(UUID.randomUUID(), l1, result, rankerRepository.countRankerByLadder(l1) + 1);
+        Ranker ranker = new Ranker(UUID.randomUUID(), l1, result, l1.getRankers().size() + 1);
 
         result = accountRepository.save(result);
         result.setUsername("Mystery Guest " + result.getId());
@@ -41,7 +43,7 @@ public class AccountService {
 
         rankerRepository.save(ranker);
 
-        log.info("Created a new Account with the uuid {} ({}).", result.getUuid().toString(), result.getId());
+        log.info("Created a new Account with the uuid {} (#{}).", result.getUuid().toString(), result.getId());
         return result.dto();
     }
 

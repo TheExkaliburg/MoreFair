@@ -29,10 +29,6 @@ public class Ladder {
     @NonNull
     @Column(nullable = false)
     private Integer number;
-    @OneToOne
-    private Ladder nextLadder;
-    @OneToOne
-    private Ladder pastLadder;
     @OneToMany(mappedBy = "ladder", fetch = FetchType.LAZY)
     private List<Ranker> rankers = new ArrayList<>();
     @NonNull

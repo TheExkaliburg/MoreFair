@@ -42,7 +42,6 @@ public class ChatController {
             if (account == null) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             if (ladder <= rankerService.findHighestRankerByAccount(account).getLadder().getNumber()) {
                 ChatDTO c = chatService.getChat(ladder);
-                log.info("{}", c);
                 return new ResponseEntity<>(c, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);

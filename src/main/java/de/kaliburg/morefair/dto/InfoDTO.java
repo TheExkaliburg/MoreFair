@@ -10,6 +10,7 @@ public class InfoDTO {
     private Integer ladderAreaSize;
     private String pointsForPromote;
     private Integer peopleForPromote;
+    private Integer assholeLadder;
 
     public InfoDTO() {
         updateLadderStepsBeforeSync = FairController.UPDATE_LADDER_STEPS_BEFORE_SYNC;
@@ -17,5 +18,6 @@ public class InfoDTO {
         ladderAreaSize = FairController.LADDER_AREA_SIZE;
         pointsForPromote = FairController.POINTS_FOR_PROMOTE.toString();
         peopleForPromote = FairController.PEOPLE_FOR_PROMOTE;
+        assholeLadder = FairController.ASSHOLE_LADDER;
     }
 }

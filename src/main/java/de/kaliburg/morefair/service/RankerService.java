@@ -5,6 +5,7 @@ import de.kaliburg.morefair.dto.LadderViewDTO;
 import de.kaliburg.morefair.entity.Account;
 import de.kaliburg.morefair.entity.Ladder;
 import de.kaliburg.morefair.entity.Ranker;
+import de.kaliburg.morefair.repository.AccountRepository;
 import de.kaliburg.morefair.repository.LadderRepository;
 import de.kaliburg.morefair.repository.RankerRepository;
 import lombok.extern.log4j.Log4j2;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,10 +24,12 @@ public class RankerService {
 
     private final RankerRepository rankerRepository;
     private final LadderRepository ladderRepository;
+    private final AccountRepository accountRepository;
 
-    public RankerService(RankerRepository rankerRepository, LadderRepository ladderRepository) {
+    public RankerService(RankerRepository rankerRepository, LadderRepository ladderRepository, AccountRepository accountRepository) {
         this.rankerRepository = rankerRepository;
         this.ladderRepository = ladderRepository;
+        this.accountRepository = accountRepository;
     }
 
     public List<Ranker> findAll() {
@@ -164,5 +169,51 @@ public class RankerService {
         ladderRepository.save(ladder);
         ranker = rankerRepository.save(ranker);
         return ranker;
+    }
+
+    public boolean beAsshole(Account account) {
+        Ranker ranker = findHighestRankerByAccount(account);
+        if (ranker.getRank() == 1 && ranker.getLadder().getSize() >= FairController.PEOPLE_FOR_PROMOTE
+                && ranker.getPoints().compareTo(FairController.POINTS_FOR_PROMOTE) >= 0
+                && ranker.getLadder().getNumber().equals(FairController.ASSHOLE_LADDER)) {
+
+            account.setIsAsshole(true);
+            accountRepository.save(account);
+
+            if (accountRepository.countAccountByIsAsshole(true) >= FairController.REQUIRED_ASSHOLE_COUNT) {
+                resetAllLadders();
+            } else {
+                ranker.setGrowing(false);
+                createNewRankerForAccountOnLadder(account, ranker.getLadder().getNumber() + 1);
+            }
+
+            return true;
+        }
+        return false;
+    }
+
+    private void resetAllLadders() {
+        // Delete all Rankers
+        rankerRepository.deleteAll();
+
+        // Go through all
+        List<Account> accounts = accountRepository.findAll();
+        for (Account a : accounts) {
+            // Manage Asshole Flags
+            a.setWasAsshole(a.getIsAsshole());
+            a.setIsAsshole(false);
+            // loginDay + 7 > today
+            if (a.getLastLogin().plus(7, ChronoUnit.DAYS).isAfter(LocalDateTime.now())) {
+                // TODO: delete Account
+                log.info("Would delete account {} with uuid: {}", a.getUsername(), a.getUuid());
+            }
+
+            // Create New Rankers for each account
+            Ladder l = ladderRepository.findByNumber(1);
+            rankerRepository.save(new Ranker(UUID.randomUUID(), l, a, l.getRankers().size() + 1));
+            accountRepository.save(a);
+        }
+
+
     }
 }

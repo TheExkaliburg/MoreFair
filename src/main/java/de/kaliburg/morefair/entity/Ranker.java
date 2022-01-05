@@ -25,10 +25,10 @@ public class Ranker {
     @Column(nullable = false)
     private UUID uuid;
     @NonNull
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 1000, scale = 0)
     private BigInteger points = BigInteger.ZERO;
     @NonNull
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 1000, scale = 0)
     private BigInteger power = BigInteger.ONE;
     @NonNull
     @Column(nullable = false)

@@ -19,6 +19,8 @@ public class FairController {
     // 250 Millionen
     public final static BigInteger POINTS_FOR_PROMOTE = new BigInteger("250000000");
     public final static Integer LADDER_AREA_SIZE_SERVER = 30;
+    public final static Integer ASSHOLE_LADDER = 15;
+    public final static Integer REQUIRED_ASSHOLE_COUNT = 10;
 
     @GetMapping("/")
     public String getIndex() {

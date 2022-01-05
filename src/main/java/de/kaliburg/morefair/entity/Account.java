@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -29,6 +30,15 @@ public class Account {
     private String username;
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
     private List<Ranker> rankers = new ArrayList<>();
+    @NonNull
+    @Column(nullable = false)
+    private Boolean isAsshole = false;
+    @NonNull
+    @Column(nullable = false)
+    private Boolean wasAsshole = false;
+    @NonNull
+    @Column(nullable = false)
+    private LocalDateTime lastLogin = LocalDateTime.now();
 
     public AccountDetailsDTO dto() {
         return new AccountDetailsDTO(this);
