@@ -40,6 +40,7 @@ public class LadderCalculator {
                 int growingRankerCount = 0;
                 for (int i = 0; i < rankers.size(); i++) {                                                      //  O(r)
                     Ranker currentRanker = rankers.get(i);
+                    currentRanker.setRank(i + 1);
                     // if the ranker is currently still on the ladder
                     if (currentRanker.isGrowing()) {
                         growingRankerCount++;
@@ -48,7 +49,6 @@ public class LadderCalculator {
                         if (currentRanker.getRank() != 1)
                             currentRanker.addPower((i + currentRanker.getBias()) * currentRanker.getMultiplier());
                         currentRanker.addPoints(currentRanker.getPower());
-
 
                         for (int j = i - 1; j >= 0; j--) {                                                      //      O(r/2) worst case; probably more of O(1)
                             // If one of the already calculated Rankers have less points than this ranker
