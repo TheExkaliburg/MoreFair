@@ -54,9 +54,13 @@ public class RankerService {
     public Ranker findHighestRankerByAccount(Account account) {
         List<Ranker> temp = rankerRepository.findHighestRankerByAccount(account);
 
+        if (temp.size() == 0) {
+            temp.add(createNewRankerForAccountOnLadder(account, 1));
+        }
+
         assert (temp.size() == 1);
 
-        return (temp.size() == 0) ? null : temp.get(0);
+        return temp.get(0);
     }
 
     public Ranker findHighestPointsByLadder(Ladder ladder) {
@@ -180,7 +184,7 @@ public class RankerService {
             account.setIsAsshole(true);
             accountRepository.save(account);
 
-            if (accountRepository.countAccountByIsAsshole(true) >= FairController.REQUIRED_ASSHOLE_COUNT) {
+            if (accountRepository.countAccountByIsAsshole(true) >= FairController.ASSHOLE_FOR_RESET) {
                 resetAllLadders();
             } else {
                 ranker.setGrowing(false);
@@ -199,13 +203,12 @@ public class RankerService {
         // Go through all
         List<Account> accounts = accountRepository.findAll();
         for (Account a : accounts) {
-            // Manage Asshole Flags
-            a.setWasAsshole(a.getIsAsshole());
+            a.setTimesAsshole(a.getTimesAsshole() + (a.getIsAsshole() ? 1 : 0));
             a.setIsAsshole(false);
             // loginDay + 7 > today
             if (a.getLastLogin().plus(7, ChronoUnit.DAYS).isAfter(LocalDateTime.now())) {
-                // TODO: delete Account
-                log.info("Would delete account {} with uuid: {}", a.getUsername(), a.getUuid());
+                // TODO: delete Account or just not create Ranker
+                log.info("Would delete account/ranker {} with uuid: {}", a.getUsername(), a.getUuid());
             }
 
             // Create New Rankers for each account
@@ -213,7 +216,5 @@ public class RankerService {
             rankerRepository.save(new Ranker(UUID.randomUUID(), l, a, l.getRankers().size() + 1));
             accountRepository.save(a);
         }
-
-
     }
 }

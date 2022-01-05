@@ -14,4 +14,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     @Query("SELECT a FROM Account a WHERE a.uuid = :uuid")
     Account findByUUID(@Param("uuid") UUID uuid);
+
+    @Query("SELECT MAX(a.timesAsshole) FROM Account a")
+    Integer findMaxTimeAsshole();
 }

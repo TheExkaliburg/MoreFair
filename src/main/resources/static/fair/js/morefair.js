@@ -6,7 +6,7 @@ let rankerTemplate = {
     multiplier: 0,
     you: false,
     growing: true,
-    asshole: false
+    timesAsshole: 0
 }
 let ladderData = {
     rankers: [rankerTemplate],
@@ -17,8 +17,9 @@ let ladderData = {
 let yourRanker = rankerTemplate;
 
 let messageTemplate = {
-    username: "name",
-    message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque et feugiat odio. Quisque vitae dolor finibus, tempor felis at, sagittis elit. Sed velit justo, rutrum et nibh sed, dignissim fringilla eros. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nam interdum nisl lorem, et sagittis libero."
+    username: "Username",
+    message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque et feugiat odio.",
+    timesAsshole: 1
 }
 let chatData = {
     messages: [messageTemplate, messageTemplate, messageTemplate],
@@ -31,7 +32,8 @@ let infoData = {
     ladderAreaSize: 10,
     pointsForPromote: new Decimal(1000),
     peopleForPromote: 10,
-    assholeLadder: 15
+    assholeLadder: 15,
+    assholeTags: ['']
 }
 
 let updateLadderSteps = 0;
@@ -275,7 +277,22 @@ function reloadInformation() {
 
 function writeNewRow(body, ranker) {
     let row = body.insertRow();
-    row.insertCell(0).innerHTML = ranker.rank;
+    // <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-asterisk" viewBox="0 0 16 16">
+    //   <path d="M8 0a1 1 0 0 1 1 1v5.268l4.562-2.634a1 1 0 1 1 1 1.732L10 8l4.562 2.634a1 1 0 1 1-1 1.732L9 9.732V15a1 1 0 1 1-2 0V9.732l-4.562 2.634a1 1 0 1 1-1-1.732L6 8 1.438 5.366a1 1 0 0 1 1-1.732L7 6.268V1a1 1 0 0 1 1-1z"></path>
+    // </svg>
+    /*
+    $(row.cells[0]).append($(document.createElement('p')).prop({
+        class: "text-start col",
+        innerHTML: ranker.rank
+    }));
+    $(row.cells[0]).append($(document.createElement('i')).prop({
+        class: "text-end col bi bi-asterisk",
+        style: "padding-right: 100px"
+    }));*/
+
+    let assholeTag = (ranker.timesAsshole < infoData.assholeTags.length) ?
+        infoData.assholeTags[ranker.timesAsshole] : infoData.assholeTags[infoData.assholeTags.length - 1];
+    row.insertCell(0).innerHTML = ranker.rank + assholeTag;
     row.insertCell(1).innerHTML = ranker.username;
     row.cells[1].style.overflow = "hidden";
     row.insertCell(2).innerHTML = numberFormatter.format(ranker.power);
@@ -285,8 +302,6 @@ function writeNewRow(body, ranker) {
     if (ranker.you) row.classList.add('table-active');
 }
 
-
-// TODO: BREAK Infinity
 async function calculatePoints() {
     ladderData.rankers.forEach(ranker => {
         if (ranker.growing) {
@@ -366,7 +381,6 @@ async function promptNameChange() {
     }
 }
 
-
 async function getChat(ladderNum) {
     try {
         const response = await axios.get("/fair/chat?ladder=" + ladderNum);
@@ -382,7 +396,9 @@ async function getChat(ladderNum) {
     for (let i = 0; i < chatData.messages.length; i++) {
         let message = chatData.messages[i];
         let row = body.insertRow();
-        row.insertCell(0).innerHTML = message.username + ":";
+        let assholeTag = (message.timesAsshole < infoData.assholeTags.length) ?
+            infoData.assholeTags[message.timesAsshole] : infoData.assholeTags[infoData.assholeTags.length - 1];
+        row.insertCell(0).innerHTML = message.username + ": " + assholeTag;
         row.cells[0].classList.add('overflow-hidden')
         row.cells[0].style.whiteSpace = 'nowrap';
         row.insertCell(1).innerHTML = message.message;

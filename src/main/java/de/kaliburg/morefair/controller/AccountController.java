@@ -55,17 +55,19 @@ public class AccountController {
             return new ResponseEntity<>(accountService.createNewAccount(), HttpStatus.CREATED);
         }
         try {
-            Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
-            if (account == null) {
+            try {
                 DatabaseWriteSemaphore.getInstance().acquire();
-                try {
+                Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
+                if (account == null) {
                     return new ResponseEntity<>(accountService.createNewAccount(),
                             HttpStatus.CREATED);
-                } finally {
-                    DatabaseWriteSemaphore.getInstance().release();
+                } else {
+                    accountService.login(account);
+                    return new ResponseEntity<>(account.dto(), HttpStatus.OK);
                 }
+            } finally {
+                DatabaseWriteSemaphore.getInstance().release();
             }
-            return new ResponseEntity<>(account.dto(), HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             log.error("Couldn't parse the UUID from {} using 'POST /fair/login {}'",
                     request.getRemoteAddr(), uuid);

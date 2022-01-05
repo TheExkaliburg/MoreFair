@@ -10,8 +10,7 @@ import de.kaliburg.morefair.repository.RankerRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import java.util.List;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -54,5 +53,15 @@ public class AccountService {
     public void updateUsername(Account account, String username) {
         account.setUsername(username);
         accountRepository.save(account);
+    }
+
+    public void login(Account account) {
+        // Set Login Date
+        account.setLastLogin(LocalDateTime.now());
+        accountRepository.save(account);
+    }
+
+    public Integer findMaxTimeAsshole() {
+        return accountRepository.findMaxTimeAsshole();
     }
 }

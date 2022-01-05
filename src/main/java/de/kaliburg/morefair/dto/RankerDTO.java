@@ -14,7 +14,7 @@ public class RankerDTO {
     private String power;
     private Integer rank;
     private String username;
-    private boolean isAsshole;
+    private Integer timesAsshole;
     private boolean isGrowing;
 
     public RankerDTO(Ranker ranker) {
@@ -25,6 +25,6 @@ public class RankerDTO {
         this.bias = ranker.getBias();
         this.multiplier = ranker.getMultiplier();
         this.isGrowing = ranker.isGrowing();
-        this.isAsshole = ranker.getAccount().getIsAsshole() || ranker.getAccount().getWasAsshole();
+        this.timesAsshole = ranker.getAccount().getTimesAsshole();
     }
 }

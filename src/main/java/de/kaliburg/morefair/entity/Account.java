@@ -35,7 +35,7 @@ public class Account {
     private Boolean isAsshole = false;
     @NonNull
     @Column(nullable = false)
-    private Boolean wasAsshole = false;
+    private Integer timesAsshole = 0;
     @NonNull
     @Column(nullable = false)
     private LocalDateTime lastLogin = LocalDateTime.now();
