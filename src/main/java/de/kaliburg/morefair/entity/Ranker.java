@@ -29,7 +29,7 @@ public class Ranker {
     private BigInteger points = BigInteger.ZERO;
     @NonNull
     @Column(nullable = false)
-    private BigInteger power = BigInteger.ZERO;
+    private BigInteger power = BigInteger.ONE;
     @NonNull
     @Column(nullable = false)
     private Integer bias = 0;
