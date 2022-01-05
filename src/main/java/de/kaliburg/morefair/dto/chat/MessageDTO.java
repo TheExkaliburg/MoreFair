@@ -4,7 +4,6 @@ import de.kaliburg.morefair.entity.chat.Message;
 import lombok.Data;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.web.util.HtmlUtils;
-import org.springframework.web.util.JavaScriptUtils;
 
 @Data
 public class MessageDTO {
@@ -14,7 +13,7 @@ public class MessageDTO {
 
     public MessageDTO(Message message) {
         this.timesAsshole = message.getAccount().getTimesAsshole();
-        this.message = JavaScriptUtils.javaScriptEscape(HtmlUtils.htmlEscape(StringEscapeUtils.unescapeJava(message.getMessage())));
-        this.username = JavaScriptUtils.javaScriptEscape(HtmlUtils.htmlEscape(StringEscapeUtils.unescapeJava(message.getAccount().getUsername())));
+        this.message = HtmlUtils.htmlEscape(StringEscapeUtils.unescapeJava(message.getMessage()));
+        this.username = HtmlUtils.htmlEscape(StringEscapeUtils.unescapeJava(message.getAccount().getUsername()));
     }
 }
