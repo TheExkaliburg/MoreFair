@@ -50,7 +50,6 @@ public class FairController {
     ));
 
     private final AccountService accountService;
-,
 
     public FairController(AccountService accountService) {
         this.accountService = accountService;
