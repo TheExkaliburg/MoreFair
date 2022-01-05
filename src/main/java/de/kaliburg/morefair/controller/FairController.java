@@ -19,12 +19,12 @@ public class FairController {
     public static final Integer UPDATE_LADDER_STEPS_BEFORE_SYNC = 10;
     public static final Integer UPDATE_CHAT_STEPS_BEFORE_SYNC = 30;
     public final static Integer LADDER_AREA_SIZE = 10;
-    public final static Integer PEOPLE_FOR_PROMOTE = 2;
+    public final static Integer PEOPLE_FOR_PROMOTE = 10;
     // 250 Millionen
-    public final static BigInteger POINTS_FOR_PROMOTE = new BigInteger("250");
+    public final static BigInteger POINTS_FOR_PROMOTE = new BigInteger("25000000");
     public final static Integer LADDER_AREA_SIZE_SERVER = 30;
-    public final static Integer ASSHOLE_LADDER = 1;
-    public final static Integer ASSHOLE_FOR_RESET = 2;
+    public final static Integer ASSHOLE_LADDER = 15;
+    public final static Integer ASSHOLE_FOR_RESET = 10;
     public final static List<String> ASSHOLE_TAGS = new ArrayList<>(Arrays.asList(
             "",
             "&emsp;(&#x2660;)",     // 01♠
@@ -50,6 +50,7 @@ public class FairController {
     ));
 
     private final AccountService accountService;
+,
 
     public FairController(AccountService accountService) {
         this.accountService = accountService;
