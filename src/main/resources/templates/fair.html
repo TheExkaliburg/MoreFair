@@ -16,6 +16,7 @@
             integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
             src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/break_infinity.js"></script>
     <script src="//cdn.rawgit.com/erosson/swarm-numberformat/v0.4.0/dist/swarm-numberformat.min.js"></script>
     <script th:src="@{/fair/js/cookie.js}" type="text/javascript"></script>
     <script th:src="@{/fair/js/morefair.js}" type="text/javascript"></script>
@@ -38,7 +39,8 @@
                     </div>
                     <div class="row col-4 text-center" style="border: 0px solid black">
                         <p class="h5" href="#" id="ladderNumber"></p>
-                        <button class="btn btn-secondary col" id="promoteButton" onclick="promote()" style="display: none"
+                        <button class="btn btn-secondary col" id="promoteButton" onclick="promote()"
+                                style="display: none"
                                 type="button">
                             <i class="bi bi-gem"></i>
                             PROMOTE

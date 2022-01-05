@@ -16,7 +16,7 @@ public class FairController {
     public static final Integer UPDATE_CHAT_STEPS_BEFORE_SYNC = 30;
     public final static Integer LADDER_AREA_SIZE = 10;
     public final static Integer PEOPLE_FOR_PROMOTE = 10;
-    public final static BigInteger POINTS_FOR_PROMOTE = BigInteger.valueOf(250000000L);
+    public final static BigInteger POINTS_FOR_PROMOTE = new BigInteger("92233720368547758070");
     public final static Integer LADDER_AREA_SIZE_SERVER = 30;
 
     @GetMapping("/")
@@ -26,6 +26,7 @@ public class FairController {
 
     @GetMapping(value = "/fair/info", produces = "application/json")
     public ResponseEntity<InfoDTO> getInfo() {
+        log.info(POINTS_FOR_PROMOTE.toString());
         return new ResponseEntity<>(new InfoDTO(), HttpStatus.OK);
     }
 }

@@ -1,4 +1,12 @@
-let rankerTemplate = {username: "", points: 0, power: 0, bias: 0, multiplier: 0, you: false, growing: true}
+let rankerTemplate = {
+    username: "",
+    points: new Decimal(0),
+    power: new Decimal(0),
+    bias: 0,
+    multiplier: 0,
+    you: false,
+    growing: true
+}
 let ladderData = {
     rankers: [rankerTemplate],
     currentLadder: {number: 0, size: 1, growingRankerCount: 1},
@@ -20,8 +28,8 @@ let infoData = {
     updateLadderStepsBeforeSync: 10,
     updateChatStepsBeforeSync: 30,
     ladderAreaSize: 10,
-    pointsForPromote: 1000,
-    peopleForPromote: 1000
+    pointsForPromote: new Decimal(1000),
+    peopleForPromote: 10
 }
 
 let updateLadderSteps = 0;
@@ -36,8 +44,10 @@ let numberFormatter;
 async function getInfo() {
     try {
         const response = await axios.get("/fair/info");
-        if (response.status === 200)
+        if (response.status === 200) {
             infoData = response.data;
+            infoData.pointsForPromote = new Decimal(infoData.peopleForPromote)
+        }
     } catch (err) {
 
     }
@@ -92,8 +102,8 @@ async function update() {
 async function buyBias() {
     biasButton.disabled = true;
     $('#biasTooltip').tooltip('hide');
-    let cost = getCost(yourRanker.bias + 1);
-    if (yourRanker.points > cost) {
+    let cost = new Decimal(getCost(yourRanker.bias + 1));
+    if (yourRanker.points.compare(cost) > 0) {
         try {
             const response = await axios.post('/fair/ranker/bias');
             if (response.status === 200) {
@@ -112,8 +122,8 @@ async function buyBias() {
 async function buyMulti() {
     multiButton.disabled = true;
     $('#multiTooltip').tooltip('hide');
-    let cost = getCost(yourRanker.multiplier + 1);
-    if (yourRanker.power > cost) {
+    let cost = new Decimal(getCost(yourRanker.multiplier + 1));
+    if (yourRanker.power.compare(cost) > 0) {
         try {
             const response = await axios.post('/fair/ranker/multiplier');
             if (response.status === 200) {
@@ -132,6 +142,13 @@ async function getLadder(forcedReload = false) {
     try {
         const response = await axios.get("/fair/ranker");
         ladderData = response.data;
+        ladderData.rankers.forEach(r => {
+            r.points = new Decimal(r.points);
+            r.power = new Decimal(r.power);
+        });
+        ladderData.firstRanker.points = new Decimal(ladderData.firstRanker.points);
+        ladderData.firstRanker.power = new Decimal(ladderData.firstRanker.power);
+
         yourRanker = ladderData.rankers.filter(r => {
             return r.you === true;
         })[0];
@@ -181,13 +198,13 @@ async function reloadLadder(forcedReload = false) {
     }
 
     let biasCost = getCost(yourRanker.bias + 1);
-    if (yourRanker.points > biasCost) {
+    if (yourRanker.points.cmp(biasCost) > 0) {
         biasButton.disabled = false;
     } else {
         biasButton.disabled = true;
     }
     let multiCost = getCost(yourRanker.multiplier + 1);
-    if (yourRanker.power > multiCost) {
+    if (yourRanker.power.cmp(new Decimal(multiCost)) > 0) {
         multiButton.disabled = false;
     } else {
         multiButton.disabled = true;
@@ -205,7 +222,7 @@ async function reloadLadder(forcedReload = false) {
 }
 
 function canPromote() {
-    if (ladderData.firstRanker.you && ladderData.currentLadder.size >= infoData.peopleForPromote && ladderData.firstRanker.points >= infoData.pointsForPromote)
+    if (ladderData.firstRanker.you && ladderData.currentLadder.size >= infoData.peopleForPromote && ladderData.firstRanker.points.cmp(infoData.pointsForPromote) >= 0)
         return true;
     return false;
 }
@@ -241,13 +258,19 @@ function writeNewRow(body, ranker) {
 async function calculatePoints() {
     ladderData.rankers.forEach(ranker => {
         if (ranker.growing) {
-            ranker.power += ranker.rank !== 1 ? Math.round(((ranker.rank - 1) + ranker.bias) * ranker.multiplier) : 0;
-            ranker.points += ranker.power;
+            let temp = new Decimal(0);
+            if (ranker.rank !== 1) {
+                temp = new Decimal(ranker.rank - 1 + ranker.bias);
+                temp = temp.multiply(new Decimal(ranker.multiplier));
+            }
+
+            ranker.power = ranker.power.add(temp);
+            ranker.points = ranker.points.add(ranker.power);
         }
     });
 
     if (ladderData.startRank > 1) {
-        ladderData.firstRanker.points += ladderData.firstRanker.power;
+        ladderData.firstRanker.points = ladderData.firstRanker.points.add(ladderData.firstRanker.power);
     }
 
     await sortLadder()
@@ -255,7 +278,7 @@ async function calculatePoints() {
 }
 
 async function sortLadder(forcedReload = false) {
-    ladderData.rankers.sort((a, b) => b.points - a.points);
+    ladderData.rankers.sort((a, b) => b.points.sub(a.points));
 
     for (let i = 0; i < ladderData.rankers.length; i++) {
         ladderData.rankers[i].rank = ladderData.startRank + i;
@@ -268,7 +291,7 @@ async function sortLadder(forcedReload = false) {
     // If my highest Ranker is higher than the firstRanker,
     // which shouldn't happen if we have the first Ranker in our rankerList,
     // then force reloading
-    if (!forcedReload && ladderData.rankers[0].points > ladderData.firstRanker.points) {
+    if (!forcedReload && ladderData.rankers[0].points.compare(ladderData.firstRanker.points) > 0) {
         await getLadder(true)
         updateLadderSteps = 0;
     }
