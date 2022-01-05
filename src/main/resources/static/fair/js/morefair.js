@@ -180,6 +180,10 @@ async function reloadLadder(forcedReload = false) {
     $('#multiTooltip').attr('data-bs-original-title', numberFormatter.format(multiCost) + ' Power');
 }
 
+function canPromote() {
+    return Math.round(Math.random());
+}
+
 function reloadInformation() {
     let yourRanker = ladderData.rankers.filter(r => {
         return r.you === true;
@@ -190,8 +194,30 @@ function reloadInformation() {
         "+" + yourRanker.bias + "   x" + yourRanker.multiplier;
 
     document.getElementById("rankerCount").innerHTML =
-        "Active Rankers: " + ladderData.currentLadder.growingRankerCount + "/" + ladderData.currentLadder.size;
+        "Rankers: " + ladderData.currentLadder.growingRankerCount + "/" + ladderData.currentLadder.size;
     document.getElementById("ladderNumber").innerHTML = "Ladder # " + ladderData.currentLadder.number;
+
+    if (canPromote()) {
+        let gem = $(document.createElement('i')).prop({
+            class: 'bi bi-gem'
+        }).prop('outerHTML');
+        let promoteButton = $(document.createElement('button')).prop({
+            type: 'button',
+            innerHTML: gem + '&emsp; &emsp; &emsp;' + (1 + ladderData.currentLadder.number) + '&emsp; &emsp; &emsp;' + gem,
+            class: 'btn btn-secondary col',
+            id: 'promoteButton'
+        })
+        $('#ladderNumber').replaceWith(promoteButton)
+    } else {
+        // <p class="h5" href="#" id="ladderNumber"></p>
+        let ladderNumber = $(document.createElement('p')).prop({
+            class: 'h5',
+            href: '#',
+            id: 'ladderNumber'
+        })
+        $('#promoteButton').replaceWith(ladderNumber)
+    }
+
 }
 
 function writeNewRow(body, ranker) {
