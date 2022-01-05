@@ -5,13 +5,15 @@ import lombok.Data;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.web.util.HtmlUtils;
 
+import java.math.BigInteger;
+
 @Data
 public class RankerDTO {
     private Integer bias;
     private boolean isYou = false;
     private Integer multiplier;
-    private Long points;
-    private Long power;
+    private BigInteger points;
+    private BigInteger power;
     private Integer rank;
     private String username;
     private boolean isGrowing;

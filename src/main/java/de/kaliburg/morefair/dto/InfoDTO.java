@@ -3,12 +3,14 @@ package de.kaliburg.morefair.dto;
 import de.kaliburg.morefair.controller.FairController;
 import lombok.Data;
 
+import java.math.BigInteger;
+
 @Data
 public class InfoDTO {
     private Integer updateLadderStepsBeforeSync;
     private Integer updateChatStepsBeforeSync;
     private Integer ladderAreaSize;
-    private Long pointsForPromote;
+    private BigInteger pointsForPromote;
     private Integer peopleForPromote;
 
     public InfoDTO() {

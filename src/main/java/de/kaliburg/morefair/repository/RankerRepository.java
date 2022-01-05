@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigInteger;
 import java.util.List;
 
 public interface RankerRepository extends JpaRepository<Ranker, Long> {
@@ -44,7 +45,7 @@ public interface RankerRepository extends JpaRepository<Ranker, Long> {
 
     @Modifying(clearAutomatically = true)
     @Query("UPDATE Ranker r SET r.rank = :rank, r.points = :points, r.power = :power WHERE r.id = :id")
-    void updateRankerStatsById(@Param("id") Long id, @Param("rank") Integer rank, @Param("points") Long points, @Param("power") Long power);
+    void updateRankerStatsById(@Param("id") Long id, @Param("rank") Integer rank, @Param("points") BigInteger points, @Param("power") BigInteger power);
 
     @Query("SELECT r FROM Ranker r WHERE r.ladder = :ladder AND " +
             "r.points = (SELECT Max(r.points) FROM Ranker r WHERE r.ladder = :ladder)")

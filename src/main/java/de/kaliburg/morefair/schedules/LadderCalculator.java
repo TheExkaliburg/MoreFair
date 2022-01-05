@@ -53,7 +53,7 @@ public class LadderCalculator {
                         for (int j = i - 1; j >= 0; j--) {                                                      //      O(r/2) worst case; probably more of O(1)
                             // If one of the already calculated Rankers have less points than this ranker
                             // swap these in the list... This way we keep the list sorted, theoretically
-                            if (currentRanker.getPoints() > rankers.get(j).getPoints()) {
+                            if (currentRanker.getPoints().compareTo(rankers.get(j).getPoints()) > 0) {
                                 rankers.set(j + 1, rankers.get(j));
                                 rankers.get(j + 1).setRank(j + 2);
                                 currentRanker.setRank(j + 1);

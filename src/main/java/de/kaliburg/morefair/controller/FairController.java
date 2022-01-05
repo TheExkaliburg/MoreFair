@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.math.BigInteger;
+
 @Controller
 @Slf4j
 public class FairController {
@@ -14,7 +16,7 @@ public class FairController {
     public static final Integer UPDATE_CHAT_STEPS_BEFORE_SYNC = 30;
     public final static Integer LADDER_AREA_SIZE = 10;
     public final static Integer PEOPLE_FOR_PROMOTE = 10;
-    public final static Long POINTS_FOR_PROMOTE = 250000000L;
+    public final static BigInteger POINTS_FOR_PROMOTE = BigInteger.valueOf(250000000L);
     public final static Integer LADDER_AREA_SIZE_SERVER = 30;
 
     @GetMapping("/")

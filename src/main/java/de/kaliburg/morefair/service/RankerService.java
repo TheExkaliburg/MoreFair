@@ -11,6 +11,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.UUID;
 
@@ -106,9 +107,8 @@ public class RankerService {
     public boolean buyBias(Account account) {
         Ranker ranker = findHighestRankerByAccount(account);
         long cost = Math.round(Math.pow(ranker.getLadder().getNumber() + 1, ranker.getBias()));
-        if (ranker.getPoints() >= cost) {
-            ranker.setPoints(0L);
-            //ranker.setPower(0L);
+        if (ranker.getPoints().compareTo(BigInteger.valueOf(cost)) >= 0) {
+            ranker.setPoints(BigInteger.ZERO);
             ranker.setBias(ranker.getBias() + 1);
             rankerRepository.save(ranker);
             updateRankerRankByLadder(ranker.getLadder());
@@ -121,9 +121,9 @@ public class RankerService {
     public boolean buyMulti(Account account) {
         Ranker ranker = findHighestRankerByAccount(account);
         long cost = Math.round(Math.pow(ranker.getLadder().getNumber() + 1, ranker.getMultiplier()));
-        if (ranker.getPower() >= cost) {
-            ranker.setPoints(0L);
-            ranker.setPower(0L);
+        if (ranker.getPower().compareTo(BigInteger.valueOf(cost)) >= 0) {
+            ranker.setPoints(BigInteger.ZERO);
+            ranker.setPower(BigInteger.ZERO);
             ranker.setBias(0);
             ranker.setMultiplier(ranker.getMultiplier() + 1);
             rankerRepository.save(ranker);
@@ -141,26 +141,10 @@ public class RankerService {
         updateAllRankerStats(rankerList);
     }
 
-
-    /*@Transactional
-    public boolean buyMulti(Account account) {
-        Ranker ranker = findHighestRankerByAccount(account);
-        long cost = Math.round(Math.pow(ranker.getLadder().getNumber() + 1, ranker.getMultiplier()));
-        if (ranker.getPower() >= cost) {
-            ranker.setPoints(0L);
-            ranker.setPower(0L);
-            ranker.setBias(0);
-            ranker.setMultiplier(ranker.getMultiplier() + 1);
-            rankerRepository.save(ranker);
-            updateRankerRankByLadder(ranker.getLadder());
-            return true;
-        }
-        return false;
-    }*/
     @Transactional
     public boolean promote(Account account) {
         Ranker ranker = findHighestRankerByAccount(account);
-        if (ranker.getRank() == 1 && ranker.getLadder().getSize() >= FairController.PEOPLE_FOR_PROMOTE && ranker.getPoints() >= FairController.POINTS_FOR_PROMOTE) {
+        if (ranker.getRank() == 1 && ranker.getLadder().getSize() >= FairController.PEOPLE_FOR_PROMOTE && ranker.getPoints().compareTo(FairController.POINTS_FOR_PROMOTE) >= 0) {
             ranker.setGrowing(false);
             createNewRankerForAccountOnLadder(account, ranker.getLadder().getNumber() + 1);
             return true;

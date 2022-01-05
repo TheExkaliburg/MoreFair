@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 import java.util.UUID;
 
 @Entity
@@ -25,10 +26,10 @@ public class Ranker {
     private UUID uuid;
     @NonNull
     @Column(nullable = false)
-    private Long points = 0L;
+    private BigInteger points = BigInteger.ZERO;
     @NonNull
     @Column(nullable = false)
-    private Long power = 1L;
+    private BigInteger power = BigInteger.ZERO;
     @NonNull
     @Column(nullable = false)
     private Integer bias = 0;
@@ -48,24 +49,22 @@ public class Ranker {
     @Column(nullable = false)
     private Integer rank;
 
-    public Ranker addPoints(Long points) {
-        this.points += points;
-        return this;
-    }
-
     public Ranker addPoints(Integer points) {
-        this.points += points;
+        return addPoints(BigInteger.valueOf(points));
+    }
+
+    public Ranker addPoints(BigInteger points) {
+        this.points = this.points.add(points);
         return this;
     }
 
-    public Ranker addPower(Long power) {
-        this.power += power;
+    public Ranker addPower(BigInteger power) {
+        this.power = this.power.add(power);
         return this;
     }
 
     public Ranker addPower(Integer power) {
-        this.power += power;
-        return this;
+        return addPower(BigInteger.valueOf(power));
     }
 
     public RankerDTO dto() {
