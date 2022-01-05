@@ -32,14 +32,17 @@
         <caption>
             <nav class="navbar navbar-light bg-light" style="border: 0px solid green">
                 <div class="container-fluid" style="border: 0px solid yellow">
-                    <div class="col text-start" style="border: 0px solid black">
-                        <p id="ladderNumber"></p>
+                    <div class="row col-4 text-start" style="border: 0px solid black">
+                        <!--button class="col-2 btn btn-secondary btn-sm">
+                            <i class="bi bi-gem"><i>
+                        <button-->
+                        <p class="col h3" href="#" id="ladderNumber"></p>
                     </div>
-                    <div class="col text-center" style="border: 0px solid black">
-                        <p id="rankerCount"></p>
+                    <div class="col-4 text-center" style="border: 0px solid black">
+                        <p class="h3" id="rankerCount" style="text-decoration: none"></p>
                     </div>
                     <div class="col-4 text-end" style="border: 0px solid black">
-                        <p id="usernameText"></p>
+                        <p class="h3" id="usernameText" style="text-decoration: none"></p>
                     </div>
                 </div>
             </nav>
@@ -87,15 +90,13 @@
                 </button>
             </div>
         </div>
-        <div class="col-1" data-toggle="tooltip"
-             id="multiTooltip">
+        <div class="col-1" data-toggle="tooltip" id="multiTooltip">
             <button class="col-12 btn btn-outline-dark btn shadow-none text-center"
                     id="multiButton" onclick="buyMulti()">
                 +1 Multi
             </button>
         </div>
-        <div class="col-1" data-toggle="tooltip"
-             id="biasTooltip">
+        <div class="col-1" data-toggle="tooltip" id="biasTooltip">
             <button class="col-12 btn btn-outline-dark btn shadow-none text-center"
                     id="biasButton" onclick="buyBias()">
                 +1 Bias

@@ -87,9 +87,7 @@ async function buyBias() {
         } catch (err) {
             if (err.response.status === 403) {
                 biasButton.disabled = false;
-                return;
             }
-            console.error(err);
         }
     }
 }
@@ -97,7 +95,7 @@ async function buyBias() {
 
 async function buyMulti() {
     multiButton.disabled = true;
-    $('#biasButton').tooltip('hide');
+    $('#multiTooltip').tooltip('hide');
     let cost = getCost(yourRanker.multiplier + 1);
     if (yourRanker.power > cost) {
         try {
@@ -109,9 +107,7 @@ async function buyMulti() {
         } catch (err) {
             if (err.response.status === 403) {
                 multiButton.disabled = false;
-                return;
             }
-            console.error(err);
         }
     }
 }
