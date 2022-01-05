@@ -16,7 +16,8 @@ public class FairController {
     public static final Integer UPDATE_CHAT_STEPS_BEFORE_SYNC = 30;
     public final static Integer LADDER_AREA_SIZE = 10;
     public final static Integer PEOPLE_FOR_PROMOTE = 10;
-    public final static BigInteger POINTS_FOR_PROMOTE = new BigInteger("92233720368547758070");
+    // 250 Millionen
+    public final static BigInteger POINTS_FOR_PROMOTE = new BigInteger("250000000");
     public final static Integer LADDER_AREA_SIZE_SERVER = 30;
 
     @GetMapping("/")

@@ -239,6 +239,27 @@ function reloadInformation() {
     document.getElementById("rankerCount").innerHTML =
         "Rankers: " + ladderData.currentLadder.growingRankerCount + "/" + ladderData.currentLadder.size;
     document.getElementById("ladderNumber").innerHTML = "Ladder # " + ladderData.currentLadder.number;
+
+    let offCanvasBody = $('#offCanvasBody');
+    offCanvasBody.empty();
+    for (let i = 1; i <= ladderData.currentLadder.number; i++) {
+        let ladder = $(document.createElement('li')).prop({
+            class: "nav-link"
+        });
+
+        let ladderLinK = $(document.createElement('a')).prop({
+            href: '#',
+            innerHTML: 'Chad #' + i,
+            class: "nav-link h5"
+        });
+
+        ladderLinK.click(async function () {
+            await getChat(i);
+        })
+
+        ladder.append(ladderLinK);
+        offCanvasBody.prepend(ladder);
+    }
 }
 
 function writeNewRow(body, ranker) {
@@ -338,7 +359,6 @@ async function promptNameChange() {
 async function getChat(ladderNum) {
     try {
         const response = await axios.get("/fair/chat?ladder=" + ladderNum);
-
         if (response.status === 200) {
             chatData = response.data;
         }
@@ -351,7 +371,7 @@ async function getChat(ladderNum) {
     for (let i = 0; i < chatData.messages.length; i++) {
         let message = chatData.messages[i];
         let row = body.insertRow();
-        row.insertCell(0).innerHTML = message.username;
+        row.insertCell(0).innerHTML = message.username + ":";
         row.cells[0].classList.add('overflow-hidden')
         row.cells[0].style.whiteSpace = 'nowrap';
         row.insertCell(1).innerHTML = message.message;
