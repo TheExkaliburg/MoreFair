@@ -4,6 +4,7 @@ import de.kaliburg.morefair.entity.Ranker;
 import lombok.Data;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.web.util.HtmlUtils;
+import org.springframework.web.util.JavaScriptUtils;
 
 @Data
 public class RankerDTO {
@@ -18,7 +19,7 @@ public class RankerDTO {
     private boolean isGrowing;
 
     public RankerDTO(Ranker ranker) {
-        this.username = HtmlUtils.htmlEscape(StringEscapeUtils.unescapeJava(ranker.getAccount().getUsername()));
+        this.username = JavaScriptUtils.javaScriptEscape(HtmlUtils.htmlEscape(StringEscapeUtils.unescapeJava(ranker.getAccount().getUsername())));
         this.rank = ranker.getRank();
         this.points = ranker.getPoints().toString();
         this.power = ranker.getPower().toString();
