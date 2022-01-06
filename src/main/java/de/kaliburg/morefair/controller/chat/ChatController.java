@@ -66,7 +66,7 @@ public class ChatController {
             DatabaseWriteSemaphore.getInstance().acquire();
             try {
                 Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
-                if (account == null) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+                if (account == null || account.getIsMuted()) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
                 if (ladder <= rankerService.findHighestRankerByAccount(account).getLadder().getNumber()) {
                     chatService.writeMessage(account, ladder, message);
                     return new ResponseEntity<>(HttpStatus.CREATED);
