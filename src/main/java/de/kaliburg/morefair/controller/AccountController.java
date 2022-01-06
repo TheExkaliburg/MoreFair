@@ -52,17 +52,17 @@ public class AccountController {
     public ResponseEntity<AccountDetailsDTO> postLogin(String uuid, HttpServletRequest request) {
         log.debug("POST /fair/login {}", uuid);
         if (uuid.isBlank()) {
-            return new ResponseEntity<>(accountService.createNewAccount(), HttpStatus.CREATED);
+            return new ResponseEntity<>(accountService.createNewAccount(request.getRemoteAddr()), HttpStatus.CREATED);
         }
         try {
             try {
                 DatabaseWriteSemaphore.getInstance().acquire();
                 Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
                 if (account == null) {
-                    return new ResponseEntity<>(accountService.createNewAccount(),
+                    return new ResponseEntity<>(accountService.createNewAccount(request.getRemoteAddr()),
                             HttpStatus.CREATED);
                 } else {
-                    accountService.login(account);
+                    accountService.login(account, request.getRemoteAddr());
                     return new ResponseEntity<>(account.dto(), HttpStatus.OK);
                 }
             } finally {

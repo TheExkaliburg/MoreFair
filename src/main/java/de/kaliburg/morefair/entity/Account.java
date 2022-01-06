@@ -42,6 +42,8 @@ public class Account {
     @NonNull
     @Column(nullable = false)
     private LocalDateTime lastLogin = LocalDateTime.now();
+    @Column
+    private String lastIp;
 
     public AccountDetailsDTO dto() {
         return new AccountDetailsDTO(this);

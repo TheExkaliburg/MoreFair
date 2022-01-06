@@ -27,7 +27,7 @@ public class AccountService {
         this.rankerRepository = rankerRepository;
     }
 
-    public AccountDetailsDTO createNewAccount() {
+    public AccountDetailsDTO createNewAccount(String remoteAddress) {
         Account result = new Account(UUID.randomUUID(), "");
         Ladder l1 = ladderRepository.findByNumber(1);
         Ranker ranker = new Ranker(UUID.randomUUID(), l1, result, l1.getRankers().size() + 1);
@@ -55,8 +55,9 @@ public class AccountService {
         accountRepository.save(account);
     }
 
-    public void login(Account account) {
+    public void login(Account account, String remoteAddress) {
         // Set Login Date
+        account.setLastIp(remoteAddress);
         account.setLastLogin(LocalDateTime.now());
         accountRepository.save(account);
     }
