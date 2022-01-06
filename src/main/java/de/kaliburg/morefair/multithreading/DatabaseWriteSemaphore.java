@@ -19,11 +19,11 @@ public class DatabaseWriteSemaphore {
     }
 
     public void acquire() throws InterruptedException {
-
+        semaphore.acquire();
     }
 
     public void release() throws InterruptedException {
-
+        semaphore.release();
     }
 
     public boolean tryAcquire() {
