@@ -108,17 +108,17 @@ async function buyBias() {
     $('#biasTooltip').tooltip('hide');
     let cost = new Decimal(getCost(yourRanker.bias + 1));
     if (yourRanker.points.compare(cost) > 0) {
+        yourRanker.points = 0;
+        yourRanker.bias += 1;
         try {
             const response = await axios.post('/fair/ranker/bias');
-            if (response.status === 200) {
-                updateLadderSteps = 0;
-                await getLadder();
-            }
         } catch (err) {
             if (err.response.status === 403) {
                 biasButton.disabled = false;
             }
         }
+        updateLadderSteps = 0;
+        await getLadder();
     }
 }
 
@@ -128,17 +128,19 @@ async function buyMulti() {
     $('#multiTooltip').tooltip('hide');
     let cost = new Decimal(getCost(yourRanker.multiplier + 1));
     if (yourRanker.power.compare(cost) > 0) {
+        yourRanker.power = 0;
+        yourRanker.points = 0;
+        yourRanker.bias = 0;
+        yourRanker.multi += 1;
         try {
             const response = await axios.post('/fair/ranker/multiplier');
-            if (response.status === 200) {
-                updateLadderSteps = 0;
-                await getLadder();
-            }
         } catch (err) {
             if (err.response.status === 403) {
                 multiButton.disabled = false;
             }
         }
+        updateLadderSteps = 0;
+        await getLadder();
     }
 }
 
@@ -277,18 +279,6 @@ function reloadInformation() {
 
 function writeNewRow(body, ranker) {
     let row = body.insertRow();
-    // <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-asterisk" viewBox="0 0 16 16">
-    //   <path d="M8 0a1 1 0 0 1 1 1v5.268l4.562-2.634a1 1 0 1 1 1 1.732L10 8l4.562 2.634a1 1 0 1 1-1 1.732L9 9.732V15a1 1 0 1 1-2 0V9.732l-4.562 2.634a1 1 0 1 1-1-1.732L6 8 1.438 5.366a1 1 0 0 1 1-1.732L7 6.268V1a1 1 0 0 1 1-1z"></path>
-    // </svg>
-    /*
-    $(row.cells[0]).append($(document.createElement('p')).prop({
-        class: "text-start col",
-        innerHTML: ranker.rank
-    }));
-    $(row.cells[0]).append($(document.createElement('i')).prop({
-        class: "text-end col bi bi-asterisk",
-        style: "padding-right: 100px"
-    }));*/
 
     let assholeTag = (ranker.timesAsshole < infoData.assholeTags.length) ?
         infoData.assholeTags[ranker.timesAsshole] : infoData.assholeTags[infoData.assholeTags.length - 1];
@@ -361,7 +351,7 @@ async function promptNameChange() {
         newUsername = temp;
     }
 
-    if (newUsername && newUsername !== yourRanker.username) {
+    if (newUsername && newUsername.trim() !== "" && newUsername !== yourRanker.username) {
         try {
             const response = await axios.put('/fair/account', new URLSearchParams({
                 username: newUsername
@@ -408,25 +398,27 @@ async function getChat(ladderNum) {
 
 async function postChat() {
     let message = $('#messageInput')[0];
-    if (message.value === "") return;
+    const messageData = message.value;
+    if (messageData === "") return;
+    message.value = "";
     try {
         const response = await axios.post('/fair/chat', new URLSearchParams({
             ladder: chatData.currentChatNumber,
-            message: message.value
+            message: messageData
         }));
-        message.value = "";
         if (response.status === 200) {
             chatData = response.data;
         }
         updateChatSteps = 0;
         await getChat(chatData.currentChatNumber);
     } catch (err) {
-
+        // Resetting the value if he can't postChat
+        message.value = messageData;
     }
-    message.value = "";
 }
 
 async function promote() {
+    $('#promoteButton').hide();
     try {
         const response = await axios.post('/fair/ranker/promote');
         if (response.status === 200) {
@@ -441,17 +433,21 @@ async function promote() {
 }
 
 async function beAsshole() {
-    if (confirm("Do you really wanna be an Asshole?!")) {
-        try {
-            const response = await axios.post('fair/ranker/asshole');
-            if (response.status === 200) {
-                updateLadderSteps = 0;
-                await getLadder();
-                updateChatSteps = 0;
-                await getChat(chatData.currentChatNumber + 1);
+    if (ladderData.firstRanker.you && ladderData.currentLadder.size >= infoData.peopleForPromote
+        && ladderData.firstRanker.points.cmp(infoData.pointsForPromote) >= 0
+        && ladderData.currentLadder.number === infoData.assholeLadder) {
+        if (confirm("Do you really wanna be an Asshole?! This is your only chance, you can still cancel!")) {
+            try {
+                const response = await axios.post('fair/ranker/asshole');
+                if (response.status === 200) {
+                    updateLadderSteps = 0;
+                    await getLadder();
+                    updateChatSteps = 0;
+                    await getChat(chatData.currentChatNumber + 1);
+                }
+            } catch (err) {
+                return;
             }
-        } catch (err) {
-            return;
         }
     }
 }
