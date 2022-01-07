@@ -27,4 +27,8 @@ public class RankerDTO {
         this.isGrowing = ranker.isGrowing();
         this.timesAsshole = ranker.getAccount().getTimesAsshole();
     }
+
+    public RankerDTO() {
+
+    }
 }

@@ -12,9 +12,9 @@ let ladderData = {
     rankers: [rankerTemplate],
     currentLadder: {number: 0, size: 1, growingRankerCount: 1},
     firstRanker: rankerTemplate,
+    yourRanker: rankerTemplate,
     startRank: 1
 };
-let yourRanker = rankerTemplate;
 
 let messageTemplate = {
     username: "Username",
@@ -106,10 +106,10 @@ async function update() {
 async function buyBias() {
     biasButton.disabled = true;
     $('#biasTooltip').tooltip('hide');
-    let cost = new Decimal(getCost(yourRanker.bias + 1));
-    if (yourRanker.points.compare(cost) > 0) {
-        yourRanker.points = 0;
-        yourRanker.bias += 1;
+    let cost = new Decimal(getCost(ladderData.yourRanker.bias + 1));
+    if (ladderData.yourRanker.points.compare(cost) > 0) {
+        ladderData.yourRanker.points = 0;
+        ladderData.yourRanker.bias += 1;
         try {
             const response = await axios.post('/fair/ranker/bias');
         } catch (err) {
@@ -126,12 +126,12 @@ async function buyBias() {
 async function buyMulti() {
     multiButton.disabled = true;
     $('#multiTooltip').tooltip('hide');
-    let cost = new Decimal(getCost(yourRanker.multiplier + 1));
-    if (yourRanker.power.compare(cost) > 0) {
-        yourRanker.power = 0;
-        yourRanker.points = 0;
-        yourRanker.bias = 0;
-        yourRanker.multi += 1;
+    let cost = new Decimal(getCost(ladderData.yourRanker.multiplier + 1));
+    if (ladderData.yourRanker.power.compare(cost) > 0) {
+        ladderData.yourRanker.power = 0;
+        ladderData.yourRanker.points = 0;
+        ladderData.yourRanker.bias = 0;
+        ladderData.yourRanker.multi += 1;
         try {
             const response = await axios.post('/fair/ranker/multiplier');
         } catch (err) {
@@ -154,10 +154,8 @@ async function getLadder(forcedReload = false) {
         });
         ladderData.firstRanker.points = new Decimal(ladderData.firstRanker.points);
         ladderData.firstRanker.power = new Decimal(ladderData.firstRanker.power);
-
-        yourRanker = ladderData.rankers.filter(r => {
-            return r.you === true;
-        })[0];
+        ladderData.yourRanker.points = new Decimal(ladderData.yourRanker.points);
+        ladderData.yourRanker.power = new Decimal(ladderData.yourRanker.power);
 
         await sortLadder(forcedReload)
         await reloadLadder(forcedReload);
@@ -169,7 +167,7 @@ async function getLadder(forcedReload = false) {
 
 async function reloadLadder(forcedReload = false) {
     let size = ladderData.currentLadder.size;
-    let rank = yourRanker.rank;
+    let rank = ladderData.yourRanker.rank;
     let startRank = rank + 1 - Math.round(infoData.ladderAreaSize / 2);
     let endRank = rank + Math.round(infoData.ladderAreaSize / 2) - 1;
 
@@ -203,14 +201,14 @@ async function reloadLadder(forcedReload = false) {
         body.rows[i].style.visibility = 'hidden';
     }
 
-    let biasCost = getCost(yourRanker.bias + 1);
-    if (yourRanker.points.cmp(biasCost) > 0) {
+    let biasCost = getCost(ladderData.yourRanker.bias + 1);
+    if (ladderData.yourRanker.points.cmp(biasCost) > 0) {
         biasButton.disabled = false;
     } else {
         biasButton.disabled = true;
     }
-    let multiCost = getCost(yourRanker.multiplier + 1);
-    if (yourRanker.power.cmp(new Decimal(multiCost)) > 0) {
+    let multiCost = getCost(ladderData.yourRanker.multiplier + 1);
+    if (ladderData.yourRanker.power.cmp(new Decimal(multiCost)) > 0) {
         multiButton.disabled = false;
     } else {
         multiButton.disabled = true;
@@ -344,14 +342,14 @@ function format(number) {
 }
 
 async function promptNameChange() {
-    let newUsername = window.prompt("What shall be your new name? (max. 32 characters)", yourRanker.username);
+    let newUsername = window.prompt("What shall be your new name? (max. 32 characters)", ladderData.yourRanker.username);
     if (newUsername && newUsername.length > 32) {
         let temp = newUsername.substring(0, 32);
         alert('The maximum number of characters in your username is 32, not ' + newUsername.length + '!');
         newUsername = temp;
     }
 
-    if (newUsername && newUsername.trim() !== "" && newUsername !== yourRanker.username) {
+    if (newUsername && newUsername.trim() !== "" && newUsername !== ladderData.yourRanker.username) {
         try {
             const response = await axios.put('/fair/account', new URLSearchParams({
                 username: newUsername

@@ -1,6 +1,7 @@
 package de.kaliburg.morefair.entity;
 
 import de.kaliburg.morefair.dto.RankerDTO;
+import de.kaliburg.morefair.dto.RankerPrivateDTO;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -48,6 +49,11 @@ public class Ranker {
     @NonNull
     @Column(nullable = false)
     private Integer rank;
+    @Column(nullable = false, precision = 1000, scale = 0)
+    private BigInteger grapes = BigInteger.ZERO;
+    @NonNull
+    @Column(nullable = false, precision = 1000, scale = 0)
+    private BigInteger vinegar = BigInteger.ZERO;
 
     public Ranker addPoints(Integer points) {
         return addPoints(BigInteger.valueOf(points));
@@ -67,7 +73,11 @@ public class Ranker {
         return addPower(BigInteger.valueOf(power));
     }
 
-    public RankerDTO dto() {
+    public RankerDTO convertToDto() {
         return new RankerDTO(this);
+    }
+
+    public RankerPrivateDTO convertToPrivateDto() {
+        return new RankerPrivateDTO(this);
     }
 }

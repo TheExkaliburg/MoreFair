@@ -44,7 +44,10 @@ public class RankerService {
         assert (currentRanker.getAccount().getUsername().equals(account.getUsername()));
 
         List<Ranker> result = findAllRankerByLadderArea(currentRanker, currentLadder);
-        return new LadderViewDTO(result, currentLadder, account, findHighestPointsByLadder(currentLadder));
+
+        LadderViewDTO ladderView = new LadderViewDTO(result, currentLadder, account, findHighestPointsByLadder(currentLadder));
+
+        return ladderView;
     }
 
     public List<Ranker> findByAccount(Account account) {
@@ -106,10 +109,12 @@ public class RankerService {
     }
 
     @Transactional
-    public void updateAllRankerStats(List<Ranker> rankers) {
-        rankers.forEach(ranker -> {
-            rankerRepository.updateRankerStatsById(ranker.getId(), ranker.getRank(), ranker.getPoints(), ranker.getPower());
-        });
+    public void saveAllRankerStats(List<Ranker> rankers) {
+        rankerRepository.saveAll(rankers);
+
+        //rankers.forEach(ranker -> {
+        //    rankerRepository.updateRankerStatsById(ranker.getId(), ranker.getRank(), ranker.getPoints(), ranker.getPower());
+        //});
     }
 
     @Transactional
@@ -147,7 +152,7 @@ public class RankerService {
         for (int i = 0; i < rankerList.size(); i++) {
             rankerList.get(i).setRank(i + 1);
         }
-        updateAllRankerStats(rankerList);
+        saveAllRankerStats(rankerList);
     }
 
     @Transactional
@@ -155,7 +160,10 @@ public class RankerService {
         Ranker ranker = findHighestRankerByAccount(account);
         if (ranker.getRank() == 1 && ranker.getLadder().getSize() >= FairController.PEOPLE_FOR_PROMOTE && ranker.getPoints().compareTo(FairController.POINTS_FOR_PROMOTE) >= 0) {
             ranker.setGrowing(false);
-            createNewRankerForAccountOnLadder(account, ranker.getLadder().getNumber() + 1);
+            Ranker newRanker = createNewRankerForAccountOnLadder(account, ranker.getLadder().getNumber() + 1);
+            newRanker.setVinegar(ranker.getVinegar());
+            newRanker.setGrapes(ranker.getGrapes());
+            rankerRepository.save(newRanker);
             return true;
         }
         return false;
@@ -188,7 +196,10 @@ public class RankerService {
                 resetAllLadders();
             } else {
                 ranker.setGrowing(false);
-                createNewRankerForAccountOnLadder(account, ranker.getLadder().getNumber() + 1);
+                Ranker newRanker = createNewRankerForAccountOnLadder(account, ranker.getLadder().getNumber() + 1);
+                newRanker.setVinegar(ranker.getVinegar());
+                newRanker.setGrapes(ranker.getGrapes());
+                rankerRepository.save(newRanker);
             }
 
             return true;

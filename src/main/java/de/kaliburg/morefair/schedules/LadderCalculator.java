@@ -1,5 +1,6 @@
 package de.kaliburg.morefair.schedules;
 
+import de.kaliburg.morefair.controller.FairController;
 import de.kaliburg.morefair.entity.Ladder;
 import de.kaliburg.morefair.entity.Ranker;
 import de.kaliburg.morefair.multithreading.DatabaseWriteSemaphore;
@@ -11,6 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @Log4j2
@@ -50,6 +52,9 @@ public class LadderCalculator {
                             currentRanker.addPower((i + currentRanker.getBias()) * currentRanker.getMultiplier());
                         currentRanker.addPoints(currentRanker.getPower());
 
+                        // Calculating Vinegar based on Grapes count
+                        currentRanker.setVinegar(currentRanker.getVinegar().add(currentRanker.getGrapes()));
+
                         for (int j = i - 1; j >= 0; j--) {
                             // If one of the already calculated Rankers have less points than this ranker
                             // swap these in the list... This way we keep the list sorted, theoretically
@@ -58,14 +63,12 @@ public class LadderCalculator {
 
                                 // Move other Ranker 1 Place down
                                 Ranker temp = rankers.get(j);
+                                temp.setRank(j + 2);
+                                if (temp.isGrowing()) temp.setGrapes(temp.getGrapes().add(BigInteger.ONE));
                                 rankers.set(j + 1, temp);
-                                rankers.get(j + 1).setRank(j + 2);
 
-                                if (temp.isGrowing())
-                                    currentRanker.getAccount().
-
-                                            // Move this Ranker 1 Place up
-                                                    currentRanker.setRank(j + 1);
+                                // Move this Ranker 1 Place up
+                                currentRanker.setRank(j + 1);
                                 rankers.set(j, currentRanker);
                             } else {
                                 break;
@@ -73,8 +76,14 @@ public class LadderCalculator {
                         }
                     }
                 }
+                // Ranker on Last Place gains 1 Grape, only if he isn't the only one
+                if (rankers.size() >= FairController.PEOPLE_FOR_PROMOTE) {
+                    Ranker lastRanker = rankers.get(rankers.size() - 1);
+                    lastRanker.setGrapes(lastRanker.getGrapes().add(BigInteger.ONE));
+                }
+
                 // Write to database here
-                rankerService.updateAllRankerStats(rankers);
+                rankerService.saveAllRankerStats(rankers);
                 ladderService.save(ladder.setSize(rankers.size()).setGrowingRankerCount(growingRankerCount));
             });
         }
