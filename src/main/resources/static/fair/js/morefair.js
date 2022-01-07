@@ -6,8 +6,17 @@ let rankerTemplate = {
     multiplier: 0,
     you: false,
     growing: true,
-    timesAsshole: 0
+    timesAsshole: 0,
+    grapes: new Decimal(0),          // only shows the actual Number on yourRanker
+    vinegar: new Decimal(0)          // only shows the actual Number on yourRanker
 }
+
+let messageTemplate = {
+    username: "Username",
+    message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque et feugiat odio.",
+    timesAsshole: 1
+}
+
 let ladderData = {
     rankers: [rankerTemplate],
     currentLadder: {number: 0, size: 1, growingRankerCount: 1},
@@ -16,24 +25,20 @@ let ladderData = {
     startRank: 1
 };
 
-let messageTemplate = {
-    username: "Username",
-    message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque et feugiat odio.",
-    timesAsshole: 1
-}
 let chatData = {
     messages: [messageTemplate, messageTemplate, messageTemplate],
     currentChatNumber: 1
 }
 
 let infoData = {
-    updateLadderStepsBeforeSync: 10,
-    updateChatStepsBeforeSync: 30,
+    updateLadderStepsBeforeSync: 30,
+    updateChatStepsBeforeSync: 60,
     ladderAreaSize: 10,
-    pointsForPromote: new Decimal(1000),
+    pointsForPromote: new Decimal(250000000),
     peopleForPromote: 10,
     assholeLadder: 15,
-    assholeTags: ['']
+    assholeTags: [''],
+    vinegarNeededToThrow: new Decimal(1000000)
 }
 
 let updateLadderSteps = 0;
@@ -45,18 +50,6 @@ let multiButton;
 let numberFormatter;
 
 
-async function getInfo() {
-    try {
-        const response = await axios.get("/fair/info");
-        if (response.status === 200) {
-            infoData = response.data;
-            infoData.pointsForPromote = new Decimal(infoData.pointsForPromote)
-        }
-    } catch (err) {
-
-    }
-}
-
 async function setup() {
     numberFormatter = new numberformat.Formatter({
         format: 'hybrid',
@@ -66,7 +59,7 @@ async function setup() {
         maxSmall: 0
     });
 
-    getInfo();
+    await getInfo();
 
     biasButton = $('#biasButton')[0];
     multiButton = $('#multiButton')[0];
@@ -100,68 +93,6 @@ async function update() {
     if (updateChatSteps >= infoData.updateChatStepsBeforeSync) {
         await getChat(chatData.currentChatNumber);
         updateChatSteps = 0;
-    }
-}
-
-async function buyBias() {
-    biasButton.disabled = true;
-    $('#biasTooltip').tooltip('hide');
-    let cost = new Decimal(getCost(ladderData.yourRanker.bias + 1));
-    if (ladderData.yourRanker.points.compare(cost) > 0) {
-        ladderData.yourRanker.points = 0;
-        ladderData.yourRanker.bias += 1;
-        try {
-            const response = await axios.post('/fair/ranker/bias');
-        } catch (err) {
-            if (err.response.status === 403) {
-                biasButton.disabled = false;
-            }
-        }
-        updateLadderSteps = 0;
-        await getLadder();
-    }
-}
-
-
-async function buyMulti() {
-    multiButton.disabled = true;
-    $('#multiTooltip').tooltip('hide');
-    let cost = new Decimal(getCost(ladderData.yourRanker.multiplier + 1));
-    if (ladderData.yourRanker.power.compare(cost) > 0) {
-        ladderData.yourRanker.power = 0;
-        ladderData.yourRanker.points = 0;
-        ladderData.yourRanker.bias = 0;
-        ladderData.yourRanker.multi += 1;
-        try {
-            const response = await axios.post('/fair/ranker/multiplier');
-        } catch (err) {
-            if (err.response.status === 403) {
-                multiButton.disabled = false;
-            }
-        }
-        updateLadderSteps = 0;
-        await getLadder();
-    }
-}
-
-async function getLadder(forcedReload = false) {
-    try {
-        const response = await axios.get("/fair/ranker");
-        ladderData = response.data;
-        ladderData.rankers.forEach(r => {
-            r.points = new Decimal(r.points);
-            r.power = new Decimal(r.power);
-        });
-        ladderData.firstRanker.points = new Decimal(ladderData.firstRanker.points);
-        ladderData.firstRanker.power = new Decimal(ladderData.firstRanker.power);
-        ladderData.yourRanker.points = new Decimal(ladderData.yourRanker.points);
-        ladderData.yourRanker.power = new Decimal(ladderData.yourRanker.power);
-
-        await sortLadder(forcedReload)
-        await reloadLadder(forcedReload);
-        reloadInformation();
-    } catch (err) {
-        console.error(err);
     }
 }
 
@@ -201,13 +132,13 @@ async function reloadLadder(forcedReload = false) {
         body.rows[i].style.visibility = 'hidden';
     }
 
-    let biasCost = getCost(ladderData.yourRanker.bias + 1);
+    let biasCost = getUpgradeCost(ladderData.yourRanker.bias + 1);
     if (ladderData.yourRanker.points.cmp(biasCost) > 0) {
         biasButton.disabled = false;
     } else {
         biasButton.disabled = true;
     }
-    let multiCost = getCost(ladderData.yourRanker.multiplier + 1);
+    let multiCost = getUpgradeCost(ladderData.yourRanker.multiplier + 1);
     if (ladderData.yourRanker.power.cmp(new Decimal(multiCost)) > 0) {
         multiButton.disabled = false;
     } else {
@@ -215,6 +146,17 @@ async function reloadLadder(forcedReload = false) {
     }
     $('#biasTooltip').attr('data-bs-original-title', numberFormatter.format(biasCost) + ' Points');
     $('#multiTooltip').attr('data-bs-original-title', numberFormatter.format(multiCost) + ' Power');
+
+    let tag1 = '', tag2 = '';
+
+    if (ladderData.yourRanker.vinegar.cmp(getVinegarThrowCost()) >= 0) {
+        tag1 = '<p style="color: plum">'
+        tag2 = '</p>'
+    }
+
+    $('#infoText').html('Grapes: ' + numberFormatter.format(ladderData.yourRanker.grapes) + '<br>' + tag1 + 'Vinegar: ' + numberFormatter.format(ladderData.yourRanker.vinegar) + tag2);
+
+
     showPromote();
 }
 
@@ -241,13 +183,9 @@ function showPromote() {
 }
 
 function reloadInformation() {
-    let yourRanker = ladderData.rankers.filter(r => {
-        return r.you === true;
-    })[0];
-
-    document.getElementById("usernameLink").innerHTML = yourRanker.username;
+    document.getElementById("usernameLink").innerHTML = ladderData.yourRanker.username;
     document.getElementById("usernameText").innerHTML =
-        "+" + yourRanker.bias + "   x" + yourRanker.multiplier;
+        "+" + ladderData.yourRanker.bias + "   x" + ladderData.yourRanker.multiplier;
 
     document.getElementById("rankerCount").innerHTML =
         "Rankers: " + ladderData.currentLadder.growingRankerCount + "/" + ladderData.currentLadder.size;
@@ -279,18 +217,29 @@ function writeNewRow(body, ranker) {
     let row = body.insertRow();
     let assholeTag = (ranker.timesAsshole < infoData.assholeTags.length) ?
         infoData.assholeTags[ranker.timesAsshole] : infoData.assholeTags[infoData.assholeTags.length - 1];
-    row.insertCell(0).innerHTML = ranker.rank + assholeTag;
+    let rank = (ranker.rank === 1 && !ranker.you && ranker.growing && ladderData.currentLadder.size >= infoData.peopleForPromote
+        && ladderData.firstRanker.points.cmp(infoData.pointsForPromote) >= 0) ?
+        '<a href="#" style="text-decoration: none" onclick="throwVinegar()">🍇</a>' : ranker.rank;
+    row.insertCell(0).innerHTML = rank + assholeTag;
     row.insertCell(1).innerHTML = ranker.username;
     row.cells[1].style.overflow = "hidden";
-    row.insertCell(2).innerHTML = numberFormatter.format(ranker.power);
+    row.insertCell(2).innerHTML = numberFormatter.format(ranker.power) + ' [+' + ranker.bias + ' x' + ranker.multiplier + ']';
     row.cells[2].classList.add('text-end');
     row.insertCell(3).innerHTML = numberFormatter.format(ranker.points);
     row.cells[3].classList.add('text-end');
     if (ranker.you) row.classList.add('table-active');
-    return row
+    return row;
 }
 
 async function calculatePoints() {
+    if (ladderData.yourRanker.rank === ladderData.currentLadder.size && ladderData.currentLadder.size >= infoData.peopleForPromote)
+        ladderData.yourRanker.grapes = ladderData.yourRanker.grapes.add(new Decimal(1));
+    ladderData.yourRanker.vinegar = ladderData.yourRanker.vinegar.add(ladderData.yourRanker.grapes);
+
+    if (ladderData.startRank > 1 && ladderData.firstRanker.growing) {
+        ladderData.firstRanker.points = ladderData.firstRanker.points.add(ladderData.firstRanker.power);
+    }
+
     ladderData.rankers.forEach(ranker => {
         if (ranker.growing) {
             let temp = new Decimal(0);
@@ -304,11 +253,8 @@ async function calculatePoints() {
         }
     });
 
-    if (ladderData.startRank > 1) {
-        ladderData.firstRanker.points = ladderData.firstRanker.points.add(ladderData.firstRanker.power);
-    }
 
-    await sortLadder()
+    await sortLadder();
     await reloadLadder();
 }
 
@@ -317,7 +263,13 @@ async function sortLadder(forcedReload = false) {
 
     for (let i = 0; i < ladderData.rankers.length; i++) {
         ladderData.rankers[i].rank = ladderData.startRank + i;
+        if (ladderData.rankers[i].you) {
+            ladderData.yourRanker.points = ladderData.rankers[i].points;
+            ladderData.yourRanker.power = ladderData.rankers[i].power;
+            ladderData.yourRanker.rank = ladderData.rankers[i].rank;
+        }
     }
+
 
     if (ladderData.rankers[0].rank === 1) {
         ladderData.firstRanker = ladderData.rankers[0];
@@ -332,120 +284,14 @@ async function sortLadder(forcedReload = false) {
     }
 }
 
-function getCost(level) {
+function getUpgradeCost(level) {
     return Math.round(Math.pow(ladderData.currentLadder.number + 1, level));
 }
 
-
-function format(number) {
-    return numberFormatter.format(number);
+function getVinegarThrowCost() {
+    return infoData.vinegarNeededToThrow.mul(new Decimal(2).pow(new Decimal(ladderData.currentLadder.number - 1)));
 }
 
-async function promptNameChange() {
-    let newUsername = window.prompt("What shall be your new name? (max. 32 characters)", ladderData.yourRanker.username);
-    if (newUsername && newUsername.length > 32) {
-        let temp = newUsername.substring(0, 32);
-        alert('The maximum number of characters in your username is 32, not ' + newUsername.length + '!');
-        newUsername = temp;
-    }
 
-    if (newUsername && newUsername.trim() !== "" && newUsername !== ladderData.yourRanker.username) {
-        try {
-            const response = await axios.put('/fair/account', new URLSearchParams({
-                username: newUsername
-            }));
-            if (response.status === 200) {
-                updateLadderSteps = 0;
-                updateChatSteps = 0;
-                await getLadder();
-                await getChat();
-            }
-        } catch (err) {
-            if (err.response.status === 403) {
-                return;
-            }
-            console.error(err);
-        }
-    }
-}
 
-async function getChat(ladderNum) {
-    try {
-        const response = await axios.get("/fair/chat?ladder=" + ladderNum);
-        if (response.status === 200) {
-            chatData = response.data;
-        }
-    } catch (err) {
 
-    }
-
-    let body = $('#messagesBody')[0];
-    body.innerHTML = "";
-    for (let i = 0; i < chatData.messages.length; i++) {
-        let message = chatData.messages[i];
-        let row = body.insertRow();
-        let assholeTag = (message.timesAsshole < infoData.assholeTags.length) ?
-            infoData.assholeTags[message.timesAsshole] : infoData.assholeTags[infoData.assholeTags.length - 1];
-        row.insertCell(0).innerHTML = message.username + ": " + assholeTag;
-        row.cells[0].classList.add('overflow-hidden')
-        row.cells[0].style.whiteSpace = 'nowrap';
-        row.insertCell(1).innerHTML = message.message;
-    }
-
-}
-
-async function postChat() {
-    let message = $('#messageInput')[0];
-    const messageData = message.value;
-    if (messageData === "") return;
-    message.value = "";
-    try {
-        const response = await axios.post('/fair/chat', new URLSearchParams({
-            ladder: chatData.currentChatNumber,
-            message: messageData
-        }));
-        if (response.status === 200) {
-            chatData = response.data;
-        }
-        updateChatSteps = 0;
-        await getChat(chatData.currentChatNumber);
-    } catch (err) {
-        // Resetting the value if he can't postChat
-        message.value = messageData;
-    }
-}
-
-async function promote() {
-    $('#promoteButton').hide();
-    try {
-        const response = await axios.post('/fair/ranker/promote');
-        if (response.status === 200) {
-            updateLadderSteps = 0;
-            await getLadder();
-            updateChatSteps = 0;
-            await getChat(chatData.currentChatNumber + 1);
-        }
-    } catch (err) {
-
-    }
-}
-
-async function beAsshole() {
-    if (ladderData.firstRanker.you && ladderData.currentLadder.size >= infoData.peopleForPromote
-        && ladderData.firstRanker.points.cmp(infoData.pointsForPromote) >= 0
-        && ladderData.currentLadder.number === infoData.assholeLadder) {
-        if (confirm("Do you really wanna be an Asshole?! This is your only chance, you can still cancel!")) {
-            try {
-                const response = await axios.post('fair/ranker/asshole');
-                if (response.status === 200) {
-                    updateLadderSteps = 0;
-                    await getLadder();
-                    updateChatSteps = 0;
-                    await getChat(chatData.currentChatNumber + 1);
-                }
-            } catch (err) {
-                return;
-            }
-        }
-    }
-}

@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,7 +46,7 @@ public class RankerService {
 
         List<Ranker> result = findAllRankerByLadderArea(currentRanker, currentLadder);
 
-        LadderViewDTO ladderView = new LadderViewDTO(result, currentLadder, account, findHighestPointsByLadder(currentLadder));
+        LadderViewDTO ladderView = new LadderViewDTO(result, currentLadder, account, findHighestRankerByLadder(currentLadder));
 
         return ladderView;
     }
@@ -66,8 +67,8 @@ public class RankerService {
         return temp.get(0);
     }
 
-    public Ranker findHighestPointsByLadder(Ladder ladder) {
-        List<Ranker> temp = rankerRepository.findHighestPointsByLadder(ladder);
+    public Ranker findHighestRankerByLadder(Ladder ladder) {
+        List<Ranker> temp = rankerRepository.findHighestRankerByLadder(ladder);
 
         assert (temp.size() >= 1);
 
@@ -227,5 +228,32 @@ public class RankerService {
             rankerRepository.save(new Ranker(UUID.randomUUID(), l, a, l.getRankers().size() + 1));
             accountRepository.save(a);
         }
+    }
+
+    public boolean throwVinegar(Account account) {
+        Ranker ranker = findHighestRankerByAccount(account);
+        Ranker target = findHighestRankerByLadder(ranker.getLadder());
+
+        // if rank 1, your target is not you, you have enough people and points to promote, the target didnt already promote AND have the necessary Vinegar to throw
+        if (target.getRank() == 1 && ranker.getUuid() != target.getUuid() && target.isGrowing() && target.getLadder().getSize() >= FairController.PEOPLE_FOR_PROMOTE
+                && target.getPoints().compareTo(FairController.POINTS_FOR_PROMOTE) >= 0
+                && ranker.getVinegar().compareTo(FairController.VINEGAR_NEEDED_TO_THROW.multiply(
+                BigInteger.TWO.pow(target.getLadder().getNumber() - 1))) >= 0) {
+            BigInteger rankerVinegar = ranker.getVinegar();
+            BigInteger targetVinegar = target.getVinegar();
+            if (targetVinegar.compareTo(rankerVinegar) > 0) {
+                targetVinegar = targetVinegar.subtract(rankerVinegar);
+                rankerVinegar = BigInteger.ZERO;
+            } else {
+                targetVinegar = BigInteger.ZERO;
+                rankerVinegar = BigInteger.ZERO;
+                promote(target.getAccount());
+            }
+            target.setVinegar(targetVinegar);
+            ranker.setVinegar(rankerVinegar);
+            saveAllRankerStats(Arrays.asList(target, ranker));
+            return true;
+        }
+        return false;
     }
 }

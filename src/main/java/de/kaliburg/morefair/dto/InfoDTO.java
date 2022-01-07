@@ -14,6 +14,7 @@ public class InfoDTO {
     private Integer peopleForPromote;
     private Integer assholeLadder;
     private List<String> assholeTags;
+    private String vinegarNeededToThrow;
 
     public InfoDTO() {
         updateLadderStepsBeforeSync = FairController.UPDATE_LADDER_STEPS_BEFORE_SYNC;
@@ -23,5 +24,6 @@ public class InfoDTO {
         peopleForPromote = FairController.PEOPLE_FOR_PROMOTE;
         assholeLadder = FairController.ASSHOLE_LADDER;
         assholeTags = FairController.ASSHOLE_TAGS;
+        vinegarNeededToThrow = FairController.VINEGAR_NEEDED_TO_THROW.toString();
     }
 }

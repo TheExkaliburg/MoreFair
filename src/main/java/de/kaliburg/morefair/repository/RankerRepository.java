@@ -49,5 +49,5 @@ public interface RankerRepository extends JpaRepository<Ranker, Long> {
 
     @Query("SELECT r FROM Ranker r WHERE r.ladder = :ladder AND " +
             "r.points = (SELECT Max(r.points) FROM Ranker r WHERE r.ladder = :ladder)")
-    List<Ranker> findHighestPointsByLadder(@Param("ladder") Ladder ladder);
+    List<Ranker> findHighestRankerByLadder(@Param("ladder") Ladder ladder);
 }
