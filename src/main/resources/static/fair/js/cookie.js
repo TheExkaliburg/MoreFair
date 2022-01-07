@@ -23,15 +23,15 @@ function getCookie(cname) {
 
 async function checkCookie() {
     let uuid = getCookie("_uuid");
-    if (uuid) {
-        try {
-            const response = await axios.post('/fair/login', new URLSearchParams({uuid: uuid}));
-            if (response.status === 200 || response.status === 203) {
+    try {
+        const response = await axios.post('/fair/login', new URLSearchParams({uuid: uuid}));
+        if (response.status === 200 || response.status === 203) {
+            if (response.data.uuid) {
                 uuid = response.data.uuid;
                 setCookie("_uuid", uuid, 365 * 5);
             }
-        } catch (err) {
-            console.error(err)
         }
+    } catch (err) {
+        console.error(err)
     }
 }
