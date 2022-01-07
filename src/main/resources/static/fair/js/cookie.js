@@ -25,7 +25,7 @@ async function checkCookie() {
     let uuid = getCookie("_uuid");
     try {
         const response = await axios.post('/fair/login', new URLSearchParams({uuid: uuid}));
-        if (response.status === 200 || response.status === 203) {
+        if (response.status === 201) {
             if (response.data.uuid) {
                 uuid = response.data.uuid;
                 setCookie("_uuid", uuid, 365 * 5);
