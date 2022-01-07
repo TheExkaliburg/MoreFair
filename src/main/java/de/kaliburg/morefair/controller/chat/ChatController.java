@@ -1,24 +1,10 @@
 package de.kaliburg.morefair.controller.chat;
 
-import de.kaliburg.morefair.dto.chat.ChatDTO;
-import de.kaliburg.morefair.entity.Account;
-import de.kaliburg.morefair.multithreading.DatabaseWriteSemaphore;
 import de.kaliburg.morefair.service.AccountService;
 import de.kaliburg.morefair.service.RankerService;
 import de.kaliburg.morefair.service.chat.ChatService;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.text.StringEscapeUtils;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.UUID;
 
 @Log4j2
 @Controller
@@ -33,7 +19,7 @@ public class ChatController {
         this.rankerService = rankerService;
     }
 
-    @GetMapping(value = "/fair/chat", produces = MediaType.APPLICATION_JSON_VALUE)
+    /*@GetMapping(value = "/fair/chat", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ChatDTO> getChat(@RequestParam Integer ladder, @CookieValue(name = "_uuid", defaultValue = "") String uuid, HttpServletRequest request) {
         log.debug("GET /fair/chat from {} for ladder number {}", uuid, ladder);
         uuid = StringEscapeUtils.escapeJava(uuid);
@@ -84,5 +70,5 @@ public class ChatController {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
+    }*/
 }

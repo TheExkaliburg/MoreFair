@@ -28,7 +28,7 @@ async function promptNameChange() {
                 updateLadderSteps = 0;
                 updateChatSteps = 0;
                 await getLadder();
-                await getChat();
+                //await getChat();
             }
         } catch (err) {
             if (err.response.status === 403) {
@@ -77,7 +77,7 @@ async function postChat() {
             chatData = response.data;
         }
         updateChatSteps = 0;
-        await getChat(chatData.currentChatNumber);
+        //await getChat(chatData.currentChatNumber);
     } catch (err) {
         // Resetting the value if he can't postChat
         message.value = messageData;
@@ -155,7 +155,7 @@ async function promote() {
             updateLadderSteps = 0;
             await getLadder();
             updateChatSteps = 0;
-            await getChat(chatData.currentChatNumber + 1);
+            //await getChat(chatData.currentChatNumber + 1);
         }
     } catch (err) {
 
@@ -184,7 +184,7 @@ async function beAsshole() {
                     updateLadderSteps = 0;
                     await getLadder();
                     updateChatSteps = 0;
-                    await getChat(chatData.currentChatNumber + 1);
+                    //await getChat(chatData.currentChatNumber + 1);
                 }
             } catch (err) {
                 return;

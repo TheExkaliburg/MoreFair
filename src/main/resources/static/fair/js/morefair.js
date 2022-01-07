@@ -12,8 +12,8 @@ let rankerTemplate = {
 }
 
 let messageTemplate = {
-    username: "Username",
-    message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque et feugiat odio.",
+    username: "Chad",
+    message: "Sorry, I disabled this currently, hope you have a better time playing this way. https://discord.gg/Ud7UfFJmYj",
     timesAsshole: 1
 }
 
@@ -75,7 +75,7 @@ async function setup() {
 
     await checkCookie();
     await getLadder();
-    await getChat(ladderData.currentLadder.number);
+    // await getChat(ladderData.currentLadder.number);
 
     window.setInterval(update, 1000);
 }
@@ -91,7 +91,7 @@ async function update() {
 
     updateChatSteps++;
     if (updateChatSteps >= infoData.updateChatStepsBeforeSync) {
-        await getChat(chatData.currentChatNumber);
+        //await getChat(chatData.currentChatNumber);
         updateChatSteps = 0;
     }
 }
@@ -205,7 +205,7 @@ function reloadInformation() {
         });
 
         ladderLinK.click(async function () {
-            await getChat(i);
+            //await getChat(i);
         })
 
         ladder.append(ladderLinK);
