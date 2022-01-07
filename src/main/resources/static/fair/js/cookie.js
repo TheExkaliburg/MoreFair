@@ -35,3 +35,29 @@ async function checkCookie() {
         console.error(err)
     }
 }
+
+async function importCookie() {
+    var newUUID = prompt("Paste your ID into here:");
+    try {
+        // Check if cookies are valid
+        const response = await axios.post('/fair/login', new URLSearchParams({uuid: newUUID}));
+        if (response.status === 200 && response.data.uuid) {
+            uuid = response.data.uuid;
+            setCookie("_uuid", uuid, 365 * 5);
+            // Relaod the page for the new cookies to take place
+            location.reload();
+        }
+
+    } catch (err) {
+        alert("Invalid ID!")
+        console.error(err)
+    }
+}
+
+async function exportCookie() {
+    // Copy the text inside the text field
+    await navigator.clipboard.writeText(getCookie("_uuid"));
+
+    // Alert the copied text
+    alert("Copied your ID to your clipboard! (don't lose it or give it away!)");
+}

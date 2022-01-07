@@ -1,0 +1,21 @@
+#exportButton {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    width: 100px;
+}
+
+#importButton {
+    position: absolute;
+    bottom: 0px;
+    right: 120px;
+    width: 100px;
+}
+
+.offCanvasOptions {
+    position: absolute;
+    bottom: 10px;
+    right: 20px;
+    width: 80%;
+    font-size: 18px
+}

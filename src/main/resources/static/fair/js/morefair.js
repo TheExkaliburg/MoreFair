@@ -277,7 +277,6 @@ function reloadInformation() {
 
 function writeNewRow(body, ranker) {
     let row = body.insertRow();
-
     let assholeTag = (ranker.timesAsshole < infoData.assholeTags.length) ?
         infoData.assholeTags[ranker.timesAsshole] : infoData.assholeTags[infoData.assholeTags.length - 1];
     row.insertCell(0).innerHTML = ranker.rank + assholeTag;
@@ -288,6 +287,7 @@ function writeNewRow(body, ranker) {
     row.insertCell(3).innerHTML = numberFormatter.format(ranker.points);
     row.cells[3].classList.add('text-end');
     if (ranker.you) row.classList.add('table-active');
+    return row
 }
 
 async function calculatePoints() {
