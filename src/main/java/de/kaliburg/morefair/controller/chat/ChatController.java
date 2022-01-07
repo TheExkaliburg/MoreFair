@@ -19,7 +19,8 @@ public class ChatController {
         this.rankerService = rankerService;
     }
 
-    /*@GetMapping(value = "/fair/chat", produces = MediaType.APPLICATION_JSON_VALUE)
+    /*
+    @GetMapping(value = "/fair/chat", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ChatDTO> getChat(@RequestParam Integer ladder, @CookieValue(name = "_uuid", defaultValue = "") String uuid, HttpServletRequest request) {
         log.debug("GET /fair/chat from {} for ladder number {}", uuid, ladder);
         uuid = StringEscapeUtils.escapeJava(uuid);
@@ -70,5 +71,6 @@ public class ChatController {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }*/
+    }
+    */
 }

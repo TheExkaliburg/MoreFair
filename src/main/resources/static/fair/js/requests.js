@@ -1,7 +1,7 @@
 async function getInfo() {
     try {
         const response = await axios.get("/fair/info");
-        if (response.status === 200) {
+        if (response.status === 200 && response.data.pointsForPromote) {
             infoData = response.data;
             infoData.pointsForPromote = new Decimal(infoData.pointsForPromote);
             infoData.vinegarNeededToThrow = new Decimal(infoData.vinegarNeededToThrow);
@@ -28,7 +28,7 @@ async function promptNameChange() {
                 updateLadderSteps = 0;
                 updateChatSteps = 0;
                 await getLadder();
-                //await getChat();
+                await getChat();
             }
         } catch (err) {
             if (err.response.status === 403) {
@@ -41,10 +41,12 @@ async function promptNameChange() {
 
 async function getChat(ladderNum) {
     try {
+        /*
         const response = await axios.get("/fair/chat?ladder=" + ladderNum);
         if (response.status === 200) {
             chatData = response.data;
         }
+         */
     } catch (err) {
 
     }
@@ -69,6 +71,7 @@ async function postChat() {
     if (messageData === "") return;
     message.value = "";
     try {
+        /*
         const response = await axios.post('/fair/chat', new URLSearchParams({
             ladder: chatData.currentChatNumber,
             message: messageData
@@ -77,7 +80,8 @@ async function postChat() {
             chatData = response.data;
         }
         updateChatSteps = 0;
-        //await getChat(chatData.currentChatNumber);
+        await getChat(chatData.currentChatNumber);
+         */
     } catch (err) {
         // Resetting the value if he can't postChat
         message.value = messageData;
@@ -132,13 +136,14 @@ async function getLadder(forcedReload = false) {
             r.points = new Decimal(r.points);
             r.power = new Decimal(r.power);
         });
-        ladderData.firstRanker.points = new Decimal(ladderData.firstRanker.points);
-        ladderData.firstRanker.power = new Decimal(ladderData.firstRanker.power);
-        ladderData.yourRanker.points = new Decimal(ladderData.yourRanker.points);
-        ladderData.yourRanker.power = new Decimal(ladderData.yourRanker.power);
-        ladderData.yourRanker.grapes = new Decimal(ladderData.yourRanker.grapes);
-        ladderData.yourRanker.vinegar = new Decimal(ladderData.yourRanker.vinegar);
-
+        if (response.status === 200 && response.data.yourRanker) {
+            ladderData.firstRanker.points = new Decimal(ladderData.firstRanker.points);
+            ladderData.firstRanker.power = new Decimal(ladderData.firstRanker.power);
+            ladderData.yourRanker.points = new Decimal(ladderData.yourRanker.points);
+            ladderData.yourRanker.power = new Decimal(ladderData.yourRanker.power);
+            ladderData.yourRanker.grapes = new Decimal(ladderData.yourRanker.grapes);
+            ladderData.yourRanker.vinegar = new Decimal(ladderData.yourRanker.vinegar);
+        }
         await sortLadder(forcedReload)
         await reloadLadder(forcedReload);
         reloadInformation();
@@ -155,7 +160,7 @@ async function promote() {
             updateLadderSteps = 0;
             await getLadder();
             updateChatSteps = 0;
-            //await getChat(chatData.currentChatNumber + 1);
+            await getChat(chatData.currentChatNumber + 1);
         }
     } catch (err) {
 
@@ -184,7 +189,7 @@ async function beAsshole() {
                     updateLadderSteps = 0;
                     await getLadder();
                     updateChatSteps = 0;
-                    //await getChat(chatData.currentChatNumber + 1);
+                    await getChat(chatData.currentChatNumber + 1);
                 }
             } catch (err) {
                 return;
