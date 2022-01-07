@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +45,11 @@ public class Account {
     private LocalDateTime lastLogin = LocalDateTime.now();
     @Column
     private String lastIp = "";
+    @Column(nullable = false, precision = 1000, scale = 0)
+    private BigInteger grapes = BigInteger.ZERO;
+    @NonNull
+    @Column(nullable = false, precision = 1000, scale = 0)
+    private BigInteger vinegar = BigInteger.ZERO;
 
     public AccountDetailsDTO dto() {
         return new AccountDetailsDTO(this);

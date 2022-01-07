@@ -33,12 +33,12 @@ public class LadderCalculator {
     @Scheduled(initialDelay = 15000, fixedRate = 1000)
     public void calc() {
         List<Ladder> ladders = ladderService.findAllLadders();
-        for (Ladder ladder : ladders) {        //O(l)
+        for (Ladder ladder : ladders) {
             DatabaseWriteSemaphore.getInstance().aquireAndAutoReleaseSilent(() -> {
                 // Read from DB here
-                List<Ranker> rankers = rankerService.findAllRankerByLadderOrderedByPoints(ladder);          //  O(r log r)
+                List<Ranker> rankers = rankerService.findAllRankerByLadderOrderedByPoints(ladder);
                 int growingRankerCount = 0;
-                for (int i = 0; i < rankers.size(); i++) {                                                      //  O(r)
+                for (int i = 0; i < rankers.size(); i++) {
                     Ranker currentRanker = rankers.get(i);
                     currentRanker.setRank(i + 1);
                     // if the ranker is currently still on the ladder
@@ -50,13 +50,22 @@ public class LadderCalculator {
                             currentRanker.addPower((i + currentRanker.getBias()) * currentRanker.getMultiplier());
                         currentRanker.addPoints(currentRanker.getPower());
 
-                        for (int j = i - 1; j >= 0; j--) {                                                      //      O(r/2) worst case; probably more of O(1)
+                        for (int j = i - 1; j >= 0; j--) {
                             // If one of the already calculated Rankers have less points than this ranker
                             // swap these in the list... This way we keep the list sorted, theoretically
                             if (currentRanker.getPoints().compareTo(rankers.get(j).getPoints()) > 0) {
-                                rankers.set(j + 1, rankers.get(j));
+                                // Move 1 Position up and move the ranker there 1 Position down
+
+                                // Move other Ranker 1 Place down
+                                Ranker temp = rankers.get(j);
+                                rankers.set(j + 1, temp);
                                 rankers.get(j + 1).setRank(j + 2);
-                                currentRanker.setRank(j + 1);
+
+                                if (temp.isGrowing())
+                                    currentRanker.getAccount().
+
+                                            // Move this Ranker 1 Place up
+                                                    currentRanker.setRank(j + 1);
                                 rankers.set(j, currentRanker);
                             } else {
                                 break;
