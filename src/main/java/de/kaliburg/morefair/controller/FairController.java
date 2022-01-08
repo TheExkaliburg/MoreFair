@@ -24,7 +24,7 @@ public class FairController {
     // 250 Millionen
     public final static BigInteger POINTS_FOR_PROMOTE = new BigInteger("250000000");
     // 1 Million
-    public final static BigInteger VINEGAR_NEEDED_TO_THROW = new BigInteger("1000000");
+    public final static BigInteger VINEGAR_NEEDED_TO_THROW = new BigInteger("2500000");
     public final static Integer ASSHOLE_LADDER = 15;
     public final static Integer ASSHOLE_FOR_RESET = 10;
     public final static List<String> ASSHOLE_TAGS = new ArrayList<>(Arrays.asList(

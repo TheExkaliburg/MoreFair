@@ -154,7 +154,7 @@ async function reloadLadder(forcedReload = false) {
         tag2 = '</p>'
     }
 
-    $('#infoText').html('Grapes: ' + numberFormatter.format(ladderData.yourRanker.grapes) + '<br>' + tag1 + 'Vinegar: ' + numberFormatter.format(ladderData.yourRanker.vinegar) + tag2);
+    $('#infoText').html('Sour Grapes: ' + numberFormatter.format(ladderData.yourRanker.grapes) + '<br>' + tag1 + 'Vinegar: ' + numberFormatter.format(ladderData.yourRanker.vinegar) + tag2);
 
 
     showPromote();
@@ -289,7 +289,7 @@ function getUpgradeCost(level) {
 }
 
 function getVinegarThrowCost() {
-    return infoData.vinegarNeededToThrow.mul(new Decimal(2).pow(new Decimal(ladderData.currentLadder.number - 1)));
+    return infoData.vinegarNeededToThrow.mul(new Decimal(ladderData.currentLadder.number));
 }
 
 
