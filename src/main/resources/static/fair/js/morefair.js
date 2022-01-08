@@ -77,6 +77,8 @@ async function setup() {
     await getLadder();
     await getChat(ladderData.currentLadder.number);
 
+    await connect();
+
     window.setInterval(update, 1000);
 }
 
@@ -154,7 +156,7 @@ async function reloadLadder(forcedReload = false) {
         tag2 = '</p>'
     }
 
-    $('#infoText').html('Grapes: ' + numberFormatter.format(ladderData.yourRanker.grapes) + '<br>' + tag1 + 'Vinegar: ' + numberFormatter.format(ladderData.yourRanker.vinegar) + tag2);
+    $('#infoText').html('Sour Grapes: ' + numberFormatter.format(ladderData.yourRanker.grapes) + '<br>' + tag1 + 'Vinegar: ' + numberFormatter.format(ladderData.yourRanker.vinegar) + tag2);
 
 
     showPromote();

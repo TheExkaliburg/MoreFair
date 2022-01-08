@@ -1,3 +1,33 @@
+let stompClient = null;
+
+async function connect() {
+    let socket = new SockJS('/fairsocket');
+    stompClient = Stomp.over(socket);
+    stompClient.connect({}, function (frame) {
+        console.log(('connected: ' + frame));
+        stompClient.subscribe('/user/queue/ladder', function (message) {
+            console.log(JSON.parse(message.body).text);
+        })
+        stompClient.subscribe('/updates/ladderupdates', function (message) {
+            console.log(JSON.parse(message.body).text);
+        })
+    })
+    stompClient.onopen = () => {
+        greet();
+    }
+}
+
+function disconnect() {
+    if (stompClient !== null) {
+        stompClient.disconnect();
+    }
+    console.log("Disconnected");
+}
+
+function greet() {
+    stompClient.send("/fair/init", {}, JSON.stringify({'uuid': getCookie("_uuid")}));
+}
+
 async function getInfo() {
     try {
         const response = await axios.get("/fair/info");
