@@ -4,17 +4,10 @@ async function connect() {
     let socket = new SockJS('/fairsocket');
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
-        console.log(('connected: ' + frame));
-        stompClient.subscribe('/user/queue/ladder', function (message) {
-            console.log(JSON.parse(message.body).text);
-        })
-        stompClient.subscribe('/updates/ladderupdates', function (message) {
-            console.log(JSON.parse(message.body).text);
-        })
+        console.log(('1connected: ' + frame));
+        stompClient.subscribe('/user/queue/login', (message) => onLogin(message))
+        login()
     })
-    stompClient.onopen = () => {
-        greet();
-    }
 }
 
 function disconnect() {
@@ -24,8 +17,17 @@ function disconnect() {
     console.log("Disconnected");
 }
 
-function greet() {
-    stompClient.send("/fair/init", {}, JSON.stringify({'uuid': getCookie("_uuid")}));
+function login() {
+    stompClient.send("/app/login", {}, JSON.stringify({'uuid': getCookie("_uuid")}));
+}
+
+function onLogin(message) {
+    if (message.status === "OK" || message.status === "CREATED") {
+        if (message.content.uuid) {
+            uuid = message.content.uuid;
+            setCookie("_uuid", uuid, 365 * 5);
+        }
+    }
 }
 
 async function getInfo() {

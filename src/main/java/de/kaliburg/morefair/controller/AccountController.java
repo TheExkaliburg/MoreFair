@@ -4,11 +4,16 @@ import de.kaliburg.morefair.dto.AccountDetailsDTO;
 import de.kaliburg.morefair.entity.Account;
 import de.kaliburg.morefair.multithreading.DatabaseWriteSemaphore;
 import de.kaliburg.morefair.service.AccountService;
+import de.kaliburg.morefair.utils.WSUtils;
+import de.kaliburg.morefair.websockets.WSMessage;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,10 +25,16 @@ import java.util.UUID;
 @Controller
 @Log4j2
 public class AccountController {
-    private final AccountService accountService;
+    private static final String LOGIN_DESTINATION = "/queue/login";
 
-    public AccountController(AccountService accountService) {
+    private final AccountService accountService;
+    private final WSUtils wsUtils;
+    private final SimpMessagingTemplate simp;
+
+    public AccountController(AccountService accountService, WSUtils wsUtils, SimpMessagingTemplate simp) {
         this.accountService = accountService;
+        this.wsUtils = wsUtils;
+        this.simp = simp;
     }
 
     @PutMapping(path = "/fair/account", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = "application/json")
@@ -52,18 +63,18 @@ public class AccountController {
     public ResponseEntity<AccountDetailsDTO> postLogin(String uuid, HttpServletRequest request) {
         log.debug("POST /fair/login {}", uuid);
         if (uuid.isBlank()) {
-            return new ResponseEntity<>(accountService.createNewAccount(request.getRemoteAddr()), HttpStatus.CREATED);
+            return new ResponseEntity<>(accountService.createNewAccount(), HttpStatus.CREATED);
         }
         try {
             try {
                 DatabaseWriteSemaphore.getInstance().acquire();
                 Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
                 if (account == null) {
-                    return new ResponseEntity<>(accountService.createNewAccount(request.getRemoteAddr()),
+                    return new ResponseEntity<>(accountService.createNewAccount(),
                             HttpStatus.CREATED);
                 } else {
-                    accountService.login(account, request.getRemoteAddr());
-                    return new ResponseEntity<>(account.dto(), HttpStatus.OK);
+                    accountService.login(account);
+                    return new ResponseEntity<>(account.convertToDTO(), HttpStatus.OK);
                 }
             } finally {
                 DatabaseWriteSemaphore.getInstance().release();
@@ -74,6 +85,44 @@ public class AccountController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (InterruptedException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @MessageMapping("/login")
+    public void ladder(SimpMessageHeaderAccessor sha, WSMessage wsMessage) throws Exception {
+        try {
+            String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
+            log.info("app/login {}", uuid);
+            if (uuid.isBlank()) {
+                if (wsUtils.canCreateUser(sha)) {
+                    wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, accountService.createNewAccount(), HttpStatus.CREATED);
+                } else {
+                    wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
+                }
+                return;
+            }
+
+            try {
+                DatabaseWriteSemaphore.getInstance().acquire();
+                Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
+                if (account == null) {
+                    if (wsUtils.canCreateUser(sha)) {
+                        wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, accountService.createNewAccount(), HttpStatus.CREATED);
+                    } else {
+                        wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
+                    }
+                    return;
+                } else {
+                    accountService.login(account);
+                    wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, account.convertToDTO());
+                }
+            } finally {
+                DatabaseWriteSemaphore.getInstance().release();
+            }
+        } catch (IllegalArgumentException e) {
+            wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, HttpStatus.BAD_REQUEST);
+        } catch (InterruptedException e) {
+            wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

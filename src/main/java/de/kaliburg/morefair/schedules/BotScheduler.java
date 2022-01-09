@@ -25,7 +25,7 @@ public class BotScheduler {
         DatabaseWriteSemaphore.getInstance().aquireAndAutoReleaseSilent(() -> {
             if (rankerService.findAllRankerByLadder(ladderService.findAllLadders().get(0)).size() < 10
                     && ThreadLocalRandom.current().nextInt(0, 10) == 0)
-                accountService.createNewAccount("");
+                accountService.createNewAccount();
         });
     }
 }

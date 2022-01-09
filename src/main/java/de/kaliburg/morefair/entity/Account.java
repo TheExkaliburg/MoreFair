@@ -45,7 +45,7 @@ public class Account {
     @Column
     private String lastIp = "";
 
-    public AccountDetailsDTO dto() {
+    public AccountDetailsDTO convertToDTO() {
         return new AccountDetailsDTO(this);
     }
 }

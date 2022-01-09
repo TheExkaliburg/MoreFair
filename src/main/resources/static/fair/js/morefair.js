@@ -59,6 +59,8 @@ async function setup() {
         maxSmall: 0
     });
 
+    await connect();
+
     await getInfo();
 
     biasButton = $('#biasButton')[0];
@@ -73,11 +75,8 @@ async function setup() {
         }
     });
 
-    await checkCookie();
     await getLadder();
     await getChat(ladderData.currentLadder.number);
-
-    await connect();
 
     window.setInterval(update, 1000);
 }

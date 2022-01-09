@@ -7,6 +7,8 @@ import de.kaliburg.morefair.service.LadderService;
 import de.kaliburg.morefair.service.RankerService;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -15,17 +17,20 @@ public class WebsocketController {
     private final LadderService ladderService;
     private final RankerService rankerService;
 
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
-    public WebsocketController(AccountService accountService, LadderService ladderService, RankerService rankerService) {
+
+    public WebsocketController(AccountService accountService, LadderService ladderService, RankerService rankerService, SimpMessagingTemplate simpMessagingTemplate) {
         this.accountService = accountService;
         this.ladderService = ladderService;
         this.rankerService = rankerService;
+        this.simpMessagingTemplate = simpMessagingTemplate;
     }
 
     @MessageMapping("/init")
-    @SendTo("/updates/ladder")
-    public Message ladder(AccountDetailsDTO accountDetailsDTO) throws Exception {
+    @SendTo("/queue/ladder")
+    public void ladder(SimpMessageHeaderAccessor sha, AccountDetailsDTO accountDetailsDTO) throws Exception {
         Account account = accountService.findAccountByUUID(accountDetailsDTO.getUuid());
-        return new Message("This is the new Ladder");
+        simpMessagingTemplate.convertAndSendToUser(sha.getUser().getName(), "/queue/ladder", new WSMessageAnswer<>("This is ladder"));
     }
 }

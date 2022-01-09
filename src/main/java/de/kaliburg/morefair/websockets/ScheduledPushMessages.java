@@ -17,6 +17,6 @@ public class ScheduledPushMessages {
 
     @Scheduled(fixedRate = 5000)
     public void sendMessage() {
-        simpMessagingTemplate.convertAndSend("/topic/pushmessages", new Message(faker.chuckNorris().fact()));
+        simpMessagingTemplate.convertAndSend("/topic/pushmessages", new WSMessageAnswer<>(faker.chuckNorris().fact()));
     }
 }

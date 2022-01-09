@@ -8,7 +8,9 @@ import lombok.RequiredArgsConstructor;
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-public class Message {
+public class WSMessage {
     @NonNull
-    private String text;
+    private String uuid;
+    @NonNull
+    private String content;
 }
