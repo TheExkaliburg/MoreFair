@@ -1,8 +1,8 @@
 package de.kaliburg.morefair.controller;
 
 import de.kaliburg.morefair.dto.LadderViewDTO;
-import de.kaliburg.morefair.entity.Account;
 import de.kaliburg.morefair.multithreading.DatabaseWriteSemaphore;
+import de.kaliburg.morefair.persistence.entity.Account;
 import de.kaliburg.morefair.service.AccountService;
 import de.kaliburg.morefair.service.RankerService;
 import lombok.extern.log4j.Log4j2;

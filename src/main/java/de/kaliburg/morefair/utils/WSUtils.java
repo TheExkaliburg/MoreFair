@@ -34,6 +34,10 @@ public class WSUtils {
         simpMessagingTemplate.convertAndSendToUser(sha.getUser().getName(), dest, new WSMessageAnswer<>("", status));
     }
 
+    public void convertAndSendToAll(String dest, Object content) {
+        simpMessagingTemplate.convertAndSend(dest, content);
+    }
+
     public boolean canCreateUser(SimpMessageHeaderAccessor sha) {
         if (createdAccountRecently.contains(sha.getUser().getName())) {
             log.info(sha.getUser().getName());

@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.websockets;
 
-import de.kaliburg.morefair.entity.Account;
+import de.kaliburg.morefair.persistence.entity.Account;
 import de.kaliburg.morefair.service.AccountService;
 import de.kaliburg.morefair.service.RankerService;
 import lombok.extern.log4j.Log4j2;
@@ -45,14 +45,16 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
         topicDestination = StringEscapeUtils.escapeJava(topicDestination);
         uuid = StringEscapeUtils.escapeJava(uuid);
         log.info("Validate subscription for {} to {}", uuid, topicDestination);
-        Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
-        if (account == null) return false;
         if (topicDestination.contains("/topic/chat/")) {
+            Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
+            if (account == null) return false;
             Integer chatDestination = Integer.parseInt(topicDestination.substring("/topic/chat/".length()));
             Integer highestLadder = rankerService.findHighestRankerByAccount(account).getLadder().getNumber();
             if (chatDestination > highestLadder) return false;
         }
         if (topicDestination.contains("/topic/ladder/")) {
+            Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
+            if (account == null) return false;
             Integer ladderDestination = Integer.parseInt(topicDestination.substring("/topic/ladder/".length()));
             Integer highestLadder = rankerService.findHighestRankerByAccount(account).getLadder().getNumber();
             if (ladderDestination > highestLadder) return false;

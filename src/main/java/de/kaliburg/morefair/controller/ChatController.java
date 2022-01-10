@@ -1,11 +1,11 @@
-package de.kaliburg.morefair.controller.chat;
+package de.kaliburg.morefair.controller;
 
-import de.kaliburg.morefair.dto.chat.ChatDTO;
-import de.kaliburg.morefair.entity.Account;
+import de.kaliburg.morefair.dto.ChatDTO;
 import de.kaliburg.morefair.messages.WSMessage;
+import de.kaliburg.morefair.persistence.entity.Account;
 import de.kaliburg.morefair.service.AccountService;
+import de.kaliburg.morefair.service.MessageService;
 import de.kaliburg.morefair.service.RankerService;
-import de.kaliburg.morefair.service.chat.ChatService;
 import de.kaliburg.morefair.utils.WSUtils;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
@@ -13,8 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.annotation.SubscribeMapping;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
 
 import java.util.UUID;
@@ -23,27 +21,28 @@ import java.util.UUID;
 @Controller
 public class ChatController {
     private static final String CHAT_DESTINATION = "/queue/chat/";
-    private final ChatService chatService;
+    private static final String CHAT_UPDATE_DESTINATION = "/topic/chat/";
+    private final MessageService messageService;
     private final AccountService accountService;
     private final RankerService rankerService;
     private final WSUtils wsUtils;
 
-    public ChatController(ChatService chatService, AccountService accountService, RankerService rankerService, WSUtils wsUtils) {
-        this.chatService = chatService;
+    public ChatController(MessageService messageService, AccountService accountService, RankerService rankerService, WSUtils wsUtils) {
+        this.messageService = messageService;
         this.accountService = accountService;
         this.rankerService = rankerService;
         this.wsUtils = wsUtils;
     }
 
     @MessageMapping("/initChat/{number}")
-    public void initChat(SimpMessageHeaderAccessor sha, WSMessage wsMessage, @DestinationVariable("number") Integer number) throws Exception {
+    public void initChat(SimpMessageHeaderAccessor sha, WSMessage wsMessage, @DestinationVariable("number") Integer number) {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
             log.info("/app/initChat/{} from {}", number, uuid);
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null) wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION + number, HttpStatus.FORBIDDEN);
             if (number <= rankerService.findHighestRankerByAccount(account).getLadder().getNumber()) {
-                ChatDTO c = chatService.getChat(number);
+                ChatDTO c = messageService.getChat(number);
                 wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION + number, c);
             } else {
                 wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION + number, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -58,13 +57,20 @@ public class ChatController {
     }
 
     @MessageMapping("/postChat/{number}")
-    public void postChat(SimpMessageHeaderAccessor sha, WSMessage wsMessage, @DestinationVariable("number") Integer number) throws Exception {
-        String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-        log.info("/app/postChat/{} from {}", number, uuid);
-    }
-
-    @SubscribeMapping("/topic/chat/{number}")
-    public void subscribeToChat(StompHeaderAccessor stompHeaderAccessor, @DestinationVariable("number") Integer number) {
-        log.info("Subscribe to /app/initChat/{} from {}", number, number);
+    public void postChat(WSMessage wsMessage, @DestinationVariable("number") Integer number) {
+        try {
+            String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
+            String message = StringEscapeUtils.escapeJava(wsMessage.getContent());
+            log.debug("/app/postChat/{} '{}' from {}", number, message, uuid);
+            Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
+            if (account == null) return;
+            if (number <= rankerService.findHighestRankerByAccount(account).getLadder().getNumber()) {
+                wsUtils.convertAndSendToAll(CHAT_UPDATE_DESTINATION + number,
+                        messageService.writeMessage(account, number, message).convertToDTO());
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

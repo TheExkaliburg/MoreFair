@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.dto;
 
-import de.kaliburg.morefair.entity.Account;
+import de.kaliburg.morefair.persistence.entity.Account;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

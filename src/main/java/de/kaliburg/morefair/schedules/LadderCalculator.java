@@ -1,9 +1,9 @@
 package de.kaliburg.morefair.schedules;
 
 import de.kaliburg.morefair.controller.FairController;
-import de.kaliburg.morefair.entity.Ladder;
-import de.kaliburg.morefair.entity.Ranker;
 import de.kaliburg.morefair.multithreading.DatabaseWriteSemaphore;
+import de.kaliburg.morefair.persistence.entity.Ladder;
+import de.kaliburg.morefair.persistence.entity.Ranker;
 import de.kaliburg.morefair.service.AccountService;
 import de.kaliburg.morefair.service.LadderService;
 import de.kaliburg.morefair.service.RankerService;

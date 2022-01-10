@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.dto;
 
-import de.kaliburg.morefair.entity.Ranker;
+import de.kaliburg.morefair.persistence.entity.Ranker;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

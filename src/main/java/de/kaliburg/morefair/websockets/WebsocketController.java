@@ -1,8 +1,8 @@
 package de.kaliburg.morefair.websockets;
 
 import de.kaliburg.morefair.dto.AccountDetailsDTO;
-import de.kaliburg.morefair.entity.Account;
 import de.kaliburg.morefair.messages.WSMessageAnswer;
+import de.kaliburg.morefair.persistence.entity.Account;
 import de.kaliburg.morefair.service.AccountService;
 import de.kaliburg.morefair.service.LadderService;
 import de.kaliburg.morefair.service.RankerService;

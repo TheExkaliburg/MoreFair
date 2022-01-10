@@ -1,12 +1,12 @@
 package de.kaliburg.morefair.service;
 
 import de.kaliburg.morefair.dto.AccountDetailsDTO;
-import de.kaliburg.morefair.entity.Account;
-import de.kaliburg.morefair.entity.Ladder;
-import de.kaliburg.morefair.entity.Ranker;
-import de.kaliburg.morefair.repository.AccountRepository;
-import de.kaliburg.morefair.repository.LadderRepository;
-import de.kaliburg.morefair.repository.RankerRepository;
+import de.kaliburg.morefair.persistence.entity.Account;
+import de.kaliburg.morefair.persistence.entity.Ladder;
+import de.kaliburg.morefair.persistence.entity.Ranker;
+import de.kaliburg.morefair.persistence.repository.AccountRepository;
+import de.kaliburg.morefair.persistence.repository.LadderRepository;
+import de.kaliburg.morefair.persistence.repository.RankerRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

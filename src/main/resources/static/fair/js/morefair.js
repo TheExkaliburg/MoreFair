@@ -19,7 +19,7 @@ let messageTemplate = {
 
 let ladderData = {
     rankers: [rankerTemplate],
-    currentLadder: {number: 0, size: 1, growingRankerCount: 1},
+    currentLadder: {number: 1, size: 1, growingRankerCount: 1},
     firstRanker: rankerTemplate,
     yourRanker: rankerTemplate,
     startRank: 1
@@ -61,7 +61,7 @@ async function setup() {
 
     await connect();
 
-    await getInfo();
+    //await getInfo();
 
     biasButton = $('#biasButton')[0];
     multiButton = $('#multiButton')[0];
@@ -75,10 +75,10 @@ async function setup() {
         }
     });
 
-    await getLadder();
-    await getChat(ladderData.currentLadder.number);
+    //await getLadder();
+    //await getChat(ladderData.currentLadder.number);
 
-    window.setInterval(update, 1000);
+    //window.setInterval(update, 1000);
 }
 
 async function update() {

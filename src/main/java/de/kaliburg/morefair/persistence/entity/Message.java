@@ -1,8 +1,6 @@
-package de.kaliburg.morefair.entity.chat;
+package de.kaliburg.morefair.persistence.entity;
 
-import de.kaliburg.morefair.dto.chat.MessageDTO;
-import de.kaliburg.morefair.entity.Account;
-import de.kaliburg.morefair.entity.Ladder;
+import de.kaliburg.morefair.dto.MessageDTO;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -39,7 +37,7 @@ public class Message {
     @Column(nullable = false)
     private LocalDateTime createdOn = LocalDateTime.now();
 
-    public MessageDTO dto() {
+    public MessageDTO convertToDTO() {
         return new MessageDTO(this);
     }
 }

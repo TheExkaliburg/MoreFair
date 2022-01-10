@@ -1,7 +1,7 @@
 package de.kaliburg.morefair.service;
 
-import de.kaliburg.morefair.entity.Ladder;
-import de.kaliburg.morefair.repository.LadderRepository;
+import de.kaliburg.morefair.persistence.entity.Ladder;
+import de.kaliburg.morefair.persistence.repository.LadderRepository;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;

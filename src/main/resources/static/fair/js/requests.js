@@ -10,12 +10,7 @@ async function connect() {
         stompClient.subscribe('/user/queue/login',
             (message) => onLoginReceived(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
         login()
-        // Init Chat Connection
-        chatSubscription = stompClient.subscribe('/topic/chat/' + ladderData.currentLadder.number,
-            (message) => handleChatUpdates(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
-        stompClient.subscribe('/user/queue/chat/' + ladderData.currentLadder.number,
-            (message) => handleChatInit(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
-        initChat();
+
     })
 }
 

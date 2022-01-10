@@ -1,7 +1,7 @@
-package de.kaliburg.morefair.dto.chat;
+package de.kaliburg.morefair.dto;
 
-import de.kaliburg.morefair.entity.Ladder;
-import de.kaliburg.morefair.entity.chat.Message;
+import de.kaliburg.morefair.persistence.entity.Ladder;
+import de.kaliburg.morefair.persistence.entity.Message;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ public class ChatDTO {
         sortedMessages.sort((o1, o2) -> o2.getCreatedOn().compareTo(o1.getCreatedOn()));
         sortedMessages = sortedMessages.subList(0, Math.min(30, sortedMessages.size()));
         for (Message m : sortedMessages) {
-            messages.add(m.dto());
+            messages.add(m.convertToDTO());
         }
     }
 }

@@ -1,8 +1,7 @@
-package de.kaliburg.morefair.entity;
+package de.kaliburg.morefair.persistence.entity;
 
+import de.kaliburg.morefair.dto.ChatDTO;
 import de.kaliburg.morefair.dto.LadderDTO;
-import de.kaliburg.morefair.dto.chat.ChatDTO;
-import de.kaliburg.morefair.entity.chat.Message;
 import lombok.*;
 import lombok.experimental.Accessors;
 

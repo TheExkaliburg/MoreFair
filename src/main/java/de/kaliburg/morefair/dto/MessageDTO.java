@@ -1,6 +1,6 @@
-package de.kaliburg.morefair.dto.chat;
+package de.kaliburg.morefair.dto;
 
-import de.kaliburg.morefair.entity.chat.Message;
+import de.kaliburg.morefair.persistence.entity.Message;
 import lombok.Data;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.web.util.HtmlUtils;

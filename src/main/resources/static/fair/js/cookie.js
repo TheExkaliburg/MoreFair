@@ -35,6 +35,13 @@ function onLoginReceived(message) {
             setCookie("_uuid", uuid, 365 * 5);
         }
     }
+
+    // Init Chat Connection
+    chatSubscription = stompClient.subscribe('/topic/chat/' + ladderData.currentLadder.number,
+        (message) => handleChatUpdates(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
+    stompClient.subscribe('/user/queue/chat/' + ladderData.currentLadder.number,
+        (message) => handleChatInit(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
+    initChat();
 }
 
 async function importCookie() {

@@ -14,7 +14,12 @@ function handleChatInit(message) {
     updateChat();
 }
 
-function postChat(message) {
+function postChat() {
+    let messageInput = $('#messageInput')[0];
+    const message = messageInput.value;
+    if (message === "") return;
+    messageInput.value = "";
+
     stompClient.send("/app/postChat/" + chatData.currentChatNumber, {}, JSON.stringify({
         'uuid': getCookie("_uuid"),
         'content': message
@@ -22,10 +27,10 @@ function postChat(message) {
 }
 
 function handleChatUpdates(message) {
-    if (message.status === "OK") {
-        if (message.content) {
-            console.log(message);
-        }
+    if (message) {
+        console.log(message);
+        chatData.messages.unshift(message);
+        if (chatData.messages.length > 30) chatData.messages.pop();
     }
     updateChat();
 }

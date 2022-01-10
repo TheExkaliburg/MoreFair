@@ -1,7 +1,7 @@
-package de.kaliburg.morefair.repository.chat;
+package de.kaliburg.morefair.persistence.repository;
 
-import de.kaliburg.morefair.entity.Ladder;
-import de.kaliburg.morefair.entity.chat.Message;
+import de.kaliburg.morefair.persistence.entity.Ladder;
+import de.kaliburg.morefair.persistence.entity.Message;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

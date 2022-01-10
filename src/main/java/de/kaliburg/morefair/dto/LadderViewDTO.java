@@ -1,8 +1,8 @@
 package de.kaliburg.morefair.dto;
 
-import de.kaliburg.morefair.entity.Account;
-import de.kaliburg.morefair.entity.Ladder;
-import de.kaliburg.morefair.entity.Ranker;
+import de.kaliburg.morefair.persistence.entity.Account;
+import de.kaliburg.morefair.persistence.entity.Ladder;
+import de.kaliburg.morefair.persistence.entity.Ranker;
 import lombok.Data;
 
 import java.util.ArrayList;
