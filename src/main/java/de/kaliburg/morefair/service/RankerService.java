@@ -235,10 +235,11 @@ public class RankerService {
         Ranker target = findHighestRankerByLadder(ranker.getLadder());
 
         // if rank 1, your target is not you, you have enough people and points to promote, the target didnt already promote AND have the necessary Vinegar to throw
-        if (target.getRank() == 1 && ranker.getUuid() != target.getUuid() && target.isGrowing() && target.getLadder().getSize() >= FairController.PEOPLE_FOR_PROMOTE
+        if (target.getRank() == 1 && ranker.getUuid() != target.getUuid() && target.isGrowing()
+                && target.getLadder().getSize() >= FairController.PEOPLE_FOR_PROMOTE
                 && target.getPoints().compareTo(FairController.POINTS_FOR_PROMOTE) >= 0
-                && ranker.getVinegar().compareTo(FairController.VINEGAR_NEEDED_TO_THROW.multiply(
-                BigInteger.TWO.pow(target.getLadder().getNumber() - 1))) >= 0) {
+                && ranker.getVinegar().compareTo(
+                FairController.VINEGAR_NEEDED_TO_THROW.multiply(BigInteger.valueOf(target.getLadder().getNumber()))) >= 0) {
             BigInteger rankerVinegar = ranker.getVinegar();
             BigInteger targetVinegar = target.getVinegar();
             if (targetVinegar.compareTo(rankerVinegar) > 0) {

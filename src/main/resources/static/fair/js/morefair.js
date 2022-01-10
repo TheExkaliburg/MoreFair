@@ -295,7 +295,7 @@ function getUpgradeCost(level) {
 }
 
 function getVinegarThrowCost() {
-    return infoData.vinegarNeededToThrow.mul(new Decimal(2).pow(new Decimal(ladderData.currentLadder.number - 1)));
+    return infoData.vinegarNeededToThrow.mul(new Decimal(ladderData.currentLadder.number));
 }
 
 
