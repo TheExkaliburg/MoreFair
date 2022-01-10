@@ -285,6 +285,21 @@ async function sortLadder(forcedReload = false) {
     }
 }
 
+function updateChat() {
+    let body = $('#messagesBody')[0];
+    body.innerHTML = "";
+    for (let i = 0; i < chatData.messages.length; i++) {
+        let message = chatData.messages[i];
+        let row = body.insertRow();
+        let assholeTag = (message.timesAsshole < infoData.assholeTags.length) ?
+            infoData.assholeTags[message.timesAsshole] : infoData.assholeTags[infoData.assholeTags.length - 1];
+        row.insertCell(0).innerHTML = message.username + ": " + assholeTag;
+        row.cells[0].classList.add('overflow-hidden')
+        row.cells[0].style.whiteSpace = 'nowrap';
+        row.insertCell(1).innerHTML = "&nbsp;" + message.message;
+    }
+}
+
 function getUpgradeCost(level) {
     return Math.round(Math.pow(ladderData.currentLadder.number + 1, level));
 }

@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.websockets;
+package de.kaliburg.morefair.messages;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

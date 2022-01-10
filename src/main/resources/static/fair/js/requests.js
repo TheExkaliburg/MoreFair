@@ -1,12 +1,21 @@
 let stompClient = null;
+let chatSubscription = null;
 
 async function connect() {
     let socket = new SockJS('/fairsocket');
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
         console.log(('1connected: ' + frame));
-        stompClient.subscribe('/user/queue/login', (message) => onLogin(message))
+        // Login
+        stompClient.subscribe('/user/queue/login',
+            (message) => onLoginReceived(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
         login()
+        // Init Chat Connection
+        chatSubscription = stompClient.subscribe('/topic/chat/' + ladderData.currentLadder.number,
+            (message) => handleChatUpdates(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
+        stompClient.subscribe('/user/queue/chat/' + ladderData.currentLadder.number,
+            (message) => handleChatInit(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
+        initChat();
     })
 }
 
@@ -17,18 +26,6 @@ function disconnect() {
     console.log("Disconnected");
 }
 
-function login() {
-    stompClient.send("/app/login", {}, JSON.stringify({'uuid': getCookie("_uuid")}));
-}
-
-function onLogin(message) {
-    if (message.status === "OK" || message.status === "CREATED") {
-        if (message.content.uuid) {
-            uuid = message.content.uuid;
-            setCookie("_uuid", uuid, 365 * 5);
-        }
-    }
-}
 
 async function getInfo() {
     try {
@@ -71,31 +68,6 @@ async function promptNameChange() {
     }
 }
 
-async function getChat(ladderNum) {
-    try {
-        /*
-        const response = await axios.get("/fair/chat?ladder=" + ladderNum);
-        if (response.status === 200) {
-            chatData = response.data;
-        }
-         */
-    } catch (err) {
-
-    }
-
-    let body = $('#messagesBody')[0];
-    body.innerHTML = "";
-    for (let i = 0; i < chatData.messages.length; i++) {
-        let message = chatData.messages[i];
-        let row = body.insertRow();
-        let assholeTag = (message.timesAsshole < infoData.assholeTags.length) ?
-            infoData.assholeTags[message.timesAsshole] : infoData.assholeTags[infoData.assholeTags.length - 1];
-        row.insertCell(0).innerHTML = message.username + ": " + assholeTag;
-        row.cells[0].classList.add('overflow-hidden')
-        row.cells[0].style.whiteSpace = 'nowrap';
-        row.insertCell(1).innerHTML = "&nbsp;" + message.message;
-    }
-}
 
 async function postChat() {
     let message = $('#messageInput')[0];

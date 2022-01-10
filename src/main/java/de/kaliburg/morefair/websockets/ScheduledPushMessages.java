@@ -1,6 +1,7 @@
 package de.kaliburg.morefair.websockets;
 
 import com.github.javafaker.Faker;
+import de.kaliburg.morefair.messages.WSMessageAnswer;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,6 @@ public class ScheduledPushMessages {
 
     @Scheduled(fixedRate = 5000)
     public void sendMessage() {
-        simpMessagingTemplate.convertAndSend("/topic/pushmessages", new WSMessageAnswer<>(faker.chuckNorris().fact()));
+        simpMessagingTemplate.convertAndSend("/topic/chat", new WSMessageAnswer<>(faker.chuckNorris().fact()));
     }
 }

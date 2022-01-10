@@ -1,11 +1,10 @@
 package de.kaliburg.morefair.controller;
 
-import de.kaliburg.morefair.dto.AccountDetailsDTO;
 import de.kaliburg.morefair.entity.Account;
+import de.kaliburg.morefair.messages.WSMessage;
 import de.kaliburg.morefair.multithreading.DatabaseWriteSemaphore;
 import de.kaliburg.morefair.service.AccountService;
 import de.kaliburg.morefair.utils.WSUtils;
-import de.kaliburg.morefair.websockets.WSMessage;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.http.HttpStatus;
@@ -13,13 +12,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
 
 @Controller
@@ -29,12 +25,10 @@ public class AccountController {
 
     private final AccountService accountService;
     private final WSUtils wsUtils;
-    private final SimpMessagingTemplate simp;
 
-    public AccountController(AccountService accountService, WSUtils wsUtils, SimpMessagingTemplate simp) {
+    public AccountController(AccountService accountService, WSUtils wsUtils) {
         this.accountService = accountService;
         this.wsUtils = wsUtils;
-        this.simp = simp;
     }
 
     @PutMapping(path = "/fair/account", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = "application/json")
@@ -59,6 +53,7 @@ public class AccountController {
         }
     }
 
+    /*
     @PostMapping(path = "/fair/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = "application/json")
     public ResponseEntity<AccountDetailsDTO> postLogin(String uuid, HttpServletRequest request) {
         log.debug("POST /fair/login {}", uuid);
@@ -87,12 +82,13 @@ public class AccountController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    */
 
     @MessageMapping("/login")
     public void ladder(SimpMessageHeaderAccessor sha, WSMessage wsMessage) throws Exception {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-            log.info("app/login {}", uuid);
+            log.info("/app/login {}", uuid);
             if (uuid.isBlank()) {
                 if (wsUtils.canCreateUser(sha)) {
                     wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, accountService.createNewAccount(), HttpStatus.CREATED);
@@ -101,7 +97,6 @@ public class AccountController {
                 }
                 return;
             }
-
             try {
                 DatabaseWriteSemaphore.getInstance().acquire();
                 Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
@@ -121,8 +116,10 @@ public class AccountController {
             }
         } catch (IllegalArgumentException e) {
             wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, HttpStatus.BAD_REQUEST);
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error(e.getMessage());
+            e.printStackTrace();
         }
     }
 

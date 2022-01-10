@@ -55,6 +55,7 @@ public class RankerService {
         return rankerRepository.findByAccount(account);
     }
 
+    @Transactional
     public Ranker findHighestRankerByAccount(Account account) {
         List<Ranker> temp = rankerRepository.findHighestRankerByAccount(account);
 

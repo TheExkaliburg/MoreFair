@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.utils;
 
-import de.kaliburg.morefair.websockets.WSMessageAnswer;
+import de.kaliburg.morefair.messages.WSMessageAnswer;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;

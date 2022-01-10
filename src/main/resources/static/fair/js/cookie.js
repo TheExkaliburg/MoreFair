@@ -21,28 +21,29 @@ function getCookie(cname) {
     return "";
 }
 
-async function checkCookie() {
-    let uuid = getCookie("_uuid");
-    try {
-        const response = await axios.post('/fair/login', new URLSearchParams({uuid: uuid}));
-        if (response.status === 201) {
-            if (response.data.uuid) {
-                uuid = response.data.uuid;
-                setCookie("_uuid", uuid, 365 * 5);
-            }
+function login() {
+    stompClient.send("/app/login", {}, JSON.stringify({
+        'uuid': getCookie("_uuid")
+    }));
+}
+
+function onLoginReceived(message) {
+    console.log(message);
+    if (message.status === "OK" || message.status === "CREATED") {
+        if (message.content.uuid) {
+            let uuid = message.content.uuid;
+            setCookie("_uuid", uuid, 365 * 5);
         }
-    } catch (err) {
-        console.error(err)
     }
 }
 
 async function importCookie() {
-    var newUUID = prompt("Paste your ID into here:");
+    let newUUID = prompt("Paste your ID into here:");
     try {
         // Check if cookies are valid
         const response = await axios.post('/fair/login', new URLSearchParams({uuid: newUUID}));
         if (response.status === 200 && response.data.uuid) {
-            uuid = response.data.uuid;
+            let uuid = response.data.uuid;
             setCookie("_uuid", uuid, 365 * 5);
             // Relaod the page for the new cookies to take place
             location.reload();
