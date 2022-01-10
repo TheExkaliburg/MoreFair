@@ -4,8 +4,8 @@ let chatSubscription = null;
 async function connect() {
     let socket = new SockJS('/fairsocket');
     stompClient = Stomp.over(socket);
+    stompClient.debug = null;
     stompClient.connect({}, function (frame) {
-        console.log(('1connected: ' + frame));
         // Login
         stompClient.subscribe('/user/queue/login',
             (message) => onLoginReceived(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
@@ -50,7 +50,6 @@ async function promptNameChange() {
             }));
             if (response.status === 200) {
                 updateLadderSteps = 0;
-                updateChatSteps = 0;
                 await getLadder();
                 await getChat();
             }

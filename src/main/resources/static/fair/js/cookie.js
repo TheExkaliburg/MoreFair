@@ -28,7 +28,6 @@ function login() {
 }
 
 function onLoginReceived(message) {
-    console.log(message);
     if (message.status === "OK" || message.status === "CREATED") {
         if (message.content.uuid) {
             let uuid = message.content.uuid;

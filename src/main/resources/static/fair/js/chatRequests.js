@@ -7,7 +7,6 @@ function initChat(ladderNum) {
 function handleChatInit(message) {
     if (message.status === "OK") {
         if (message.content) {
-            console.log(message);
             chatData = message.content;
         }
     }
@@ -28,7 +27,6 @@ function postChat() {
 
 function handleChatUpdates(message) {
     if (message) {
-        console.log(message);
         chatData.messages.unshift(message);
         if (chatData.messages.length > 30) chatData.messages.pop();
     }
