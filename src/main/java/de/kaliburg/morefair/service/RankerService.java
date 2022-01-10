@@ -22,7 +22,6 @@ import java.util.UUID;
 @Service
 @Log4j2
 public class RankerService {
-
     private final RankerRepository rankerRepository;
     private final LadderRepository ladderRepository;
     private final AccountRepository accountRepository;

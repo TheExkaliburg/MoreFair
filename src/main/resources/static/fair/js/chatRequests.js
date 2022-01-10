@@ -1,5 +1,5 @@
-function initChat() {
-    stompClient.send("/app/initChat/" + chatData.currentChatNumber, {}, JSON.stringify({
+function initChat(ladderNum) {
+    stompClient.send("/app/initChat/" + ladderNum, {}, JSON.stringify({
         'uuid': getCookie("_uuid")
     }));
 }
@@ -33,4 +33,11 @@ function handleChatUpdates(message) {
         if (chatData.messages.length > 30) chatData.messages.pop();
     }
     updateChat();
+}
+
+function changeChat(ladderNum) {
+    chatSubscription.unsubscribe();
+    chatSubscription = stompClient.subscribe('/topic/chat/' + ladderNum,
+        (message) => handleChatUpdates(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
+    initChat(ladderNum);
 }

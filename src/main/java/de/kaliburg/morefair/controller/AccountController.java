@@ -1,5 +1,6 @@
 package de.kaliburg.morefair.controller;
 
+import de.kaliburg.morefair.dto.AccountDetailsDTO;
 import de.kaliburg.morefair.messages.WSMessage;
 import de.kaliburg.morefair.multithreading.DatabaseWriteSemaphore;
 import de.kaliburg.morefair.persistence.entity.Account;
@@ -14,8 +15,10 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
 
 @Controller
@@ -53,7 +56,7 @@ public class AccountController {
         }
     }
 
-    /*
+
     @PostMapping(path = "/fair/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = "application/json")
     public ResponseEntity<AccountDetailsDTO> postLogin(String uuid, HttpServletRequest request) {
         log.debug("POST /fair/login {}", uuid);
@@ -82,7 +85,6 @@ public class AccountController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    */
 
     @MessageMapping("/login")
     public void ladder(SimpMessageHeaderAccessor sha, WSMessage wsMessage) throws Exception {

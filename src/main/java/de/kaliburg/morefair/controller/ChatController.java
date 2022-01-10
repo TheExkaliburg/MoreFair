@@ -40,17 +40,17 @@ public class ChatController {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
             log.info("/app/initChat/{} from {}", number, uuid);
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
-            if (account == null) wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION + number, HttpStatus.FORBIDDEN);
+            if (account == null) wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.FORBIDDEN);
             if (number <= rankerService.findHighestRankerByAccount(account).getLadder().getNumber()) {
                 ChatDTO c = messageService.getChat(number);
-                wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION + number, c);
+                wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, c);
             } else {
-                wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION + number, HttpStatus.INTERNAL_SERVER_ERROR);
+                wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } catch (IllegalArgumentException e) {
-            wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION + number, HttpStatus.BAD_REQUEST);
+            wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION + number, HttpStatus.INTERNAL_SERVER_ERROR);
+            wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
             log.error(e.getMessage());
             e.printStackTrace();
         }

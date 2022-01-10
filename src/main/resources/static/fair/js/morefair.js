@@ -32,7 +32,6 @@ let chatData = {
 
 let infoData = {
     updateLadderStepsBeforeSync: 30,
-    updateChatStepsBeforeSync: 60,
     ladderAreaSize: 10,
     pointsForPromote: new Decimal(250000000),
     peopleForPromote: 10,
@@ -42,7 +41,6 @@ let infoData = {
 }
 
 let updateLadderSteps = 0;
-let updateChatSteps = 0;
 
 let biasButton;
 let multiButton;
@@ -59,9 +57,8 @@ async function setup() {
         maxSmall: 0
     });
 
+    await getInfo();
     await connect();
-
-    //await getInfo();
 
     biasButton = $('#biasButton')[0];
     multiButton = $('#multiButton')[0];
@@ -75,10 +72,9 @@ async function setup() {
         }
     });
 
-    //await getLadder();
-    //await getChat(ladderData.currentLadder.number);
+    await getLadder();
 
-    //window.setInterval(update, 1000);
+    window.setInterval(update, 1000);
 }
 
 async function update() {
@@ -88,12 +84,6 @@ async function update() {
     } else {
         await getLadder();
         updateLadderSteps = 0;
-    }
-
-    updateChatSteps++;
-    if (updateChatSteps >= infoData.updateChatStepsBeforeSync) {
-        await getChat(chatData.currentChatNumber);
-        updateChatSteps = 0;
     }
 }
 
@@ -206,7 +196,7 @@ function reloadInformation() {
         });
 
         ladderLinK.click(async function () {
-            await getChat(i);
+            changeChat(i);
         })
 
         ladder.append(ladderLinK);
