@@ -1,10 +1,11 @@
 let stompClient = null;
 let chatSubscription = null;
+let ladderSubscription = null;
 
 async function connect() {
     let socket = new SockJS('/fairsocket');
     stompClient = Stomp.over(socket);
-    stompClient.debug = null;
+    //stompClient.debug = null;
     stompClient.connect({}, function (frame) {
         // Login
         stompClient.subscribe('/user/queue/login',
@@ -89,7 +90,7 @@ async function postChat() {
 }
 
 async function buyBias() {
-    biasButton.disabled = true;
+    $('#biasButton').disabled = true;
     $('#biasTooltip').tooltip('hide');
     let cost = new Decimal(getUpgradeCost(ladderData.yourRanker.bias + 1));
     if (ladderData.yourRanker.points.compare(cost) > 0) {
@@ -99,7 +100,7 @@ async function buyBias() {
             const response = await axios.post('/fair/ranker/bias');
         } catch (err) {
             if (err.response.status === 403) {
-                biasButton.disabled = false;
+                $('#biasButton').disabled = false;
             }
         }
         updateLadderSteps = 0;
@@ -108,7 +109,7 @@ async function buyBias() {
 }
 
 async function buyMulti() {
-    multiButton.disabled = true;
+    $('#multiButton').disabled = true;
     $('#multiTooltip').tooltip('hide');
     let cost = new Decimal(getUpgradeCost(ladderData.yourRanker.multiplier + 1));
     if (ladderData.yourRanker.power.compare(cost) > 0) {
@@ -120,7 +121,7 @@ async function buyMulti() {
             const response = await axios.post('/fair/ranker/multiplier');
         } catch (err) {
             if (err.response.status === 403) {
-                multiButton.disabled = false;
+                $('#multiButton').disabled = false;
             }
         }
         updateLadderSteps = 0;

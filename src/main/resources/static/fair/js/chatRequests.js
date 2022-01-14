@@ -1,5 +1,5 @@
 function initChat(ladderNum) {
-    stompClient.send("/app/initChat/" + ladderNum, {}, JSON.stringify({
+    stompClient.send("/app/chat/init/" + ladderNum, {}, JSON.stringify({
         'uuid': getCookie("_uuid")
     }));
 }
@@ -19,7 +19,7 @@ function postChat() {
     if (message === "") return;
     messageInput.value = "";
 
-    stompClient.send("/app/postChat/" + chatData.currentChatNumber, {}, JSON.stringify({
+    stompClient.send("/app/chat/post/" + chatData.currentChatNumber, {}, JSON.stringify({
         'uuid': getCookie("_uuid"),
         'content': message
     }));

@@ -1,33 +1,71 @@
 package de.kaliburg.morefair.controller;
 
 import de.kaliburg.morefair.dto.LadderViewDTO;
-import de.kaliburg.morefair.multithreading.DatabaseWriteSemaphore;
+import de.kaliburg.morefair.messages.WSMessage;
 import de.kaliburg.morefair.persistence.entity.Account;
 import de.kaliburg.morefair.service.AccountService;
 import de.kaliburg.morefair.service.RankerService;
+import de.kaliburg.morefair.utils.WSUtils;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
 
 @Controller
 @Log4j2
 public class RankerController {
+    public static final String LADDER_DESTINATION = "/queue/ladder/";
+    public static final String LADDER_UPDATE_DESTINATION = "/topic/ladder/";
     private final RankerService rankerService;
     private final AccountService accountService;
+    private final WSUtils wsUtils;
 
-    public RankerController(RankerService rankerService, AccountService accountService) {
+    public RankerController(RankerService rankerService, AccountService accountService, WSUtils wsUtils) {
         this.rankerService = rankerService;
         this.accountService = accountService;
+        this.wsUtils = wsUtils;
     }
 
+
+    @MessageMapping("/ladder/init/{number}")
+    public void initChat(SimpMessageHeaderAccessor sha, WSMessage wsMessage, @DestinationVariable("number") Integer number) {
+        try {
+            String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
+            log.debug("/app/ladder/init/{} from {}", number, uuid);
+            Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
+            if (account == null) wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, HttpStatus.FORBIDDEN);
+            if (number <= rankerService.findHighestRankerByAccount(account).getLadder().getNumber()) {
+                LadderViewDTO l = rankerService.findAllRankerByHighestLadderAreaAndAccount(account);
+                wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, l);
+            } else {
+                wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } catch (IllegalArgumentException e) {
+            wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @MessageMapping("/ladder/post/bias")
+    public void buyBias(SimpMessageHeaderAccessor sha, WSMessage wsMessage, @DestinationVariable("number") Integer number) {
+        String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
+        log.debug("/app/initChat/{} from {}", number, uuid);
+        Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
+
+    }
+
+
+    // OLD HTTP REQUESTS
+
+    /*
     @GetMapping(value = "/fair/ranker", produces = "application/json")
     public ResponseEntity<LadderViewDTO> getLadder(@CookieValue(name = "_uuid", defaultValue = "") String uuid, HttpServletRequest request) {
         uuid = StringEscapeUtils.escapeJava(uuid);
@@ -171,6 +209,5 @@ public class RankerController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
+    */
 }

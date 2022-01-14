@@ -4,12 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class MoreFairApplicationTests
-{
+class MoreFairApplicationTests {
 
     @Test
-    void contextLoads()
-    {
+    void contextLoads() {
     }
-
 }

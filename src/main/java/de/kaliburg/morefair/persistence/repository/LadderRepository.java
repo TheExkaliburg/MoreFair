@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface LadderRepository extends JpaRepository<Ladder, Long> {
@@ -14,5 +14,8 @@ public interface LadderRepository extends JpaRepository<Ladder, Long> {
     Ladder findByNumber(@Param("number") int number);
 
     @Query("SELECT l FROM Ladder l LEFT JOIN FETCH l.messages")
-    List<Ladder> findAllLaddersWithMessages();
+    Set<Ladder> findAllLaddersJoinedWithMessages();
+
+    @Query("SELECT l FROM Ladder l JOIN FETCH l.rankers")
+    Set<Ladder> findAllLaddersJoinedWithRankers();
 }

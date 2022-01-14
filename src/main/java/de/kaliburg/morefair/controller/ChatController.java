@@ -20,8 +20,8 @@ import java.util.UUID;
 @Log4j2
 @Controller
 public class ChatController {
-    private static final String CHAT_DESTINATION = "/queue/chat/";
-    private static final String CHAT_UPDATE_DESTINATION = "/topic/chat/";
+    public static final String CHAT_DESTINATION = "/queue/chat/";
+    public static final String CHAT_UPDATE_DESTINATION = "/topic/chat/";
     private final MessageService messageService;
     private final AccountService accountService;
     private final RankerService rankerService;
@@ -34,11 +34,11 @@ public class ChatController {
         this.wsUtils = wsUtils;
     }
 
-    @MessageMapping("/initChat/{number}")
+    @MessageMapping("/chat/init/{number}")
     public void initChat(SimpMessageHeaderAccessor sha, WSMessage wsMessage, @DestinationVariable("number") Integer number) {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-            log.info("/app/initChat/{} from {}", number, uuid);
+            log.debug("/app/chat/init/{} from {}", number, uuid);
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null) wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.FORBIDDEN);
             if (number <= rankerService.findHighestRankerByAccount(account).getLadder().getNumber()) {
@@ -56,12 +56,12 @@ public class ChatController {
         }
     }
 
-    @MessageMapping("/postChat/{number}")
+    @MessageMapping("/chat/post/{number}")
     public void postChat(WSMessage wsMessage, @DestinationVariable("number") Integer number) {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
             String message = StringEscapeUtils.escapeJava(wsMessage.getContent());
-            log.debug("/app/postChat/{} '{}' from {}", number, message, uuid);
+            log.debug("/app/chat/post/{} '{}' from {}", number, message, uuid);
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null) return;
             if (number <= rankerService.findHighestRankerByAccount(account).getLadder().getNumber()) {

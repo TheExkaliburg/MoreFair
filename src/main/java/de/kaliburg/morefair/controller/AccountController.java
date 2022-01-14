@@ -90,7 +90,7 @@ public class AccountController {
     public void ladder(SimpMessageHeaderAccessor sha, WSMessage wsMessage) throws Exception {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-            log.info("/app/login {}", uuid);
+            log.debug("/app/login {}", uuid);
             if (uuid.isBlank()) {
                 if (wsUtils.canCreateUser(sha)) {
                     wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, accountService.createNewAccount(), HttpStatus.CREATED);

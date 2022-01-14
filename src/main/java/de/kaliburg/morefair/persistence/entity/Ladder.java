@@ -30,12 +30,6 @@ public class Ladder {
     private Integer number;
     @OneToMany(mappedBy = "ladder", fetch = FetchType.LAZY)
     private List<Ranker> rankers = new ArrayList<>();
-    @NonNull
-    @Column(nullable = false)
-    private Integer size = 0;
-    @NonNull
-    @Column(nullable = false)
-    private Integer growingRankerCount = 0;
     @OneToMany(mappedBy = "ladder", fetch = FetchType.LAZY)
     private List<Message> messages = new ArrayList<>();
 

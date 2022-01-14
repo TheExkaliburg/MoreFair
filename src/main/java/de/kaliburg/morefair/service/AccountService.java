@@ -2,11 +2,7 @@ package de.kaliburg.morefair.service;
 
 import de.kaliburg.morefair.dto.AccountDetailsDTO;
 import de.kaliburg.morefair.persistence.entity.Account;
-import de.kaliburg.morefair.persistence.entity.Ladder;
-import de.kaliburg.morefair.persistence.entity.Ranker;
 import de.kaliburg.morefair.persistence.repository.AccountRepository;
-import de.kaliburg.morefair.persistence.repository.LadderRepository;
-import de.kaliburg.morefair.persistence.repository.RankerRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,32 +14,32 @@ import java.util.UUID;
 @Log4j2
 public class AccountService {
     private final AccountRepository accountRepository;
-    private final LadderRepository ladderRepository;
-    private final RankerRepository rankerRepository;
+    private final RankerService rankerService;
 
-    public AccountService(AccountRepository accountRepository, LadderRepository ladderRepository,
-                          RankerRepository rankerRepository) {
+    public AccountService(AccountRepository accountRepository, RankerService rankerService) {
         this.accountRepository = accountRepository;
-        this.ladderRepository = ladderRepository;
-        this.rankerRepository = rankerRepository;
+        this.rankerService = rankerService;
     }
 
     @Transactional
     public AccountDetailsDTO createNewAccount() {
         Account result = new Account(UUID.randomUUID(), "");
-        Ladder l1 = ladderRepository.findByNumber(1);
-        Integer rank = l1.getSize() + 1;
-        Ranker ranker = new Ranker(UUID.randomUUID(), l1, result, rank);
+
+        try {
+            rankerService.getLadderSem().acquire();
+            try {
+                rankerService.createNewRankerForAccountOnLadder(result, 1);
+            } finally {
+                rankerService.getLadderSem().release();
+            }
+        } catch (InterruptedException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }
 
         result = accountRepository.save(result);
-        result.setUsername("Mystery Guest " + result.getId());
+        result.setUsername("Mystery Guest #" + result.getId());
         result = accountRepository.save(result);
-
-        l1.setSize(l1.getSize() + 1);
-        l1.setGrowingRankerCount(l1.getGrowingRankerCount() + 1);
-        ladderRepository.save(l1);
-
-        rankerRepository.save(ranker);
 
         log.info("Created a new Account with the uuid {} (#{}).", result.getUuid().toString(), result.getId());
         return result.convertToDTO();

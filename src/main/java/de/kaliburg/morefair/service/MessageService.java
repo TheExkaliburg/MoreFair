@@ -6,15 +6,13 @@ import de.kaliburg.morefair.persistence.entity.Ladder;
 import de.kaliburg.morefair.persistence.entity.Message;
 import de.kaliburg.morefair.persistence.repository.LadderRepository;
 import de.kaliburg.morefair.persistence.repository.MessageRepository;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Log4j2
@@ -22,7 +20,8 @@ public class MessageService {
     private final MessageRepository messageRepository;
     private final LadderRepository ladderRepository;
 
-    private List<Ladder> ladderMemory = new ArrayList<>();
+    @Getter
+    private List<Ladder> chats = new ArrayList<>();
 
     public MessageService(MessageRepository messageRepository, LadderRepository ladderRepository) {
         this.messageRepository = messageRepository;
@@ -32,8 +31,8 @@ public class MessageService {
     @PostConstruct
     public void init() {
         messageRepository.deleteAll();
-        ladderMemory = ladderRepository.findAllLaddersWithMessages();
-        for (Ladder l : ladderMemory) {
+        chats = ladderRepository.findAllLaddersJoinedWithMessages().stream().toList();
+        for (Ladder l : chats) {
             if (l.getMessages().size() > 30) {
                 List<Message> messages = l.getMessages();
                 messages.sort(Comparator.comparing(Message::getCreatedOn));
@@ -51,12 +50,13 @@ public class MessageService {
     }
 
     public ChatDTO getChat(int ladderNum) {
-        Ladder ladder = ladderMemory.stream().filter(l -> l.getNumber() == ladderNum).findFirst().get();
+        Optional<Ladder> optional = chats.stream().filter(l -> l.getNumber() == ladderNum).findFirst();
+        Ladder ladder = optional.get();
         return ladder.convertToChatDTO();
     }
 
     public Message writeMessage(Account account, Integer ladderNum, String messageString) {
-        Ladder ladder = ladderMemory.stream().filter(l -> l.getNumber() == ladderNum).findFirst().get();
+        Ladder ladder = chats.stream().filter(l -> l.getNumber() == ladderNum).findFirst().get();
         Message message = new Message(UUID.randomUUID(), account, messageString, ladder);
         List<Message> messages = ladder.getMessages();
         messages.add(0, message);

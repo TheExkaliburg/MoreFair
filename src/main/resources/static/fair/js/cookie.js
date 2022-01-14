@@ -33,14 +33,21 @@ function onLoginReceived(message) {
             let uuid = message.content.uuid;
             setCookie("_uuid", uuid, 365 * 5);
         }
-    }
 
-    // Init Chat Connection
-    chatSubscription = stompClient.subscribe('/topic/chat/' + ladderData.currentLadder.number,
-        (message) => handleChatUpdates(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
-    stompClient.subscribe('/user/queue/chat/',
-        (message) => handleChatInit(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
-    initChat(ladderData.currentLadder.number);
+        // Init Chat Connection
+        chatSubscription = stompClient.subscribe('/topic/chat/' + ladderData.currentLadder.number,
+            (message) => handleChatUpdates(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
+        stompClient.subscribe('/user/queue/chat/',
+            (message) => handleChatInit(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
+        initChat(ladderData.currentLadder.number);
+
+        // Init Ladder Connection
+        ladderSubscription = stompClient.subscribe('/topic/ladder/' + ladderData.currentLadder.number,
+            (message) => handleLadderUpdates(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
+        stompClient.subscribe('/user/queue/ladder/',
+            (message) => handleLadderInit(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
+        initLadder(ladderData.currentLadder.number);
+    }
 }
 
 async function importCookie() {

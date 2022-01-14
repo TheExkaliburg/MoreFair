@@ -24,6 +24,6 @@ public class InfoDTO {
         peopleForPromote = FairController.PEOPLE_FOR_PROMOTE;
         assholeLadder = FairController.ASSHOLE_LADDER;
         assholeTags = FairController.ASSHOLE_TAGS;
-        vinegarNeededToThrow = FairController.VINEGAR_NEEDED_TO_THROW.toString();
+        vinegarNeededToThrow = FairController.BASE_VINEGAR_NEEDED_TO_THROW.toString();
     }
 }

@@ -60,9 +60,6 @@ async function setup() {
     await getInfo();
     await connect();
 
-    biasButton = $('#biasButton')[0];
-    multiButton = $('#multiButton')[0];
-
     $('#messageInput')[0].addEventListener("keyup", event => {
         if (event.key === "Enter") {
             // Cancel the default action, if needed
@@ -71,10 +68,6 @@ async function setup() {
             postChat();
         }
     });
-
-    await getLadder();
-
-    window.setInterval(update, 1000);
 }
 
 async function update() {
@@ -125,15 +118,15 @@ async function reloadLadder(forcedReload = false) {
 
     let biasCost = getUpgradeCost(ladderData.yourRanker.bias + 1);
     if (ladderData.yourRanker.points.cmp(biasCost) > 0) {
-        biasButton.disabled = false;
+        $('#biasButton').disabled = false;
     } else {
-        biasButton.disabled = true;
+        $('#biasButton').disabled = true;
     }
     let multiCost = getUpgradeCost(ladderData.yourRanker.multiplier + 1);
     if (ladderData.yourRanker.power.cmp(new Decimal(multiCost)) > 0) {
-        multiButton.disabled = false;
+        $('#multiButton').disabled = false;
     } else {
-        multiButton.disabled = true;
+        $('#multiButton').disabled = true;
     }
     $('#biasTooltip').attr('data-bs-original-title', numberFormatter.format(biasCost) + ' Points');
     $('#multiTooltip').attr('data-bs-original-title', numberFormatter.format(multiCost) + ' Power');
