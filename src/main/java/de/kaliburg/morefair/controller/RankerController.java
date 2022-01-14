@@ -1,5 +1,6 @@
 package de.kaliburg.morefair.controller;
 
+import de.kaliburg.morefair.dto.EventDTO;
 import de.kaliburg.morefair.dto.LadderViewDTO;
 import de.kaliburg.morefair.messages.WSMessage;
 import de.kaliburg.morefair.persistence.entity.Account;
@@ -55,11 +56,78 @@ public class RankerController {
     }
 
     @MessageMapping("/ladder/post/bias")
-    public void buyBias(SimpMessageHeaderAccessor sha, WSMessage wsMessage, @DestinationVariable("number") Integer number) {
-        String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-        log.debug("/app/initChat/{} from {}", number, uuid);
-        Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
+    public void buyBias(SimpMessageHeaderAccessor sha, WSMessage wsMessage) {
+        try {
+            String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
+            log.debug("/app/ladder/post/bias from {}", uuid);
+            Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
+            if (account != null)
+                rankerService.addEvent(rankerService.findHighestRankerByAccount(account).getLadder().getNumber(),
+                        new EventDTO(EventDTO.EventType.BIAS, account.getId()));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
+    @MessageMapping("/ladder/post/multi")
+    public void buyMulti(SimpMessageHeaderAccessor sha, WSMessage wsMessage) {
+        try {
+            String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
+            log.debug("/app/ladder/post/multi from {}", uuid);
+            Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
+            if (account != null)
+                rankerService.addEvent(rankerService.findHighestRankerByAccount(account).getLadder().getNumber(),
+                        new EventDTO(EventDTO.EventType.MULTI, account.getId()));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @MessageMapping("/ladder/post/vinegar")
+    public void throwVinegar(SimpMessageHeaderAccessor sha, WSMessage wsMessage) {
+        try {
+            String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
+            log.debug("/app/ladder/post/vinegar from {}", uuid);
+            Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
+            if (account != null)
+                rankerService.addEvent(rankerService.findHighestRankerByAccount(account).getLadder().getNumber(),
+                        new EventDTO(EventDTO.EventType.VINEGAR, account.getId()));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @MessageMapping("/ladder/post/promote")
+    public void promote(SimpMessageHeaderAccessor sha, WSMessage wsMessage) {
+        try {
+            String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
+            log.debug("/app/ladder/post/promote from {}", uuid);
+            Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
+            if (account != null)
+                rankerService.addEvent(rankerService.findHighestRankerByAccount(account).getLadder().getNumber(),
+                        new EventDTO(EventDTO.EventType.PROMOTE, account.getId()));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @MessageMapping("/ladder/post/asshole")
+    public void beAsshole(SimpMessageHeaderAccessor sha, WSMessage wsMessage) {
+        try {
+            String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
+            log.debug("/app/ladder/post/asshole from {}", uuid);
+            Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
+            if (account != null)
+                rankerService.addEvent(rankerService.findHighestRankerByAccount(account).getLadder().getNumber(),
+                        new EventDTO(EventDTO.EventType.ASSHOLE, account.getId()));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }
     }
 
 

@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.UUID;
 
@@ -55,22 +56,26 @@ public class Ranker {
     @Column(nullable = false, precision = 1000, scale = 0)
     private BigInteger vinegar = BigInteger.ZERO;
 
-    public Ranker addPoints(Integer points) {
-        return addPoints(BigInteger.valueOf(points));
+    public Ranker addPoints(Integer points, double secondsPassed) {
+        return addPoints(BigInteger.valueOf(points), secondsPassed);
     }
 
-    public Ranker addPoints(BigInteger points) {
-        this.points = this.points.add(points);
+    public Ranker addPoints(BigInteger points, double secondsPassed) {
+        BigDecimal decPoints = new BigDecimal(points);
+        decPoints = decPoints.multiply(BigDecimal.valueOf(secondsPassed));
+        this.points = this.points.add(decPoints.toBigInteger());
         return this;
     }
 
-    public Ranker addPower(BigInteger power) {
-        this.power = this.power.add(power);
+    public Ranker addPower(BigInteger power, double secondsPassed) {
+        BigDecimal decPower = new BigDecimal(power);
+        decPower = decPower.multiply(BigDecimal.valueOf(secondsPassed));
+        this.power = this.power.add(decPower.toBigInteger());
         return this;
     }
 
-    public Ranker addPower(Integer power) {
-        return addPower(BigInteger.valueOf(power));
+    public Ranker addPower(Integer power, double secondsPassed) {
+        return addPower(BigInteger.valueOf(power), secondsPassed);
     }
 
     public RankerDTO convertToDto() {
@@ -80,4 +85,27 @@ public class Ranker {
     public RankerPrivateDTO convertToPrivateDto() {
         return new RankerPrivateDTO(this);
     }
+
+    public Ranker addVinegar(Integer vinegar, double secondsPassed) {
+        return addVinegar(BigInteger.valueOf(vinegar), secondsPassed);
+    }
+
+    public Ranker addVinegar(BigInteger vinegar, double secondsPassed) {
+        BigDecimal decVinegar = new BigDecimal(vinegar);
+        decVinegar = decVinegar.multiply(BigDecimal.valueOf(secondsPassed));
+        this.vinegar = this.vinegar.add(decVinegar.toBigInteger());
+        return this;
+    }
+
+    public Ranker addGrapes(Integer grapes, double secondsPassed) {
+        return addGrapes(BigInteger.valueOf(grapes), secondsPassed);
+    }
+
+    public Ranker addGrapes(BigInteger grapes, double secondsPassed) {
+        BigDecimal decGrapes = new BigDecimal(grapes);
+        decGrapes = decGrapes.multiply(BigDecimal.valueOf(secondsPassed));
+        this.grapes = this.grapes.add(decGrapes.toBigInteger());
+        return this;
+    }
+
 }

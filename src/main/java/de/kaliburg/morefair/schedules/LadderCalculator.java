@@ -61,20 +61,20 @@ public class LadderCalculator {
                             for (EventDTO e : events) {
                                 switch (e.getEventType()) {
                                     case BIAS -> {
-                                        if (!rankerService.buyBias(e.getRankerId(), ladder)) events.remove(e);
+                                        if (!rankerService.buyBias(e.getAccountId(), ladder)) events.remove(e);
                                     }
                                     case MULTI -> {
-                                        if (!rankerService.buyMulti(e.getRankerId(), ladder)) events.remove(e);
+                                        if (!rankerService.buyMulti(e.getAccountId(), ladder)) events.remove(e);
                                     }
                                     case PROMOTE -> {
-                                        if (!rankerService.promote(e.getRankerId(), ladder)) events.remove(e);
+                                        if (!rankerService.promote(e.getAccountId(), ladder)) events.remove(e);
                                     }
                                     case ASSHOLE -> {
-                                        if (!rankerService.beAsshole(e.getRankerId(), ladder)) events.remove(e);
+                                        if (!rankerService.beAsshole(e.getAccountId(), ladder)) events.remove(e);
                                         else didPressAssholeButton = true;
                                     }
                                     case VINEGAR -> {
-                                        if (!rankerService.throwVinegar(e.getRankerId(), ladder)) events.remove(e);
+                                        if (!rankerService.throwVinegar(e.getAccountId(), ladder)) events.remove(e);
                                     }
                                     default -> {
                                         events.remove(e);
@@ -92,7 +92,7 @@ public class LadderCalculator {
 
                 // Calculate Time passed
                 long currentNanos = System.nanoTime();
-                double deltaSec = (currentNanos - lastTimeMeasured) / NANOS_IN_SECONDS;
+                double deltaSec = Math.max((currentNanos - lastTimeMeasured) / NANOS_IN_SECONDS, 1.0d);
                 lastTimeMeasured = currentNanos;
 
                 // Send Broadcasts
@@ -115,7 +115,7 @@ public class LadderCalculator {
                 // Calculate Ladder yourself
                 List<Ladder> ladders = rankerService.getLadders();
                 List<CompletableFuture<Void>> futures = ladders.stream()
-                        .map(ladder -> CompletableFuture.runAsync(() -> calculateLadder(ladder)))
+                        .map(ladder -> CompletableFuture.runAsync(() -> calculateLadder(ladder, deltaSec)))
                         .toList();
                 try {
                     CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get();
@@ -130,7 +130,7 @@ public class LadderCalculator {
         }
     }
 
-    private void calculateLadder(Ladder ladder) {
+    private void calculateLadder(Ladder ladder, double deltaSec) {
         List<Ranker> rankers = ladder.getRankers();
         rankers.sort(Comparator.comparing(Ranker::getPoints).reversed());
         for (int i = 0; i < rankers.size(); i++) {
@@ -140,11 +140,11 @@ public class LadderCalculator {
             if (currentRanker.isGrowing()) {
                 // Calculating points & Power
                 if (currentRanker.getRank() != 1)
-                    currentRanker.addPower((i + currentRanker.getBias()) * currentRanker.getMultiplier());
-                currentRanker.addPoints(currentRanker.getPower());
+                    currentRanker.addPower((i + currentRanker.getBias()) * currentRanker.getMultiplier(), deltaSec);
+                currentRanker.addPoints(currentRanker.getPower(), deltaSec);
 
                 // Calculating Vinegar based on Grapes count
-                currentRanker.setVinegar(currentRanker.getVinegar().add(currentRanker.getGrapes()));
+                currentRanker.addVinegar(currentRanker.getGrapes(), deltaSec);
 
                 for (int j = i - 1; j >= 0; j--) {
                     // If one of the already calculated Rankers have less points than this ranker
@@ -170,7 +170,7 @@ public class LadderCalculator {
         // Ranker on Last Place gains 1 Grape, only if he isn't the only one
         if (rankers.size() >= FairController.PEOPLE_FOR_PROMOTE) {
             Ranker lastRanker = rankers.get(rankers.size() - 1);
-            lastRanker.setGrapes(lastRanker.getGrapes().add(BigInteger.ONE));
+            lastRanker.addGrapes(BigInteger.ONE, deltaSec);
         }
     }
 }
