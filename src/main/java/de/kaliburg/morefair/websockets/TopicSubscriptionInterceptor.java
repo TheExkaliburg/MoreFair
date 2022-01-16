@@ -49,14 +49,14 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null) return false;
             Integer chatDestination = Integer.parseInt(topicDestination.substring("/topic/chat/".length()));
-            Integer highestLadder = rankerService.findHighestRankerByAccount(account).getLadder().getNumber();
+            Integer highestLadder = Math.max(rankerService.findHighestRankerByAccount(account).getLadder().getNumber(), 1);
             if (chatDestination > highestLadder) return false;
         }
         if (topicDestination.contains("/topic/ladder/")) {
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null) return false;
             Integer ladderDestination = Integer.parseInt(topicDestination.substring("/topic/ladder/".length()));
-            Integer highestLadder = rankerService.findHighestRankerByAccount(account).getLadder().getNumber();
+            Integer highestLadder = Math.max(rankerService.findHighestRankerByAccount(account).getLadder().getNumber(), 1);
             if (ladderDestination > highestLadder) return false;
         }
 

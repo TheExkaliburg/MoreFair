@@ -7,7 +7,7 @@ import org.springframework.web.util.HtmlUtils;
 
 @Data
 public class RankerDTO {
-    private Long id;
+    private Long accountId;
     private Integer bias;
     private boolean isYou = false;
     private Integer multiplier;
@@ -19,7 +19,7 @@ public class RankerDTO {
     private boolean isGrowing;
 
     public RankerDTO(Ranker ranker) {
-        this.id = ranker.getAccount().getId();
+        this.accountId = ranker.getAccount().getId();
         this.username = HtmlUtils.htmlEscape(StringEscapeUtils.unescapeJava(ranker.getAccount().getUsername()));
         this.rank = ranker.getRank();
         this.points = ranker.getPoints().toString();

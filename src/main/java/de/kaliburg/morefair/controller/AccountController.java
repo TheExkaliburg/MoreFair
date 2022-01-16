@@ -5,6 +5,7 @@ import de.kaliburg.morefair.messages.WSMessage;
 import de.kaliburg.morefair.multithreading.DatabaseWriteSemaphore;
 import de.kaliburg.morefair.persistence.entity.Account;
 import de.kaliburg.morefair.service.AccountService;
+import de.kaliburg.morefair.service.RankerService;
 import de.kaliburg.morefair.utils.WSUtils;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
@@ -14,9 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
@@ -24,38 +23,17 @@ import java.util.UUID;
 @Controller
 @Log4j2
 public class AccountController {
-    private static final String LOGIN_DESTINATION = "/queue/login";
+    private static final String LOGIN_DESTINATION = "/queue/account/login";
 
     private final AccountService accountService;
+    private final RankerService rankerService;
     private final WSUtils wsUtils;
 
-    public AccountController(AccountService accountService, WSUtils wsUtils) {
+    public AccountController(AccountService accountService, RankerService rankerService, WSUtils wsUtils) {
         this.accountService = accountService;
+        this.rankerService = rankerService;
         this.wsUtils = wsUtils;
     }
-
-    @PutMapping(path = "/fair/account", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = "application/json")
-    public ResponseEntity<Void> changeUsername(String username, @CookieValue(name = "_uuid", defaultValue = "") String uuid) {
-        log.debug("PUT /fair/account {} {}", uuid, username);
-        username = username.substring(0, Math.min(32, username.length()));
-        username = StringEscapeUtils.escapeJava(username);
-        try {
-            Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
-            if (account == null) {
-                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-            }
-            DatabaseWriteSemaphore.getInstance().acquire();
-            try {
-                accountService.updateUsername(account, username);
-                return new ResponseEntity<>(HttpStatus.OK);
-            } finally {
-                DatabaseWriteSemaphore.getInstance().release();
-            }
-        } catch (InterruptedException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
 
     @PostMapping(path = "/fair/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = "application/json")
     public ResponseEntity<AccountDetailsDTO> postLogin(String uuid, HttpServletRequest request) {
@@ -86,11 +64,11 @@ public class AccountController {
         }
     }
 
-    @MessageMapping("/login")
-    public void ladder(SimpMessageHeaderAccessor sha, WSMessage wsMessage) throws Exception {
+    @MessageMapping("/account/login")
+    public void login(SimpMessageHeaderAccessor sha, WSMessage wsMessage) throws Exception {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-            log.debug("/app/login {}", uuid);
+            log.debug("/app/account/login {}", uuid);
             if (uuid.isBlank()) {
                 if (wsUtils.canCreateUser(sha)) {
                     wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, accountService.createNewAccount(), HttpStatus.CREATED);
@@ -99,27 +77,41 @@ public class AccountController {
                 }
                 return;
             }
-            try {
-                DatabaseWriteSemaphore.getInstance().acquire();
-                Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
-                if (account == null) {
-                    if (wsUtils.canCreateUser(sha)) {
-                        wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, accountService.createNewAccount(), HttpStatus.CREATED);
-                    } else {
-                        wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
-                    }
-                    return;
+
+            Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
+            if (account == null) {
+                if (wsUtils.canCreateUser(sha)) {
+                    wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, accountService.createNewAccount(), HttpStatus.CREATED);
                 } else {
-                    accountService.login(account);
-                    wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, account.convertToDTO());
+                    wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
                 }
-            } finally {
-                DatabaseWriteSemaphore.getInstance().release();
+                return;
+            } else {
+                accountService.login(account);
+                wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, account.convertToDTO());
             }
+
         } catch (IllegalArgumentException e) {
             wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @MessageMapping("/account/name")
+    public void changeUsername(SimpMessageHeaderAccessor sha, WSMessage wsMessage) throws Exception {
+        try {
+            String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
+            String userName = StringEscapeUtils.escapeJava(wsMessage.getContent());
+            log.debug("/app/account/name {} {}", uuid, userName);
+
+            Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
+            if (account != null) {
+                accountService.updateUsername(account, userName);
+            }
+        } catch (Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();
         }

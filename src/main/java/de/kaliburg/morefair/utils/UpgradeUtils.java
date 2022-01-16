@@ -6,7 +6,10 @@ import java.math.BigInteger;
 
 public class UpgradeUtils {
     public static BigInteger buyUpgradeCost(Integer ladderNum, Integer currentUpgrade) {
-        return BigInteger.valueOf(ladderNum + 1).pow(currentUpgrade);
+        BigInteger ladder = BigInteger.valueOf(ladderNum + 1);
+        BigInteger result = ladder.pow(currentUpgrade);
+
+        return result;
     }
 
     public static BigInteger throwVinegarCost(Integer ladderNum) {

@@ -15,10 +15,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -40,9 +37,6 @@ public class LadderCalculator {
         this.wsUtils = wsUtils;
     }
 
-    // TODO: Change the algorithm, that it only needs to read from the DB when theres an update to one of the Rankers
-    //  That way i would get rid of the O(r log r);
-    // O(l * (r log r + (r * r/2) + r)) = O ( l * r * r)
     @Scheduled(initialDelay = 1000, fixedRate = 1000)
     public void update() {
         // Reset the Heartbeat
@@ -55,39 +49,52 @@ public class LadderCalculator {
                 try {
                     rankerService.getEventSem().acquire();
                     try {
-                        for (Ladder ladder : rankerService.getLadders()) {
-                            // Handle the events from the last Second
+                        for (int i = 1; i <= rankerService.getLadders().size(); i++) {
+                            // Handle the events since the last update
+                            Ladder ladder = rankerService.getLadders().get(i);
                             List<EventDTO> events = rankerService.getEventMap().get(ladder.getNumber());
-                            for (EventDTO e : events) {
+                            List<EventDTO> eventsToBeRemoved = new ArrayList<>();
+                            for (int j = 0; j < events.size(); j++) {
+                                EventDTO e = events.get(j);
                                 switch (e.getEventType()) {
                                     case BIAS -> {
-                                        if (!rankerService.buyBias(e.getAccountId(), ladder)) events.remove(e);
+                                        if (!rankerService.buyBias(e.getAccountId(), ladder))
+                                            eventsToBeRemoved.add(e);
                                     }
                                     case MULTI -> {
-                                        if (!rankerService.buyMulti(e.getAccountId(), ladder)) events.remove(e);
+                                        if (!rankerService.buyMulti(e.getAccountId(), ladder))
+                                            eventsToBeRemoved.add(e);
                                     }
                                     case PROMOTE -> {
-                                        if (!rankerService.promote(e.getAccountId(), ladder)) events.remove(e);
+                                        if (!rankerService.promote(e.getAccountId(), ladder))
+                                            eventsToBeRemoved.add(e);
                                     }
                                     case ASSHOLE -> {
-                                        if (!rankerService.beAsshole(e.getAccountId(), ladder)) events.remove(e);
-                                        else didPressAssholeButton = true;
+                                        eventsToBeRemoved.add(e);
+                                        if (rankerService.beAsshole(e.getAccountId(), ladder))
+                                            didPressAssholeButton = true;
                                     }
                                     case VINEGAR -> {
-                                        if (!rankerService.throwVinegar(e.getAccountId(), ladder)) events.remove(e);
+                                        if (!rankerService.throwVinegar(e.getAccountId(), ladder, e))
+                                            eventsToBeRemoved.add(e);
                                     }
                                     default -> {
-                                        events.remove(e);
+
                                     }
                                 }
                             }
-                            heartbeatMap.put(ladder.getNumber(), new HeartbeatDTO(events));
+                            for (EventDTO e : eventsToBeRemoved) {
+                                events.remove(e);
+                            }
+                            heartbeatMap.put(ladder.getNumber(), new HeartbeatDTO(new ArrayList<>(events)));
                         }
+                        rankerService.resetEvents();
                     } finally {
                         rankerService.getEventSem().release();
                     }
-                } catch (InterruptedException ignored) {
-
+                } catch (Exception e) {
+                    log.error(e.getMessage());
+                    e.printStackTrace();
                 }
 
                 // Calculate Time passed
@@ -97,36 +104,41 @@ public class LadderCalculator {
 
                 // Send Broadcasts
 
+
                 // If someone was an Asshole and the reset worked, should notify all and end calculation
                 if (didPressAssholeButton && rankerService.resetAllLadders()) {
-                    for (Ladder ladder : rankerService.getLadders()) {
+                    for (Ladder ladder : rankerService.getLadders().values()) {
                         heartbeatMap.get(ladder.getNumber()).setSecondsPassed(deltaSec);
-                        wsUtils.convertAndSendToAll(RankerController.LADDER_UPDATE_DESTINATION + ladder.getNumber(), "RESET");
+                        heartbeatMap.get(ladder.getNumber()).setEvents(new ArrayList<>());
+                        heartbeatMap.get(ladder.getNumber()).getEvents().add(new EventDTO(EventDTO.EventType.RESET, 0L));
+                        wsUtils.convertAndSendToAll(RankerController.LADDER_UPDATE_DESTINATION + ladder.getNumber(), heartbeatMap.get(ladder.getNumber()));
                     }
                     return;
                 }
 
                 // Otherwise, just send the default Broadcasts
-                for (Ladder ladder : rankerService.getLadders()) {
+                for (Ladder ladder : rankerService.getLadders().values()) {
                     heartbeatMap.get(ladder.getNumber()).setSecondsPassed(deltaSec);
                     wsUtils.convertAndSendToAll(RankerController.LADDER_UPDATE_DESTINATION + ladder.getNumber(), heartbeatMap.get(ladder.getNumber()));
                 }
 
                 // Calculate Ladder yourself
-                List<Ladder> ladders = rankerService.getLadders();
+                Collection<Ladder> ladders = rankerService.getLadders().values();
                 List<CompletableFuture<Void>> futures = ladders.stream()
                         .map(ladder -> CompletableFuture.runAsync(() -> calculateLadder(ladder, deltaSec)))
                         .toList();
                 try {
                     CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get();
                 } catch (ExecutionException | InterruptedException e) {
+                    log.error(e.getMessage());
                     e.printStackTrace();
                 }
             } finally {
                 rankerService.getLadderSem().release();
             }
-        } catch (InterruptedException ignored) {
-
+        } catch (InterruptedException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
         }
     }
 

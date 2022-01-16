@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = "uuid")})
+@Table
 @Getter
 @Setter
 @Accessors(chain = true)
@@ -23,10 +23,10 @@ public class Ladder {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_ladder")
     private Long id;
     @NonNull
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private UUID uuid;
     @NonNull
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private Integer number;
     @OneToMany(mappedBy = "ladder", fetch = FetchType.LAZY)
     private List<Ranker> rankers = new ArrayList<>();

@@ -1,10 +1,14 @@
 package de.kaliburg.morefair.controller;
 
 import de.kaliburg.morefair.dto.InfoDTO;
+import de.kaliburg.morefair.messages.WSMessage;
 import de.kaliburg.morefair.service.AccountService;
+import de.kaliburg.morefair.utils.WSUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -16,14 +20,10 @@ import java.util.List;
 @Controller
 @Slf4j
 public class FairController {
-    public static final Integer UPDATE_LADDER_STEPS_BEFORE_SYNC = 30;
-    public static final Integer UPDATE_CHAT_STEPS_BEFORE_SYNC = 60;
-    public final static Integer LADDER_AREA_SIZE = 10;
-    public final static Integer LADDER_AREA_SIZE_SERVER = 30;
     public final static Integer PEOPLE_FOR_PROMOTE = 10;
     // 250 Millionen
     public final static BigInteger POINTS_FOR_PROMOTE = new BigInteger("250000000");
-    // 1 Million
+    // 2.5 Million
     public final static BigInteger BASE_VINEGAR_NEEDED_TO_THROW = new BigInteger("2500000");
     public final static Integer ASSHOLE_LADDER = 15;
     public final static Integer ASSHOLES_FOR_RESET = 10;
@@ -50,11 +50,14 @@ public class FairController {
             "&emsp;(&#x265A;)",     // 19♚
             "&emsp;(&#x2654;)"      // 20♔
     ));
-
+    public final static String INFO_DESTINATION = "/queue/info";
     private final AccountService accountService;
+    private final WSUtils wsUtils;
 
-    public FairController(AccountService accountService) {
+
+    public FairController(AccountService accountService, WSUtils wsUtils) {
         this.accountService = accountService;
+        this.wsUtils = wsUtils;
     }
 
     @GetMapping("/")
@@ -62,11 +65,21 @@ public class FairController {
         return "fair";
     }
 
-    @GetMapping(value = "/fair/info", produces = "application/json")
-    public ResponseEntity<InfoDTO> getInfo() {
-        InfoDTO info = new InfoDTO();
-        // Lets hope this works :)
-        info.setAssholeTags(info.getAssholeTags().subList(0, Math.min(accountService.findMaxTimeAsshole() + 2, info.getAssholeTags().size())));
-        return new ResponseEntity<>(info, HttpStatus.OK);
+    @MessageMapping("/info")
+    public void login(SimpMessageHeaderAccessor sha, WSMessage wsMessage) throws Exception {
+        try {
+            String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
+            log.debug("/app/info {}", uuid);
+
+            InfoDTO info = new InfoDTO();
+            info.setAssholeTags(info.getAssholeTags().subList(0, Math.min(accountService.findMaxTimeAsshole() + 2, info.getAssholeTags().size())));
+            wsUtils.convertAndSendToUser(sha, INFO_DESTINATION, info);
+        } catch (IllegalArgumentException e) {
+            wsUtils.convertAndSendToUser(sha, INFO_DESTINATION, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            wsUtils.convertAndSendToUser(sha, INFO_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

@@ -21,9 +21,10 @@ public class LadderViewDTO {
         startRank = rankers.get(0).getRank();
         for (Ranker ranker : rankers) {
             RankerDTO dto = ranker.convertToDto();
-            if (ranker.getAccount().getUuid() == account.getUuid()) {
-                dto.setYou(true);
+            if (ranker.getAccount().getUuid().equals(account.getUuid())) {
                 yourRanker = ranker.convertToPrivateDto();
+                dto = yourRanker;
+                dto.setYou(true);
             }
             this.rankers.add(dto);
             if (ranker.getRank() < startRank) startRank = ranker.getRank();

@@ -1,7 +1,9 @@
 package de.kaliburg.morefair.service;
 
 import de.kaliburg.morefair.dto.AccountDetailsDTO;
+import de.kaliburg.morefair.dto.EventDTO;
 import de.kaliburg.morefair.persistence.entity.Account;
+import de.kaliburg.morefair.persistence.entity.Ranker;
 import de.kaliburg.morefair.persistence.repository.AccountRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -21,14 +23,19 @@ public class AccountService {
         this.rankerService = rankerService;
     }
 
-    @Transactional
+
     public AccountDetailsDTO createNewAccount() {
         Account result = new Account(UUID.randomUUID(), "");
+        result = saveAccount(result);
+        result.setUsername("Mystery Guest #" + result.getId());
+        result = saveAccount(result);
+        result = accountRepository.findByUuid(result.getUuid());
 
         try {
             rankerService.getLadderSem().acquire();
             try {
-                rankerService.createNewRankerForAccountOnLadder(result, 1);
+                Ranker ranker = rankerService.createNewRankerForAccountOnLadder(result, 1);
+                result.getRankers().add(ranker);
             } finally {
                 rankerService.getLadderSem().release();
             }
@@ -37,21 +44,27 @@ public class AccountService {
             e.printStackTrace();
         }
 
-        result = accountRepository.save(result);
-        result.setUsername("Mystery Guest #" + result.getId());
-        result = accountRepository.save(result);
-
+        result = accountRepository.findByUuid(result.getUuid());
         log.info("Created a new Account with the uuid {} (#{}).", result.getUuid().toString(), result.getId());
         return result.convertToDTO();
+    }
+
+    @Transactional
+    protected Account saveAccount(Account account) {
+        return accountRepository.save(account);
     }
 
     public Account findAccountByUUID(UUID uuid) {
         return accountRepository.findByUuid(uuid);
     }
 
+    @Transactional
     public void updateUsername(Account account, String username) {
         account.setUsername(username);
         accountRepository.save(account);
+        EventDTO event = new EventDTO(EventDTO.EventType.NAMECHANGE, account.getId());
+        event.setChangedUsername(username);
+        rankerService.addGlobalEvent(event);
     }
 
     public void login(Account account) {
@@ -61,6 +74,10 @@ public class AccountService {
     }
 
     public Integer findMaxTimeAsshole() {
-        return accountRepository.findTopByTimesAsshole();
+        return (accountRepository.findTopByTimesAsshole() != null) ? accountRepository.findTopByTimesAsshole() : 0;
+    }
+
+    public Account findAccountById(Long accountId) {
+        return accountRepository.findById(accountId).get();
     }
 }

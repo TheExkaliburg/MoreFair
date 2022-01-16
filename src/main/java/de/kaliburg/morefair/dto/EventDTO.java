@@ -9,8 +9,13 @@ public class EventDTO {
     private EventType eventType;
     @NonNull
     private Long accountId;
+    private JoinDTO joinData;
+    private String changedUsername;
+    private String vinegarThrown;
+
+    // TODO: Rework the way this DTO transfers additional Data like joinData, changedUsername, vinegarThrown...
 
     public enum EventType {
-        BIAS, MULTI, PROMOTE, ASSHOLE, VINEGAR
+        BIAS, MULTI, PROMOTE, ASSHOLE, VINEGAR, JOIN, NAMECHANGE, RESET
     }
 }

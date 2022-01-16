@@ -1,3 +1,9 @@
+let identityData = {
+    uuid: "",
+    accountId: 0,
+    highestCurrentLadder: 1
+}
+
 function setCookie(cName, cValue, expDays) {
     const d = new Date();
     d.setTime(d.getTime() + (expDays * 24 * 60 * 60 * 1000));
@@ -22,31 +28,31 @@ function getCookie(cname) {
 }
 
 function login() {
-    stompClient.send("/app/login", {}, JSON.stringify({
+    stompClient.send("/app/account/login", {}, JSON.stringify({
         'uuid': getCookie("_uuid")
     }));
 }
 
 function onLoginReceived(message) {
     if (message.status === "OK" || message.status === "CREATED") {
-        if (message.content.uuid) {
-            let uuid = message.content.uuid;
-            setCookie("_uuid", uuid, 365 * 5);
+        if (message.content) {
+            identityData = message.content;
+            setCookie("_uuid", identityData.uuid, 365 * 5);
         }
 
         // Init Chat Connection
-        chatSubscription = stompClient.subscribe('/topic/chat/' + ladderData.currentLadder.number,
+        chatSubscription = stompClient.subscribe('/topic/chat/' + identityData.highestCurrentLadder,
             (message) => handleChatUpdates(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
         stompClient.subscribe('/user/queue/chat/',
             (message) => handleChatInit(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
-        initChat(ladderData.currentLadder.number);
+        initChat(identityData.highestCurrentLadder);
 
         // Init Ladder Connection
-        ladderSubscription = stompClient.subscribe('/topic/ladder/' + ladderData.currentLadder.number,
+        ladderSubscription = stompClient.subscribe('/topic/ladder/' + identityData.highestCurrentLadder,
             (message) => handleLadderUpdates(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
         stompClient.subscribe('/user/queue/ladder/',
             (message) => handleLadderInit(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
-        initLadder(ladderData.currentLadder.number);
+        initLadder(identityData.highestCurrentLadder);
     }
 }
 

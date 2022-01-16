@@ -21,18 +21,28 @@ public class MessageService {
     private final LadderRepository ladderRepository;
 
     @Getter
-    private List<Ladder> chats = new ArrayList<>();
+    private Map<Integer, Ladder> chats = new HashMap<>();
 
     public MessageService(MessageRepository messageRepository, LadderRepository ladderRepository) {
         this.messageRepository = messageRepository;
         this.ladderRepository = ladderRepository;
     }
 
+    public Ladder findLadderWithChat(Ladder ladder) {
+        return ladderRepository.findLadderByUUIDWithMessage(ladder.getUuid());
+    }
+
+    public Ladder addChat(Ladder ladder) {
+        Ladder result = findLadderWithChat(ladder);
+        chats.putIfAbsent(ladder.getNumber(), result);
+        return result;
+    }
+
     @PostConstruct
     public void init() {
         messageRepository.deleteAll();
-        chats = ladderRepository.findAllLaddersJoinedWithMessages().stream().toList();
-        for (Ladder l : chats) {
+        ladderRepository.findAllLaddersJoinedWithMessages().forEach(l -> chats.put(l.getNumber(), l));
+        for (Ladder l : chats.values()) {
             if (l.getMessages().size() > 30) {
                 List<Message> messages = l.getMessages();
                 messages.sort(Comparator.comparing(Message::getCreatedOn));
@@ -49,14 +59,13 @@ public class MessageService {
         log.debug("Saving Chats...");
     }
 
+    //TODO: Manage the Chat better
     public ChatDTO getChat(int ladderNum) {
-        Optional<Ladder> optional = chats.stream().filter(l -> l.getNumber() == ladderNum).findFirst();
-        Ladder ladder = optional.get();
-        return ladder.convertToChatDTO();
+        return chats.get(ladderNum).convertToChatDTO();
     }
 
     public Message writeMessage(Account account, Integer ladderNum, String messageString) {
-        Ladder ladder = chats.stream().filter(l -> l.getNumber() == ladderNum).findFirst().get();
+        Ladder ladder = chats.get(ladderNum);
         Message message = new Message(UUID.randomUUID(), account, messageString, ladder);
         List<Message> messages = ladder.getMessages();
         messages.add(0, message);

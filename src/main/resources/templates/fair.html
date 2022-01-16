@@ -23,8 +23,8 @@
     <script th:src="@{/fair/js/cookie.js}" type="text/javascript"></script>
     <script th:src="@{/fair/js/morefair.js}" type="text/javascript"></script>
     <script th:src="@{/fair/js/requests.js}" type="text/javascript"></script>
-    <script th:src="@{/fair/js/chatRequests.js}" type="text/javascript"></script>
-    <script th:src="@{/fair/js/ladderRequests.js}" type="text/javascript"></script>
+    <script th:src="@{/fair/js/chat.js}" type="text/javascript"></script>
+    <script th:src="@{/fair/js/ladder.js}" type="text/javascript"></script>
 
 
 </head>
@@ -33,6 +33,10 @@
         $('[data-toggle="tooltip"]').tooltip();
         setup();
     });
+
+    $(window).on("beforeunload", (event) => {
+        disconnect();
+    })
 </script>
 <body style="overflow-y: hidden">
 <noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
@@ -59,7 +63,7 @@
                                 style="display: none"
                                 type="button">
                             <i class="bi bi-emoji-dizzy"></i>
-                            ASSHOLE BUTTON
+                            I AM AN ASSHOLE
                             <i class="bi bi-emoji-dizzy"></i>
                         </button>
                     </div>
@@ -116,7 +120,7 @@
                 <input class="form-control shadow-none" id="messageInput" maxlength="280"
                        placeholder="Chad is listening..." type="text">
                 <button class="btn btn-primary shadow-none" href="#" id="sendButton"
-                        onclick="postChat()">Send
+                        onclick="sendMessage()">Send
                 </button>
             </div>
         </div>
