@@ -179,8 +179,8 @@ public class LadderCalculator {
                 }
             }
         }
-        // Ranker on Last Place gains 1 Grape, only if he isn't the only one
-        if (rankers.size() >= FairController.PEOPLE_FOR_PROMOTE) {
+        // Ranker on Last Place gains 1 Grape, only if he isn't in the top group
+        if (rankers.size() >= Math.max(FairController.MINIMUM_PEOPLE_FOR_PROMOTE, ladder.getNumber())) {
             Ranker lastRanker = rankers.get(rankers.size() - 1);
             lastRanker.addGrapes(BigInteger.ONE, deltaSec);
         }

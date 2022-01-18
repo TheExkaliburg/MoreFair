@@ -256,7 +256,7 @@ public class RankerService {
             // - Ranker is #1
             // - There are enough people to promote
             // - Ranker got enough points to promote
-            if (ranker.getRank() == 1 && ranker.getLadder().getRankers().size() >= FairController.PEOPLE_FOR_PROMOTE
+            if (ranker.getRank() == 1 && ranker.getLadder().getRankers().size() >= Math.max(FairController.MINIMUM_PEOPLE_FOR_PROMOTE, ladder.getNumber())
                     && ranker.getPoints().compareTo(FairController.POINTS_FOR_PROMOTE) >= 0) {
                 ranker.setGrowing(false);
                 Ranker newRanker = createNewRankerForAccountOnLadder(ranker.getAccount(), ranker.getLadder().getNumber() + 1);
@@ -281,7 +281,7 @@ public class RankerService {
             // - There are enough people to promote
             // - Ranker got enough points to promote
             // - The current Ladder is the assholeLadder or higher
-            if (ranker.getRank() == 1 && ranker.getLadder().getRankers().size() >= FairController.PEOPLE_FOR_PROMOTE
+            if (ranker.getRank() == 1 && ranker.getLadder().getRankers().size() >= Math.max(FairController.MINIMUM_PEOPLE_FOR_PROMOTE, ladder.getNumber())
                     && ranker.getPoints().compareTo(FairController.POINTS_FOR_PROMOTE) >= 0
                     && ranker.getLadder().getNumber().compareTo(FairController.ASSHOLE_LADDER) >= 0) {
                 Account account = accountRepository.findByUuid(ranker.getAccount().getUuid());
@@ -314,7 +314,7 @@ public class RankerService {
             // - Target got enough points to promote
             // - Ranker got enough Vinegar to throw
             if (target.getRank() == 1 && ranker.getUuid() != target.getUuid() && target.isGrowing()
-                    && target.getLadder().getRankers().size() >= FairController.PEOPLE_FOR_PROMOTE
+                    && target.getLadder().getRankers().size() >= Math.max(FairController.MINIMUM_PEOPLE_FOR_PROMOTE, ladder.getNumber())
                     && target.getPoints().compareTo(FairController.POINTS_FOR_PROMOTE) >= 0
                     && ranker.getVinegar().compareTo(UpgradeUtils.throwVinegarCost(target.getLadder().getNumber())) >= 0) {
                 BigInteger rankerVinegar = ranker.getVinegar();

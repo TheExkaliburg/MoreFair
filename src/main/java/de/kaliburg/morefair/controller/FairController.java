@@ -20,12 +20,12 @@ import java.util.List;
 @Controller
 @Slf4j
 public class FairController {
-    public final static Integer PEOPLE_FOR_PROMOTE = 10;
+    public final static Integer MINIMUM_PEOPLE_FOR_PROMOTE = 10;
     // 250 Millionen
     public final static BigInteger POINTS_FOR_PROMOTE = new BigInteger("250000000");
     // 2.5 Million
     public final static BigInteger BASE_VINEGAR_NEEDED_TO_THROW = new BigInteger("2500000");
-    public final static Integer ASSHOLE_LADDER = 15;
+    public final static Integer ASSHOLE_LADDER = 20;
     public final static Integer ASSHOLES_FOR_RESET = 10;
     public final static List<String> ASSHOLE_TAGS = new ArrayList<>(Arrays.asList(
             "",

@@ -15,7 +15,7 @@ let rankerTemplate = {
 
 let ladderData = {
     rankers: [rankerTemplate],
-    currentLadder: {number: 1, size: 1, growingRankerCount: 1},
+    currentLadder: {number: 1},
     firstRanker: rankerTemplate,
     yourRanker: rankerTemplate
 };
@@ -100,7 +100,7 @@ function promote() {
 }
 
 function beAsshole() {
-    if (ladderData.firstRanker.you && ladderData.rankers.length >= infoData.peopleForPromote
+    if (ladderData.firstRanker.you && ladderData.rankers.length >= Math.max(infoData.minimumPeopleForPromote, ladderData.currentLadder.number)
         && ladderData.firstRanker.points.cmp(infoData.pointsForPromote) >= 0
         && ladderData.currentLadder.number >= infoData.assholeLadder) {
         if (confirm("Do you really wanna be an Asshole?!")) {
@@ -273,7 +273,7 @@ function calculateLadder(delta) {
     }
 
     // Ranker on Last Place gains 1 Grape, only if he isn't the only one
-    if (ladderData.rankers.length >= infoData.peopleForPromote) {
+    if (ladderData.rankers.length >= Math.max(infoData.minimumPeopleForPromote, ladderData.currentLadder.number)) {
         let index = ladderData.rankers.length - 1;
         if (ladderData.rankers[index].growing)
             ladderData.rankers[index].grapes = ladderData.rankers[index].grapes.add(new Decimal(1).mul(delta).floor());
@@ -351,7 +351,7 @@ function writeNewRow(body, ranker) {
     let row = body.insertRow();
     let assholeTag = (ranker.timesAsshole < infoData.assholeTags.length) ?
         infoData.assholeTags[ranker.timesAsshole] : infoData.assholeTags[infoData.assholeTags.length - 1];
-    let rank = (ranker.rank === 1 && !ranker.you && ranker.growing && ladderData.rankers.length >= infoData.peopleForPromote
+    let rank = (ranker.rank === 1 && !ranker.you && ranker.growing && ladderData.rankers.length >= Math.max(infoData.minimumPeopleForPromote, ladderData.currentLadder.number)
         && ladderData.firstRanker.points.cmp(infoData.pointsForPromote) >= 0) ?
         '<a href="#" style="text-decoration: none" onclick="throwVinegar()">🍇</a>' : ranker.rank;
     row.insertCell(0).innerHTML = rank + assholeTag;
@@ -390,7 +390,8 @@ function showButtons() {
     let assholeButton = $('#assholeButton');
     let ladderNumber = $('#ladderNumber');
 
-    if (ladderData.firstRanker.you && ladderData.rankers.length >= infoData.peopleForPromote && ladderData.firstRanker.points.cmp(infoData.pointsForPromote) >= 0) {
+    if (ladderData.firstRanker.you && ladderData.rankers.length >= Math.max(infoData.minimumPeopleForPromote, ladderData.currentLadder.number)
+        && ladderData.firstRanker.points.cmp(infoData.pointsForPromote) >= 0) {
         if (ladderData.currentLadder.number === infoData.assholeLadder) {
             promoteButton.hide()
             ladderNumber.hide()

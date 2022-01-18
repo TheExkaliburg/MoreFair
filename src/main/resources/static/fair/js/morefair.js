@@ -1,6 +1,6 @@
 let infoData = {
     pointsForPromote: new Decimal(250000000),
-    peopleForPromote: 10,
+    minimumPeopleForPromote: 10,
     assholeLadder: 15,
     assholeTags: [''],
     baseVinegarNeededToThrow: new Decimal(1000000)
@@ -21,7 +21,7 @@ let ladderSubscription = null;
 function connect() {
     let socket = new SockJS('/fairsocket');
     stompClient = Stomp.over(socket);
-    //stompClient.debug = null;
+    stompClient.debug = null;
     stompClient.connect({}, function (frame) {
         // INFO
         stompClient.subscribe('/user/queue/info',
