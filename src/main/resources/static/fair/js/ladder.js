@@ -258,7 +258,7 @@ function calculateLadder(delta) {
 
                     // Move other Ranker 1 Place down
                     ladderData.rankers[j].rank = j + 2;
-                    if (ladderData.rankers[j].growing && ladderData.rankers[j].you)
+                    if (ladderData.rankers[j].growing && ladderData.rankers[j].you && (ladderData.rankers[j].bias > 0 || ladderData.rankers[j].multiplier > 1))
                         ladderData.rankers[j].grapes = ladderData.rankers[j].grapes.add(new Decimal(1));
                     ladderData.rankers[j + 1] = ladderData.rankers[j];
 

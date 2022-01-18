@@ -27,15 +27,17 @@ function connect() {
         stompClient.subscribe('/user/queue/info',
             (message) => onInfoReceived(JSON.parse(message.body)), {uuid: getCookie("_uuid")})
         getInfo()
+    }, function (frame) {
+        disconnect();
+        connect();
     })
-
 }
 
 function disconnect() {
     if (stompClient !== null) {
         stompClient.disconnect();
     }
-    console.log("Disconnected");
+    console.log("Currently disconnected...");
 }
 
 async function setup() {

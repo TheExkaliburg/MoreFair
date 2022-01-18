@@ -167,7 +167,8 @@ public class LadderCalculator {
                         // Move other Ranker 1 Place down
                         Ranker temp = rankers.get(j);
                         temp.setRank(j + 2);
-                        if (temp.isGrowing()) temp.setGrapes(temp.getGrapes().add(BigInteger.ONE));
+                        if (temp.isGrowing() && (temp.getBias() > 0 || temp.getMultiplier() > 1))
+                            temp.setGrapes(temp.getGrapes().add(BigInteger.ONE));
                         rankers.set(j + 1, temp);
 
                         // Move this Ranker 1 Place up
