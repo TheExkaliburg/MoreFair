@@ -396,7 +396,9 @@ public class RankerService {
         try {
             Ranker ranker = findActiveRankerOfAccountOnLadder(accountId, ladder);
             BigInteger cost = UpgradeUtils.buyAutoPromoteCost(ranker.getRank(), ranker.getLadder().getNumber());
-            if (!ranker.isAutoPromote() && ranker.getGrapes().compareTo(cost) >= 0) {
+            if (!ranker.isAutoPromote() && ranker.getGrapes().compareTo(cost) >= 0
+                    && ladder.getNumber() >= FairController.AUTO_PROMOTE_LADDER
+                    && ladder.getNumber() != FairController.BASE_ASSHOLE_LADDER + accountRepository.findMaxTimesAsshole()) {
                 ranker.setGrapes(ranker.getGrapes().subtract(cost));
                 ranker.setAutoPromote(true);
                 return true;

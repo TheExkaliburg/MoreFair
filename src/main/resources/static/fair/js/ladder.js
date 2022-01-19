@@ -139,6 +139,7 @@ function buyAutoPromote() {
     $('#biasButton').prop("disabled", true);
     $('#autoPromoteTooltip').tooltip('hide');
     if (ladderData.currentLadder.number >= infoData.autoPromoteLadder
+        && ladderData.currentLadder.number !== infoData.assholeLadder
         && ladderData.yourRanker.grapes.cmp(getAutoPromoteGrapeCost(ladderData.yourRanker.rank)) >= 0) {
         stompClient.send("/app/ladder/post/auto-promote", {}, JSON.stringify({
             'uuid': identityData.uuid
@@ -482,7 +483,8 @@ function showButtons() {
     let autoPromoteButton = $('#autoPromoteButton');
     let autoPromoteTooltip = $('#autoPromoteTooltip');
     let autoPromoteCost = getAutoPromoteGrapeCost(ladderData.yourRanker.rank);
-    if (!ladderData.yourRanker.autoPromote && ladderData.currentLadder.number >= infoData.autoPromoteLadder) {
+    if (!ladderData.yourRanker.autoPromote && ladderData.currentLadder.number >= infoData.autoPromoteLadder
+        && ladderData.currentLadder.number !== infoData.assholeLadder) {
         autoPromoteButton.show();
         if (ladderData.yourRanker.grapes.cmp(autoPromoteCost) >= 0) {
             autoPromoteButton.prop("disabled", false);
