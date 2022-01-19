@@ -55,6 +55,7 @@ public class Ranker {
     @NonNull
     @Column(nullable = false, precision = 1000, scale = 0)
     private BigInteger vinegar = BigInteger.ZERO;
+    private boolean autoPromote = false;
 
     public Ranker addPoints(Integer points, double secondsPassed) {
         return addPoints(BigInteger.valueOf(points), secondsPassed);

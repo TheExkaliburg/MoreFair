@@ -70,7 +70,7 @@ function updateChat() {
 function updateChatUsername(event) {
     chatData.messages.forEach(message => {
         if (event.accountId === message.accountId) {
-            message.username = event.changedUsername;
+            message.username = event.data;
         }
     })
     updateChat();

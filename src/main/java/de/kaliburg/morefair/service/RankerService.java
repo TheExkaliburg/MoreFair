@@ -1,9 +1,10 @@
 package de.kaliburg.morefair.service;
 
 import de.kaliburg.morefair.controller.FairController;
-import de.kaliburg.morefair.dto.EventDTO;
-import de.kaliburg.morefair.dto.JoinDTO;
 import de.kaliburg.morefair.dto.LadderViewDTO;
+import de.kaliburg.morefair.events.Event;
+import de.kaliburg.morefair.events.EventType;
+import de.kaliburg.morefair.events.data.JoinData;
 import de.kaliburg.morefair.persistence.entity.Account;
 import de.kaliburg.morefair.persistence.entity.Ladder;
 import de.kaliburg.morefair.persistence.entity.Ranker;
@@ -32,7 +33,7 @@ public class RankerService {
     private final AccountRepository accountRepository;
     private final MessageService messageService;
     @Getter
-    private final Map<Integer, List<EventDTO>> eventMap = new HashMap<>();
+    private final Map<Integer, List<Event>> eventMap = new HashMap<>();
     @Getter
     private final Semaphore ladderSem = new Semaphore(1);
     @Getter
@@ -141,7 +142,7 @@ public class RankerService {
     }
 
 
-    public void addEvent(Integer ladderNum, EventDTO event) {
+    public void addEvent(Integer ladderNum, Event event) {
         try {
             eventSem.acquire();
             try {
@@ -155,7 +156,7 @@ public class RankerService {
         }
     }
 
-    public void addGlobalEvent(EventDTO event) {
+    public void addGlobalEvent(Event event) {
         try {
             eventSem.acquire();
             try {
@@ -182,9 +183,9 @@ public class RankerService {
         Ranker ranker = saveRanker(new Ranker(UUID.randomUUID(), ladder, account, ladder.getRankers().size() + 1));
         ladder.getRankers().add(ranker);
 
-        EventDTO eventDTO = new EventDTO(EventDTO.EventType.JOIN, account.getId());
-        eventDTO.setJoinData(new JoinDTO(account.getUsername(), account.getTimesAsshole()));
-        eventMap.get(ladderNum).add(eventDTO);
+        Event event = new Event(EventType.JOIN, account.getId());
+        event.setData(new JoinData(account.getUsername(), account.getTimesAsshole()));
+        eventMap.get(ladderNum).add(event);
 
         return ranker;
     }
@@ -283,13 +284,13 @@ public class RankerService {
             // - The current Ladder is the assholeLadder or higher
             if (ranker.getRank() == 1 && ranker.getLadder().getRankers().size() >= Math.max(FairController.MINIMUM_PEOPLE_FOR_PROMOTE, ladder.getNumber())
                     && ranker.getPoints().compareTo(FairController.POINTS_FOR_PROMOTE) >= 0
-                    && ranker.getLadder().getNumber().compareTo(FairController.ASSHOLE_LADDER) >= 0) {
+                    && ranker.getLadder().getNumber().compareTo(FairController.BASE_ASSHOLE_LADDER + accountRepository.findMaxTimesAsshole()) >= 0) {
                 Account account = accountRepository.findByUuid(ranker.getAccount().getUuid());
                 account.setIsAsshole(true);
                 saveAccount(account);
 
                 // Promote the Ranker afterwards
-                eventMap.get(ladder.getNumber()).add(new EventDTO(EventDTO.EventType.PROMOTE, ranker.getAccount().getId()));
+                eventMap.get(ladder.getNumber()).add(new Event(EventType.PROMOTE, ranker.getAccount().getId()));
                 return true;
             }
         } catch (Exception e) {
@@ -301,7 +302,7 @@ public class RankerService {
     }
 
 
-    public boolean throwVinegar(Long accountId, Ladder ladder, EventDTO event) {
+    public boolean throwVinegar(Long accountId, Ladder ladder, Event event) {
         try {
             Ranker ranker = findActiveRankerOfAccountOnLadder(accountId, ladder);
             Ranker target = findHighestRankerByLadder(ranker.getLadder());
@@ -317,6 +318,11 @@ public class RankerService {
                     && target.getLadder().getRankers().size() >= Math.max(FairController.MINIMUM_PEOPLE_FOR_PROMOTE, ladder.getNumber())
                     && target.getPoints().compareTo(FairController.POINTS_FOR_PROMOTE) >= 0
                     && ranker.getVinegar().compareTo(UpgradeUtils.throwVinegarCost(target.getLadder().getNumber())) >= 0) {
+                if (target.isAutoPromote()) {
+                    eventMap.get(ladder.getNumber()).add(new Event(EventType.PROMOTE, target.getAccount().getId()));
+                    return true;
+                }
+
                 BigInteger rankerVinegar = ranker.getVinegar();
                 BigInteger targetVinegar = target.getVinegar();
                 log.debug("User {} is using their {} Vinegar on the User {} with {}", ranker.getAccount().getUsername(), rankerVinegar, target.getAccount().getUsername(), targetVinegar);
@@ -324,10 +330,9 @@ public class RankerService {
                     targetVinegar = targetVinegar.subtract(rankerVinegar);
                 } else {
                     targetVinegar = BigInteger.ZERO;
-                    // add a new Event to promote the Ranker
-                    eventMap.get(ladder.getNumber()).add(new EventDTO(EventDTO.EventType.PROMOTE, target.getAccount().getId()));
+                    eventMap.get(ladder.getNumber()).add(new Event(EventType.SOFT_RESET_POINTS, target.getAccount().getId()));
                 }
-                event.setVinegarThrown(rankerVinegar.toString());
+                event.setData(rankerVinegar.toString());
                 ranker.setVinegar(BigInteger.ZERO);
                 target.setVinegar(targetVinegar);
                 return true;
@@ -387,4 +392,32 @@ public class RankerService {
     }
 
 
+    public boolean buyAutoPromote(Long accountId, Ladder ladder) {
+        try {
+            Ranker ranker = findActiveRankerOfAccountOnLadder(accountId, ladder);
+            BigInteger cost = UpgradeUtils.buyAutoPromoteCost(ranker.getRank(), ranker.getLadder().getNumber());
+            if (!ranker.isAutoPromote() && ranker.getGrapes().compareTo(cost) >= 0) {
+                ranker.setGrapes(ranker.getGrapes().subtract(cost));
+                ranker.setAutoPromote(true);
+                return true;
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+        return false;
+    }
+
+    public boolean softResetPoints(Long accountId, Ladder ladder) {
+        try {
+            Ranker ranker = findActiveRankerOfAccountOnLadder(accountId, ladder);
+            ranker.setPoints(BigInteger.ZERO);
+            return true;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

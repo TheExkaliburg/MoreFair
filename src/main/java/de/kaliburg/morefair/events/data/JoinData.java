@@ -1,10 +1,10 @@
-package de.kaliburg.morefair.dto;
+package de.kaliburg.morefair.events.data;
 
 import lombok.Data;
 import lombok.NonNull;
 
 @Data
-public class JoinDTO {
+public class JoinData {
     @NonNull
     private String username;
     @NonNull

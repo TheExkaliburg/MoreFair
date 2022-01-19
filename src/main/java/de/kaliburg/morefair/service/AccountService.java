@@ -1,8 +1,10 @@
 package de.kaliburg.morefair.service;
 
 import de.kaliburg.morefair.dto.AccountDetailsDTO;
-import de.kaliburg.morefair.dto.EventDTO;
+import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.persistence.entity.Account;
+import de.kaliburg.morefair.persistence.entity.Ladder;
+import de.kaliburg.morefair.persistence.entity.Message;
 import de.kaliburg.morefair.persistence.entity.Ranker;
 import de.kaliburg.morefair.persistence.repository.AccountRepository;
 import lombok.extern.log4j.Log4j2;
@@ -17,10 +19,12 @@ import java.util.UUID;
 public class AccountService {
     private final AccountRepository accountRepository;
     private final RankerService rankerService;
+    private final MessageService messageService;
 
-    public AccountService(AccountRepository accountRepository, RankerService rankerService) {
+    public AccountService(AccountRepository accountRepository, RankerService rankerService, MessageService messageService) {
         this.accountRepository = accountRepository;
         this.rankerService = rankerService;
+        this.messageService = messageService;
     }
 
 
@@ -58,13 +62,25 @@ public class AccountService {
         return accountRepository.findByUuid(uuid);
     }
 
-    @Transactional
-    public void updateUsername(Account account, String username) {
-        account.setUsername(username);
-        accountRepository.save(account);
-        EventDTO event = new EventDTO(EventDTO.EventType.NAMECHANGE, account.getId());
-        event.setChangedUsername(username);
-        rankerService.addGlobalEvent(event);
+    public boolean updateUsername(Long accountId, Ladder ladder, Event event) {
+        Account account = findAccountById(accountId);
+        String newUsername = (String) event.getData();
+        account.setUsername(newUsername);
+        account = saveAccount(account);
+
+        for (Ranker ranker : rankerService.getLadders().get(ladder.getNumber()).getRankers()) {
+            if (ranker.getAccount().getId().equals(accountId)) {
+                ranker.setAccount(account);
+            }
+        }
+
+        for (Message message : messageService.getChats().get(ladder.getNumber()).getMessages()) {
+            if (message.getAccount().getId().equals(accountId)) {
+                message.setAccount(account);
+            }
+        }
+
+        return true;
     }
 
     public void login(Account account) {
@@ -74,7 +90,7 @@ public class AccountService {
     }
 
     public Integer findMaxTimeAsshole() {
-        return (accountRepository.findTopByTimesAsshole() != null) ? accountRepository.findTopByTimesAsshole() : 0;
+        return (accountRepository.findMaxTimesAsshole() != null) ? accountRepository.findMaxTimesAsshole() : 0;
     }
 
     public Account findAccountById(Long accountId) {

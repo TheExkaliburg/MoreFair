@@ -3,7 +3,9 @@ let infoData = {
     minimumPeopleForPromote: 10,
     assholeLadder: 15,
     assholeTags: [''],
-    baseVinegarNeededToThrow: new Decimal(1000000)
+    baseVinegarNeededToThrow: new Decimal(1000000),
+    baseGrapesNeededToAutoPromote: new Decimal(1000),
+    autoPromoteLadder: 2
 }
 
 let clientData = {
@@ -16,7 +18,6 @@ let numberFormatter;
 let stompClient = null;
 let chatSubscription = null;
 let ladderSubscription = null;
-
 
 function connect() {
     let socket = new SockJS('/fairsocket');
@@ -67,6 +68,7 @@ function onInfoReceived(message) {
         infoData = message.content
         infoData.pointsForPromote = new Decimal(infoData.pointsForPromote);
         infoData.baseVinegarNeededToThrow = new Decimal(infoData.baseVinegarNeededToThrow);
+        infoData.baseGrapesNeededToAutoPromote = new Decimal(infoData.baseGrapesNeededToAutoPromote);
 
         // Login
         stompClient.subscribe('/user/queue/account/login',
@@ -104,6 +106,12 @@ function getUpgradeCost(level) {
 
 function getVinegarThrowCost() {
     return new Decimal(infoData.baseVinegarNeededToThrow.mul(new Decimal(ladderData.currentLadder.number)));
+}
+
+function getAutoPromoteGrapeCost(rank) {
+    let minPeople = Math.max(infoData.minimumPeopleForPromote, ladderData.currentLadder.number);
+    let divisor = Math.max(rank - minPeople + 1, 1);
+    return infoData.baseGrapesNeededToAutoPromote.div(divisor).floor();
 }
 
 

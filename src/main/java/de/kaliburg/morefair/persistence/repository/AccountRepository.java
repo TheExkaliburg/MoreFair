@@ -17,7 +17,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     Account findByUuid(@Param("uuid") UUID uuid);
 
     @Query("SELECT MAX(a.timesAsshole) FROM Account a")
-    Integer findTopByTimesAsshole();
+    Integer findMaxTimesAsshole();
 
     @Query("SELECT a FROM Account a LEFT JOIN FETCH a.rankers")
     Set<Account> findAllAccountsJoinedWithRankers();

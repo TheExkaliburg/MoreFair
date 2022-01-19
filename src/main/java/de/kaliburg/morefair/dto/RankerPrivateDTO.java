@@ -9,10 +9,12 @@ import lombok.EqualsAndHashCode;
 public class RankerPrivateDTO extends RankerDTO {
     private String grapes;
     private String vinegar;
+    private boolean autoPromote = false;
 
     public RankerPrivateDTO(Ranker ranker) {
         super(ranker);
         this.grapes = ranker.getGrapes().toString();
         this.vinegar = ranker.getVinegar().toString();
+        this.autoPromote = ranker.isAutoPromote();
     }
 }

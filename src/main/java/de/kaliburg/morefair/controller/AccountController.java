@@ -1,6 +1,8 @@
 package de.kaliburg.morefair.controller;
 
 import de.kaliburg.morefair.dto.AccountDetailsDTO;
+import de.kaliburg.morefair.events.Event;
+import de.kaliburg.morefair.events.EventType;
 import de.kaliburg.morefair.messages.WSMessage;
 import de.kaliburg.morefair.multithreading.DatabaseWriteSemaphore;
 import de.kaliburg.morefair.persistence.entity.Account;
@@ -104,12 +106,14 @@ public class AccountController {
     public void changeUsername(SimpMessageHeaderAccessor sha, WSMessage wsMessage) throws Exception {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-            String userName = StringEscapeUtils.escapeJava(wsMessage.getContent());
-            log.debug("/app/account/name {} {}", uuid, userName);
+            String username = StringEscapeUtils.escapeJava(wsMessage.getContent());
+            log.debug("/app/account/name {} {}", uuid, username);
 
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account != null) {
-                accountService.updateUsername(account, userName);
+                Event event = new Event(EventType.NAME_CHANGE, account.getId());
+                event.setData(username);
+                rankerService.addGlobalEvent(event);
             }
         } catch (Exception e) {
             log.error(e.getMessage());

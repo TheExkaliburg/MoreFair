@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Component
 @Log4j2
@@ -32,6 +33,18 @@ public class WSUtils {
 
     public void convertAndSendToUser(SimpMessageHeaderAccessor sha, String dest, HttpStatus status) {
         simpMessagingTemplate.convertAndSendToUser(sha.getUser().getName(), dest, new WSMessageAnswer<>("", status));
+    }
+
+    public void convertAndSendToUser(UUID uuid, String dest, Object content) {
+        simpMessagingTemplate.convertAndSend(dest + uuid.toString(), new WSMessageAnswer<>(content));
+    }
+
+    public void convertAndSendToUser(UUID uuid, String dest, Object content, HttpStatus status) {
+        simpMessagingTemplate.convertAndSend(dest + uuid.toString(), new WSMessageAnswer<>(content, status));
+    }
+
+    public void convertAndSendToUser(UUID uuid, String dest, HttpStatus status) {
+        simpMessagingTemplate.convertAndSend(dest + uuid.toString(), new WSMessageAnswer<>("", status));
     }
 
     public void convertAndSendToAll(String dest, Object content) {

@@ -25,7 +25,10 @@ public class FairController {
     public final static BigInteger POINTS_FOR_PROMOTE = new BigInteger("250000000");
     // 2.5 Million
     public final static BigInteger BASE_VINEGAR_NEEDED_TO_THROW = new BigInteger("2500000");
-    public final static Integer ASSHOLE_LADDER = 20;
+    // 1 Thousand
+    public final static BigInteger BASE_GRAPES_NEEDED_TO_AUTO_PROMOTE = new BigInteger("1000");
+    public final static Integer AUTO_PROMOTE_LADDER = 2;
+    public final static Integer BASE_ASSHOLE_LADDER = 20;
     public final static Integer ASSHOLES_FOR_RESET = 10;
     public final static List<String> ASSHOLE_TAGS = new ArrayList<>(Arrays.asList(
             "",
@@ -71,8 +74,9 @@ public class FairController {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
             log.debug("/app/info {}", uuid);
 
-            InfoDTO info = new InfoDTO();
-            info.setAssholeTags(info.getAssholeTags().subList(0, Math.min(accountService.findMaxTimeAsshole() + 2, info.getAssholeTags().size())));
+            Integer maxTimesAssholes = accountService.findMaxTimeAsshole();
+            InfoDTO info = new InfoDTO(maxTimesAssholes);
+
             wsUtils.convertAndSendToUser(sha, INFO_DESTINATION, info);
         } catch (IllegalArgumentException e) {
             wsUtils.convertAndSendToUser(sha, INFO_DESTINATION, HttpStatus.BAD_REQUEST);

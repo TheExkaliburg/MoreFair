@@ -1,7 +1,8 @@
 package de.kaliburg.morefair.controller;
 
-import de.kaliburg.morefair.dto.EventDTO;
 import de.kaliburg.morefair.dto.LadderViewDTO;
+import de.kaliburg.morefair.events.Event;
+import de.kaliburg.morefair.events.EventType;
 import de.kaliburg.morefair.messages.WSMessage;
 import de.kaliburg.morefair.persistence.entity.Account;
 import de.kaliburg.morefair.service.AccountService;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @Log4j2
 public class RankerController {
     public static final String LADDER_DESTINATION = "/queue/ladder/";
+    public static final String LADDER_PRIVATE_UPDATE_DESTINATION = "/queue/ladder/updates/";
     public static final String LADDER_UPDATE_DESTINATION = "/topic/ladder/";
     private final RankerService rankerService;
     private final AccountService accountService;
@@ -63,7 +65,7 @@ public class RankerController {
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account != null)
                 rankerService.addEvent(rankerService.findHighestRankerByAccount(account).getLadder().getNumber(),
-                        new EventDTO(EventDTO.EventType.BIAS, account.getId()));
+                        new Event(EventType.BIAS, account.getId()));
         } catch (Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();
@@ -78,7 +80,7 @@ public class RankerController {
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account != null)
                 rankerService.addEvent(rankerService.findHighestRankerByAccount(account).getLadder().getNumber(),
-                        new EventDTO(EventDTO.EventType.MULTI, account.getId()));
+                        new Event(EventType.MULTI, account.getId()));
         } catch (Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();
@@ -93,7 +95,7 @@ public class RankerController {
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account != null)
                 rankerService.addEvent(rankerService.findHighestRankerByAccount(account).getLadder().getNumber(),
-                        new EventDTO(EventDTO.EventType.VINEGAR, account.getId()));
+                        new Event(EventType.VINEGAR, account.getId()));
         } catch (Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();
@@ -108,7 +110,7 @@ public class RankerController {
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account != null)
                 rankerService.addEvent(rankerService.findHighestRankerByAccount(account).getLadder().getNumber(),
-                        new EventDTO(EventDTO.EventType.PROMOTE, account.getId()));
+                        new Event(EventType.PROMOTE, account.getId()));
         } catch (Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();
@@ -123,7 +125,23 @@ public class RankerController {
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account != null)
                 rankerService.addEvent(rankerService.findHighestRankerByAccount(account).getLadder().getNumber(),
-                        new EventDTO(EventDTO.EventType.ASSHOLE, account.getId()));
+                        new Event(EventType.ASSHOLE, account.getId()));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @MessageMapping("/ladder/post/auto-promote")
+    public void buyAutoPromote(SimpMessageHeaderAccessor sha, WSMessage wsMessage) {
+        try {
+            String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
+            log.debug("/app/ladder/post/auto-promote from {}", uuid);
+            Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
+            if (account != null) {
+                rankerService.addEvent(rankerService.findHighestRankerByAccount(account).getLadder().getNumber(),
+                        new Event(EventType.AUTO_PROMOTE, account.getId()));
+            }
         } catch (Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();

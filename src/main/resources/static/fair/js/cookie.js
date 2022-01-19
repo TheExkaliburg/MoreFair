@@ -33,6 +33,7 @@ function login() {
     }));
 }
 
+
 function onLoginReceived(message) {
     if (message.status === "OK" || message.status === "CREATED") {
         if (message.content) {
@@ -52,6 +53,8 @@ function onLoginReceived(message) {
             (message) => handleLadderUpdates(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
         stompClient.subscribe('/user/queue/ladder/',
             (message) => handleLadderInit(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
+        stompClient.subscribe('/user/queue/ladder/updates',
+            (message) => handlePrivateLadderUpdates(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
         initLadder(identityData.highestCurrentLadder);
     }
 }

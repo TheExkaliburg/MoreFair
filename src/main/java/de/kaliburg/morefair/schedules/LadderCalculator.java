@@ -2,8 +2,9 @@ package de.kaliburg.morefair.schedules;
 
 import de.kaliburg.morefair.controller.FairController;
 import de.kaliburg.morefair.controller.RankerController;
-import de.kaliburg.morefair.dto.EventDTO;
 import de.kaliburg.morefair.dto.HeartbeatDTO;
+import de.kaliburg.morefair.events.Event;
+import de.kaliburg.morefair.events.EventType;
 import de.kaliburg.morefair.persistence.entity.Ladder;
 import de.kaliburg.morefair.persistence.entity.Ranker;
 import de.kaliburg.morefair.service.AccountService;
@@ -52,10 +53,10 @@ public class LadderCalculator {
                         for (int i = 1; i <= rankerService.getLadders().size(); i++) {
                             // Handle the events since the last update
                             Ladder ladder = rankerService.getLadders().get(i);
-                            List<EventDTO> events = rankerService.getEventMap().get(ladder.getNumber());
-                            List<EventDTO> eventsToBeRemoved = new ArrayList<>();
+                            List<Event> events = rankerService.getEventMap().get(ladder.getNumber());
+                            List<Event> eventsToBeRemoved = new ArrayList<>();
                             for (int j = 0; j < events.size(); j++) {
-                                EventDTO e = events.get(j);
+                                Event e = events.get(j);
                                 switch (e.getEventType()) {
                                     case BIAS -> {
                                         if (!rankerService.buyBias(e.getAccountId(), ladder))
@@ -78,12 +79,23 @@ public class LadderCalculator {
                                         if (!rankerService.throwVinegar(e.getAccountId(), ladder, e))
                                             eventsToBeRemoved.add(e);
                                     }
+                                    case NAME_CHANGE -> {
+                                        if (ladder.getNumber() == 1)
+                                            accountService.updateUsername(e.getAccountId(), ladder, e);
+                                    }
+                                    case AUTO_PROMOTE -> {
+                                        if (!rankerService.buyAutoPromote(e.getAccountId(), ladder))
+                                            eventsToBeRemoved.add(e);
+                                    }
+                                    case SOFT_RESET_POINTS -> {
+                                        rankerService.softResetPoints(e.getAccountId(), ladder);
+                                    }
                                     default -> {
 
                                     }
                                 }
                             }
-                            for (EventDTO e : eventsToBeRemoved) {
+                            for (Event e : eventsToBeRemoved) {
                                 events.remove(e);
                             }
                             heartbeatMap.put(ladder.getNumber(), new HeartbeatDTO(new ArrayList<>(events)));
@@ -104,13 +116,12 @@ public class LadderCalculator {
 
                 // Send Broadcasts
 
-
                 // If someone was an Asshole and the reset worked, should notify all and end calculation
                 if (didPressAssholeButton && rankerService.resetAllLadders()) {
                     for (Ladder ladder : rankerService.getLadders().values()) {
                         heartbeatMap.get(ladder.getNumber()).setSecondsPassed(deltaSec);
                         heartbeatMap.get(ladder.getNumber()).setEvents(new ArrayList<>());
-                        heartbeatMap.get(ladder.getNumber()).getEvents().add(new EventDTO(EventDTO.EventType.RESET, 0L));
+                        heartbeatMap.get(ladder.getNumber()).getEvents().add(new Event(EventType.RESET, 0L));
                         wsUtils.convertAndSendToAll(RankerController.LADDER_UPDATE_DESTINATION + ladder.getNumber(), heartbeatMap.get(ladder.getNumber()));
                     }
                     return;
@@ -156,7 +167,8 @@ public class LadderCalculator {
                 currentRanker.addPoints(currentRanker.getPower(), deltaSec);
 
                 // Calculating Vinegar based on Grapes count
-                currentRanker.addVinegar(currentRanker.getGrapes(), deltaSec);
+                if (currentRanker.getRank() != 1)
+                    currentRanker.addVinegar(currentRanker.getGrapes(), deltaSec);
 
                 for (int j = i - 1; j >= 0; j--) {
                     // If one of the already calculated Rankers have less points than this ranker
@@ -184,6 +196,10 @@ public class LadderCalculator {
         if (rankers.size() >= Math.max(FairController.MINIMUM_PEOPLE_FOR_PROMOTE, ladder.getNumber())) {
             Ranker lastRanker = rankers.get(rankers.size() - 1);
             lastRanker.addGrapes(BigInteger.ONE, deltaSec);
+        }
+
+        if (rankers.size() >= 1 && rankers.get(0).isAutoPromote()) {
+            rankerService.addEvent(ladder.getNumber(), new Event(EventType.PROMOTE, rankers.get(0).getAccount().getId()));
         }
     }
 }

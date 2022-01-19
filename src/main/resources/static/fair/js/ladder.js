@@ -1,6 +1,7 @@
 let rankerTemplate = {
     accountId: 0,
     username: "",
+    rank: 0,
     points: new Decimal(0),
     power: new Decimal(0),
     bias: 0,
@@ -9,7 +10,8 @@ let rankerTemplate = {
     growing: true,
     timesAsshole: 0,
     grapes: new Decimal(0),          // only shows the actual Number on yourRanker
-    vinegar: new Decimal(0)          // only shows the actual Number on yourRanker
+    vinegar: new Decimal(0),         // only shows the actual Number on yourRanker
+    autoPromote: false
 }
 
 
@@ -63,9 +65,20 @@ function handleLadderInit(message) {
 }
 
 function buyBias() {
-    $('#biasButton').prop("disabled", true);
-    $('#biasTooltip').tooltip('hide');
     let cost = new Decimal(getUpgradeCost(ladderData.yourRanker.bias + 1));
+    let biasButton = $('#biasButton');
+    let biasTooltip = $('#biasTooltip');
+
+    if (ladderData.yourRanker.points.cmp(ladderData.firstRanker.points.mul(0.95)) >= 0) {
+        if (!confirm("You're really close to the top, are you sure, you want to bias.")) {
+            biasButton.prop("disabled", true);
+            biasTooltip.tooltip('hide');
+            return;
+        }
+    }
+
+    biasButton.prop("disabled", true);
+    biasTooltip.tooltip('hide');
     if (ladderData.yourRanker.points.compare(cost) > 0) {
         stompClient.send("/app/ladder/post/bias", {}, JSON.stringify({
             'uuid': identityData.uuid
@@ -74,9 +87,20 @@ function buyBias() {
 }
 
 function buyMulti() {
-    $('#multiButton').prop("disabled", true);
-    $('#multiTooltip').tooltip('hide');
     let cost = getUpgradeCost(ladderData.yourRanker.multiplier + 1);
+    let multiButton = $('#multiButton');
+    let multiTooltip = $('#multiTooltip');
+
+    if (ladderData.yourRanker.points.cmp(ladderData.firstRanker.points.mul(0.95)) >= 0) {
+        if (!confirm("You're really close to the top, are you sure, you want to multi.")) {
+            multiButton.prop("disabled", true);
+            multiTooltip.tooltip('hide');
+            return;
+        }
+    }
+
+    multiButton.prop("disabled", true);
+    multiTooltip.tooltip('hide');
     if (ladderData.yourRanker.power.compare(cost) > 0) {
         stompClient.send("/app/ladder/post/multi", {}, JSON.stringify({
             'uuid': identityData.uuid
@@ -111,11 +135,31 @@ function beAsshole() {
     }
 }
 
+function buyAutoPromote() {
+    $('#biasButton').prop("disabled", true);
+    $('#autoPromoteTooltip').tooltip('hide');
+    if (ladderData.currentLadder.number >= infoData.autoPromoteLadder
+        && ladderData.yourRanker.grapes.cmp(getAutoPromoteGrapeCost(ladderData.yourRanker.rank)) >= 0) {
+        stompClient.send("/app/ladder/post/auto-promote", {}, JSON.stringify({
+            'uuid': identityData.uuid
+        }));
+
+    }
+}
+
 function handleLadderUpdates(message) {
     if (message) {
         message.events.forEach(e => handleEvent(e))
     }
     calculateLadder(message.secondsPassed);
+    updateLadder();
+}
+
+
+function handlePrivateLadderUpdates(message) {
+    if (message) {
+        message.events.forEach(e => handleEvent(e))
+    }
     updateLadder();
 }
 
@@ -125,6 +169,7 @@ function changeLadder(ladderNum) {
         (message) => handleLadderUpdates(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
     initLadder(ladderNum);
 }
+
 
 function handleEvent(event) {
     switch (event.eventType) {
@@ -137,13 +182,19 @@ function handleEvent(event) {
         case 'VINEGAR':
             handleVinegar(event);
             break;
+        case 'SOFT_RESET_POINTS':
+            handleSoftResetPoints(event);
+            break;
         case 'PROMOTE':
             handlePromote(event);
+            break;
+        case 'AUTO_PROMOTE':
+            handleAutoPromote(event);
             break;
         case 'JOIN':
             handleJoin(event);
             break;
-        case 'NAMECHANGE':
+        case 'NAME_CHANGE':
             handleNameChange(event);
             break;
         case 'RESET':
@@ -174,13 +225,21 @@ function handleMultiplier(event) {
 
 function handleVinegar(event) {
     ladderData.rankers.forEach(ranker => {
-        if (event.accountId === ranker.accountId) {
+        if (ranker.you && event.accountId === ranker.accountId) {
             ranker.vinegar = new Decimal(0);
         }
     });
 
-    let vinegarThrown = new Decimal(event.vinegarThrown);
+    let vinegarThrown = new Decimal(event.data);
     ladderData.rankers[0].vinegar = Decimal.max(ladderData.rankers[0].vinegar.sub(vinegarThrown), 0);
+}
+
+function handleSoftResetPoints(event) {
+    ladderData.rankers.forEach(ranker => {
+        if (event.accountId === ranker.accountId) {
+            ranker.points = new Decimal(0);
+        }
+    });
 }
 
 function handlePromote(event) {
@@ -197,17 +256,25 @@ function handlePromote(event) {
     }
 }
 
+function handleAutoPromote(event) {
+    ladderData.rankers.forEach(ranker => {
+        if (ranker.you && event.accountId === ranker.accountId) {
+            ranker.autoPromote = true;
+        }
+    })
+}
+
 function handleJoin(event) {
     let newRanker = {
         accountId: event.accountId,
-        username: event.joinData.username,
+        username: event.data.username,
         points: new Decimal(0),
         power: new Decimal(1),
         bias: 0,
         multiplier: 1,
         you: false,
         growing: true,
-        timesAsshole: event.joinData.timesAsshole,
+        timesAsshole: event.data.timesAsshole,
         grapes: new Decimal(0),          // only shows the actual Number on yourRanker
         vinegar: new Decimal(0)          // only shows the actual Number on yourRanker
     }
@@ -219,7 +286,7 @@ function handleJoin(event) {
 function handleNameChange(event) {
     ladderData.rankers.forEach(ranker => {
         if (event.accountId === ranker.accountId) {
-            ranker.username = event.changedUsername;
+            ranker.username = event.data;
         }
     })
     updateChatUsername(event);
@@ -227,7 +294,7 @@ function handleNameChange(event) {
 
 async function handleReset(event) {
     disconnect();
-    await new Promise(r => setTimeout(r, 2000));
+    await new Promise(r => setTimeout(r, 5000));
     location.reload();
 }
 
@@ -247,7 +314,8 @@ function calculateLadder(delta) {
             ladderData.rankers[i].points = ladderData.rankers[i].points.add(ladderData.rankers[i].power.mul(delta).floor());
 
             // Calculating Vinegar based on Grapes count
-            ladderData.rankers[i].vinegar = ladderData.rankers[i].vinegar.add(ladderData.rankers[i].grapes.mul(delta).floor());
+            if (ladderData.rankers[i].rank !== 1 && ladderData.rankers[i].you)
+                ladderData.rankers[i].vinegar = ladderData.rankers[i].vinegar.add(ladderData.rankers[i].grapes.mul(delta).floor());
 
             for (let j = i - 1; j >= 0; j--) {
                 // If one of the already calculated Rankers have less points than this ranker
@@ -258,7 +326,8 @@ function calculateLadder(delta) {
 
                     // Move other Ranker 1 Place down
                     ladderData.rankers[j].rank = j + 2;
-                    if (ladderData.rankers[j].growing && ladderData.rankers[j].you && (ladderData.rankers[j].bias > 0 || ladderData.rankers[j].multiplier > 1))
+                    if (ladderData.rankers[j].growing && ladderData.rankers[j].you &&
+                        (ladderData.rankers[j].bias > 0 || ladderData.rankers[j].multiplier > 1))
                         ladderData.rankers[j].grapes = ladderData.rankers[j].grapes.add(new Decimal(1));
                     ladderData.rankers[j + 1] = ladderData.rankers[j];
 
@@ -275,10 +344,11 @@ function calculateLadder(delta) {
     // Ranker on Last Place gains 1 Grape, only if he isn't the only one
     if (ladderData.rankers.length >= Math.max(infoData.minimumPeopleForPromote, ladderData.currentLadder.number)) {
         let index = ladderData.rankers.length - 1;
-        if (ladderData.rankers[index].growing)
+        if (ladderData.rankers[index].growing && ladderData.rankers[index].you)
             ladderData.rankers[index].grapes = ladderData.rankers[index].grapes.add(new Decimal(1).mul(delta).floor());
     }
 
+    // Set yourRanker and firstRanker
     ladderData.rankers.forEach(ranker => {
         if (ranker.you) {
             ladderData.yourRanker = ranker;
@@ -386,6 +456,7 @@ function showButtons() {
     $('#biasTooltip').attr('data-bs-original-title', numberFormatter.format(biasCost) + ' Points');
     $('#multiTooltip').attr('data-bs-original-title', numberFormatter.format(multiCost) + ' Power');
 
+    // Promote and Asshole Button Logic
     let promoteButton = $('#promoteButton');
     let assholeButton = $('#assholeButton');
     let ladderNumber = $('#ladderNumber');
@@ -406,4 +477,22 @@ function showButtons() {
         promoteButton.hide()
         ladderNumber.show()
     }
+
+    // Auto-Promote Button
+    let autoPromoteButton = $('#autoPromoteButton');
+    let autoPromoteTooltip = $('#autoPromoteTooltip');
+    let autoPromoteCost = getAutoPromoteGrapeCost(ladderData.yourRanker.rank);
+    if (!ladderData.yourRanker.autoPromote && ladderData.currentLadder.number >= infoData.autoPromoteLadder) {
+        autoPromoteButton.show();
+        if (ladderData.yourRanker.grapes.cmp(autoPromoteCost) >= 0) {
+            autoPromoteButton.prop("disabled", false);
+        } else {
+            autoPromoteButton.prop("disabled", true);
+        }
+        autoPromoteTooltip.attr('data-bs-original-title', numberFormatter.format(autoPromoteCost) + ' Grapes');
+    } else {
+        autoPromoteButton.hide();
+    }
+
+
 }
