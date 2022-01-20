@@ -5,6 +5,7 @@ let infoData = {
     assholeTags: [''],
     baseVinegarNeededToThrow: new Decimal(1000000),
     baseGrapesNeededToAutoPromote: new Decimal(1000),
+    manualPromoteWaitTime: 15,
     autoPromoteLadder: 2
 }
 
@@ -28,9 +29,8 @@ function connect() {
         stompClient.subscribe('/user/queue/info',
             (message) => onInfoReceived(JSON.parse(message.body)), {uuid: getCookie("_uuid")})
         getInfo()
-    }, function (frame) {
-        disconnect();
-        connect();
+    }, async function (frame) {
+        await handleReset();
     })
 }
 

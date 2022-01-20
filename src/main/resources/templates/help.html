@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Fair Game</title>
+    <link crossorigin="anonymous"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+          rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:src="@{/fair/styles/style.css}">
+    <script crossorigin="anonymous"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script crossorigin="anonymous"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+</head>
+
+<body>
+<div class="m-1">
+    <div class="row">
+        <nav class="navbar navbar-expand navbar-light bg-light">
+            <div class="container-fluid">
+                <div class="col-8"></div>
+                <div class="col-4 text-end">
+                    <a class="h5 link-secondary" href="/">Back</a>
+                </div>
+            </div>
+        </nav>
+    </div>
+    <div class="container">
+        <div class="accordion" id="accordionExample">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingPower">
+                    <button aria-controls="collapsePower" aria-expanded="true" class="accordion-button collapsed"
+                            data-bs-target="#collapsePower"
+                            data-bs-toggle="collapse" type="button">
+                        Power / Points
+                    </button>
+                </h2>
+                <div aria-labelledby="headingPower" class="accordion-collapse collapse"
+                     id="collapsePower">
+                    <div class="accordion-body">
+                        You gain <strong>power</strong> based on the rankers above you, at your current ladder. The rate
+                        at
+                        which you gain power is also influenced by your bias and multi. Each bias increases
+                        the power gained, by one. Each multi multiplies that score (including the Bias)
+                        by its value.<br>
+                        You gain <strong>points</strong> based on your current power. <br><br>
+                        power += (rank + bias - 1) * multi;<br>
+                        points += power;
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingUpgrades">
+                    <button aria-controls="collapseUpgrades" aria-expanded="false" class="accordion-button collapsed"
+                            data-bs-target="#collapseUpgrades" data-bs-toggle="collapse" type="button">
+                        Bias / Multi
+                    </button>
+                </h2>
+                <div aria-labelledby="headingUpgrades" class="accordion-collapse collapse" id="collapseUpgrades">
+                    <div class="accordion-body">
+                        You gain bias or multi by paying points or power. The cost is based on your current ladder.<br>
+                        For <strong>bias</strong> you need to pay with points and for <strong>multi</strong> you pay
+                        with
+                        power, but also sacrifice all your points. <br><br>
+                        upgradeCost = currentLadder ^ (level);
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingPromote">
+                    <button aria-controls="collapsePromote" aria-expanded="false" class="accordion-button collapsed"
+                            data-bs-target="#collapsePromote" data-bs-toggle="collapse" type="button">
+                        Promoting to the next Ladder
+                    </button>
+                </h2>
+                <div aria-labelledby="headingPromote" class="accordion-collapse collapse" id="collapsePromote">
+                    <div class="accordion-body">
+                        You can promote to the next ladder, once there a few criteria fulfilled.<br>
+                        <ul>
+                            <li>You need to be <strong>rank 1</strong>.</li>
+                            <li>You need to have reached <strong>250 million points</strong> or more.</li>
+                            <li>You need enough people at your ladder. The minimum amount to promote is 10, but it
+                                increases from 11 and onward by 1.
+                            </li>
+                            <li>You need a big enough lead to your pursuer. This lead is generally reached after being
+                                <strong>~30sec</strong> in front of him. (people can throw vinegar at you during this
+                                time)
+                            </li>
+                            <li>
+                                You need to press the <strong>promote</strong> button, that will appear on the top of
+                                your
+                                screen.
+                            </li>
+                        </ul>
+                        Promotion leaves behind a body, that doesn't gain power or points, for the rest of the ladder to
+                        marvel at.<br>
+                        If you are at the last ladder with all your peers, the ability to promote turns into an <strong>Asshole-Button</strong>,
+                        which, if enough people press it:
+                        <br>
+                        <h4 style="text-align: center;"><strong><u>RESET THE GAME!</u></strong></h4>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingGrapes">
+                    <button aria-controls="collapseGrapes" aria-expanded="false" class="accordion-button collapsed"
+                            data-bs-target="#collapseGrapes" data-bs-toggle="collapse" type="button">
+                        Sour Grapes / Vinegar
+                    </button>
+                </h2>
+                <div aria-labelledby="headingGrapes" class="accordion-collapse collapse" id="collapseGrapes">
+                    <div class="accordion-body">
+                        You can gain sour grapes in 2 ways.
+                        <ul>
+                            <li><strong>Being last</strong>, gains you 1 sour grape every second.</li>
+                            <li><strong>Getting passed</strong> by someone else also rewards you with 1 sour grape.</li>
+                        </ul>
+                        Also, you gain vinegar based on your current grape-count. (if you are not #1)<br>
+                        This vinegar can be used to throw onto the top person, if they are rank 1. If they have more
+                        vinegar
+                        than you, you just subtract your amount of vinegar from theirs, but if you throw more than they
+                        can
+                        handle, you force them to buy a multi or reset their points to 0.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingAutoPromote">
+                    <button aria-controls="collapseAutoPromote" aria-expanded="false" class="accordion-button collapsed"
+                            data-bs-target="#collapseAutoPromote" data-bs-toggle="collapse" type="button">
+                        Auto-Promotion
+                    </button>
+                </h2>
+                <div aria-labelledby="headingAutoPromote" class="accordion-collapse collapse" id="collapseAutoPromote">
+                    <div class="accordion-body">
+                        There is a way that you can auto-promote, which unlocks from Ladder 2 onward. This feature, can
+                        be
+                        bought using your hard-earned grapes and completely bypasses the criteria, that you need a big
+                        enough lead to promote.<br>
+                        Also, it's completely server-sided, so once you have it, no amount of vinegar can hurt you this
+                        ladder, even if you are not online. The cost of this feature gets cheaper, depending on how far
+                        behind you are on your current climb.<br>
+                        Sadly, this feature is not available on the last ladder, which means <strong>no one</strong>,
+                        can
+                        escape the grapes of their competitors.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingDiscord">
+                    <button aria-controls="collapseDiscord" aria-expanded="false" class="accordion-button collapsed"
+                            data-bs-target="#collapseDiscord" data-bs-toggle="collapse" type="button">
+                        Discord
+                    </button>
+                </h2>
+                <div aria-labelledby="headingDiscord" class="accordion-collapse collapse" id="collapseDiscord">
+                    <div class="accordion-body">
+                        If you have any questions, ideas, want to stay up to date to the latest updates or simply just
+                        want
+                        to chat with your fellow rankers, without having Chad listening, you can join us on our
+                        <a href="https://discord.gg/PppdEz8GfV">Discord</a>.<br><br>
+                        I appreciate everyone that's part of this amazing community. <strong>Thank you!</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

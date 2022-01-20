@@ -253,12 +253,27 @@ public class RankerService {
             Ranker ranker = findActiveRankerOfAccountOnLadder(accountId, ladder);
             if (ranker == null) return false;
 
+            Ranker pursuingRanker = ladder.getRankers().get(ranker.getRank());
+            if (pursuingRanker == null) return false;
+
+            // How many points the ranker is in front of his pursuer
+            BigInteger pointDiff = ranker.getPoints().subtract(pursuingRanker.getPoints());
+            // How many more points does the ranker gain against his pursuer, every Second
+            BigInteger powerDiff = ranker.getPower().subtract(
+                    pursuingRanker.isGrowing() ? pursuingRanker.getPower() : BigInteger.ZERO);
+            // Calculate the needed Point difference, to have f.e. 15seconds of point generation with the difference in power
+            BigInteger neededPointDiff = powerDiff.multiply(BigInteger.valueOf(FairController.MANUAL_PROMOTE_WAIT_TIME)).abs();
+
             // If
             // - Ranker is #1
             // - There are enough people to promote
             // - Ranker got enough points to promote
+            // - Ranker has either:
+            //      - Auto-Promote
+            //      - enough points to be in front of the next ranker
             if (ranker.getRank() == 1 && ranker.getLadder().getRankers().size() >= Math.max(FairController.MINIMUM_PEOPLE_FOR_PROMOTE, ladder.getNumber())
-                    && ranker.getPoints().compareTo(FairController.POINTS_FOR_PROMOTE) >= 0) {
+                    && ranker.getPoints().compareTo(FairController.POINTS_FOR_PROMOTE) >= 0
+                    && (ranker.isAutoPromote() || pointDiff.compareTo(neededPointDiff) >= 0)) {
                 ranker.setGrowing(false);
                 Ranker newRanker = createNewRankerForAccountOnLadder(ranker.getAccount(), ranker.getLadder().getNumber() + 1);
                 newRanker.setVinegar(ranker.getVinegar());
@@ -330,6 +345,8 @@ public class RankerService {
                     targetVinegar = targetVinegar.subtract(rankerVinegar);
                 } else {
                     targetVinegar = BigInteger.ZERO;
+
+                    eventMap.get(ladder.getNumber()).add(new Event(EventType.MULTI, target.getAccount().getId()));
                     eventMap.get(ladder.getNumber()).add(new Event(EventType.SOFT_RESET_POINTS, target.getAccount().getId()));
                 }
                 event.setData(rankerVinegar.toString());

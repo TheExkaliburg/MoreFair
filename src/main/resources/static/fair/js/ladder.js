@@ -23,7 +23,9 @@ let ladderData = {
 };
 
 let ladderStats = {
-    growingRankerCount: 0
+    growingRankerCount: 0,
+    pointsNeededForManualPromote: new Decimal(0),
+    eta: 0
 }
 
 function initLadder(ladderNum) {
@@ -295,7 +297,7 @@ function handleNameChange(event) {
 
 async function handleReset(event) {
     disconnect();
-    await new Promise(r => setTimeout(r, 5000));
+    await new Promise(r => setTimeout(r, 15000));
     location.reload();
 }
 
@@ -356,6 +358,33 @@ function calculateLadder(delta) {
         }
     })
     ladderData.firstRanker = ladderData.rankers[0];
+
+    calculateStats();
+}
+
+function calculateStats() {
+    // Points Needed For Promotion
+    if (ladderData.rankers.length >= Math.max(infoData.minimumPeopleForPromote, ladderData.currentLadder.number)) {
+        if (ladderData.firstRanker.points.cmp(infoData.pointsForPromote) >= 0) {
+            let leadingRanker = ladderData.firstRanker.growing ? ladderData.firstRanker : ladderData.rankers[1];
+            let pursuingRanker = ladderData.firstRanker.growing ? ladderData.rankers[1] : ladderData.firstRanker;
+
+            // How many more points does the ranker gain against his pursuer, every Second
+            let powerDiff = leadingRanker.power.sub(pursuingRanker.growing ? pursuingRanker.power : 0);
+            // Calculate the needed Point difference, to have f.e. 15seconds of point generation with the difference in power
+            let neededPointDiff = powerDiff.mul(new Decimal(infoData.manualPromoteWaitTime)).abs();
+
+            ladderStats.pointsNeededForManualPromote = Decimal.max(pursuingRanker.points.add(neededPointDiff), infoData.pointsForPromote);
+        } else {
+            ladderStats.pointsNeededForManualPromote = infoData.pointsForPromote;
+        }
+
+    } else {
+        ladderStats.pointsNeededForManualPromote = new Decimal(Infinity);
+    }
+
+    // ETA
+    // TODO: ETA
 }
 
 function updateLadder() {
@@ -389,10 +418,11 @@ function updateLadder() {
     $('#infoText').html('Sour Grapes: ' + numberFormatter.format(ladderData.yourRanker.grapes) + '<br>' + tag1 + 'Vinegar: ' + numberFormatter.format(ladderData.yourRanker.vinegar) + tag2);
 
     $('#usernameLink').html(ladderData.yourRanker.username);
-    $('#usernameText').html("+" + ladderData.yourRanker.bias + "   x" + ladderData.yourRanker.multiplier);
 
     $('#rankerCount').html("Rankers: " + ladderStats.growingRankerCount + "/" + ladderData.rankers.length);
     $('#ladderNumber').html("Ladder # " + ladderData.currentLadder.number);
+
+    $('#manualPromoteText').html("Points for Manual Promote at #1: " + numberFormatter.format(ladderStats.pointsNeededForManualPromote));
 
     let offCanvasBody = $('#offCanvasBody');
     offCanvasBody.empty();
@@ -438,6 +468,7 @@ function writeNewRow(body, ranker) {
 }
 
 function showButtons() {
+    // Bias and Multi Button Logic
     let biasButton = $('#biasButton');
     let multiButton = $('#multiButton');
 
@@ -462,8 +493,7 @@ function showButtons() {
     let assholeButton = $('#assholeButton');
     let ladderNumber = $('#ladderNumber');
 
-    if (ladderData.firstRanker.you && ladderData.rankers.length >= Math.max(infoData.minimumPeopleForPromote, ladderData.currentLadder.number)
-        && ladderData.firstRanker.points.cmp(infoData.pointsForPromote) >= 0) {
+    if (ladderData.firstRanker.you && ladderData.firstRanker.points.cmp(ladderStats.pointsNeededForManualPromote) >= 0) {
         if (ladderData.currentLadder.number === infoData.assholeLadder) {
             promoteButton.hide()
             ladderNumber.hide()
