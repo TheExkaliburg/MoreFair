@@ -80,8 +80,7 @@ public class LadderCalculator {
                                             eventsToBeRemoved.add(e);
                                     }
                                     case NAME_CHANGE -> {
-                                        if (ladder.getNumber() == 1)
-                                            accountService.updateUsername(e.getAccountId(), ladder, e);
+                                        accountService.updateUsername(e.getAccountId(), ladder, e);
                                     }
                                     case AUTO_PROMOTE -> {
                                         if (!rankerService.buyAutoPromote(e.getAccountId(), ladder))
