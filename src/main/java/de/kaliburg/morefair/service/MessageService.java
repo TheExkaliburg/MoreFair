@@ -60,7 +60,7 @@ public class MessageService {
         for (Ladder l : chats.values()) {
             saveAllMessages(l.getMessages());
         }
-        log.debug("Chats are saved!");
+        log.trace("Chats are saved!");
     }
 
     @Transactional

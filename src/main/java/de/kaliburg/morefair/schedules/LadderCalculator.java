@@ -198,7 +198,10 @@ public class LadderCalculator {
             lastRanker.addGrapes(BigInteger.ONE, deltaSec);
         }
 
-        if (rankers.size() >= 1 && rankers.get(0).isAutoPromote()) {
+        if (rankers.size() >= 1 && rankers.get(0).isAutoPromote() && rankers.get(0).isGrowing()
+                && rankers.get(0).getPoints().compareTo(FairController.POINTS_FOR_PROMOTE) >= 0
+                && rankers.size() >= Math.max(ladder.getNumber(), FairController.MINIMUM_PEOPLE_FOR_PROMOTE)) {
+            log.info("[L{}] Trying to auto-promote {}", ladder.getNumber(), rankers.get(0).getAccount().getUsername());
             rankerService.addEvent(ladder.getNumber(), new Event(EventType.PROMOTE, rankers.get(0).getAccount().getId()));
         }
     }

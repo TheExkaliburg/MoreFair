@@ -422,7 +422,9 @@ function updateLadder() {
     $('#rankerCount').html("Rankers: " + ladderStats.growingRankerCount + "/" + ladderData.rankers.length);
     $('#ladderNumber').html("Ladder # " + ladderData.currentLadder.number);
 
-    $('#manualPromoteText').html("Points for Manual Promote at #1: " + numberFormatter.format(ladderStats.pointsNeededForManualPromote));
+    $('#manualPromoteText').html("Points for "
+        + ((ladderData.currentLadder.number === infoData.assholeLadder) ? "being an asshole" : "manually promoting at #1")
+        + ":" + numberFormatter.format(ladderStats.pointsNeededForManualPromote));
 
     let offCanvasBody = $('#offCanvasBody');
     offCanvasBody.empty();

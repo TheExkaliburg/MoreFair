@@ -91,7 +91,7 @@ public class RankerService {
             log.error(e.getMessage());
             e.printStackTrace();
         }
-        log.debug("Ladders are saved!");
+        log.trace("Ladders are saved!");
     }
 
     // SEARCHES
@@ -253,6 +253,8 @@ public class RankerService {
             Ranker ranker = findActiveRankerOfAccountOnLadder(accountId, ladder);
             if (ranker == null) return false;
 
+
+            if (ladder.getRankers().size() <= ranker.getRank()) return false;
             Ranker pursuingRanker = ladder.getRankers().get(ranker.getRank());
             if (pursuingRanker == null) return false;
 
@@ -334,13 +336,14 @@ public class RankerService {
                     && target.getPoints().compareTo(FairController.POINTS_FOR_PROMOTE) >= 0
                     && ranker.getVinegar().compareTo(UpgradeUtils.throwVinegarCost(target.getLadder().getNumber())) >= 0) {
                 if (target.isAutoPromote()) {
+                    log.info("[L{}] User {} tried to throw Vinegar at {}, but they had Auto-Promote!", ladder.getNumber(), ranker.getAccount().getUsername(), target.getAccount().getUsername());
                     eventMap.get(ladder.getNumber()).add(new Event(EventType.PROMOTE, target.getAccount().getId()));
                     return true;
                 }
 
                 BigInteger rankerVinegar = ranker.getVinegar();
                 BigInteger targetVinegar = target.getVinegar();
-                log.debug("User {} is using their {} Vinegar on the User {} with {}", ranker.getAccount().getUsername(), rankerVinegar, target.getAccount().getUsername(), targetVinegar);
+                log.info("[L{}] User {} is using their {} Vinegar on the User {} with {} Vinegar", ladder.getNumber(), ranker.getAccount().getUsername(), rankerVinegar, target.getAccount().getUsername(), targetVinegar);
                 if (targetVinegar.compareTo(rankerVinegar) > 0) {
                     targetVinegar = targetVinegar.subtract(rankerVinegar);
                 } else {
@@ -416,6 +419,7 @@ public class RankerService {
             if (!ranker.isAutoPromote() && ranker.getGrapes().compareTo(cost) >= 0
                     && ladder.getNumber() >= FairController.AUTO_PROMOTE_LADDER
                     && ladder.getNumber() != FairController.BASE_ASSHOLE_LADDER + accountRepository.findMaxTimesAsshole()) {
+                log.info("[L{}] Buying Auto-Promote for {}", ladder.getNumber(), ranker.getAccount().getUsername());
                 ranker.setGrapes(ranker.getGrapes().subtract(cost));
                 ranker.setAutoPromote(true);
                 return true;

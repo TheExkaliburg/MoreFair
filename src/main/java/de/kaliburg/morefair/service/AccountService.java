@@ -79,7 +79,6 @@ public class AccountService {
                 message.setAccount(account);
             }
         }
-
         return true;
     }
 
