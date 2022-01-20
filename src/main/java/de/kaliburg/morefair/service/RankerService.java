@@ -76,7 +76,6 @@ public class RankerService {
     @Transactional
     @Scheduled(initialDelay = 60000, fixedRate = 60000)
     public void syncWithDB() {
-        // TODO: Sync with DB
         log.debug("Saving Ladders...");
         try {
             ladderSem.acquire();
@@ -92,6 +91,7 @@ public class RankerService {
             log.error(e.getMessage());
             e.printStackTrace();
         }
+        log.debug("Ladders are saved!");
     }
 
     // SEARCHES

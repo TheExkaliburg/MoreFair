@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
@@ -40,7 +41,6 @@ public class MessageService {
 
     @PostConstruct
     public void init() {
-        messageRepository.deleteAll();
         ladderRepository.findAllLaddersJoinedWithMessages().forEach(l -> chats.put(l.getNumber(), l));
         for (Ladder l : chats.values()) {
             if (l.getMessages().size() > 30) {
@@ -52,11 +52,25 @@ public class MessageService {
     }
 
     // Every Minute
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(initialDelay = 60000, fixedRate = 60000)
     public void syncWithDB() {
-        // TODO: Sync with DB
-        //ladderRepository.saveAll(ladderMemory);
         log.debug("Saving Chats...");
+        deleteAllMessages();
+
+        for (Ladder l : chats.values()) {
+            saveAllMessages(l.getMessages());
+        }
+        log.debug("Chats are saved!");
+    }
+
+    @Transactional
+    public void deleteAllMessages() {
+        messageRepository.deleteAll();
+    }
+
+    @Transactional
+    public void saveAllMessages(List<Message> messages) {
+        messageRepository.saveAll(messages);
     }
 
     //TODO: Manage the Chat better
