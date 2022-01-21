@@ -9,7 +9,7 @@ import java.math.RoundingMode;
 public class UpgradeUtils {
     public static BigInteger buyUpgradeCost(Integer ladderNum, Integer currentUpgrade) {
         BigInteger ladder = BigInteger.valueOf(ladderNum + 1);
-        BigInteger result = ladder.pow(currentUpgrade);
+        BigInteger result = ladder.pow(currentUpgrade + 1);
 
         return result;
     }
