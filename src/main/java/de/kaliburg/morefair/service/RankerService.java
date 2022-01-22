@@ -5,6 +5,7 @@ import de.kaliburg.morefair.dto.LadderViewDTO;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.EventType;
 import de.kaliburg.morefair.events.data.JoinData;
+import de.kaliburg.morefair.events.data.VinegarData;
 import de.kaliburg.morefair.persistence.entity.Account;
 import de.kaliburg.morefair.persistence.entity.Ladder;
 import de.kaliburg.morefair.persistence.entity.Ranker;
@@ -344,15 +345,17 @@ public class RankerService {
                 BigInteger rankerVinegar = ranker.getVinegar();
                 BigInteger targetVinegar = target.getVinegar();
                 log.info("[L{}] User {} is using their {} Vinegar on the User {} with {} Vinegar", ladder.getNumber(), ranker.getAccount().getUsername(), rankerVinegar, target.getAccount().getUsername(), targetVinegar);
+                VinegarData data = new VinegarData(rankerVinegar.toString());
                 if (targetVinegar.compareTo(rankerVinegar) > 0) {
                     targetVinegar = targetVinegar.subtract(rankerVinegar);
                 } else {
                     targetVinegar = BigInteger.ZERO;
 
+                    data.setSuccess(true);
                     eventMap.get(ladder.getNumber()).add(new Event(EventType.MULTI, target.getAccount().getId()));
                     eventMap.get(ladder.getNumber()).add(new Event(EventType.SOFT_RESET_POINTS, target.getAccount().getId()));
                 }
-                event.setData(rankerVinegar.toString());
+                event.setData(data);
                 ranker.setVinegar(BigInteger.ZERO);
                 target.setVinegar(targetVinegar);
                 return true;

@@ -71,7 +71,7 @@ function buyBias() {
     let biasButton = $('#biasButton');
     let biasTooltip = $('#biasTooltip');
 
-    if (ladderData.yourRanker.points.cmp(ladderData.firstRanker.points.mul(0.95)) >= 0) {
+    if (ladderData.yourRanker.points.cmp(ladderData.firstRanker.points.mul(0.8)) >= 0) {
         if (!confirm("You're really close to the top, are you sure, you want to bias.")) {
             biasButton.prop("disabled", true);
             biasTooltip.tooltip('hide');
@@ -93,7 +93,7 @@ function buyMulti() {
     let multiButton = $('#multiButton');
     let multiTooltip = $('#multiTooltip');
 
-    if (ladderData.yourRanker.points.cmp(ladderData.firstRanker.points.mul(0.95)) >= 0) {
+    if (ladderData.yourRanker.points.cmp(ladderData.firstRanker.points.mul(0.8)) >= 0) {
         if (!confirm("You're really close to the top, are you sure, you want to multi.")) {
             multiButton.prop("disabled", true);
             multiTooltip.tooltip('hide');
@@ -227,13 +227,21 @@ function handleMultiplier(event) {
 }
 
 function handleVinegar(event) {
+    let vinegarThrown = new Decimal(event.data.amount);
+
     ladderData.rankers.forEach(ranker => {
-        if (ranker.you && event.accountId === ranker.accountId) {
-            ranker.vinegar = new Decimal(0);
+        if (event.accountId === ranker.accountId) {
+            if (ranker.you) ranker.vinegar = new Decimal(0);
+
+            if (ladderData.firstRanker.you && event.data.success) {
+                setTimeout(function () {
+                    alert(ranker.username + " threw his " + numberFormatter.format(vinegarThrown) + " Vinegar at you and made you slip to the bottom of the ladder.");
+                }, 1);
+
+            }
         }
     });
 
-    let vinegarThrown = new Decimal(event.data);
     ladderData.rankers[0].vinegar = Decimal.max(ladderData.rankers[0].vinegar.sub(vinegarThrown), 0);
 }
 

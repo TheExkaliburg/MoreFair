@@ -6,6 +6,7 @@ class UpgradeUtilsTest {
 
     @Test
     void buyUpgradeCost() {
+        System.out.println(UpgradeUtils.buyUpgradeCost(16, 4));
         System.out.println(UpgradeUtils.buyUpgradeCost(16, 5));
     }
 }
