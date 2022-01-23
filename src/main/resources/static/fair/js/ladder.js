@@ -401,7 +401,7 @@ function updateLadder() {
     let ladderArea = Math.floor(rank / clientData.ladderAreaSize);
 
     let startRank = (ladderArea * clientData.ladderAreaSize) - clientData.ladderPadding;
-    let endRank = startRank + clientData.ladderAreaSize - 1 + (2 * clientData.ladderPadding);
+    let endRank = startRank + clientData.ladderAreaSize - (ladderArea === 0 ? 0 : 1) + (2 * clientData.ladderPadding);
 
     let body = document.getElementById("ladderBody");
     body.innerHTML = "";
