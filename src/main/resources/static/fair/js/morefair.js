@@ -10,8 +10,8 @@ let infoData = {
 }
 
 let clientData = {
-    ladderAreaSize: 10,
-    ladderPadding: 2
+    ladderAreaSize: 1,
+    ladderPadding: 7
 }
 
 let numberFormatter;

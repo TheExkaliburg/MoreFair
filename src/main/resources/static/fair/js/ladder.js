@@ -374,15 +374,16 @@ function calculateStats() {
     // Points Needed For Promotion
     if (ladderData.rankers.length >= Math.max(infoData.minimumPeopleForPromote, ladderData.currentLadder.number)) {
         if (ladderData.firstRanker.points.cmp(infoData.pointsForPromote) >= 0) {
-            let leadingRanker = ladderData.firstRanker.growing ? ladderData.firstRanker : ladderData.rankers[1];
-            let pursuingRanker = ladderData.firstRanker.growing ? ladderData.rankers[1] : ladderData.firstRanker;
+            let leadingRanker = ladderData.firstRanker;
+            let pursuingRanker = ladderData.yourRanker;
 
             // How many more points does the ranker gain against his pursuer, every Second
             let powerDiff = leadingRanker.power.sub(pursuingRanker.growing ? pursuingRanker.power : 0);
-            // Calculate the needed Point difference, to have f.e. 15seconds of point generation with the difference in power
+            // Calculate the needed Point difference, to have f.e. 30seconds of point generation with the difference in power
             let neededPointDiff = powerDiff.mul(new Decimal(infoData.manualPromoteWaitTime)).abs();
 
-            ladderStats.pointsNeededForManualPromote = Decimal.max(pursuingRanker.points.add(neededPointDiff), infoData.pointsForPromote);
+            ladderStats.pointsNeededForManualPromote = Decimal.max((leadingRanker.you ? pursuingRanker : leadingRanker)
+                .points.add(neededPointDiff), infoData.pointsForPromote);
         } else {
             ladderStats.pointsNeededForManualPromote = infoData.pointsForPromote;
         }
@@ -399,16 +400,25 @@ function updateLadder() {
     let size = ladderData.rankers.length;
     let rank = ladderData.yourRanker.rank;
     let ladderArea = Math.floor(rank / clientData.ladderAreaSize);
+    let ladderAreaIndex = ladderArea * clientData.ladderAreaSize + 1;
 
-    let startRank = (ladderArea * clientData.ladderAreaSize) - clientData.ladderPadding;
-    let endRank = ((ladderArea + 1) * clientData.ladderAreaSize) - 1 + clientData.ladderPadding;
+    let startRank = ladderAreaIndex - clientData.ladderPadding;
+    let endRank = ladderAreaIndex + clientData.ladderAreaSize + clientData.ladderPadding - 1;
+    // If at start of the ladder
+    if (startRank < 1) {
+        endRank -= startRank - 1
+    }
+    // If at end of the ladder
+    if (endRank > size) {
+        startRank -= endRank - size;
+    }
 
     let body = document.getElementById("ladderBody");
     body.innerHTML = "";
-    if (startRank > 1) writeNewRow(body, ladderData.firstRanker);
     for (let i = 0; i < ladderData.rankers.length; i++) {
         let ranker = ladderData.rankers[i];
-        if ((ranker.rank >= startRank && ranker.rank <= endRank)) writeNewRow(body, ranker);
+        if (ranker.rank === startRank) writeNewRow(body, ladderData.firstRanker);
+        if ((ranker.rank > startRank && ranker.rank <= endRank)) writeNewRow(body, ranker);
     }
 
     // if we dont have enough Ranker yet, fill the table with filler rows
@@ -464,7 +474,7 @@ function writeNewRow(body, ranker) {
     let assholeTag = (ranker.timesAsshole < infoData.assholeTags.length) ?
         infoData.assholeTags[ranker.timesAsshole] : infoData.assholeTags[infoData.assholeTags.length - 1];
     let rank = (ranker.rank === 1 && !ranker.you && ranker.growing && ladderData.rankers.length >= Math.max(infoData.minimumPeopleForPromote, ladderData.currentLadder.number)
-        && ladderData.firstRanker.points.cmp(infoData.pointsForPromote) >= 0) ?
+        && ladderData.firstRanker.points.cmp(infoData.pointsForPromote) >= 0 && ladderData.yourRanker.vinegar.cmp(getVinegarThrowCost()) >= 0) ?
         '<a href="#" style="text-decoration: none" onclick="throwVinegar()">🍇</a>' : ranker.rank;
     row.insertCell(0).innerHTML = rank + assholeTag;
     row.insertCell(1).innerHTML = ranker.username;
