@@ -401,7 +401,7 @@ function updateLadder() {
     let ladderArea = Math.floor(rank / clientData.ladderAreaSize);
 
     let startRank = (ladderArea * clientData.ladderAreaSize) - clientData.ladderPadding;
-    let endRank = (ladderArea * (clientData.ladderAreaSize + 1)) - 1 + clientData.ladderPadding;
+    let endRank = ((ladderArea + 1) * clientData.ladderAreaSize) - 1 + clientData.ladderPadding;
 
     let body = document.getElementById("ladderBody");
     body.innerHTML = "";
@@ -460,6 +460,7 @@ function updateLadder() {
 
 function writeNewRow(body, ranker) {
     let row = body.insertRow();
+    if (!ranker.growing) row.classList.add('strikeout')
     let assholeTag = (ranker.timesAsshole < infoData.assholeTags.length) ?
         infoData.assholeTags[ranker.timesAsshole] : infoData.assholeTags[infoData.assholeTags.length - 1];
     let rank = (ranker.rank === 1 && !ranker.you && ranker.growing && ladderData.rankers.length >= Math.max(infoData.minimumPeopleForPromote, ladderData.currentLadder.number)
