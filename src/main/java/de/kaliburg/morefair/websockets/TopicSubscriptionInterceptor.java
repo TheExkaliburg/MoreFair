@@ -36,7 +36,7 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
             String uuid = StringEscapeUtils.escapeJava(Objects.requireNonNull(headerAccessor.getNativeHeader("uuid")).get(0));
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (!validateSubscription(userPrincipal, headerAccessor.getDestination(), uuid)) {
-                throw new MessagingException("No permission for this topic (" + StringEscapeUtils.escapeJava(headerAccessor.getDestination()) + ") for user " + account.getUsername());
+                throw new MessagingException("No permission for this topic (" + StringEscapeUtils.escapeJava(headerAccessor.getDestination()) + ") for user: " + account.getUsername() + " with principal: " + userPrincipal);
             }
         }
         return message;
@@ -46,7 +46,7 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
         if (principal == null) return false;
         topicDestination = StringEscapeUtils.escapeJava(topicDestination);
         uuid = StringEscapeUtils.escapeJava(uuid);
-        log.debug("Validate subscription for {} to {}", uuid, topicDestination);
+        log.info("Validate subscription for {} to {}", uuid, topicDestination);
         if (topicDestination.contains("/topic/chat/")) {
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null) return false;
