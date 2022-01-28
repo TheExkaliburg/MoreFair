@@ -33,10 +33,9 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
         if (StompCommand.SUBSCRIBE.equals(headerAccessor.getCommand())) {
             Principal userPrincipal = headerAccessor.getUser();
-            String uuid = StringEscapeUtils.escapeJava(Objects.requireNonNull(headerAccessor.getNativeHeader("uuid")).get(0));
-            Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
+            String uuid = Objects.requireNonNull(headerAccessor.getNativeHeader("uuid")).get(0);
             if (!validateSubscription(userPrincipal, headerAccessor.getDestination(), uuid)) {
-                throw new MessagingException("No permission for this topic (" + StringEscapeUtils.escapeJava(headerAccessor.getDestination()) + ") for user: " + account.getUsername() + " with principal: " + userPrincipal);
+                throw new MessagingException("No permission for this topic (" + StringEscapeUtils.escapeJava(headerAccessor.getDestination()) + ") with principal: " + userPrincipal);
             }
         }
         return message;
