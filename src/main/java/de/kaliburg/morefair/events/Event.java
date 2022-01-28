@@ -10,4 +10,5 @@ public class Event {
     @NonNull
     private Long accountId;
     private Object data;
+    
 }
