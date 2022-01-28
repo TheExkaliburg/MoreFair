@@ -43,7 +43,7 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
     }
 
     private boolean validateSubscription(Principal principal, String topicDestination, String uuid) {
-        // if (principal == null) return false;
+        if (principal == null) return false;
         topicDestination = StringEscapeUtils.escapeJava(topicDestination);
         uuid = StringEscapeUtils.escapeJava(uuid);
         log.debug("Validate subscription for {} to {}", uuid, topicDestination);
