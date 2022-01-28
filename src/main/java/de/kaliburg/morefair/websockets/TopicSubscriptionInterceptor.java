@@ -14,6 +14,7 @@ import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
 
 import java.security.Principal;
+import java.util.Objects;
 import java.util.UUID;
 
 @Log4j2
@@ -32,9 +33,10 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
         if (StompCommand.SUBSCRIBE.equals(headerAccessor.getCommand())) {
             Principal userPrincipal = headerAccessor.getUser();
-            String uuid = headerAccessor.getNativeHeader("uuid").get(0);
+            String uuid = StringEscapeUtils.escapeJava(Objects.requireNonNull(headerAccessor.getNativeHeader("uuid")).get(0));
+            Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (!validateSubscription(userPrincipal, headerAccessor.getDestination(), uuid)) {
-                throw new MessagingException("No permission for this topic");
+                throw new MessagingException("No permission for this topic (" + StringEscapeUtils.escapeJava(headerAccessor.getDestination()) + ") for user " + account.getUsername());
             }
         }
         return message;
