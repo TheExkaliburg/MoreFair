@@ -107,6 +107,9 @@ public class AccountController {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
             String username = StringEscapeUtils.escapeJava(wsMessage.getContent());
+            username = username.trim();
+            if (username.length() > 32) username = username.substring(0, 32);
+
             log.debug("/app/account/name {} {}", uuid, username);
 
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));

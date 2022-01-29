@@ -61,6 +61,9 @@ public class ChatController {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
             String message = StringEscapeUtils.escapeJava(wsMessage.getContent());
+            message = message.trim();
+            if (message.length() > 280) message = message.substring(0, 280);
+
             log.debug("/app/chat/post/{} '{}' from {}", number, message, uuid);
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null) return;

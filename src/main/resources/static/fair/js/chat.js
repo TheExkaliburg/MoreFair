@@ -27,9 +27,13 @@ function handleChatInit(message) {
 
 function sendMessage() {
     let messageInput = $('#messageInput')[0];
-    const message = messageInput.value;
+    let message = messageInput.value;
     if (message === "") return;
     messageInput.value = "";
+
+    if (message && message.length > 280) {
+        message = message.substring(0, 280);
+    }
 
     stompClient.send("/app/chat/post/" + chatData.currentChatNumber, {}, JSON.stringify({
         'uuid': getCookie("_uuid"),
