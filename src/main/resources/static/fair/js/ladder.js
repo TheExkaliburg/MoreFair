@@ -374,8 +374,8 @@ function calculateStats() {
     // Points Needed For Promotion
     if (ladderData.rankers.length >= Math.max(infoData.minimumPeopleForPromote, ladderData.currentLadder.number)) {
         if (ladderData.firstRanker.points.cmp(infoData.pointsForPromote) >= 0) {
-            let leadingRanker = ladderData.firstRanker;
-            let pursuingRanker = ladderData.yourRanker;
+            let leadingRanker = ladderData.firstRanker.you ? ladderData.yourRanker : ladderData.firstRanker;
+            let pursuingRanker = ladderData.firstRanker.you ? ladderData.rankers[1] : ladderData.yourRanker;
 
             // How many more points does the ranker gain against his pursuer, every Second
             let powerDiff = leadingRanker.power.sub(pursuingRanker.growing ? pursuingRanker.power : 0);
