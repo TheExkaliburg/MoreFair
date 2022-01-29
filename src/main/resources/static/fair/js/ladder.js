@@ -235,7 +235,7 @@ function handleVinegar(event) {
 
             if (ladderData.firstRanker.you && event.data.success) {
                 setTimeout(function () {
-                    alert(ranker.username + " threw his " + numberFormatter.format(vinegarThrown) + " Vinegar at you and made you slip to the bottom of the ladder.");
+                    alert(ranker.username + " threw their " + numberFormatter.format(vinegarThrown) + " Vinegar at you and made you slip to the bottom of the ladder.");
                 }, 1);
 
             }

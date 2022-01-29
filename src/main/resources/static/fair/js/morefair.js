@@ -4,7 +4,7 @@ let infoData = {
     assholeLadder: 15,
     assholeTags: [''],
     baseVinegarNeededToThrow: new Decimal(1000000),
-    baseGrapesNeededToAutoPromote: new Decimal(1000),
+    baseGrapesNeededToAutoPromote: new Decimal(2000),
     manualPromoteWaitTime: 15,
     autoPromoteLadder: 2
 }

@@ -27,7 +27,7 @@ public class Message {
     @ManyToOne
     private Account account;
     @NonNull
-    @Column(nullable = false)
+    @Column(nullable = false, length = 500)
     private String message;
     @NonNull
     @ManyToOne
