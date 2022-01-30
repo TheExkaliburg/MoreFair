@@ -13,6 +13,7 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Objects;
 import java.util.UUID;
@@ -32,6 +33,7 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
         if (StompCommand.SUBSCRIBE.equals(headerAccessor.getCommand())) {
+            log.info("Payload: {} Headers: {}", new String((byte[]) message.getPayload(), StandardCharsets.UTF_8), message.getHeaders().toString());
             Principal userPrincipal = headerAccessor.getUser();
             String uuid = Objects.requireNonNull(headerAccessor.getNativeHeader("uuid")).get(0);
             if (!validateSubscription(userPrincipal, headerAccessor.getDestination(), uuid)) {
