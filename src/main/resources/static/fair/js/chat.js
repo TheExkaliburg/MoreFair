@@ -2,7 +2,8 @@ let messageTemplate = {
     username: "Chad, the Listener",
     message: "Sorry, I'm currently resting my ears. If you want to be heard, head over into our Discord. https://discord.gg/Ud7UfFJmYj ",
     timesAsshole: 0,
-    accountId: 0
+    accountId: 0,
+    timeCreated: "00:00"
 }
 
 let chatData = {
@@ -64,10 +65,10 @@ function updateChat() {
         let row = body.insertRow();
         let assholeTag = (message.timesAsshole < infoData.assholeTags.length) ?
             infoData.assholeTags[message.timesAsshole] : infoData.assholeTags[infoData.assholeTags.length - 1];
-        row.insertCell(0).innerHTML = message.username + ": " + assholeTag;
+        row.insertCell(0).innerHTML = "[" + message.timeCreated + "] " + message.username + ": " + assholeTag;
         row.cells[0].classList.add('overflow-hidden')
         row.cells[0].style.whiteSpace = 'nowrap';
-        row.insertCell(1).innerHTML = "&nbsp;" + message.message;
+        row.insertCell(1).innerHTML = message.message;
     }
 }
 
