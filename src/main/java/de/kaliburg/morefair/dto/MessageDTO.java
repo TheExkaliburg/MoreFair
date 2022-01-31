@@ -10,11 +10,12 @@ public class MessageDTO {
     private final String username;
     private final Integer timesAsshole;
     private final Long accountId;
-
+    private final Long timestamp
     public MessageDTO(Message message) {
         this.timesAsshole = message.getAccount().getTimesAsshole();
         this.message = StringEscapeUtils.unescapeJava(message.getMessage());
         this.username = StringEscapeUtils.unescapeJava(message.getAccount().getUsername());
         this.accountId = message.getAccount().getId();
+        this.timestamp = message.createdOn;
     }
 }
