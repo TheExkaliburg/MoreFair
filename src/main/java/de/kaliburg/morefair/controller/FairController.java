@@ -33,26 +33,26 @@ public class FairController {
     public final static Integer ASSHOLES_FOR_RESET = 10;
     public final static List<String> ASSHOLE_TAGS = new ArrayList<>(Arrays.asList(
             "",
-            "&emsp;(&#x2660;)",     // 01♠
-            "&emsp;(&#x2663;)",     // 02♣
-            "&emsp;(&#x2665;)",     // 03♥
-            "&emsp;(&#x2666;)",     // 04♦
-            "&emsp;(&#x2664;)",     // 05♤
-            "&emsp;(&#x2667;)",     // 06♧
-            "&emsp;(&#x2661;)",     // 07♡
-            "&emsp;(&#x2662;)",     // 08♢
-            "&emsp;(&#x265F;)",     // 09♟
-            "&emsp;(&#x2659;)",     // 10♙
-            "&emsp;(&#x265E;)",     // 11♞
-            "&emsp;(&#x2658;)",     // 12♘
-            "&emsp;(&#x265D;)",     // 13♝
-            "&emsp;(&#x2657;)",     // 14♗
-            "&emsp;(&#x265C;)",     // 15♜
-            "&emsp;(&#x2656;)",     // 16♖
-            "&emsp;(&#x265B;)",     // 17♛
-            "&emsp;(&#x2655;)",     // 18♕
-            "&emsp;(&#x265A;)",     // 19♚
-            "&emsp;(&#x2654;)"      // 20♔
+            "&#x2660;",     // 01♠
+            "&#x2663;",     // 02♣
+            "&#x2665;",     // 03♥
+            "&#x2666;",     // 04♦
+            "&#x2664;",     // 05♤
+            "&#x2667;",     // 06♧
+            "&#x2661;",     // 07♡
+            "&#x2662;",     // 08♢
+            "&#x265F;",     // 09♟
+            "&#x2659;",     // 10♙
+            "&#x265E;",     // 11♞
+            "&#x2658;",     // 12♘
+            "&#x265D;",     // 13♝
+            "&#x2657;",     // 14♗
+            "&#x265C;",     // 15♜
+            "&#x2656;",     // 16♖
+            "&#x265B;",     // 17♛
+            "&#x2655;",     // 18♕
+            "&#x265A;",     // 19♚
+            "&#x2654;"      // 20♔
     ));
     public final static String INFO_DESTINATION = "/queue/info";
     private final AccountService accountService;
