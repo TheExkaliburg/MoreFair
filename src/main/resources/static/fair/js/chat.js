@@ -59,12 +59,13 @@ function changeChatRoom(ladderNum) {
 function updateChat() {
     let body = $('#messagesBody')[0];
     body.innerHTML = "";
+    let reference_time = new Date().getTime()
     for (let i = 0; i < chatData.messages.length; i++) {
         let message = chatData.messages[i];
         let row = body.insertRow();
         let assholeTag = (message.timesAsshole < infoData.assholeTags.length) ?
             infoData.assholeTags[message.timesAsshole] : infoData.assholeTags[infoData.assholeTags.length - 1];
-        row.insertCell(0).innerHTML = message.username + ": " + assholeTag;
+        row.insertCell(0).innerHTML = `[${fancyTime((reference_time-message.timestamp)/1000)}] ` + message.username + ": " + assholeTag;
         row.cells[0].classList.add('overflow-hidden')
         row.cells[0].style.whiteSpace = 'nowrap';
         row.insertCell(1).innerHTML = "&nbsp;" + message.message;
@@ -78,4 +79,55 @@ function updateChatUsername(event) {
         }
     })
     updateChat();
+}
+
+const time_names = [
+		["second", "s"],
+		["minute", "min"],
+		["hour", "h"],
+		["day", "d"],
+		["week", "w"],
+		["month", "m"],
+		["year", "y"]
+]
+const time_modulos = [
+		1,
+		60,
+		3600,
+		3600*24,
+		3600*24*7,
+		3660*24*30,
+		3660*24*365.25
+]
+
+function fancyTime(t) {
+	let short = true
+	let index = short ? 1 : 0;
+    let time_values = []
+	let slotted_time = 0
+    // Iterates modulos in reverse
+	// Adds fitting time to values
+	// Subtracts t with added time
+    for (let i = time_modulos.length; i > 0; i--) {
+		slotted_time = Math.max(Math.floor(t/time_modulos[i-1]))
+	    time_values.push(slotted_time)
+		t = t - slotted_time*time_modulos[i-1]
+    }
+    console.log(time_values)
+    // Connects name with index value
+	// The value array is flipped upside down, so it requires some special care
+	let pretty = []
+	for (let i = time_names.length; i > 0; i--) {
+	    console.log(time_names[i-1])
+		if (time_values[time_values.length-i] > 0) {
+			let _name = time_names[i-1][index]
+			// Adds 's' to name if applicable. Example: 2 minute -> 2 minutes
+			if ((time_values[time_values.length-i] > 1) && !(short)) {
+				_name = _name + "s"
+			}
+			pretty.push(`${time_values[time_values.length-i]} ${_name}`)
+		}
+    }
+	pretty = pretty.join(" ")
+	return pretty	
 }
