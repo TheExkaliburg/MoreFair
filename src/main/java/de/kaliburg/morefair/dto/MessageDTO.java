@@ -10,7 +10,7 @@ public class MessageDTO {
     private final String username;
     private final Integer timesAsshole;
     private final Long accountId;
-    private final Long timestamp
+    private final Long timestamp;
     public MessageDTO(Message message) {
         this.timesAsshole = message.getAccount().getTimesAsshole();
         this.message = StringEscapeUtils.unescapeJava(message.getMessage());
