@@ -3,7 +3,6 @@ package de.kaliburg.morefair.dto;
 import de.kaliburg.morefair.persistence.entity.Ranker;
 import lombok.Data;
 import org.apache.commons.text.StringEscapeUtils;
-import org.springframework.web.util.HtmlUtils;
 
 @Data
 public class RankerDTO {
@@ -20,7 +19,7 @@ public class RankerDTO {
 
     public RankerDTO(Ranker ranker) {
         this.accountId = ranker.getAccount().getId();
-        this.username = HtmlUtils.htmlEscape(StringEscapeUtils.unescapeJava(ranker.getAccount().getUsername()));
+        this.username = StringEscapeUtils.unescapeJava(ranker.getAccount().getUsername());
         this.rank = ranker.getRank();
         this.points = ranker.getPoints().toString();
         this.power = ranker.getPower().toString();

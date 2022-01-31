@@ -23,8 +23,8 @@ public class FairController {
     public final static Integer MINIMUM_PEOPLE_FOR_PROMOTE = 10;
     // 250 Millionen
     public final static BigInteger POINTS_FOR_PROMOTE = new BigInteger("250000000");
-    // 2.5 Million
-    public final static BigInteger BASE_VINEGAR_NEEDED_TO_THROW = new BigInteger("1000000");
+    // 500 Thousand
+    public final static BigInteger BASE_VINEGAR_NEEDED_TO_THROW = new BigInteger("500000");
     // 2 Thousand
     public final static BigInteger BASE_GRAPES_NEEDED_TO_AUTO_PROMOTE = new BigInteger("2000");
     public final static Integer AUTO_PROMOTE_LADDER = 2;

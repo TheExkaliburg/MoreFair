@@ -18,6 +18,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.util.HtmlUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
@@ -106,9 +107,10 @@ public class AccountController {
     public void changeUsername(SimpMessageHeaderAccessor sha, WSMessage wsMessage) throws Exception {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-            String username = StringEscapeUtils.escapeJava(wsMessage.getContent());
+            String username = wsMessage.getContent();
             username = username.trim();
             if (username.length() > 32) username = username.substring(0, 32);
+            username = StringEscapeUtils.escapeJava(HtmlUtils.htmlEscape(username));
 
             log.debug("/app/account/name {} {}", uuid, username);
 

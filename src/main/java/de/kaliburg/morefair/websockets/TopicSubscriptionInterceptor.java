@@ -33,7 +33,7 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
         if (StompCommand.SUBSCRIBE.equals(headerAccessor.getCommand())) {
-            log.info("Payload: {} Headers: {}", new String((byte[]) message.getPayload(), StandardCharsets.UTF_8), message.getHeaders().toString());
+            log.trace("Payload: {} Headers: {}", new String((byte[]) message.getPayload(), StandardCharsets.UTF_8), message.getHeaders().toString());
             Principal userPrincipal = headerAccessor.getUser();
             String uuid = Objects.requireNonNull(headerAccessor.getNativeHeader("uuid")).get(0);
             if (!validateSubscription(userPrincipal, headerAccessor.getDestination(), uuid)) {

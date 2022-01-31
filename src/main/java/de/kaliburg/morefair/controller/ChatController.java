@@ -14,6 +14,7 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.util.HtmlUtils;
 
 import java.util.UUID;
 
@@ -60,9 +61,10 @@ public class ChatController {
     public void postChat(WSMessage wsMessage, @DestinationVariable("number") Integer number) {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-            String message = StringEscapeUtils.escapeJava(wsMessage.getContent());
+            String message = wsMessage.getContent();
             message = message.trim();
             if (message.length() > 280) message = message.substring(0, 280);
+            message = StringEscapeUtils.escapeJava(HtmlUtils.htmlEscape(message));
 
             log.debug("/app/chat/post/{} '{}' from {}", number, message, uuid);
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));

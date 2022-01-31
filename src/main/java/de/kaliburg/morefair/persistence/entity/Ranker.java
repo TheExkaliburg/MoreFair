@@ -98,6 +98,12 @@ public class Ranker {
         return this;
     }
 
+    public Ranker mulVinegar(double multiplier, double deltaSec) {
+        BigDecimal decVinegar = new BigDecimal(this.vinegar);
+        this.vinegar = decVinegar.multiply(BigDecimal.valueOf(Math.pow(multiplier, deltaSec))).toBigInteger();
+        return this;
+    }
+
     public Ranker addGrapes(Integer grapes, double secondsPassed) {
         return addGrapes(BigInteger.valueOf(grapes), secondsPassed);
     }

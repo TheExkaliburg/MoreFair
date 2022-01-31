@@ -166,8 +166,12 @@ public class LadderCalculator {
                 currentRanker.addPoints(currentRanker.getPower(), deltaSec);
 
                 // Calculating Vinegar based on Grapes count
-                if (currentRanker.getRank() != 1)
+                if (currentRanker.getRank() != 1) {
                     currentRanker.addVinegar(currentRanker.getGrapes(), deltaSec);
+                }
+                if (currentRanker.getRank() == 1 && ladder.getNumber() == 1) {
+                    currentRanker.mulVinegar(0.9975, deltaSec);
+                }
 
                 for (int j = i - 1; j >= 0; j--) {
                     // If one of the already calculated Rankers have less points than this ranker

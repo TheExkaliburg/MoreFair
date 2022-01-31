@@ -270,6 +270,7 @@ function handlePromote(event) {
 function handleAutoPromote(event) {
     ladderData.rankers.forEach(ranker => {
         if (ranker.you && event.accountId === ranker.accountId) {
+            ranker.grapes = ranker.grapes.sub(getAutoPromoteGrapeCost(ranker.rank));
             ranker.autoPromote = true;
         }
     })
@@ -327,6 +328,9 @@ function calculateLadder(delta) {
             // Calculating Vinegar based on Grapes count
             if (ladderData.rankers[i].rank !== 1 && ladderData.rankers[i].you)
                 ladderData.rankers[i].vinegar = ladderData.rankers[i].vinegar.add(ladderData.rankers[i].grapes.mul(delta).floor());
+
+            if (ladderData.rankers[i].rank === 1 && ladderData.currentLadder.number === 1 && ladderData.rankers[i].you)
+                ladderData.rankers[i].vinegar = ladderData.rankers[i].vinegar.mul(Math.pow(0.9975, delta)).floor();
 
             for (let j = i - 1; j >= 0; j--) {
                 // If one of the already calculated Rankers have less points than this ranker

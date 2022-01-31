@@ -14,7 +14,7 @@ public class CustomHandshakeHandler extends DefaultHandshakeHandler {
     @Override
     protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler, Map<String, Object> attributes) {
         UUID uuid = UUID.randomUUID();
-        log.info("Determining user for session {} as {}", request.getURI().toString(), uuid);
+        log.trace("Determining user for session {} as {}", request.getURI().toString(), uuid);
 
         return new StompPrincipal(uuid.toString());
     }
