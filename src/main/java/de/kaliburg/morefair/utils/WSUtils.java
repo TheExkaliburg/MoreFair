@@ -53,7 +53,7 @@ public class WSUtils {
 
     public boolean canCreateUser(SimpMessageHeaderAccessor sha) {
         if (createdAccountRecently.contains(sha.getUser().getName())) {
-            return true;
+            return false;
         }
         createdAccountRecently.add(sha.getUser().getName());
         return true;
