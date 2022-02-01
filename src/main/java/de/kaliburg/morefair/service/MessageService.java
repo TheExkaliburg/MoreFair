@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.*;
 
 @Service
@@ -53,6 +54,7 @@ public class MessageService {
 
     // Every Minute
     @Scheduled(initialDelay = 60000, fixedRate = 60000)
+    @PreDestroy
     public void syncWithDB() {
         log.debug("Saving Chats...");
         deleteAllMessages();
