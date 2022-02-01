@@ -1,15 +1,15 @@
 package de.kaliburg.morefair.service;
 
+import de.kaliburg.morefair.account.entity.Account;
+import de.kaliburg.morefair.account.repository.AccountRepository;
 import de.kaliburg.morefair.controller.FairController;
 import de.kaliburg.morefair.dto.LadderViewDTO;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.EventType;
 import de.kaliburg.morefair.events.data.JoinData;
 import de.kaliburg.morefair.events.data.VinegarData;
-import de.kaliburg.morefair.persistence.entity.Account;
 import de.kaliburg.morefair.persistence.entity.Ladder;
 import de.kaliburg.morefair.persistence.entity.Ranker;
-import de.kaliburg.morefair.persistence.repository.AccountRepository;
 import de.kaliburg.morefair.persistence.repository.LadderRepository;
 import de.kaliburg.morefair.persistence.repository.RankerRepository;
 import de.kaliburg.morefair.utils.UpgradeUtils;
@@ -179,7 +179,7 @@ public class RankerService {
         eventMap.values().forEach(List::clear);
     }
 
-    protected Ranker createNewRankerForAccountOnLadder(Account account, Integer ladderNum) {
+    public Ranker createNewRankerForAccountOnLadder(Account account, Integer ladderNum) {
         Ladder ladder = findLadder(ladderNum);
         if (ladder == null) ladder = createNewLadder(ladderNum);
 

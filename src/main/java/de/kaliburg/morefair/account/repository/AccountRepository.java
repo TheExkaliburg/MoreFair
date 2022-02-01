@@ -1,6 +1,6 @@
-package de.kaliburg.morefair.persistence.repository;
+package de.kaliburg.morefair.account.repository;
 
-import de.kaliburg.morefair.persistence.entity.Account;
+import de.kaliburg.morefair.account.entity.Account;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

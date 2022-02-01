@@ -1,8 +1,8 @@
 package de.kaliburg.morefair.controller;
 
+import de.kaliburg.morefair.account.service.AccountService;
 import de.kaliburg.morefair.dto.InfoDTO;
 import de.kaliburg.morefair.messages.WSMessage;
-import de.kaliburg.morefair.service.AccountService;
 import de.kaliburg.morefair.utils.WSUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringEscapeUtils;

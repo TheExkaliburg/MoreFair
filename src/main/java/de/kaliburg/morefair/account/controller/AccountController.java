@@ -1,12 +1,12 @@
-package de.kaliburg.morefair.controller;
+package de.kaliburg.morefair.account.controller;
 
+import de.kaliburg.morefair.account.entity.Account;
+import de.kaliburg.morefair.account.service.AccountService;
 import de.kaliburg.morefair.dto.AccountDetailsDTO;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.EventType;
 import de.kaliburg.morefair.messages.WSMessage;
 import de.kaliburg.morefair.multithreading.DatabaseWriteSemaphore;
-import de.kaliburg.morefair.persistence.entity.Account;
-import de.kaliburg.morefair.service.AccountService;
 import de.kaliburg.morefair.service.RankerService;
 import de.kaliburg.morefair.utils.WSUtils;
 import lombok.extern.log4j.Log4j2;
@@ -52,7 +52,7 @@ public class AccountController {
                     return new ResponseEntity<>(accountService.createNewAccount(),
                             HttpStatus.CREATED);
                 } else {
-                    accountService.login(account);
+                    accountService.updateActivity(account);
                     return new ResponseEntity<>(account.convertToDTO(), HttpStatus.OK);
                 }
             } finally {
@@ -90,7 +90,7 @@ public class AccountController {
                 }
                 return;
             } else {
-                accountService.login(account);
+                accountService.updateActivity(account);
                 wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, account.convertToDTO());
             }
 

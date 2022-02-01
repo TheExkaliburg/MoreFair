@@ -1,7 +1,7 @@
 package de.kaliburg.morefair.websockets;
 
-import de.kaliburg.morefair.persistence.entity.Account;
-import de.kaliburg.morefair.service.AccountService;
+import de.kaliburg.morefair.account.entity.Account;
+import de.kaliburg.morefair.account.service.AccountService;
 import de.kaliburg.morefair.service.RankerService;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;

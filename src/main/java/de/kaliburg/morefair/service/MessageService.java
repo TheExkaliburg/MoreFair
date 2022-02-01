@@ -1,7 +1,7 @@
 package de.kaliburg.morefair.service;
 
+import de.kaliburg.morefair.account.entity.Account;
 import de.kaliburg.morefair.dto.ChatDTO;
-import de.kaliburg.morefair.persistence.entity.Account;
 import de.kaliburg.morefair.persistence.entity.Ladder;
 import de.kaliburg.morefair.persistence.entity.Message;
 import de.kaliburg.morefair.persistence.repository.LadderRepository;

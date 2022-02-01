@@ -1,5 +1,6 @@
 package de.kaliburg.morefair.persistence.entity;
 
+import de.kaliburg.morefair.account.entity.Account;
 import de.kaliburg.morefair.dto.RankerDTO;
 import de.kaliburg.morefair.dto.RankerPrivateDTO;
 import lombok.*;

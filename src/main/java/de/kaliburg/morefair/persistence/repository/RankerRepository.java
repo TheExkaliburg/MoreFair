@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.persistence.repository;
 
-import de.kaliburg.morefair.persistence.entity.Account;
+import de.kaliburg.morefair.account.entity.Account;
 import de.kaliburg.morefair.persistence.entity.Ladder;
 import de.kaliburg.morefair.persistence.entity.Ranker;
 import org.springframework.data.jpa.repository.JpaRepository;

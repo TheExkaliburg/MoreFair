@@ -1,17 +1,21 @@
-package de.kaliburg.morefair.service;
+package de.kaliburg.morefair.account.service;
 
+import de.kaliburg.morefair.account.entity.Account;
+import de.kaliburg.morefair.account.repository.AccountRepository;
 import de.kaliburg.morefair.dto.AccountDetailsDTO;
 import de.kaliburg.morefair.events.Event;
-import de.kaliburg.morefair.persistence.entity.Account;
 import de.kaliburg.morefair.persistence.entity.Ladder;
 import de.kaliburg.morefair.persistence.entity.Message;
 import de.kaliburg.morefair.persistence.entity.Ranker;
-import de.kaliburg.morefair.persistence.repository.AccountRepository;
+import de.kaliburg.morefair.service.MessageService;
+import de.kaliburg.morefair.service.RankerService;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.UUID;
 
 @Service
@@ -20,6 +24,9 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final RankerService rankerService;
     private final MessageService messageService;
+
+    @Getter
+    private ArrayList<Account> accountList = new ArrayList<>();
 
     public AccountService(AccountRepository accountRepository, RankerService rankerService, MessageService messageService) {
         this.accountRepository = accountRepository;
@@ -82,7 +89,7 @@ public class AccountService {
         return true;
     }
 
-    public void login(Account account) {
+    public void updateActivity(Account account) {
         // Set Login Date
         account.setLastLogin(LocalDateTime.now());
         accountRepository.save(account);
