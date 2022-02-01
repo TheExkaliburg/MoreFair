@@ -382,7 +382,7 @@ function calculateStats() {
             let pursuingRanker = ladderData.firstRanker.you ? ladderData.rankers[1] : ladderData.yourRanker;
 
             // How many more points does the ranker gain against his pursuer, every Second
-            let powerDiff = leadingRanker.power.sub(pursuingRanker.growing ? pursuingRanker.power : 0);
+            let powerDiff = (leadingRanker.growing ? pursuingRanker.power : new Decimal(0)).sub(pursuingRanker.growing ? pursuingRanker.power : 0);
             // Calculate the needed Point difference, to have f.e. 30seconds of point generation with the difference in power
             let neededPointDiff = powerDiff.mul(new Decimal(infoData.manualPromoteWaitTime)).abs();
 

@@ -254,6 +254,7 @@ public class RankerService {
             Ranker ranker = findActiveRankerOfAccountOnLadder(accountId, ladder);
             if (ranker == null) return false;
 
+            BigInteger neededPointDiff = BigInteger.ZERO;
 
             if (ladder.getRankers().size() <= ranker.getRank()) return false;
             Ranker pursuingRanker = ladder.getRankers().get(ranker.getRank());
@@ -261,11 +262,15 @@ public class RankerService {
 
             // How many points the ranker is in front of his pursuer
             BigInteger pointDiff = ranker.getPoints().subtract(pursuingRanker.getPoints());
-            // How many more points does the ranker gain against his pursuer, every Second
-            BigInteger powerDiff = ranker.getPower().subtract(
-                    pursuingRanker.isGrowing() ? pursuingRanker.getPower() : BigInteger.ZERO);
-            // Calculate the needed Point difference, to have f.e. 15seconds of point generation with the difference in power
-            BigInteger neededPointDiff = powerDiff.multiply(BigInteger.valueOf(FairController.MANUAL_PROMOTE_WAIT_TIME)).abs();
+
+            if (ladder.getNumber() >= FairController.AUTO_PROMOTE_LADDER) {
+                // How many more points does the ranker gain against his pursuer, every Second
+                BigInteger powerDiff = ranker.getPower().subtract(
+                        pursuingRanker.isGrowing() ? pursuingRanker.getPower() : BigInteger.ZERO);
+                // Calculate the needed Point difference, to have f.e. 15seconds of point generation with the difference in power
+                neededPointDiff = powerDiff.multiply(BigInteger.valueOf(FairController.MANUAL_PROMOTE_WAIT_TIME)).abs();
+            }
+
 
             // If
             // - Ranker is #1
