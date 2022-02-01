@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -76,6 +77,7 @@ public class RankerService {
 
     @Transactional
     @Scheduled(initialDelay = 60000, fixedRate = 60000)
+    @PreDestroy
     public void syncWithDB() {
         log.debug("Saving Ladders...");
         try {
@@ -283,6 +285,7 @@ public class RankerService {
                     && ranker.getPoints().compareTo(FairController.POINTS_FOR_PROMOTE) >= 0
                     && (ranker.isAutoPromote() || pointDiff.compareTo(neededPointDiff) >= 0)) {
                 ranker.setGrowing(false);
+                saveRanker(ranker);
                 Ranker newRanker = createNewRankerForAccountOnLadder(ranker.getAccount(), ranker.getLadder().getNumber() + 1);
                 newRanker.setVinegar(ranker.getVinegar());
                 newRanker.setGrapes(ranker.getGrapes());

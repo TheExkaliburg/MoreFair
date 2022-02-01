@@ -480,7 +480,7 @@ function writeNewRow(body, ranker) {
     let rank = (ranker.rank === 1 && !ranker.you && ranker.growing && ladderData.rankers.length >= Math.max(infoData.minimumPeopleForPromote, ladderData.currentLadder.number)
         && ladderData.firstRanker.points.cmp(infoData.pointsForPromote) >= 0 && ladderData.yourRanker.vinegar.cmp(getVinegarThrowCost()) >= 0) ?
         '<a href="#" style="text-decoration: none" onclick="throwVinegar()">🍇</a>' : ranker.rank;
-    row.insertCell(0).innerHTML = rank + assholeTag;
+    row.insertCell(0).innerHTML = rank + " " + assholeTag;
     row.insertCell(1).innerHTML = ranker.username;
     row.cells[1].style.overflow = "hidden";
     row.insertCell(2).innerHTML = numberFormatter.format(ranker.power) +
