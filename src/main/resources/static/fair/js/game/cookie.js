@@ -28,8 +28,13 @@ function getCookie(cname) {
 }
 
 function login() {
+    let uuid = getCookie("_uuid")
+    if (uuid === "" && !confirm("Do you want to create a new account?")) {
+        return;
+    }
+
     stompClient.send("/app/account/login", {}, JSON.stringify({
-        'uuid': getCookie("_uuid")
+        'uuid': uuid
     }));
 }
 
