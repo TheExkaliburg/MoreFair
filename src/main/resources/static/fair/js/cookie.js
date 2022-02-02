@@ -60,17 +60,13 @@ function onLoginReceived(message) {
 }
 
 async function importCookie() {
-    let newUUID = prompt("Paste your ID into here:");
+    let newUUID = prompt("Paste your ID into here (your old uuid will be copied into your clipboard):");
     try {
-        // Check if cookies are valid
-        const response = await axios.post('/fair/login', new URLSearchParams({uuid: newUUID}));
-        if (response.status === 200 && response.data.uuid) {
-            let uuid = response.data.uuid;
-            setCookie("_uuid", uuid, 365 * 5);
-            // Relaod the page for the new cookies to take place
-            location.reload();
-        }
-
+        // TODO: Check if cookies are valid
+        await navigator.clipboard.writeText(getCookie("_uuid"));
+        setCookie("_uuid", newUUID, 365 * 5);
+        // Relaod the page for the new cookies to take place
+        location.reload();
     } catch (err) {
         alert("Invalid ID!")
         console.error(err)

@@ -12,15 +12,11 @@ import de.kaliburg.morefair.utils.WSUtils;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.util.HtmlUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
 
 @Controller
@@ -36,35 +32,6 @@ public class AccountController {
         this.accountService = accountService;
         this.rankerService = rankerService;
         this.wsUtils = wsUtils;
-    }
-
-    @PostMapping(path = "/fair/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = "application/json")
-    public ResponseEntity<AccountDetailsDTO> postLogin(String uuid, HttpServletRequest request) {
-        log.debug("POST /fair/login {}", uuid);
-        if (uuid.isBlank()) {
-            return new ResponseEntity<>(accountService.createNewAccount(), HttpStatus.CREATED);
-        }
-        try {
-            try {
-                DatabaseWriteSemaphore.getInstance().acquire();
-                Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
-                if (account == null) {
-                    return new ResponseEntity<>(accountService.createNewAccount(),
-                            HttpStatus.CREATED);
-                } else {
-                    accountService.updateActivity(account);
-                    return new ResponseEntity<>(account.convertToDTO(), HttpStatus.OK);
-                }
-            } finally {
-                DatabaseWriteSemaphore.getInstance().release();
-            }
-        } catch (IllegalArgumentException e) {
-            log.error("Couldn't parse the UUID from {} using 'POST /fair/login {}'",
-                    request.getRemoteAddr(), uuid);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } catch (InterruptedException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
     @MessageMapping("/account/login")
