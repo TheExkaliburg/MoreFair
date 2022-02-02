@@ -306,7 +306,7 @@ function handleNameChange(event) {
 
 async function handleReset(event) {
     disconnect();
-    await new Promise(r => setTimeout(r, 60000));
+    await new Promise(r => setTimeout(r, 65000));
     location.reload();
 }
 
