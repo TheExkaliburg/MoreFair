@@ -2,13 +2,13 @@ package de.kaliburg.morefair.account.controller;
 
 import de.kaliburg.morefair.account.entity.Account;
 import de.kaliburg.morefair.account.service.AccountService;
-import de.kaliburg.morefair.dto.AccountDetailsDTO;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.EventType;
 import de.kaliburg.morefair.messages.WSMessage;
-import de.kaliburg.morefair.multithreading.DatabaseWriteSemaphore;
 import de.kaliburg.morefair.service.RankerService;
+import de.kaliburg.morefair.utils.RequestThrottler;
 import de.kaliburg.morefair.utils.WSUtils;
+import de.kaliburg.morefair.websockets.StompPrincipal;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.http.HttpStatus;
@@ -26,21 +26,24 @@ public class AccountController {
 
     private final AccountService accountService;
     private final RankerService rankerService;
+    private final RequestThrottler requestThrottler;
     private final WSUtils wsUtils;
 
-    public AccountController(AccountService accountService, RankerService rankerService, WSUtils wsUtils) {
+    public AccountController(AccountService accountService, RankerService rankerService, RequestThrottler requestThrottler, WSUtils wsUtils) {
         this.accountService = accountService;
         this.rankerService = rankerService;
+        this.requestThrottler = requestThrottler;
         this.wsUtils = wsUtils;
     }
 
     @MessageMapping("/account/login")
     public void login(SimpMessageHeaderAccessor sha, WSMessage wsMessage) throws Exception {
         try {
+            StompPrincipal principal = wsUtils.convertMessageHeaderAccessorToStompPrincipal(sha);
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
             log.debug("/app/account/login {}", uuid);
             if (uuid.isBlank()) {
-                if (wsUtils.canCreateUser(sha)) {
+                if (requestThrottler.canCreateAccount(principal)) {
                     wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, accountService.createNewAccount(), HttpStatus.CREATED);
                 } else {
                     wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
@@ -50,7 +53,7 @@ public class AccountController {
 
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null) {
-                if (wsUtils.canCreateUser(sha)) {
+                if (requestThrottler.canCreateAccount(principal)) {
                     wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, accountService.createNewAccount(), HttpStatus.CREATED);
                 } else {
                     wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, HttpStatus.FORBIDDEN);

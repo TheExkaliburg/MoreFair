@@ -1,6 +1,7 @@
 package de.kaliburg.morefair.utils;
 
 import de.kaliburg.morefair.messages.WSMessageAnswer;
+import de.kaliburg.morefair.websockets.StompPrincipal;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -51,11 +52,7 @@ public class WSUtils {
         simpMessagingTemplate.convertAndSend(dest, content);
     }
 
-    public boolean canCreateUser(SimpMessageHeaderAccessor sha) {
-        if (createdAccountRecently.contains(sha.getUser().getName())) {
-            return false;
-        }
-        createdAccountRecently.add(sha.getUser().getName());
-        return true;
+    public StompPrincipal convertMessageHeaderAccessorToStompPrincipal(SimpMessageHeaderAccessor sha) {
+        return ((StompPrincipal) sha.getUser());
     }
 }

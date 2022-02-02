@@ -4,18 +4,16 @@ import lombok.Data;
 import lombok.NonNull;
 
 import java.security.Principal;
-import java.util.UUID;
 
 @Data
 public class StompPrincipal implements Principal {
     @NonNull
     private String name;
+    @NonNull
+    private Integer ipAddress;
 
-    public StompPrincipal(@NonNull String name) {
+    public StompPrincipal(@NonNull String name, @NonNull Integer ipAddress) {
         this.name = name;
-    }
-
-    public StompPrincipal() {
-        this.name = UUID.randomUUID().toString();
+        this.ipAddress = ipAddress;
     }
 }

@@ -10,7 +10,11 @@ import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
+import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.security.Principal;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -18,14 +22,15 @@ import java.util.concurrent.TimeUnit;
 @Log4j2
 public class CustomHandshakeHandler extends DefaultHandshakeHandler {
 
-    private LoadingCache<String, Integer> connectionsPerIpAddress;
+    private final static Integer MAX_CONNECTIONS_PER_MINUTE = 3;
+    private final LoadingCache<Integer, Integer> connectionsPerIpAddress;
 
     public CustomHandshakeHandler() {
         super();
 
-        connectionsPerIpAddress = Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build(new CacheLoader<String, Integer>() {
+        connectionsPerIpAddress = Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build(new CacheLoader<>() {
             @Override
-            public @Nullable Integer load(@NonNull String s) throws Exception {
+            public @Nullable Integer load(@NonNull Integer s) throws Exception {
                 return 0;
             }
         });
@@ -33,10 +38,38 @@ public class CustomHandshakeHandler extends DefaultHandshakeHandler {
 
     @Override
     protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler, Map<String, Object> attributes) {
-        log.debug(request.getHeaders().get("x-forwarded-for"));
-        UUID uuid = UUID.randomUUID();
-        log.trace("Determining user for session {} as {}", request.getURI().toString(), uuid);
+        String ipString = request.getHeaders().getOrDefault("x-forwarded-for", List.of(request.getRemoteAddress().getHostName())).get(0);
+        Integer ip = 0;
+        try {
+            ip = new BigInteger(InetAddress.getByName(ipString).getAddress()).intValue();
+        } catch (UnknownHostException e) {
+            log.error(e);
+            e.printStackTrace();
+        }
 
-        return new StompPrincipal(uuid.toString());
+        if (isMaximumConnectionsPerMinuteExceeded(ip)) {
+            return null;
+        }
+
+        UUID uuid = UUID.randomUUID();
+        log.trace("Determining user for session {} with ip {} as {}", request.getURI().toString(), ip, uuid);
+        return new StompPrincipal(uuid.toString(), ip);
+    }
+
+    private boolean isMaximumConnectionsPerMinuteExceeded(Integer ipAddress) {
+        Integer requests;
+        requests = connectionsPerIpAddress.get(ipAddress);
+        if (requests != null) {
+            if (requests >= MAX_CONNECTIONS_PER_MINUTE) {
+                connectionsPerIpAddress.asMap().remove(ipAddress);
+                connectionsPerIpAddress.put(ipAddress, requests);
+                return true;
+            }
+        } else {
+            requests = 0;
+        }
+        requests++;
+        connectionsPerIpAddress.put(ipAddress, requests);
+        return false;
     }
 }
