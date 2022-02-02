@@ -33,7 +33,7 @@ public class CustomHandshakeHandler extends DefaultHandshakeHandler {
 
     @Override
     protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler, Map<String, Object> attributes) {
-        log.debug(request.getHeaders());
+        log.debug(request.getHeaders().get("x-forwarded-for"));
         UUID uuid = UUID.randomUUID();
         log.trace("Determining user for session {} as {}", request.getURI().toString(), uuid);
 
