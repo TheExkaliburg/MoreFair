@@ -378,16 +378,20 @@ function calculateStats() {
     // Points Needed For Promotion
     if (ladderData.rankers.length >= Math.max(infoData.minimumPeopleForPromote, ladderData.currentLadder.number)) {
         if (ladderData.firstRanker.points.cmp(infoData.pointsForPromote) >= 0) {
-            let leadingRanker = ladderData.firstRanker.you ? ladderData.yourRanker : ladderData.firstRanker;
-            let pursuingRanker = ladderData.firstRanker.you ? ladderData.rankers[1] : ladderData.yourRanker;
+            if (ladderData.currentLadder.number >= infoData.autoPromoteLadder) {
+                let leadingRanker = ladderData.firstRanker.you ? ladderData.yourRanker : ladderData.firstRanker;
+                let pursuingRanker = ladderData.firstRanker.you ? ladderData.rankers[1] : ladderData.yourRanker;
 
-            // How many more points does the ranker gain against his pursuer, every Second
-            let powerDiff = (leadingRanker.growing ? pursuingRanker.power : new Decimal(0)).sub(pursuingRanker.growing ? pursuingRanker.power : 0);
-            // Calculate the needed Point difference, to have f.e. 30seconds of point generation with the difference in power
-            let neededPointDiff = powerDiff.mul(new Decimal(infoData.manualPromoteWaitTime)).abs();
+                // How many more points does the ranker gain against his pursuer, every Second
+                let powerDiff = (leadingRanker.growing ? pursuingRanker.power : new Decimal(0)).sub(pursuingRanker.growing ? pursuingRanker.power : 0);
+                // Calculate the needed Point difference, to have f.e. 30seconds of point generation with the difference in power
+                let neededPointDiff = powerDiff.mul(new Decimal(infoData.manualPromoteWaitTime)).abs();
 
-            ladderStats.pointsNeededForManualPromote = Decimal.max((leadingRanker.you ? pursuingRanker : leadingRanker)
-                .points.add(neededPointDiff), infoData.pointsForPromote);
+                ladderStats.pointsNeededForManualPromote = Decimal.max((leadingRanker.you ? pursuingRanker : leadingRanker)
+                    .points.add(neededPointDiff), infoData.pointsForPromote);
+            } else {
+                ladderStats.pointsNeededForManualPromote = ladderData.firstRanker.points.add(1);
+            }
         } else {
             ladderStats.pointsNeededForManualPromote = infoData.pointsForPromote;
         }
