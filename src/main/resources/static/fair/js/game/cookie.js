@@ -68,10 +68,11 @@ async function importCookie() {
     let newUUID = prompt("Paste your ID into here (your old uuid will be copied into your clipboard):");
     try {
         // TODO: Check if cookies are valid
-        await navigator.clipboard.writeText(getCookie("_uuid"));
+        let oldUuid = getCookie("_uuid");
         setCookie("_uuid", newUUID, 365 * 5);
+        setTimeout(async () => await navigator.clipboard.writeText(oldUuid), 1000);
         // Relaod the page for the new cookies to take place
-        location.reload();
+        setTimeout(() => location.reload(), 1500);
     } catch (err) {
         alert("Invalid ID!")
         console.error(err)
