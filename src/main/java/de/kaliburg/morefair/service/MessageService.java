@@ -89,4 +89,10 @@ public class MessageService {
         ladder.setMessages(messages);
         return message;
     }
+
+    public ArrayList<Message> getAllMessages() {
+        ArrayList<Message> result = new ArrayList<>();
+        chats.values().forEach(c -> result.addAll(c.getMessages()));
+        return result;
+    }
 }

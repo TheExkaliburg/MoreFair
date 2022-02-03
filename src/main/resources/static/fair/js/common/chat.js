@@ -11,6 +11,7 @@ let chatData = {
     currentChatNumber: 1
 }
 
+
 function initChat(ladderNum) {
     stompClient.send("/app/chat/init/" + ladderNum, {}, JSON.stringify({
         'uuid': getCookie("_uuid")

@@ -1,5 +1,6 @@
 package de.kaliburg.morefair.account.entity;
 
+import de.kaliburg.morefair.account.type.AccountAccessRole;
 import de.kaliburg.morefair.dto.AccountDetailsDTO;
 import de.kaliburg.morefair.persistence.entity.Ranker;
 import lombok.*;
@@ -45,10 +46,10 @@ public class Account {
     private LocalDateTime lastLogin = LocalDateTime.now();
     @Column
     private String lastIp = "";
-    //@NonNull
-    //@Column(nullable = false)
-    //@Enumerated(EnumType.STRING)
-    //private AccountAccessRole accessRole = AccountAccessRole.PLAYER;
+    @NonNull
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private AccountAccessRole accessRole = AccountAccessRole.PLAYER;
 
     public AccountDetailsDTO convertToDTO() {
         return new AccountDetailsDTO(this);

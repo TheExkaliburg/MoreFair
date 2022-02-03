@@ -454,4 +454,8 @@ public class RankerService {
             return false;
         }
     }
+
+    public Ladder getHighestLadder() {
+        return ladders.values().stream().max(Comparator.comparing(Ladder::getNumber)).orElse(null);
+    }
 }

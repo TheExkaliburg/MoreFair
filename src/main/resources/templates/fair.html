@@ -19,10 +19,9 @@
     <script src="//cdn.rawgit.com/erosson/swarm-numberformat/v0.4.0/dist/swarm-numberformat.min.js"></script>
     <script src="/webjars/sockjs-client/sockjs.min.js"></script>
     <script src="/webjars/stomp-websocket/stomp.min.js"></script>
-    <script th:src="@{/fair/js/game/cookie.js}" type="text/javascript"></script>
+    <script th:src="@{/fair/js/common/cookie.js}" type="text/javascript"></script>
     <script th:src="@{/fair/js/game/morefair.js}" type="text/javascript"></script>
-    <script th:src="@{/fair/js/game/requests.js}" type="text/javascript"></script>
-    <script th:src="@{/fair/js/game/chat.js}" type="text/javascript"></script>
+    <script th:src="@{/fair/js/common/chat.js}" type="text/javascript"></script>
     <script th:src="@{/fair/js/game/ladder.js}" type="text/javascript"></script>
 
 
@@ -34,7 +33,7 @@
     });
 
     $(window).on("beforeunload", (event) => {
-        disconnect();
+        modTool.disconnect();
     })
 </script>
 <body>

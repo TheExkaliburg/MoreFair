@@ -49,8 +49,6 @@ async function setup() {
         minSuffix: 1e10,
         maxSmall: 0
     });
-
-
     connect();
 
     $('#messageInput')[0].addEventListener("keyup", event => {
@@ -81,6 +79,43 @@ function getInfo() {
     stompClient.send("/app/info", {}, JSON.stringify({
         'uuid': getCookie("_uuid")
     }));
+}
+
+function login() {
+    let uuid = getCookie("_uuid")
+    if (uuid === "" && !confirm("Do you want to create a new account?")) {
+        return;
+    }
+
+    stompClient.send("/app/account/login", {}, JSON.stringify({
+        'uuid': uuid
+    }));
+}
+
+
+function onLoginReceived(message) {
+    if (message.status === "OK" || message.status === "CREATED") {
+        if (message.content) {
+            identityData = message.content;
+            setCookie("_uuid", identityData.uuid, 365 * 5);
+        }
+
+        // Init Chat Connection
+        chatSubscription = stompClient.subscribe('/topic/chat/' + identityData.highestCurrentLadder,
+            (message) => handleChatUpdates(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
+        stompClient.subscribe('/user/queue/chat/',
+            (message) => handleChatInit(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
+        initChat(identityData.highestCurrentLadder);
+
+        // Init Ladder Connection
+        ladderSubscription = stompClient.subscribe('/topic/ladder/' + identityData.highestCurrentLadder,
+            (message) => handleLadderUpdates(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
+        stompClient.subscribe('/user/queue/ladder/',
+            (message) => handleLadderInit(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
+        stompClient.subscribe('/user/queue/ladder/updates',
+            (message) => handlePrivateLadderUpdates(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
+        initLadder(identityData.highestCurrentLadder);
+    }
 }
 
 function promptNameChange() {
