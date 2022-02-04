@@ -251,7 +251,7 @@ public class RankerService {
         return false;
     }
 
-    public boolean promote(Long accountId, Ladder ladder) {
+    public boolean promote(Long accountId, Ladder ladder, Boolean isAssholeEvent) {
         try {
             Ranker ranker = findActiveRankerOfAccountOnLadder(accountId, ladder);
             if (ranker == null) return false;
@@ -273,7 +273,6 @@ public class RankerService {
                 neededPointDiff = powerDiff.multiply(BigInteger.valueOf(FairController.MANUAL_PROMOTE_WAIT_TIME)).abs();
             }
 
-
             // If
             // - Ranker is #1
             // - There are enough people to promote
@@ -289,6 +288,12 @@ public class RankerService {
                 Ranker newRanker = createNewRankerForAccountOnLadder(ranker.getAccount(), ranker.getLadder().getNumber() + 1);
                 newRanker.setVinegar(ranker.getVinegar());
                 newRanker.setGrapes(ranker.getGrapes());
+                if (isAssholeEvent && ranker.getLadder().getNumber().compareTo(FairController.BASE_ASSHOLE_LADDER + accountRepository.findMaxTimesAsshole()) == 0) {
+                    Account account = accountRepository.findByUuid(ranker.getAccount().getUuid());
+                    account.setIsAsshole(true);
+                    saveAccount(account);
+                    return true;
+                }
                 return true;
             }
         } catch (Exception e) {
@@ -300,6 +305,7 @@ public class RankerService {
     }
 
 
+    @Deprecated
     public boolean beAsshole(Long accountId, Ladder ladder) {
         try {
             Ranker ranker = findActiveRankerOfAccountOnLadder(accountId, ladder);
