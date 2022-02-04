@@ -67,12 +67,12 @@ public class LadderCalculator {
                                             eventsToBeRemoved.add(e);
                                     }
                                     case PROMOTE -> {
-                                        if (!rankerService.promote(e.getAccountId(), ladder))
+                                        if (!rankerService.promote(e.getAccountId(), ladder, false))
                                             eventsToBeRemoved.add(e);
                                     }
                                     case ASSHOLE -> {
                                         eventsToBeRemoved.add(e);
-                                        if (rankerService.beAsshole(e.getAccountId(), ladder))
+                                        if (rankerService.promote(e.getAccountId(), ladder, true))
                                             didPressAssholeButton = true;
                                     }
                                     case VINEGAR -> {

@@ -390,7 +390,7 @@ function calculateStats() {
                 ladderStats.pointsNeededForManualPromote = Decimal.max((leadingRanker.you ? pursuingRanker : leadingRanker)
                     .points.add(neededPointDiff), infoData.pointsForPromote);
             } else {
-                ladderStats.pointsNeededForManualPromote = ladderData.firstRanker.points.add(1);
+                ladderStats.pointsNeededForManualPromote = ladderData.firstRanker.you ? ladderData.rankers[1].points.add(1) : ladderData.firstRanker.points.add(1);
             }
         } else {
             ladderStats.pointsNeededForManualPromote = infoData.pointsForPromote;
