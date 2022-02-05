@@ -24,8 +24,11 @@ import java.util.UUID;
 @Controller
 @Log4j2
 public class ModerationController {
+    public final static String CHAT_UPDATE_DESTINATION = "/topic/mod/chat";
+    public final static String GAME_UPDATE_DESTINATION = "/topic/mod/game";
     private final static String INFO_DESTINATION = "/queue/mod/info";
-
+    private final static String CHAT_DESTINATION = "/queue/mod/chat";
+    private final static String GAME_DESTINATION = "/queue/mod/game";
     private final AccountService accountService;
     private final WSUtils wsUtils;
     private final RankerService ladderService;
@@ -72,15 +75,15 @@ public class ModerationController {
 
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null || !(account.getAccessRole().equals(AccountAccessRole.MODERATOR) || account.getAccessRole().equals(AccountAccessRole.OWNER))) {
-                wsUtils.convertAndSendToUser(sha, INFO_DESTINATION, HttpStatus.FORBIDDEN);
+                wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.FORBIDDEN);
             } else {
                 ArrayList<Message> messages = messageService.getAllMessages();
-                wsUtils.convertAndSendToUser(sha, INFO_DESTINATION, new ModChatData(messages));
+                wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, new ModChatData(messages));
             }
         } catch (IllegalArgumentException e) {
-            wsUtils.convertAndSendToUser(sha, INFO_DESTINATION, HttpStatus.BAD_REQUEST);
+            wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            wsUtils.convertAndSendToUser(sha, INFO_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
+            wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
             log.error(e.getMessage());
             e.printStackTrace();
         }
@@ -93,16 +96,16 @@ public class ModerationController {
 
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null || !(account.getAccessRole().equals(AccountAccessRole.MODERATOR) || account.getAccessRole().equals(AccountAccessRole.OWNER))) {
-                wsUtils.convertAndSendToUser(sha, INFO_DESTINATION, HttpStatus.FORBIDDEN);
+                wsUtils.convertAndSendToUser(sha, GAME_DESTINATION, HttpStatus.FORBIDDEN);
             } else {
                 Integer highestLadder = ladderService.getHighestLadder().getNumber();
                 ModerationInfoData infoData = new ModerationInfoData(highestLadder, account.getAccessRole());
-                wsUtils.convertAndSendToUser(sha, INFO_DESTINATION, infoData);
+                wsUtils.convertAndSendToUser(sha, GAME_DESTINATION, infoData);
             }
         } catch (IllegalArgumentException e) {
-            wsUtils.convertAndSendToUser(sha, INFO_DESTINATION, HttpStatus.BAD_REQUEST);
+            wsUtils.convertAndSendToUser(sha, GAME_DESTINATION, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            wsUtils.convertAndSendToUser(sha, INFO_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
+            wsUtils.convertAndSendToUser(sha, GAME_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
             log.error(e.getMessage());
             e.printStackTrace();
         }

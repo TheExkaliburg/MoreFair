@@ -1,12 +1,4 @@
-let modInfo = {
-    highestLadder: 1
-}
-
 let modTool;
-
-function setup() {
-    modTool = new ModerationTool(true);
-}
 
 class ModerationTool {
     #stompClient;
@@ -67,19 +59,19 @@ class ModerationTool {
 
     getChatUpdates() {
         this.subscribe('/user/queue/mod/chat', (message) => this.#onChatReceived(JSON.parse(message.body)));
-        this.subscribe('/topic/mod/chat', (message) => this.#onChatUpdatesReceived(JSON.parse(message.body)));
         this.send("/app/mod/chat");
     }
 
     #onChatReceived(message) {
         if (message.content) {
-            this.#chatUpdates = new ModGameEvents(message.content);
+            this.#chatUpdates = new ModChat(message.content);
+            this.subscribe('/topic/mod/chat', (message) => this.#onChatUpdatesReceived(JSON.parse(message.body)));
         }
     }
 
     #onChatUpdatesReceived(message) {
-        if (message.content) {
-            this.#chatUpdates.update(message.content);
+        if (message) {
+            this.#chatUpdates.update(message);
         }
     }
 
@@ -88,7 +80,7 @@ class ModerationTool {
     }
 
     #onGameUpdatesReceived(message) {
-        if (message.content) {
+        if (message) {
             this.#gameUpdates = new ModGameEvents(message.content);
         }
     }
@@ -105,14 +97,32 @@ class ModInfo {
 }
 
 class ModChat {
-    #dom;
+    #rowTemplate;
+    #data;
 
     constructor(data) {
-        console.log(data);
+        this.#rowTemplate = Handlebars.compile($('#messageRow-template').html());
+        this.#data = data;
+        this.#draw();
     }
 
     update(data) {
+        this.#data.messages.unshift(data);
+        this.#draw();
+    }
 
+    #draw() {
+        this.#data.tags = tags;
+        let html = this.#rowTemplate(this.#data);
+        let messageBody = $('#messageBody')
+        messageBody.html(html);
+        console.log(messageBody.each());
+        messageBody.each(e => e.on("click", this.#ban));
+    }
+
+    #ban(event) {
+        let accountId = event.currentTarget.dataset.accountId;
+        console.log("Banning Account " + accountId);
     }
 }
 
@@ -126,4 +136,5 @@ class ModGameEvents {
     update(data) {
 
     }
+
 }
