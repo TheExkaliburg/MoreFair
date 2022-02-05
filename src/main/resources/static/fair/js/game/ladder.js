@@ -322,7 +322,7 @@ function calculateLadder(delta) {
             if (ladderData.rankers[i].rank !== 1)
                 ladderData.rankers[i].power = ladderData.rankers[i].power.add(
                     new Decimal((ladderData.rankers[i].bias + ladderData.rankers[i].rank - 1) * ladderData.rankers[i].multiplier)
-                        .mul(new Decimal(delta).floor()));
+                        .mul(new Decimal(delta)).floor());
             ladderData.rankers[i].points = ladderData.rankers[i].points.add(ladderData.rankers[i].power.mul(delta).floor());
 
             // Calculating Vinegar based on Grapes count
