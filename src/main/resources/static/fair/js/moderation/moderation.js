@@ -64,7 +64,7 @@ class ModerationTool {
 
     #onChatReceived(message) {
         if (message.content) {
-            this.#chatUpdates = new ModChat(message.content);
+            this.#chatUpdates = new ModChat(message.content, this);
             this.subscribe('/topic/mod/chat', (message) => this.#onChatUpdatesReceived(JSON.parse(message.body)));
         }
     }
@@ -81,9 +81,39 @@ class ModerationTool {
 
     #onGameUpdatesReceived(message) {
         if (message) {
-            this.#gameUpdates = new ModGameEvents(message.content);
+            this.#gameUpdates = new ModGameEvents(message.content, this);
         }
     }
+
+    ban(event) {
+        let dataSet = event.target.dataset;
+        if (confirm(`Are you sure you want to ban ${dataSet.username}`)) {
+            console.log(`Banning Account ${dataSet.accountId}`);
+        }
+    }
+
+    mute(event) {
+        let dataSet = event.target.dataset;
+        if (confirm(`Are you sure you want to mute ${dataSet.username}`)) {
+            console.log(`Muting Account ${dataSet.accountId}`);
+        }
+    }
+
+    rename(event) {
+        let dataSet = event.target.dataset;
+        let newName = prompt(`What would you like to name ${dataSet.username}`);
+        if (newName) {
+            console.log(`Renaming ${dataSet.username} to ${newName}`);
+        }
+    }
+
+    free(event) {
+        let dataSet = event.target.dataset;
+        if (confirm(`Are you sure you want to free ${dataSet.username}}`)) {
+            console.log(`Freeing Account ${dataSet.accountId}`);
+        }
+    }
+
 }
 
 class ModInfo {
@@ -97,10 +127,12 @@ class ModInfo {
 }
 
 class ModChat {
+    #modTool
     #rowTemplate;
     #data;
 
-    constructor(data) {
+    constructor(data, tool) {
+        this.#modTool = tool;
         this.#rowTemplate = Handlebars.compile($('#messageRow-template').html());
         this.#data = data;
         this.#draw();
@@ -116,14 +148,13 @@ class ModChat {
         let html = this.#rowTemplate(this.#data);
         let messageBody = $('#messageBody')
         messageBody.html(html);
-        console.log(messageBody.each());
-        messageBody.each(e => e.on("click", this.#ban));
+        $("*[id='banSymbol']").on('click', this.#modTool.ban.bind(this));
+        $("*[id='muteSymbol']").on('click', this.#modTool.mute);
+        $("*[id='nameSymbol']").on('click', this.#modTool.rename.bind(this));
+        $("*[id='freeSymbol']").on('click', this.#modTool.free);
     }
 
-    #ban(event) {
-        let accountId = event.currentTarget.dataset.accountId;
-        console.log("Banning Account " + accountId);
-    }
+
 }
 
 class ModGameEvents {

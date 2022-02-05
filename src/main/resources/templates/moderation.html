@@ -68,9 +68,10 @@
     <tr>
         <td>[{{timeCreated}}] {{assholeTag}} - {{username}}</td>
         <td>
-            <a href="#" id="banSymbol" data-account-id="{{accountId}}">🔨</a>
-            <a href="#" id="muteSymbol" data-account-id="{{accountId}}">🤐</a>
-            <a href="#" id="nameSymbol" data-account-id="{{accountId}}">💬</a>
+            <a href="#" id="banSymbol" data-account-id="{{accountId}}" data-username="{{username}}">🔨</a>
+            <a href="#" id="muteSymbol" data-account-id="{{accountId}}" data-username="{{username}}">🤐</a>
+            <a href="#" id="nameSymbol" data-account-id="{{accountId}}" data-username="{{username}}">💬</a>
+            <a href="#" id="freeSymbol" data-account-id="{{accountId}}" data-username="{{username}}">🔙</a>
         </td>
         <td>{{message}}</td>
     </tr>
