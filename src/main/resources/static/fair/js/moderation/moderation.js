@@ -77,12 +77,18 @@ class ModerationTool {
 
     getGameUpdates() {
         this.subscribe('/topic/mod/game', (message) => this.#onGameUpdatesReceived(JSON.parse(message.body)));
+        this.subscribe('/topic/mod/global', (message) => this.#onGlobalUpdatesReceived(JSON.parse(message.body)));
     }
 
     #onGameUpdatesReceived(message) {
         if (message) {
             this.#gameUpdates = new ModGameEvents(message.content, this);
         }
+    }
+
+    #onGameUpdatesReceived(message) {
+        if (!this.#gameUpdates) this.#gameUpdates = new ModGameEvents(message.content, this);
+
     }
 
     ban(event) {

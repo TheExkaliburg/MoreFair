@@ -14,9 +14,11 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.concurrent.Semaphore;
 
 @Service
 @Log4j2
@@ -26,12 +28,19 @@ public class AccountService {
     private final MessageService messageService;
 
     @Getter
+    private Semaphore accountSem = new Semaphore(1);
+    @Getter
     private ArrayList<Account> accountList = new ArrayList<>();
 
     public AccountService(AccountRepository accountRepository, RankerService rankerService, MessageService messageService) {
         this.accountRepository = accountRepository;
         this.rankerService = rankerService;
         this.messageService = messageService;
+    }
+
+    @PostConstruct
+    public void init() {
+
     }
 
 
