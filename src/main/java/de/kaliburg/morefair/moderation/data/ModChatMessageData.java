@@ -21,7 +21,7 @@ public class ModChatMessageData {
         this.username = StringEscapeUtils.unescapeJava(message.getAccount().getUsername());
         this.assholeTag = FairController.ASSHOLE_TAGS.get(message.getAccount().getTimesAsshole());
         this.accountId = message.getAccount().getId();
-        this.timeCreated = message.getCreatedOn().format(DateTimeFormatter.ofPattern("HH:mm"));
+        this.timeCreated = message.getCreatedOn().format(DateTimeFormatter.ofPattern("EE HH:mm"));
         this.ladderNumber = message.getLadder().getNumber();
     }
 }

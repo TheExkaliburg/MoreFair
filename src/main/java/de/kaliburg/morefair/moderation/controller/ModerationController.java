@@ -89,4 +89,24 @@ public class ModerationController {
             e.printStackTrace();
         }
     }
+
+    @MessageMapping("/mod/ban")
+    public void ban(SimpMessageHeaderAccessor sha, WSMessage wsMessage) throws Exception {
+        try {
+            String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
+
+            Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
+            if (account == null || !(account.getAccessRole().equals(AccountAccessRole.MODERATOR) || account.getAccessRole().equals(AccountAccessRole.OWNER))) {
+                wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.FORBIDDEN);
+            } else {
+                accountService.ban
+            }
+        } catch (IllegalArgumentException e) {
+            wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }

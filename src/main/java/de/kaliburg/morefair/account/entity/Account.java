@@ -33,7 +33,7 @@ public class Account {
     @NonNull
     @Column(nullable = false)
     private String username;
-    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "account", fetch = FetchType.EAGER)
     private List<Ranker> rankers = new ArrayList<>();
     @NonNull
     @Column(nullable = false)

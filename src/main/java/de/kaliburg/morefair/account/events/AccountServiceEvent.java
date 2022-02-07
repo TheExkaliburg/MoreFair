@@ -4,19 +4,19 @@ import de.kaliburg.morefair.account.entity.Account;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
-public class AccountEvent extends ApplicationEvent {
+public class AccountServiceEvent extends ApplicationEvent {
     @Getter
     private final Account account;
     @Getter
-    private final AccountEventType eventType;
+    private final AccountServiceEventType eventType;
 
-    public AccountEvent(Object source, Account account, AccountEventType eventType) {
+    public AccountServiceEvent(Object source, Account account, AccountServiceEventType eventType) {
         super(source);
         this.account = account;
         this.eventType = eventType;
     }
 
-    public enum AccountEventType {
+    public enum AccountServiceEventType {
         CREATE, UPDATE
     }
 }

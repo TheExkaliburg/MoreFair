@@ -2,7 +2,7 @@ package de.kaliburg.morefair.ladder;
 
 import de.kaliburg.morefair.FairController;
 import de.kaliburg.morefair.account.entity.Account;
-import de.kaliburg.morefair.account.events.AccountEvent;
+import de.kaliburg.morefair.account.events.AccountServiceEvent;
 import de.kaliburg.morefair.account.service.AccountService;
 import de.kaliburg.morefair.chat.MessageService;
 import de.kaliburg.morefair.dto.LadderViewDTO;
@@ -15,6 +15,7 @@ import de.kaliburg.morefair.utils.UpgradeUtils;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,10 +30,9 @@ import java.util.concurrent.Semaphore;
 
 @Service
 @Log4j2
-public class RankerService implements ApplicationListener<AccountEvent> {
+public class RankerService implements ApplicationListener<AccountServiceEvent> {
     private final RankerRepository rankerRepository;
     private final LadderRepository ladderRepository;
-    private final AccountService accountService;
     private final MessageService messageService;
     @Getter
     private final Map<Integer, List<Event>> eventMap = new HashMap<>();
@@ -44,15 +44,16 @@ public class RankerService implements ApplicationListener<AccountEvent> {
     private final Semaphore eventSem = new Semaphore(1);
     @Getter
     private final Map<Integer, Ladder> ladders = new HashMap<>();
+    private final AccountService accountService;
 
-    public RankerService(RankerRepository rankerRepository, LadderRepository ladderRepository, AccountService accountService, MessageService messageService) {
+    public RankerService(RankerRepository rankerRepository, LadderRepository ladderRepository, MessageService messageService, @Lazy AccountService accountService) {
         this.rankerRepository = rankerRepository;
         this.ladderRepository = ladderRepository;
-        this.accountService = accountService;
         this.messageService = messageService;
+        this.accountService = accountService;
     }
 
-    @PostConstruct
+    /*@PostConstruct
     @Transactional
     public void test() {
         Ladder ladder = ladderRepository.findAllLaddersJoinedWithRankers().stream().toList().get(0);
@@ -66,7 +67,7 @@ public class RankerService implements ApplicationListener<AccountEvent> {
         ranker.setPoints(ranker.getPoints().add(BigInteger.ONE));
         rankerRepository.saveAll(List.of(ranker));
         System.out.println(ranker.getAccount().getUsername());
-    }
+    }*/
 
     @PostConstruct
     public void init() {
@@ -193,11 +194,13 @@ public class RankerService implements ApplicationListener<AccountEvent> {
 
     public void resetEvents() {
         eventMap.values().forEach(List::clear);
+        globalEventList.clear();
     }
 
     public Ranker createNewRankerForAccountOnLadder(Account account, Integer ladderNum) {
         Ladder ladder = findLadder(ladderNum);
         if (ladder == null) ladder = createNewLadder(ladderNum);
+
 
         Ranker ranker = saveRanker(new Ranker(UUID.randomUUID(), ladder, account, ladder.getRankers().size() + 1));
         ladder.getRankers().add(ranker);
@@ -480,21 +483,22 @@ public class RankerService implements ApplicationListener<AccountEvent> {
     }
 
     @Override
-    public void onApplicationEvent(AccountEvent event) {
+    public void onApplicationEvent(AccountServiceEvent event) {
         switch (event.getEventType()) {
             case CREATE -> onCreatedAccount(event);
             case UPDATE -> onUpdatedAccount(event);
         }
     }
 
-    private void onCreatedAccount(AccountEvent event) {
+    private void onCreatedAccount(AccountServiceEvent event) {
         Ranker ranker = createNewRankerForAccountOnLadder(event.getAccount(), 1);
         event.getAccount().getRankers().add(ranker);
     }
 
-    private void onUpdatedAccount(AccountEvent event) {
-        for (Ladder ladder : getLadders().values()) {
-            for (Ranker ranker : getLadders().get(ladder.getNumber()).getRankers()) {
+    private void onUpdatedAccount(AccountServiceEvent event) {
+        for (Ranker accRanker : event.getAccount().getRankers()) {
+            Ladder ladder = findLadder(accRanker.getLadder());
+            for (Ranker ranker : ladder.getRankers()) {
                 if (ranker.getAccount().getId().equals(event.getAccount().getId())) {
                     ranker.setAccount(event.getAccount());
                 }

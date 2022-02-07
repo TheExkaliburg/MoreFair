@@ -88,7 +88,9 @@ class ModerationTool {
             for (let i = 1; i <= this.#modInfo.highestLadder; i++) {
                 this.subscribe('/topic/ladder/' + i, (message) => this.#onGameUpdatesReceived(JSON.parse(message.body), i));
             }
-            this.subscribe('/topic/global', (message => this.#onGameUpdatesReceived(JSON.parse(message.body), 0)));
+
+            this.subscribe('/topic/global/', (message) => this.#onGameUpdatesReceived({events: JSON.parse(message.body)}, 0));
+            this.subscribe('/topic/mod/', (message) => this.#onGameUpdatesReceived({events: JSON.parse(message.body)}, 0));
         }
     }
 
@@ -160,10 +162,11 @@ class ModChat {
         let html = this.#rowTemplate(this.#data);
         let messageBody = $('#messageBody');
         messageBody.html(html);
-        $("*[id='banSymbol']").on('click', this.#modTool.ban);
-        $("*[id='muteSymbol']").on('click', this.#modTool.mute);
-        $("*[id='nameSymbol']").on('click', this.#modTool.rename);
-        $("*[id='freeSymbol']").on('click', this.#modTool.free);
+        console.log($("#messageBody .banSymbol"));
+        $("#messageBody .banSymbol").on('click', this.#modTool.ban);
+        $("#messageBody .muteSymbol").on('click', this.#modTool.mute);
+        $("#messageBody .nameSymbol").on('click', this.#modTool.rename);
+        $("#messageBody .freeSymbol").on('click', this.#modTool.free);
     }
 
 
@@ -180,7 +183,7 @@ class ModGameEvents {
         this.#rankers = data.rankers;
         this.#rowTemplate = Handlebars.compile($('#updateRow-template').html())
         this.#data = {events: []};
-        this.#draw()
+        this.#draw();
     }
 
     update(data, ladder) {
@@ -193,9 +196,11 @@ class ModGameEvents {
                 }
                 this.#rankers.unshift(newRanker);
             }
-            this.#rankers.forEach(ranker => {
-                if (ranker.accountId === event.accountId) {
-                    event.username = ranker.username;
+            let ranker;
+            this.#rankers.forEach(r => {
+                if (r.accountId === event.accountId) {
+                    event.username = r.username;
+                    ranker = r;
                 }
             });
 
@@ -206,8 +211,13 @@ class ModGameEvents {
                 case 'VINEGAR':
                 case 'AUTO_PROMOTE':
                 case 'NAME_CHANGE':
+                    console.log(event);
                     this.#data.events.unshift(event);
                     break;
+            }
+
+            if (event.eventType === "NAME_CHANGE") {
+                ranker.username = event.data;
             }
         });
         this.#draw();

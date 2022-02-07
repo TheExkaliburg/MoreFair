@@ -1,7 +1,7 @@
 package de.kaliburg.morefair.account.service;
 
 import de.kaliburg.morefair.account.entity.Account;
-import de.kaliburg.morefair.account.events.AccountEvent;
+import de.kaliburg.morefair.account.events.AccountServiceEvent;
 import de.kaliburg.morefair.account.repository.AccountRepository;
 import de.kaliburg.morefair.dto.AccountDetailsDTO;
 import de.kaliburg.morefair.events.Event;
@@ -25,7 +25,6 @@ public class AccountService {
         this.eventPublisher = eventPublisher;
     }
 
-
     public AccountDetailsDTO createNewAccount() {
         Account result = new Account(UUID.randomUUID(), "");
         result = saveAccount(result);
@@ -33,7 +32,7 @@ public class AccountService {
         result = saveAccount(result);
         result = accountRepository.findByUuid(result.getUuid());
 
-        eventPublisher.publishEvent(new AccountEvent(this, result, AccountEvent.AccountEventType.CREATE));
+        eventPublisher.publishEvent(new AccountServiceEvent(this, result, AccountServiceEvent.AccountServiceEventType.CREATE));
 
         result = accountRepository.findByUuid(result.getUuid());
         log.info("Created a new Account with the uuid {} (#{}).", result.getUuid().toString(), result.getId());
@@ -43,7 +42,8 @@ public class AccountService {
     @Transactional
     public Account saveAccount(Account account) {
         Account result = accountRepository.save(account);
-        eventPublisher.publishEvent(new AccountEvent(this, result, AccountEvent.AccountEventType.UPDATE));
+        //result = accountRepository.findByUuid(result.getUuid());
+        eventPublisher.publishEvent(new AccountServiceEvent(this, result, AccountServiceEvent.AccountServiceEventType.UPDATE));
         return result;
     }
 
@@ -83,5 +83,9 @@ public class AccountService {
 
     public Account findByUuid(UUID uuid) {
         return accountRepository.findByUuid(uuid);
+    }
+
+    public boolean ban(long accountId) {
+        return true;
     }
 }

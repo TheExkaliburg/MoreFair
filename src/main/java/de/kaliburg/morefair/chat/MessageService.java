@@ -1,7 +1,7 @@
 package de.kaliburg.morefair.chat;
 
 import de.kaliburg.morefair.account.entity.Account;
-import de.kaliburg.morefair.account.events.AccountEvent;
+import de.kaliburg.morefair.account.events.AccountServiceEvent;
 import de.kaliburg.morefair.dto.ChatDTO;
 import de.kaliburg.morefair.ladder.Ladder;
 import de.kaliburg.morefair.ladder.LadderRepository;
@@ -18,10 +18,9 @@ import java.util.*;
 
 @Service
 @Log4j2
-public class MessageService implements ApplicationListener<AccountEvent> {
+public class MessageService implements ApplicationListener<AccountServiceEvent> {
     private final MessageRepository messageRepository;
     private final LadderRepository ladderRepository;
-
     @Getter
     private Map<Integer, Ladder> chats = new HashMap<>();
 
@@ -97,8 +96,8 @@ public class MessageService implements ApplicationListener<AccountEvent> {
     }
 
     @Override
-    public void onApplicationEvent(AccountEvent event) {
-        if (event.getEventType().equals(AccountEvent.AccountEventType.UPDATE)) {
+    public void onApplicationEvent(AccountServiceEvent event) {
+        if (event.getEventType().equals(AccountServiceEvent.AccountServiceEventType.UPDATE)) {
             for (Ladder ladder : chats.values()) {
                 for (Message message : chats.get(ladder.getNumber()).getMessages()) {
                     if (message.getAccount().getId().equals(event.getAccount().getId())) {

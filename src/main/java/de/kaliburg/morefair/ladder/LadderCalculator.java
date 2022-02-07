@@ -96,7 +96,7 @@ public class LadderCalculator {
                             }
                             heartbeatMap.put(ladder.getNumber(), new HeartbeatDTO(new ArrayList<>(events)));
                         }
-                        globalEvents = rankerService.getGlobalEventList();
+                        globalEvents = new ArrayList<>(rankerService.getGlobalEventList());
                         for (int i = 0; i < globalEvents.size(); i++) {
                             Event e = globalEvents.get(i);
                             switch (e.getEventType()) {
@@ -124,16 +124,13 @@ public class LadderCalculator {
 
                 // If someone was an Asshole and the reset worked, should notify all and end calculation
                 if (didPressAssholeButton && rankerService.resetAllLadders()) {
-                    for (Ladder ladder : rankerService.getLadders().values()) {
-                        heartbeatMap.get(ladder.getNumber()).setSecondsPassed(deltaSec);
-                        heartbeatMap.get(ladder.getNumber()).setEvents(new ArrayList<>());
-                        heartbeatMap.get(ladder.getNumber()).getEvents().add(new Event(EventType.RESET, 0L));
-                        wsUtils.convertAndSendToAll(RankerController.LADDER_UPDATE_DESTINATION + ladder.getNumber(), heartbeatMap.get(ladder.getNumber()));
-                    }
+                    globalEvents.add(new Event(EventType.RESET, 0L));
+                    wsUtils.convertAndSendToAll(RankerController.GLOBAL_UPDATE_DESTINATION, globalEvents);
                     return;
                 }
 
-                wsUtils.convertAndSendToAll(RankerController.GLOBAL_UPDATE_DESTINATION, globalEvents);
+                if (!globalEvents.isEmpty())
+                    wsUtils.convertAndSendToAll(RankerController.GLOBAL_UPDATE_DESTINATION, globalEvents);
 
                 // Otherwise, just send the default Broadcasts
                 for (Ladder ladder : rankerService.getLadders().values()) {
