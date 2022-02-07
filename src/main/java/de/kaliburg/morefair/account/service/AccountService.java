@@ -1,46 +1,28 @@
 package de.kaliburg.morefair.account.service;
 
 import de.kaliburg.morefair.account.entity.Account;
+import de.kaliburg.morefair.account.events.AccountEvent;
 import de.kaliburg.morefair.account.repository.AccountRepository;
 import de.kaliburg.morefair.dto.AccountDetailsDTO;
 import de.kaliburg.morefair.events.Event;
-import de.kaliburg.morefair.persistence.entity.Ladder;
-import de.kaliburg.morefair.persistence.entity.Message;
-import de.kaliburg.morefair.persistence.entity.Ranker;
-import de.kaliburg.morefair.service.MessageService;
-import de.kaliburg.morefair.service.RankerService;
-import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Semaphore;
 
 @Service
 @Log4j2
 public class AccountService {
     private final AccountRepository accountRepository;
-    private final RankerService rankerService;
-    private final MessageService messageService;
+    private final ApplicationEventPublisher eventPublisher;
 
-    @Getter
-    private Semaphore accountSem = new Semaphore(1);
-    @Getter
-    private ArrayList<Account> accountList = new ArrayList<>();
-
-    public AccountService(AccountRepository accountRepository, RankerService rankerService, MessageService messageService) {
+    public AccountService(AccountRepository accountRepository, ApplicationEventPublisher eventPublisher) {
         this.accountRepository = accountRepository;
-        this.rankerService = rankerService;
-        this.messageService = messageService;
-    }
-
-    @PostConstruct
-    public void init() {
-
+        this.eventPublisher = eventPublisher;
     }
 
 
@@ -51,18 +33,7 @@ public class AccountService {
         result = saveAccount(result);
         result = accountRepository.findByUuid(result.getUuid());
 
-        try {
-            rankerService.getLadderSem().acquire();
-            try {
-                Ranker ranker = rankerService.createNewRankerForAccountOnLadder(result, 1);
-                result.getRankers().add(ranker);
-            } finally {
-                rankerService.getLadderSem().release();
-            }
-        } catch (InterruptedException e) {
-            log.error(e.getMessage());
-            e.printStackTrace();
-        }
+        eventPublisher.publishEvent(new AccountEvent(this, result, AccountEvent.AccountEventType.CREATE));
 
         result = accountRepository.findByUuid(result.getUuid());
         log.info("Created a new Account with the uuid {} (#{}).", result.getUuid().toString(), result.getId());
@@ -70,31 +41,21 @@ public class AccountService {
     }
 
     @Transactional
-    protected Account saveAccount(Account account) {
-        return accountRepository.save(account);
+    public Account saveAccount(Account account) {
+        Account result = accountRepository.save(account);
+        eventPublisher.publishEvent(new AccountEvent(this, result, AccountEvent.AccountEventType.UPDATE));
+        return result;
     }
 
     public Account findAccountByUUID(UUID uuid) {
         return accountRepository.findByUuid(uuid);
     }
 
-    public boolean updateUsername(Long accountId, Ladder ladder, Event event) {
+    public boolean updateUsername(Long accountId, Event event) {
         Account account = findAccountById(accountId);
         String newUsername = (String) event.getData();
         account.setUsername(newUsername);
         account = saveAccount(account);
-
-        for (Ranker ranker : rankerService.getLadders().get(ladder.getNumber()).getRankers()) {
-            if (ranker.getAccount().getId().equals(accountId)) {
-                ranker.setAccount(account);
-            }
-        }
-
-        for (Message message : messageService.getChats().get(ladder.getNumber()).getMessages()) {
-            if (message.getAccount().getId().equals(accountId)) {
-                message.setAccount(account);
-            }
-        }
         return true;
     }
 
@@ -110,5 +71,17 @@ public class AccountService {
 
     public Account findAccountById(Long accountId) {
         return accountRepository.findById(accountId).get();
+    }
+
+    public Integer findMaxTimesAsshole() {
+        return accountRepository.findMaxTimesAsshole();
+    }
+
+    public Set<Account> findAllAccountsJoinedWithRankers() {
+        return accountRepository.findAllAccountsJoinedWithRankers();
+    }
+
+    public Account findByUuid(UUID uuid) {
+        return accountRepository.findByUuid(uuid);
     }
 }

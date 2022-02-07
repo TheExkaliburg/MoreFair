@@ -1,14 +1,10 @@
-package de.kaliburg.morefair.controller;
+package de.kaliburg.morefair.chat;
 
 import de.kaliburg.morefair.account.entity.Account;
 import de.kaliburg.morefair.account.service.AccountService;
 import de.kaliburg.morefair.dto.ChatDTO;
+import de.kaliburg.morefair.ladder.RankerService;
 import de.kaliburg.morefair.messages.WSMessage;
-import de.kaliburg.morefair.moderation.controller.ModerationController;
-import de.kaliburg.morefair.moderation.data.ModChatMessageData;
-import de.kaliburg.morefair.persistence.entity.Message;
-import de.kaliburg.morefair.service.MessageService;
-import de.kaliburg.morefair.service.RankerService;
 import de.kaliburg.morefair.utils.WSUtils;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
@@ -75,7 +71,6 @@ public class ChatController {
             if (number <= rankerService.findHighestRankerByAccount(account).getLadder().getNumber()) {
                 Message answer = messageService.writeMessage(account, number, message);
                 wsUtils.convertAndSendToAll(CHAT_UPDATE_DESTINATION + number, answer.convertToDTO());
-                wsUtils.convertAndSendToAll(ModerationController.CHAT_UPDATE_DESTINATION, new ModChatMessageData(answer));
             }
         } catch (Exception e) {
             log.error(e.getMessage());

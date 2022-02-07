@@ -1,7 +1,7 @@
 package de.kaliburg.morefair.moderation.data;
 
-import de.kaliburg.morefair.controller.FairController;
-import de.kaliburg.morefair.persistence.entity.Message;
+import de.kaliburg.morefair.FairController;
+import de.kaliburg.morefair.chat.Message;
 import lombok.Data;
 import org.apache.commons.text.StringEscapeUtils;
 

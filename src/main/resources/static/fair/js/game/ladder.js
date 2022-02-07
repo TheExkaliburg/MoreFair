@@ -158,6 +158,13 @@ function handleLadderUpdates(message) {
     updateLadder();
 }
 
+function handleGlobalUpdates(message) {
+    console.log(message);
+    if (message) {
+        message.events.forEach(e => handleEvent(e))
+    }
+}
+
 
 function handlePrivateLadderUpdates(message) {
     if (message) {

@@ -36,15 +36,23 @@
     $(window).on("beforeunload", (event) => {
         modTool.disconnect();
     })
-
-    let tags = ["", "a", "b"];
 </script>
 <body>
 <div class="m-1">
     <div class="container-fluid">
         <div class="row">
             <div class="col-6">
-
+                <table class="table table-sm table-striped table-borderless">
+                    <thead>
+                    <tr>
+                        <th class="col-4"></th>
+                        <th class="col-2"></th>
+                        <th class="col"></th>
+                    </tr>
+                    </thead>
+                    <tbody id="updateBody">
+                    </tbody>
+                </table>
             </div>
             <div class="col-6">
                 <table class="table table-sm table-striped table-borderless">
@@ -63,6 +71,14 @@
     </div>
 </div>
 </body>
+<script id="updateRow-template" type="text/x-handlebars-template">
+    {{#each events}}
+    <tr>
+        <td>[L{{ladder}}] {{username}} {{eventType}}</td>
+    </tr>
+    {{/each}}
+</script>
+
 <script id="messageRow-template" type="text/x-handlebars-template">
     {{#each messages}}
     <tr>

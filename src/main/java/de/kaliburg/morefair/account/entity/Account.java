@@ -2,7 +2,7 @@ package de.kaliburg.morefair.account.entity;
 
 import de.kaliburg.morefair.account.type.AccountAccessRole;
 import de.kaliburg.morefair.dto.AccountDetailsDTO;
-import de.kaliburg.morefair.persistence.entity.Ranker;
+import de.kaliburg.morefair.ladder.Ranker;
 import lombok.*;
 import lombok.experimental.Accessors;
 

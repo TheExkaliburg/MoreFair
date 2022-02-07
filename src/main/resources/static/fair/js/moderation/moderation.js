@@ -65,7 +65,9 @@ class ModerationTool {
     #onChatReceived(message) {
         if (message.content) {
             this.#chatUpdates = new ModChat(message.content, this);
-            this.subscribe('/topic/mod/chat', (message) => this.#onChatUpdatesReceived(JSON.parse(message.body)));
+            for (let i = 1; i <= this.#modInfo.highestLadder; i++) {
+                this.subscribe('/topic/chat/' + i, (message) => this.#onChatUpdatesReceived(JSON.parse(message.body)));
+            }
         }
     }
 
@@ -76,19 +78,24 @@ class ModerationTool {
     }
 
     getGameUpdates() {
-        this.subscribe('/topic/mod/game', (message) => this.#onGameUpdatesReceived(JSON.parse(message.body)));
-        this.subscribe('/topic/mod/global', (message) => this.#onGlobalUpdatesReceived(JSON.parse(message.body)));
+        this.subscribe('/user/queue/ladder/', (message) => this.#onGameReceived(JSON.parse(message.body)));
+        this.send("/app/ladder/init/" + 1);
     }
 
-    #onGameUpdatesReceived(message) {
-        if (message) {
+    #onGameReceived(message) {
+        if (message.content) {
             this.#gameUpdates = new ModGameEvents(message.content, this);
+            for (let i = 1; i <= this.#modInfo.highestLadder; i++) {
+                this.subscribe('/topic/ladder/' + i, (message) => this.#onGameUpdatesReceived(JSON.parse(message.body), i));
+            }
+            this.subscribe('/topic/global', (message => this.#onGameUpdatesReceived(JSON.parse(message.body), 0)));
         }
     }
 
-    #onGameUpdatesReceived(message) {
-        if (!this.#gameUpdates) this.#gameUpdates = new ModGameEvents(message.content, this);
-
+    #onGameUpdatesReceived(message, ladder) {
+        if (message) {
+            this.#gameUpdates.update(message, ladder);
+        }
     }
 
     ban(event) {
@@ -150,13 +157,12 @@ class ModChat {
     }
 
     #draw() {
-        this.#data.tags = tags;
         let html = this.#rowTemplate(this.#data);
-        let messageBody = $('#messageBody')
+        let messageBody = $('#messageBody');
         messageBody.html(html);
-        $("*[id='banSymbol']").on('click', this.#modTool.ban.bind(this));
+        $("*[id='banSymbol']").on('click', this.#modTool.ban);
         $("*[id='muteSymbol']").on('click', this.#modTool.mute);
-        $("*[id='nameSymbol']").on('click', this.#modTool.rename.bind(this));
+        $("*[id='nameSymbol']").on('click', this.#modTool.rename);
         $("*[id='freeSymbol']").on('click', this.#modTool.free);
     }
 
@@ -164,14 +170,53 @@ class ModChat {
 }
 
 class ModGameEvents {
-    #dom;
+    #rowTemplate;
+    #modTool
+    #data
+    #rankers
 
-    constructor(data) {
-        console.log(data);
+    constructor(data, tool) {
+        this.#modTool = tool;
+        this.#rankers = data.rankers;
+        this.#rowTemplate = Handlebars.compile($('#updateRow-template').html())
+        this.#data = {events: []};
+        this.#draw()
     }
 
-    update(data) {
+    update(data, ladder) {
+        data.events.forEach(event => {
+            if (event.eventType === "JOIN" && ladder === 1) {
+                let newRanker = {
+                    accountId: event.accountId,
+                    username: event.data.username,
+                    timesAsshole: event.data.timesAsshole,
+                }
+                this.#rankers.unshift(newRanker);
+            }
+            this.#rankers.forEach(ranker => {
+                if (ranker.accountId === event.accountId) {
+                    event.username = ranker.username;
+                }
+            });
 
+            event.ladder = ladder;
+
+            switch (event.eventType) {
+                case 'PROMOTE':
+                case 'VINEGAR':
+                case 'AUTO_PROMOTE':
+                case 'NAME_CHANGE':
+                    this.#data.events.unshift(event);
+                    break;
+            }
+        });
+        this.#draw();
+    }
+
+    #draw() {
+        let html = this.#rowTemplate(this.#data);
+        let updateBody = $('#updateBody');
+        updateBody.html(html);
     }
 
 }

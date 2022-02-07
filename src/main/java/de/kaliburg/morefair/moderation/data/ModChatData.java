@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.moderation.data;
 
-import de.kaliburg.morefair.persistence.entity.Message;
+import de.kaliburg.morefair.chat.Message;
 import lombok.Data;
 
 import java.util.ArrayList;

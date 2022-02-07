@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.controller;
+package de.kaliburg.morefair.ladder;
 
 import de.kaliburg.morefair.account.entity.Account;
 import de.kaliburg.morefair.account.service.AccountService;
@@ -6,7 +6,6 @@ import de.kaliburg.morefair.dto.LadderViewDTO;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.EventType;
 import de.kaliburg.morefair.messages.WSMessage;
-import de.kaliburg.morefair.service.RankerService;
 import de.kaliburg.morefair.utils.WSUtils;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
@@ -24,6 +23,7 @@ public class RankerController {
     public static final String LADDER_DESTINATION = "/queue/ladder/";
     public static final String LADDER_PRIVATE_UPDATE_DESTINATION = "/queue/ladder/updates/";
     public static final String LADDER_UPDATE_DESTINATION = "/topic/ladder/";
+    public static final String GLOBAL_UPDATE_DESTINATION = "/topic/global/";
     private final RankerService rankerService;
     private final AccountService accountService;
     private final WSUtils wsUtils;

@@ -3,12 +3,12 @@ package de.kaliburg.morefair.moderation.controller;
 import de.kaliburg.morefair.account.entity.Account;
 import de.kaliburg.morefair.account.service.AccountService;
 import de.kaliburg.morefair.account.type.AccountAccessRole;
+import de.kaliburg.morefair.chat.Message;
+import de.kaliburg.morefair.chat.MessageService;
+import de.kaliburg.morefair.ladder.RankerService;
 import de.kaliburg.morefair.messages.WSMessage;
 import de.kaliburg.morefair.moderation.data.ModChatData;
 import de.kaliburg.morefair.moderation.data.ModerationInfoData;
-import de.kaliburg.morefair.persistence.entity.Message;
-import de.kaliburg.morefair.service.MessageService;
-import de.kaliburg.morefair.service.RankerService;
 import de.kaliburg.morefair.utils.WSUtils;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
@@ -26,6 +26,7 @@ import java.util.UUID;
 public class ModerationController {
     public final static String CHAT_UPDATE_DESTINATION = "/topic/mod/chat";
     public final static String GAME_UPDATE_DESTINATION = "/topic/mod/game";
+    public final static String GLOBAL_UPDATE_DESTINATION = "/topic/mod/global";
     private final static String INFO_DESTINATION = "/queue/mod/info";
     private final static String CHAT_DESTINATION = "/queue/mod/chat";
     private final static String GAME_DESTINATION = "/queue/mod/game";
@@ -84,28 +85,6 @@ public class ModerationController {
             wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
-            log.error(e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    @MessageMapping("/mod/game")
-    public void game(SimpMessageHeaderAccessor sha, WSMessage wsMessage) throws Exception {
-        try {
-            String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-
-            Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
-            if (account == null || !(account.getAccessRole().equals(AccountAccessRole.MODERATOR) || account.getAccessRole().equals(AccountAccessRole.OWNER))) {
-                wsUtils.convertAndSendToUser(sha, GAME_DESTINATION, HttpStatus.FORBIDDEN);
-            } else {
-                Integer highestLadder = ladderService.getHighestLadder().getNumber();
-                ModerationInfoData infoData = new ModerationInfoData(highestLadder, account.getAccessRole());
-                wsUtils.convertAndSendToUser(sha, GAME_DESTINATION, infoData);
-            }
-        } catch (IllegalArgumentException e) {
-            wsUtils.convertAndSendToUser(sha, GAME_DESTINATION, HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            wsUtils.convertAndSendToUser(sha, GAME_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
             log.error(e.getMessage());
             e.printStackTrace();
         }

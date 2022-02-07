@@ -1,14 +1,10 @@
-package de.kaliburg.morefair.schedules;
+package de.kaliburg.morefair.ladder;
 
+import de.kaliburg.morefair.FairController;
 import de.kaliburg.morefair.account.service.AccountService;
-import de.kaliburg.morefair.controller.FairController;
-import de.kaliburg.morefair.controller.RankerController;
 import de.kaliburg.morefair.dto.HeartbeatDTO;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.EventType;
-import de.kaliburg.morefair.persistence.entity.Ladder;
-import de.kaliburg.morefair.persistence.entity.Ranker;
-import de.kaliburg.morefair.service.RankerService;
 import de.kaliburg.morefair.utils.WSUtils;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -42,6 +38,7 @@ public class LadderCalculator {
     public void update() {
         // Reset the Heartbeat
         heartbeatMap = new HashMap<>();
+        List<Event> globalEvents = new ArrayList<>();
         boolean didPressAssholeButton = false;
         try {
             rankerService.getLadderSem().acquire();
@@ -82,9 +79,6 @@ public class LadderCalculator {
                                         if (!rankerService.throwVinegar(e.getAccountId(), ladder, e))
                                             eventsToBeRemoved.add(e);
                                     }
-                                    case NAME_CHANGE -> {
-                                        accountService.updateUsername(e.getAccountId(), ladder, e);
-                                    }
                                     case AUTO_PROMOTE -> {
                                         if (!rankerService.buyAutoPromote(e.getAccountId(), ladder))
                                             eventsToBeRemoved.add(e);
@@ -102,6 +96,16 @@ public class LadderCalculator {
                             }
                             heartbeatMap.put(ladder.getNumber(), new HeartbeatDTO(new ArrayList<>(events)));
                         }
+                        globalEvents = rankerService.getGlobalEventList();
+                        for (int i = 0; i < globalEvents.size(); i++) {
+                            Event e = globalEvents.get(i);
+                            switch (e.getEventType()) {
+                                case NAME_CHANGE -> {
+                                    accountService.updateUsername(e.getAccountId(), e);
+                                }
+                            }
+                        }
+
                         rankerService.resetEvents();
                     } finally {
                         rankerService.getEventSem().release();
@@ -128,6 +132,8 @@ public class LadderCalculator {
                     }
                     return;
                 }
+
+                wsUtils.convertAndSendToAll(RankerController.GLOBAL_UPDATE_DESTINATION, globalEvents);
 
                 // Otherwise, just send the default Broadcasts
                 for (Ladder ladder : rankerService.getLadders().values()) {

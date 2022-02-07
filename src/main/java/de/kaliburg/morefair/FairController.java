@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.controller;
+package de.kaliburg.morefair;
 
 import de.kaliburg.morefair.account.service.AccountService;
 import de.kaliburg.morefair.dto.InfoDTO;

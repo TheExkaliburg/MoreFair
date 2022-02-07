@@ -110,9 +110,11 @@ function onLoginReceived(message) {
         // Init Ladder Connection
         ladderSubscription = stompClient.subscribe('/topic/ladder/' + identityData.highestCurrentLadder,
             (message) => handleLadderUpdates(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
+        stompClient.subscribe('/topic/global/',
+            (message) => handleGlobalUpdates(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
         stompClient.subscribe('/user/queue/ladder/',
             (message) => handleLadderInit(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
-        stompClient.subscribe('/user/queue/ladder/updates',
+        stompClient.subscribe('/user/queue/ladder/updates/',
             (message) => handlePrivateLadderUpdates(JSON.parse(message.body)), {uuid: getCookie("_uuid")});
         initLadder(identityData.highestCurrentLadder);
     }

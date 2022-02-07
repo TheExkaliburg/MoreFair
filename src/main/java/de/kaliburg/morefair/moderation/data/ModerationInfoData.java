@@ -7,7 +7,7 @@ import lombok.NonNull;
 @Data
 public class ModerationInfoData {
     @NonNull
-    private Integer highestLadderReachedYet;
+    private Integer highestLadder;
     @NonNull
     private AccountAccessRole yourAccessRole;
 }
