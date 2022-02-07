@@ -19,6 +19,6 @@ public class MessageDTO {
         this.message = StringEscapeUtils.unescapeJava(message.getMessage());
         this.username = StringEscapeUtils.unescapeJava(message.getAccount().getUsername());
         this.accountId = message.getAccount().getId();
-        this.timeCreated = message.getCreatedOn().format(DateTimeFormatter.ofPattern("HH:mm"));
+        this.timeCreated = message.getCreatedOn().format(DateTimeFormatter.ofPattern("EE HH:mm"));
     }
 }
