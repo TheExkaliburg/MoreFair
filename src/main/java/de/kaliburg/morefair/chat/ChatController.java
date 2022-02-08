@@ -46,7 +46,7 @@ public class ChatController {
                 return;
             }
 
-            if (number <= rankerService.findHighestRankerByAccount(account).getLadder().getNumber()) {
+            if (number <= rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber()) {
                 ChatDTO c = messageService.getChat(number);
                 wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, c);
             } else {
@@ -74,7 +74,7 @@ public class ChatController {
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null || account.getAccessRole().equals(AccountAccessRole.MUTED_PLAYER) || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER))
                 return;
-            if (number <= rankerService.findHighestRankerByAccount(account).getLadder().getNumber()) {
+            if (number <= rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber()) {
                 Message answer = messageService.writeMessage(account, number, message);
                 wsUtils.convertAndSendToAll(CHAT_UPDATE_DESTINATION + number, answer.convertToDTO());
             }

@@ -46,7 +46,7 @@ public class RankerController {
                 wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, HttpStatus.FORBIDDEN);
                 return;
             }
-            if (number <= rankerService.findHighestRankerByAccount(account).getLadder().getNumber()) {
+            if (number <= rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber()) {
                 LadderViewDTO l = rankerService.findAllRankerByLadderAreaAndAccount(number, account);
                 wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, l);
             } else {
@@ -70,7 +70,7 @@ public class RankerController {
             if (account == null || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
                 return;
             }
-            rankerService.addEvent(rankerService.findHighestRankerByAccount(account).getLadder().getNumber(),
+            rankerService.addEvent(rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber(),
                     new Event(EventType.BIAS, account.getId()));
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -87,7 +87,7 @@ public class RankerController {
             if (account == null || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
                 return;
             }
-            rankerService.addEvent(rankerService.findHighestRankerByAccount(account).getLadder().getNumber(),
+            rankerService.addEvent(rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber(),
                     new Event(EventType.MULTI, account.getId()));
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -104,7 +104,7 @@ public class RankerController {
             if (account == null || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
                 return;
             }
-            rankerService.addEvent(rankerService.findHighestRankerByAccount(account).getLadder().getNumber(),
+            rankerService.addEvent(rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber(),
                     new Event(EventType.VINEGAR, account.getId()));
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -121,7 +121,7 @@ public class RankerController {
             if (account == null || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
                 return;
             }
-            rankerService.addEvent(rankerService.findHighestRankerByAccount(account).getLadder().getNumber(),
+            rankerService.addEvent(rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber(),
                     new Event(EventType.PROMOTE, account.getId()));
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -138,7 +138,7 @@ public class RankerController {
             if (account == null || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
                 return;
             }
-            rankerService.addEvent(rankerService.findHighestRankerByAccount(account).getLadder().getNumber(),
+            rankerService.addEvent(rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber(),
                     new Event(EventType.ASSHOLE, account.getId()));
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -155,7 +155,7 @@ public class RankerController {
             if (account == null || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
                 return;
             }
-            rankerService.addEvent(rankerService.findHighestRankerByAccount(account).getLadder().getNumber(),
+            rankerService.addEvent(rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber(),
                     new Event(EventType.AUTO_PROMOTE, account.getId()));
         } catch (Exception e) {
             log.error(e.getMessage());

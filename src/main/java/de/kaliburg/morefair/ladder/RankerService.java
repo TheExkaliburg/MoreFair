@@ -131,23 +131,22 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
         return ladderView;
     }
 
-    public Ranker findHighestRankerByAccount(Account account) {
+    public Ranker findHighestActiveRankerByAccount(Account account) {
         if (account.getRankers().size() == 0)
-            createNewRankerForAccountOnLadder(account, 1);
+            createNewActiveRankerForAccountOnLadder(account, 1);
 
         account = accountService.findByUuid(account.getUuid());
-        Ranker ranker = Collections.max(account.getRankers(), Comparator.comparing(r -> r.getLadder().getNumber()));
+        Ranker ranker = Collections.max(account.getRankers().stream().filter(Ranker::isGrowing).toList(), Comparator.comparing(r -> r.getLadder().getNumber()));
 
         if (ranker == null) {
-            ranker = createNewRankerForAccountOnLadder(account, 1);
+            ranker = createNewActiveRankerForAccountOnLadder(account, 1);
         }
 
         return ranker;
     }
 
     public Ranker findHighestRankerByLadder(Ladder ladder) {
-        Ranker ranker = Collections.max(findLadder(ladder).getRankers(), Comparator.comparing(Ranker::getPoints));
-        return ranker;
+        return Collections.max(findLadder(ladder).getRankers(), Comparator.comparing(Ranker::getPoints));
     }
 
     public List<Ranker> findAllRankerByLadderOrderedByPoints(Ladder ladder) {
@@ -197,17 +196,26 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
         globalEventList.clear();
     }
 
-    public Ranker createNewRankerForAccountOnLadder(Account account, Integer ladderNum) {
+    public Ranker createNewActiveRankerForAccountOnLadder(Account account, Integer ladderNum) {
         Ladder ladder = findLadder(ladderNum);
-        if (ladder == null) ladder = createNewLadder(ladderNum);
+        if (ladder == null) {
+            ladder = createNewLadder(ladderNum);
+            ladder = findLadder(ladder);
+        }
 
+        List<Ranker> activeRankersInLadder = account.getRankers().stream()
+                .filter(r -> r.getLadder().getNumber().equals(ladderNum) && r.isGrowing()).toList();
+        Ranker ranker;
 
-        Ranker ranker = saveRanker(new Ranker(UUID.randomUUID(), ladder, account, ladder.getRankers().size() + 1));
-        ladder.getRankers().add(ranker);
-
-        Event event = new Event(EventType.JOIN, account.getId());
-        event.setData(new JoinData(account.getUsername(), account.getTimesAsshole()));
-        eventMap.get(ladderNum).add(event);
+        if (activeRankersInLadder.isEmpty()) {
+            ranker = saveRanker(new Ranker(UUID.randomUUID(), ladder, account, ladder.getRankers().size() + 1));
+            ladder.getRankers().add(ranker);
+            Event event = new Event(EventType.JOIN, account.getId());
+            event.setData(new JoinData(account.getUsername(), account.getTimesAsshole()));
+            eventMap.get(ladderNum).add(event);
+        } else {
+            ranker = activeRankersInLadder.get(0);
+        }
 
         return ranker;
     }
@@ -304,7 +312,7 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
                     && (ranker.isAutoPromote() || pointDiff.compareTo(neededPointDiff) >= 0)) {
                 ranker.setGrowing(false);
                 saveRanker(ranker);
-                Ranker newRanker = createNewRankerForAccountOnLadder(ranker.getAccount(), ranker.getLadder().getNumber() + 1);
+                Ranker newRanker = createNewActiveRankerForAccountOnLadder(ranker.getAccount(), ranker.getLadder().getNumber() + 1);
                 newRanker.setVinegar(ranker.getVinegar());
                 newRanker.setGrapes(ranker.getGrapes());
                 if (isAssholeEvent && ranker.getLadder().getNumber().compareTo(FairController.BASE_ASSHOLE_LADDER + accountService.findMaxTimesAsshole()) == 0) {
@@ -418,7 +426,7 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
                     // This should prevent old and inactive accounts from getting a ranker on Restart
                     if (account.getLastLogin().plus(1, ChronoUnit.DAYS).isAfter(LocalDateTime.now())) {
                         // Create New Ranker
-                        createNewRankerForAccountOnLadder(account, 1);
+                        createNewActiveRankerForAccountOnLadder(account, 1);
                     }
                     accountService.saveAccount(account);
                 }
@@ -491,7 +499,7 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
     }
 
     private void onCreatedAccount(AccountServiceEvent event) {
-        Ranker ranker = createNewRankerForAccountOnLadder(event.getAccount(), 1);
+        Ranker ranker = createNewActiveRankerForAccountOnLadder(event.getAccount(), 1);
         event.getAccount().getRankers().add(ranker);
     }
 
