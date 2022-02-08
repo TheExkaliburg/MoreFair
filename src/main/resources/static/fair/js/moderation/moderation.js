@@ -168,7 +168,6 @@ class ModChat {
     }
 
     update(data, ladder) {
-        console.log(data);
         data.ladderNumber = ladder;
         this.#data.messages.unshift(data);
         this.#draw();
@@ -229,16 +228,15 @@ class ModGameEvents {
                 [time.getHours().toString().padStart(2, '0'), time.getMinutes().toString().padStart(2, '0'),].join(':');
 
             switch (event.eventType) {
-                case 'PROMOTE':
                 case 'VINEGAR':
                     console.log(data);
+                case 'PROMOTE':
                 case 'AUTO_PROMOTE':
                 case 'NAME_CHANGE':
                 case 'BAN':
                 case 'MUTE':
                 case 'FREE':
                 case 'MOD':
-                    console.log(event);
                     this.#data.events.unshift(event);
                     break;
             }
@@ -251,7 +249,6 @@ class ModGameEvents {
     }
 
     #draw() {
-        console.log(this.#data);
         let html = this.#rowTemplate(this.#data);
         let updateBody = $('#updateBody');
         updateBody.html(html);

@@ -159,7 +159,6 @@ function handleLadderUpdates(message) {
 }
 
 function handleGlobalUpdates(message) {
-    console.log(message);
     if (message) {
         message.forEach(e => handleEvent(e))
     }

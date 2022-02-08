@@ -30,7 +30,7 @@
 <script>
     $(document).ready(function () {
         $('[data-toggle="tooltip"]').tooltip();
-        modTool = new ModerationTool(true);
+        modTool = new ModerationTool(false);
     });
 
     $(window).on("beforeunload", (event) => {
@@ -112,7 +112,7 @@
             <a href="#" class="freeSymbol" data-account-id="{{accountId}}" data-username="{{username}}">🔙</a>
             <a href="#" class="modSymbol" data-account-id="{{accountId}}" data-username="{{username}}">⬆️</a>
         </td>
-        <td>{{eventType}}: {{if eventNameChange}}NAM{{data}}{{/if}} {{if eventVinegar}}{{data}}{{/if}}</td>
+        <td>{{eventType}}: {{data}}</td>
     </tr>
     {{/each}}
 </script>
