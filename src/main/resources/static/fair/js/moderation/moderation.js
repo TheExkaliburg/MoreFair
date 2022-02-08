@@ -70,14 +70,14 @@ class ModerationTool {
         if (message.content) {
             this.#chatUpdates = new ModChat(message.content, this);
             for (let i = 1; i <= this.#modInfo.highestLadder; i++) {
-                this.subscribe('/topic/chat/' + i, (message) => this.#onChatUpdatesReceived(JSON.parse(message.body)));
+                this.subscribe('/topic/chat/' + i, (message) => this.#onChatUpdatesReceived(JSON.parse(message.body), i));
             }
         }
     }
 
-    #onChatUpdatesReceived(message) {
+    #onChatUpdatesReceived(message, ladder) {
         if (message) {
-            this.#chatUpdates.update(message);
+            this.#chatUpdates.update(message, ladder);
         }
     }
 
@@ -167,7 +167,9 @@ class ModChat {
         this.#draw();
     }
 
-    update(data) {
+    update(data, ladder) {
+        console.log(data);
+        data.ladderNumber = ladder;
         this.#data.messages.unshift(data);
         this.#draw();
     }
@@ -222,6 +224,9 @@ class ModGameEvents {
             });
 
             event.ladder = ladder;
+            let time = new Date(Date.now());
+            event.timeCreated = days[time.getDay()] + " " +
+                [time.getHours().toString().padStart(2, '0'), time.getMinutes().toString().padStart(2, '0'),].join(':');
 
             switch (event.eventType) {
                 case 'PROMOTE':
@@ -287,7 +292,13 @@ class ModGameEvents {
             }
         });
 
+        let time = new Date(Date.now());
+        forcedEvent.timeCreated = days[time.getDay()] + " " +
+            [time.getHours().toString().padStart(2, '0'), time.getMinutes().toString().padStart(2, '0'),].join(':');
+
         this.#data.events.unshift(forcedEvent);
         this.#draw();
     }
 }
+
+let days = ['Su.', 'Mo.', 'Tu.', 'We.', 'Th.', 'Fr.', 'Sa.'];

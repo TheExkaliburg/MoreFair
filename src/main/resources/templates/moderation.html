@@ -104,7 +104,7 @@
 <script id="updateRow-template" type="text/x-handlebars-template">
     {{#each events}}
     <tr>
-        <td>[L{{ladder}}] {{username}}</td>
+        <td>[L{{ladder}} {{timeCreated}}] {{{username}}}</td>
         <td>
             <a href="#" class="banSymbol" data-account-id="{{accountId}}" data-username="{{username}}">🔨</a>
             <a href="#" class="muteSymbol" data-account-id="{{accountId}}" data-username="{{username}}">🤐</a>
@@ -120,14 +120,14 @@
 <script id="messageRow-template" type="text/x-handlebars-template">
     {{#each messages}}
     <tr>
-        <td>[{{timeCreated}}] {{assholeTag}} - {{username}}</td>
+        <td>[C{{ladderNumber}} {{timeCreated}}] {{{assholeTag}}} - {{{username}}}</td>
         <td>
             <a href="#" class="banSymbol" data-account-id="{{accountId}}" data-username="{{username}}">🔨</a>
             <a href="#" class="muteSymbol" data-account-id="{{accountId}}" data-username="{{username}}">🤐</a>
             <a href="#" class="nameSymbol" data-account-id="{{accountId}}" data-username="{{username}}">💬</a>
             <a href="#" class="freeSymbol" data-account-id="{{accountId}}" data-username="{{username}}">🔙</a>
         </td>
-        <td>{{message}}</td>
+        <td>{{{message}}}</td>
     </tr>
     {{/each}}
 </script>
