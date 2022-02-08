@@ -1,5 +1,6 @@
 package de.kaliburg.morefair.websockets;
 
+import de.kaliburg.morefair.FairController;
 import de.kaliburg.morefair.account.entity.Account;
 import de.kaliburg.morefair.account.service.AccountService;
 import de.kaliburg.morefair.account.type.AccountAccessRole;
@@ -73,6 +74,8 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null) return false;
             int ladderDestination = Integer.parseInt(topicDestination.substring("/topic/ladder/".length()));
+            if (ladderDestination == FairController.BASE_ASSHOLE_LADDER + accountService.findMaxTimesAsshole())
+                return true;
             int highestLadder = account.getRankers().stream().mapToInt(v -> v.getLadder().getNumber()).max().orElse(1);
             if (ladderDestination > highestLadder) return false;
         }

@@ -80,7 +80,7 @@ public class FairController {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
             log.debug("/app/info {}", uuid);
 
-            Integer maxTimesAssholes = accountService.findMaxTimeAsshole();
+            Integer maxTimesAssholes = accountService.findMaxTimesAsshole();
             InfoDTO info = new InfoDTO(maxTimesAssholes);
 
             wsUtils.convertAndSendToUser(sha, INFO_DESTINATION, info);

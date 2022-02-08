@@ -1,5 +1,6 @@
 package de.kaliburg.morefair.ladder;
 
+import de.kaliburg.morefair.FairController;
 import de.kaliburg.morefair.account.entity.Account;
 import de.kaliburg.morefair.account.service.AccountService;
 import de.kaliburg.morefair.account.type.AccountAccessRole;
@@ -46,7 +47,9 @@ public class RankerController {
                 wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, HttpStatus.FORBIDDEN);
                 return;
             }
-            if (number <= rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber()) {
+            if (account.getAccessRole().equals(AccountAccessRole.OWNER) || account.getAccessRole().equals(AccountAccessRole.MODERATOR)
+                    || number == FairController.BASE_ASSHOLE_LADDER + accountService.findMaxTimesAsshole()
+                    || number <= rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber()) {
                 LadderViewDTO l = rankerService.findAllRankerByLadderAreaAndAccount(number, account);
                 wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, l);
             } else {

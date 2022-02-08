@@ -73,16 +73,13 @@ public class AccountService {
         saveAccount(account);
     }
 
-    public Integer findMaxTimeAsshole() {
-        return (accountRepository.findMaxTimesAsshole() != null) ? accountRepository.findMaxTimesAsshole() : 0;
+    public Integer findMaxTimesAsshole() {
+        Integer result = accountRepository.findMaxTimesAsshole();
+        return (result != null) ? result : 0;
     }
 
     public Account findAccountById(Long accountId) {
         return accountRepository.findById(accountId).get();
-    }
-
-    public Integer findMaxTimesAsshole() {
-        return accountRepository.findMaxTimesAsshole();
     }
 
     public Set<Account> findAllAccountsJoinedWithRankers() {
