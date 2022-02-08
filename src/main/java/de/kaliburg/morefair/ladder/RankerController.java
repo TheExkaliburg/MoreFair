@@ -47,13 +47,19 @@ public class RankerController {
                 wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, HttpStatus.FORBIDDEN);
                 return;
             }
-            if (account.getAccessRole().equals(AccountAccessRole.OWNER) || account.getAccessRole().equals(AccountAccessRole.MODERATOR)
-                    || number == FairController.BASE_ASSHOLE_LADDER + accountService.findMaxTimesAsshole()
-                    || number <= rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber()) {
-                LadderViewDTO l = rankerService.findAllRankerByLadderAreaAndAccount(number, account);
-                wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, l);
-            } else {
-                wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
+
+            rankerService.getLadderSem().acquire();
+            try {
+                if (account.getAccessRole().equals(AccountAccessRole.OWNER) || account.getAccessRole().equals(AccountAccessRole.MODERATOR)
+                        || number == FairController.BASE_ASSHOLE_LADDER + accountService.findMaxTimesAsshole()
+                        || number <= rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber()) {
+                    LadderViewDTO l = rankerService.findAllRankerByLadderAreaAndAccount(number, account);
+                    wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, l);
+                } else {
+                    wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            } finally {
+                rankerService.getLadderSem().release();
             }
         } catch (IllegalArgumentException e) {
             wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, HttpStatus.BAD_REQUEST);

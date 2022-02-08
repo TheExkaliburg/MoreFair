@@ -132,11 +132,8 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
     }
 
     public Ranker findHighestActiveRankerByAccount(Account account) {
-        if (account.getRankers().size() == 0)
-            createNewActiveRankerForAccountOnLadder(account, 1);
-
-        account = accountService.findByUuid(account.getUuid());
-        Ranker ranker = Collections.max(account.getRankers().stream().filter(Ranker::isGrowing).toList(), Comparator.comparing(r -> r.getLadder().getNumber()));
+        Ranker ranker = Collections.max(account.getRankers().stream()
+                .filter(Ranker::isGrowing).toList(), Comparator.comparing(r -> r.getLadder().getNumber()));
 
         if (ranker == null) {
             ranker = createNewActiveRankerForAccountOnLadder(account, 1);
@@ -198,6 +195,7 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
 
     public Ranker createNewActiveRankerForAccountOnLadder(Account account, Integer ladderNum) {
         Ladder ladder = findLadder(ladderNum);
+
         if (ladder == null) {
             ladder = createNewLadder(ladderNum);
             ladder = findLadder(ladder);

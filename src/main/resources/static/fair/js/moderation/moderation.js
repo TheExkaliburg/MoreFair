@@ -231,6 +231,7 @@ class ModGameEvents {
             switch (event.eventType) {
                 case 'PROMOTE':
                 case 'VINEGAR':
+                    console.log(data);
                 case 'AUTO_PROMOTE':
                 case 'NAME_CHANGE':
                 case 'BAN':
@@ -250,6 +251,7 @@ class ModGameEvents {
     }
 
     #draw() {
+        console.log(this.#data);
         let html = this.#rowTemplate(this.#data);
         let updateBody = $('#updateBody');
         updateBody.html(html);

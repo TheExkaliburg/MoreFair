@@ -46,11 +46,16 @@ public class ChatController {
                 return;
             }
 
-            if (number <= rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber()) {
-                ChatDTO c = messageService.getChat(number);
-                wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, c);
-            } else {
-                wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
+            rankerService.getLadderSem().acquire();
+            try {
+                if (number <= rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber()) {
+                    ChatDTO c = messageService.getChat(number);
+                    wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, c);
+                } else {
+                    wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            } finally {
+                rankerService.getLadderSem().release();
             }
         } catch (IllegalArgumentException e) {
             wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.BAD_REQUEST);
