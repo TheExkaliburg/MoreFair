@@ -3,9 +3,9 @@ let modTool;
 class ModerationTool {
     #stompClient;
     #subscribeMap;
-    #modInfo;
     #chatUpdates;
     #gameUpdates;
+    #modInfo;
 
     constructor(enableDebug) {
         let socket = new SockJS('/fairsocket');
@@ -18,6 +18,10 @@ class ModerationTool {
         }, async function (frame) {
             //await handleReset();
         });
+    }
+
+    disconnect() {
+
     }
 
     subscribe(destination, func) {
@@ -90,7 +94,6 @@ class ModerationTool {
             }
 
             this.subscribe('/topic/global/', (message) => this.#onGameUpdatesReceived({events: JSON.parse(message.body)}, 0));
-            this.subscribe('/topic/mod/', (message) => this.#onGameUpdatesReceived({events: JSON.parse(message.body)}, 0));
         }
     }
 
@@ -102,31 +105,42 @@ class ModerationTool {
 
     ban(event) {
         let dataSet = event.target.dataset;
-        if (confirm(`Are you sure you want to ban ${dataSet.username}`)) {
-            console.log(`Banning Account ${dataSet.accountId}`);
+        if (confirm(`Are you sure you want to ban "${dataSet.username}" (${dataSet.accountId})`)) {
+            this.send("/app/mod/ban/" + dataSet.accountId);
         }
     }
 
     mute(event) {
         let dataSet = event.target.dataset;
-        if (confirm(`Are you sure you want to mute ${dataSet.username}`)) {
-            console.log(`Muting Account ${dataSet.accountId}`);
+        if (confirm(`Are you sure you want to mute "${dataSet.username}" (${dataSet.accountId})`)) {
+            this.send("/app/mod/mute/" + dataSet.accountId);
         }
     }
 
     rename(event) {
         let dataSet = event.target.dataset;
-        let newName = prompt(`What would you like to name ${dataSet.username}`);
+        let newName = prompt(`What would you like to name "${dataSet.username}" (${dataSet.accountId})`);
         if (newName) {
-            console.log(`Renaming ${dataSet.username} to ${newName}`);
+            this.send("/app/mod/name/" + dataSet.accountId, newName);
         }
     }
 
     free(event) {
         let dataSet = event.target.dataset;
-        if (confirm(`Are you sure you want to free ${dataSet.username}}`)) {
-            console.log(`Freeing Account ${dataSet.accountId}`);
+        if (confirm(`Are you sure you want to free "${dataSet.username}" (${dataSet.accountId})`)) {
+            this.send("/app/mod/free/" + dataSet.accountId);
         }
+    }
+
+    mod(event) {
+        let dataSet = event.target.dataset;
+        if (confirm(`Are you sure you want to mod "${dataSet.username}" (${dataSet.accountId})`)) {
+            this.send("/app/mod/mod/" + dataSet.accountId);
+        }
+    }
+
+    getModInfo() {
+        return this.#modInfo;
     }
 
 }
@@ -162,11 +176,10 @@ class ModChat {
         let html = this.#rowTemplate(this.#data);
         let messageBody = $('#messageBody');
         messageBody.html(html);
-        console.log($("#messageBody .banSymbol"));
-        $("#messageBody .banSymbol").on('click', this.#modTool.ban);
-        $("#messageBody .muteSymbol").on('click', this.#modTool.mute);
-        $("#messageBody .nameSymbol").on('click', this.#modTool.rename);
-        $("#messageBody .freeSymbol").on('click', this.#modTool.free);
+        $("#messageBody .banSymbol").on('click', this.#modTool.ban.bind(this.#modTool));
+        $("#messageBody .muteSymbol").on('click', this.#modTool.mute.bind(this.#modTool));
+        $("#messageBody .nameSymbol").on('click', this.#modTool.rename.bind(this.#modTool));
+        $("#messageBody .freeSymbol").on('click', this.#modTool.free.bind(this.#modTool));
     }
 
 
@@ -184,6 +197,9 @@ class ModGameEvents {
         this.#rowTemplate = Handlebars.compile($('#updateRow-template').html())
         this.#data = {events: []};
         this.#draw();
+
+        $("#lookupButton").on('click', this.find.bind(this));
+        $("#idButton").on('click', this.forceEvent.bind(this));
     }
 
     update(data, ladder) {
@@ -201,6 +217,7 @@ class ModGameEvents {
                 if (r.accountId === event.accountId) {
                     event.username = r.username;
                     ranker = r;
+                    if (event.eventType === 'NAME_CHANGE') r.username = event.data;
                 }
             });
 
@@ -211,6 +228,10 @@ class ModGameEvents {
                 case 'VINEGAR':
                 case 'AUTO_PROMOTE':
                 case 'NAME_CHANGE':
+                case 'BAN':
+                case 'MUTE':
+                case 'FREE':
+                case 'MOD':
                     console.log(event);
                     this.#data.events.unshift(event);
                     break;
@@ -227,6 +248,46 @@ class ModGameEvents {
         let html = this.#rowTemplate(this.#data);
         let updateBody = $('#updateBody');
         updateBody.html(html);
+        $("#updateBody .banSymbol").on('click', this.#modTool.ban.bind(this.#modTool));
+        $("#updateBody .muteSymbol").on('click', this.#modTool.mute.bind(this.#modTool));
+        $("#updateBody .nameSymbol").on('click', this.#modTool.rename.bind(this.#modTool));
+        $("#updateBody .freeSymbol").on('click', this.#modTool.free.bind(this.#modTool));
+        if (this.#modTool.getModInfo().yourAccessRole === "OWNER") {
+            $("#updateBody .modSymbol").on('click', this.#modTool.mod.bind(this.#modTool));
+        } else {
+            $("#updateBody .modSymbol").remove();
+        }
     }
 
+    find() {
+        let input = $('#usernameLookup');
+        let result = '['
+
+        this.#rankers.forEach(r => {
+            if (r.username.toLowerCase().includes(input.val().toLowerCase())) {
+                result += '{' + r.accountId + ':' + r.username + '} ';
+            }
+        });
+
+        result = result.trim() + ']';
+        $('#lookupResult').html(result);
+    }
+
+    forceEvent() {
+        let input = $('#idInput');
+
+        let forcedEvent = {
+            ladder: 0,
+            accountId: parseInt(input.val().trim()),
+            eventType: "FORCED"
+        }
+        this.#rankers.forEach(r => {
+            if (r.accountId === forcedEvent.accountId) {
+                forcedEvent.username = r.username;
+            }
+        });
+
+        this.#data.events.unshift(forcedEvent);
+        this.#draw();
+    }
 }

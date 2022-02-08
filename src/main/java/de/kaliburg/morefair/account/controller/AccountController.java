@@ -2,6 +2,7 @@ package de.kaliburg.morefair.account.controller;
 
 import de.kaliburg.morefair.account.entity.Account;
 import de.kaliburg.morefair.account.service.AccountService;
+import de.kaliburg.morefair.account.type.AccountAccessRole;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.EventType;
 import de.kaliburg.morefair.ladder.RankerService;
@@ -60,6 +61,9 @@ public class AccountController {
                 }
                 return;
             } else {
+                if (account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
+                    wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
+                }
                 accountService.updateActivity(account);
                 wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, account.convertToDTO());
             }
@@ -85,11 +89,12 @@ public class AccountController {
             log.debug("/app/account/name {} {}", uuid, username);
 
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
-            if (account != null) {
-                Event event = new Event(EventType.NAME_CHANGE, account.getId());
-                event.setData(username);
-                rankerService.addGlobalEvent(event);
+            if (account == null || account.getAccessRole().equals(AccountAccessRole.MUTED_PLAYER) || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
+                return;
             }
+            Event event = new Event(EventType.NAME_CHANGE, account.getId());
+            event.setData(username);
+            rankerService.addGlobalEvent(event);
         } catch (Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();

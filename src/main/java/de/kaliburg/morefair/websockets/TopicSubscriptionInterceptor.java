@@ -51,26 +51,29 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
         // Give free pass for all moderators and above
         if (topicDestination.contains("/topic/")) {
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
-            if (account != null &&
-                    (account.getAccessRole().equals(AccountAccessRole.OWNER) ||
-                            account.getAccessRole().equals(AccountAccessRole.MODERATOR)))
-                return true;
-
+            if (account != null) {
+                if (account.getAccessRole().equals(AccountAccessRole.OWNER) || account.getAccessRole().equals(AccountAccessRole.MODERATOR)) {
+                    return true;
+                }
+                if (account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
+                    return false;
+                }
+            }
             // Otherwise, just normal approval
         }
 
         if (topicDestination.contains("/topic/chat/")) {
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null) return false;
-            Integer chatDestination = Integer.parseInt(topicDestination.substring("/topic/chat/".length()));
-            Integer highestLadder = account.getRankers().stream().mapToInt(v -> v.getLadder().getNumber()).max().orElse(1);
+            int chatDestination = Integer.parseInt(topicDestination.substring("/topic/chat/".length()));
+            int highestLadder = account.getRankers().stream().mapToInt(v -> v.getLadder().getNumber()).max().orElse(1);
             if (chatDestination > highestLadder) return false;
         }
         if (topicDestination.contains("/topic/ladder/")) {
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null) return false;
-            Integer ladderDestination = Integer.parseInt(topicDestination.substring("/topic/ladder/".length()));
-            Integer highestLadder = account.getRankers().stream().mapToInt(v -> v.getLadder().getNumber()).max().orElse(1);
+            int ladderDestination = Integer.parseInt(topicDestination.substring("/topic/ladder/".length()));
+            int highestLadder = account.getRankers().stream().mapToInt(v -> v.getLadder().getNumber()).max().orElse(1);
             if (ladderDestination > highestLadder) return false;
         }
 

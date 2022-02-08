@@ -42,6 +42,33 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-6">
+                <div class="row m-1">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            Find Account-ID:
+                        </span>
+                        <input class="form-control shadow-none" id="usernameLookup" maxlength="64"
+                               placeholder="Username" type="text">
+                        <button class="btn btn-primary shadow-none" href="#" id="lookupButton">
+                            Send
+                        </button>
+                    </div>
+                </div>
+                <div class="row m-2">
+                    <div id="lookupResult">Result: [0]</div>
+                </div>
+                <div class="row m-1">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            Force Event:
+                        </span>
+                        <input class="form-control shadow-none" id="idInput" maxlength="64"
+                               placeholder="Account-ID" type="text">
+                        <button class="btn btn-primary shadow-none" href="#" id="idButton">
+                            Send
+                        </button>
+                    </div>
+                </div>
                 <table class="table table-sm table-striped table-borderless">
                     <thead>
                     <tr>
@@ -55,17 +82,20 @@
                 </table>
             </div>
             <div class="col-6">
-                <table class="table table-sm table-striped table-borderless">
-                    <thead>
-                    <tr>
-                        <th class="col-4"></th>
-                        <th class="col-2"></th>
-                        <th class="col"></th>
-                    </tr>
-                    </thead>
-                    <tbody id="messageBody">
-                    </tbody>
-                </table>
+
+                <div class="row">
+                    <table class="table table-sm table-striped table-borderless">
+                        <thead>
+                        <tr>
+                            <th class="col-4"></th>
+                            <th class="col-2"></th>
+                            <th class="col"></th>
+                        </tr>
+                        </thead>
+                        <tbody id="messageBody">
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -80,6 +110,7 @@
             <a href="#" class="muteSymbol" data-account-id="{{accountId}}" data-username="{{username}}">🤐</a>
             <a href="#" class="nameSymbol" data-account-id="{{accountId}}" data-username="{{username}}">💬</a>
             <a href="#" class="freeSymbol" data-account-id="{{accountId}}" data-username="{{username}}">🔙</a>
+            <a href="#" class="modSymbol" data-account-id="{{accountId}}" data-username="{{username}}">⬆️</a>
         </td>
         <td>{{eventType}}: {{data}}</td>
     </tr>

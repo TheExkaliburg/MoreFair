@@ -21,9 +21,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @SequenceGenerator(name = "seq_acc", sequenceName = "seq_acc", allocationSize = 1)
 public class Account {
-    @NonNull
-    @Column
-    private Boolean isMuted = false;
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_acc")
     private Long id;
@@ -41,11 +38,11 @@ public class Account {
     @NonNull
     @Column(nullable = false)
     private Integer timesAsshole = 0;
+    @Column
+    private Integer lastIp;
     @NonNull
     @Column(nullable = false)
     private LocalDateTime lastLogin = LocalDateTime.now();
-    @Column
-    private String lastIp = "";
     @NonNull
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

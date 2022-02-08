@@ -2,6 +2,7 @@ package de.kaliburg.morefair.chat;
 
 import de.kaliburg.morefair.account.entity.Account;
 import de.kaliburg.morefair.account.service.AccountService;
+import de.kaliburg.morefair.account.type.AccountAccessRole;
 import de.kaliburg.morefair.dto.ChatDTO;
 import de.kaliburg.morefair.ladder.RankerService;
 import de.kaliburg.morefair.messages.WSMessage;
@@ -40,7 +41,11 @@ public class ChatController {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
             log.debug("/app/chat/init/{} from {}", number, uuid);
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
-            if (account == null) wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.FORBIDDEN);
+            if (account == null || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
+                wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.FORBIDDEN);
+                return;
+            }
+
             if (number <= rankerService.findHighestRankerByAccount(account).getLadder().getNumber()) {
                 ChatDTO c = messageService.getChat(number);
                 wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, c);
@@ -67,7 +72,8 @@ public class ChatController {
 
             log.debug("/app/chat/post/{} '{}' from {}", number, message, uuid);
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
-            if (account == null) return;
+            if (account == null || account.getAccessRole().equals(AccountAccessRole.MUTED_PLAYER) || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER))
+                return;
             if (number <= rankerService.findHighestRankerByAccount(account).getLadder().getNumber()) {
                 Message answer = messageService.writeMessage(account, number, message);
                 wsUtils.convertAndSendToAll(CHAT_UPDATE_DESTINATION + number, answer.convertToDTO());
