@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.persistence.entity;
+package de.kaliburg.morefair.ladder;
 
 import de.kaliburg.morefair.account.entity.Account;
 import de.kaliburg.morefair.dto.RankerDTO;

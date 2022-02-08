@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.dto;
 
-import de.kaliburg.morefair.persistence.entity.Ladder;
+import de.kaliburg.morefair.ladder.Ladder;
 import lombok.Data;
 
 @Data

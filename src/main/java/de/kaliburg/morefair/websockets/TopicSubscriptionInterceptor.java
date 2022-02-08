@@ -2,7 +2,7 @@ package de.kaliburg.morefair.websockets;
 
 import de.kaliburg.morefair.account.entity.Account;
 import de.kaliburg.morefair.account.service.AccountService;
-import de.kaliburg.morefair.service.RankerService;
+import de.kaliburg.morefair.account.type.AccountAccessRole;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.messaging.Message;
@@ -22,11 +22,9 @@ import java.util.UUID;
 @Component
 public class TopicSubscriptionInterceptor implements ChannelInterceptor {
     private final AccountService accountService;
-    private final RankerService rankerService;
 
-    public TopicSubscriptionInterceptor(AccountService accountService, RankerService rankerService) {
+    public TopicSubscriptionInterceptor(AccountService accountService) {
         this.accountService = accountService;
-        this.rankerService = rankerService;
     }
 
     @Override
@@ -47,19 +45,35 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
         if (principal == null) return false;
         topicDestination = StringEscapeUtils.escapeJava(topicDestination);
         uuid = StringEscapeUtils.escapeJava(uuid);
+
         log.debug("Validate subscription for {} to {}", uuid, topicDestination);
+
+        // Give free pass for all moderators and above
+        if (topicDestination.contains("/topic/")) {
+            Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
+            if (account != null) {
+                if (account.getAccessRole().equals(AccountAccessRole.OWNER) || account.getAccessRole().equals(AccountAccessRole.MODERATOR)) {
+                    return true;
+                }
+                if (account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
+                    return false;
+                }
+            }
+            // Otherwise, just normal approval
+        }
+
         if (topicDestination.contains("/topic/chat/")) {
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null) return false;
-            Integer chatDestination = Integer.parseInt(topicDestination.substring("/topic/chat/".length()));
-            Integer highestLadder = Math.max(rankerService.findHighestRankerByAccount(account).getLadder().getNumber(), 1);
+            int chatDestination = Integer.parseInt(topicDestination.substring("/topic/chat/".length()));
+            int highestLadder = account.getRankers().stream().mapToInt(v -> v.getLadder().getNumber()).max().orElse(1);
             if (chatDestination > highestLadder) return false;
         }
         if (topicDestination.contains("/topic/ladder/")) {
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null) return false;
-            Integer ladderDestination = Integer.parseInt(topicDestination.substring("/topic/ladder/".length()));
-            Integer highestLadder = Math.max(rankerService.findHighestRankerByAccount(account).getLadder().getNumber(), 1);
+            int ladderDestination = Integer.parseInt(topicDestination.substring("/topic/ladder/".length()));
+            int highestLadder = account.getRankers().stream().mapToInt(v -> v.getLadder().getNumber()).max().orElse(1);
             if (ladderDestination > highestLadder) return false;
         }
 

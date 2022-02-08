@@ -1,14 +1,10 @@
-package de.kaliburg.morefair.schedules;
+package de.kaliburg.morefair.ladder;
 
+import de.kaliburg.morefair.FairController;
 import de.kaliburg.morefair.account.service.AccountService;
-import de.kaliburg.morefair.controller.FairController;
-import de.kaliburg.morefair.controller.RankerController;
 import de.kaliburg.morefair.dto.HeartbeatDTO;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.EventType;
-import de.kaliburg.morefair.persistence.entity.Ladder;
-import de.kaliburg.morefair.persistence.entity.Ranker;
-import de.kaliburg.morefair.service.RankerService;
 import de.kaliburg.morefair.utils.WSUtils;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -30,6 +26,9 @@ public class LadderCalculator {
     private final AccountService accountService;
     private final WSUtils wsUtils;
     private Map<Integer, HeartbeatDTO> heartbeatMap = new HashMap<>();
+    private List<Event> globalEvents = new ArrayList<>();
+    private List<Event> modEvents = new ArrayList<>();
+    private boolean didPressAssholeButton = false;
     private long lastTimeMeasured = System.nanoTime();
 
     public LadderCalculator(RankerService rankerService, AccountService accountService, WSUtils wsUtils) {
@@ -42,71 +41,15 @@ public class LadderCalculator {
     public void update() {
         // Reset the Heartbeat
         heartbeatMap = new HashMap<>();
-        boolean didPressAssholeButton = false;
+        globalEvents = new ArrayList<>();
+        modEvents = new ArrayList<>();
+        didPressAssholeButton = false;
         try {
             rankerService.getLadderSem().acquire();
             try {
                 // Process and filter all events since the last Calculation Step
-                try {
-                    rankerService.getEventSem().acquire();
-                    try {
-                        for (int i = 1; i <= rankerService.getLadders().size(); i++) {
-                            // Handle the events since the last update
-                            Ladder ladder = rankerService.getLadders().get(i);
-                            List<Event> events = rankerService.getEventMap().get(ladder.getNumber());
-                            List<Event> eventsToBeRemoved = new ArrayList<>();
-                            for (int j = 0; j < events.size(); j++) {
-                                Event e = events.get(j);
-                                switch (e.getEventType()) {
-                                    case BIAS -> {
-                                        if (!rankerService.buyBias(e.getAccountId(), ladder))
-                                            eventsToBeRemoved.add(e);
-                                    }
-                                    case MULTI -> {
-                                        if (!rankerService.buyMulti(e.getAccountId(), ladder))
-                                            eventsToBeRemoved.add(e);
-                                    }
-                                    case PROMOTE -> {
-                                        if (!rankerService.promote(e.getAccountId(), ladder, false))
-                                            eventsToBeRemoved.add(e);
-                                    }
-                                    case ASSHOLE -> {
-                                        eventsToBeRemoved.add(e);
-                                        if (rankerService.promote(e.getAccountId(), ladder, true))
-                                            didPressAssholeButton = true;
-                                    }
-                                    case VINEGAR -> {
-                                        if (!rankerService.throwVinegar(e.getAccountId(), ladder, e))
-                                            eventsToBeRemoved.add(e);
-                                    }
-                                    case NAME_CHANGE -> {
-                                        accountService.updateUsername(e.getAccountId(), ladder, e);
-                                    }
-                                    case AUTO_PROMOTE -> {
-                                        if (!rankerService.buyAutoPromote(e.getAccountId(), ladder))
-                                            eventsToBeRemoved.add(e);
-                                    }
-                                    case SOFT_RESET_POINTS -> {
-                                        rankerService.softResetPoints(e.getAccountId(), ladder);
-                                    }
-                                    default -> {
-
-                                    }
-                                }
-                            }
-                            for (Event e : eventsToBeRemoved) {
-                                events.remove(e);
-                            }
-                            heartbeatMap.put(ladder.getNumber(), new HeartbeatDTO(new ArrayList<>(events)));
-                        }
-                        rankerService.resetEvents();
-                    } finally {
-                        rankerService.getEventSem().release();
-                    }
-                } catch (Exception e) {
-                    log.error(e.getMessage());
-                    e.printStackTrace();
-                }
+                handlePlayerEvents();
+                handleModEvents();
 
                 // Calculate Time passed
                 long currentNanos = System.nanoTime();
@@ -117,14 +60,16 @@ public class LadderCalculator {
 
                 // If someone was an Asshole and the reset worked, should notify all and end calculation
                 if (didPressAssholeButton && rankerService.resetAllLadders()) {
-                    for (Ladder ladder : rankerService.getLadders().values()) {
-                        heartbeatMap.get(ladder.getNumber()).setSecondsPassed(deltaSec);
-                        heartbeatMap.get(ladder.getNumber()).setEvents(new ArrayList<>());
-                        heartbeatMap.get(ladder.getNumber()).getEvents().add(new Event(EventType.RESET, 0L));
-                        wsUtils.convertAndSendToAll(RankerController.LADDER_UPDATE_DESTINATION + ladder.getNumber(), heartbeatMap.get(ladder.getNumber()));
-                    }
+                    globalEvents.add(new Event(EventType.RESET, 0L));
+                    wsUtils.convertAndSendToAll(RankerController.GLOBAL_UPDATE_DESTINATION, globalEvents);
                     return;
                 }
+
+                if (!modEvents.isEmpty())
+                    wsUtils.convertAndSendToAll(RankerController.GLOBAL_UPDATE_DESTINATION, modEvents);
+
+                if (!globalEvents.isEmpty())
+                    wsUtils.convertAndSendToAll(RankerController.GLOBAL_UPDATE_DESTINATION, globalEvents);
 
                 // Otherwise, just send the default Broadcasts
                 for (Ladder ladder : rankerService.getLadders().values()) {
@@ -147,6 +92,116 @@ public class LadderCalculator {
                 rankerService.getLadderSem().release();
             }
         } catch (InterruptedException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void handleModEvents() {
+        try {
+            accountService.getModEventSem().acquire();
+            try {
+                modEvents = new ArrayList<>(accountService.getModEventList());
+
+                for (int i = 0; i < modEvents.size(); i++) {
+                    Event e = modEvents.get(i);
+                    switch (e.getEventType()) {
+                        case BAN -> {
+                            accountService.ban(e.getAccountId(), e);
+                        }
+                        case FREE -> {
+                            accountService.free(e.getAccountId(), e);
+                        }
+                        case MUTE -> {
+                            accountService.mute(e.getAccountId(), e);
+                        }
+                        case NAME_CHANGE -> {
+                            accountService.updateUsername(e.getAccountId(), e);
+                        }
+                        case MOD -> {
+                            accountService.mod(e.getAccountId(), e);
+                        }
+                    }
+                }
+
+                accountService.resetEvents();
+            } finally {
+                accountService.getModEventSem().release();
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void handlePlayerEvents() {
+        try {
+            rankerService.getEventSem().acquire();
+            try {
+                for (int i = 1; i <= rankerService.getLadders().size(); i++) {
+                    // Handle the events since the last update
+                    Ladder ladder = rankerService.getLadders().get(i);
+                    List<Event> events = rankerService.getEventMap().get(ladder.getNumber());
+                    List<Event> eventsToBeRemoved = new ArrayList<>();
+                    for (int j = 0; j < events.size(); j++) {
+                        Event e = events.get(j);
+                        switch (e.getEventType()) {
+                            case BIAS -> {
+                                if (!rankerService.buyBias(e.getAccountId(), ladder))
+                                    eventsToBeRemoved.add(e);
+                            }
+                            case MULTI -> {
+                                if (!rankerService.buyMulti(e.getAccountId(), ladder))
+                                    eventsToBeRemoved.add(e);
+                            }
+                            case PROMOTE -> {
+                                if (!rankerService.promote(e.getAccountId(), ladder, false))
+                                    eventsToBeRemoved.add(e);
+                            }
+                            case ASSHOLE -> {
+                                if (rankerService.promote(e.getAccountId(), ladder, true)) {
+                                    e.setEventType(EventType.PROMOTE);
+                                    didPressAssholeButton = true;
+                                } else {
+                                    eventsToBeRemoved.add(e);
+                                }
+                            }
+                            case VINEGAR -> {
+                                if (!rankerService.throwVinegar(e.getAccountId(), ladder, e))
+                                    eventsToBeRemoved.add(e);
+                            }
+                            case AUTO_PROMOTE -> {
+                                if (!rankerService.buyAutoPromote(e.getAccountId(), ladder))
+                                    eventsToBeRemoved.add(e);
+                            }
+                            case SOFT_RESET_POINTS -> {
+                                rankerService.softResetPoints(e.getAccountId(), ladder);
+                            }
+                            default -> {
+
+                            }
+                        }
+                    }
+                    for (Event e : eventsToBeRemoved) {
+                        events.remove(e);
+                    }
+                    heartbeatMap.put(ladder.getNumber(), new HeartbeatDTO(new ArrayList<>(events)));
+                }
+                globalEvents = new ArrayList<>(rankerService.getGlobalEventList());
+                for (int i = 0; i < globalEvents.size(); i++) {
+                    Event e = globalEvents.get(i);
+                    switch (e.getEventType()) {
+                        case NAME_CHANGE -> {
+                            accountService.updateUsername(e.getAccountId(), e);
+                        }
+                    }
+                }
+
+                rankerService.resetEvents();
+            } finally {
+                rankerService.getEventSem().release();
+            }
+        } catch (Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();
         }

@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 @Log4j2
 public class CustomHandshakeHandler extends DefaultHandshakeHandler {
 
-    private final static Integer MAX_CONNECTIONS_PER_MINUTE = 3;
+    private final static Integer MAX_CONNECTIONS_PER_MINUTE = 5;
     private final LoadingCache<Integer, Integer> connectionsPerIpAddress;
 
     public CustomHandshakeHandler() {

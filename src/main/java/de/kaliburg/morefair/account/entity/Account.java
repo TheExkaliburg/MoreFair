@@ -1,7 +1,8 @@
 package de.kaliburg.morefair.account.entity;
 
+import de.kaliburg.morefair.account.type.AccountAccessRole;
 import de.kaliburg.morefair.dto.AccountDetailsDTO;
-import de.kaliburg.morefair.persistence.entity.Ranker;
+import de.kaliburg.morefair.ladder.Ranker;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -20,9 +21,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @SequenceGenerator(name = "seq_acc", sequenceName = "seq_acc", allocationSize = 1)
 public class Account {
-    @NonNull
-    @Column
-    private Boolean isMuted = false;
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_acc")
     private Long id;
@@ -32,7 +30,7 @@ public class Account {
     @NonNull
     @Column(nullable = false)
     private String username;
-    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "account", fetch = FetchType.EAGER)
     private List<Ranker> rankers = new ArrayList<>();
     @NonNull
     @Column(nullable = false)
@@ -40,15 +38,15 @@ public class Account {
     @NonNull
     @Column(nullable = false)
     private Integer timesAsshole = 0;
+    @Column
+    private Integer lastIp;
     @NonNull
     @Column(nullable = false)
     private LocalDateTime lastLogin = LocalDateTime.now();
-    @Column
-    private String lastIp = "";
-    //@NonNull
-    //@Column(nullable = false)
-    //@Enumerated(EnumType.STRING)
-    //private AccountAccessRole accessRole = AccountAccessRole.PLAYER;
+    @NonNull
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private AccountAccessRole accessRole = AccountAccessRole.PLAYER;
 
     public AccountDetailsDTO convertToDTO() {
         return new AccountDetailsDTO(this);

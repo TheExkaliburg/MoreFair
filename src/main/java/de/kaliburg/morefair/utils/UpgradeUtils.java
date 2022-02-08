@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.utils;
 
-import de.kaliburg.morefair.controller.FairController;
+import de.kaliburg.morefair.FairController;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

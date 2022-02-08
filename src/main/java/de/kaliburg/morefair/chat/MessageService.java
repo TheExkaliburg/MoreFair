@@ -1,13 +1,13 @@
-package de.kaliburg.morefair.service;
+package de.kaliburg.morefair.chat;
 
 import de.kaliburg.morefair.account.entity.Account;
+import de.kaliburg.morefair.account.events.AccountServiceEvent;
 import de.kaliburg.morefair.dto.ChatDTO;
-import de.kaliburg.morefair.persistence.entity.Ladder;
-import de.kaliburg.morefair.persistence.entity.Message;
-import de.kaliburg.morefair.persistence.repository.LadderRepository;
-import de.kaliburg.morefair.persistence.repository.MessageRepository;
+import de.kaliburg.morefair.ladder.Ladder;
+import de.kaliburg.morefair.ladder.LadderRepository;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,10 +18,9 @@ import java.util.*;
 
 @Service
 @Log4j2
-public class MessageService {
+public class MessageService implements ApplicationListener<AccountServiceEvent> {
     private final MessageRepository messageRepository;
     private final LadderRepository ladderRepository;
-
     @Getter
     private Map<Integer, Ladder> chats = new HashMap<>();
 
@@ -44,10 +43,10 @@ public class MessageService {
     public void init() {
         ladderRepository.findAllLaddersJoinedWithMessages().forEach(l -> chats.put(l.getNumber(), l));
         for (Ladder l : chats.values()) {
-            if (l.getMessages().size() > 30) {
+            if (l.getMessages().size() > 50) {
                 List<Message> messages = l.getMessages();
                 messages.sort(Comparator.comparing(Message::getCreatedOn));
-                l.setMessages(messages.subList(0, 30));
+                l.setMessages(messages.subList(0, 50));
             }
         }
     }
@@ -88,5 +87,24 @@ public class MessageService {
         if (messages.size() > 30) messages.remove(messages.size() - 1);
         ladder.setMessages(messages);
         return message;
+    }
+
+    public ArrayList<Message> getAllMessages() {
+        ArrayList<Message> result = new ArrayList<>();
+        chats.values().forEach(c -> result.addAll(c.getMessages()));
+        return result;
+    }
+
+    @Override
+    public void onApplicationEvent(AccountServiceEvent event) {
+        if (event.getEventType().equals(AccountServiceEvent.AccountServiceEventType.UPDATE)) {
+            for (Ladder ladder : chats.values()) {
+                for (Message message : chats.get(ladder.getNumber()).getMessages()) {
+                    if (message.getAccount().getId().equals(event.getAccount().getId())) {
+                        message.setAccount(event.getAccount());
+                    }
+                }
+            }
+        }
     }
 }

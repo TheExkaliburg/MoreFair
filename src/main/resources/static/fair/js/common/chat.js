@@ -1,6 +1,6 @@
 let messageTemplate = {
     username: "Chad, the Listener",
-    message: "Sorry, I'm currently resting my ears. If you want to be heard, head over into our Discord. https://discord.gg/Ud7UfFJmYj ",
+    message: "Sorry, I'm currently resting my ears. If you want to be heard, head over into our Discord. https://discord.gg/ThKzCknfFr",
     timesAsshole: 0,
     accountId: 0,
     timeCreated: "00:00"
@@ -10,6 +10,7 @@ let chatData = {
     messages: [messageTemplate],
     currentChatNumber: 1
 }
+
 
 function initChat(ladderNum) {
     stompClient.send("/app/chat/init/" + ladderNum, {}, JSON.stringify({
