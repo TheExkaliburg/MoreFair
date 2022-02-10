@@ -48,23 +48,30 @@ public class RankerController {
                 return;
             }
 
-            rankerService.getLadderSem().acquire();
-            try {
-                if (account.getAccessRole().equals(AccountAccessRole.OWNER) || account.getAccessRole().equals(AccountAccessRole.MODERATOR)
-                        || number == FairController.BASE_ASSHOLE_LADDER + accountService.findMaxTimesAsshole()
-                        || number <= rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber()) {
-                    LadderViewDTO l = rankerService.findAllRankerByLadderAreaAndAccount(number, account);
-                    wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, l);
-                } else {
-                    wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
+            Ranker ranker = rankerService.findHighestActiveRankerByAccount(account);
+
+            if (ranker == null) {
+                rankerService.getLadderSem().acquire();
+                try {
+                    ranker = rankerService.createNewActiveRankerForAccountOnLadder(account, 1);
+                } finally {
+                    rankerService.getLadderSem().release();
                 }
-            } finally {
-                rankerService.getLadderSem().release();
             }
+
+            if (account.getAccessRole().equals(AccountAccessRole.OWNER) || account.getAccessRole().equals(AccountAccessRole.MODERATOR)
+                    || number == FairController.BASE_ASSHOLE_LADDER + accountService.findMaxTimesAsshole()
+                    || number <= ranker.getLadder().getNumber()) {
+                LadderViewDTO l = rankerService.findAllRankerByLadderAreaAndAccount(number, account);
+                wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, l);
+            } else {
+                wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, "Can't get permission to view the ladder.", HttpStatus.FORBIDDEN);
+            }
+
         } catch (IllegalArgumentException e) {
             wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
+            wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             log.error(e.getMessage());
             e.printStackTrace();
         }

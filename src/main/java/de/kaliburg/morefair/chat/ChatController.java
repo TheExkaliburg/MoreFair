@@ -4,6 +4,7 @@ import de.kaliburg.morefair.account.entity.Account;
 import de.kaliburg.morefair.account.service.AccountService;
 import de.kaliburg.morefair.account.type.AccountAccessRole;
 import de.kaliburg.morefair.dto.ChatDTO;
+import de.kaliburg.morefair.ladder.Ranker;
 import de.kaliburg.morefair.ladder.RankerService;
 import de.kaliburg.morefair.messages.WSMessage;
 import de.kaliburg.morefair.utils.WSUtils;
@@ -46,17 +47,25 @@ public class ChatController {
                 return;
             }
 
-            rankerService.getLadderSem().acquire();
-            try {
-                if (number <= rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber()) {
-                    ChatDTO c = messageService.getChat(number);
-                    wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, c);
-                } else {
-                    wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
+            Ranker ranker = rankerService.findHighestActiveRankerByAccount(account);
+
+            if (ranker == null) {
+                rankerService.getLadderSem().acquire();
+                try {
+                    ranker = rankerService.createNewActiveRankerForAccountOnLadder(account, 1);
+                } finally {
+                    rankerService.getLadderSem().release();
                 }
-            } finally {
-                rankerService.getLadderSem().release();
             }
+
+            if (account.getAccessRole().equals(AccountAccessRole.OWNER) || account.getAccessRole().equals(AccountAccessRole.MODERATOR)
+                    || number <= ranker.getLadder().getNumber()) {
+                ChatDTO c = messageService.getChat(number);
+                wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, c);
+            } else {
+                wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
         } catch (IllegalArgumentException e) {
             wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
