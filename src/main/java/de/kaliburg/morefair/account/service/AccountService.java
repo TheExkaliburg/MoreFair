@@ -8,6 +8,7 @@ import de.kaliburg.morefair.dto.AccountDetailsDTO;
 import de.kaliburg.morefair.events.Event;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,6 +65,7 @@ public class AccountService {
         String newUsername = (String) event.getData();
         account.setUsername(newUsername);
         account = saveAccount(account);
+        event.setData(StringEscapeUtils.unescapeJava(newUsername));
         return true;
     }
 
