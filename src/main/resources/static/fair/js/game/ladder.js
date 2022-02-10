@@ -297,8 +297,10 @@ function handleJoin(event) {
         vinegar: new Decimal(0)          // only shows the actual Number on yourRanker
     }
 
-    if (newRanker.accountId !== identityData.accountId)
-        ladderData.rankers.push(newRanker);
+    if (!ladderData.rankers.find(r => r.accountId === event.accountId)) {
+        if (newRanker.accountId !== identityData.accountId)
+            ladderData.rankers.push(newRanker);
+    }
 }
 
 function handleNameChange(event) {

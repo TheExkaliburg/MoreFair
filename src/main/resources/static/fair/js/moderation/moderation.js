@@ -170,6 +170,7 @@ class ModChat {
     update(data, ladder) {
         data.ladderNumber = ladder;
         this.#data.messages.unshift(data);
+        if (this.#data.messages.length > 300) this.#data.messages.pop();
         this.#draw();
     }
 
@@ -238,7 +239,7 @@ class ModGameEvents {
                 case 'FREE':
                 case 'MOD':
                     this.#data.events.unshift(event);
-                    break;
+                    if (this.#data.events.length > 50) this.#data.events.pop();
             }
 
             if (event.eventType === "NAME_CHANGE") {
