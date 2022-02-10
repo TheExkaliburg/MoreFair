@@ -132,6 +132,9 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
     }
 
     public Ranker findHighestActiveRankerByAccount(Account account) {
+        if (account.getRankers().size() <= 0)
+            createNewActiveRankerForAccountOnLadder(account, 1);
+
         Ranker ranker = Collections.max(account.getRankers().stream()
                 .filter(Ranker::isGrowing).toList(), Comparator.comparing(r -> r.getLadder().getNumber()));
 
