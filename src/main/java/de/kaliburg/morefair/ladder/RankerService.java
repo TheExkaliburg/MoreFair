@@ -135,6 +135,7 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
         if (account.getRankers().size() <= 0)
             createNewActiveRankerForAccountOnLadder(account, 1);
 
+        account = accountService.findAccountByUUID(account.getUuid());
         Ranker ranker = Collections.max(account.getRankers().stream()
                 .filter(Ranker::isGrowing).toList(), Comparator.comparing(r -> r.getLadder().getNumber()));
 
