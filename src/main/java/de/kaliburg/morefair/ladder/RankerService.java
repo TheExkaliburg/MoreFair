@@ -319,7 +319,7 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
                 if (newLadder.getRankers().size() == 1) {
                     newRanker.setAutoPromote(true);
                 }
-                if (isAssholeEvent && ranker.getLadder().getNumber().compareTo(FairController.BASE_ASSHOLE_LADDER + accountService.findMaxTimesAsshole()) == 0) {
+                if ((isAssholeEvent || ranker.isAutoPromote()) && ranker.getLadder().getNumber().compareTo(FairController.BASE_ASSHOLE_LADDER + accountService.findMaxTimesAsshole()) == 0) {
                     Account account = accountService.findByUuid(ranker.getAccount().getUuid());
                     account.setIsAsshole(true);
                     accountService.saveAccount(account);
@@ -464,8 +464,6 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
                 log.info("[L{}] Buying Auto-Promote for {}", ladder.getNumber(), ranker.getAccount().getUsername());
                 ranker.setGrapes(ranker.getGrapes().subtract(cost));
                 ranker.setAutoPromote(true);
-                ModUpdateData modUpdateData = new ModUpdateData();
-                modUpdateData.setLadderNumber(ladder.getNumber());
                 return true;
             }
         } catch (Exception e) {
