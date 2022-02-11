@@ -314,6 +314,11 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
                 Ranker newRanker = createNewActiveRankerForAccountOnLadder(ranker.getAccount(), ranker.getLadder().getNumber() + 1);
                 newRanker.setVinegar(ranker.getVinegar());
                 newRanker.setGrapes(ranker.getGrapes());
+                Ladder newLadder = findLadder(newRanker.getLadder());
+
+                if (newLadder.getRankers().size() == 1) {
+                    newRanker.setAutoPromote(true);
+                }
                 if (isAssholeEvent && ranker.getLadder().getNumber().compareTo(FairController.BASE_ASSHOLE_LADDER + accountService.findMaxTimesAsshole()) == 0) {
                     Account account = accountService.findByUuid(ranker.getAccount().getUuid());
                     account.setIsAsshole(true);
