@@ -24,6 +24,7 @@
     <script src="/webjars/sockjs-client/sockjs.min.js"></script>
     <script src="/webjars/stomp-websocket/stomp.min.js"></script>
     <script th:src="@{/fair/js/common/cookie.js}" type="text/javascript"></script>
+    <script th:src="@{/fair/js/common/handlebarsHelper.js}" type="text/javascript"></script>
     <script th:src="@{/fair/js/moderation/moderation.js}" type="text/javascript"></script>
     <!--script th:src="@{/fair/js/common/chat.js}" type="text/javascript"></script-->
 </head>
@@ -112,7 +113,7 @@
             <a href="#" class="freeSymbol" data-account-id="{{accountId}}" data-username="{{username}}">🔙</a>
             <a href="#" class="modSymbol" data-account-id="{{accountId}}" data-username="{{username}}">⬆️</a>
         </td>
-        <td>{{eventType}}: {{data}}</td>
+        <td>{{eventType}}: {{json data}}</td>
     </tr>
     {{/each}}
 </script>
