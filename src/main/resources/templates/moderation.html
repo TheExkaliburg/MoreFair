@@ -113,7 +113,7 @@
             <a href="#" class="freeSymbol" data-account-id="{{accountId}}" data-username="{{username}}">🔙</a>
             <a href="#" class="modSymbol" data-account-id="{{accountId}}" data-username="{{username}}">⬆️</a>
         </td>
-        <td>{{eventType}}: {{json data}}</td>
+        <td>{{eventType}}{{#if data}}: {{json data}}{{/if}}</td>
     </tr>
     {{/each}}
 </script>
