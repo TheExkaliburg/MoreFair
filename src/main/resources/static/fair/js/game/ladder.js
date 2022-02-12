@@ -71,7 +71,7 @@ function buyBias() {
     let biasButton = $('#biasButton');
     let biasTooltip = $('#biasTooltip');
 
-    if (ladderData.yourRanker.points.cmp(ladderData.firstRanker.points.mul(0.8)) >= 0) {
+    if (ladderData.yourRanker.points.cmp(Decimal.max(ladderData.firstRanker.points, infoData.pointsForPromote).mul(0.8)) >= 0) {
         if (!confirm("You're really close to the top, are you sure, you want to bias.")) {
             biasButton.prop("disabled", true);
             biasTooltip.tooltip('hide');
@@ -93,7 +93,7 @@ function buyMulti() {
     let multiButton = $('#multiButton');
     let multiTooltip = $('#multiTooltip');
 
-    if (ladderData.yourRanker.points.cmp(ladderData.firstRanker.points.mul(0.8)) >= 0) {
+    if (ladderData.yourRanker.points.cmp(Decimal.max(ladderData.firstRanker.points, infoData.pointsForPromote).mul(0.8)) >= 0) {
         if (!confirm("You're really close to the top, are you sure, you want to multi.")) {
             multiButton.prop("disabled", true);
             multiTooltip.tooltip('hide');

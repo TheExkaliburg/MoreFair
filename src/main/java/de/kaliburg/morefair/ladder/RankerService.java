@@ -14,6 +14,7 @@ import de.kaliburg.morefair.moderation.data.ModUpdateData;
 import de.kaliburg.morefair.utils.UpgradeUtils;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -210,7 +211,7 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
             ranker = saveRanker(new Ranker(UUID.randomUUID(), ladder, account, ladder.getRankers().size() + 1));
             ladder.getRankers().add(ranker);
             Event event = new Event(EventType.JOIN, account.getId());
-            event.setData(new JoinData(account.getUsername(), account.getTimesAsshole()));
+            event.setData(new JoinData(StringEscapeUtils.unescapeJava(account.getUsername()), account.getTimesAsshole()));
             eventMap.get(ladderNum).add(event);
         } else {
             ranker = activeRankersInLadder.get(0);
