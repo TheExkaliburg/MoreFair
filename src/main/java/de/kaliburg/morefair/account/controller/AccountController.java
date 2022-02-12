@@ -45,7 +45,7 @@ public class AccountController {
             log.debug("/app/account/login {}", uuid);
             if (uuid.isBlank()) {
                 if (requestThrottler.canCreateAccount(principal)) {
-                    wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, accountService.createNewAccount(), HttpStatus.CREATED);
+                    wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, accountService.createNewAccount(principal), HttpStatus.CREATED);
                 } else {
                     wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
                 }
@@ -55,7 +55,7 @@ public class AccountController {
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null) {
                 if (requestThrottler.canCreateAccount(principal)) {
-                    wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, accountService.createNewAccount(), HttpStatus.CREATED);
+                    wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, accountService.createNewAccount(principal), HttpStatus.CREATED);
                 } else {
                     wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
                 }
@@ -64,7 +64,7 @@ public class AccountController {
                 if (account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
                     wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
                 }
-                accountService.updateActivity(account);
+                accountService.login(account, principal);
                 wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, account.convertToDTO());
             }
 
