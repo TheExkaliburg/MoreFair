@@ -417,7 +417,11 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
         try {
             List<Account> accounts = accountService.findAllAccountsJoinedWithRankers().stream().toList();
             long assholeCount = accounts.stream().filter(Account::getIsAsshole).count();
-            if (assholeCount >= FairController.ASSHOLES_FOR_RESET) {
+
+            int assholeLadder = FairController.BASE_ASSHOLE_LADDER + accountService.findMaxTimesAsshole();
+            int neededAssholesForReset = Math.max(FairController.ASSHOLES_FOR_RESET, (assholeLadder + 1) >> 1);
+
+            if (assholeCount >= neededAssholesForReset) {
                 deleteAllRanker();
                 for (Ladder ladder : ladders.values()) {
                     ladder = ladderRepository.findLadderByUUIDWithRanker(ladder.getUuid());
