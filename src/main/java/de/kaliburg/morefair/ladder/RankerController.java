@@ -81,14 +81,14 @@ public class RankerController {
     public void buyBias(SimpMessageHeaderAccessor sha, WSMessage wsMessage) {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-            log.debug("/app/ladder/post/bias from {} {}", uuid, wsMessage.getEvent());
+            log.debug("/app/ladder/post/bias from {}", uuid);
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
                 return;
             }
-            log.info("[BIAS] {} (#{}) {}", account.getUsername(), account.getId(), wsMessage.getEvent());
-            rankerService.addEvent(rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber(),
-                    new Event(EventType.BIAS, account.getId()));
+            Integer num = rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber();
+            log.info("[L{}] BIAS: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
+            rankerService.addEvent(num, new Event(EventType.BIAS, account.getId()));
         } catch (Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();
@@ -99,14 +99,14 @@ public class RankerController {
     public void buyMulti(SimpMessageHeaderAccessor sha, WSMessage wsMessage) {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-            log.debug("/app/ladder/post/bias from {} {}", uuid);
+            log.debug("/app/ladder/post/bias from {}", uuid);
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
                 return;
             }
-            log.info("[MULT] {} (#{}) {}", account.getUsername(), account.getId(), wsMessage.getEvent());
-            rankerService.addEvent(rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber(),
-                    new Event(EventType.MULTI, account.getId()));
+            Integer num = rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber();
+            log.info("[L{}] MULTI: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
+            rankerService.addEvent(num, new Event(EventType.MULTI, account.getId()));
         } catch (Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();
