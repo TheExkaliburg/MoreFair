@@ -105,6 +105,7 @@ public class ModerationController {
             } else {
                 log.info("{} is banning the account with id {}", account.getUsername(), id);
                 accountService.addModEvent(new Event(EventType.BAN, id));
+                accountService.addModEvent(new Event(EventType.NAME_CHANGE, id, "BANNED"))
             }
         } catch (IllegalArgumentException e) {
             wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.BAD_REQUEST);
