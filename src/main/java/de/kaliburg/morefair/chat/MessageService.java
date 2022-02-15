@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.*;
+import java.util.concurrent.Semaphore;
 
 @Service
 @Log4j2
@@ -23,6 +24,7 @@ public class MessageService implements ApplicationListener<AccountServiceEvent> 
     private final LadderRepository ladderRepository;
     @Getter
     private Map<Integer, Ladder> chats = new HashMap<>();
+    private Semaphore chatSem = new Semaphore(1);
 
     public MessageService(MessageRepository messageRepository, LadderRepository ladderRepository) {
         this.messageRepository = messageRepository;
@@ -57,7 +59,6 @@ public class MessageService implements ApplicationListener<AccountServiceEvent> 
     public void syncWithDB() {
         log.debug("Saving Chats...");
         deleteAllMessages();
-
         for (Ladder l : chats.values()) {
             saveAllMessages(l.getMessages());
         }
@@ -104,6 +105,29 @@ public class MessageService implements ApplicationListener<AccountServiceEvent> 
                         message.setAccount(event.getAccount());
                     }
                 }
+            }
+        }
+
+        if (event.getEventType().equals(AccountServiceEvent.AccountServiceEventType.BAN)
+                || event.getEventType().equals(AccountServiceEvent.AccountServiceEventType.MUTE)) {
+            try {
+                chatSem.acquire();
+                try {
+                    chats.values().forEach(ladder -> {
+                        List<Message> messages = new ArrayList<>(ladder.getMessages());
+
+                        messages.forEach(message -> {
+                            if (message.getAccount().getId().equals(event.getAccount().getId())) {
+                                ladder.getMessages().remove(message);
+                            }
+                        });
+                    });
+                } finally {
+                    chatSem.release();
+                }
+            } catch (InterruptedException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
             }
         }
     }

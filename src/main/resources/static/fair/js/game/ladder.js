@@ -215,6 +215,10 @@ function handleEvent(event) {
         case 'RESET':
             handleReset(event);
             break;
+        case 'BAN':
+        case 'MUTE':
+            removeMessages(event);
+            break;
     }
 }
 

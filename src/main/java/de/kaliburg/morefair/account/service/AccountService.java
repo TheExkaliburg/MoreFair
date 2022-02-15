@@ -113,7 +113,8 @@ public class AccountService {
         Account account = findAccountById(accountId);
         if (account != null && !account.getAccessRole().equals(AccountAccessRole.OWNER)) {
             account.setAccessRole(AccountAccessRole.BANNED_PLAYER);
-            saveAccount(account);
+            account = saveAccount(account);
+            eventPublisher.publishEvent(new AccountServiceEvent(e, account, AccountServiceEvent.AccountServiceEventType.BAN));
         }
     }
 
@@ -121,7 +122,8 @@ public class AccountService {
         Account account = findAccountById(accountId);
         if (account != null && !account.getAccessRole().equals(AccountAccessRole.OWNER)) {
             account.setAccessRole(AccountAccessRole.MUTED_PLAYER);
-            saveAccount(account);
+            account = saveAccount(account);
+            eventPublisher.publishEvent(new AccountServiceEvent(e, account, AccountServiceEvent.AccountServiceEventType.MUTE));
         }
     }
 

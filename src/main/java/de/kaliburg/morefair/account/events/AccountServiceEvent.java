@@ -17,6 +17,6 @@ public class AccountServiceEvent extends ApplicationEvent {
     }
 
     public enum AccountServiceEventType {
-        CREATE, UPDATE
+        CREATE, UPDATE, BAN, MUTE
     }
 }
