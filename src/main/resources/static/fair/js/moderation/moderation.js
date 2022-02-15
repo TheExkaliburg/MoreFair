@@ -1,7 +1,7 @@
 let modTool;
 
 let loggedEvents = ['NAME_CHANGE', 'BAN', 'MUTE', 'FREE', 'MOD', 'CONFIRM'];
-let filterLocations = ['/app/ladder/post/promote', '/app/ladder/post/auto-promote', "/app/ladder/post/vinegar"];
+let filterLocations = [];
 let filterLadders = [];
 let filterAccounts = [];
 
@@ -250,7 +250,7 @@ class ModGameEvents {
 
             if (loggedEvents.includes(event.eventType)) {
                 this.#data.events.unshift(event);
-                if (this.#data.events.length > 100) this.#data.events.pop();
+                if (this.#data.events.length > 50) this.#data.events.pop();
             }
 
             if (event.eventType === "NAME_CHANGE") {
@@ -287,7 +287,7 @@ class ModGameEvents {
 
         if (filterLocations.includes(data.location) && isInFilter) {
             this.#data.events.unshift(event);
-            if (this.#data.events.length > 100) this.#data.events.pop();
+            if (this.#data.events.length > 50) this.#data.events.pop();
         }
         this.#draw();
     }
