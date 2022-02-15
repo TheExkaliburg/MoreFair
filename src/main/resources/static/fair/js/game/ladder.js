@@ -37,7 +37,6 @@ function initLadder(ladderNum) {
 function handleLadderInit(message) {
     if (message.status === "OK") {
         if (message.content) {
-            console.log(message);
             ladderData = message.content;
             ladderData.rankers.forEach(ranker => {
                 ranker.power = new Decimal(ranker.power);
@@ -69,7 +68,6 @@ function handleLadderInit(message) {
 }
 
 function buyBias(event) {
-    console.log(event);
     let cost = new Decimal(getUpgradeCost(ladderData.yourRanker.bias + 1));
     let biasButton = $('#biasButton');
     let biasTooltip = $('#biasTooltip');
@@ -93,7 +91,6 @@ function buyBias(event) {
 }
 
 function buyMulti(event) {
-    console.log(event);
     let cost = getUpgradeCost(ladderData.yourRanker.multiplier + 1);
     let multiButton = $('#multiButton');
     let multiTooltip = $('#multiTooltip');
