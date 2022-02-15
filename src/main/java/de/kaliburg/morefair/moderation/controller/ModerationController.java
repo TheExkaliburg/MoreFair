@@ -28,12 +28,12 @@ import java.util.UUID;
 @Controller
 @Log4j2
 public class ModerationController {
-    public final static String CHAT_UPDATE_DESTINATION = "/topic/mod/chat";
-    public final static String GAME_UPDATE_DESTINATION = "/topic/mod/game";
-    public final static String GLOBAL_UPDATE_DESTINATION = "/topic/mod/global";
-    private final static String INFO_DESTINATION = "/queue/mod/info";
-    private final static String CHAT_DESTINATION = "/queue/mod/chat";
-    private final static String GAME_DESTINATION = "/queue/mod/game";
+    public final static String CHAT_UPDATE_DESTINATION = "/topic/mod/chat/";
+    public final static String GAME_UPDATE_DESTINATION = "/topic/mod/ladder/";
+    public final static String GLOBAL_UPDATE_DESTINATION = "/topic/mod/global/";
+    private final static String INFO_DESTINATION = "/queue/mod/info/";
+    private final static String CHAT_DESTINATION = "/queue/mod/chat/";
+    private final static String GAME_DESTINATION = "/queue/mod/game/";
     private final AccountService accountService;
     private final WSUtils wsUtils;
     private final RankerService ladderService;

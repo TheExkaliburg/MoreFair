@@ -8,6 +8,8 @@ import de.kaliburg.morefair.dto.LadderViewDTO;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.EventType;
 import de.kaliburg.morefair.messages.WSMessage;
+import de.kaliburg.morefair.moderation.controller.ModerationController;
+import de.kaliburg.morefair.moderation.data.ModServerMessageData;
 import de.kaliburg.morefair.utils.WSUtils;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
@@ -81,13 +83,14 @@ public class RankerController {
     public void buyBias(SimpMessageHeaderAccessor sha, WSMessage wsMessage) {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-            log.debug("/app/ladder/post/bias from {}", uuid);
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
                 return;
             }
             Integer num = rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber();
-            log.info("[L{}] BIAS: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
+            log.debug("[L{}] BIAS: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
+            ModServerMessageData data = new ModServerMessageData(account.getId(), sha.getDestination(), wsMessage.getContent(), wsMessage.getEvent());
+            wsUtils.convertAndSendToAll(ModerationController.GAME_UPDATE_DESTINATION + num, data);
             rankerService.addEvent(num, new Event(EventType.BIAS, account.getId()));
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -99,13 +102,14 @@ public class RankerController {
     public void buyMulti(SimpMessageHeaderAccessor sha, WSMessage wsMessage) {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-            log.debug("/app/ladder/post/bias from {}", uuid);
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
                 return;
             }
             Integer num = rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber();
-            log.info("[L{}] MULTI: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
+            log.debug("[L{}] MULTI: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
+            ModServerMessageData data = new ModServerMessageData(account.getId(), sha.getDestination(), wsMessage.getContent(), wsMessage.getEvent());
+            wsUtils.convertAndSendToAll(ModerationController.GAME_UPDATE_DESTINATION + num, data);
             rankerService.addEvent(num, new Event(EventType.MULTI, account.getId()));
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -117,13 +121,14 @@ public class RankerController {
     public void throwVinegar(SimpMessageHeaderAccessor sha, WSMessage wsMessage) {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-            log.debug("/app/ladder/post/vinegar from {}", uuid);
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
                 return;
             }
             Integer num = rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber();
-            log.info("[L{}] VINEGAR: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
+            log.debug("[L{}] VINEGAR: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
+            ModServerMessageData data = new ModServerMessageData(account.getId(), sha.getDestination(), wsMessage.getContent(), wsMessage.getEvent());
+            wsUtils.convertAndSendToAll(ModerationController.GAME_UPDATE_DESTINATION + num, data);
             rankerService.addEvent(num, new Event(EventType.VINEGAR, account.getId()));
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -135,13 +140,14 @@ public class RankerController {
     public void promote(SimpMessageHeaderAccessor sha, WSMessage wsMessage) {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-            log.debug("/app/ladder/post/promote from {}", uuid);
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
                 return;
             }
             Integer num = rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber();
-            log.info("[L{}] PROMOTE: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
+            log.debug("[L{}] PROMOTE: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
+            ModServerMessageData data = new ModServerMessageData(account.getId(), sha.getDestination(), wsMessage.getContent(), wsMessage.getEvent());
+            wsUtils.convertAndSendToAll(ModerationController.GAME_UPDATE_DESTINATION + num, data);
             rankerService.addEvent(num, new Event(EventType.PROMOTE, account.getId()));
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -159,7 +165,9 @@ public class RankerController {
                 return;
             }
             Integer num = rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber();
-            log.info("[L{}] ASSHOLE: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
+            log.debug("[L{}] ASSHOLE: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
+            ModServerMessageData data = new ModServerMessageData(account.getId(), sha.getDestination(), wsMessage.getContent(), wsMessage.getEvent());
+            wsUtils.convertAndSendToAll(ModerationController.GAME_UPDATE_DESTINATION + num, data);
             rankerService.addEvent(num, new Event(EventType.ASSHOLE, account.getId()));
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -171,13 +179,14 @@ public class RankerController {
     public void buyAutoPromote(SimpMessageHeaderAccessor sha, WSMessage wsMessage) {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-            log.debug("/app/ladder/post/auto-promote from {}", uuid);
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
                 return;
             }
             Integer num = rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber();
-            log.info("[L{}] AUTOPROMOTE: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
+            log.debug("[L{}] AUTOPROMOTE: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
+            ModServerMessageData data = new ModServerMessageData(account.getId(), sha.getDestination(), wsMessage.getContent(), wsMessage.getEvent());
+            wsUtils.convertAndSendToAll(ModerationController.GAME_UPDATE_DESTINATION + num, data);
             rankerService.addEvent(num, new Event(EventType.AUTO_PROMOTE, account.getId()));
         } catch (Exception e) {
             log.error(e.getMessage());

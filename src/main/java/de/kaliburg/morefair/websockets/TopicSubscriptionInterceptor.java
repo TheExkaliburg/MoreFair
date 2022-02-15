@@ -80,6 +80,8 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
             if (ladderDestination > highestLadder) return false;
         }
 
+        if (topicDestination.contains("/topic/mod/")) return false;
+
         return true;
     }
 }
