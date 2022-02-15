@@ -136,6 +136,56 @@ function promptNameChange() {
     }
 }
 
+function serializeClickEvent(event) {
+    console.log(event);
+    let serializableEvent = {
+        altKey: event.altKey,
+        bubbles: event.bubbles,
+        button: event.button,
+        buttons: event.buttons,
+        cancelBubble: event.cancelBubble,
+        cancelable: event.cancelable,
+        clientX: event.clientX,
+        clientY: event.clientY,
+        composed: event.composed,
+        ctrlKey: event.ctrlKey,
+        currentTarget: JSON.stringify(event.currentTarget),
+        defaultPrevented: event.defaultPrevented,
+        delegateTarget: event.delegateTarget,
+        detail: event.detail,
+        eventPhase: event.eventPhase,
+        explicitOriginalTarget: JSON.stringify(event.explicitOriginalTarget),
+        isTrusted: event.isTrusted,
+        layerX: event.layerX,
+        layerY: event.layerY,
+        metaKey: event.metaKey,
+        movementX: event.movementX,
+        movementY: event.movementY,
+        mozInputSource: event.mozInputSource,
+        mozPressure: event.mozPressure,
+        offsetX: event.offsetX,
+        offsetY: event.offsetY,
+        originalTarget: JSON.stringify(event.originalTarget),
+        pageX: event.pageX,
+        pageY: event.pageY,
+        rangeOffset: event.rangeOffset,
+        rangeParent: JSON.stringify(event.rangeParent),
+        region: event.region,
+        relatedTarget: event.relatedTarget,
+        returnValue: event.returnValue,
+        screenX: event.screenX,
+        screenY: event.screenY,
+        shiftKey: event.shiftKey,
+        srcElement: JSON.stringify(event.srcElement),
+        target: JSON.stringify(event.target),
+        timeStamp: event.timeStamp,
+        type: event.type,
+        which: event.which,
+        x: event.x,
+        y: event.y,
+    }
+    return JSON.stringify(serializableEvent);
+}
 
 function getUpgradeCost(level) {
     return new Decimal(Math.round(Math.pow(ladderData.currentLadder.number + 1, level)));
@@ -150,7 +200,4 @@ function getAutoPromoteGrapeCost(rank) {
     let divisor = Math.max(rank - minPeople + 1, 1);
     return infoData.baseGrapesNeededToAutoPromote.div(divisor).floor();
 }
-
-
-
 

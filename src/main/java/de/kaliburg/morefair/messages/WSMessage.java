@@ -14,5 +14,5 @@ public class WSMessage {
     @NonNull
     private String content;
     @NonNull
-    private Object event;
+    private String event;
 }

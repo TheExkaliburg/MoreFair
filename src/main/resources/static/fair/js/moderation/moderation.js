@@ -238,7 +238,6 @@ class ModGameEvents {
 
             switch (event.eventType) {
                 case 'VINEGAR':
-                    console.log(data);
                 case 'PROMOTE':
                 case 'AUTO_PROMOTE':
                 case 'NAME_CHANGE':

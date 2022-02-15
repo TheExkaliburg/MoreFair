@@ -50,14 +50,14 @@
                     </div>
                     <div class="row col-4 text-center" style="border: 0px solid black">
                         <p class="h5" href="#" id="ladderNumber"></p>
-                        <button class="btn btn-secondary col" id="promoteButton" onclick="promote()"
+                        <button class="btn btn-secondary col" id="promoteButton" onclick="promote(event)"
                                 style="display: none"
                                 type="button">
                             <i class="bi bi-gem"></i>
                             PROMOTE
                             <i class="bi bi-gem"></i>
                         </button>
-                        <button class="btn btn-secondary col" id="assholeButton" onclick="beAsshole()"
+                        <button class="btn btn-secondary col" id="assholeButton" onclick="beAsshole(event)"
                                 style="display: none"
                                 type="button">
                             <i class="bi bi-emoji-dizzy"></i>
@@ -90,7 +90,7 @@
                     <div class="row">
                         <div class="col-auto" data-toggle="tooltip" id="autoPromoteTooltip">
                             <button class="btn btn-outline-dark btn-sm shadow-none text-center" id="autoPromoteButton"
-                                    onclick="buyAutoPromote()">
+                                    onclick="buyAutoPromote(event)">
                                 Auto-Promote!
                             </button>
                         </div>

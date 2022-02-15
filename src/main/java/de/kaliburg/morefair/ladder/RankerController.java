@@ -122,8 +122,9 @@ public class RankerController {
             if (account == null || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
                 return;
             }
-            rankerService.addEvent(rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber(),
-                    new Event(EventType.VINEGAR, account.getId()));
+            Integer num = rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber();
+            log.info("[L{}] VINEGAR: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
+            rankerService.addEvent(num, new Event(EventType.VINEGAR, account.getId()));
         } catch (Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();
@@ -139,8 +140,9 @@ public class RankerController {
             if (account == null || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
                 return;
             }
-            rankerService.addEvent(rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber(),
-                    new Event(EventType.PROMOTE, account.getId()));
+            Integer num = rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber();
+            log.info("[L{}] PROMOTE: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
+            rankerService.addEvent(num, new Event(EventType.PROMOTE, account.getId()));
         } catch (Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();
@@ -156,8 +158,9 @@ public class RankerController {
             if (account == null || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
                 return;
             }
-            rankerService.addEvent(rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber(),
-                    new Event(EventType.ASSHOLE, account.getId()));
+            Integer num = rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber();
+            log.info("[L{}] ASSHOLE: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
+            rankerService.addEvent(num, new Event(EventType.ASSHOLE, account.getId()));
         } catch (Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();
@@ -173,8 +176,9 @@ public class RankerController {
             if (account == null || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
                 return;
             }
-            rankerService.addEvent(rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber(),
-                    new Event(EventType.AUTO_PROMOTE, account.getId()));
+            Integer num = rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber();
+            log.info("[L{}] AUTOPROMOTE: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
+            rankerService.addEvent(num, new Event(EventType.AUTO_PROMOTE, account.getId()));
         } catch (Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();

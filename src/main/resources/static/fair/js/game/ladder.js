@@ -85,7 +85,7 @@ function buyBias(event) {
     if (ladderData.yourRanker.points.compare(cost) > 0) {
         stompClient.send("/app/ladder/post/bias", {}, JSON.stringify({
             'uuid': identityData.uuid,
-            'event': event
+            'event': serializeClickEvent(event)
         }));
     }
 }
@@ -108,46 +108,50 @@ function buyMulti(event) {
     if (ladderData.yourRanker.power.compare(cost) > 0) {
         stompClient.send("/app/ladder/post/multi", {}, JSON.stringify({
             'uuid': identityData.uuid,
-            'event': event
+            'event': serializeClickEvent(event)
         }));
     }
 }
 
-function throwVinegar() {
+function throwVinegar(event) {
     if (ladderData.yourRanker.vinegar.cmp(getVinegarThrowCost()) >= 0) {
         stompClient.send("/app/ladder/post/vinegar", {}, JSON.stringify({
-            'uuid': identityData.uuid
+            'uuid': identityData.uuid,
+            'event': serializeClickEvent(event)
         }));
     }
 }
 
-function promote() {
+function promote(event) {
     $('#promoteButton').hide();
     stompClient.send("/app/ladder/post/promote", {}, JSON.stringify({
-        'uuid': identityData.uuid
+        'uuid': identityData.uuid,
+        'event': serializeClickEvent(event)
     }));
 }
 
-function beAsshole() {
+function beAsshole(event) {
     if (ladderData.firstRanker.you && ladderData.rankers.length >= Math.max(infoData.minimumPeopleForPromote, ladderData.currentLadder.number)
         && ladderData.firstRanker.points.cmp(infoData.pointsForPromote) >= 0
         && ladderData.currentLadder.number >= infoData.assholeLadder) {
         if (confirm("Do you really wanna be an Asshole?!")) {
             stompClient.send("/app/ladder/post/asshole", {}, JSON.stringify({
-                'uuid': identityData.uuid
+                'uuid': identityData.uuid,
+                'event': serializeClickEvent(event)
             }));
         }
     }
 }
 
-function buyAutoPromote() {
+function buyAutoPromote(event) {
     $('#biasButton').prop("disabled", true);
     $('#autoPromoteTooltip').tooltip('hide');
     if (ladderData.currentLadder.number >= infoData.autoPromoteLadder
         && ladderData.currentLadder.number !== infoData.assholeLadder
         && ladderData.yourRanker.grapes.cmp(getAutoPromoteGrapeCost(ladderData.yourRanker.rank)) >= 0) {
         stompClient.send("/app/ladder/post/auto-promote", {}, JSON.stringify({
-            'uuid': identityData.uuid
+            'uuid': identityData.uuid,
+            'event': serializeClickEvent(event)
         }));
 
     }
