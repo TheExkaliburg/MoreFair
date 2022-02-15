@@ -183,6 +183,29 @@ public class ModerationController {
         }
     }
 
+    @MessageMapping("/mod/confirm/{id}")
+    public void promptConfirm(SimpMessageHeaderAccessor sha, WSMessage wsMessage, @DestinationVariable("id") Long id) throws Exception {
+        try {
+            String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
+            String text = StringEscapeUtils.escapeJava(HtmlUtils.htmlEscape(wsMessage.getContent()));
+
+            Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
+            if (account == null || !(account.getAccessRole().equals(AccountAccessRole.MODERATOR) || account.getAccessRole().equals(AccountAccessRole.OWNER))) {
+                wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.FORBIDDEN);
+                return;
+            } else {
+                log.info("{} is prompting an confirm to the account with id {} with '{}'", account.getUsername(), id, text);
+                accountService.addModEvent(new Event(EventType.CONFIRM, id, text));
+            }
+        } catch (IllegalArgumentException e) {
+            wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     @MessageMapping("/mod/mod/{id}")
     public void mod(SimpMessageHeaderAccessor sha, WSMessage wsMessage, @DestinationVariable("id") Long id) throws Exception {
         try {

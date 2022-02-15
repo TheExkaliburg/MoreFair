@@ -125,6 +125,14 @@ class ModerationTool {
         }
     }
 
+    promptConfirm(event) {
+        let dataSet = event.target.dataset;
+        let text = prompt(`What confirm-prompt would you like to send to "${dataSet.username}" (${dataSet.accountId})`);
+        if (text) {
+            this.send("/app/mod/confirm/" + dataSet.accountId, text);
+        }
+    }
+
     free(event) {
         let dataSet = event.target.dataset;
         if (confirm(`Are you sure you want to free "${dataSet.username}" (${dataSet.accountId})`)) {
@@ -256,6 +264,7 @@ class ModGameEvents {
         $("#updateBody .banSymbol").on('click', this.#modTool.ban.bind(this.#modTool));
         $("#updateBody .muteSymbol").on('click', this.#modTool.mute.bind(this.#modTool));
         $("#updateBody .nameSymbol").on('click', this.#modTool.rename.bind(this.#modTool));
+        $("#updateBody .confirmSymbol").on('click', this.#modTool.promptConfirm.bind(this.#modTool));
         $("#updateBody .freeSymbol").on('click', this.#modTool.free.bind(this.#modTool));
         if (this.#modTool.getModInfo().yourAccessRole === "OWNER") {
             $("#updateBody .modSymbol").on('click', this.#modTool.mod.bind(this.#modTool));

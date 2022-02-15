@@ -52,6 +52,8 @@ function handleLadderInit(message) {
                 }
             })
 
+            if (!ladderData.yourRanker) ladderData.yourRanker = rankerTemplate;
+
             ladderData.yourRanker.power = new Decimal(ladderData.yourRanker.power);
             ladderData.yourRanker.points = new Decimal(ladderData.yourRanker.points);
             ladderData.yourRanker.grapes = new Decimal(ladderData.yourRanker.grapes);
@@ -66,7 +68,8 @@ function handleLadderInit(message) {
     updateLadder();
 }
 
-function buyBias() {
+function buyBias(event) {
+    console.log(event);
     let cost = new Decimal(getUpgradeCost(ladderData.yourRanker.bias + 1));
     let biasButton = $('#biasButton');
     let biasTooltip = $('#biasTooltip');
@@ -83,12 +86,14 @@ function buyBias() {
     biasTooltip.tooltip('hide');
     if (ladderData.yourRanker.points.compare(cost) > 0) {
         stompClient.send("/app/ladder/post/bias", {}, JSON.stringify({
-            'uuid': identityData.uuid
+            'uuid': identityData.uuid,
+            'event': event
         }));
     }
 }
 
-function buyMulti() {
+function buyMulti(event) {
+    console.log(event);
     let cost = getUpgradeCost(ladderData.yourRanker.multiplier + 1);
     let multiButton = $('#multiButton');
     let multiTooltip = $('#multiTooltip');
@@ -105,7 +110,8 @@ function buyMulti() {
     multiTooltip.tooltip('hide');
     if (ladderData.yourRanker.power.compare(cost) > 0) {
         stompClient.send("/app/ladder/post/multi", {}, JSON.stringify({
-            'uuid': identityData.uuid
+            'uuid': identityData.uuid,
+            'event': event
         }));
     }
 }
@@ -205,6 +211,9 @@ function handleEvent(event) {
             break;
         case 'NAME_CHANGE':
             handleNameChange(event);
+            break;
+        case 'CONFIRM':
+            handleConfirm(event);
             break;
         case 'RESET':
             handleReset(event);
@@ -310,6 +319,14 @@ function handleNameChange(event) {
         }
     })
     updateChatUsername(event);
+}
+
+function handleConfirm(event) {
+    ladderData.rankers.forEach(ranker => {
+        if (event.accountId === ranker.accountId && ranker.you) {
+            confirm(event.data);
+        }
+    })
 }
 
 async function handleReset(event) {

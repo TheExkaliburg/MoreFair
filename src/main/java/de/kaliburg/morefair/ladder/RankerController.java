@@ -81,7 +81,7 @@ public class RankerController {
     public void buyBias(SimpMessageHeaderAccessor sha, WSMessage wsMessage) {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-            log.debug("/app/ladder/post/bias from {}", uuid);
+            log.info("/app/ladder/post/bias from {} {}", uuid, wsMessage.getEvent());
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
                 return;
@@ -98,7 +98,7 @@ public class RankerController {
     public void buyMulti(SimpMessageHeaderAccessor sha, WSMessage wsMessage) {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-            log.debug("/app/ladder/post/multi from {}", uuid);
+            log.info("/app/ladder/post/bias from {} {}", uuid, wsMessage.getEvent());
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
                 return;

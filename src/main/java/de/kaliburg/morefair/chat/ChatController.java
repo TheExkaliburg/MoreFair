@@ -7,6 +7,7 @@ import de.kaliburg.morefair.dto.ChatDTO;
 import de.kaliburg.morefair.ladder.Ranker;
 import de.kaliburg.morefair.ladder.RankerService;
 import de.kaliburg.morefair.messages.WSMessage;
+import de.kaliburg.morefair.utils.RequestThrottler;
 import de.kaliburg.morefair.utils.WSUtils;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
@@ -28,12 +29,14 @@ public class ChatController {
     private final AccountService accountService;
     private final RankerService rankerService;
     private final WSUtils wsUtils;
+    private final RequestThrottler throttler;
 
-    public ChatController(MessageService messageService, AccountService accountService, RankerService rankerService, WSUtils wsUtils) {
+    public ChatController(MessageService messageService, AccountService accountService, RankerService rankerService, WSUtils wsUtils, RequestThrottler throttler) {
         this.messageService = messageService;
         this.accountService = accountService;
         this.rankerService = rankerService;
         this.wsUtils = wsUtils;
+        this.throttler = throttler;
     }
 
     @MessageMapping("/chat/init/{number}")
@@ -88,7 +91,7 @@ public class ChatController {
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null || account.getAccessRole().equals(AccountAccessRole.MUTED_PLAYER) || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER))
                 return;
-            if (number <= rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber()) {
+            if (number <= rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber() && throttler.canPostMessage(account.getUuid())) {
                 Message answer = messageService.writeMessage(account, number, message);
                 wsUtils.convertAndSendToAll(CHAT_UPDATE_DESTINATION + number, answer.convertToDTO());
             }

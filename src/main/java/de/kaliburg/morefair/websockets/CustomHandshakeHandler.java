@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 @Log4j2
 public class CustomHandshakeHandler extends DefaultHandshakeHandler {
 
-    private final static Integer MAX_CONNECTIONS_PER_MINUTE = 5;
+    private final static Integer MAX_CONNECTIONS_PER_MINUTE = 3;
     private final LoadingCache<Integer, Integer> connectionsPerIpAddress;
 
     public CustomHandshakeHandler() {
@@ -61,8 +61,6 @@ public class CustomHandshakeHandler extends DefaultHandshakeHandler {
         requests = connectionsPerIpAddress.get(ipAddress);
         if (requests != null) {
             if (requests >= MAX_CONNECTIONS_PER_MINUTE) {
-                connectionsPerIpAddress.asMap().remove(ipAddress);
-                connectionsPerIpAddress.put(ipAddress, requests);
                 return true;
             }
         } else {
