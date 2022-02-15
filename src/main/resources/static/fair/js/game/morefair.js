@@ -137,7 +137,6 @@ function promptNameChange() {
 }
 
 function serializeClickEvent(event) {
-    console.log(event);
     let serializableEvent = {
         altKey: event.altKey,
         bubbles: event.bubbles,
