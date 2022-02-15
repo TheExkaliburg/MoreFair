@@ -27,7 +27,6 @@ import java.util.concurrent.Semaphore;
 public class AccountService {
     private final AccountRepository accountRepository;
     private final ApplicationEventPublisher eventPublisher;
-    public final static Long ANNOUNCEMENT_USER = 9999999L;
     @Getter
     private List<Event> modEventList = new ArrayList<>();
     @Getter
@@ -36,17 +35,6 @@ public class AccountService {
     public AccountService(AccountRepository accountRepository, ApplicationEventPublisher eventPublisher) {
         this.accountRepository = accountRepository;
         this.eventPublisher = eventPublisher;
-    }
-
-    @PostConstruct
-    public void init() {
-        //Create or find system messaging account.
-        Account eventAccount = findAccountById(ANNOUNCEMENT_USER);
-        if(eventAccount == null) {
-            eventAccount = new Account(UUID.randomUUID(), "SYSTEM NEWS");
-            eventAccount.setId(ANNOUNCEMENT_USER);
-            saveAccount(eventAccount);
-        }
     }
 
     public AccountDetailsDTO createNewAccount() {
@@ -99,6 +87,16 @@ public class AccountService {
 
     public Set<Account> findAllAccountsJoinedWithRankers() {
         return accountRepository.findAllAccountsJoinedWithRankers();
+    }
+
+    public Account findOwnerAccount() {
+        List<Account> accounts = accountRepository.findAllAccountsByAccessRole(AccountAccessRole.OWNER.name());
+        if(accounts.size() == 1) {
+            return accounts.get(0);
+        } else {
+            log.error("Single OWNER account access roles not found.");
+            throw new RuntimeException("Single OWNER account not found, found " + accounts.size() + " owner accounts.");
+        }
     }
 
     public Account findByUuid(UUID uuid) {

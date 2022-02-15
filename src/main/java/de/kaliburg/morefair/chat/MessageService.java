@@ -2,10 +2,12 @@ package de.kaliburg.morefair.chat;
 
 import de.kaliburg.morefair.account.entity.Account;
 import de.kaliburg.morefair.account.events.AccountServiceEvent;
+import de.kaliburg.morefair.account.service.AccountService;
 import de.kaliburg.morefair.dto.ChatDTO;
 import de.kaliburg.morefair.ladder.Ladder;
 import de.kaliburg.morefair.ladder.LadderRepository;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,18 +17,21 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.*;
+import java.util.stream.IntStream;
 
 @Service
 @Log4j2
 public class MessageService implements ApplicationListener<AccountServiceEvent> {
     private final MessageRepository messageRepository;
     private final LadderRepository ladderRepository;
+    private final AccountService accountService;
     @Getter
     private Map<Integer, Ladder> chats = new HashMap<>();
 
-    public MessageService(MessageRepository messageRepository, LadderRepository ladderRepository) {
+    public MessageService(MessageRepository messageRepository, LadderRepository ladderRepository, AccountService accountService) {
         this.messageRepository = messageRepository;
         this.ladderRepository = ladderRepository;
+        this.accountService = accountService;
     }
 
     public Ladder findLadderWithChat(Ladder ladder) {
@@ -79,12 +84,20 @@ public class MessageService implements ApplicationListener<AccountServiceEvent> 
         return chats.get(ladderNum).convertToChatDTO();
     }
 
-    public void writeSystemMessage(Integer highestLadder, Account account, String messageString) {
-        if(account != null) {
-            for(int loopLadders = 1 ; loopLadders<= highestLadder;loopLadders++) {
-                writeMessage(account, loopLadders, messageString);
+    //Injecting Ranker Service here would cause a circular dependency.
+    public void writeSystemMessage(@NonNull Integer highestLadder,@NonNull String messageString) {
+        try {
+            Account systemMessager = accountService.findOwnerAccount();
+            if (systemMessager != null) {
+                IntStream.range(1,highestLadder+1)
+                        .forEach(ladder -> {
+                            writeMessage(systemMessager,ladder,messageString);
+                        });
             }
+        } catch (RuntimeException re) {
+            log.error("Error processing System Message: " + messageString,re);
         }
+
     }
 
     public Message writeMessage(Account account, Integer ladderNum, String messageString) {

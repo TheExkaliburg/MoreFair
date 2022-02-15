@@ -350,10 +350,8 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
                 Account account = accountService.findByUuid(ranker.getAccount().getUuid());
                 account.setIsAsshole(true);
                 accountService.saveAccount(account);
-                Account systemMessager = accountService.findAccountById(AccountService.ANNOUNCEMENT_USER);
-                if(systemMessager != null) {
-                    addGlobalEvent(new Event(EventType.SYSTEM_MESSAGE,systemMessager.getId(), account.getUsername() + " is an asshole."));
-                }
+                addGlobalEvent(new Event(EventType.SYSTEM_MESSAGE,0L, account.getUsername() + " is an asshole."));
+
                 // Promote the Ranker afterwards
                 eventMap.get(ladder.getNumber()).add(new Event(EventType.PROMOTE, ranker.getAccount().getId()));
                 return true;

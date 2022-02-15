@@ -199,11 +199,8 @@ public class LadderCalculator {
                             accountService.updateUsername(e.getAccountId(), e);
                         }
                         case SYSTEM_MESSAGE -> {
-                            Account systemMessager = accountService.findAccountById(AccountService.ANNOUNCEMENT_USER);
-                            if(systemMessager != null && e.getData().toString() != null) {
-                                messageService.writeSystemMessage(rankerService.getHighestLadder().getNumber(),
-                                        systemMessager,e.getData().toString());
-                            }
+                            messageService.writeSystemMessage(rankerService.getHighestLadder().getNumber(),
+                                     e.getData().toString());
                         }
                     }
                 }
