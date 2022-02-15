@@ -91,7 +91,9 @@ public class ChatController {
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null || account.getAccessRole().equals(AccountAccessRole.MUTED_PLAYER) || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER))
                 return;
-            if (number <= rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber() && throttler.canPostMessage(account.getUuid())) {
+            if (account.getAccessRole().equals(AccountAccessRole.MODERATOR) || account.getAccessRole().equals(AccountAccessRole.OWNER)
+                    || (number <= rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber()
+                    && throttler.canPostMessage(account.getUuid()))) {
                 Message answer = messageService.writeMessage(account, number, message);
                 wsUtils.convertAndSendToAll(CHAT_UPDATE_DESTINATION + number, answer.convertToDTO());
             }
