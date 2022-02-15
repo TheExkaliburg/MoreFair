@@ -13,6 +13,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +27,7 @@ import java.util.concurrent.Semaphore;
 public class AccountService {
     private final AccountRepository accountRepository;
     private final ApplicationEventPublisher eventPublisher;
-
+    public final static Long ANNOUNCEMENT_USER = 9999999L;
     @Getter
     private List<Event> modEventList = new ArrayList<>();
     @Getter
@@ -34,6 +36,17 @@ public class AccountService {
     public AccountService(AccountRepository accountRepository, ApplicationEventPublisher eventPublisher) {
         this.accountRepository = accountRepository;
         this.eventPublisher = eventPublisher;
+    }
+
+    @PostConstruct
+    public void init() {
+        //Create or find system messaging account.
+        Account eventAccount = findAccountById(ANNOUNCEMENT_USER);
+        if(eventAccount == null) {
+            eventAccount = new Account(UUID.randomUUID(), "SYSTEM NEWS");
+            eventAccount.setId(ANNOUNCEMENT_USER);
+            saveAccount(eventAccount);
+        }
     }
 
     public AccountDetailsDTO createNewAccount() {

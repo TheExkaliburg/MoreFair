@@ -79,6 +79,14 @@ public class MessageService implements ApplicationListener<AccountServiceEvent> 
         return chats.get(ladderNum).convertToChatDTO();
     }
 
+    public void writeSystemMessage(Integer highestLadder, Account account, String messageString) {
+        if(account != null) {
+            for(int loopLadders = 1 ; loopLadders<= highestLadder;loopLadders++) {
+                writeMessage(account, loopLadders, messageString);
+            }
+        }
+    }
+
     public Message writeMessage(Account account, Integer ladderNum, String messageString) {
         Ladder ladder = chats.get(ladderNum);
         Message message = new Message(UUID.randomUUID(), account, messageString, ladder);
