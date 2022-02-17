@@ -384,7 +384,7 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
                 if (target.isAutoPromote()) {
                     log.info("[L{}] User {} tried to throw Vinegar at {}, but they had Auto-Promote!", ladder.getNumber(), ranker.getAccount().getUsername(), target.getAccount().getUsername());
                     eventMap.get(ladder.getNumber()).add(new Event(EventType.PROMOTE, target.getAccount().getId()));
-                    return true;
+                    return false;
                 }
 
                 BigInteger rankerVinegar = ranker.getVinegar();
