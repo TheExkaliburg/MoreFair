@@ -88,7 +88,7 @@ public class RankerController {
                 return;
             }
             Integer num = rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber();
-            log.debug("[L{}] BIAS: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
+            log.info("[L{}] BIAS: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
             ModServerMessageData data = new ModServerMessageData(account.getId(), sha.getDestination(), wsMessage.getContent(), wsMessage.getEvent());
             wsUtils.convertAndSendToAll(ModerationController.GAME_UPDATE_DESTINATION + num, data);
             rankerService.addEvent(num, new Event(EventType.BIAS, account.getId()));
@@ -107,7 +107,7 @@ public class RankerController {
                 return;
             }
             Integer num = rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber();
-            log.debug("[L{}] MULTI: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
+            log.info("[L{}] MULTI: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
             ModServerMessageData data = new ModServerMessageData(account.getId(), sha.getDestination(), wsMessage.getContent(), wsMessage.getEvent());
             wsUtils.convertAndSendToAll(ModerationController.GAME_UPDATE_DESTINATION + num, data);
             rankerService.addEvent(num, new Event(EventType.MULTI, account.getId()));
@@ -126,7 +126,7 @@ public class RankerController {
                 return;
             }
             Integer num = rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber();
-            log.debug("[L{}] VINEGAR: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
+            log.info("[L{}] VINEGAR: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
             ModServerMessageData data = new ModServerMessageData(account.getId(), sha.getDestination(), wsMessage.getContent(), wsMessage.getEvent());
             wsUtils.convertAndSendToAll(ModerationController.GAME_UPDATE_DESTINATION + num, data);
             rankerService.addEvent(num, new Event(EventType.VINEGAR, account.getId()));
@@ -145,7 +145,7 @@ public class RankerController {
                 return;
             }
             Integer num = rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber();
-            log.debug("[L{}] PROMOTE: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
+            log.info("[L{}] PROMOTE: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
             ModServerMessageData data = new ModServerMessageData(account.getId(), sha.getDestination(), wsMessage.getContent(), wsMessage.getEvent());
             wsUtils.convertAndSendToAll(ModerationController.GAME_UPDATE_DESTINATION + num, data);
             rankerService.addEvent(num, new Event(EventType.PROMOTE, account.getId()));
@@ -159,13 +159,12 @@ public class RankerController {
     public void beAsshole(SimpMessageHeaderAccessor sha, WSMessage wsMessage) {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-            log.debug("/app/ladder/post/asshole from {}", uuid);
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
                 return;
             }
             Integer num = rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber();
-            log.debug("[L{}] ASSHOLE: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
+            log.info("[L{}] ASSHOLE: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
             ModServerMessageData data = new ModServerMessageData(account.getId(), sha.getDestination(), wsMessage.getContent(), wsMessage.getEvent());
             wsUtils.convertAndSendToAll(ModerationController.GAME_UPDATE_DESTINATION + num, data);
             rankerService.addEvent(num, new Event(EventType.ASSHOLE, account.getId()));
@@ -184,7 +183,7 @@ public class RankerController {
                 return;
             }
             Integer num = rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber();
-            log.debug("[L{}] AUTOPROMOTE: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
+            log.info("[L{}] AUTOPROMOTE: {} (#{}) {}", num, account.getUsername(), account.getId(), wsMessage.getEvent());
             ModServerMessageData data = new ModServerMessageData(account.getId(), sha.getDestination(), wsMessage.getContent(), wsMessage.getEvent());
             wsUtils.convertAndSendToAll(ModerationController.GAME_UPDATE_DESTINATION + num, data);
             rankerService.addEvent(num, new Event(EventType.AUTO_PROMOTE, account.getId()));

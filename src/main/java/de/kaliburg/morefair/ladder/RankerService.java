@@ -308,7 +308,7 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
             //      - Auto-Promote
             //      - enough points to be in front of the next ranker
             if (ranker.getRank() == 1 && ranker.getLadder().getRankers().size() >= Math.max(FairController.MINIMUM_PEOPLE_FOR_PROMOTE, ladder.getNumber())
-                    && ranker.getPoints().compareTo(FairController.POINTS_FOR_PROMOTE) >= 0
+                    && ranker.getPoints().compareTo(FairController.POINTS_FOR_PROMOTE.multiply(BigInteger.valueOf(ranker.getLadder().getNumber()))) >= 0
                     && (ranker.isAutoPromote() || pointDiff.compareTo(neededPointDiff) >= 0)) {
                 ranker.setGrowing(false);
                 saveRanker(ranker);
@@ -346,7 +346,7 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
             // - Ranker got enough points to promote
             // - The current Ladder is the assholeLadder or higher
             if (ranker.getRank() == 1 && ranker.getLadder().getRankers().size() >= Math.max(FairController.MINIMUM_PEOPLE_FOR_PROMOTE, ladder.getNumber())
-                    && ranker.getPoints().compareTo(FairController.POINTS_FOR_PROMOTE) >= 0
+                    && ranker.getPoints().compareTo(FairController.POINTS_FOR_PROMOTE.multiply(BigInteger.valueOf(ladder.getNumber()))) >= 0
                     && ranker.getLadder().getNumber().compareTo(FairController.BASE_ASSHOLE_LADDER + accountService.findMaxTimesAsshole()) >= 0) {
                 Account account = accountService.findByUuid(ranker.getAccount().getUuid());
                 account.setIsAsshole(true);
@@ -379,7 +379,7 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
             // - Ranker got enough Vinegar to throw
             if (target.getRank() == 1 && ranker.getUuid() != target.getUuid() && target.isGrowing()
                     && target.getLadder().getRankers().size() >= Math.max(FairController.MINIMUM_PEOPLE_FOR_PROMOTE, ladder.getNumber())
-                    && target.getPoints().compareTo(FairController.POINTS_FOR_PROMOTE) >= 0
+                    && target.getPoints().compareTo(FairController.POINTS_FOR_PROMOTE.multiply(BigInteger.valueOf(ladder.getNumber()))) >= 0
                     && ranker.getVinegar().compareTo(UpgradeUtils.throwVinegarCost(target.getLadder().getNumber())) >= 0) {
                 if (target.isAutoPromote()) {
                     log.info("[L{}] User {} tried to throw Vinegar at {}, but they had Auto-Promote!", ladder.getNumber(), ranker.getAccount().getUsername(), target.getAccount().getUsername());

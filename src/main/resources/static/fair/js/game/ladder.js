@@ -72,7 +72,7 @@ function buyBias(event) {
     let biasButton = $('#biasButton');
     let biasTooltip = $('#biasTooltip');
 
-    if (ladderData.yourRanker.points.cmp(Decimal.max(ladderData.firstRanker.points, infoData.pointsForPromote).mul(0.8)) >= 0) {
+    if (ladderData.yourRanker.points.cmp(Decimal.max(ladderData.firstRanker.points, infoData.pointsForPromote.mul(ladderData.currentLadder.number)).mul(0.8)) >= 0) {
         if (!confirm("You're really close to the top, are you sure, you want to bias.")) {
             biasButton.prop("disabled", true);
             biasTooltip.tooltip('hide');
@@ -95,7 +95,7 @@ function buyMulti(event) {
     let multiButton = $('#multiButton');
     let multiTooltip = $('#multiTooltip');
 
-    if (ladderData.yourRanker.points.cmp(Decimal.max(ladderData.firstRanker.points, infoData.pointsForPromote).mul(0.8)) >= 0) {
+    if (ladderData.yourRanker.points.cmp(Decimal.max(ladderData.firstRanker.points, infoData.pointsForPromote.mul(ladderData.currentLadder.number)).mul(0.8)) >= 0) {
         if (!confirm("You're really close to the top, are you sure, you want to multi.")) {
             multiButton.prop("disabled", true);
             multiTooltip.tooltip('hide');
@@ -132,7 +132,7 @@ function promote(event) {
 
 function beAsshole(event) {
     if (ladderData.firstRanker.you && ladderData.rankers.length >= Math.max(infoData.minimumPeopleForPromote, ladderData.currentLadder.number)
-        && ladderData.firstRanker.points.cmp(infoData.pointsForPromote) >= 0
+        && ladderData.firstRanker.points.cmp(infoData.pointsForPromote.mul(ladderData.currentLadder.number)) >= 0
         && ladderData.currentLadder.number >= infoData.assholeLadder) {
         if (confirm("Do you really wanna be an Asshole?!")) {
             stompClient.send("/app/ladder/post/asshole", {}, JSON.stringify({
@@ -359,7 +359,7 @@ function calculateLadder(delta) {
             if (ladderData.rankers[i].rank !== 1 && ladderData.rankers[i].you)
                 ladderData.rankers[i].vinegar = ladderData.rankers[i].vinegar.add(ladderData.rankers[i].grapes.mul(delta).floor());
 
-            if (ladderData.rankers[i].rank === 1 && ladderData.currentLadder.number === 1 && ladderData.rankers[i].you)
+            if (ladderData.rankers[i].rank === 1 && ladderData.rankers[i].you)
                 ladderData.rankers[i].vinegar = ladderData.rankers[i].vinegar.mul(Math.pow(0.9975, delta)).floor();
 
             for (let j = i - 1; j >= 0; j--) {
@@ -371,8 +371,7 @@ function calculateLadder(delta) {
 
                     // Move other Ranker 1 Place down
                     ladderData.rankers[j].rank = j + 2;
-                    if (ladderData.rankers[j].growing && ladderData.rankers[j].you &&
-                        (ladderData.rankers[j].bias > 0 || ladderData.rankers[j].multiplier > 1))
+                    if (ladderData.rankers[j].growing && ladderData.rankers[j].you && ladderData.rankers[j].multiplier > 1)
                         ladderData.rankers[j].grapes = ladderData.rankers[j].grapes.add(new Decimal(1));
                     ladderData.rankers[j + 1] = ladderData.rankers[j];
 
@@ -407,7 +406,7 @@ function calculateLadder(delta) {
 function calculateStats() {
     // Points Needed For Promotion
     if (ladderData.rankers.length >= Math.max(infoData.minimumPeopleForPromote, ladderData.currentLadder.number)) {
-        if (ladderData.firstRanker.points.cmp(infoData.pointsForPromote) >= 0) {
+        if (ladderData.firstRanker.points.cmp(infoData.pointsForPromote.mul(ladderData.currentLadder.number)) >= 0) {
             if (ladderData.currentLadder.number >= infoData.autoPromoteLadder) {
                 let leadingRanker = ladderData.firstRanker.you ? ladderData.yourRanker : ladderData.firstRanker;
                 let pursuingRanker = ladderData.firstRanker.you ? ladderData.rankers[1] : ladderData.yourRanker;
@@ -418,12 +417,12 @@ function calculateStats() {
                 let neededPointDiff = powerDiff.mul(infoData.manualPromoteWaitTime).abs();
 
                 ladderStats.pointsNeededForManualPromote = Decimal.max((leadingRanker.you ? pursuingRanker : leadingRanker)
-                    .points.add(neededPointDiff), infoData.pointsForPromote);
+                    .points.add(neededPointDiff), infoData.pointsForPromote.mul(ladderData.currentLadder.number));
             } else {
                 ladderStats.pointsNeededForManualPromote = ladderData.firstRanker.you ? ladderData.rankers[1].points.add(1) : ladderData.firstRanker.points.add(1);
             }
         } else {
-            ladderStats.pointsNeededForManualPromote = infoData.pointsForPromote;
+            ladderStats.pointsNeededForManualPromote = infoData.pointsForPromote.mul(ladderData.currentLadder.number);
         }
 
     } else {
@@ -512,7 +511,7 @@ function writeNewRow(body, ranker) {
     let assholeTag = (ranker.timesAsshole < infoData.assholeTags.length) ?
         infoData.assholeTags[ranker.timesAsshole] : infoData.assholeTags[infoData.assholeTags.length - 1];
     let rank = (ranker.rank === 1 && !ranker.you && ranker.growing && ladderData.rankers.length >= Math.max(infoData.minimumPeopleForPromote, ladderData.currentLadder.number)
-        && ladderData.firstRanker.points.cmp(infoData.pointsForPromote) >= 0 && ladderData.yourRanker.vinegar.cmp(getVinegarThrowCost()) >= 0) ?
+        && ladderData.firstRanker.points.cmp(infoData.pointsForPromote.mul(ladderData.currentLadder.number)) >= 0 && ladderData.yourRanker.vinegar.cmp(getVinegarThrowCost()) >= 0) ?
         '<a href="#" style="text-decoration: none" onclick="throwVinegar(event)">🍇</a>' : ranker.rank;
     row.insertCell(0).innerHTML = rank + " " + assholeTag;
     row.insertCell(1).innerHTML = ranker.username;
