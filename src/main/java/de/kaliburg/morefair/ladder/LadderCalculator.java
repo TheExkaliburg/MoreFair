@@ -1,6 +1,5 @@
 package de.kaliburg.morefair.ladder;
 
-import de.kaliburg.morefair.FairController;
 import de.kaliburg.morefair.account.service.AccountService;
 import de.kaliburg.morefair.dto.HeartbeatDTO;
 import de.kaliburg.morefair.events.Event;
@@ -210,7 +209,6 @@ public class LadderCalculator {
     private void calculateLadder(Ladder ladder, double deltaSec) {
         List<Ranker> rankers = ladder.getRankers();
         rankers.sort(Comparator.comparing(Ranker::getPoints).reversed());
-        Ranker firstRanker = rankers.get(0);
 
         for (int i = 0; i < rankers.size(); i++) {
             Ranker currentRanker = rankers.get(i);
@@ -226,7 +224,7 @@ public class LadderCalculator {
                 if (currentRanker.getRank() != 1) {
                     currentRanker.addVinegar(currentRanker.getGrapes(), deltaSec);
                 }
-                if (currentRanker.getRank() == 1 && LadderUtils.isLadderUnlocked(ladder, firstRanker)) {
+                if (currentRanker.getRank() == 1 && LadderUtils.isLadderUnlocked(ladder, rankers.get(0))) {
                     currentRanker.mulVinegar(0.9975, deltaSec);
                 }
 
@@ -253,14 +251,14 @@ public class LadderCalculator {
             }
         }
         // Ranker on Last Place gains 1 Grape, only if he isn't in the top group
-        if (rankers.size() >= Math.max(FairController.MINIMUM_PEOPLE_FOR_PROMOTE, ladder.getNumber())) {
+        if (rankers.size() >= ladder.getRequiredRankerCountToUnlock()) {
             Ranker lastRanker = rankers.get(rankers.size() - 1);
             lastRanker.addGrapes(BigInteger.ONE, deltaSec);
         }
 
         if (rankers.size() >= 1 && rankers.get(0).isAutoPromote() && rankers.get(0).isGrowing()
-                && rankers.get(0).getPoints().compareTo(FairController.POINTS_FOR_PROMOTE.multiply(BigInteger.valueOf(ladder.getNumber()))) >= 0
-                && rankers.size() >= Math.max(ladder.getNumber(), FairController.MINIMUM_PEOPLE_FOR_PROMOTE)) {
+                && rankers.get(0).getPoints().compareTo(ladder.getRequiredPointsToUnlock()) >= 0
+                && rankers.size() >= ladder.getRequiredRankerCountToUnlock()) {
             log.info("[L{}] Trying to auto-promote {} (#{})", ladder.getNumber(), rankers.get(0).getAccount().getUsername(), rankers.get(0).getAccount().getId());
             rankerService.addEvent(ladder.getNumber(), new Event(EventType.PROMOTE, rankers.get(0).getAccount().getId()));
         }
