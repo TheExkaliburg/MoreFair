@@ -359,7 +359,7 @@ function calculateLadder(delta) {
             if (ladderData.rankers[i].rank !== 1 && ladderData.rankers[i].you)
                 ladderData.rankers[i].vinegar = ladderData.rankers[i].vinegar.add(ladderData.rankers[i].grapes.mul(delta).floor());
 
-            if (ladderData.rankers[i].rank === 1 && ladderData.rankers[i].you)
+            if (ladderData.rankers[i].rank === 1 && ladderData.rankers[i].you && isLadderUnlocked())
                 ladderData.rankers[i].vinegar = ladderData.rankers[i].vinegar.mul(Math.pow(0.9975, delta)).floor();
 
             for (let j = i - 1; j >= 0; j--) {
@@ -585,4 +585,20 @@ function showButtons() {
     }
 
 
+}
+
+function isLadderUnlocked() {
+    if (ladderData.rankers.length <= 0) return false;
+    let rankerCount = ladderData.rankers.length;
+    if (rankerCount < getRequiredRankerCountToUnlockLadder()) return false;
+    return ladderData.firstRanker.points.cmp(getRequiredPointsToUnlockLadder()) >= 0;
+}
+
+
+function getRequiredRankerCountToUnlockLadder() {
+    return Math.max(infoData.minimumPeopleForPromote, ladderData.currentLadder.number);
+}
+
+function getRequiredPointsToUnlockLadder() {
+    return infoData.pointsForPromote.mul(ladderData.currentLadder.number);
 }

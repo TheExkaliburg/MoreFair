@@ -210,6 +210,8 @@ public class LadderCalculator {
     private void calculateLadder(Ladder ladder, double deltaSec) {
         List<Ranker> rankers = ladder.getRankers();
         rankers.sort(Comparator.comparing(Ranker::getPoints).reversed());
+        Ranker firstRanker = rankers.get(0);
+
         for (int i = 0; i < rankers.size(); i++) {
             Ranker currentRanker = rankers.get(i);
             currentRanker.setRank(i + 1);
@@ -224,7 +226,7 @@ public class LadderCalculator {
                 if (currentRanker.getRank() != 1) {
                     currentRanker.addVinegar(currentRanker.getGrapes(), deltaSec);
                 }
-                if (currentRanker.getRank() == 1) {
+                if (currentRanker.getRank() == 1 && LadderUtils.isLadderUnlocked(ladder, firstRanker)) {
                     currentRanker.mulVinegar(0.9975, deltaSec);
                 }
 
