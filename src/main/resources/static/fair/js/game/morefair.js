@@ -41,6 +41,32 @@ function disconnect() {
     console.log("Currently disconnected...");
 }
 
+
+function loadAndRunScript(url) {
+    var script = document.createElement('script');
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+}
+
+function loadQOLScripts()
+{
+
+    if(!confirm("The QOL scripts are not guaranteed to work and may cause issues or break things. Do you want to continue?"))
+    {
+        return;
+    }
+
+    //Closing the navbar because it would cause issues.
+    document.getElementsByClassName("navbar-toggler")[0].click();
+
+    // Main QOL Script
+    loadAndRunScript("https://raw.githack.com/LynnCinnamon/fair-game-qol/main/fairgame.js");
+
+    // Lynn's Addon
+    loadAndRunScript("https://raw.githack.com/LynnCinnamon/Fairgame-Lynns-QOL-Extensions/master/Lynns%20Extension.js");
+
+}
+
 async function setup() {
     numberFormatter = new numberformat.Formatter({
         format: 'hybrid',
