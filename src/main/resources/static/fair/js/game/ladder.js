@@ -359,7 +359,7 @@ function calculateLadder(delta) {
             if (ladderData.rankers[i].rank !== 1 && ladderData.rankers[i].you)
                 ladderData.rankers[i].vinegar = ladderData.rankers[i].vinegar.add(ladderData.rankers[i].grapes.mul(delta).floor());
 
-            if (ladderData.rankers[i].rank === 1 && ladderData.currentLadder.number === 1 && ladderData.rankers[i].you)
+            if (ladderData.rankers[i].rank === 1 && ladderData.rankers[i].you)
                 ladderData.rankers[i].vinegar = ladderData.rankers[i].vinegar.mul(Math.pow(0.9975, delta)).floor();
 
             for (let j = i - 1; j >= 0; j--) {
