@@ -20,6 +20,8 @@ let stompClient = null;
 let chatSubscription = null;
 let ladderSubscription = null;
 
+let isQolLoaded = false;
+
 function connect() {
     let socket = new SockJS('/fairsocket');
     stompClient = Stomp.over(socket);
@@ -48,23 +50,18 @@ function loadAndRunScript(url) {
     document.getElementsByTagName('head')[0].appendChild(script);
 }
 
-function loadQOLScripts()
-{
-
-    if(!confirm("The QOL scripts are not guaranteed to work and may cause issues or break things. Do you want to continue?"))
-    {
+function loadQOLScripts() {
+    if (isQolLoaded || !confirm("The QOL scripts are written and maintained by a 3rd-party, they are not guaranteed to work and may cause issues or break things. Do you want to continue loading these?")) {
         return;
     }
 
     //Closing the navbar because it would cause issues.
     document.getElementsByClassName("navbar-toggler")[0].click();
-
     // Main QOL Script
     loadAndRunScript("https://raw.githack.com/LynnCinnamon/fair-game-qol/main/fairgame.js");
-
     // Lynn's Addon
     loadAndRunScript("https://raw.githack.com/LynnCinnamon/Fairgame-Lynns-QOL-Extensions/master/Lynns%20Extension.js");
-
+    isQolLoaded = true;
 }
 
 async function setup() {
