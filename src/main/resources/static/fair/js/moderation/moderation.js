@@ -225,6 +225,7 @@ class ModGameEvents {
     }
 
     update(data, ladder) {
+        let isUpdated = false;
         data.events.forEach(event => {
             if (event.eventType === "JOIN" && ladder === 1) {
                 let newRanker = {
@@ -251,13 +252,14 @@ class ModGameEvents {
             if (loggedEvents.includes(event.eventType)) {
                 this.#data.events.unshift(event);
                 if (this.#data.events.length > 50) this.#data.events.pop();
+                isUpdated = true;
             }
 
             if (event.eventType === "NAME_CHANGE") {
                 ranker.username = event.data;
             }
         });
-        this.#draw();
+        if (isUpdated) this.#draw();
     }
 
     destinationUpdate(data, ladder) {
@@ -288,8 +290,8 @@ class ModGameEvents {
         if (filterLocations.includes(data.location) && isInFilter) {
             this.#data.events.unshift(event);
             if (this.#data.events.length > 50) this.#data.events.pop();
+            this.#draw();
         }
-        this.#draw();
     }
 
     #draw() {
