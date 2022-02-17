@@ -9,6 +9,14 @@ body {
     width: 100px;
 }
 
+
+#QOLButton {
+    position: absolute;
+    bottom: 0px;
+    left: -31px;
+    width: auto;
+}
+
 #importButton {
     position: absolute;
     bottom: 0px;
