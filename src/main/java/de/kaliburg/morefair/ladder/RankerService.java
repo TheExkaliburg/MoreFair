@@ -433,9 +433,9 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
                     account.setIsAsshole(false);
                     // If Account was active in the last 7 days
                     // This should prevent old and inactive accounts from getting a ranker on Restart
-                    if (account.getLastLogin().plus(1, ChronoUnit.DAYS).isAfter(LocalDateTime.now())) {
+                    if (account.getLastLogin().plus(0, ChronoUnit.HOURS).isAfter(LocalDateTime.now())) {
                         // Create New Ranker
-                        createNewActiveRankerForAccountOnLadder(account, 1);
+                        // createNewActiveRankerForAccountOnLadder(account, 1);
                     }
                     accountService.saveAccount(account);
                 }
