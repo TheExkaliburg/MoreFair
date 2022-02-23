@@ -389,7 +389,7 @@ function calculateLadder(delta) {
     if (ladderData.rankers.length >= Math.max(infoData.minimumPeopleForPromote, ladderData.currentLadder.number)) {
         let index = ladderData.rankers.length - 1;
         if (ladderData.rankers[index].growing && ladderData.rankers[index].you)
-            ladderData.rankers[index].grapes = ladderData.rankers[index].grapes.add(new Decimal(1).mul(delta).floor());
+            ladderData.rankers[index].grapes = ladderData.rankers[index].grapes.add(new Decimal(5).mul(delta).floor());
     }
 
     // Set yourRanker and firstRanker

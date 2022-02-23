@@ -90,6 +90,129 @@
                 </div>
             </div>
             <div class="accordion-item">
+                <h2 class="accordion-header" id="headingPower">
+                    <button aria-controls="collapsePower" aria-expanded="true" class="accordion-button collapsed"
+                            data-bs-target="#collapsePower"
+                            data-bs-toggle="collapse" type="button">
+                        Power / Points
+                    </button>
+                </h2>
+                <div aria-labelledby="headingPower" class="accordion-collapse collapse"
+                     id="collapsePower">
+                    <div class="accordion-body">
+                        You gain <strong>power</strong> based on the rankers above you, at your current ladder. The rate
+                        at
+                        which you gain power is also influenced by your bias and multi. Each bias increases
+                        the power gained, by one. Each multi multiplies that score (including the Bias)
+                        by its value.<br>
+                        You gain <strong>points</strong> based on your current power. <br><br>
+                        power += (rank + bias - 1) * multi;<br>
+                        points += power;
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingUpgrades">
+                    <button aria-controls="collapseUpgrades" aria-expanded="false" class="accordion-button collapsed"
+                            data-bs-target="#collapseUpgrades" data-bs-toggle="collapse" type="button">
+                        Bias / Multi
+                    </button>
+                </h2>
+                <div aria-labelledby="headingUpgrades" class="accordion-collapse collapse" id="collapseUpgrades">
+                    <div class="accordion-body">
+                        You gain multi and bias by sacrificing all your power and/or points. The cost is based on your
+                        current ladder.<br>
+                        For <strong>bias</strong> you need to sacrifice your points and for <strong>multi</strong> you
+                        reset with power, but also sacrifice all your points and bias. <br><br>
+                        upgradeCost = (currentLadder + 1) ^ (level);
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingPromote">
+                    <button aria-controls="collapsePromote" aria-expanded="false" class="accordion-button collapsed"
+                            data-bs-target="#collapsePromote" data-bs-toggle="collapse" type="button">
+                        Promoting to the next Ladder
+                    </button>
+                </h2>
+                <div aria-labelledby="headingPromote" class="accordion-collapse collapse" id="collapsePromote">
+                    <div class="accordion-body">
+                        You can promote to the next ladder, once there a few criteria fulfilled.<br>
+                        <ul>
+                            <li>You need to be <strong>rank 1</strong>.</li>
+                            <li>You need to have reached <strong>100 million points * current ladder</strong> or more.
+                            </li>
+                            <li>You need enough people at your ladder. The minimum amount to promote is 10, but it
+                                increases from 11 and onward by 1.
+                            </li>
+                            <li>You need a big enough lead to your pursuer. This lead is generally reached after being
+                                <strong>~30sec</strong> in front of him. (people can throw vinegar at you during this
+                                time)
+                            </li>
+                            <li>
+                                You need to press the <strong>promote</strong> button, that will appear on the top of
+                                your
+                                screen.
+                            </li>
+                        </ul>
+                        Promotion leaves behind a body, that doesn't gain power or points, for the rest of the ladder to
+                        marvel at.<br>
+                        If you are at the last ladder with all your peers, the ability to promote turns into an <strong>Asshole-Button</strong>,
+                        which, if enough people press it:
+                        <br>
+                        <h4 style="text-align: center;"><strong><u>RESETS THE GAME!</u></strong></h4>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingGrapes">
+                    <button aria-controls="collapseGrapes" aria-expanded="false" class="accordion-button collapsed"
+                            data-bs-target="#collapseGrapes" data-bs-toggle="collapse" type="button">
+                        Sour Grapes / Vinegar
+                    </button>
+                </h2>
+                <div aria-labelledby="headingGrapes" class="accordion-collapse collapse" id="collapseGrapes">
+                    <div class="accordion-body">
+                        You can gain sour grapes in 2 ways.
+                        <ul>
+                            <li><strong>Being last</strong> in a ladder that filled up, gains you 5
+                                sour grape every second.
+                            </li>
+                            <li><strong>Getting passed</strong> by someone else, while having more than 1 multi, also
+                                rewards you with 1 sour grape.
+                            </li>
+                        </ul>
+                        Also, you gain vinegar based on your current grape-count. (if you are not #1)<br>
+                        This vinegar can be used to throw onto the top person, if they are rank 1. If they have more
+                        vinegar than you, you just subtract your amount of vinegar from theirs, but if you throw more
+                        than they can handle, you force them to buy a multi or reset their points to 0 if they can't
+                        afford it.
+                        The person on the top spot also looses 0.25% of their vinegar count every second.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingAutoPromote">
+                    <button aria-controls="collapseAutoPromote" aria-expanded="false" class="accordion-button collapsed"
+                            data-bs-target="#collapseAutoPromote" data-bs-toggle="collapse" type="button">
+                        Auto-Promotion
+                    </button>
+                </h2>
+                <div aria-labelledby="headingAutoPromote" class="accordion-collapse collapse" id="collapseAutoPromote">
+                    <div class="accordion-body">
+                        There is a way that you can auto-promote, which unlocks from Ladder 1 onward. This feature, can
+                        be
+                        bought using your hard-earned grapes and completely bypasses the criteria, that you need a big
+                        enough lead to promote.<br>
+                        Also, it's completely server-sided, so once you have it, no amount of vinegar can hurt you this
+                        ladder, even if you are not online. The cost of this feature gets cheaper, depending on how far
+                        behind you are on your current climb.<br>
+                        Sadly, this feature is not available on the last ladder, which means <strong>no one</strong>,
+                        can escape the grapes of their competitors.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
                 <h2 class="accordion-header" id="headingGuideLadder1">
                     <button aria-controls="collapseGuideLadder1" aria-expanded="false"
                             class="accordion-button collapsed"
@@ -196,129 +319,6 @@
                             it to the top and provides many more quality of life features for the game. Do not be afraid
                             to ask on discord or the ingame-chat for help whenever you have questions.</p>
 
-                    </div>
-                </div>
-            </div>
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingPower">
-                    <button aria-controls="collapsePower" aria-expanded="true" class="accordion-button collapsed"
-                            data-bs-target="#collapsePower"
-                            data-bs-toggle="collapse" type="button">
-                        Power / Points
-                    </button>
-                </h2>
-                <div aria-labelledby="headingPower" class="accordion-collapse collapse"
-                     id="collapsePower">
-                    <div class="accordion-body">
-                        You gain <strong>power</strong> based on the rankers above you, at your current ladder. The rate
-                        at
-                        which you gain power is also influenced by your bias and multi. Each bias increases
-                        the power gained, by one. Each multi multiplies that score (including the Bias)
-                        by its value.<br>
-                        You gain <strong>points</strong> based on your current power. <br><br>
-                        power += (rank + bias - 1) * multi;<br>
-                        points += power;
-                    </div>
-                </div>
-            </div>
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingUpgrades">
-                    <button aria-controls="collapseUpgrades" aria-expanded="false" class="accordion-button collapsed"
-                            data-bs-target="#collapseUpgrades" data-bs-toggle="collapse" type="button">
-                        Bias / Multi
-                    </button>
-                </h2>
-                <div aria-labelledby="headingUpgrades" class="accordion-collapse collapse" id="collapseUpgrades">
-                    <div class="accordion-body">
-                        You gain multi and bias by sacrificing all your power and/or points. The cost is based on your
-                        current ladder.<br>
-                        For <strong>bias</strong> you need to sacrifice your points and for <strong>multi</strong> you
-                        reset with power, but also sacrifice all your points and bias. <br><br>
-                        upgradeCost = (currentLadder + 1) ^ (level);
-                    </div>
-                </div>
-            </div>
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingPromote">
-                    <button aria-controls="collapsePromote" aria-expanded="false" class="accordion-button collapsed"
-                            data-bs-target="#collapsePromote" data-bs-toggle="collapse" type="button">
-                        Promoting to the next Ladder
-                    </button>
-                </h2>
-                <div aria-labelledby="headingPromote" class="accordion-collapse collapse" id="collapsePromote">
-                    <div class="accordion-body">
-                        You can promote to the next ladder, once there a few criteria fulfilled.<br>
-                        <ul>
-                            <li>You need to be <strong>rank 1</strong>.</li>
-                            <li>You need to have reached <strong>100 million points * current ladder</strong> or more.
-                            </li>
-                            <li>You need enough people at your ladder. The minimum amount to promote is 10, but it
-                                increases from 11 and onward by 1.
-                            </li>
-                            <li>You need a big enough lead to your pursuer. This lead is generally reached after being
-                                <strong>~30sec</strong> in front of him. (people can throw vinegar at you during this
-                                time)
-                            </li>
-                            <li>
-                                You need to press the <strong>promote</strong> button, that will appear on the top of
-                                your
-                                screen.
-                            </li>
-                        </ul>
-                        Promotion leaves behind a body, that doesn't gain power or points, for the rest of the ladder to
-                        marvel at.<br>
-                        If you are at the last ladder with all your peers, the ability to promote turns into an <strong>Asshole-Button</strong>,
-                        which, if enough people press it:
-                        <br>
-                        <h4 style="text-align: center;"><strong><u>RESETS THE GAME!</u></strong></h4>
-                    </div>
-                </div>
-            </div>
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingGrapes">
-                    <button aria-controls="collapseGrapes" aria-expanded="false" class="accordion-button collapsed"
-                            data-bs-target="#collapseGrapes" data-bs-toggle="collapse" type="button">
-                        Sour Grapes / Vinegar
-                    </button>
-                </h2>
-                <div aria-labelledby="headingGrapes" class="accordion-collapse collapse" id="collapseGrapes">
-                    <div class="accordion-body">
-                        You can gain sour grapes in 2 ways.
-                        <ul>
-                            <li><strong>Being last</strong> in a ladder that filled up, gains you 1
-                                sour grape every second.
-                            </li>
-                            <li><strong>Getting passed</strong> by someone else, while having more than 1 multi, also
-                                rewards you with 1 sour grape.
-                            </li>
-                        </ul>
-                        Also, you gain vinegar based on your current grape-count. (if you are not #1)<br>
-                        This vinegar can be used to throw onto the top person, if they are rank 1. If they have more
-                        vinegar than you, you just subtract your amount of vinegar from theirs, but if you throw more
-                        than they can handle, you force them to buy a multi or reset their points to 0 if they can't
-                        afford it.
-                        The person on the top spot also looses 0.25% of their vinegar count every second.
-                    </div>
-                </div>
-            </div>
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingAutoPromote">
-                    <button aria-controls="collapseAutoPromote" aria-expanded="false" class="accordion-button collapsed"
-                            data-bs-target="#collapseAutoPromote" data-bs-toggle="collapse" type="button">
-                        Auto-Promotion
-                    </button>
-                </h2>
-                <div aria-labelledby="headingAutoPromote" class="accordion-collapse collapse" id="collapseAutoPromote">
-                    <div class="accordion-body">
-                        There is a way that you can auto-promote, which unlocks from Ladder 2 onward. This feature, can
-                        be
-                        bought using your hard-earned grapes and completely bypasses the criteria, that you need a big
-                        enough lead to promote.<br>
-                        Also, it's completely server-sided, so once you have it, no amount of vinegar can hurt you this
-                        ladder, even if you are not online. The cost of this feature gets cheaper, depending on how far
-                        behind you are on your current climb.<br>
-                        Sadly, this feature is not available on the last ladder, which means <strong>no one</strong>,
-                        can escape the grapes of their competitors.
                     </div>
                 </div>
             </div>
