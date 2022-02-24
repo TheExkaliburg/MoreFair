@@ -465,7 +465,8 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
             BigInteger cost = UpgradeUtils.buyAutoPromoteCost(ranker.getRank(), ranker.getLadder().getNumber());
             if (!ranker.isAutoPromote() && ranker.getGrapes().compareTo(cost) >= 0
                     && ladder.getNumber() >= FairController.AUTO_PROMOTE_LADDER
-                    && ladder.getNumber() != FairController.BASE_ASSHOLE_LADDER + accountService.findMaxTimesAsshole()) {
+                    && ladder.getNumber() != FairController.BASE_ASSHOLE_LADDER + accountService.findMaxTimesAsshole()
+                    && LadderUtils.isLadderUnlocked(ladder, ladder.getRankers().get(0))) {
                 log.info("[L{}] Buying Auto-Promote for {}", ladder.getNumber(), ranker.getAccount().getUsername());
                 ranker.setGrapes(ranker.getGrapes().subtract(cost));
                 ranker.setAutoPromote(true);

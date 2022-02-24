@@ -10,6 +10,10 @@ public class LadderUtils {
         return ranker.getRank() == 1 && ranker.getId().equals(firstRanker.getId()) && isLadderUnlocked(ladder, firstRanker);
     }
 
+    public static boolean isLadderUnlocked(@NonNull Ladder ladder) {
+        return isLadderUnlocked(ladder, null);
+    }
+
     public static boolean isLadderUnlocked(@NonNull Ladder ladder, @Nullable Ranker firstRanker) {
         if (ladder.getRankers().size() <= 0) return false;
         int rankerCount = ladder.getRankers().size();
