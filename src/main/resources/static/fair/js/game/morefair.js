@@ -82,6 +82,15 @@ async function setup() {
             sendMessage();
         }
     });
+
+    // For a better script updating experience.
+    // With this, the script may enable the user to reload the script when a new version is available.
+    // (See https://github.com/LynnCinnamon/Fairgame-Lynns-QOL-Extensions/commit/f00d896a241d46b6153558256baa5139c9f350c5)
+    if(localStorage.getItem("autoLoadQOL") === "true")
+    {
+        localStorage.removeItem("autoLoadQOL");
+        loadQOLScripts();
+    }
 }
 
 function onInfoReceived(message) {
