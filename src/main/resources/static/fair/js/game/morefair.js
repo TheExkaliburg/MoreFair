@@ -50,13 +50,16 @@ function loadAndRunScript(url) {
     document.getElementsByTagName('head')[0].appendChild(script);
 }
 
-function loadQOLScripts() {
-    if (isQolLoaded || !confirm("The QOL scripts are written and maintained by a 3rd-party, they are not guaranteed to work and may cause issues or break things. Do you want to continue loading these?")) {
+function loadQOLScripts(skipConfirm = false) {
+    if (isQolLoaded || (!skipConfirm && !confirm("The QOL scripts are written and maintained by a 3rd-party, they are not guaranteed to work and may cause issues or break things. Do you want to continue loading these?"))) {
         return;
     }
 
     //Closing the navbar because it would cause issues.
-    document.getElementsByClassName("navbar-toggler")[0].click();
+    if(!skipConfirm)
+    {
+        document.getElementsByClassName("navbar-toggler")[0].click();
+    }
     // Main QOL Script
     loadAndRunScript("https://raw.githack.com/LynnCinnamon/fair-game-qol/main/fairgame.js");
     // Lynn's Addon
@@ -82,6 +85,15 @@ async function setup() {
             sendMessage();
         }
     });
+
+    // For a better script updating experience.
+    // With this, the script may enable the user to reload the script when a new version is available.
+    // (See https://github.com/LynnCinnamon/Fairgame-Lynns-QOL-Extensions/commit/f00d896a241d46b6153558256baa5139c9f350c5)
+    if(localStorage.getItem("autoLoadQOL") === "true")
+    {
+        localStorage.removeItem("autoLoadQOL");
+        loadQOLScripts(true);
+    }
 }
 
 function onInfoReceived(message) {
