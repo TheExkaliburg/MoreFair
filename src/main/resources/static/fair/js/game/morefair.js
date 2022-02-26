@@ -50,8 +50,8 @@ function loadAndRunScript(url) {
     document.getElementsByTagName('head')[0].appendChild(script);
 }
 
-function loadQOLScripts() {
-    if (isQolLoaded || !confirm("The QOL scripts are written and maintained by a 3rd-party, they are not guaranteed to work and may cause issues or break things. Do you want to continue loading these?")) {
+function loadQOLScripts(skipConfirm = false) {
+    if (isQolLoaded || (!skipConfirm && !confirm("The QOL scripts are written and maintained by a 3rd-party, they are not guaranteed to work and may cause issues or break things. Do you want to continue loading these?"))) {
         return;
     }
 
@@ -89,7 +89,7 @@ async function setup() {
     if(localStorage.getItem("autoLoadQOL") === "true")
     {
         localStorage.removeItem("autoLoadQOL");
-        loadQOLScripts();
+        loadQOLScripts(true);
     }
 }
 
