@@ -572,8 +572,7 @@ function showButtons() {
     let autoPromoteTooltip = $('#autoPromoteTooltip');
     let autoPromoteCost = getAutoPromoteGrapeCost(ladderData.yourRanker.rank);
     if (!ladderData.yourRanker.autoPromote && ladderData.currentLadder.number >= infoData.autoPromoteLadder
-        && ladderData.currentLadder.number !== infoData.assholeLadder
-        && isLadderUnlocked()) {
+        && ladderData.currentLadder.number !== infoData.assholeLadder) {
 
         autoPromoteButton.show();
         if (ladderData.yourRanker.grapes.cmp(autoPromoteCost) >= 0) {
