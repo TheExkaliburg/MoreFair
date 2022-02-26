@@ -56,7 +56,10 @@ function loadQOLScripts(skipConfirm = false) {
     }
 
     //Closing the navbar because it would cause issues.
-    document.getElementsByClassName("navbar-toggler")[0].click();
+    if(!skipConfirm)
+    {
+        document.getElementsByClassName("navbar-toggler")[0].click();
+    }
     // Main QOL Script
     loadAndRunScript("https://raw.githack.com/LynnCinnamon/fair-game-qol/main/fairgame.js");
     // Lynn's Addon
