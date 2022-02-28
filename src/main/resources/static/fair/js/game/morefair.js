@@ -20,6 +20,8 @@ let stompClient = null;
 let chatSubscription = null;
 let ladderSubscription = null;
 
+let isQolLoaded = false;
+
 function connect() {
     let socket = new SockJS('/fairsocket');
     stompClient = Stomp.over(socket);
@@ -41,6 +43,30 @@ function disconnect() {
     console.log("Currently disconnected...");
 }
 
+
+function loadAndRunScript(url) {
+    var script = document.createElement('script');
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+}
+
+function loadQOLScripts(skipConfirm = false) {
+    if (isQolLoaded || (!skipConfirm && !confirm("The QOL scripts are written and maintained by a 3rd-party, they are not guaranteed to work and may cause issues or break things. Do you want to continue loading these?"))) {
+        return;
+    }
+
+    //Closing the navbar because it would cause issues.
+    if(!skipConfirm)
+    {
+        document.getElementsByClassName("navbar-toggler")[0].click();
+    }
+    // Main QOL Script
+    loadAndRunScript("https://raw.githack.com/LynnCinnamon/fair-game-qol/main/fairgame.js");
+    // Lynn's Addon
+    loadAndRunScript("https://raw.githack.com/LynnCinnamon/Fairgame-Lynns-QOL-Extensions/master/Lynns%20Extension.js");
+    isQolLoaded = true;
+}
+
 async function setup() {
     numberFormatter = new numberformat.Formatter({
         format: 'hybrid',
@@ -59,6 +85,15 @@ async function setup() {
             sendMessage();
         }
     });
+
+    // For a better script updating experience.
+    // With this, the script may enable the user to reload the script when a new version is available.
+    // (See https://github.com/LynnCinnamon/Fairgame-Lynns-QOL-Extensions/commit/f00d896a241d46b6153558256baa5139c9f350c5)
+    if(localStorage.getItem("autoLoadQOL") === "true")
+    {
+        localStorage.removeItem("autoLoadQOL");
+        loadQOLScripts(true);
+    }
 }
 
 function onInfoReceived(message) {
@@ -136,6 +171,49 @@ function promptNameChange() {
     }
 }
 
+function serializeClickEvent(event) {
+    let serializableEvent = {
+        altKey: event.altKey,
+        bubbles: event.bubbles,
+        button: event.button,
+        buttons: event.buttons,
+        cancelBubble: event.cancelBubble,
+        cancelable: event.cancelable,
+        clientX: event.clientX,
+        clientY: event.clientY,
+        composed: event.composed,
+        ctrlKey: event.ctrlKey,
+        defaultPrevented: event.defaultPrevented,
+        delegateTarget: event.delegateTarget,
+        detail: event.detail,
+        eventPhase: event.eventPhase,
+        isTrusted: event.isTrusted,
+        layerX: event.layerX,
+        layerY: event.layerY,
+        metaKey: event.metaKey,
+        movementX: event.movementX,
+        movementY: event.movementY,
+        mozInputSource: event.mozInputSource,
+        mozPressure: event.mozPressure,
+        offsetX: event.offsetX,
+        offsetY: event.offsetY,
+        pageX: event.pageX,
+        pageY: event.pageY,
+        rangeOffset: event.rangeOffset,
+        region: event.region,
+        relatedTarget: event.relatedTarget,
+        returnValue: event.returnValue,
+        screenX: event.screenX,
+        screenY: event.screenY,
+        shiftKey: event.shiftKey,
+        timeStamp: event.timeStamp,
+        type: event.type,
+        which: event.which,
+        x: event.x,
+        y: event.y,
+    }
+    return JSON.stringify(serializableEvent);
+}
 
 function getUpgradeCost(level) {
     return new Decimal(Math.round(Math.pow(ladderData.currentLadder.number + 1, level)));
@@ -150,7 +228,4 @@ function getAutoPromoteGrapeCost(rank) {
     let divisor = Math.max(rank - minPeople + 1, 1);
     return infoData.baseGrapesNeededToAutoPromote.div(divisor).floor();
 }
-
-
-
 

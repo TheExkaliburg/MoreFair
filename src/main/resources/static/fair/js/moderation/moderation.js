@@ -1,5 +1,11 @@
 let modTool;
 
+let loggedEvents = ['NAME_CHANGE', 'BAN', 'MUTE', 'FREE', 'MOD', 'CONFIRM'];
+let filterLocations = [];
+let filterLadders = [];
+let filterAccounts = [];
+
+
 class ModerationTool {
     #stompClient;
     #subscribeMap;
@@ -49,7 +55,7 @@ class ModerationTool {
     }
 
     getInfo() {
-        this.subscribe('/user/queue/mod/info', (message) => this.#onInfoReceived(JSON.parse(message.body)));
+        this.subscribe('/user/queue/mod/info/', (message) => this.#onInfoReceived(JSON.parse(message.body)));
         this.send("/app/mod/info");
     }
 
@@ -62,7 +68,7 @@ class ModerationTool {
     }
 
     getChatUpdates() {
-        this.subscribe('/user/queue/mod/chat', (message) => this.#onChatReceived(JSON.parse(message.body)));
+        this.subscribe('/user/queue/mod/chat/', (message) => this.#onChatReceived(JSON.parse(message.body)));
         this.send("/app/mod/chat");
     }
 
@@ -91,8 +97,8 @@ class ModerationTool {
             this.#gameUpdates = new ModGameEvents(message.content, this);
             for (let i = 1; i <= this.#modInfo.highestLadder; i++) {
                 this.subscribe('/topic/ladder/' + i, (message) => this.#onGameUpdatesReceived(JSON.parse(message.body), i));
+                this.subscribe('/topic/mod/ladder/' + i, (message) => this.#onDestinationUpdatesReceived(JSON.parse(message.body), i));
             }
-
             this.subscribe('/topic/global/', (message) => this.#onGameUpdatesReceived({events: JSON.parse(message.body)}, 0));
         }
     }
@@ -100,6 +106,12 @@ class ModerationTool {
     #onGameUpdatesReceived(message, ladder) {
         if (message) {
             this.#gameUpdates.update(message, ladder);
+        }
+    }
+
+    #onDestinationUpdatesReceived(message, ladder) {
+        if (message) {
+            this.#gameUpdates.destinationUpdate(message, ladder);
         }
     }
 
@@ -122,6 +134,14 @@ class ModerationTool {
         let newName = prompt(`What would you like to name "${dataSet.username}" (${dataSet.accountId})`);
         if (newName) {
             this.send("/app/mod/name/" + dataSet.accountId, newName);
+        }
+    }
+
+    promptConfirm(event) {
+        let dataSet = event.target.dataset;
+        let text = prompt(`What confirm-prompt would you like to send to "${dataSet.username}" (${dataSet.accountId})`);
+        if (text) {
+            this.send("/app/mod/confirm/" + dataSet.accountId, text);
         }
     }
 
@@ -205,6 +225,7 @@ class ModGameEvents {
     }
 
     update(data, ladder) {
+        let isUpdated = false;
         data.events.forEach(event => {
             if (event.eventType === "JOIN" && ladder === 1) {
                 let newRanker = {
@@ -228,25 +249,49 @@ class ModGameEvents {
             event.timeCreated = days[time.getDay()] + " " +
                 [time.getHours().toString().padStart(2, '0'), time.getMinutes().toString().padStart(2, '0'),].join(':');
 
-            switch (event.eventType) {
-                case 'VINEGAR':
-                    console.log(data);
-                case 'PROMOTE':
-                case 'AUTO_PROMOTE':
-                case 'NAME_CHANGE':
-                case 'BAN':
-                case 'MUTE':
-                case 'FREE':
-                case 'MOD':
-                    this.#data.events.unshift(event);
-                    if (this.#data.events.length > 50) this.#data.events.pop();
+            if (loggedEvents.includes(event.eventType)) {
+                this.#data.events.unshift(event);
+                if (this.#data.events.length > 50) this.#data.events.pop();
+                isUpdated = true;
             }
 
             if (event.eventType === "NAME_CHANGE") {
                 ranker.username = event.data;
             }
         });
-        this.#draw();
+        if (isUpdated) this.#draw();
+    }
+
+    destinationUpdate(data, ladder) {
+        let event = {}
+        event.accountId = data.id;
+        this.#rankers.forEach(r => {
+            if (r.accountId === event.accountId) {
+                event.username = r.username;
+            }
+        });
+        event.ladder = ladder;
+        let time = new Date(Date.now());
+        event.timeCreated = days[time.getDay()] + " " +
+            [time.getHours().toString().padStart(2, '0'), time.getMinutes().toString().padStart(2, '0'),].join(':');
+
+        event.data = {};
+        if (data.content) event.data.content = JSON.parse(data.content);
+        event.data.event = JSON.parse(data.event);
+
+        if (data.location.includes('app/ladder/'))
+            event.eventType = data.location.slice(('app/ladder/').length);
+        else event.eventType = data.location;
+
+        let isInFilter = true;
+        if (filterAccounts.length > 0 && !filterAccounts.includes(data.id)) isInFilter = false;
+        if (filterLadders.length > 0 && !filterLadders.includes(ladder)) isInFilter = false;
+
+        if (filterLocations.includes(data.location) && isInFilter) {
+            this.#data.events.unshift(event);
+            if (this.#data.events.length > 50) this.#data.events.pop();
+            this.#draw();
+        }
     }
 
     #draw() {
@@ -256,6 +301,7 @@ class ModGameEvents {
         $("#updateBody .banSymbol").on('click', this.#modTool.ban.bind(this.#modTool));
         $("#updateBody .muteSymbol").on('click', this.#modTool.mute.bind(this.#modTool));
         $("#updateBody .nameSymbol").on('click', this.#modTool.rename.bind(this.#modTool));
+        $("#updateBody .confirmSymbol").on('click', this.#modTool.promptConfirm.bind(this.#modTool));
         $("#updateBody .freeSymbol").on('click', this.#modTool.free.bind(this.#modTool));
         if (this.#modTool.getModInfo().yourAccessRole === "OWNER") {
             $("#updateBody .modSymbol").on('click', this.#modTool.mod.bind(this.#modTool));

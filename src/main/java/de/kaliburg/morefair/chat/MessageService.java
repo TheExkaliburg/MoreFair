@@ -2,12 +2,10 @@ package de.kaliburg.morefair.chat;
 
 import de.kaliburg.morefair.account.entity.Account;
 import de.kaliburg.morefair.account.events.AccountServiceEvent;
-import de.kaliburg.morefair.account.service.AccountService;
 import de.kaliburg.morefair.dto.ChatDTO;
 import de.kaliburg.morefair.ladder.Ladder;
 import de.kaliburg.morefair.ladder.LadderRepository;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,21 +15,20 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.*;
-import java.util.stream.IntStream;
+import java.util.concurrent.Semaphore;
 
 @Service
 @Log4j2
 public class MessageService implements ApplicationListener<AccountServiceEvent> {
     private final MessageRepository messageRepository;
     private final LadderRepository ladderRepository;
-    private final AccountService accountService;
     @Getter
     private Map<Integer, Ladder> chats = new HashMap<>();
+    private Semaphore chatSem = new Semaphore(1);
 
-    public MessageService(MessageRepository messageRepository, LadderRepository ladderRepository, AccountService accountService) {
+    public MessageService(MessageRepository messageRepository, LadderRepository ladderRepository) {
         this.messageRepository = messageRepository;
         this.ladderRepository = ladderRepository;
-        this.accountService = accountService;
     }
 
     public Ladder findLadderWithChat(Ladder ladder) {
@@ -62,7 +59,6 @@ public class MessageService implements ApplicationListener<AccountServiceEvent> 
     public void syncWithDB() {
         log.debug("Saving Chats...");
         deleteAllMessages();
-
         for (Ladder l : chats.values()) {
             saveAllMessages(l.getMessages());
         }
@@ -82,22 +78,6 @@ public class MessageService implements ApplicationListener<AccountServiceEvent> 
     //TODO: Manage the Chat better
     public ChatDTO getChat(int ladderNum) {
         return chats.get(ladderNum).convertToChatDTO();
-    }
-
-    //Injecting Ranker Service here would cause a circular dependency.
-    public void writeSystemMessage(@NonNull Integer highestLadder,@NonNull String messageString) {
-        try {
-            Account systemMessager = accountService.findOwnerAccount();
-            if (systemMessager != null) {
-                IntStream.range(1,highestLadder+1)
-                        .forEach(ladder -> {
-                            writeMessage(systemMessager,ladder,messageString);
-                        });
-            }
-        } catch (RuntimeException re) {
-            log.error("Error processing System Message: " + messageString,re);
-        }
-
     }
 
     public Message writeMessage(Account account, Integer ladderNum, String messageString) {
@@ -125,6 +105,29 @@ public class MessageService implements ApplicationListener<AccountServiceEvent> 
                         message.setAccount(event.getAccount());
                     }
                 }
+            }
+        }
+
+        if (event.getEventType().equals(AccountServiceEvent.AccountServiceEventType.BAN)
+                || event.getEventType().equals(AccountServiceEvent.AccountServiceEventType.MUTE)) {
+            try {
+                chatSem.acquire();
+                try {
+                    chats.values().forEach(ladder -> {
+                        List<Message> messages = new ArrayList<>(ladder.getMessages());
+
+                        messages.forEach(message -> {
+                            if (message.getAccount().getId().equals(event.getAccount().getId())) {
+                                ladder.getMessages().remove(message);
+                            }
+                        });
+                    });
+                } finally {
+                    chatSem.release();
+                }
+            } catch (InterruptedException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
             }
         }
     }

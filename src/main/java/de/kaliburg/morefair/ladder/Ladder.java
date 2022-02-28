@@ -1,5 +1,6 @@
 package de.kaliburg.morefair.ladder;
 
+import de.kaliburg.morefair.FairController;
 import de.kaliburg.morefair.chat.Message;
 import de.kaliburg.morefair.dto.ChatDTO;
 import de.kaliburg.morefair.dto.LadderDTO;
@@ -7,6 +8,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -40,5 +42,13 @@ public class Ladder {
 
     public ChatDTO convertToChatDTO() {
         return new ChatDTO(this);
+    }
+
+    public Integer getRequiredRankerCountToUnlock() {
+        return Math.max(FairController.MINIMUM_PEOPLE_FOR_PROMOTE, getNumber());
+    }
+
+    public BigInteger getRequiredPointsToUnlock() {
+        return FairController.POINTS_FOR_PROMOTE.multiply(BigInteger.valueOf(getNumber()));
     }
 }

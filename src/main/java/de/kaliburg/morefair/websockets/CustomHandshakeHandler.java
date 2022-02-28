@@ -61,8 +61,6 @@ public class CustomHandshakeHandler extends DefaultHandshakeHandler {
         requests = connectionsPerIpAddress.get(ipAddress);
         if (requests != null) {
             if (requests >= MAX_CONNECTIONS_PER_MINUTE) {
-                connectionsPerIpAddress.asMap().remove(ipAddress);
-                connectionsPerIpAddress.put(ipAddress, requests);
                 return true;
             }
         } else {

@@ -1,9 +1,6 @@
 package de.kaliburg.morefair.ladder;
 
-import de.kaliburg.morefair.FairController;
-import de.kaliburg.morefair.account.entity.Account;
 import de.kaliburg.morefair.account.service.AccountService;
-import de.kaliburg.morefair.chat.MessageService;
 import de.kaliburg.morefair.dto.HeartbeatDTO;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.EventType;
@@ -26,7 +23,6 @@ public class LadderCalculator {
     private static final double NANOS_IN_SECONDS = TimeUnit.SECONDS.toNanos(1);
     private final RankerService rankerService;
     private final AccountService accountService;
-    private final MessageService messageService;
     private final WSUtils wsUtils;
     private Map<Integer, HeartbeatDTO> heartbeatMap = new HashMap<>();
     private List<Event> globalEvents = new ArrayList<>();
@@ -34,11 +30,10 @@ public class LadderCalculator {
     private boolean didPressAssholeButton = false;
     private long lastTimeMeasured = System.nanoTime();
 
-    public LadderCalculator(RankerService rankerService, AccountService accountService, WSUtils wsUtils, MessageService messageService) {
+    public LadderCalculator(RankerService rankerService, AccountService accountService, WSUtils wsUtils) {
         this.rankerService = rankerService;
         this.accountService = accountService;
         this.wsUtils = wsUtils;
-        this.messageService = messageService;
     }
 
     @Scheduled(initialDelay = 1000, fixedRate = 1000)
@@ -198,10 +193,6 @@ public class LadderCalculator {
                         case NAME_CHANGE -> {
                             accountService.updateUsername(e.getAccountId(), e);
                         }
-                        case SYSTEM_MESSAGE -> {
-                            messageService.writeSystemMessage(rankerService.getHighestLadder().getNumber(),
-                                     e.getData().toString());
-                        }
                     }
                 }
 
@@ -218,6 +209,7 @@ public class LadderCalculator {
     private void calculateLadder(Ladder ladder, double deltaSec) {
         List<Ranker> rankers = ladder.getRankers();
         rankers.sort(Comparator.comparing(Ranker::getPoints).reversed());
+
         for (int i = 0; i < rankers.size(); i++) {
             Ranker currentRanker = rankers.get(i);
             currentRanker.setRank(i + 1);
@@ -232,7 +224,7 @@ public class LadderCalculator {
                 if (currentRanker.getRank() != 1) {
                     currentRanker.addVinegar(currentRanker.getGrapes(), deltaSec);
                 }
-                if (currentRanker.getRank() == 1 && ladder.getNumber() == 1) {
+                if (currentRanker.getRank() == 1 && LadderUtils.isLadderUnlocked(ladder, rankers.get(0))) {
                     currentRanker.mulVinegar(0.9975, deltaSec);
                 }
 
@@ -245,7 +237,7 @@ public class LadderCalculator {
                         // Move other Ranker 1 Place down
                         Ranker temp = rankers.get(j);
                         temp.setRank(j + 2);
-                        if (temp.isGrowing() && (temp.getBias() > 0 || temp.getMultiplier() > 1))
+                        if (temp.isGrowing() && temp.getMultiplier() > 1)
                             temp.setGrapes(temp.getGrapes().add(BigInteger.ONE));
                         rankers.set(j + 1, temp);
 
@@ -259,15 +251,15 @@ public class LadderCalculator {
             }
         }
         // Ranker on Last Place gains 1 Grape, only if he isn't in the top group
-        if (rankers.size() >= Math.max(FairController.MINIMUM_PEOPLE_FOR_PROMOTE, ladder.getNumber())) {
+        if (rankers.size() >= ladder.getRequiredRankerCountToUnlock()) {
             Ranker lastRanker = rankers.get(rankers.size() - 1);
-            lastRanker.addGrapes(BigInteger.ONE, deltaSec);
+            lastRanker.addGrapes(BigInteger.valueOf(5), deltaSec);
         }
 
         if (rankers.size() >= 1 && rankers.get(0).isAutoPromote() && rankers.get(0).isGrowing()
-                && rankers.get(0).getPoints().compareTo(FairController.POINTS_FOR_PROMOTE) >= 0
-                && rankers.size() >= Math.max(ladder.getNumber(), FairController.MINIMUM_PEOPLE_FOR_PROMOTE)) {
-            log.info("[L{}] Trying to auto-promote {}", ladder.getNumber(), rankers.get(0).getAccount().getUsername());
+                && rankers.get(0).getPoints().compareTo(ladder.getRequiredPointsToUnlock()) >= 0
+                && rankers.size() >= ladder.getRequiredRankerCountToUnlock()) {
+            log.info("[L{}] Trying to auto-promote {} (#{})", ladder.getNumber(), rankers.get(0).getAccount().getUsername(), rankers.get(0).getAccount().getId());
             rankerService.addEvent(ladder.getNumber(), new Event(EventType.PROMOTE, rankers.get(0).getAccount().getId()));
         }
     }

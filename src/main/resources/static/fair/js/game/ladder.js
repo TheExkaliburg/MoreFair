@@ -37,7 +37,6 @@ function initLadder(ladderNum) {
 function handleLadderInit(message) {
     if (message.status === "OK") {
         if (message.content) {
-            console.log(message);
             ladderData = message.content;
             ladderData.rankers.forEach(ranker => {
                 ranker.power = new Decimal(ranker.power);
@@ -51,6 +50,8 @@ function handleLadderInit(message) {
                     ranker.vinegar = new Decimal(0);
                 }
             })
+
+            if (!ladderData.yourRanker) ladderData.yourRanker = rankerTemplate;
 
             ladderData.yourRanker.power = new Decimal(ladderData.yourRanker.power);
             ladderData.yourRanker.points = new Decimal(ladderData.yourRanker.points);
@@ -66,12 +67,12 @@ function handleLadderInit(message) {
     updateLadder();
 }
 
-function buyBias() {
+function buyBias(event) {
     let cost = new Decimal(getUpgradeCost(ladderData.yourRanker.bias + 1));
     let biasButton = $('#biasButton');
     let biasTooltip = $('#biasTooltip');
 
-    if (ladderData.yourRanker.points.cmp(ladderData.firstRanker.points.mul(0.8)) >= 0) {
+    if (ladderData.yourRanker.points.cmp(Decimal.max(ladderData.firstRanker.points, infoData.pointsForPromote.mul(ladderData.currentLadder.number)).mul(0.8)) >= 0) {
         if (!confirm("You're really close to the top, are you sure, you want to bias.")) {
             biasButton.prop("disabled", true);
             biasTooltip.tooltip('hide');
@@ -83,17 +84,18 @@ function buyBias() {
     biasTooltip.tooltip('hide');
     if (ladderData.yourRanker.points.compare(cost) > 0) {
         stompClient.send("/app/ladder/post/bias", {}, JSON.stringify({
-            'uuid': identityData.uuid
+            'uuid': identityData.uuid,
+            'event': serializeClickEvent(event)
         }));
     }
 }
 
-function buyMulti() {
+function buyMulti(event) {
     let cost = getUpgradeCost(ladderData.yourRanker.multiplier + 1);
     let multiButton = $('#multiButton');
     let multiTooltip = $('#multiTooltip');
 
-    if (ladderData.yourRanker.points.cmp(ladderData.firstRanker.points.mul(0.8)) >= 0) {
+    if (ladderData.yourRanker.points.cmp(Decimal.max(ladderData.firstRanker.points, infoData.pointsForPromote.mul(ladderData.currentLadder.number)).mul(0.8)) >= 0) {
         if (!confirm("You're really close to the top, are you sure, you want to multi.")) {
             multiButton.prop("disabled", true);
             multiTooltip.tooltip('hide');
@@ -105,46 +107,51 @@ function buyMulti() {
     multiTooltip.tooltip('hide');
     if (ladderData.yourRanker.power.compare(cost) > 0) {
         stompClient.send("/app/ladder/post/multi", {}, JSON.stringify({
-            'uuid': identityData.uuid
+            'uuid': identityData.uuid,
+            'event': serializeClickEvent(event)
         }));
     }
 }
 
-function throwVinegar() {
+function throwVinegar(event) {
     if (ladderData.yourRanker.vinegar.cmp(getVinegarThrowCost()) >= 0) {
         stompClient.send("/app/ladder/post/vinegar", {}, JSON.stringify({
-            'uuid': identityData.uuid
+            'uuid': identityData.uuid,
+            'event': serializeClickEvent(event)
         }));
     }
 }
 
-function promote() {
+function promote(event) {
     $('#promoteButton').hide();
     stompClient.send("/app/ladder/post/promote", {}, JSON.stringify({
-        'uuid': identityData.uuid
+        'uuid': identityData.uuid,
+        'event': serializeClickEvent(event)
     }));
 }
 
-function beAsshole() {
+function beAsshole(event) {
     if (ladderData.firstRanker.you && ladderData.rankers.length >= Math.max(infoData.minimumPeopleForPromote, ladderData.currentLadder.number)
-        && ladderData.firstRanker.points.cmp(infoData.pointsForPromote) >= 0
+        && ladderData.firstRanker.points.cmp(infoData.pointsForPromote.mul(ladderData.currentLadder.number)) >= 0
         && ladderData.currentLadder.number >= infoData.assholeLadder) {
         if (confirm("Do you really wanna be an Asshole?!")) {
             stompClient.send("/app/ladder/post/asshole", {}, JSON.stringify({
-                'uuid': identityData.uuid
+                'uuid': identityData.uuid,
+                'event': serializeClickEvent(event)
             }));
         }
     }
 }
 
-function buyAutoPromote() {
+function buyAutoPromote(event) {
     $('#biasButton').prop("disabled", true);
     $('#autoPromoteTooltip').tooltip('hide');
     if (ladderData.currentLadder.number >= infoData.autoPromoteLadder
         && ladderData.currentLadder.number !== infoData.assholeLadder
         && ladderData.yourRanker.grapes.cmp(getAutoPromoteGrapeCost(ladderData.yourRanker.rank)) >= 0) {
         stompClient.send("/app/ladder/post/auto-promote", {}, JSON.stringify({
-            'uuid': identityData.uuid
+            'uuid': identityData.uuid,
+            'event': serializeClickEvent(event)
         }));
 
     }
@@ -206,8 +213,15 @@ function handleEvent(event) {
         case 'NAME_CHANGE':
             handleNameChange(event);
             break;
+        case 'CONFIRM':
+            handleConfirm(event);
+            break;
         case 'RESET':
             handleReset(event);
+            break;
+        case 'BAN':
+        case 'MUTE':
+            removeMessages(event);
             break;
     }
 }
@@ -312,6 +326,14 @@ function handleNameChange(event) {
     updateChatUsername(event);
 }
 
+function handleConfirm(event) {
+    ladderData.rankers.forEach(ranker => {
+        if (event.accountId === ranker.accountId && ranker.you) {
+            confirm(event.data);
+        }
+    })
+}
+
 async function handleReset(event) {
     disconnect();
     await new Promise(r => setTimeout(r, 65000));
@@ -337,7 +359,7 @@ function calculateLadder(delta) {
             if (ladderData.rankers[i].rank !== 1 && ladderData.rankers[i].you)
                 ladderData.rankers[i].vinegar = ladderData.rankers[i].vinegar.add(ladderData.rankers[i].grapes.mul(delta).floor());
 
-            if (ladderData.rankers[i].rank === 1 && ladderData.currentLadder.number === 1 && ladderData.rankers[i].you)
+            if (ladderData.rankers[i].rank === 1 && ladderData.rankers[i].you && isLadderUnlocked())
                 ladderData.rankers[i].vinegar = ladderData.rankers[i].vinegar.mul(Math.pow(0.9975, delta)).floor();
 
             for (let j = i - 1; j >= 0; j--) {
@@ -349,8 +371,7 @@ function calculateLadder(delta) {
 
                     // Move other Ranker 1 Place down
                     ladderData.rankers[j].rank = j + 2;
-                    if (ladderData.rankers[j].growing && ladderData.rankers[j].you &&
-                        (ladderData.rankers[j].bias > 0 || ladderData.rankers[j].multiplier > 1))
+                    if (ladderData.rankers[j].growing && ladderData.rankers[j].you && ladderData.rankers[j].multiplier > 1)
                         ladderData.rankers[j].grapes = ladderData.rankers[j].grapes.add(new Decimal(1));
                     ladderData.rankers[j + 1] = ladderData.rankers[j];
 
@@ -368,7 +389,7 @@ function calculateLadder(delta) {
     if (ladderData.rankers.length >= Math.max(infoData.minimumPeopleForPromote, ladderData.currentLadder.number)) {
         let index = ladderData.rankers.length - 1;
         if (ladderData.rankers[index].growing && ladderData.rankers[index].you)
-            ladderData.rankers[index].grapes = ladderData.rankers[index].grapes.add(new Decimal(1).mul(delta).floor());
+            ladderData.rankers[index].grapes = ladderData.rankers[index].grapes.add(new Decimal(5).mul(delta).floor());
     }
 
     // Set yourRanker and firstRanker
@@ -385,7 +406,7 @@ function calculateLadder(delta) {
 function calculateStats() {
     // Points Needed For Promotion
     if (ladderData.rankers.length >= Math.max(infoData.minimumPeopleForPromote, ladderData.currentLadder.number)) {
-        if (ladderData.firstRanker.points.cmp(infoData.pointsForPromote) >= 0) {
+        if (ladderData.firstRanker.points.cmp(infoData.pointsForPromote.mul(ladderData.currentLadder.number)) >= 0) {
             if (ladderData.currentLadder.number >= infoData.autoPromoteLadder) {
                 let leadingRanker = ladderData.firstRanker.you ? ladderData.yourRanker : ladderData.firstRanker;
                 let pursuingRanker = ladderData.firstRanker.you ? ladderData.rankers[1] : ladderData.yourRanker;
@@ -396,12 +417,12 @@ function calculateStats() {
                 let neededPointDiff = powerDiff.mul(infoData.manualPromoteWaitTime).abs();
 
                 ladderStats.pointsNeededForManualPromote = Decimal.max((leadingRanker.you ? pursuingRanker : leadingRanker)
-                    .points.add(neededPointDiff), infoData.pointsForPromote);
+                    .points.add(neededPointDiff), infoData.pointsForPromote.mul(ladderData.currentLadder.number));
             } else {
                 ladderStats.pointsNeededForManualPromote = ladderData.firstRanker.you ? ladderData.rankers[1].points.add(1) : ladderData.firstRanker.points.add(1);
             }
         } else {
-            ladderStats.pointsNeededForManualPromote = infoData.pointsForPromote;
+            ladderStats.pointsNeededForManualPromote = infoData.pointsForPromote.mul(ladderData.currentLadder.number);
         }
 
     } else {
@@ -490,8 +511,8 @@ function writeNewRow(body, ranker) {
     let assholeTag = (ranker.timesAsshole < infoData.assholeTags.length) ?
         infoData.assholeTags[ranker.timesAsshole] : infoData.assholeTags[infoData.assholeTags.length - 1];
     let rank = (ranker.rank === 1 && !ranker.you && ranker.growing && ladderData.rankers.length >= Math.max(infoData.minimumPeopleForPromote, ladderData.currentLadder.number)
-        && ladderData.firstRanker.points.cmp(infoData.pointsForPromote) >= 0 && ladderData.yourRanker.vinegar.cmp(getVinegarThrowCost()) >= 0) ?
-        '<a href="#" style="text-decoration: none" onclick="throwVinegar()">🍇</a>' : ranker.rank;
+        && ladderData.firstRanker.points.cmp(infoData.pointsForPromote.mul(ladderData.currentLadder.number)) >= 0 && ladderData.yourRanker.vinegar.cmp(getVinegarThrowCost()) >= 0) ?
+        '<a href="#" style="text-decoration: none" onclick="throwVinegar(event)">🍇</a>' : ranker.rank;
     row.insertCell(0).innerHTML = rank + " " + assholeTag;
     row.insertCell(1).innerHTML = ranker.username;
     row.cells[1].style.overflow = "hidden";
@@ -552,6 +573,7 @@ function showButtons() {
     let autoPromoteCost = getAutoPromoteGrapeCost(ladderData.yourRanker.rank);
     if (!ladderData.yourRanker.autoPromote && ladderData.currentLadder.number >= infoData.autoPromoteLadder
         && ladderData.currentLadder.number !== infoData.assholeLadder) {
+
         autoPromoteButton.show();
         if (ladderData.yourRanker.grapes.cmp(autoPromoteCost) >= 0) {
             autoPromoteButton.prop("disabled", false);
@@ -564,4 +586,20 @@ function showButtons() {
     }
 
 
+}
+
+function isLadderUnlocked() {
+    if (ladderData.rankers.length <= 0) return false;
+    let rankerCount = ladderData.rankers.length;
+    if (rankerCount < getRequiredRankerCountToUnlockLadder()) return false;
+    return ladderData.firstRanker.points.cmp(getRequiredPointsToUnlockLadder()) >= 0;
+}
+
+
+function getRequiredRankerCountToUnlockLadder() {
+    return Math.max(infoData.minimumPeopleForPromote, ladderData.currentLadder.number);
+}
+
+function getRequiredPointsToUnlockLadder() {
+    return infoData.pointsForPromote.mul(ladderData.currentLadder.number);
 }

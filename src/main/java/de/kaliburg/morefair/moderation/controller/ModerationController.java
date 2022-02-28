@@ -28,12 +28,12 @@ import java.util.UUID;
 @Controller
 @Log4j2
 public class ModerationController {
-    public final static String CHAT_UPDATE_DESTINATION = "/topic/mod/chat";
-    public final static String GAME_UPDATE_DESTINATION = "/topic/mod/game";
-    public final static String GLOBAL_UPDATE_DESTINATION = "/topic/mod/global";
-    private final static String INFO_DESTINATION = "/queue/mod/info";
-    private final static String CHAT_DESTINATION = "/queue/mod/chat";
-    private final static String GAME_DESTINATION = "/queue/mod/game";
+    public final static String CHAT_UPDATE_DESTINATION = "/topic/mod/chat/";
+    public final static String GAME_UPDATE_DESTINATION = "/topic/mod/ladder/";
+    public final static String GLOBAL_UPDATE_DESTINATION = "/topic/mod/global/";
+    private final static String INFO_DESTINATION = "/queue/mod/info/";
+    private final static String CHAT_DESTINATION = "/queue/mod/chat/";
+    private final static String GAME_DESTINATION = "/queue/mod/game/";
     private final AccountService accountService;
     private final WSUtils wsUtils;
     private final RankerService ladderService;
@@ -105,6 +105,7 @@ public class ModerationController {
             } else {
                 log.info("{} is banning the account with id {}", account.getUsername(), id);
                 accountService.addModEvent(new Event(EventType.BAN, id));
+                accountService.addModEvent(new Event(EventType.NAME_CHANGE, id, "BANNED"));
             }
         } catch (IllegalArgumentException e) {
             wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.BAD_REQUEST);
@@ -173,6 +174,29 @@ public class ModerationController {
             } else {
                 log.info("{} is renaming the account with id {} to {}", account.getUsername(), id, username);
                 accountService.addModEvent(new Event(EventType.NAME_CHANGE, id, username));
+            }
+        } catch (IllegalArgumentException e) {
+            wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @MessageMapping("/mod/confirm/{id}")
+    public void promptConfirm(SimpMessageHeaderAccessor sha, WSMessage wsMessage, @DestinationVariable("id") Long id) throws Exception {
+        try {
+            String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
+            String text = StringEscapeUtils.escapeJava(HtmlUtils.htmlEscape(wsMessage.getContent()));
+
+            Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
+            if (account == null || !(account.getAccessRole().equals(AccountAccessRole.MODERATOR) || account.getAccessRole().equals(AccountAccessRole.OWNER))) {
+                wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.FORBIDDEN);
+                return;
+            } else {
+                log.info("{} is prompting an confirm to the account with id {} with '{}'", account.getUsername(), id, text);
+                accountService.addModEvent(new Event(EventType.CONFIRM, id, text));
             }
         } catch (IllegalArgumentException e) {
             wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.BAD_REQUEST);

@@ -81,3 +81,11 @@ function updateChatUsername(event) {
     })
     updateChat();
 }
+
+function removeMessages(event) {
+    console.log(event);
+    chatData.messages = chatData.messages.filter((m) => {
+        return event.accountId !== m.accountId
+    })
+    updateChat();
+}

@@ -6,6 +6,7 @@ import de.kaliburg.morefair.account.repository.AccountRepository;
 import de.kaliburg.morefair.account.type.AccountAccessRole;
 import de.kaliburg.morefair.dto.AccountDetailsDTO;
 import de.kaliburg.morefair.events.Event;
+import de.kaliburg.morefair.websockets.StompPrincipal;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
@@ -37,8 +38,9 @@ public class AccountService {
         this.eventPublisher = eventPublisher;
     }
 
-    public AccountDetailsDTO createNewAccount() {
+    public AccountDetailsDTO createNewAccount(StompPrincipal principal) {
         Account result = new Account(UUID.randomUUID(), "");
+        if (principal != null) result.setLastIp(principal.getIpAddress());
         result = saveAccount(result);
         result.setUsername("Mystery Guest #" + result.getId());
         result = saveAccount(result);
@@ -46,7 +48,7 @@ public class AccountService {
         eventPublisher.publishEvent(new AccountServiceEvent(this, result, AccountServiceEvent.AccountServiceEventType.CREATE));
 
         result = accountRepository.findByUuid(result.getUuid());
-        log.info("Created a new Account with the uuid {} (#{}).", result.getUuid().toString(), result.getId());
+        log.info("Created Mystery Guest #{}.", result.getId());
         return result.convertToDTO();
     }
 
@@ -70,9 +72,10 @@ public class AccountService {
         return true;
     }
 
-    public void updateActivity(Account account) {
+    public void login(Account account, StompPrincipal principal) {
         // Set Login Date
         account.setLastLogin(LocalDateTime.now());
+        account.setLastIp(principal.getIpAddress());
         saveAccount(account);
     }
 
@@ -121,7 +124,8 @@ public class AccountService {
         Account account = findAccountById(accountId);
         if (account != null && !account.getAccessRole().equals(AccountAccessRole.OWNER)) {
             account.setAccessRole(AccountAccessRole.BANNED_PLAYER);
-            saveAccount(account);
+            account = saveAccount(account);
+            eventPublisher.publishEvent(new AccountServiceEvent(e, account, AccountServiceEvent.AccountServiceEventType.BAN));
         }
     }
 
@@ -129,7 +133,8 @@ public class AccountService {
         Account account = findAccountById(accountId);
         if (account != null && !account.getAccessRole().equals(AccountAccessRole.OWNER)) {
             account.setAccessRole(AccountAccessRole.MUTED_PLAYER);
-            saveAccount(account);
+            account = saveAccount(account);
+            eventPublisher.publishEvent(new AccountServiceEvent(e, account, AccountServiceEvent.AccountServiceEventType.MUTE));
         }
     }
 

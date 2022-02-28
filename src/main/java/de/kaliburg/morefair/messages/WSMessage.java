@@ -13,4 +13,6 @@ public class WSMessage {
     private String uuid;
     @NonNull
     private String content;
+    @NonNull
+    private String event;
 }
