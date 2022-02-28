@@ -3,152 +3,31 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
+    <groupId>de.kaliburg</groupId>
+    <artifactId>morefair</artifactId>
+    <version>1.0</version>
+    <packaging>pom</packaging>
+
+    <name>MoreFairGame</name>
+    <description>Demo project for Spring Boot</description>
+
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.6.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>de.kaliburg</groupId>
-    <artifactId>morefair</artifactId>
-    <version>1.0</version>
-    <name>morefair</name>
-    <description>Demo project for Spring Boot</description>
+
     <properties>
-        <java.version>17</java.version>
+        <main.basedir>${project.basedir}</main.basedir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <log4j2.version>2.17.1</log4j2.version>
     </properties>
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-thymeleaf</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>nz.net.ultraq.thymeleaf</groupId>
-                    <artifactId>thymeleaf-layout-dialect</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.22</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-text</artifactId>
-            <version>1.9</version>
-        </dependency>
-        <!--PostgreSQL -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jdbc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-        </dependency>
-        <!-- WebJars -->
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>webjars-locator</artifactId>
-            <version>0.42</version>
-        </dependency>
-        <!-- Websockets -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-websocket</artifactId>
-        </dependency>
-        <!-- Client Side Websockets -->
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>sockjs-client</artifactId>
-            <version>1.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>stomp-websocket</artifactId>
-            <version>2.3.3</version>
-        </dependency>
 
-        <dependency>
-            <groupId>io.projectreactor</groupId>
-            <artifactId>reactor-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.javafaker</groupId>
-            <artifactId>javafaker</artifactId>
-            <version>1.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-        </dependency>
-
-        <!-- Caffeine -->
-        <dependency>
-            <groupId>com.github.ben-manes.caffeine</groupId>
-            <artifactId>caffeine</artifactId>
-        </dependency>
-
-    </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>build-info</goal>
-                        </goals>
-                        <configuration>
-                            <additionalProperties>
-                                <encoding.source>${project.build.sourceEncoding}</encoding.source>
-                                <encoding.reporting>${project.reporting.outputEncoding}</encoding.reporting>
-                                <java.source>${maven.compiler.source}</java.source>
-                                <java.target>${maven.compiler.target}</java.target>
-                            </additionalProperties>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-
+    <modules>
+        <module>frontend</module>
+        <module>backend</module>
+    </modules>
 
 </project>

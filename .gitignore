@@ -1,4 +1,5 @@
-src/main/resources/keystore
+dependency
+/backend/src/main/resources/public/
 
 # Created by https://www.toptal.com/developers/gitignore/api/git,java,maven,intellij+all,node
 # Edit at https://www.toptal.com/developers/gitignore?templates=git,java,maven,intellij+all,node
@@ -285,4 +286,3 @@ dist
 .svelte-kit
 
 # End of https://www.toptal.com/developers/gitignore/api/git,java,maven,intellij+all,node
-dependency
