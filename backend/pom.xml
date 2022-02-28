@@ -123,6 +123,11 @@
             <artifactId>caffeine</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.coderplus.maven.plugins</groupId>
+            <artifactId>copy-rename-maven-plugin</artifactId>
+            <version>1.0.1</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -151,7 +156,7 @@
                 <version>3.2.0</version>
                 <executions>
                     <execution>
-                        <id>copy Vue.js frontend content</id>
+                        <id>copy-frontend-content</id>
                         <phase>generate-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
@@ -169,6 +174,28 @@
                                     </includes>
                                 </resource>
                             </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.coderplus.maven.plugins</groupId>
+                <artifactId>copy-rename-maven-plugin</artifactId>
+                <version>1.0.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-jar-after-package</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <sourceFile>
+                                ${project.basedir}/target/${project.artifactId}-${project.version}.jar
+                            </sourceFile>
+                            <destinationFile>
+                                ${project.parent.basedir}/target/${project.parent.artifactId}-${project.parent.version}.jar
+                            </destinationFile>
                         </configuration>
                     </execution>
                 </executions>
