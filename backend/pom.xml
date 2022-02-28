@@ -122,12 +122,6 @@
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>com.coderplus.maven.plugins</groupId>
-            <artifactId>copy-rename-maven-plugin</artifactId>
-            <version>1.0.1</version>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
