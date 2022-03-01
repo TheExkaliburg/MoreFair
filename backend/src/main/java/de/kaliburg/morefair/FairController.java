@@ -64,11 +64,6 @@ public class FairController {
         this.wsUtils = wsUtils;
     }
 
-    @GetMapping("/")
-    public String getIndex() {
-        return "fair";
-    }
-
     @GetMapping("/help")
     public String getHelp() {
         return "help";

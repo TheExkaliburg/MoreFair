@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Fair Game</title>
+    <link crossorigin="anonymous"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+          rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/old/static/fair/styles/style.css}">
+    <script crossorigin="anonymous"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script crossorigin="anonymous"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/break_infinity.js"></script>
+    <script src="//cdn.rawgit.com/erosson/swarm-numberformat/v0.4.0/dist/swarm-numberformat.min.js"></script>
+    <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+    <script th:src="@{/old/static/fair/js/common/cookie.js}" type="text/javascript"></script>
+    <script th:src="@{/old/static/fair/js/game/morefair.js}" type="text/javascript"></script>
+    <script th:src="@{/old/static/fair/js/common/chat.js}" type="text/javascript"></script>
+    <script th:src="@{/old/static/fair/js/game/ladder.js}" type="text/javascript"></script>
+
+
+</head>
+<script>
+    $(document).ready(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+        setup();
+    });
+
+    $(window).on("beforeunload", (event) => {
+        disconnect();
+    })
+</script>
+<body>
+<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
+    enabled. Please enable
+    Javascript and reload this page!</h2></noscript>
+<div class="m-1" style="overflow-y: hidden; overflow-x:hidden; border: 0px solid red">
+    <div class="container-fluid" style="border: 0px solid green">
+        <div class="row">
+            <nav class="navbar navbar-light bg-light" style="border: 0px solid green">
+                <div class="container-fluid" style="border: 0px solid yellow">
+                    <div class="col-4 text-start" style="border: 0px solid black">
+                        <p class="h5" id="rankerCount" style="text-decoration: none"></p>
+                    </div>
+                    <div class="row col-4 text-center" style="border: 0px solid black">
+                        <p class="h5" href="#" id="ladderNumber"></p>
+                        <button class="btn btn-secondary col" id="promoteButton" onclick="promote(event)"
+                                style="display: none"
+                                type="button">
+                            <i class="bi bi-gem"></i>
+                            PROMOTE
+                            <i class="bi bi-gem"></i>
+                        </button>
+                        <button class="btn btn-secondary col" id="assholeButton" onclick="beAsshole(event)"
+                                style="display: none"
+                                type="button">
+                            <i class="bi bi-emoji-dizzy"></i>
+                            I AM AN ASSHOLE
+                            <i class="bi bi-emoji-dizzy"></i>
+                        </button>
+                    </div>
+                    <div class="col-4 text-end" style="border: 0px solid black">
+                        <a class="h5 link-secondary" href="/help" id="helpLink" rel="noopener noreferrer"
+                           target="_blank">Help</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div class="row">
+            <div class="col-7">
+                <table class="table table-sm caption-top table-borderless" style="border: 0px solid yellow">
+                    <thead>
+                    <tr class="thead-light">
+                        <th class="col-1">#</th>
+                        <th class="col-5">Username</th>
+                        <th class="col-3 text-end">Power</th>
+                        <th class="col-3 text-end">Points</th>
+                    </tr>
+                    </thead>
+                    <tbody class="" id="ladderBody">
+                    </tbody>
+                </table>
+                <div>
+                    <div class="row">
+                        <div class="col-auto" data-toggle="tooltip" id="autoPromoteTooltip">
+                            <button class="btn btn-outline-dark btn-sm shadow-none text-center" id="autoPromoteButton"
+                                    onclick="buyAutoPromote(event)">
+                                Auto-Promote!
+                            </button>
+                        </div>
+                    </div>
+                    <p id="manualPromoteText">
+                        Points needed for manual promote
+                    </p>
+                    <p id="infoText">Grapes: <br>Vinegar: </p>
+                </div>
+                <p style="color: plum"></p>
+            </div>
+            <div class="col" style="height:100vh; border: 0px solid black ;overflow-y:auto; overflow-x: hidden">
+                <table class="table table-sm table-striped table-borderless"
+                       style="border: 0px solid red; table-layout: fixed">
+                    <thead>
+                    <tr>
+                        <th class="col-5"></th>
+                        <th class="col"></th>
+                    </tr>
+                    </thead>
+                    <tbody class="" id="messagesBody" style="border: 0px solid yellow">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<nav class="navbar navbar-light bg-light fixed-bottom container-fluid">
+    <div class="container-fluid" style="border: 0px solid red">
+        <div class="col-8">
+            <div class="input-group">
+                <span class="input-group-text" id="basic-addon1">
+                     <a class=link-secondary href="#" id="usernameLink"
+                        onclick="promptNameChange()"></a>
+                </span>
+                <input class="form-control shadow-none" id="messageInput" maxlength="280"
+                       placeholder="Chad is listening..." type="text">
+                <button class="btn btn-primary shadow-none" href="#" id="sendButton"
+                        onclick="sendMessage()">Send
+                </button>
+            </div>
+        </div>
+        <div class="col-1" data-toggle="tooltip" id="multiTooltip">
+            <button class="col-12 btn btn-outline-dark btn shadow-none text-center"
+                    id="multiButton" onclick="buyMulti(event)">
+                +1 Multi
+            </button>
+        </div>
+        <div class="col-1" data-toggle="tooltip" id="biasTooltip">
+            <button class="col-12 btn btn-outline-dark btn shadow-none text-center"
+                    id="biasButton" onclick="buyBias(event)">
+                +1 Bias
+            </button>
+        </div>
+        <button aria-controls="offcanvasNavbar" class="navbar-toggler"
+                data-bs-target="#offcanvasNavbar"
+                data-bs-toggle="offcanvas"
+                type="button col">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div aria-labelledby="offcanvasNavbarLabel" class="offcanvas offcanvas-end"
+             id="offcanvasNavbar" tabindex="-1">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Ladders</h5>
+                <button aria-label="Close" class="btn-close text-reset" data-bs-dismiss="offcanvas"
+                        type="button"></button>
+            </div>
+            <div class="offcanvas-body">
+                <ul class="navbar-nav justify-content-end flex-grow-1 pe-3" id="offCanvasBody">
+                    <!-- Here goes the Ladder links -->
+                </ul>
+                <div class="offCanvasOptions">
+                    <button class="btn btn-outline-dark btn shadow-none text-center" id="QOLButton"
+                            onclick="loadQOLScripts()">QOL Scripts
+                    </button>
+                    <button class="btn btn-outline-dark btn shadow-none text-center" id="importButton"
+                            onclick="importCookie()">import
+                    </button>
+                    <button class="btn btn-outline-dark btn shadow-none text-center" id="exportButton"
+                            onclick="exportCookie()">export
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+</body>
+</html>
