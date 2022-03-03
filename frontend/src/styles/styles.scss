@@ -1,0 +1,46 @@
+@import "variables";
+
+body {
+  background-color: $background-color;
+  color: $main-color
+}
+
+a {
+  color: $link-color;
+
+  &:hover {
+    color: $link-hover-color;
+  }
+}
+
+.navbar {
+  background-color: $navbar-color;
+}
+
+.btn-outline-primary {
+  color: $main-color !important;
+  border-color: $button-color !important;
+  outline-color: $button-color !important;
+
+  &:hover {
+    color: $button-hover-color !important;
+    border-color: $button-hover-color !important;
+    background-color: $main-color !important;
+    outline-color: $button-color !important;
+  }
+}
+
+.navbar .navbar-toggler {
+  color: $button-color;
+  border-color: $button-color;
+
+  i {
+    font-size: 1.75rem;
+    color: $main-color;
+  }
+}
+
+div .offcanvas {
+  background-color: $offcanvas-background-color;
+}
+

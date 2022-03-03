@@ -4,14 +4,14 @@ import Cookies from "js-cookie";
 
 export class StompClient {
   constructor() {
-    let enableDevelop = process.env.NODE_ENV === "development";
-    let connection = enableDevelop
+    let isInDevelop = process.env.NODE_ENV === "development";
+    let connection = isInDevelop
       ? "http://localhost:8080/fairsocket"
       : "/fairsocket";
     let socket = SockJs(connection);
     this.subscribeMap = new Map();
     this.stompClient = Stomp.over(socket);
-    if (!enableDevelop) this.stompClient.debug = null;
+    if (!isInDevelop) this.stompClient.debug = null;
     this.stompClient.connect(
       {},
       () => {},

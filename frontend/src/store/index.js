@@ -1,14 +1,19 @@
 import { createStore } from "vuex";
 import { StompClient } from "@/stomp/stompClient";
+import ladderModule from "@/ladder/store/ladderModule";
 
 let store = createStore({
-  state: {
-    stompClient: new StompClient(),
+  state: function () {
+    return {
+      stompClient: new StompClient(),
+    };
   },
   getters: {},
   mutations: {},
   actions: {},
-  modules: {},
+  modules: {
+    ladder: ladderModule,
+  },
 });
 
 export default store;
