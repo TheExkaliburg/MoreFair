@@ -1,9 +1,14 @@
 import { createStore } from "vuex";
+import { StompClient } from "@/stomp/stompClient";
 
-export default createStore({
-  state: {},
+let store = createStore({
+  state: {
+    stompClient: new StompClient(),
+  },
   getters: {},
   mutations: {},
   actions: {},
   modules: {},
 });
+
+export default store;

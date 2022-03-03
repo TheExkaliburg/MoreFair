@@ -22,12 +22,8 @@ class ModerationTool {
             // INFO
             this.getInfo();
         }, async function (frame) {
-            //await handleReset();
+            await this.disconnect();
         });
-    }
-
-    disconnect() {
-
     }
 
     subscribe(destination, func) {
@@ -49,9 +45,11 @@ class ModerationTool {
         this.#stompClient.send(destination, {}, JSON.stringify(data))
     }
 
-    disconnect() {
+    async disconnect() {
         if (this.#stompClient !== null) this.#stompClient.disconnect();
         console.log("Currently disconnected...");
+        await new Promise((r) => setTimeout(r, 65000));
+        location.reload();
     }
 
     getInfo() {
