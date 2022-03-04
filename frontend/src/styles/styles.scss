@@ -2,7 +2,9 @@
 
 body {
   background-color: $background-color;
-  color: $main-color
+  color: $main-color;
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 a {
@@ -10,6 +12,17 @@ a {
 
   &:hover {
     color: $link-hover-color;
+  }
+}
+
+input.form-control {
+  background-color: $navbar-color !important;
+  border-color: $button-color !important;
+  color: $main-color !important;
+
+  &::placeholder {
+    color: $input-placeholder-color !important;
+    opacity: 0.5;
   }
 }
 
@@ -22,9 +35,20 @@ a {
   border-color: $button-color !important;
   outline-color: $button-color !important;
 
+  &.active {
+    color: $button-hover-color !important;
+    background-color: $main-color !important;
+    outline-color: $button-color !important;
+  }
+
+  &.show {
+    color: $button-hover-color !important;
+    background-color: $main-color !important;
+    outline-color: $button-color !important;
+  }
+
   &:hover {
     color: $button-hover-color !important;
-    border-color: $button-hover-color !important;
     background-color: $main-color !important;
     outline-color: $button-color !important;
   }

@@ -1,8 +1,11 @@
 import Ranker from "@/ladder/entities/ranker";
 
 export default {
-  state: {
-    ladder: [new Ranker({})],
+  state: () => {
+    console.log("Init ladderModule");
+    return {
+      ladder: [new Ranker({})],
+    };
   },
   mutations: {
     importLadder(state, payload) {

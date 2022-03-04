@@ -12,6 +12,9 @@ export class StompClient {
     this.subscribeMap = new Map();
     this.stompClient = Stomp.over(socket);
     if (!isInDevelop) this.stompClient.debug = null;
+  }
+
+  connect() {
     this.stompClient.connect(
       {},
       () => {},
