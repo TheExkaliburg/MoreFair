@@ -32,7 +32,7 @@ public class RequestThrottler {
             if (request) {
                 hasCreatedAccountRecently.asMap().remove(ipAddress);
                 hasCreatedAccountRecently.put(ipAddress, true);
-                return true;
+                return false;
             }
         }
         hasCreatedAccountRecently.put(ipAddress, true);
