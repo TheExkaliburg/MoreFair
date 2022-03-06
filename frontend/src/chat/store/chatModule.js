@@ -11,8 +11,11 @@ const chatModule = {
     init(state, payload) {
       state.chat = new Chat(payload.message.content);
     },
+    addMessage(state, payload) {
+      state.chat.addNewMessage(payload.message);
+    },
     updateChat(state, payload) {
-      console.log(payload);
+      state.chat.update(payload.message);
     },
   },
   actions: {},

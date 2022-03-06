@@ -30,18 +30,22 @@ function setupConnection() {
 
 function setupData() {
   let highestLadderReached = store.state.user.highestCurrentLadder;
-  stompClient.subscribe("/topic/chat/" + highestLadderReached, () => {});
+  stompClient.subscribe("/topic/chat/" + highestLadderReached, (message) => {
+    store.commit({ type: "chat/addMessage", message: message });
+  });
   stompClient.subscribe("/user/queue/chat/", (message) => {
     store.commit({ type: "chat/init", message: message });
   });
   stompClient.send("/app/chat/init/" + highestLadderReached);
 
-  /*
-  stompClient.subscribe("/topic/ladder/" + highestLadderReached, () => {});
-  stompClient.subscribe("/topic/global/", () => {});
+  stompClient.subscribe("/topic/ladder/" + highestLadderReached, () => {
+    //store.commit({ type: "chat/updateChat", message: message });
+  });
+  stompClient.subscribe("/topic/global/", (message) => {
+    store.commit({ type: "chat/updateChat", message: message });
+  });
   stompClient.subscribe("/user/queue/ladder/", () => {});
   stompClient.send("/app/ladder/init/" + highestLadderReached);
-   */
 }
 
 provide("$stompClient", stompClient);
