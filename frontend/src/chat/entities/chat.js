@@ -5,7 +5,7 @@ class Chat {
     this.currentChatNumber = data.currentChatNumber;
     this.messages = [];
     data.messages.forEach((message) => {
-      this.messages.push(new Message(message));
+      this.messages.unshift(new Message(message));
     });
   }
 

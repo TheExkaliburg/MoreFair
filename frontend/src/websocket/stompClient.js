@@ -12,7 +12,6 @@ export class StompClient {
     this.subscribeMap = new Map();
     this.stompClient = Stomp.over(socket);
     if (!isInDevelop) this.stompClient.debug = null;
-    this.promise;
   }
 
   connect(func) {
@@ -44,6 +43,14 @@ export class StompClient {
       { uuid: Cookies.get("_uuid") }
     );
     this.subscribeMap.set(destination, subscription);
+  }
+
+  unsubscribe(destination) {
+    let subscription = this.subscribeMap.get(destination);
+    if (subscription) {
+      subscription.unsubscribe();
+      this.subscribeMap.delete(destination);
+    }
   }
 
   send(destination, content) {

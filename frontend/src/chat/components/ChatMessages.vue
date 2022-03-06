@@ -2,30 +2,26 @@
   <div class="container px-3 py-1 message">
     <div class="row py-0 message-header">
       <div class="col-4 message-username">
-        <span class="message-user-name">Kali </span>
-        <span class="message-user-id">#11235</span>
+        <span class="message-user-name">{{ msg.username }} </span>
+        <span class="message-user-id">#{{ msg.accountId }}</span>
       </div>
-      <div class="col-3 message-date">Tue, 19:53</div>
+      <div class="col-3 message-date">{{ msg.timeCreated }}</div>
       <div class="col-4 message-status">♠ - [🟢][⚙️][3]</div>
       <div class="col-1 message-options">...</div>
     </div>
     <div class="row py-0 message-body">
-      <span
-        >Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
-        nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,
-        sed diam voluptua. At vero eos et accusam et justo duo dolores et ea
-        rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem
-        ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing
-        elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna
-        aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
-        dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus
-        est Lorem ipsum dolor sit amet.
-      </span>
+      <span> {{ msg.message }}</span>
     </div>
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+import { defineProps } from "vue";
+
+defineProps({
+  msg: Object,
+});
+</script>
 
 <style lang="scss">
 @import "../../styles/styles";

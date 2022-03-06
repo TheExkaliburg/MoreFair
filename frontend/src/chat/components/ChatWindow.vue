@@ -22,15 +22,11 @@
       </div>
     </div>
     <div class="chat-content row py-0">
-      <ChatMessage />
-      <ChatMessage />
-      <ChatMessage />
-      <ChatMessage />
-      <ChatMessage />
-      <ChatMessage />
-      <ChatMessage />
-      <ChatMessage />
-      <ChatMessage />
+      <ChatMessage
+        v-for="message in chat.messages"
+        :key="message"
+        :msg="message"
+      />
     </div>
     <div class="chat-input row py-3">
       <div class="input-group">
@@ -46,6 +42,12 @@
 
 <script setup>
 import ChatMessage from "@/chat/components/ChatMessages";
+import { useStore } from "vuex";
+import { computed } from "vue";
+
+let store = useStore();
+
+const chat = computed(() => store.state.chat.chat);
 </script>
 
 <style lang="scss">
