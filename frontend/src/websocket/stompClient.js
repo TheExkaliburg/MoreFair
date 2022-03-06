@@ -12,12 +12,15 @@ export class StompClient {
     this.subscribeMap = new Map();
     this.stompClient = Stomp.over(socket);
     if (!isInDevelop) this.stompClient.debug = null;
+    this.promise;
   }
 
-  connect() {
+  connect(func) {
     this.stompClient.connect(
       {},
-      () => {},
+      () => {
+        func(this);
+      },
       async () => {
         await this.disconnect();
       }
@@ -37,14 +40,15 @@ export class StompClient {
     if (subscription) subscription.unsubscribe();
     subscription = this.stompClient.subscribe(
       destination,
-      (message) => func(message),
+      (message) => func(JSON.parse(message.body)),
       { uuid: Cookies.get("_uuid") }
     );
     this.subscribeMap.set(destination, subscription);
   }
 
   send(destination, content) {
-    let data = { uuid: Cookies.get("uuid") };
+    let data = { uuid: Cookies.get("_uuid") };
+    if (!data.uuid) data.uuid = "";
     if (content) data.content = content;
     this.stompClient.send(destination, {}, JSON.stringify(data));
   }

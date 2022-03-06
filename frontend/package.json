@@ -18,6 +18,7 @@
     "net": "^1.0.2",
     "sockjs-client": "^1.6.0",
     "stomp-websocket": "^2.3.4-next",
+    "swarm-numberformat": "^0.4.0",
     "util": "^0.12.4",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",

@@ -48,7 +48,7 @@ public class CustomHandshakeHandler extends DefaultHandshakeHandler {
         }
 
         if (isMaximumConnectionsPerMinuteExceeded(ip)) {
-            return null;
+            //return null;
         }
 
         UUID uuid = UUID.randomUUID();

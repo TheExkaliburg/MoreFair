@@ -1,17 +1,16 @@
 import Ranker from "@/ladder/entities/ranker";
 
 export default {
+  namespaced: true,
   state: () => {
-    console.log("Init ladderModule");
     return {
       ladder: [new Ranker({})],
     };
   },
   mutations: {
-    importLadder(state, payload) {
-      // TODO: Import a Ladder
-      state.ladder = [];
-      console.log(payload);
+    connect(state, payload) {
+      let stompClient = payload;
+      console.log(stompClient);
     },
   },
   actions: {},

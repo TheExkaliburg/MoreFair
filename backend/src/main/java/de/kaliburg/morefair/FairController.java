@@ -64,7 +64,12 @@ public class FairController {
         this.wsUtils = wsUtils;
     }
 
-    @GetMapping("/help")
+    @GetMapping("/legacy")
+    public String getLegacy() {
+        return "fair";
+    }
+
+    @GetMapping("/legacy/help")
     public String getHelp() {
         return "help";
     }

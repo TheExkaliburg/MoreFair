@@ -1,8 +1,11 @@
-class Chat {
+class Message {
   constructor(data) {
-    this.currentChatNumber = data.currentChatNumber;
-    this.messages = ["", "", ""];
+    this.username = data.username;
+    this.message = data.message;
+    this.timesAsshole = data.timesAsshole;
+    this.accountId = data.accountId;
+    this.timeCreated = data.timeCreated;
   }
 }
 
-export default Chat;
+export default Message;

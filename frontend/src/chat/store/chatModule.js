@@ -1,9 +1,20 @@
+import Chat from "@/chat/entities/chat";
+
 const chatModule = {
-  state: (context) => {
-    console.log(context);
-    return {};
+  namespaced: true,
+  state: () => {
+    return {
+      chat: {},
+    };
   },
-  mutations: {},
+  mutations: {
+    init(state, payload) {
+      state.chat = new Chat(payload.message.content);
+    },
+    updateChat(state, payload) {
+      console.log(payload);
+    },
+  },
   actions: {},
   getters: {},
 };

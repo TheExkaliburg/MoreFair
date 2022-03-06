@@ -44,13 +44,8 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import ChatMessage from "@/chat/components/ChatMessages";
-
-export default {
-  name: "ChatWindow",
-  components: { ChatMessage },
-};
 </script>
 
 <style lang="scss">

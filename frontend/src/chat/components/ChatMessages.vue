@@ -6,7 +6,7 @@
         <span class="message-user-id">#11235</span>
       </div>
       <div class="col-3 message-date">Tue, 19:53</div>
-      <div class="col-4 message-status">[4][1][2][3]</div>
+      <div class="col-4 message-status">♠ - [🟢][⚙️][3]</div>
       <div class="col-1 message-options">...</div>
     </div>
     <div class="row py-0 message-body">
@@ -25,11 +25,7 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "ChatMessages",
-};
-</script>
+<script setup></script>
 
 <style lang="scss">
 @import "../../styles/styles";
@@ -43,7 +39,7 @@ export default {
 }
 
 .message-header {
-  font-size: 11.4px;
+  font-size: 12px;
   color: $main-color;
 }
 
@@ -57,7 +53,7 @@ export default {
 
 .message-body {
   //ddd
-  font-size: 12.5px;
+  font-size: 14px;
   text-align: start;
   color: #e7d5b3;
 }

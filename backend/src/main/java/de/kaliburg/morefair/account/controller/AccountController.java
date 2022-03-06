@@ -42,8 +42,7 @@ public class AccountController {
         try {
             StompPrincipal principal = wsUtils.convertMessageHeaderAccessorToStompPrincipal(sha);
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-            log.debug("/app/account/login {}", uuid);
-            if (uuid.isBlank()) {
+            if (uuid == null || uuid.isBlank()) {
                 if (requestThrottler.canCreateAccount(principal)) {
                     wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, accountService.createNewAccount(principal), HttpStatus.CREATED);
                 } else {
@@ -51,7 +50,6 @@ public class AccountController {
                 }
                 return;
             }
-
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null) {
                 if (requestThrottler.canCreateAccount(principal)) {
