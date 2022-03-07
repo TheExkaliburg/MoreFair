@@ -43,13 +43,13 @@ input.form-control {
 
   &.show {
     color: $button-hover-color !important;
-    background-color: $main-color !important;
+    background-color: $button-hover-background-color !important;
     outline-color: $button-color !important;
   }
 
   &:hover {
     color: $button-hover-color !important;
-    background-color: $main-color !important;
+    background-color: $button-hover-background-color !important;
     outline-color: $button-color !important;
   }
 }
@@ -68,3 +68,15 @@ div .offcanvas {
   background-color: $offcanvas-background-color;
 }
 
+.dropdown-menu {
+  background-color: $offcanvas-background-color !important;
+
+  li .dropdown-item {
+    color: $main-color !important;
+
+    &:hover {
+      color: $offcanvas-background-color !important;
+      background-color: $button-hover-background-color !important;
+    }
+  }
+}

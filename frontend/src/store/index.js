@@ -9,8 +9,8 @@ let store = createStore({
   strict: process.env.NODE_ENV !== "production",
   state: () => {
     return {
-      settings: undefined,
-      user: undefined,
+      settings: {},
+      user: {},
       numberFormatter: new numberformat.Formatter({
         format: "hybrid",
         sigfigs: 6,

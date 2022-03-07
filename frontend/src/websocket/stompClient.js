@@ -18,7 +18,9 @@ export class StompClient {
     this.stompClient.connect(
       {},
       () => {
-        func(this);
+        this.isFinished = new Promise((resolve) => {
+          func(resolve);
+        });
       },
       async () => {
         await this.disconnect();

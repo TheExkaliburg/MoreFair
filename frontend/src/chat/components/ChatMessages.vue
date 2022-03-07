@@ -2,11 +2,14 @@
   <div class="container px-3 py-1 message">
     <div class="row py-0 message-header">
       <div class="col-4 message-username">
-        <span class="message-user-name">{{ msg.username }} </span>
+        <span class="message-user-name">
+          <strong>{{ settings.assholeTags[msg.timesAsshole] }}</strong> -
+          {{ msg.username }}
+        </span>
         <span class="message-user-id">#{{ msg.accountId }}</span>
       </div>
       <div class="col-3 message-date">{{ msg.timeCreated }}</div>
-      <div class="col-4 message-status">♠ - [🟢][⚙️][3]</div>
+      <div class="col-4 message-status"></div>
       <div class="col-1 message-options">...</div>
     </div>
     <div class="row py-0 message-body">
@@ -16,7 +19,11 @@
 </template>
 
 <script setup>
-import { defineProps } from "vue";
+import { computed, defineProps } from "vue";
+import { useStore } from "vuex";
+
+const store = useStore();
+const settings = computed(() => store.state.settings);
 
 defineProps({
   msg: Object,
@@ -27,7 +34,7 @@ defineProps({
 @import "../../styles/styles";
 
 .message {
-  //border: white solid 0.5px;
+  // border: white solid 0.5px;
 }
 
 .message-user-id {
@@ -35,12 +42,14 @@ defineProps({
 }
 
 .message-header {
-  font-size: 12px;
+  font-size: 14px;
   color: $main-color;
+  white-space: nowrap;
 }
 
 .message-username {
   text-align: start;
+  overflow-x: hidden;
 }
 
 .message-options {
@@ -48,8 +57,7 @@ defineProps({
 }
 
 .message-body {
-  //ddd
-  font-size: 14px;
+  font-size: 15px;
   text-align: start;
   color: #e7d5b3;
 }

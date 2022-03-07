@@ -33,26 +33,26 @@ public class FairController {
     public final static Integer ASSHOLES_FOR_RESET = 10;
     public final static List<String> ASSHOLE_TAGS = new ArrayList<>(Arrays.asList(
             "",
-            "&#x2660;",     // 01♠
-            "&#x2663;",     // 02♣
-            "&#x2665;",     // 03♥
-            "&#x2666;",     // 04♦
-            "&#x2664;",     // 05♤
-            "&#x2667;",     // 06♧
-            "&#x2661;",     // 07♡
-            "&#x2662;",     // 08♢
-            "&#x265F;",     // 09♟
-            "&#x2659;",     // 10♙
-            "&#x265E;",     // 11♞
-            "&#x2658;",     // 12♘
-            "&#x265D;",     // 13♝
-            "&#x2657;",     // 14♗
-            "&#x265C;",     // 15♜
-            "&#x2656;",     // 16♖
-            "&#x265B;",     // 17♛
-            "&#x2655;",     // 18♕
-            "&#x265A;",     // 19♚
-            "&#x2654;"      // 20♔
+            "♠",     // 01♠
+            "♣",     // 02♣
+            "♥",     // 03♥
+            "♦",     // 04♦
+            "♤",     // 05♤
+            "♧",     // 06♧
+            "♡",     // 07♡
+            "♢",     // 08♢
+            "♟",     // 09♟
+            "♙",     // 10♙
+            "♞",     // 11♞
+            "♘",     // 12♘
+            "♝",     // 13♝
+            "♗",     // 14♗
+            "♜",     // 15♜
+            "♖",     // 16♖
+            "♛",     // 17♛
+            "♕",     // 18♕
+            "♚",     // 19♚
+            "♔"      // 20♔
     ));
     public final static String INFO_DESTINATION = "/queue/info";
     private final AccountService accountService;

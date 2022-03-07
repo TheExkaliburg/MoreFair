@@ -1,60 +1,3 @@
-<script setup>
-import { onMounted, provide } from "vue";
-import { useStore } from "vuex";
-import Cookies from "js-cookie";
-import { StompClient } from "@/websocket/stompClient";
-
-const store = useStore();
-const stompClient = new StompClient();
-
-function setupConnection() {
-  stompClient.connect((client) => {
-    client.subscribe("/user/queue/info", (message) => {
-      store.commit({ type: "initSettings", message: message });
-
-      client.subscribe("/user/queue/account/login", (message) => {
-        store.commit({ type: "initUser", message: message });
-        setupData();
-      });
-
-      let uuid = Cookies.get("_uuid");
-      if (uuid === "" && !confirm("Do you want to create a new account?")) {
-        return;
-      }
-      client.send("/app/account/login");
-    });
-
-    client.send("/app/info");
-  });
-}
-
-function setupData() {
-  let highestLadderReached = store.state.user.highestCurrentLadder;
-  stompClient.subscribe("/topic/chat/" + highestLadderReached, (message) => {
-    store.commit({ type: "chat/addMessage", message: message });
-  });
-  stompClient.subscribe("/user/queue/chat/", (message) => {
-    store.commit({ type: "chat/init", message: message });
-  });
-  stompClient.send("/app/chat/init/" + highestLadderReached);
-
-  stompClient.subscribe("/topic/ladder/" + highestLadderReached, () => {
-    //store.commit({ type: "chat/updateChat", message: message });
-  });
-  stompClient.subscribe("/topic/global/", (message) => {
-    store.commit({ type: "chat/updateChat", message: message });
-  });
-  stompClient.subscribe("/user/queue/ladder/", () => {});
-  stompClient.send("/app/ladder/init/" + highestLadderReached);
-}
-
-provide("$stompClient", stompClient);
-
-onMounted(() => {
-  setupConnection();
-});
-</script>
-
 <template>
   <nav class="navbar">
     <a class="navbar-brand" href="#">
@@ -115,6 +58,63 @@ onMounted(() => {
   </div>
   <router-view />
 </template>
+
+<script setup>
+import { provide } from "vue";
+import { useStore } from "vuex";
+import Cookies from "js-cookie";
+import { StompClient } from "@/websocket/stompClient";
+
+const store = useStore();
+const stompClient = new StompClient();
+
+let setupPromise = setupConnection();
+provide("$setupPromise", setupPromise);
+provide("$stompClient", stompClient);
+
+function setupConnection() {
+  return new Promise((resolve) => {
+    stompClient.connect(() => {
+      stompClient.subscribe("/user/queue/info", (message) => {
+        store.commit({ type: "initSettings", message: message });
+
+        stompClient.subscribe("/user/queue/account/login", (message) => {
+          store.commit({ type: "initUser", message: message });
+          setupData(resolve);
+        });
+
+        let uuid = Cookies.get("_uuid");
+        if (uuid === "" && !confirm("Do you want to create a new account?")) {
+          return;
+        }
+        stompClient.send("/app/account/login");
+      });
+
+      stompClient.send("/app/info");
+    });
+  });
+}
+
+function setupData(resolve) {
+  let highestLadderReached = store.state.user.highestCurrentLadder;
+  stompClient.subscribe("/topic/chat/" + highestLadderReached, (message) => {
+    store.commit({ type: "chat/addMessage", message: message });
+  });
+  stompClient.subscribe("/user/queue/chat/", (message) => {
+    store.commit({ type: "chat/init", message: message });
+  });
+  stompClient.send("/app/chat/init/" + highestLadderReached);
+  stompClient.subscribe("/topic/ladder/" + highestLadderReached, () => {
+    //store.commit({ type: "chat/updateChat", message: message });
+    resolve();
+  });
+  stompClient.subscribe("/topic/global/", (message) => {
+    store.commit({ type: "chat/updateChat", message: message });
+  });
+  stompClient.subscribe("/user/queue/ladder/", () => {});
+  stompClient.send("/app/ladder/init/" + highestLadderReached);
+}
+</script>
 
 <style lang="scss">
 @import "./styles/styles";
