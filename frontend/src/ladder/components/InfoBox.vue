@@ -108,9 +108,7 @@
           {{ numberFormatter.format(stats.pointsNeededForManualPromote) }}
           Points ({{
             numberFormatter.format(
-              yourRanker.points
-                .div(stats.pointsNeededForManualPromote)
-                .mul(new Decimal(100))
+              yourRanker.points.mul(100).div(stats.pointsNeededForManualPromote)
             )
           }}%)
         </div>
@@ -141,7 +139,6 @@
 <script setup>
 import { useStore } from "vuex";
 import { computed, inject, ref } from "vue";
-import Decimal from "break_infinity.js";
 
 const store = useStore();
 const stompClient = inject("$stompClient");
