@@ -1,7 +1,7 @@
 <template>
-  <div class="chat-window container rounded px-3 py-1">
-    <div class="chat-header row py-0">
-      <div class="col chat-info">Chad #{{ chat.currentChatNumber }}</div>
+  <div class="chat-window container rounded py-1 px-3">
+    <div class="chat-header row py-1">
+      <!--div class="col chat-info">Chad #{{ chat.currentChatNumber }}</div-->
       <div class="col chat-pagination">
         <div class="btn-group dropdown">
           <button
@@ -136,10 +136,9 @@ const chat = computed(() => store.state.chat.chat);
 const user = computed(() => store.state.user);
 
 function sendMessage() {
-  stompClient.send(
-    "/app/chat/post/" + chat.value.currentChatNumber,
-    message.value
-  );
+  stompClient.send("/app/chat/post/" + chat.value.currentChatNumber, {
+    content: message.value,
+  });
   message.value = "";
 }
 
@@ -159,7 +158,7 @@ onUpdated(() => {
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import "../../styles/styles";
 // .
 .chat-window {
@@ -176,11 +175,15 @@ onUpdated(() => {
   overflow-y: auto;
   overflow-x: hidden;
   align-content: start;
-  height: calc(100% - 85px);
+  height: calc(100% - calc(70px + 40px));
 }
 
 .chat-info {
   white-space: nowrap;
   overflow-x: hidden;
+}
+
+.chat-header {
+  max-height: 48px;
 }
 </style>

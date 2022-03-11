@@ -1,10 +1,12 @@
 import Ladder from "@/ladder/entities/ladder";
+import LadderStats from "@/ladder/entities/ladderStats";
 
 export default {
   namespaced: true,
   state: () => {
     return {
-      ladder: {},
+      ladder: Ladder.placeholder(),
+      stats: new LadderStats(),
     };
   },
   mutations: {
@@ -13,6 +15,7 @@ export default {
     },
     calculate(state, { delta, settings }) {
       state.ladder.calculate(delta, settings);
+      state.stats.calculateStats(state.ladder, settings);
     },
     handleNameChange(state, { event }) {
       state.ladder.changeName(event.accountId, event.data);
@@ -46,26 +49,32 @@ export default {
     },
   }, //
   actions: {
-    update({ message, rootState, dispatch, commit }) {
-      if (message) {
-        message.events.forEach((event) =>
-          dispatch({ type: "handleEvent", event: event })
-        );
-        commit({
-          type: "calculate",
-          delta: message.secondsPassed,
-          settings: rootState.settings,
-        });
-      }
+    update({ rootState, dispatch, commit }, { message, stompClient }) {
+      message.events.forEach((event) =>
+        dispatch({
+          type: "handleEvent",
+          event: event,
+          stompClient: stompClient,
+        })
+      );
+      commit({
+        type: "calculate",
+        delta: message.secondsPassed,
+        settings: rootState.settings,
+      });
     },
-    updateGlobal({ message, dispatch }) {
+    updateGlobal({ dispatch }, { message, stompClient }) {
       if (message) {
         message.forEach((event) =>
-          dispatch({ type: "handleEvent", event: event })
+          dispatch({
+            type: "handleEvent",
+            event: event,
+            stompClient: stompClient,
+          })
         );
       }
     },
-    handleEvent({ event, commit, rootState }) {
+    async handleEvent({ commit, rootState }, { event, stompClient }) {
       switch (event.eventType) {
         case "BIAS":
           commit({ type: "handleBias", event: event });
@@ -86,6 +95,10 @@ export default {
           });
           if (event.accountId === rootState.user.accountId) {
             // TODO: Go up a ladder
+            commit(
+              { type: "incrementHighestLadder", stompClient: stompClient },
+              { root: true }
+            );
           }
           break;
         case "AUTO_PROMOTE":
@@ -105,10 +118,22 @@ export default {
           // TODO: CONFIRM
           break;
         case "RESET":
-          // TODO: RESET
+          await stompClient.disconnect();
           break;
       }
     },
   },
-  getters: {},
+  getters: {
+    shownRankers(state) {
+      const numberAtTop = 30;
+      const padding = 50;
+      const rank = state.ladder.yourRanker.rank;
+
+      return state.ladder.rankers.filter(
+        (ranker) =>
+          ranker.rank <= numberAtTop ||
+          (ranker.rank >= rank - padding && ranker.rank <= rank + padding)
+      );
+    },
+  },
 };

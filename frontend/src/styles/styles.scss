@@ -5,6 +5,7 @@ body {
   color: $main-color;
   overflow-x: hidden;
   overflow-y: hidden;
+  font-size: $text-font-size;
 }
 
 a {
@@ -66,6 +67,7 @@ input.form-control {
 
 div .offcanvas {
   background-color: $offcanvas-background-color;
+  font-size: 24px;
 }
 
 .dropdown-menu {
@@ -101,4 +103,8 @@ table tbody tr {
   font-size: $text-font-size;
   white-space: nowrap;
   overflow-x: hidden;
+}
+
+.text-highlight {
+  color: $text-highlight-color;
 }

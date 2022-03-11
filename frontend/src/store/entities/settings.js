@@ -13,6 +13,19 @@ class Settings {
     this.manualPromoteWaitTime = data.manualPromoteWaitTime;
     this.autoPromoteLadder = data.autoPromoteLadder;
   }
+
+  static placeholder() {
+    return new Settings({
+      pointsForPromote: new Decimal(Infinity),
+      minimumPeopleForPromote: Infinity,
+      assholeLadder: Infinity,
+      assholeTags: [""],
+      baseVinegarNeededToThrow: new Decimal(Infinity),
+      baseGrapesNeededToAutoPromote: new Decimal(Infinity),
+      manualPromoteWaitTime: Infinity,
+      autoPromoteLadder: Infinity,
+    });
+  }
 }
 
 export default Settings;

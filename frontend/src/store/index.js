@@ -7,10 +7,11 @@ import { numberformat } from "swarm-numberformat";
 
 let store = createStore({
   strict: process.env.NODE_ENV !== "production",
+  namespaced: true,
   state: () => {
     return {
-      settings: {},
-      user: {},
+      settings: Settings.placeholder(),
+      user: UserDetails.placeholder(),
       numberFormatter: new numberformat.Formatter({
         format: "hybrid",
         sigfigs: 6,
@@ -34,7 +35,13 @@ let store = createStore({
         payload.message.content
       ) {
         state.user = new UserDetails(payload.message.content);
+        state.user.saveUUID();
       }
+    },
+    incrementHighestLadder(state, { stompClient }) {
+      state.user.highestCurrentLadder++;
+      stompClient.send("/app/ladder/init/" + state.user.highestCurrentLadder);
+      stompClient.send("/app/chat/init/" + state.user.highestCurrentLadder);
     },
   },
   actions: {},

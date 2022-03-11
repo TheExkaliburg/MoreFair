@@ -105,12 +105,20 @@ function setupData(resolve) {
   });
   stompClient.send("/app/chat/init/" + highestLadderReached);
   stompClient.subscribe("/topic/ladder/" + highestLadderReached, (message) => {
-    store.dispatch({ type: "ladder/update", message: message });
+    store.dispatch({
+      type: "ladder/update",
+      message: message,
+      stompClient: stompClient,
+    });
     resolve();
   });
   stompClient.subscribe("/topic/global/", (message) => {
     store.commit({ type: "chat/update", message: message });
-    store.commit({ type: "ladder/updateGlobal", message: message });
+    store.dispatch({
+      type: "ladder/updateGlobal",
+      message: message,
+      stompClient: stompClient,
+    });
   });
   stompClient.subscribe("/user/queue/ladder/", (message) => {
     store.commit({ type: "ladder/init", message: message });
@@ -136,7 +144,6 @@ function setupData(resolve) {
 .row {
   padding-top: 15px;
   padding-bottom: 15px;
-  font-size: 24px;
 
   .col-8 {
     text-align: start;

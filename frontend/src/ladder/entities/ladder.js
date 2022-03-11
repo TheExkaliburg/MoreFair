@@ -3,7 +3,7 @@ import Decimal from "break_infinity.js";
 
 class Ladder {
   constructor(data) {
-    this.currentLadderNum = data.currentLadder.number;
+    this.ladderNumber = data.currentLadder.number;
     this.rankers = [];
     data.rankers.forEach((ranker) => {
       const r = new Ranker(ranker);
@@ -14,12 +14,25 @@ class Ladder {
     this.firstRanker = new Ranker(data.firstRanker);
   }
 
+  static placeholder() {
+    const ranker = Ranker.placeholder();
+    return new Ladder({
+      currentLadder: { number: 1 },
+      rankers: [ranker],
+      startRank: 1,
+      yourRanker: ranker,
+      firstRanker: ranker,
+    });
+  }
+
   calculate(delta, settings) {
     this.rankers = this.rankers.sort((a, b) =>
       new Decimal(b.points).sub(a.points)
     );
     // ladderStats.growingRankerCount = 0;
     for (let i = 0; i < this.rankers.length; i++) {
+      if (this.yourRanker.accountId === this.rankers[i].accountId)
+        this.yourRanker = this.rankers[i];
       this.rankers[i].rank = i + 1;
       // If the ranker is currently still on ladder
       if (this.rankers[i].growing) {
@@ -81,6 +94,19 @@ class Ladder {
         }
       }
     }
+    // Ranker on Last Place gains 1 Grape, only if he isn't the only one
+    if (
+      this.rankers.length >=
+      Math.max(settings.minimumPeopleForPromote, this.ladderNumber)
+    ) {
+      let index = this.rankers.length - 1;
+      if (this.rankers[index].growing && this.rankers[index].you)
+        this.rankers[index].grapes = this.rankers[index].grapes.add(
+          new Decimal(3).mul(delta).floor()
+        );
+    }
+
+    this.firstRanker = this.rankers[0];
   }
 
   multiRanker(accountId) {
@@ -141,7 +167,7 @@ class Ladder {
     this.rankers.forEach((ranker) => {
       if (ranker.you && accountId === ranker.accountId) {
         ranker.grapes = ranker.grapes.sub(
-          this.getAutoPromoteCost(this.currentLadderNum, ranker.rank, settings)
+          this.getAutoPromoteCost(this.ladderNumber, ranker.rank, settings)
         );
         ranker.autoPromote = true;
       }
@@ -165,33 +191,51 @@ class Ladder {
   }
 
   getMinimumPointsForPromote(settings) {
-    return settings.pointsForPromote.mul(this.currentLadderNum);
+    return settings.pointsForPromote.mul(this.ladderNumber);
   }
 
   getAutoPromoteCost(rank, settings) {
-    let minPeople = this.getMinimumPeopleForPromote(
-      this.currentLadderNum,
-      settings
-    );
+    let minPeople = this.getMinimumPeopleForPromote(settings);
     let divisor = Math.max(rank - minPeople + 1, 1);
     return settings.baseGrapesNeededToAutoPromote.div(divisor).floor();
   }
 
   getMinimumPeopleForPromote(settings) {
-    return Math.max(settings.minimumPeopleForPromote, this.currentLadderNum);
+    return Math.max(settings.minimumPeopleForPromote, this.ladderNumber);
   }
 
   isLadderUnlocked(settings) {
     if (this.rankers.length <= 0) return false;
     let rankerCount = this.rankers.length;
     if (
-      rankerCount <
-      this.getMinimumPeopleForPromote(this.currentLadderNum, settings)
+      rankerCount < this.getMinimumPeopleForPromote(this.ladderNumber, settings)
     )
       return false;
     return (
       this.firstRanker.points.cmp(this.getMinimumPointsForPromote(settings)) >=
       0
+    );
+  }
+
+  canThrowVinegar(settings) {
+    return (
+      this.firstRanker.growing &&
+      !this.firstRanker.you &&
+      this.firstRanker.points.cmp(settings.pointsForPromote) >= 0 &&
+      this.rankers.length >= settings.minimumPeopleForPromote &&
+      this.yourRanker.vinegar.cmp(this.getVinegarThrowCost(settings)) >= 0
+    );
+  }
+
+  getNextUpgradeCost(currentUpgrade) {
+    return new Decimal(
+      Math.round(Math.pow(this.ladderNumber + 1, currentUpgrade + 1))
+    );
+  }
+
+  getVinegarThrowCost(settings) {
+    return settings.baseVinegarNeededToThrow.mul(
+      new Decimal(this.ladderNumber)
     );
   }
 }

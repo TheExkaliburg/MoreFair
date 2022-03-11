@@ -34,6 +34,7 @@ export class StompClient {
       "Currently disconnected, waiting 60sec before trying to reconnect..."
     );
     await new Promise((r) => setTimeout(r, 65000));
+    location.reload();
   }
 
   subscribe(destination, func) {
@@ -55,10 +56,13 @@ export class StompClient {
     }
   }
 
-  send(destination, content) {
-    let data = { uuid: Cookies.get("_uuid") };
+  send(destination, payload) {
+    let data = { uuid: Cookies.get("_uuid"), content: "", event: "" };
     if (!data.uuid) data.uuid = "";
-    if (content) data.content = content;
+    if (payload) {
+      if (payload.content) data.content = payload.content;
+      if (payload.event) data.event = JSON.stringify(payload.event);
+    }
     this.stompClient.send(destination, {}, JSON.stringify(data));
   }
 }

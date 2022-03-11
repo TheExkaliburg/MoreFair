@@ -1,9 +1,11 @@
 <template>
   <div class="game-view container">
-    <div class="row" style="height: 100%; max-height: 100%">
-      <div class="col-7 container">
-        <LadderWindow />
-        <InfoBox />
+    <div class="row py-0" style="height: 100%; max-height: 100%">
+      <div class="col-7">
+        <div class="container py-1 px-3">
+          <LadderWindow />
+          <InfoBox />
+        </div>
       </div>
       <div class="col-5">
         <ChatWindow />
@@ -12,23 +14,14 @@
   </div>
 </template>
 
-<script>
+<script setup>
 // @ is an alias to /src
 import LadderWindow from "@/ladder/components/LadderWindow";
 import ChatWindow from "@/chat/components/ChatWindow";
-import InfoBox from "@/components/InfoBox";
-
-export default {
-  name: "HomeView",
-  components: {
-    LadderWindow,
-    ChatWindow,
-    InfoBox,
-  },
-};
+import InfoBox from "@/ladder/components/InfoBox";
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import "../styles/styles";
 
 .game-view {
@@ -37,6 +30,10 @@ export default {
 
   div {
     max-height: 100%;
+
+    &.container {
+      height: 100%;
+    }
   }
 }
 

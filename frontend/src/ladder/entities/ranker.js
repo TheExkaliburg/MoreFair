@@ -22,6 +22,23 @@ class Ranker {
       this.vinegar = new Decimal(0);
     }
   }
+
+  static placeholder() {
+    return new Ranker({
+      accountId: 0,
+      username: "",
+      rank: 1,
+      points: new Decimal(0),
+      power: new Decimal(1),
+      bias: 0,
+      multiplier: 1,
+      you: false,
+      growing: true,
+      autoPromote: false,
+      grapes: new Decimal(0),
+      vinegar: new Decimal(0),
+    });
+  }
 }
 
 export default Ranker;
