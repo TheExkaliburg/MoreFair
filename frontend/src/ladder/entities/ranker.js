@@ -1,6 +1,7 @@
 import Decimal from "break_infinity.js";
 
-export default class Ranker {
+//
+class Ranker {
   constructor(data) {
     this.accountId = data.accountId;
     this.username = data.username;
@@ -11,8 +12,16 @@ export default class Ranker {
     this.multiplier = data.multiplier;
     this.you = data.you;
     this.growing = data.growing;
-    this.grapes = new Decimal(data.grapes);
-    this.vinegar = new Decimal(data.vinegar);
     this.autoPromote = data.autoPromote;
+
+    if (this.you) {
+      this.grapes = new Decimal(data.grapes);
+      this.vinegar = new Decimal(data.vinegar);
+    } else {
+      this.grapes = new Decimal(0);
+      this.vinegar = new Decimal(0);
+    }
   }
 }
+
+export default Ranker;

@@ -42,7 +42,7 @@ defineProps({
 }
 
 .message-header {
-  font-size: 14px;
+  font-size: $header-font-size;
   color: $main-color;
   white-space: nowrap;
 }
@@ -57,8 +57,8 @@ defineProps({
 }
 
 .message-body {
-  font-size: 15px;
+  font-size: $text-font-size;
   text-align: start;
-  color: #e7d5b3;
+  color: $text-color;
 }
 </style>

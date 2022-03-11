@@ -104,14 +104,17 @@ function setupData(resolve) {
     store.commit({ type: "chat/init", message: message });
   });
   stompClient.send("/app/chat/init/" + highestLadderReached);
-  stompClient.subscribe("/topic/ladder/" + highestLadderReached, () => {
-    //store.commit({ type: "chat/updateChat", message: message });
+  stompClient.subscribe("/topic/ladder/" + highestLadderReached, (message) => {
+    store.dispatch({ type: "ladder/update", message: message });
     resolve();
   });
   stompClient.subscribe("/topic/global/", (message) => {
-    store.commit({ type: "chat/updateChat", message: message });
+    store.commit({ type: "chat/update", message: message });
+    store.commit({ type: "ladder/updateGlobal", message: message });
   });
-  stompClient.subscribe("/user/queue/ladder/", () => {});
+  stompClient.subscribe("/user/queue/ladder/", (message) => {
+    store.commit({ type: "ladder/init", message: message });
+  });
   stompClient.send("/app/ladder/init/" + highestLadderReached);
 }
 </script>

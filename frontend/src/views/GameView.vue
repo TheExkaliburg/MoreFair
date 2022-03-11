@@ -1,7 +1,7 @@
 <template>
   <div class="game-view container">
     <div class="row" style="height: 100%; max-height: 100%">
-      <div class="col-7">
+      <div class="col-7 container">
         <LadderWindow />
         <InfoBox />
       </div>
@@ -14,7 +14,7 @@
 
 <script>
 // @ is an alias to /src
-import LadderWindow from "@/components/LadderWindow";
+import LadderWindow from "@/ladder/components/LadderWindow";
 import ChatWindow from "@/chat/components/ChatWindow";
 import InfoBox from "@/components/InfoBox";
 

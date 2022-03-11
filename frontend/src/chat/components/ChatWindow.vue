@@ -167,6 +167,7 @@ onUpdated(() => {
 }
 
 .chat-pagination {
+  white-space: nowrap;
   text-align: end;
   padding-right: 0px;
 }
@@ -175,7 +176,11 @@ onUpdated(() => {
   overflow-y: auto;
   overflow-x: hidden;
   align-content: start;
-  height: 90%;
-  max-height: 90%;
+  height: calc(100% - 85px);
+}
+
+.chat-info {
+  white-space: nowrap;
+  overflow-x: hidden;
 }
 </style>

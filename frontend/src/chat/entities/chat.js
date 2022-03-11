@@ -20,9 +20,20 @@ class Chat {
         switch (event.eventType) {
           case "NAME_CHANGE":
             this.handleNameChange(event);
+            break;
+          case "BAN":
+          case "MUTE":
+            this.removeMessages(event);
+            break;
         }
       });
     }
+  }
+
+  removeMessages(event) {
+    this.messages = this.messages.filter(
+      (m) => event.accountId !== m.accountId
+    );
   }
 
   handleNameChange(event) {

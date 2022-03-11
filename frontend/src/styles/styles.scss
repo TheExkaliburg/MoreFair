@@ -80,3 +80,25 @@ div .offcanvas {
     }
   }
 }
+
+table {
+  border-collapse: collapse;
+
+  tbody {
+    line-height: 1;
+  }
+}
+
+table thead tr {
+  color: $header-color;
+  font-size: $header-font-size;
+  white-space: nowrap;
+  overflow-x: hidden;
+}
+
+table tbody tr {
+  color: $text-color;
+  font-size: $text-font-size;
+  white-space: nowrap;
+  overflow-x: hidden;
+}

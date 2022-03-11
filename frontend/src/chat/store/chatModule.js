@@ -14,7 +14,7 @@ const chatModule = {
     addMessage(state, payload) {
       state.chat.addNewMessage(payload.message);
     },
-    updateChat(state, payload) {
+    update(state, payload) {
       state.chat.update(payload.message);
     },
   },
