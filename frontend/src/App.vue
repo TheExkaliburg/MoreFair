@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar">
+  <nav class="navbar px-2">
     <a class="navbar-brand" href="#">
       <img
         class="d-inline-block align-top"
@@ -33,7 +33,12 @@
           <router-link to="/">Game</router-link>
         </div>
         <div class="col-4">
-          <button class="col-12 btn btn-sm btn-outline-primary">Export</button>
+          <button
+            class="col-12 btn btn-sm btn-outline-primary shadow-none"
+            @click="promptNameChange"
+          >
+            Change Name
+          </button>
         </div>
       </div>
       <div class="row">
@@ -41,12 +46,25 @@
           <router-link to="/options">Options</router-link>
         </div>
         <div class="col-4">
-          <button class="col-12 btn btn-sm btn-outline-primary">Import</button>
+          <button
+            class="col-12 btn btn-sm btn-outline-primary shadow-none"
+            @click="exportCookie"
+          >
+            Export
+          </button>
         </div>
       </div>
       <div class="row">
         <div class="col-8">
           <router-link to="/help">Help</router-link>
+        </div>
+        <div class="col-4">
+          <button
+            class="col-12 btn btn-sm btn-outline-primary shadow-none"
+            @click="importCookie"
+          >
+            Import
+          </button>
         </div>
       </div>
       <div class="row">
@@ -125,9 +143,63 @@ function setupData(resolve) {
   });
   stompClient.send("/app/ladder/init/" + highestLadderReached);
 }
+
+function promptNameChange() {
+  let newUsername = window.prompt(
+    "What shall be your new name? (max. 32 characters)",
+    store.state.ladder.ladder.yourRanker.username
+  );
+  if (newUsername && newUsername.length > 32) {
+    let temp = newUsername.substring(0, 32);
+    alert(
+      "The maximum number of characters in your username is 32, not " +
+        newUsername.length +
+        "!"
+    );
+    newUsername = temp;
+  }
+
+  if (
+    newUsername &&
+    newUsername.trim() !== "" &&
+    newUsername !== store.state.ladder.ladder.yourRanker.username
+  ) {
+    stompClient.send("/app/account/name", { content: newUsername });
+  }
+}
+
+async function importCookie() {
+  let newUUID = prompt(
+    "Paste your ID into here (your old uuid will be copied into your clipboard):"
+  );
+  try {
+    if (newUUID) {
+      // TODO: Check if cookies are valid
+      let oldUuid = Cookies.get("_uuid");
+      Cookies.set("_uuid", newUUID, { expires: 10 * 365 });
+      await setTimeout(
+        async () => await navigator.clipboard.writeText(oldUuid),
+        1000
+      );
+      // Relaod the page for the new cookies to take place
+      setTimeout(() => location.reload(), 1500);
+    }
+  } catch (err) {
+    alert("Invalid ID!");
+    console.error(err);
+  }
+}
+
+async function exportCookie() {
+  // Copy the text inside the text field
+  await navigator.clipboard.writeText(Cookies.get("_uuid"));
+
+  // Alert the copied text
+  alert("Copied your ID to your clipboard! (don't lose it or give it away!)");
+}
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import "./styles/styles";
 
 #app {
@@ -160,7 +232,7 @@ function setupData(resolve) {
 }
 
 nav {
-  padding: 30px;
+  padding: 8px;
 
   a {
     font-weight: bold;

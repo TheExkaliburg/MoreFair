@@ -3,10 +3,11 @@
     <div class="row py-0 message-header">
       <div class="col-4 message-username">
         <span class="message-user-name">
-          <strong>{{ settings.assholeTags[msg.timesAsshole] }}</strong> -
+          <strong>{{ settings.assholeTags[msg.timesAsshole] }}</strong>
+          {{ msg.timesAsshole > 0 ? "-" : "" }}
           {{ msg.username }}
         </span>
-        <span class="message-user-id">#{{ msg.accountId }}</span>
+        <span class="message-user-id">&nbsp;#{{ msg.accountId }}</span>
       </div>
       <div class="col-3 message-date">{{ msg.timeCreated }}</div>
       <div class="col-4 message-status"></div>
