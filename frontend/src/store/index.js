@@ -50,4 +50,5 @@ let store = createStore({
     chat: chatModule,
   },
 });
+window.store = store;
 export default store;
