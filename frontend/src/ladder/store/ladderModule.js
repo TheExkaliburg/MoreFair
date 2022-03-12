@@ -74,7 +74,7 @@ export default {
         );
       }
     },
-    async handleEvent({ commit, rootState }, { event, stompClient }) {
+    async handleEvent({ commit, rootState, dispatch }, { event, stompClient }) {
       switch (event.eventType) {
         case "BIAS":
           commit({ type: "handleBias", event: event });
@@ -95,7 +95,7 @@ export default {
           });
           if (event.accountId === rootState.user.accountId) {
             // TODO: Go up a ladder
-            commit(
+            dispatch(
               { type: "incrementHighestLadder", stompClient: stompClient },
               { root: true }
             );
