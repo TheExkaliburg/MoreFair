@@ -4,6 +4,7 @@ import chatModule from "@/chat/store/chatModule";
 import Settings from "@/store/entities/settings";
 import UserDetails from "@/store/entities/userDetails";
 import { numberformat } from "swarm-numberformat";
+import optionsModule from "@/options/store/optionsModule";
 
 let store = createStore({
   strict: process.env.NODE_ENV !== "production",
@@ -48,6 +49,7 @@ let store = createStore({
   modules: {
     ladder: ladderModule,
     chat: chatModule,
+    options: optionsModule,
   },
 });
 window.store = store;
