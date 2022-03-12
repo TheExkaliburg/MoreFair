@@ -12,6 +12,9 @@ class Chat {
   addNewMessage(message) {
     if (!(message instanceof Message)) message = new Message(message);
     this.messages.push(message);
+    if (this.messages.length > 50) {
+      this.messages.shift();
+    }
   }
 
   update(message) {
