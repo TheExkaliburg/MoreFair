@@ -39,13 +39,44 @@ let store = createStore({
         state.user.saveUUID();
       }
     },
-    incrementHighestLadder(state, { stompClient }) {
-      state.user.highestCurrentLadder++;
+    setHighestLadder(state, { payload }) {
+      state.user.highestCurrentLadder = payload;
+    },
+  },
+  actions: {
+    incrementHighestLadder({ state, commit, dispatch }, { stompClient }) {
+      stompClient.unsubscribe(
+        "/topic/ladder/" + state.ladder.ladder.ladderNumber
+      );
+      stompClient.unsubscribe(
+        "/topic/chat/" + state.chat.chat.currentChatNumber
+      );
+
+      commit({
+        type: "setHighestLadder",
+        payload: state.user.highestCurrentLadder + 1,
+      });
+
+      stompClient.subscribe(
+        "/topic/ladder/" + state.user.highestCurrentLadder,
+        (message) => {
+          dispatch({
+            type: "ladder/update",
+            message: message,
+            stompClient: stompClient,
+          });
+        }
+      );
+      stompClient.subscribe(
+        "/topic/chat/" + state.user.highestCurrentLadder,
+        (message) => {
+          commit({ type: "chat/addMessage", message: message });
+        }
+      );
       stompClient.send("/app/ladder/init/" + state.user.highestCurrentLadder);
       stompClient.send("/app/chat/init/" + state.user.highestCurrentLadder);
     },
   },
-  actions: {},
   modules: {
     ladder: ladderModule,
     chat: chatModule,

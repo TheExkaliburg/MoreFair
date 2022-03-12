@@ -5,7 +5,7 @@
         <span class="message-user-name">
           <strong>{{ settings.assholeTags[msg.timesAsshole] }}</strong>
           {{ msg.timesAsshole > 0 ? "-" : "" }}
-          {{ msg.username }}
+          <span v-html="msg.username" />
         </span>
         <span class="message-user-id">&nbsp;#{{ msg.accountId }}</span>
       </div>
@@ -14,7 +14,7 @@
       <div class="col-1 message-options">...</div>
     </div>
     <div class="row py-0 message-body">
-      <span> {{ msg.message }}</span>
+      <span v-html="msg.message" />
     </div>
   </div>
 </template>
