@@ -49,7 +49,7 @@ export default {
     },
   }, //
   actions: {
-    update({ rootState, dispatch, commit }, { message, stompClient }) {
+    async update({ rootState, dispatch, commit }, { message, stompClient }) {
       message.events.forEach((event) =>
         dispatch({
           type: "handleEvent",
@@ -63,7 +63,7 @@ export default {
         settings: rootState.settings,
       });
     },
-    updateGlobal({ dispatch }, { message, stompClient }) {
+    async updateGlobal({ dispatch }, { message, stompClient }) {
       if (message) {
         message.forEach((event) =>
           dispatch({
@@ -94,7 +94,6 @@ export default {
             event: event,
           });
           if (event.accountId === rootState.user.accountId) {
-            // TODO: Go up a ladder
             dispatch(
               { type: "incrementHighestLadder", stompClient: stompClient },
               { root: true }
@@ -125,8 +124,8 @@ export default {
   },
   getters: {
     shownRankers(state) {
-      const numberAtTop = 30;
-      const padding = 50;
+      const numberAtTop = 10;
+      const padding = 1000;
       const rank = state.ladder.yourRanker.rank;
 
       return state.ladder.rankers.filter(
