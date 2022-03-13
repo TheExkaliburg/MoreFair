@@ -34,7 +34,7 @@ function update({ target }) {
   store.commit({
     type: "options/updateOption",
     option: props.option,
-    payload: { value: newValue },
+    payload: { value: parseInt(newValue) },
   });
 }
 </script>

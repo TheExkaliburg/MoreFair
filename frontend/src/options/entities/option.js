@@ -100,3 +100,11 @@ export class IntegerOption extends NumberOption {
     super.set({ value, min, max });
   }
 }
+
+export class OptionSection {
+  constructor({ displayName, name, options }) {
+    this.displayName = displayName;
+    this.name = name;
+    this.options = options;
+  }
+}
