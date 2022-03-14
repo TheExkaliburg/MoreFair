@@ -35,8 +35,13 @@ const props = defineProps({
 .option-section {
   border: 1px solid $main-color;
   padding: 10px;
-  width: max-content;
+  width: 50%;
   position: relative;
+  text-align: center;
+  margin: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  overflow: hidden;
 }
 .title {
   border-bottom: 1px solid $main-color;

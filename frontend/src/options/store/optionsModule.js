@@ -33,6 +33,27 @@ const optionsModule = {
             }),
           ],
         }),
+        new OptionSection({
+          displayName: "Lynn's Chad tweaks",
+          name: "lynnsChadTweaks",
+          options: [
+            new BoolOption({
+              displayName: "Un-Invert Chad",
+              name: "invertChad",
+              value: false,
+            }),
+            new BoolOption({
+              displayName: "Un-Invert Lynn",
+              name: "invertLynn",
+              value: false,
+            }),
+            new BoolOption({
+              displayName: "Highlight Mentions",
+              name: "highlightMentions",
+              value: false,
+            }),
+          ],
+        }),
       ],
     };
   },
