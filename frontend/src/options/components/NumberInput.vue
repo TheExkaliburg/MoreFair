@@ -20,7 +20,6 @@ const value = computed(() => props.option.value);
 
 function update({ target }) {
   const newValue = target.value;
-  console.log(newValue);
   store.commit({
     type: "options/updateOption",
     option: props.option,
