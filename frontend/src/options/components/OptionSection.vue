@@ -1,7 +1,6 @@
 <template>
   <div class="option-section">
     <h2 class="title">{{ props.options.displayName }}</h2>
-    <div class="toggle">X</div>
     <div v-for="option in props.options.options" :key="option">
       <CheckBox v-if="option instanceof BoolOption" :option="option" />
       <RangeSlider v-else-if="option instanceof RangeOption" :option="option" />
@@ -43,26 +42,5 @@ const props = defineProps({
   border-bottom: 1px solid $main-color;
   width: max-content;
   display: inline-block;
-}
-.toggle {
-  border: 1px solid $main-color;
-  border-radius: 50%;
-  cursor: pointer;
-  height: 20px;
-  width: 20px;
-  display: inline-block;
-  position: absolute;
-  top: 17px;
-  right: 17px;
-  text-align: center;
-  line-height: 17px;
-
-  //disable selection
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
 }
 </style>
