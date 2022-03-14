@@ -53,7 +53,31 @@ const optionsModule = {
     },
   },
   actions: {},
-  getters: {},
+  getters: {
+    getOption: (state) => (name) => {
+      for(const section of state.options) {
+        if(section.name === name) {
+          return section;
+        }
+        if(!(section instanceof OptionSection))
+        {
+          continue;
+        }
+        for(const option of section.options) {
+          if(option.name === name) {
+            return option;
+          }
+        }
+      }
+    },
+    getOptionValue: (state, getters) => (name) => {
+      const option = getters.getOption(name);
+      if(option) {
+        return option.get();
+      }
+      return null;
+    }
+  },
 };
 
 export default optionsModule;
