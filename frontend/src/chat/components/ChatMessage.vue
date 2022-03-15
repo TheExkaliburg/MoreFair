@@ -55,7 +55,7 @@ const messageParts = [
     new MessagePart(MessagePartType.plain, props.msg.message),
 ];
 
-processAllMentions();
+findMentions();
 
 
 function spliceNewMessagePartsIntoArray(oldPart, newParts)
@@ -63,79 +63,49 @@ function spliceNewMessagePartsIntoArray(oldPart, newParts)
     messageParts.splice(messageParts.indexOf(oldPart), 1, ...newParts);
 }
 
-function processAllMentions()
-{
-    //deep copy the array
-    const messagePartsCopy = [...messageParts];
-    messagePartsCopy.forEach(part => {
-        if (part.is(MessagePartType.plain)) {
-            const newParts = findMentions(part);
-            spliceNewMessagePartsIntoArray(part, newParts);
+function findMentions() {
+    //FIXME: This is demo data, we need to get the user list from the server
+    let users = [{
+        name: "John",
+        id: "12345",
+    }, {
+        name: "Jane",
+        id: "67890",
+    }, {
+        name: "Jane",
+        id: "6",
+    }];
+    const sortedUsers = users.sort((a, b) => {
+        const nameCompare = a.name.localeCompare(b.name);
+        if (nameCompare !== 0) {
+            return nameCompare;
         }
+        return b.id.length -a.id.length;
+    });
+
+    sortedUsers.forEach(user => {
+        findMention(user);
     });
 }
 
-function findMentions(messagePart) {
-    const messageParts = [];
-    //keep track of where we are in the message
-    let currentIndex = 0;
-    const message = messagePart.text;
-    //find the first @
-    let mentionIndex = message.indexOf("@");
-    outer:
-    while (mentionIndex !== -1) {
-        let endOfMentionIndex = mentionIndex + 1;
-        //find the first #
-        while (message[endOfMentionIndex] !== "#") {
-            endOfMentionIndex++;
-            if(endOfMentionIndex >= message.length) {
-                break outer;
+function findMention(user) {
+    for(let messagePart of messageParts) {
+        if (messagePart.is(MessagePartType.plain)) {
+            const mention = messagePart.text.indexOf(`@${user.name}#${user.id}`);
+            if (mention !== -1) {
+                const preMessagePart = new MessagePart(MessagePartType.plain, messagePart.text.substring(0, mention));
+                const mentionAtsign = new MessagePart(MessagePartType.mentionAtsign, "@");
+                const mentionName = new MessagePart(MessagePartType.mentionName, user.name);
+                const mentionNumber = new MessagePart(MessagePartType.mentionNumber, '#'+user.id);
+                const postMessagePart = new MessagePart(MessagePartType.plain, messagePart.text.substring(mention+`@${user.name}#${user.id}`.length));
+                spliceNewMessagePartsIntoArray(messagePart, [preMessagePart, mentionAtsign, mentionName, mentionNumber, postMessagePart]);
+                console.info(`Spliced ${messagePart.text} into ${preMessagePart.text},,${mentionAtsign.text},,${mentionName.text},,${mentionNumber.text},,${postMessagePart.text}`);
+                findMentions(user);
             }
         }
-        //check if the next character is a number
-        if (isNaN(message[endOfMentionIndex + 1])) {
-            //if it isn't, we have a bad mention
-            continue;
-        }
-        endOfMentionIndex++;
-        //look for the last number in the mention
-        while (!isNaN(message[endOfMentionIndex])) {
-            endOfMentionIndex++;
-            if(endOfMentionIndex >= message.length) {
-                break;
-            }
-        }
-
-        const possibleMention = message.substring(mentionIndex, endOfMentionIndex);
-
-        //TODO: check if the mention is valid
-
-        //if we have a text before the mention, add the text before it to the messageParts
-        if (mentionIndex > currentIndex) {
-            messageParts.push(new MessagePart(MessagePartType.plain, message.substring(currentIndex, mentionIndex)));
-        }
-
-        //add the mention to the messageParts array
-        const mentionNumber = possibleMention.substring(possibleMention.indexOf("#"));
-        const mentionName = possibleMention.substring(1, possibleMention.indexOf("#"));
-        const mentionAtsign = possibleMention.substring(0, 1);
-        messageParts.push(new MessagePart(MessagePartType.mentionAtsign, mentionAtsign));
-        messageParts.push(new MessagePart(MessagePartType.mentionName, mentionName));
-        messageParts.push(new MessagePart(MessagePartType.mentionNumber, mentionNumber));
-
-
-
-        //update the currentIndex
-        currentIndex = endOfMentionIndex;
-        //find the next @
-        mentionIndex = message.indexOf("@", currentIndex);
     }
-    //add the text after the last mention to the messageParts
-    if (currentIndex < message.length) {
-        messageParts.push(new MessagePart(MessagePartType.plain, message.substring(currentIndex)));
-    }
-    return messageParts;
 }
+
 
 </script>
 
