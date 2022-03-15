@@ -30,10 +30,7 @@ class Ladder {
       new Decimal(a.points).sub(b.points)
     );*/
 
-
-    performance.mark("start");
     let rankers = [...this.rankers];
-    performance.mark("sort");
     // ladderStats.growingRankerCount = 0;
     for (let i = 0; i < rankers.length; i++) {
       let ranker = new Ranker(rankers[i]);
@@ -90,38 +87,17 @@ class Ladder {
       if (
         rankers.length >=
         Math.max(settings.minimumPeopleForPromote, this.ladderNumber)
-        ) {
-          let index = rankers.length - 1;
-          if (rankers[index].growing && rankers[index].you)
+      ) {
+        let index = rankers.length - 1;
+        if (rankers[index].growing && rankers[index].you)
           rankers[index].grapes = rankers[index].grapes.add(
             new Decimal(3).mul(delta).floor()
-            );
-          }
-        }
-    performance.mark("end");
+          );
+      }
+    }
     this.rankers = Object.freeze(rankers);
-    performance.mark("saved");
 
     this.firstRanker = this.rankers[0];
-    performance.mark("done")
-    performance.measure("calculate", "start", "end");
-    performance.measure("save", "end", "saved");
-    performance.measure("everything", "start", "done");
-    performance.measure("saved-done", "saved", "done");
-
-    let calculate = performance.getEntriesByName("calculate").reduce((a, b) => a + b.duration, 0) / performance.getEntriesByName("calculate").length;
-    let save = performance.getEntriesByName("save").reduce((a, b) => a + b.duration, 0) / performance.getEntriesByName("save").length;
-    let saved = performance.getEntriesByName("saved-done").reduce((a, b) => a + b.duration, 0) / performance.getEntriesByName("saved-done").length;
-    let everything = performance.getEntriesByName("everything").reduce((a, b) => a + b.duration, 0) / performance.getEntriesByName("everything").length;
-
-
-    console.info();
-    console.info("calculate", Math.floor(calculate), Math.floor(calculate / everything * 100) + "%");
-    console.info("save", Math.floor(save), Math.floor(save / everything * 100) + "%");
-    console.info("saved-done",Math.floor(saved), Math.floor(saved / everything * 100) + "%");
-    console.info("everything", Math.floor(everything));
-    console.info("measurements", performance.getEntriesByName("everything").length);
-    //performance.clearMeasures();
   }
 
   multiRanker(accountId) {
