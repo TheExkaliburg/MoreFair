@@ -86,21 +86,21 @@ class Ladder {
           }
         }
       }
-    }
+      // Ranker on Last Place gains 1 Grape, only if he isn't the only one
+      if (
+        rankers.length >=
+        Math.max(settings.minimumPeopleForPromote, this.ladderNumber)
+        ) {
+          let index = rankers.length - 1;
+          if (rankers[index].growing && rankers[index].you)
+          rankers[index].grapes = rankers[index].grapes.add(
+            new Decimal(3).mul(delta).floor()
+            );
+          }
+        }
     performance.mark("end");
-    this.rankers = rankers;
+    this.rankers = Object.freeze(rankers);
     performance.mark("saved");
-    // Ranker on Last Place gains 1 Grape, only if he isn't the only one
-    if (
-      this.rankers.length >=
-      Math.max(settings.minimumPeopleForPromote, this.ladderNumber)
-    ) {
-      let index = this.rankers.length - 1;
-      if (this.rankers[index].growing && this.rankers[index].you)
-        this.rankers[index].grapes = this.rankers[index].grapes.add(
-          new Decimal(3).mul(delta).floor()
-        );
-    }
 
     this.firstRanker = this.rankers[0];
     performance.mark("done")
