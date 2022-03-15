@@ -107,12 +107,21 @@ class Ladder {
     performance.measure("calculate", "start", "end");
     performance.measure("save", "end", "saved");
     performance.measure("everything", "start", "done");
+    performance.measure("saved-done", "saved", "done");
+
+    let calculate = performance.getEntriesByName("calculate").reduce((a, b) => a + b.duration, 0) / performance.getEntriesByName("calculate").length;
+    let save = performance.getEntriesByName("save").reduce((a, b) => a + b.duration, 0) / performance.getEntriesByName("save").length;
+    let saved = performance.getEntriesByName("saved-done").reduce((a, b) => a + b.duration, 0) / performance.getEntriesByName("saved-done").length;
+    let everything = performance.getEntriesByName("everything").reduce((a, b) => a + b.duration, 0) / performance.getEntriesByName("everything").length;
+
 
     console.info();
-    console.info("calculate", performance.getEntriesByName("calculate")[0].duration);
-    console.info("save", performance.getEntriesByName("save")[0].duration);
-    console.info("everything", performance.getEntriesByName("everything")[0].duration);
-    performance.clearMeasures();
+    console.info("calculate", Math.floor(calculate), Math.floor(calculate / everything * 100) + "%");
+    console.info("save", Math.floor(save), Math.floor(save / everything * 100) + "%");
+    console.info("saved-done",Math.floor(saved), Math.floor(saved / everything * 100) + "%");
+    console.info("everything", Math.floor(everything));
+    console.info("measurements", performance.getEntriesByName("everything").length);
+    //performance.clearMeasures();
   }
 
   multiRanker(accountId) {
