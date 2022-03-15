@@ -1,7 +1,7 @@
 <template>
   <div class="container px-3 py-1 message">
     <span
-        v-for="part in messageParts"
+        v-for="part in messagePartsComputed"
         :key="part">
         <!-- Plain Message -->
         <span v-if="part.is(MessagePartType.plain)">
@@ -27,7 +27,7 @@
 
 <script setup>
 import { useStore } from "vuex";
-import { defineProps } from "vue";
+import { defineProps, computed } from "vue";
 
 const props = defineProps({
   msg: Object,
@@ -37,7 +37,7 @@ const store = useStore();
 
 //const numberFormatter = computed(() => store.state.numberFormatter);
 //const ladder = computed(() => store.state.ladder);
-const rankers = store.getters["ladder/shownRankers"]
+const rankers = computed(() => store.getters["ladder/shownRankers"]);
 
 //Basically an enum
 const MessagePartType = {
@@ -56,12 +56,27 @@ class MessagePart {
         return this.type === type;
     }
 }
-
 const messageParts = [
     new MessagePart(MessagePartType.plain, props.msg.message),
 ];
 
-findMentions();
+//FIXME: This is a mess. We really should be getting a flag somewhere that tells us if we are fully connected.
+let messagePartsComputed = computed(() => {
+    if(rankers.value.length < 2)
+    {
+        //We probably don't have enough rankers to be considered on a server
+        return messageParts;
+    }
+    findMentions();
+    messagePartsComputed = computed(() => {
+        return messageParts;
+    });
+    return messageParts;
+})
+
+
+
+
 
 
 function spliceNewMessagePartsIntoArray(oldPart, newParts)
@@ -71,7 +86,7 @@ function spliceNewMessagePartsIntoArray(oldPart, newParts)
 
 function findMentions() {
 
-    const sortedUsers = rankers.sort((a, b) => {
+    const sortedUsers = rankers.value.sort((a, b) => {
         const nameCompare = a.username.localeCompare(b.username);
         if (nameCompare !== 0) {
             return nameCompare;
