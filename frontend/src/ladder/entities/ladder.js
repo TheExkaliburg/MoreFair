@@ -30,7 +30,10 @@ class Ladder {
       new Decimal(a.points).sub(b.points)
     );*/
 
+
+    performance.mark("start");
     let rankers = [...this.rankers];
+    performance.mark("sort");
     // ladderStats.growingRankerCount = 0;
     for (let i = 0; i < rankers.length; i++) {
       let ranker = new Ranker(rankers[i]);
@@ -84,7 +87,9 @@ class Ladder {
         }
       }
     }
+    performance.mark("end");
     this.rankers = rankers;
+    performance.mark("saved");
     // Ranker on Last Place gains 1 Grape, only if he isn't the only one
     if (
       this.rankers.length >=
@@ -98,6 +103,16 @@ class Ladder {
     }
 
     this.firstRanker = this.rankers[0];
+    performance.mark("done")
+    performance.measure("calculate", "start", "end");
+    performance.measure("save", "end", "saved");
+    performance.measure("everything", "start", "done");
+
+    console.info();
+    console.info("calculate", performance.getEntriesByName("calculate")[0].duration);
+    console.info("save", performance.getEntriesByName("save")[0].duration);
+    console.info("everything", performance.getEntriesByName("everything")[0].duration);
+    performance.clearMeasures();
   }
 
   multiRanker(accountId) {
