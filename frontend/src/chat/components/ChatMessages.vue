@@ -14,13 +14,14 @@
       <div class="col-1 message-options">...</div>
     </div>
     <div class="row py-0 message-body">
-      <span v-html="msg.message" />
+      <ChatMessage :msg=msg />
     </div>
   </div>
 </template>
 
 <script setup>
 import { computed, defineProps } from "vue";
+import ChatMessage from '@/chat/components/ChatMessage';
 import { useStore } from "vuex";
 
 const store = useStore();

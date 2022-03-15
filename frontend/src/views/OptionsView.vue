@@ -1,19 +1,23 @@
 <template>
   <div>
     <div v-for="option in options" :key="option">
-      <CheckBox v-if="option instanceof BoolOption" :option="option" />
-      <div v-if="option instanceof RangeOption">
-        {{ option.name }} {{ option.value }}
-      </div>
+      <OptionSection :options="option" />
     </div>
   </div>
 </template>
 
 <script setup>
-import CheckBox from "@/options/components/CheckBox";
+//import CheckBox from "@/options/components/CheckBox";
+//import RangeSlider from "@/options/components/RangeSlider";
+//import NumberInput from "@/options/components/NumberInput";
+import OptionSection from "@/options/components/OptionSection";
 import { computed } from "vue";
 import { useStore } from "vuex";
-import { BoolOption, RangeOption } from "@/options/entities/option";
+//import {
+//  BoolOption,
+//  RangeOption,
+//  NumberOption,
+//} from "@/options/entities/option";
 
 const store = useStore();
 const options = computed(() => store.state.options.options);
