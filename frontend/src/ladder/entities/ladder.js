@@ -26,74 +26,65 @@ class Ladder {
   }
 
   calculate(delta, settings) {
-    this.rankers = this.rankers.sort((a, b) =>
-      new Decimal(b.points).sub(a.points)
-    );
+    /*this.rankers = this.rankers.sort((a, b) =>
+      new Decimal(a.points).sub(b.points)
+    );*/
+
+    let rankers = [...this.rankers];
     // ladderStats.growingRankerCount = 0;
-    for (let i = 0; i < this.rankers.length; i++) {
-      if (this.yourRanker.accountId === this.rankers[i].accountId)
-        this.yourRanker = this.rankers[i];
-      this.rankers[i].rank = i + 1;
+    for (let i = 0; i < rankers.length; i++) {
+      let ranker = new Ranker(rankers[i]);
+      if (this.yourRanker.accountId === ranker.accountId)
+        this.yourRanker = ranker;
+      ranker.rank = i + 1;
       // If the ranker is currently still on ladder
-      if (this.rankers[i].growing) {
+      if (ranker.growing) {
         // ladderStats.growingRankerCount += 1;
         // Calculating Points & Power
-        if (this.rankers[i].rank !== 1)
-          this.rankers[i].power = this.rankers[i].power.add(
-            new Decimal(
-              (this.rankers[i].bias + this.rankers[i].rank - 1) *
-                this.rankers[i].multiplier
-            )
+        if (ranker.rank !== 1)
+          ranker.power = ranker.power.add(
+            new Decimal((ranker.bias + ranker.rank - 1) * ranker.multiplier)
               .mul(new Decimal(delta))
               .floor()
           );
-        this.rankers[i].points = this.rankers[i].points.add(
-          this.rankers[i].power.mul(delta).floor()
-        );
+        ranker.points = ranker.points.add(ranker.power.mul(delta).floor());
 
         // Calculating Vinegar based on Grapes count
-        if (this.rankers[i].rank !== 1 && this.rankers[i].you)
-          this.rankers[i].vinegar = this.rankers[i].vinegar.add(
-            this.rankers[i].grapes.mul(delta).floor()
-          );
+        if (ranker.rank !== 1 && ranker.you)
+          ranker.vinegar = ranker.vinegar.add(ranker.grapes.mul(delta).floor());
 
-        if (
-          this.rankers[i].rank === 1 &&
-          this.rankers[i].you &&
-          this.isLadderUnlocked(settings)
-        )
-          this.rankers[i].vinegar = this.rankers[i].vinegar
-            .mul(Math.pow(0.9975, delta))
-            .floor();
+        if (ranker.rank === 1 && ranker.you && this.isLadderUnlocked(settings))
+          ranker.vinegar = ranker.vinegar.mul(Math.pow(0.9975, delta)).floor();
+
+        rankers[i] = ranker;
 
         for (let j = i - 1; j >= 0; j--) {
           // If one of the already calculated Rankers have less points than this ranker
           // swap these in the list... This way we keep the list sorted, theoretically
-          let currentRanker = this.rankers[j + 1];
-          if (currentRanker.points.cmp(this.rankers[j].points) > 0) {
+          let currentRanker = rankers[j + 1];
+          if (currentRanker.points.cmp(rankers[j].points) > 0) {
             // Move 1 Position up and move the ranker there 1 Position down
 
             // Move other Ranker 1 Place down
-            this.rankers[j].rank = j + 2;
+            rankers[j].rank = j + 2;
             if (
-              this.rankers[j].growing &&
-              this.rankers[j].you &&
-              this.rankers[j].multiplier > 1
+              rankers[j].growing &&
+              rankers[j].you &&
+              rankers[j].multiplier > 1
             )
-              this.rankers[j].grapes = this.rankers[j].grapes.add(
-                new Decimal(1)
-              );
-            this.rankers[j + 1] = this.rankers[j];
+              rankers[j].grapes = rankers[j].grapes.add(new Decimal(1));
+            rankers[j + 1] = rankers[j];
 
             // Move this Ranker 1 Place up
             currentRanker.rank = j + 1;
-            this.rankers[j] = currentRanker;
+            rankers[j] = currentRanker;
           } else {
             break;
           }
         }
       }
     }
+    this.rankers = rankers;
     // Ranker on Last Place gains 1 Grape, only if he isn't the only one
     if (
       this.rankers.length >=
