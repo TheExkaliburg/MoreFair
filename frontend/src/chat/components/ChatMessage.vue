@@ -26,12 +26,18 @@
 </template>
 
 <script setup>
+import { useStore } from "vuex";
 import { defineProps } from "vue";
 
 const props = defineProps({
   msg: Object,
 });
 
+const store = useStore();
+
+//const numberFormatter = computed(() => store.state.numberFormatter);
+//const ladder = computed(() => store.state.ladder);
+const rankers = store.getters["ladder/shownRankers"]
 
 //Basically an enum
 const MessagePartType = {
@@ -64,23 +70,13 @@ function spliceNewMessagePartsIntoArray(oldPart, newParts)
 }
 
 function findMentions() {
-    //FIXME: This is demo data, we need to get the user list from the server
-    let users = [{
-        name: "John",
-        id: "12345",
-    }, {
-        name: "Jane",
-        id: "67890",
-    }, {
-        name: "Jane",
-        id: "6",
-    }];
-    const sortedUsers = users.sort((a, b) => {
-        const nameCompare = a.name.localeCompare(b.name);
+
+    const sortedUsers = rankers.sort((a, b) => {
+        const nameCompare = a.username.localeCompare(b.username);
         if (nameCompare !== 0) {
             return nameCompare;
         }
-        return b.id.length -a.id.length;
+        return b.accountId - a.accountId;
     });
 
     sortedUsers.forEach(user => {
@@ -91,15 +87,14 @@ function findMentions() {
 function findMention(user) {
     for(let messagePart of messageParts) {
         if (messagePart.is(MessagePartType.plain)) {
-            const mention = messagePart.text.indexOf(`@${user.name}#${user.id}`);
+            const mention = messagePart.text.indexOf(`@${user.username}#${user.accountId}`);
             if (mention !== -1) {
                 const preMessagePart = new MessagePart(MessagePartType.plain, messagePart.text.substring(0, mention));
                 const mentionAtsign = new MessagePart(MessagePartType.mentionAtsign, "@");
-                const mentionName = new MessagePart(MessagePartType.mentionName, user.name);
-                const mentionNumber = new MessagePart(MessagePartType.mentionNumber, '#'+user.id);
-                const postMessagePart = new MessagePart(MessagePartType.plain, messagePart.text.substring(mention+`@${user.name}#${user.id}`.length));
+                const mentionName = new MessagePart(MessagePartType.mentionName, user.username);
+                const mentionNumber = new MessagePart(MessagePartType.mentionNumber, '#'+user.accountId);
+                const postMessagePart = new MessagePart(MessagePartType.plain, messagePart.text.substring(mention+`@${user.username}#${user.accountId}`.length));
                 spliceNewMessagePartsIntoArray(messagePart, [preMessagePart, mentionAtsign, mentionName, mentionNumber, postMessagePart]);
-                console.info(`Spliced ${messagePart.text} into ${preMessagePart.text},,${mentionAtsign.text},,${mentionName.text},,${mentionNumber.text},,${postMessagePart.text}`);
                 findMentions(user);
             }
         }
