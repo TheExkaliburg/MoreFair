@@ -76,16 +76,15 @@ const optionsModule = {
   actions: {},
   getters: {
     getOption: (state) => (name) => {
-      for(const section of state.options) {
-        if(section.name === name) {
+      for (const section of state.options) {
+        if (section.name === name) {
           return section;
         }
-        if(!(section instanceof OptionSection))
-        {
+        if (!(section instanceof OptionSection)) {
           continue;
         }
-        for(const option of section.options) {
-          if(option.name === name) {
+        for (const option of section.options) {
+          if (option.name === name) {
             return option;
           }
         }
@@ -93,11 +92,11 @@ const optionsModule = {
     },
     getOptionValue: (state, getters) => (name) => {
       const option = getters.getOption(name);
-      if(option) {
+      if (option) {
         return option.get();
       }
       return null;
-    }
+    },
   },
 };
 
