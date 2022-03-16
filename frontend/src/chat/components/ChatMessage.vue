@@ -45,7 +45,7 @@ const store = useStore();
 //const numberFormatter = computed(() => store.state.numberFormatter);
 //const ladder = computed(() => store.state.ladder);
 const rankers = computed(() => store.getters["ladder/shownRankers"]);
-
+const highlightMentions = computed(() => store.getters["options/getOptionValue"]("highlightMentions"));
 //Basically an enum
 const MessagePartType = {
   plain: Symbol("plain"),
@@ -60,7 +60,18 @@ class MessagePart {
     this.text = text;
   }
   is(type) {
-    return this.type === type;
+    if(this.type === type) return true
+    if(type === MessagePartType.plain)
+    {
+      //Here we can disable the different types of highlighting
+      if(!highlightMentions.value)
+      {
+        return( this.type === MessagePartType.mentionName   ||
+                this.type === MessagePartType.mentionNumber ||
+                this.type === MessagePartType.mentionAtsign );
+
+      }
+    }
   }
 }
 const messageParts = [
