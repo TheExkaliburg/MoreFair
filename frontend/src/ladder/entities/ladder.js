@@ -29,13 +29,13 @@ class Ladder {
     /*this.rankers = this.rankers.sort((a, b) =>
       new Decimal(a.points).sub(b.points)
     );*/
-
     let rankers = [...this.rankers];
+    let yourRanker = new Ranker(this.yourRanker);
     // ladderStats.growingRankerCount = 0;
+
     for (let i = 0; i < rankers.length; i++) {
       let ranker = new Ranker(rankers[i]);
-      if (this.yourRanker.accountId === ranker.accountId)
-        this.yourRanker = ranker;
+      if (yourRanker.accountId === ranker.accountId) yourRanker = ranker;
       ranker.rank = i + 1;
       // If the ranker is currently still on ladder
       if (ranker.growing) {
@@ -84,20 +84,22 @@ class Ladder {
         }
       }
     }
-    this.rankers = rankers;
+
     // Ranker on Last Place gains 1 Grape, only if he isn't the only one
     if (
-      this.rankers.length >=
+      rankers.length >=
       Math.max(settings.minimumPeopleForPromote, this.ladderNumber)
     ) {
-      let index = this.rankers.length - 1;
-      if (this.rankers[index].growing && this.rankers[index].you)
-        this.rankers[index].grapes = this.rankers[index].grapes.add(
+      let index = rankers.length - 1;
+      if (rankers[index].growing && rankers[index].you)
+        rankers[index].grapes = rankers[index].grapes.add(
           new Decimal(3).mul(delta).floor()
         );
     }
 
-    this.firstRanker = this.rankers[0];
+    this.firstRanker = rankers[0];
+    this.yourRanker = yourRanker;
+    this.rankers = rankers;
   }
 
   multiRanker(accountId) {
