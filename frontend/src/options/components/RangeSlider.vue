@@ -1,7 +1,15 @@
 <template>
   <label>
-    <input type="checkbox" @change="update" :checked="value" />
-    <span>{{ option.displayName }}</span>
+    <span>{{ option.displayName }}: {{ value }}</span
+    ><br />
+    <input
+      type="range"
+      @change="update"
+      @input="update"
+      :value="value"
+      :min="min"
+      :max="max"
+    />
   </label>
 </template>
 
@@ -17,23 +25,22 @@ const props = defineProps({
 });
 
 const value = computed(() => props.option.value);
+const min = computed(() => props.option.min);
+const max = computed(() => props.option.max);
 
 function update({ target }) {
-  const newChecked = target.checked;
+  const newValue = target.value;
   store.commit({
     type: "options/updateOption",
     option: props.option,
-    payload: { value: newChecked },
+    payload: { value: parseInt(newValue) },
   });
 }
-
-//store.commit({type: "options/registerNewOption", option: new BoolOption({ name: props.optionID, value: props.checked }) });
 </script>
 
 <style lang="scss" scoped>
 @import "../../styles/styles";
 label > span {
-  margin-left: 10px;
   //disable selection
   -webkit-touch-callout: none;
   -webkit-user-select: none;

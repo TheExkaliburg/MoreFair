@@ -97,9 +97,9 @@ class Ladder {
         );
     }
 
+    this.rankers = Object.freeze(rankers);
     this.firstRanker = rankers[0];
     this.yourRanker = yourRanker;
-    this.rankers = rankers;
   }
 
   multiRanker(accountId) {

@@ -13,8 +13,9 @@ class Option {
 }
 
 export class BoolOption extends Option {
-  constructor({ name, value }) {
+  constructor({ displayName, name, value }) {
     super();
+    this.displayName = displayName;
     this.name = name;
     this.value = value;
   }
@@ -32,8 +33,9 @@ export class BoolOption extends Option {
 }
 
 export class RangeOption extends Option {
-  constructor({ name, value, min, max }) {
+  constructor({ displayName, name, value, min, max }) {
     super();
+    this.displayName = displayName;
     this.name = name;
     this.value = value;
     this.min = min;
@@ -54,5 +56,55 @@ export class RangeOption extends Option {
     if (value > max) {
       this.value = max;
     }
+  }
+}
+
+export class NumberOption extends Option {
+  constructor({ displayName, name, value, min, max }) {
+    super();
+    this.displayName = displayName;
+    this.name = name;
+    this.value = value;
+    this.min = min;
+    this.max = max;
+  }
+
+  get() {
+    return this.value;
+  }
+
+  set({ value = this.value, min = this.min, max = this.max }) {
+    this.min = min;
+    this.max = max;
+    this.value = value;
+    if (min && value < min) {
+      this.value = min;
+    }
+    if (max && value > max) {
+      this.value = max;
+    }
+  }
+}
+
+export class IntegerOption extends NumberOption {
+  constructor({ displayName, name, value, min, max }) {
+    super({ displayName, name, value, min, max });
+  }
+
+  get() {
+    return super.get();
+  }
+
+  set({ value = this.value, min = this.min, max = this.max }) {
+    value = Math.floor(value);
+    super.set({ value, min, max });
+  }
+}
+
+export class OptionSection {
+  constructor({ displayName, name, options }) {
+    this.displayName = displayName;
+    this.name = name;
+    this.options = options;
   }
 }
