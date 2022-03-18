@@ -327,6 +327,7 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
                     account.setIsAsshole(true);
                     accountService.saveAccount(account);
                 }
+                saveRanker(newRanker);
                 return true;
             }
         } catch (Exception e) {
