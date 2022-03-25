@@ -24,6 +24,6 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     @Query("SELECT a FROM Account a LEFT JOIN FETCH a.rankers")
     Set<Account> findAllAccountsJoinedWithRankers();
 
-    @Query("SELECT a FROM Account WHERE a.accessRole = :string")
-    List<Account> findAllAccountsByAccessRole(@Param("string") String accessRole);
+    @Query("SELECT a FROM Account a WHERE a.accessRole = :role")
+    List<Account> findAllAccountsByAccessRole(@Param("role") AccountAccessRole accessRole);
 }

@@ -93,7 +93,7 @@ public class AccountService {
     }
 
     public Account findOwnerAccount() {
-        List<Account> accounts = accountRepository.findAllAccountsByAccessRole(AccountAccessRole.OWNER.name());
+        List<Account> accounts = accountRepository.findAllAccountsByAccessRole(AccountAccessRole.OWNER);
         if(accounts.size() == 1) {
             return accounts.get(0);
         } else {
