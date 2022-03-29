@@ -8,6 +8,7 @@ import de.kaliburg.morefair.dto.LadderViewDTO;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.EventType;
 import de.kaliburg.morefair.messages.WSMessage;
+import de.kaliburg.morefair.messages.WSObservedMessage;
 import de.kaliburg.morefair.moderation.controller.ModerationController;
 import de.kaliburg.morefair.moderation.data.ModServerMessageData;
 import de.kaliburg.morefair.utils.WSUtils;
@@ -80,7 +81,7 @@ public class RankerController {
     }
 
     @MessageMapping("/ladder/post/bias")
-    public void buyBias(SimpMessageHeaderAccessor sha, WSMessage wsMessage) {
+    public void buyBias(SimpMessageHeaderAccessor sha, WSObservedMessage wsMessage) {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
@@ -99,7 +100,7 @@ public class RankerController {
     }
 
     @MessageMapping("/ladder/post/multi")
-    public void buyMulti(SimpMessageHeaderAccessor sha, WSMessage wsMessage) {
+    public void buyMulti(SimpMessageHeaderAccessor sha, WSObservedMessage wsMessage) {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
@@ -118,7 +119,7 @@ public class RankerController {
     }
 
     @MessageMapping("/ladder/post/vinegar")
-    public void throwVinegar(SimpMessageHeaderAccessor sha, WSMessage wsMessage) {
+    public void throwVinegar(SimpMessageHeaderAccessor sha, WSObservedMessage wsMessage) {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
@@ -137,7 +138,7 @@ public class RankerController {
     }
 
     @MessageMapping("/ladder/post/promote")
-    public void promote(SimpMessageHeaderAccessor sha, WSMessage wsMessage) {
+    public void promote(SimpMessageHeaderAccessor sha, WSObservedMessage wsMessage) {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
@@ -156,7 +157,7 @@ public class RankerController {
     }
 
     @MessageMapping("/ladder/post/asshole")
-    public void beAsshole(SimpMessageHeaderAccessor sha, WSMessage wsMessage) {
+    public void beAsshole(SimpMessageHeaderAccessor sha, WSObservedMessage wsMessage) {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
@@ -175,7 +176,7 @@ public class RankerController {
     }
 
     @MessageMapping("/ladder/post/auto-promote")
-    public void buyAutoPromote(SimpMessageHeaderAccessor sha, WSMessage wsMessage) {
+    public void buyAutoPromote(SimpMessageHeaderAccessor sha, WSObservedMessage wsMessage) {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));

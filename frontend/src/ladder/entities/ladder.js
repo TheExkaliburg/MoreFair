@@ -26,10 +26,8 @@ class Ladder {
   }
 
   calculate(delta, settings) {
-    /*this.rankers = this.rankers.sort((a, b) =>
-      new Decimal(a.points).sub(b.points)
-    );*/
     let rankers = [...this.rankers];
+    rankers = rankers.sort((a, b) => new Decimal(a.points).sub(b.points));
     let yourRanker = new Ranker(this.yourRanker);
     // ladderStats.growingRankerCount = 0;
 
@@ -97,7 +95,7 @@ class Ladder {
         );
     }
 
-    this.rankers = Object.freeze(rankers);
+    this.rankers = rankers;
     this.firstRanker = rankers[0];
     this.yourRanker = yourRanker;
   }

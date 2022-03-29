@@ -6,7 +6,8 @@ import de.kaliburg.morefair.account.type.AccountAccessRole;
 import de.kaliburg.morefair.dto.ChatDTO;
 import de.kaliburg.morefair.ladder.Ranker;
 import de.kaliburg.morefair.ladder.RankerService;
-import de.kaliburg.morefair.messages.WSMessage;
+import de.kaliburg.morefair.messages.WSEmptyMessage;
+import de.kaliburg.morefair.messages.WSMetaMessage;
 import de.kaliburg.morefair.utils.RequestThrottler;
 import de.kaliburg.morefair.utils.WSUtils;
 import lombok.extern.log4j.Log4j2;
@@ -40,7 +41,7 @@ public class ChatController {
     }
 
     @MessageMapping("/chat/init/{number}")
-    public void initChat(SimpMessageHeaderAccessor sha, WSMessage wsMessage, @DestinationVariable("number") Integer number) {
+    public void initChat(SimpMessageHeaderAccessor sha, WSEmptyMessage wsMessage, @DestinationVariable("number") Integer number) {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
             log.debug("/app/chat/init/{} from {}", number, uuid);
@@ -79,7 +80,7 @@ public class ChatController {
     }
 
     @MessageMapping("/chat/post/{number}")
-    public void postChat(WSMessage wsMessage, @DestinationVariable("number") Integer number) {
+    public void postChat(WSMetaMessage wsMessage, @DestinationVariable("number") Integer number) {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
             String message = wsMessage.getContent();

@@ -3,19 +3,18 @@
     <span>{{ option.displayName }}: {{ value }}</span
     ><br />
     <input
+      :max="max"
+      :min="min"
+      :value="value"
       type="range"
       @change="update"
       @input="update"
-      :value="value"
-      :min="min"
-      :max="max"
     />
   </label>
 </template>
 
 <script setup>
-import { defineProps } from "vue";
-import { computed } from "vue";
+import { computed, defineProps } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
@@ -40,6 +39,7 @@ function update({ target }) {
 
 <style lang="scss" scoped>
 @import "../../styles/styles";
+
 label > span {
   //disable selection
   -webkit-touch-callout: none;
