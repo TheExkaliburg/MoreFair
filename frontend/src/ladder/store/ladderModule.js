@@ -134,5 +134,8 @@ export default {
           (ranker.rank >= rank - padding && ranker.rank <= rank + padding)
       );
     },
+    allRankers(state) {
+      return state.ladder.rankers;
+    }
   },
 };
