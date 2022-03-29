@@ -138,7 +138,6 @@ const user = computed(() => store.state.user);
 const rankers = computed(() => store.getters["ladder/allRankers"]);
 
 function sendMessage() {
-
   const [msg, metadata] = parseSendMessage();
 
   stompClient.send("/app/chat/post/" + chat.value.currentChatNumber, {
@@ -159,29 +158,24 @@ function changeChat(event) {
   }
 }
 
-function parseSendMessage()
-{
-    const msgBox = document.getElementById("chatInput");
-    const children = msgBox.childNodes;
-    var msg = "";
-    var mentions = [];
-    for(let i = 0; i < children.length; i++)
-    {
-        if(children[i].nodeType == 3)
-        {
-            msg += children[i].nodeValue;
-        }
-        else if(children[i].classList.contains("mention"))
-        {
-            mentions.push({
-                u: children[i].getAttribute("data-user"),
-                id: children[i].getAttribute("data-id"),
-                i: msg.length
-            });
-            msg += `{@}`;
-        }
+function parseSendMessage() {
+  const msgBox = document.getElementById("chatInput");
+  const children = msgBox.childNodes;
+  var msg = "";
+  var mentions = [];
+  for (let i = 0; i < children.length; i++) {
+    if (children[i].nodeType == 3) {
+      msg += children[i].nodeValue;
+    } else if (children[i].classList.contains("mention")) {
+      mentions.push({
+        u: children[i].getAttribute("data-user"),
+        id: children[i].getAttribute("data-id"),
+        i: msg.length,
+      });
+      msg += `{@}`;
     }
-    return [msg, mentions];
+  }
+  return [msg, mentions];
 }
 
 setTimeout(() => {
@@ -259,212 +253,241 @@ setTimeout(() => {
   observer.observe(document.getElementById("chatInput"), config);
 
   // Key listener
-  document.getElementById("chatInput").addEventListener("keydown", function(e) {
-        //if the key is key up or down
-        if(e.keyCode == 38 || e.keyCode == 40)
-        {
-            e.preventDefault();
-            if(!document.getElementById("mentionDropdown"))
-            {
-              console.log("no dropdown");
-                return;
-            }
-
-            //unhighlight all the options
-            for(let i = 0; i < document.getElementById("mentionDropdown").children.length; i++)
-            {
-                document.getElementById("mentionDropdown").children[i].style.backgroundColor = "";
-            }
-
-            //increment or decrement dropdownElementSelected
-            if(e.keyCode == 38)
-            {
-                window.dropdownElementSelected--;
-            }
-            else
-            {
-                window.dropdownElementSelected++;
-            }
-
-            console.log(window.dropdownElementSelected);
-            //if the selected element is out of bounds
-            if(window.dropdownElementSelected < 0)
-            {
-                window.dropdownElementSelected = document.getElementById("mentionDropdown").children.length - 1;
-            }
-            else if(window.dropdownElementSelected >= document.getElementById("mentionDropdown").children.length)
-            {
-                window.dropdownElementSelected = 0;
-            }
-
-            //scroll the selected element into view using the scrollTop property
-            if(window.dropdownElementSelected > -1)
-            {
-                //if the selected element is not fully visible
-                if(document.getElementById("mentionDropdown").children[window.dropdownElementSelected].offsetTop + document.getElementById("mentionDropdown").children[window.dropdownElementSelected].offsetHeight > document.getElementById("mentionDropdown").scrollTop + document.getElementById("mentionDropdown").offsetHeight)
-                {
-                    document.getElementById("mentionDropdown").scrollTop = document.getElementById("mentionDropdown").children[window.dropdownElementSelected].offsetTop + document.getElementById("mentionDropdown").children[window.dropdownElementSelected].offsetHeight - document.getElementById("mentionDropdown").offsetHeight;
-                }
-                else if(document.getElementById("mentionDropdown").children[window.dropdownElementSelected].offsetTop < document.getElementById("mentionDropdown").scrollTop)
-                {
-                    document.getElementById("mentionDropdown").scrollTop = document.getElementById("mentionDropdown").children[window.dropdownElementSelected].offsetTop;
-                }
-            }
-
-            //highlight the selected element
-            document.getElementById("mentionDropdown").children[window.dropdownElementSelected].style.backgroundColor = "rgba(200,200,255,1)";
-
+  document
+    .getElementById("chatInput")
+    .addEventListener("keydown", function (e) {
+      //if the key is key up or down
+      if (e.keyCode == 38 || e.keyCode == 40) {
+        e.preventDefault();
+        if (!document.getElementById("mentionDropdown")) {
+          console.log("no dropdown");
+          return;
         }
 
-        //if the key is enter
-        if(e.keyCode == 13)
-        {
-            //if the mentionDropdown is open and we have a selection
-            if(document.getElementById("mentionDropdown") && window.dropdownElementSelected != -1)
-            {
-                //click the selected element
-                e.preventDefault();
-                document.getElementById("mentionDropdown").children[window.dropdownElementSelected].click();
-                return;
-            }
-            else
-            {
-                e.preventDefault();
-                sendMessage();
-            }
+        //unhighlight all the options
+        for (
+          let i = 0;
+          i < document.getElementById("mentionDropdown").children.length;
+          i++
+        ) {
+          document.getElementById("mentionDropdown").children[
+            i
+          ].style.backgroundColor = "";
         }
+
+        //increment or decrement dropdownElementSelected
+        if (e.keyCode == 38) {
+          window.dropdownElementSelected--;
+        } else {
+          window.dropdownElementSelected++;
+        }
+
+        //if the selected element is out of bounds
+        if (window.dropdownElementSelected < 0) {
+          window.dropdownElementSelected =
+            document.getElementById("mentionDropdown").children.length - 1;
+        } else if (
+          window.dropdownElementSelected >=
+          document.getElementById("mentionDropdown").children.length
+        ) {
+          window.dropdownElementSelected = 0;
+        }
+
+        //scroll the selected element into view using the scrollTop property
+        if (window.dropdownElementSelected > -1) {
+          //if the selected element is not fully visible
+          if (
+            document.getElementById("mentionDropdown").children[
+              window.dropdownElementSelected
+            ].offsetTop +
+              document.getElementById("mentionDropdown").children[
+                window.dropdownElementSelected
+              ].offsetHeight >
+            document.getElementById("mentionDropdown").scrollTop +
+              document.getElementById("mentionDropdown").offsetHeight
+          ) {
+            document.getElementById("mentionDropdown").scrollTop =
+              document.getElementById("mentionDropdown").children[
+                window.dropdownElementSelected
+              ].offsetTop +
+              document.getElementById("mentionDropdown").children[
+                window.dropdownElementSelected
+              ].offsetHeight -
+              document.getElementById("mentionDropdown").offsetHeight;
+          } else if (
+            document.getElementById("mentionDropdown").children[
+              window.dropdownElementSelected
+            ].offsetTop < document.getElementById("mentionDropdown").scrollTop
+          ) {
+            document.getElementById("mentionDropdown").scrollTop =
+              document.getElementById("mentionDropdown").children[
+                window.dropdownElementSelected
+              ].offsetTop;
+          }
+        }
+
+        //highlight the selected element
+        document.getElementById("mentionDropdown").children[
+          window.dropdownElementSelected
+        ].style.backgroundColor = "rgba(200,200,255,1)";
+      }
+
+      //if the key is enter
+      if (e.keyCode == 13) {
+        //if the mentionDropdown is open and we have a selection
+        if (
+          document.getElementById("mentionDropdown") &&
+          window.dropdownElementSelected != -1
+        ) {
+          //click the selected element
+          e.preventDefault();
+          document
+            .getElementById("mentionDropdown")
+            .children[window.dropdownElementSelected].click();
+          return;
+        } else {
+          e.preventDefault();
+          sendMessage();
+          document.getElementById("chatInput").innerText = "";
+        }
+      }
     });
 
-    //implement better mentioning system
-    document.getElementById("chatInput").addEventListener("keyup", function(e) {
+  //implement better mentioning system
+  document.getElementById("chatInput").addEventListener("keyup", function (e) {
+    if (e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 13) {
+      e.preventDefault();
+      return;
+    }
 
-        if(e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 13)
-        {
-            e.preventDefault();
-            return;
+    //if the key is escape
+    if (e.keyCode == 27) {
+      window.dropdownElementSelected = -1;
+    }
+
+    //remove any existing dropdown
+    var dropdown = document.getElementById("mentionDropdown");
+    if (dropdown) {
+      dropdown.remove();
+    }
+    window.dropdownElementSelected = -1;
+
+    var text = document
+      .getElementById("chatInput")
+      .innerText.replaceAll(String.fromCharCode(10), "");
+    //find the last @ in the text
+    var lastAt = text.lastIndexOf("@");
+    //if there is no @, return
+    if (lastAt == -1) {
+      return;
+    }
+    //if there is a space after the @, return
+    if (text.charAt(lastAt + 1) == " ") {
+      return;
+    }
+
+    //if the text after the @ is part of any username, display a dropdown with all the matching usernames
+    var possibleMention = text.substring(lastAt + 1);
+    var possibleMentionLower = possibleMention.toLowerCase();
+    var possibleMentions = [];
+    for (let i = 0; i < rankers.value.length; i++) {
+      if (
+        (rankers.value[i].username + "#" + rankers.value[i].accountId)
+          .toLowerCase()
+          .startsWith(possibleMentionLower)
+      ) {
+        possibleMentions.push(
+          rankers.value[i].username + "#" + rankers.value[i].accountId
+        );
+      }
+    }
+
+    window.possibleMention = possibleMentions;
+    if (possibleMentions.length == 0) {
+      return;
+    }
+
+    //sort the possible mentions alphabetically
+    possibleMentions.sort();
+
+    //create and display the dropdown
+    dropdown = document.createElement("div");
+    dropdown.id = "mentionDropdown";
+    dropdown.style.display = "block";
+    dropdown.innerHTML = "";
+    for (let i = 0; i < possibleMentions.length; i++) {
+      var option = document.createElement("option");
+      option.innerHTML = possibleMentions[i];
+
+      option.style.border = "1px solid black";
+
+      option.style.paddingRight = "5px";
+      option.style.paddingLeft = "5px";
+
+      option.addEventListener("click", function () {
+        let msgBox = document.getElementById("chatInput");
+        let lastChild = msgBox.lastChild;
+        //while the last child is a br, skip it
+        while (lastChild.nodeName == "BR") {
+          lastChild = lastChild.previousSibling;
+          lastChild.nextSibling.remove();
         }
+        let atPos = lastChild.textContent.lastIndexOf("@");
+        lastChild.textContent = lastChild.textContent.substring(0, atPos);
+        let mention = document.createElement("span");
+        mention.innerHTML = "@" + possibleMentions[i];
+        mention.style.backgroundColor = "rgba(200,200,255,1)";
+        mention.style.padding = "2px";
+        mention.style.border = "1px solid black";
+        mention.style.borderRadius = "5px";
+        mention.style.cursor = "pointer";
+        mention.style.fontWeight = "bold";
+        mention.classList.add("mention");
+        mention.setAttribute("data-user", possibleMentions[i].split("#")[0]);
+        mention.setAttribute("data-id", possibleMentions[i].split("#")[1]);
 
-        //if the key is escape
-        if(e.keyCode == 27)
-        {
-            window.dropdownElementSelected = -1
-        }
+        msgBox.appendChild(mention);
+        //add a space after the mention and put the cursor at the end of the text
+        var textNode = document.createTextNode(" ");
+        msgBox.appendChild(textNode);
+        msgBox.appendChild(document.createElement("br"));
+        msgBox.focus();
 
-        //remove any existing dropdown
-        var dropdown = document.getElementById("mentionDropdown");
-        if(dropdown) { dropdown.remove(); }
-        window.dropdownElementSelected = -1;
+        //remove the dropdown
+        dropdown.remove();
 
-        var text = document.getElementById("chatInput").innerText.replaceAll(String.fromCharCode(10), "");
-        //find the last @ in the text
-        var lastAt = text.lastIndexOf("@");
-        //if there is no @, return
-        if(lastAt == -1) { return; }
-        //if there is a space after the @, return
-        if(text.charAt(lastAt+1) == " ") { return; }
+        var range = document.createRange();
+        range.setStart(textNode, 1);
+        range.collapse(true);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        msgBox.focus();
+      });
 
-        //if the text after the @ is part of any username, display a dropdown with all the matching usernames
-        var possibleMention = text.substring(lastAt+1);
-        var possibleMentionLower = possibleMention.toLowerCase();
-        var possibleMentions = [];
-        for(let i = 0; i < rankers.value.length; i++)
-        {
-            if(((rankers.value[i].username) + '#' + rankers.value[i].accountId).toLowerCase().startsWith(possibleMentionLower))
-            {
-                possibleMentions.push(((rankers.value[i].username) + '#' + rankers.value[i].accountId));
-            }
-        }
+      dropdown.appendChild(option);
+    }
+    //add the dropdown to the document
+    var navbar = document.getElementById("chatInput");
+    document.body.appendChild(dropdown);
 
+    dropdown.style.bottom = navbar.offsetHeight + "px";
+    dropdown.style.left = 95 + "px";
+    dropdown.style.position = "absolute";
+    dropdown.style.background = "white";
+    dropdown.style.border = "1px solid black";
+    dropdown.style.borderRadius = "5px";
+    dropdown.style.zIndex = "1000";
+    dropdown.style.padding = "5px";
 
-        window.possibleMention = possibleMentions;
-        if(possibleMentions.length == 0) { return; }
-
-        //sort the possible mentions alphabetically
-        possibleMentions.sort();
-
-        //create and display the dropdown
-        dropdown = document.createElement("div");
-        dropdown.id = "mentionDropdown";
-        dropdown.style.display = "block";
-        dropdown.innerHTML = "";
-        for(let i = 0; i < possibleMentions.length; i++)
-        {
-            var option = document.createElement("option");
-            option.innerHTML = possibleMentions[i];
-
-            option.style.border = "1px solid black";
-
-            option.style.paddingRight = "5px";
-            option.style.paddingLeft = "5px";
-
-            option.addEventListener("click", function() {
-                let msgBox = document.getElementById("chatInput");
-                let lastChild = msgBox.lastChild;
-                //while the last child is a br, skip it
-                while(lastChild.nodeName == "BR")
-                {
-                    lastChild = lastChild.previousSibling;
-                    lastChild.nextSibling.remove();
-                }
-                let atPos = lastChild.textContent.lastIndexOf("@");
-                lastChild.textContent = lastChild.textContent.substring(0, atPos);
-                let mention = document.createElement("span");
-                mention.innerHTML = "@" + possibleMentions[i];
-                mention.style.backgroundColor = "rgba(200,200,255,1)";
-                mention.style.padding = "2px";
-                mention.style.border = "1px solid black";
-                mention.style.borderRadius = "5px";
-                mention.style.cursor = "pointer";
-                mention.style.fontWeight = "bold";
-                mention.classList.add("mention");
-                mention.setAttribute("data-user", possibleMentions[i].split("#")[0]);
-                mention.setAttribute("data-id", possibleMentions[i].split("#")[1]);
-
-                msgBox.appendChild(mention);
-                //add a space after the mention and put the cursor at the end of the text
-                var textNode = document.createTextNode(" ");
-                msgBox.appendChild(textNode);
-                msgBox.appendChild(document.createElement("br"));
-                msgBox.focus();
-
-                //remove the dropdown
-                dropdown.remove();
-
-
-                var range = document.createRange();
-                range.setStart(textNode, 1);
-                range.collapse(true);
-                var sel = window.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(range);
-                msgBox.focus();
-            });
-
-
-            dropdown.appendChild(option);
-        }
-        //add the dropdown to the document
-        var navbar = document.getElementById("chatInput");
-        document.body.appendChild(dropdown);
-
-        dropdown.style.bottom = navbar.offsetHeight + "px";
-        dropdown.style.left = (95) + "px";
-        dropdown.style.position = "absolute";
-        dropdown.style.background = "white";
-        dropdown.style.border = "1px solid black";
-        dropdown.style.borderRadius = "5px";
-        dropdown.style.zIndex = "1000";
-        dropdown.style.padding = "5px";
-
-        //limit the dropdown height to 300px
-        if(dropdown.offsetHeight > 300)
-        {
-            dropdown.style.height = "300px";
-            dropdown.style.overflowY = "scroll";
-            //scroll to the bottom
-            dropdown.scrollTop = dropdown.scrollHeight;
-        }
-    });
+    //limit the dropdown height to 300px
+    if (dropdown.offsetHeight > 300) {
+      dropdown.style.height = "300px";
+      dropdown.style.overflowY = "scroll";
+      //scroll to the bottom
+      dropdown.scrollTop = dropdown.scrollHeight;
+    }
+  });
 }, 1000);
 
 onUpdated(() => {

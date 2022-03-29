@@ -136,6 +136,6 @@ export default {
     },
     allRankers(state) {
       return state.ladder.rankers;
-    }
+    },
   },
 };
