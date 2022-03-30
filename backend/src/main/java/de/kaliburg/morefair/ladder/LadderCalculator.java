@@ -1,6 +1,7 @@
 package de.kaliburg.morefair.ladder;
 
 import de.kaliburg.morefair.account.service.AccountService;
+import de.kaliburg.morefair.chat.MessageService;
 import de.kaliburg.morefair.dto.HeartbeatDTO;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.EventType;
@@ -23,6 +24,7 @@ public class LadderCalculator {
     private static final double NANOS_IN_SECONDS = TimeUnit.SECONDS.toNanos(1);
     private final RankerService rankerService;
     private final AccountService accountService;
+    private final MessageService messageService;
     private final WSUtils wsUtils;
     private Map<Integer, HeartbeatDTO> heartbeatMap = new HashMap<>();
     private List<Event> globalEvents = new ArrayList<>();
@@ -30,10 +32,12 @@ public class LadderCalculator {
     private boolean didPressAssholeButton = false;
     private long lastTimeMeasured = System.nanoTime();
 
-    public LadderCalculator(RankerService rankerService, AccountService accountService, WSUtils wsUtils) {
+    public LadderCalculator(RankerService rankerService, AccountService accountService, WSUtils wsUtils,
+                            MessageService messageService) {
         this.rankerService = rankerService;
         this.accountService = accountService;
         this.wsUtils = wsUtils;
+        this.messageService = messageService;
     }
 
     @Scheduled(initialDelay = 1000, fixedRate = 1000)
@@ -192,6 +196,9 @@ public class LadderCalculator {
                     switch (e.getEventType()) {
                         case NAME_CHANGE -> {
                             accountService.updateUsername(e.getAccountId(), e);
+                        }
+                        case SYSTEM_MESSAGE -> {
+                            messageService.writeSystemMessage(rankerService.getHighestLadder(),(String)e.getData());
                         }
                     }
                 }
