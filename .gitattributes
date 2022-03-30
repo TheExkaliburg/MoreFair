@@ -23,6 +23,7 @@
 *.txt           eol=lf
 *.tag           eol=lf
 *.tagx          eol=lf
+*.vue          	eol=lf
 *.xml           eol=lf
 *.yml           eol=lf
 
