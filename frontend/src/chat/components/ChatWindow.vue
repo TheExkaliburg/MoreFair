@@ -261,7 +261,6 @@ function chatBoxKeyDown(e) {
   if (e.keyCode == 38 || e.keyCode == 40) {
     e.preventDefault();
     if (!document.getElementById("mentionDropdown")) {
-      console.log("no dropdown");
       return;
     }
 
