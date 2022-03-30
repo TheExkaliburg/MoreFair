@@ -50,7 +50,7 @@ const optionsModule = {
             new BoolOption({
               displayName: "Highlight Mentions",
               name: "highlightMentions",
-              value: false,
+              value: true,
             }),
           ],
         }),

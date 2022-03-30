@@ -1,6 +1,6 @@
 <template>
   <div class="container px-3 py-1 message">
-    <span v-for="part in messagePartsComputed" :key="part">
+    <span v-for="part in messageParts" :key="part">
       <!-- Plain Message -->
       <span v-if="part.is(MessagePartType.plain)">
         {{ part.text }}
@@ -44,7 +44,6 @@ const store = useStore();
 
 //const numberFormatter = computed(() => store.state.numberFormatter);
 //const ladder = computed(() => store.state.ladder);
-const rankers = computed(() => store.getters["ladder/shownRankers"]);
 const highlightMentions = computed(() =>
   store.getters["options/getOptionValue"]("highlightMentions")
 );
@@ -81,79 +80,50 @@ const messageParts = [
   new MessagePart(MessagePartType.plain, props.msg.message),
 ];
 
-//FIXME: This is a mess. We really should be getting a flag somewhere that tells us if we are fully connected.
-let messagePartsComputed = computed(() => {
-  if (rankers.value.length < 2) {
-    // We probably don't have enough rankers to be considered on a server
-    return messageParts;
-  }
-  findMentions();
-  messagePartsComputed = computed(() => {
-    return messageParts;
-  });
-  return messageParts;
-});
-
 function spliceNewMessagePartsIntoArray(oldPart, newParts) {
   messageParts.splice(messageParts.indexOf(oldPart), 1, ...newParts);
 }
 
-function findMentions() {
-  let sortedUsers = [...rankers.value];
-  sortedUsers = sortedUsers.sort((a, b) => {
-    const nameCompare = a.username.localeCompare(b.username);
-    if (nameCompare !== 0) {
-      return nameCompare;
-    }
-    return b.accountId - a.accountId;
-  });
-
-  sortedUsers.forEach((user) => {
-    findMention(user);
-  });
-}
-
-function findMention(user) {
-  for (let messagePart of messageParts) {
-    if (messagePart.is(MessagePartType.plain)) {
-      const mention = messagePart.text.indexOf(
-        `@${user.username}#${user.accountId}`
-      );
-      if (mention !== -1) {
-        const preMessagePart = new MessagePart(
-          MessagePartType.plain,
-          messagePart.text.substring(0, mention)
-        );
-        const mentionAtsign = new MessagePart(
-          MessagePartType.mentionAtsign,
-          "@"
-        );
-        const mentionName = new MessagePart(
-          MessagePartType.mentionName,
-          user.username
-        );
-        const mentionNumber = new MessagePart(
-          MessagePartType.mentionNumber,
-          "#" + user.accountId
-        );
-        const postMessagePart = new MessagePart(
-          MessagePartType.plain,
-          messagePart.text.substring(
-            mention + `@${user.username}#${user.accountId}`.length
-          )
-        );
-        spliceNewMessagePartsIntoArray(messagePart, [
-          preMessagePart,
-          mentionAtsign,
-          mentionName,
-          mentionNumber,
-          postMessagePart,
-        ]);
-        findMentions(user);
-      }
-    }
+(function findMentions() {
+  const msg = props.msg;
+  let meta = msg.metadata;
+  if (!meta) {
+    return;
   }
-}
+  //const message = msg.message;
+  const mentions = meta.filter((m) => "u" in m && "id" in m && "i" in m);
+  mentions.sort((a, b) => a.i - b.i);
+  let offset = 0;
+  let currentPlainText = messageParts[0];
+  mentions.forEach((m) => {
+    let index = m.i - offset;
+    let id = parseInt(m.id);
+    let name = m.u;
+    name = name.trim();
+
+    if (currentPlainText.text.slice(index, index + 3) !== "{@}") {
+      return;
+    }
+
+    let newParts = [
+      new MessagePart(
+        MessagePartType.plain,
+        currentPlainText.text.slice(0, index)
+      ),
+      new MessagePart(MessagePartType.mentionAtsign, "@"),
+      new MessagePart(MessagePartType.mentionName, name),
+      new MessagePart(MessagePartType.mentionNumber, "#" + id),
+      new MessagePart(
+        MessagePartType.plain,
+        currentPlainText.text.slice(index + 3)
+      ),
+    ];
+
+    spliceNewMessagePartsIntoArray(currentPlainText, newParts);
+    offset += index + 3;
+    currentPlainText = newParts[4];
+  });
+})();
 </script>
 
 <style lang="scss" scoped>
