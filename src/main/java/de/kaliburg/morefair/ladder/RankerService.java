@@ -326,6 +326,12 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
                     Account account = accountService.findByUuid(ranker.getAccount().getUuid());
                     account.setIsAsshole(true);
                     accountService.saveAccount(account);
+                    int assholeLadder = FairController.BASE_ASSHOLE_LADDER + accountService.findMaxTimesAsshole();
+                    int neededAssholesForReset = Math.max(FairController.ASSHOLES_FOR_RESET, (assholeLadder + 1) >> 1);
+                    List<Account> accounts = accountService.findAllAccountsJoinedWithRankers().stream().toList();
+                    long assholeCount = accounts.stream().filter(Account::getIsAsshole).count();
+                    globalEventList.add(new Event(EventType.SYSTEM_MESSAGE,0L, account.getUsername() +
+                            " is an asshole.  Number " + assholeCount + "of " + neededAssholesForReset + " needed assholes."));
                 }
                 saveRanker(newRanker);
                 return true;

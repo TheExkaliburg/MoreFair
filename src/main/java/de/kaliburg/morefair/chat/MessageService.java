@@ -2,10 +2,13 @@ package de.kaliburg.morefair.chat;
 
 import de.kaliburg.morefair.account.entity.Account;
 import de.kaliburg.morefair.account.events.AccountServiceEvent;
+import de.kaliburg.morefair.account.service.AccountService;
 import de.kaliburg.morefair.dto.ChatDTO;
 import de.kaliburg.morefair.ladder.Ladder;
 import de.kaliburg.morefair.ladder.LadderRepository;
+import de.kaliburg.morefair.utils.WSUtils;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,19 +19,26 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.*;
 import java.util.concurrent.Semaphore;
+import java.util.stream.IntStream;
+
+import static de.kaliburg.morefair.chat.ChatController.CHAT_UPDATE_DESTINATION;
 
 @Service
 @Log4j2
 public class MessageService implements ApplicationListener<AccountServiceEvent> {
     private final MessageRepository messageRepository;
+    private final AccountService accountService;
     private final LadderRepository ladderRepository;
+    private final WSUtils wsUtils;
     @Getter
     private Map<Integer, Ladder> chats = new HashMap<>();
     private Semaphore chatSem = new Semaphore(1);
 
-    public MessageService(MessageRepository messageRepository, LadderRepository ladderRepository) {
+    public MessageService(MessageRepository messageRepository, LadderRepository ladderRepository, AccountService accountService, WSUtils wsUtils) {
         this.messageRepository = messageRepository;
         this.ladderRepository = ladderRepository;
+        this.accountService = accountService;
+        this.wsUtils = wsUtils;
     }
 
     public Ladder findLadderWithChat(Ladder ladder) {
@@ -78,6 +88,22 @@ public class MessageService implements ApplicationListener<AccountServiceEvent> 
     //TODO: Manage the Chat better
     public ChatDTO getChat(int ladderNum) {
         return chats.get(ladderNum).convertToChatDTO();
+    }
+
+    public void writeSystemMessage(@NonNull Ladder highestLadder, @NonNull String messageString) {
+        try {
+            Account systemMessager = accountService.findOwnerAccount();
+            log.debug("SystemMessager is " + (systemMessager != null ? systemMessager.getUsername() : " null"));
+            if (systemMessager != null) {
+                IntStream.range(1,highestLadder.getNumber()+1)
+                        .forEach(ladder -> {
+                            Message answer = writeMessage(systemMessager,ladder,messageString);
+                            wsUtils.convertAndSendToAll(CHAT_UPDATE_DESTINATION + ladder, answer.convertToDTO());
+                        });
+            }
+        } catch (RuntimeException re) {
+            log.error("Error processing System Message: " + messageString,re);
+        }
     }
 
     public Message writeMessage(Account account, Integer ladderNum, String messageString) {
