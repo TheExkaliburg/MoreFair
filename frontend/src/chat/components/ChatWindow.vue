@@ -177,6 +177,8 @@ function parseSendMessage() {
       msg += `{@}`;
     }
   }
+  //finally, replace all non-breaking spaces with regular spaces so vue doesn't choke on them
+  msg = msg.replace(/\u00a0/g, " ");
   return [msg, mentions];
 }
 
