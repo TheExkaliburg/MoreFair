@@ -278,7 +278,7 @@ function chatBoxKeyDown(e) {
     //increment or decrement dropdownElementSelected
     if (e.keyCode == 38) {
       window.dropdownElementSelected--;
-    } else {
+    } else if (e.keyCode == 40) {
       window.dropdownElementSelected++;
     }
 
@@ -336,8 +336,8 @@ function chatBoxKeyDown(e) {
     ].style.backgroundColor = "rgb(70, 70, 70)";
   }
 
-  //if the key is enter
-  if (e.keyCode == 13) {
+  //if the key is enter or tab
+  if (e.keyCode == 13 || e.keyCode == 9) {
     //if the mentionDropdown is open and we have a selection
     if (
       document.getElementById("mentionDropdown") &&
@@ -358,14 +358,15 @@ function chatBoxKeyDown(e) {
 }
 
 function chatBoxKeyUp(e) {
-  if (e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 13 || e.keyCode == 9) {
+  if (
+    e.keyCode == 38 ||
+    e.keyCode == 40 ||
+    e.keyCode == 13 ||
+    e.keyCode == 9 ||
+    e.keyCode == 27
+  ) {
     e.preventDefault();
     return;
-  }
-
-  //if the key is escape
-  if (e.keyCode == 27) {
-    window.dropdownElementSelected = -1;
   }
 
   //remove any existing dropdown
@@ -498,6 +499,11 @@ function chatBoxKeyUp(e) {
     //scroll to the bottom
     dropdown.scrollTop = dropdown.scrollHeight;
   }
+
+  //select the last element
+  window.dropdownElementSelected = possibleMentions.length - 1;
+  dropdown.children[window.dropdownElementSelected].style.backgroundColor =
+    "rgb(70, 70, 70)";
 }
 
 onUpdated(() => {
