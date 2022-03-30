@@ -10,8 +10,8 @@ export default {
     };
   },
   mutations: {
-    init(state, payload) {
-      state.ladder = new Ladder(payload.message.content);
+    init(state, { message }) {
+      state.ladder = new Ladder(message.content);
     },
     calculate(state, { delta, settings }) {
       state.ladder.calculate(delta, settings);
@@ -125,14 +125,16 @@ export default {
   getters: {
     shownRankers(state) {
       const numberAtTop = 10;
-      const padding = 1000;
+      const padding = 50;
       const rank = state.ladder.yourRanker.rank;
 
-      return state.ladder.rankers.filter(
+      state.ladder.rankers.filter(
         (ranker) =>
           ranker.rank <= numberAtTop ||
           (ranker.rank >= rank - padding && ranker.rank <= rank + padding)
       );
+
+      return state.ladder.rankers;
     },
     allRankers(state) {
       return state.ladder.rankers;

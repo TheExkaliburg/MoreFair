@@ -1,175 +1,66 @@
 <template>
   <div class="container px-3 py-1 message">
-    <span v-for="part in messagePartsComputed" :key="part">
-      <!-- Plain Message -->
-      <span v-if="part.is(MessagePartType.plain)">
-        {{ part.text }}
-      </span>
-      <!-- Mentions -->
-      <span
-        v-else-if="part.is(MessagePartType.mentionAtsign)"
-        class="chat-mention-at"
-      >
-        {{ part.text }}
-      </span>
-      <span
-        v-else-if="part.is(MessagePartType.mentionName)"
-        class="chat-mention"
-      >
-        {{ part.text }}
-      </span>
-      <span
-        v-else-if="part.is(MessagePartType.mentionNumber)"
-        class="chat-mention-user-id"
-      >
-        {{ part.text }}
-      </span>
-      <!-- Unimplemented -->
-      <span v-else class="chat-unknown-part-type">
-        {{ part.text }}
-      </span>
-    </span>
+    <div class="row py-0 message-header">
+      <div class="col-4 message-username">
+        <span class="message-user-name">
+          <strong>{{ settings.assholeTags[msg.timesAsshole] }}</strong>
+          {{ msg.timesAsshole > 0 ? "-" : "" }}
+          <span v-html="msg.username" />
+        </span>
+        <span class="message-user-id">&nbsp;#{{ msg.accountId }}</span>
+      </div>
+      <div class="col-3 message-date">{{ msg.timeCreated }}</div>
+      <div class="col-4 message-status"></div>
+      <div class="col-1 message-options">...</div>
+    </div>
+    <div class="row py-0 message-body">
+      <ChatMessageBody :msg="msg" />
+    </div>
   </div>
 </template>
 
 <script setup>
+import { computed, defineProps } from "vue";
 import { useStore } from "vuex";
-import { defineProps, computed } from "vue";
-
-const props = defineProps({
-  msg: Object,
-});
+import ChatMessageBody from "@/chat/components/ChatMessageBody";
 
 const store = useStore();
+const settings = computed(() => store.state.settings);
 
-//const numberFormatter = computed(() => store.state.numberFormatter);
-//const ladder = computed(() => store.state.ladder);
-const rankers = computed(() => store.getters["ladder/shownRankers"]);
-const highlightMentions = computed(() =>
-  store.getters["options/getOptionValue"]("highlightMentions")
-);
-//Basically an enum
-const MessagePartType = {
-  plain: Symbol("plain"),
-  mentionName: Symbol("mentionName"),
-  mentionNumber: Symbol("mentionNumber"),
-  mentionAtsign: Symbol("mentionAtsign"),
-};
-
-class MessagePart {
-  constructor(type, text) {
-    this.type = type;
-    this.text = text;
-  }
-  is(type) {
-    if (this.type === type) return true;
-    if (type === MessagePartType.plain) {
-      //Here we can disable the different types of highlighting
-      if (!highlightMentions.value) {
-        return (
-          this.type === MessagePartType.mentionName ||
-          this.type === MessagePartType.mentionNumber ||
-          this.type === MessagePartType.mentionAtsign
-        );
-      }
-    }
-  }
-}
-const messageParts = [
-  new MessagePart(MessagePartType.plain, props.msg.message),
-];
-
-//FIXME: This is a mess. We really should be getting a flag somewhere that tells us if we are fully connected.
-let messagePartsComputed = computed(() => {
-  if (rankers.value.length < 2) {
-    //We probably don't have enough rankers to be considered on a server
-    return messageParts;
-  }
-  findMentions();
-  messagePartsComputed = computed(() => {
-    return messageParts;
-  });
-  return messageParts;
+defineProps({
+  msg: Object,
 });
-
-function spliceNewMessagePartsIntoArray(oldPart, newParts) {
-  messageParts.splice(messageParts.indexOf(oldPart), 1, ...newParts);
-}
-
-function findMentions() {
-  const sortedUsers = rankers.value.sort((a, b) => {
-    const nameCompare = a.username.localeCompare(b.username);
-    if (nameCompare !== 0) {
-      return nameCompare;
-    }
-    return b.accountId - a.accountId;
-  });
-
-  sortedUsers.forEach((user) => {
-    findMention(user);
-  });
-}
-
-function findMention(user) {
-  for (let messagePart of messageParts) {
-    if (messagePart.is(MessagePartType.plain)) {
-      const mention = messagePart.text.indexOf(
-        `@${user.username}#${user.accountId}`
-      );
-      if (mention !== -1) {
-        const preMessagePart = new MessagePart(
-          MessagePartType.plain,
-          messagePart.text.substring(0, mention)
-        );
-        const mentionAtsign = new MessagePart(
-          MessagePartType.mentionAtsign,
-          "@"
-        );
-        const mentionName = new MessagePart(
-          MessagePartType.mentionName,
-          user.username
-        );
-        const mentionNumber = new MessagePart(
-          MessagePartType.mentionNumber,
-          "#" + user.accountId
-        );
-        const postMessagePart = new MessagePart(
-          MessagePartType.plain,
-          messagePart.text.substring(
-            mention + `@${user.username}#${user.accountId}`.length
-          )
-        );
-        spliceNewMessagePartsIntoArray(messagePart, [
-          preMessagePart,
-          mentionAtsign,
-          mentionName,
-          mentionNumber,
-          postMessagePart,
-        ]);
-        findMentions(user);
-      }
-    }
-  }
-}
 </script>
 
 <style lang="scss" scoped>
 @import "../../styles/styles";
 
-.chat-mention-at,
-.chat-mention {
-  color: $main-color;
+.message {
+  // border: white solid 0.5px;
 }
 
-//This hurts my eyes and exactly that is what I want.
-//Because this is shown when we forget to implement a part type
-.chat-unknown-part-type {
-  font-weight: bold;
-  color: white;
-  background-color: red;
-}
-
-.chat-mention-user-id {
+.message-user-id {
   color: #cf573c;
+}
+
+.message-header {
+  font-size: $header-font-size;
+  color: $main-color;
+  white-space: nowrap;
+}
+
+.message-username {
+  text-align: start;
+  overflow-x: hidden;
+}
+
+.message-options {
+  text-align: end;
+}
+
+.message-body {
+  font-size: $text-font-size;
+  text-align: start;
+  color: $text-color;
 }
 </style>

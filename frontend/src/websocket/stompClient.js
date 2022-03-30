@@ -57,7 +57,7 @@ export class StompClient {
   }
 
   send(destination, payload) {
-    let data = { uuid: Cookies.get("_uuid"), content: "", event: "" };
+    let data = { uuid: Cookies.get("_uuid") };
     if (!data.uuid) data.uuid = "";
     if (payload) {
       if (payload.content) data.content = payload.content;

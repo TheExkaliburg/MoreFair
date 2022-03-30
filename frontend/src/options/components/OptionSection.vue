@@ -22,8 +22,8 @@ import NumberInput from "@/options/components/NumberInput";
 import { defineProps } from "vue";
 import {
   BoolOption,
-  RangeOption,
   NumberOption,
+  RangeOption,
 } from "@/options/entities/option";
 
 const props = defineProps({
@@ -32,6 +32,7 @@ const props = defineProps({
 </script>
 <style lang="scss" scoped>
 @import "../../styles/styles";
+
 .option-section {
   border: 1px solid $main-color;
   padding: 10px;
@@ -43,6 +44,7 @@ const props = defineProps({
   margin-right: auto;
   overflow: hidden;
 }
+
 .title {
   border-bottom: 1px solid $main-color;
   width: max-content;

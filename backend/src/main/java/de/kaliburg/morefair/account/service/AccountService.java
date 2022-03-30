@@ -14,6 +14,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +28,6 @@ import java.util.concurrent.Semaphore;
 public class AccountService {
     private final AccountRepository accountRepository;
     private final ApplicationEventPublisher eventPublisher;
-
     @Getter
     private List<Event> modEventList = new ArrayList<>();
     @Getter
@@ -89,6 +90,16 @@ public class AccountService {
 
     public Set<Account> findAllAccountsJoinedWithRankers() {
         return accountRepository.findAllAccountsJoinedWithRankers();
+    }
+
+    public Account findOwnerAccount() {
+        List<Account> accounts = accountRepository.findAllAccountsByAccessRole(AccountAccessRole.OWNER);
+        if(accounts.size() == 1) {
+            return accounts.get(0);
+        } else {
+            log.error("Single OWNER account access roles not found.");
+            throw new RuntimeException("Single OWNER account not found, found " + accounts.size() + " owner accounts.");
+        }
     }
 
     public Account findByUuid(UUID uuid) {

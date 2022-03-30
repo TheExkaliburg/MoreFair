@@ -7,7 +7,7 @@
       >
         <thead>
           <tr class="thead-light">
-            <th class="col-1 text-start">#</th>
+            <th class="col-1 text-start">-</th>
             <th class="col-5 text-start">Username</th>
             <th class="col-3 text-end">Power</th>
             <th class="col-3 text-end">Points</th>
@@ -20,7 +20,7 @@
             :class="[ranker.you ? 'you' : '', ranker.growing ? '' : 'promoted']"
           >
             <td class="text-start">{{ ranker.rank }}</td>
-            <td class="text-start">{{ ranker.username }}</td>
+            <td class="text-start">{{ ranker.username }} {{ ranker.rank }}</td>
             <td class="text-end">
               {{ numberFormatter.format(ranker.power) }} [+{{
                 ("" + ranker.bias).padStart(2, "0")

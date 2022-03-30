@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.dto;
+package de.kaliburg.morefair.chat;
 
 import de.kaliburg.morefair.FairController;
 import de.kaliburg.morefair.chat.Message;
@@ -15,6 +15,7 @@ public class MessageDTO {
     private final Long accountId;
     private final String timeCreated;
     private final String assholeTag;
+    private final String metadata;
 
     public MessageDTO(Message message) {
         this.timesAsshole = message.getAccount().getTimesAsshole();
@@ -23,5 +24,6 @@ public class MessageDTO {
         this.username = StringEscapeUtils.unescapeJava(message.getAccount().getUsername());
         this.accountId = message.getAccount().getId();
         this.timeCreated = message.getCreatedOn().format(DateTimeFormatter.ofPattern("EE HH:mm"));
+        this.metadata = message.getMetadata();
     }
 }

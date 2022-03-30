@@ -6,7 +6,8 @@ import de.kaliburg.morefair.account.type.AccountAccessRole;
 import de.kaliburg.morefair.dto.ChatDTO;
 import de.kaliburg.morefair.ladder.Ranker;
 import de.kaliburg.morefair.ladder.RankerService;
-import de.kaliburg.morefair.messages.WSMessage;
+import de.kaliburg.morefair.websockets.messages.WSEmptyMessage;
+import de.kaliburg.morefair.websockets.messages.WSMetaMessage;
 import de.kaliburg.morefair.utils.RequestThrottler;
 import de.kaliburg.morefair.utils.WSUtils;
 import lombok.extern.log4j.Log4j2;
@@ -40,7 +41,7 @@ public class ChatController {
     }
 
     @MessageMapping("/chat/init/{number}")
-    public void initChat(SimpMessageHeaderAccessor sha, WSMessage wsMessage, @DestinationVariable("number") Integer number) {
+    public void initChat(SimpMessageHeaderAccessor sha, WSEmptyMessage wsMessage, @DestinationVariable("number") Integer number) {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
             log.debug("/app/chat/init/{} from {}", number, uuid);
@@ -79,22 +80,22 @@ public class ChatController {
     }
 
     @MessageMapping("/chat/post/{number}")
-    public void postChat(WSMessage wsMessage, @DestinationVariable("number") Integer number) {
+    public void postChat(WSMetaMessage wsMessage, @DestinationVariable("number") Integer number) {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
             String message = wsMessage.getContent();
+            String metadata = wsMessage.getMetadata();
             message = message.trim();
-            if (message.length() > 280) message = message.substring(0, 280);
+            if (message.length() > 140) message = message.substring(0, 140);
             message = StringEscapeUtils.escapeJava(HtmlUtils.htmlEscape(message));
 
-            log.debug("/app/chat/post/{} '{}' from {}", number, message, uuid);
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null || account.getAccessRole().equals(AccountAccessRole.MUTED_PLAYER) || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER))
                 return;
             if (account.getAccessRole().equals(AccountAccessRole.MODERATOR) || account.getAccessRole().equals(AccountAccessRole.OWNER)
                     || (number <= rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber()
                     && throttler.canPostMessage(account.getUuid()))) {
-                Message answer = messageService.writeMessage(account, number, message);
+                Message answer = messageService.writeMessage(account, number, message, metadata);
                 wsUtils.convertAndSendToAll(CHAT_UPDATE_DESTINATION + number, answer.convertToDTO());
             }
         } catch (Exception e) {

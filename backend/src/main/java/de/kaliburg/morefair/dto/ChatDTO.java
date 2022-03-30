@@ -1,6 +1,7 @@
 package de.kaliburg.morefair.dto;
 
 import de.kaliburg.morefair.chat.Message;
+import de.kaliburg.morefair.chat.MessageDTO;
 import de.kaliburg.morefair.ladder.Ladder;
 import lombok.Data;
 

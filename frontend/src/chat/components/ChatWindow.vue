@@ -95,7 +95,7 @@
       </div>
     </div>
     <div ref="chatContent" class="chat-content row py-0">
-      <ChatMessages
+      <ChatMessage
         v-for="message in chat.messages"
         :key="message"
         :msg="message"
@@ -125,9 +125,9 @@
 </template>
 
 <script setup>
-import ChatMessages from "@/chat/components/ChatMessages";
 import { useStore } from "vuex";
 import { computed, inject, onUpdated, ref } from "vue";
+import ChatMessage from "@/chat/components/ChatMessage";
 
 const store = useStore();
 const stompClient = inject("$stompClient");
