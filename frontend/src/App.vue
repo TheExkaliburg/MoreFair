@@ -83,6 +83,10 @@ import { useStore } from "vuex";
 import Cookies from "js-cookie";
 import { StompClient } from "@/websocket/stompClient";
 
+import { hooksSystemSetup } from "@/modules/hooks";
+
+hooksSystemSetup();
+
 const store = useStore();
 const stompClient = new StompClient();
 

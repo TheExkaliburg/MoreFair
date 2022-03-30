@@ -5,6 +5,15 @@ import {
   OptionSection,
 } from "../entities/option";
 
+import { createHookEndpoint } from "@/modules/hooks";
+
+const optionChangedHook = createHookEndpoint(
+  "optionChanged",
+  (hook, ...[option, allOptions]) => {
+    hook.callback(option, allOptions);
+  }
+);
+
 const optionsModule = {
   namespaced: true,
   state: () => {
@@ -71,6 +80,9 @@ const optionsModule = {
       const newValue = payload.value;
       //TODO: save locally
       //TODO: save to server
+
+      //Call hooks to let users know that the option has changed
+      optionChangedHook(option, state.options);
     },
   },
   actions: {},
