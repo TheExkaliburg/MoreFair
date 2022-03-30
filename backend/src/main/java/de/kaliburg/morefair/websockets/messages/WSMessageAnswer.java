@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.messages;
+package de.kaliburg.morefair.websockets.messages;
 
 import lombok.*;
 import org.springframework.http.HttpStatus;

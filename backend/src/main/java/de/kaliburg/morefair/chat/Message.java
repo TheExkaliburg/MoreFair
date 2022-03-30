@@ -1,7 +1,6 @@
 package de.kaliburg.morefair.chat;
 
 import de.kaliburg.morefair.account.entity.Account;
-import de.kaliburg.morefair.dto.MessageDTO;
 import de.kaliburg.morefair.ladder.Ladder;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -31,6 +30,8 @@ public class Message {
     @NonNull
     @Column(nullable = false, length = 500)
     private String message;
+    @Column(length = 500)
+    private String metadata;
     @NonNull
     @ManyToOne
     @JoinColumn(name = "ladder_id", nullable = false)

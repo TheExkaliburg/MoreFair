@@ -1,13 +1,12 @@
 <template>
   <label>
     <span>{{ option.displayName }}: </span>
-    <input type="number" @change="update" @input="update" :value="value" />
+    <input :value="value" type="number" @change="update" @input="update" />
   </label>
 </template>
 
 <script setup>
-import { defineProps } from "vue";
-import { computed } from "vue";
+import { computed, defineProps } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
@@ -30,6 +29,7 @@ function update({ target }) {
 
 <style lang="scss" scoped>
 @import "../../styles/styles";
+
 label > span {
   //disable selection
   -webkit-touch-callout: none;
@@ -62,6 +62,7 @@ input[type="number"] {
   -moz-appearance: textfield;
   appearance: textfield;
 }
+
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;

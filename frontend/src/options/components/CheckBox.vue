@@ -1,13 +1,12 @@
 <template>
   <label>
-    <input type="checkbox" @change="update" :checked="value" />
+    <input :checked="value" type="checkbox" @change="update" />
     <span>{{ option.displayName }}</span>
   </label>
 </template>
 
 <script setup>
-import { defineProps } from "vue";
-import { computed } from "vue";
+import { computed, defineProps } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
@@ -32,6 +31,7 @@ function update({ target }) {
 
 <style lang="scss" scoped>
 @import "../../styles/styles";
+
 label > span {
   margin-left: 10px;
   //disable selection
