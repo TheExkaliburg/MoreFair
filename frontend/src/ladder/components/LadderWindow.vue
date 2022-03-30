@@ -21,7 +21,7 @@
             :key="ranker.accountId"
             :class="[ranker.you ? 'you' : '', ranker.growing ? '' : 'promoted']"
           >
-            <td class="text-start">{{ ranker.rank }}</td>
+            <td class="text-start rank">{{ ranker.rank }}</td>
             <td class="text-start">{{ ranker.username }} {{ ranker.rank }}</td>
             <td class="text-end">
               {{ numberFormatter.format(ranker.power) }} [+{{
@@ -52,6 +52,10 @@ const rankers = computed(() => store.getters["ladder/shownRankers"]);
 
 <style lang="scss" scoped>
 @import "../../styles/styles";
+
+.rank {
+  padding-left: 1rem;
+}
 
 .ladder-row {
   width: 100%;
