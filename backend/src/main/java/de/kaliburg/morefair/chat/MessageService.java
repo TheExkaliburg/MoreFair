@@ -96,9 +96,8 @@ public class MessageService implements ApplicationListener<AccountServiceEvent> 
             Account systemMessager = accountService.findOwnerAccount();
             log.debug("SystemMessager is " + (systemMessager != null ? systemMessager.getUsername() : " null"));
             if (systemMessager != null) {
-                IntStream.range(1,highestLadder.getNumber()+1)
-                        .forEach(ladder -> {
-                            Message answer = writeMessage(systemMessager,ladder,messageString);
+                chats.values().forEach(ladder -> {
+                            Message answer = writeMessage(systemMessager,ladder.getNumber(),messageString);
                             wsUtils.convertAndSendToAll(CHAT_UPDATE_DESTINATION + ladder, answer.convertToDTO());
                         });
             }
@@ -107,7 +106,11 @@ public class MessageService implements ApplicationListener<AccountServiceEvent> 
         }
     }
 
-    public Message writeMessage(Account account, Integer ladderNum, String messageString) {
+    public Message writeMessage(Account account, Integer ladderNum, String messageString){
+        return writeMessage(account, ladderNum, messageString, null);
+    }
+
+    public Message writeMessage(Account account, Integer ladderNum, String messageString, String metadata) {
         Ladder ladder = chats.get(ladderNum);
         Message message = new Message(UUID.randomUUID(), account, messageString, ladder);
 
