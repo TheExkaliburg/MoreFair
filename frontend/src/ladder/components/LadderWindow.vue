@@ -1,5 +1,7 @@
 <template>
-  <div style="overflow: hidden">
+  <div
+    style="overflow: hidden; max-height: calc(100% - 150px); overflow-y: auto"
+  >
     <div class="row py-1 ladder-row">
       <table
         class="table table-sm caption-top table-borderless"
