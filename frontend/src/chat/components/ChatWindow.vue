@@ -257,8 +257,8 @@ setTimeout(() => {
 }, 10);
 
 function chatBoxKeyDown(e) {
-  //if the key is key up or down
-  if (e.keyCode == 38 || e.keyCode == 40) {
+  //if the key is key up or down or tab
+  if (e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 9) {
     e.preventDefault();
     if (!document.getElementById("mentionDropdown")) {
       return;
@@ -358,7 +358,7 @@ function chatBoxKeyDown(e) {
 }
 
 function chatBoxKeyUp(e) {
-  if (e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 13) {
+  if (e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 13 || e.keyCode == 9) {
     e.preventDefault();
     return;
   }
