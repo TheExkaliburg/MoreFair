@@ -99,7 +99,8 @@ function spliceNewMessagePartsIntoArray(oldPart, newParts) {
 }
 
 function findMentions() {
-  const sortedUsers = rankers.value.sort((a, b) => {
+  let sortedUsers = [...rankers.value];
+  sortedUsers = sortedUsers.sort((a, b) => {
     const nameCompare = a.username.localeCompare(b.username);
     if (nameCompare !== 0) {
       return nameCompare;

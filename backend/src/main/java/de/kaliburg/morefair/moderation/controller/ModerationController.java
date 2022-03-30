@@ -8,7 +8,7 @@ import de.kaliburg.morefair.chat.MessageService;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.EventType;
 import de.kaliburg.morefair.ladder.RankerService;
-import de.kaliburg.morefair.messages.WSMessage;
+import de.kaliburg.morefair.websockets.messages.WSMessage;
 import de.kaliburg.morefair.moderation.data.ModChatData;
 import de.kaliburg.morefair.moderation.data.ModerationInfoData;
 import de.kaliburg.morefair.utils.WSUtils;

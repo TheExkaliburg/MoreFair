@@ -138,6 +138,7 @@ const user = computed(() => store.state.user);
 function sendMessage() {
   stompClient.send("/app/chat/post/" + chat.value.currentChatNumber, {
     content: message.value,
+    metadata: { u: "Tester", id: "1", pos: "0" },
   });
   message.value = "";
 }

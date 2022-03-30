@@ -7,6 +7,7 @@ import de.kaliburg.morefair.ladder.Ladder;
 import de.kaliburg.morefair.ladder.LadderRepository;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -80,9 +81,14 @@ public class MessageService implements ApplicationListener<AccountServiceEvent> 
         return chats.get(ladderNum).convertToChatDTO();
     }
 
-    public Message writeMessage(Account account, Integer ladderNum, String messageString) {
+    public Message writeMessage(Account account, Integer ladderNum, String messageString, String metadata) {
         Ladder ladder = chats.get(ladderNum);
         Message message = new Message(UUID.randomUUID(), account, messageString, ladder);
+
+        if(!StringUtils.isBlank(metadata)){
+            message.setMetadata(metadata);
+        }
+
         List<Message> messages = ladder.getMessages();
         messages.add(0, message);
         if (messages.size() > 30) messages.remove(messages.size() - 1);

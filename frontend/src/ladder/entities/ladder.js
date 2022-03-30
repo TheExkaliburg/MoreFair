@@ -27,7 +27,7 @@ class Ladder {
 
   calculate(delta, settings) {
     let rankers = [...this.rankers];
-    rankers = rankers.sort((a, b) => new Decimal(a.points).sub(b.points));
+    rankers.sort((a, b) => new Decimal(a.points).sub(b.points));
     let yourRanker = new Ranker(this.yourRanker);
     // ladderStats.growingRankerCount = 0;
 

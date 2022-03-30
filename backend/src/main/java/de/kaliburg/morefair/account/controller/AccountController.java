@@ -6,7 +6,7 @@ import de.kaliburg.morefair.account.type.AccountAccessRole;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.EventType;
 import de.kaliburg.morefair.ladder.RankerService;
-import de.kaliburg.morefair.messages.WSMessage;
+import de.kaliburg.morefair.websockets.messages.WSMessage;
 import de.kaliburg.morefair.utils.RequestThrottler;
 import de.kaliburg.morefair.utils.WSUtils;
 import de.kaliburg.morefair.websockets.StompPrincipal;
