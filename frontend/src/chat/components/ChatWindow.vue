@@ -2,9 +2,10 @@
   <div class="chat-window container rounded py-1 px-3">
     <div class="chat-header row py-1">
       <!--div class="col chat-info">Chad #{{ chat.currentChatNumber }}</div-->
-      <PaginationComponent
+      <PaginationGroup
         :current="chat.currentChatNumber"
         :max="user.highestCurrentLadder"
+        :onChange="changeChat"
       />
     </div>
     <div ref="chatContent" class="chat-content row py-0">
@@ -41,7 +42,7 @@
 import { useStore } from "vuex";
 import { computed, inject, onUpdated, ref } from "vue";
 import ChatMessage from "@/chat/components/ChatMessage";
-import PaginationComponent from "@/components/PaginationComponent";
+import PaginationGroup from "@/components/PaginationGroup";
 
 const store = useStore();
 const stompClient = inject("$stompClient");

@@ -1,5 +1,5 @@
 <template>
-  <div style="overflow: hidden">
+  <div class="px-3" style="overflow: hidden">
     <div class="row py-1 ladder-row">
       <table
         class="table table-sm caption-top table-borderless"
@@ -20,7 +20,7 @@
             :class="[ranker.you ? 'you' : '', ranker.growing ? '' : 'promoted']"
           >
             <td class="text-start">{{ ranker.rank }}</td>
-            <td class="text-start">{{ ranker.username }} {{ ranker.rank }}</td>
+            <td class="text-start">{{ ranker.username }}</td>
             <td class="text-end">
               {{ numberFormatter.format(ranker.power) }} [+{{
                 ("" + ranker.bias).padStart(2, "0")
@@ -52,7 +52,6 @@ const rankers = computed(() => store.getters["ladder/shownRankers"]);
 @import "../../styles/styles";
 
 .ladder-row {
-  width: 100%;
   height: 50%;
   max-height: 50%;
   overflow-y: auto;
