@@ -376,13 +376,32 @@ function chatBoxKeyUp(e) {
   }
   window.dropdownElementSelected = -1;
 
+  //for any 2 text nodes directly next to each other (i.e. "hello " and "world") merge them into one
+  var textNodes = document.getElementById("chatInput").childNodes;
+  for (let i = 0; i < textNodes.length; i++) {
+    if (textNodes[i].nodeType == 3) {
+      if (i + 1 < textNodes.length && textNodes[i + 1].nodeType == 3) {
+        textNodes[i].textContent += textNodes[i + 1].textContent;
+        textNodes[i + 1].remove();
+      }
+    }
+  }
+
   var text = document
     .getElementById("chatInput")
     .innerText.replaceAll(String.fromCharCode(10), "");
   //find the last @ in the text
   var lastAt = text.lastIndexOf("@");
   //if there is no @, return
-  if (lastAt == -1) {
+  if (
+    lastAt == -1 ||
+    (document.getElementById("chatInput").lastChild.tagName == "BR" &&
+      (document.getElementById("chatInput").lastChild.previousSibling.tagName ==
+        "SPAN" ||
+        document
+          .getElementById("chatInput")
+          .lastChild.previousSibling.textContent.trim() == ""))
+  ) {
     return;
   }
   //if there is a space after the @, return
@@ -430,14 +449,27 @@ function chatBoxKeyUp(e) {
 
     option.addEventListener("click", function () {
       let msgBox = document.getElementById("chatInput");
-      let lastChild = msgBox.lastChild;
       //while the last child is a br, skip it
-      while (lastChild.nodeName == "BR") {
-        lastChild = lastChild.previousSibling;
-        lastChild.nextSibling.remove();
+      while (
+        msgBox.lastChild.nodeName == "BR" ||
+        msgBox.lastChild?.innerText?.trim() == "" ||
+        msgBox.lastChild?.textContent?.trim() == ""
+      ) {
+        msgBox.lastChild.remove();
       }
+      let lastChild = msgBox.lastChild;
       let atPos = lastChild.textContent.lastIndexOf("@");
+      console.log("==============");
+      //log all children
+      for (let i = 0; i < msgBox.childNodes.length; i++) {
+        console.log(msgBox.childNodes[i]);
+      }
+      console.log("==============");
+      console.log(lastChild);
+      console.log(lastChild.nodeName);
+      console.log(lastChild.textContent);
       lastChild.textContent = lastChild.textContent.substring(0, atPos);
+      console.log(lastChild.textContent);
       let mention = document.createElement("span");
       mention.innerHTML = "@" + possibleMentions[i];
       mention.style.backgroundColor = "rgb(70, 70, 70)";
