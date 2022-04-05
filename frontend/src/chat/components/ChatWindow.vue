@@ -2,97 +2,10 @@
   <div class="chat-window container rounded py-1 px-3">
     <div class="chat-header row py-1">
       <!--div class="col chat-info">Chad #{{ chat.currentChatNumber }}</div-->
-      <div class="col chat-pagination">
-        <div class="btn-group dropdown">
-          <button
-            :class="user.highestCurrentLadder === 1 ? 'disabled' : ''"
-            class="btn btn-outline-primary shadow-none"
-            data-chat="1"
-            @click="changeChat"
-          >
-            &laquo;
-          </button>
-          <button
-            :class="chat.currentChatNumber === 1 ? 'active' : ''"
-            :data-chat="
-              chat.currentChatNumber === 1
-                ? chat.currentChatNumber
-                : chat.currentChatNumber - 1
-            "
-            class="btn btn-outline-primary shadow-none"
-            @click="changeChat"
-          >
-            {{
-              chat.currentChatNumber === 1
-                ? chat.currentChatNumber
-                : chat.currentChatNumber - 1
-            }}
-          </button>
-          <button
-            :class="[
-              user.highestCurrentLadder === 1 ? 'disabled' : '',
-              chat.currentChatNumber === 1 ? '' : 'active',
-            ]"
-            :data-chat="
-              chat.currentChatNumber === 1
-                ? chat.currentChatNumber + 1
-                : chat.currentChatNumber
-            "
-            class="btn btn-outline-primary shadow-none"
-            @click="changeChat"
-          >
-            {{
-              chat.currentChatNumber === 1
-                ? chat.currentChatNumber + 1
-                : chat.currentChatNumber
-            }}
-          </button>
-          <button
-            :class="
-              user.highestCurrentLadder >=
-              Math.max(chat.currentChatNumber, 2) + 1
-                ? ''
-                : 'disabled'
-            "
-            :data-chat="
-              chat.currentChatNumber === 1
-                ? chat.currentChatNumber + 2
-                : chat.currentChatNumber + 1
-            "
-            class="btn btn-outline-primary shadow-none"
-            @click="changeChat"
-          >
-            {{
-              chat.currentChatNumber === 1
-                ? chat.currentChatNumber + 2
-                : chat.currentChatNumber + 1
-            }}
-          </button>
-          <button
-            :class="user.highestCurrentLadder === 1 ? 'disabled' : ''"
-            :data-chat="user.highestCurrentLadder"
-            class="btn btn-outline-primary shadow-none"
-            @click="changeChat"
-          >
-            &raquo;
-          </button>
-          <button
-            class="btn btn-outline-primary shadow-none dropdown-toggle"
-            data-bs-toggle="dropdown"
-          ></button>
-          <ul class="dropdown-menu">
-            <li v-for="i in user.highestCurrentLadder" :key="i">
-              <a
-                :data-chat="i"
-                class="dropdown-item"
-                href="#"
-                @click="changeChat"
-                >{{ i }}</a
-              >
-            </li>
-          </ul>
-        </div>
-      </div>
+      <PaginationComponent
+        :current="chat.currentChatNumber"
+        :max="user.highestCurrentLadder"
+      />
     </div>
     <div ref="chatContent" class="chat-content row py-0">
       <ChatMessage
@@ -106,10 +19,10 @@
         <div
           id="chatInput"
           class="form-control shadow-none"
-          placeholder="Chad is listening..."
-          type="text"
-          role="textbox"
           contenteditable="true"
+          placeholder="Chad is listening..."
+          role="textbox"
+          type="text"
           @keydown="chatBoxKeyDown"
           @keyup="chatBoxKeyUp"
         ></div>
@@ -128,6 +41,7 @@
 import { useStore } from "vuex";
 import { computed, inject, onUpdated, ref } from "vue";
 import ChatMessage from "@/chat/components/ChatMessage";
+import PaginationComponent from "@/components/PaginationComponent";
 
 const store = useStore();
 const stompClient = inject("$stompClient");
@@ -258,7 +172,7 @@ setTimeout(() => {
 
 function chatBoxKeyDown(e) {
   //if the key is key up or down
-  if (e.keyCode == 38 || e.keyCode == 40) {
+  if (e.keyCode === 38 || e.keyCode === 40) {
     e.preventDefault();
     if (!document.getElementById("mentionDropdown")) {
       return;
@@ -276,7 +190,7 @@ function chatBoxKeyDown(e) {
     }
 
     //increment or decrement dropdownElementSelected
-    if (e.keyCode == 38) {
+    if (e.keyCode === 38) {
       window.dropdownElementSelected--;
     } else {
       window.dropdownElementSelected++;
@@ -529,10 +443,12 @@ onUpdated(() => {
   white-space: nowrap;
   overflow-x: hidden;
 }
+
 #chatInput {
   background-color: #10141f;
   color: #de9e41;
 }
+
 .chat-header {
   max-height: 48px;
 }

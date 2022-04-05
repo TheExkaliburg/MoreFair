@@ -84,7 +84,7 @@ function spliceNewMessagePartsIntoArray(oldPart, newParts) {
   messageParts.splice(messageParts.indexOf(oldPart), 1, ...newParts);
 }
 
-(function findMentions() {
+function findMentions() {
   const msg = props.msg;
   let meta = msg.metadata;
   if (!meta) {
@@ -123,7 +123,9 @@ function spliceNewMessagePartsIntoArray(oldPart, newParts) {
     offset += index + 3;
     currentPlainText = newParts[4];
   });
-})();
+}
+
+findMentions();
 </script>
 
 <style lang="scss" scoped>
