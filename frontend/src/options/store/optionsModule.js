@@ -5,6 +5,15 @@ import {
   OptionSection,
 } from "../entities/option";
 
+//import { createHookEndpoint } from "@/modules/hooks";
+
+//const optionChangedHook = createHookEndpoint(
+//  "optionChanged",
+//  (hook, ...[option, allOptions]) => {
+//    hook.callback(option, allOptions);
+//  }
+//);
+
 const optionsModule = {
   namespaced: true,
   state: () => {
@@ -29,24 +38,14 @@ const optionsModule = {
             new IntegerOption({
               displayName: "Rankers padding",
               name: "rankersPadding",
-              value: 1000,
+              value: 100,
             }),
           ],
         }),
         new OptionSection({
-          displayName: "Lynn's Chad tweaks",
-          name: "lynnsChadTweaks",
+          displayName: "Chat Settings",
+          name: "chatSettings",
           options: [
-            new BoolOption({
-              displayName: "Un-Invert Chad",
-              name: "invertChad",
-              value: false,
-            }),
-            new BoolOption({
-              displayName: "Un-Invert Lynn",
-              name: "invertLynn",
-              value: false,
-            }),
             new BoolOption({
               displayName: "Highlight Mentions",
               name: "highlightMentions",
@@ -69,8 +68,24 @@ const optionsModule = {
       //payload may also include other properties that are describing other aspects of the option
       //eslint-disable-next-line no-unused-vars
       const newValue = payload.value;
-      //TODO: save locally
+
+      //Saving to localstorage
+      let allOptions = state.options.map(
+        (section) => section.options || [section]
+      );
+      allOptions = [].concat(...allOptions);
+      let optionNamesAndValues = allOptions.map((option) => {
+        return {
+          name: option.name,
+          value: option.value,
+        };
+      });
+      localStorage.setItem("options", JSON.stringify(optionNamesAndValues));
+
       //TODO: save to server
+
+      //Call hooks to let users know that the option has changed
+      //optionChangedHook(option, state.options);
     },
   },
   actions: {},
