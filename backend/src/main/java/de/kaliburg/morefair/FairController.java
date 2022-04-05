@@ -20,7 +20,7 @@ import java.util.List;
 @Controller
 @Slf4j
 public class FairController {
-    public final static Integer MINIMUM_PEOPLE_FOR_PROMOTE = 10;
+    public final static Integer MINIMUM_PEOPLE_FOR_PROMOTE = 1;
     // 250 Millionen
     public final static BigInteger POINTS_FOR_PROMOTE = new BigInteger("200000000");
     // 500 Thousand
@@ -29,8 +29,8 @@ public class FairController {
     public final static BigInteger BASE_GRAPES_NEEDED_TO_AUTO_PROMOTE = new BigInteger("2000");
     public final static Integer AUTO_PROMOTE_LADDER = 1;
     public final static Integer MANUAL_PROMOTE_WAIT_TIME = 30;
-    public final static Integer BASE_ASSHOLE_LADDER = 10;
-    public final static Integer ASSHOLES_FOR_RESET = 10;
+    public final static Integer BASE_ASSHOLE_LADDER = 1;
+    public final static Integer ASSHOLES_FOR_RESET = 1;
     public final static List<String> ASSHOLE_TAGS = new ArrayList<>(Arrays.asList(
             "",
             "♠",     // 01♠
