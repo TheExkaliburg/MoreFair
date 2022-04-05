@@ -83,9 +83,9 @@ import { useStore } from "vuex";
 import Cookies from "js-cookie";
 import { StompClient } from "@/websocket/stompClient";
 
-import { hooksSystemSetup } from "@/modules/hooks";
+//import { hooksSystemSetup } from "@/modules/hooks";
 
-hooksSystemSetup();
+//hooksSystemSetup();
 
 const store = useStore();
 const stompClient = new StompClient();
