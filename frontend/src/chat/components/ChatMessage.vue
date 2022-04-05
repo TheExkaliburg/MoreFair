@@ -11,13 +11,7 @@
       </div>
       <div class="col-3 message-date">{{ msg.timeCreated }}</div>
       <div class="col-4 message-status"></div>
-      <div class="col-1 message-options">
-        <ModalBox>
-          <template #title> {{ msg.username }}#{{ msg.accountId }} </template>
-          This is the content of the modal Box. <br />
-          We can place any options regarding the user here. <br />
-        </ModalBox>
-      </div>
+      <div class="col-1 message-options">...</div>
     </div>
     <div class="row py-0 message-body">
       <ChatMessageBody :msg="msg" />
@@ -29,7 +23,6 @@
 import { computed, defineProps } from "vue";
 import { useStore } from "vuex";
 import ChatMessageBody from "@/chat/components/ChatMessageBody";
-import ModalBox from "@/chat/components/ModalBox";
 
 const store = useStore();
 const settings = computed(() => store.state.settings);
