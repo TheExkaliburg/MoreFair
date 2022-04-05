@@ -20,7 +20,7 @@ import java.util.List;
 @Controller
 @Slf4j
 public class FairController {
-    public final static Integer MINIMUM_PEOPLE_FOR_PROMOTE = 10;
+    public final static Integer MINIMUM_PEOPLE_FOR_PROMOTE = 1;
     // 250 Millionen
     public final static BigInteger POINTS_FOR_PROMOTE = new BigInteger("200000000");
     // 500 Thousand
