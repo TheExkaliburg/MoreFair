@@ -51,6 +51,10 @@ const rankers = computed(() => store.getters["ladder/shownRankers"]);
 <style lang="scss" scoped>
 @import "../../styles/styles";
 
+.rank {
+  padding-left: 1rem;
+}
+
 .ladder-row {
   height: 50%;
   max-height: 50%;
