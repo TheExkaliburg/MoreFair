@@ -127,6 +127,7 @@
 <script setup>
 import { useStore } from "vuex";
 import { computed, inject, onUpdated, ref } from "vue";
+import { onMounted } from "vue";
 import ChatMessage from "@/chat/components/ChatMessage";
 
 const store = useStore();
@@ -182,7 +183,7 @@ function parseSendMessage() {
   return [msg, mentions];
 }
 
-setTimeout(() => {
+onMounted(() => {
   window.dropdownElementSelected = -1;
   const observer = new MutationObserver(function (mutations) {
     mutations.forEach(function (mutation) {
@@ -254,7 +255,7 @@ setTimeout(() => {
     subtree: true,
   };
   observer.observe(document.getElementById("chatInput"), config);
-}, 10);
+});
 
 function chatBoxKeyDown(e) {
   //if the key is key up or down or tab
@@ -359,11 +360,11 @@ function chatBoxKeyDown(e) {
 
 function chatBoxKeyUp(e) {
   if (
-    e.keyCode == 38 ||
-    e.keyCode == 40 ||
-    e.keyCode == 13 ||
-    e.keyCode == 9 ||
-    e.keyCode == 27
+    e.keyCode == 38 || //up
+    e.keyCode == 40 || //down
+    e.keyCode == 13 || //enter
+    e.keyCode == 9 || //tab
+    e.keyCode == 27 //esc
   ) {
     e.preventDefault();
     return;
@@ -459,17 +460,7 @@ function chatBoxKeyUp(e) {
       }
       let lastChild = msgBox.lastChild;
       let atPos = lastChild.textContent.lastIndexOf("@");
-      console.log("==============");
-      //log all children
-      for (let i = 0; i < msgBox.childNodes.length; i++) {
-        console.log(msgBox.childNodes[i]);
-      }
-      console.log("==============");
-      console.log(lastChild);
-      console.log(lastChild.nodeName);
-      console.log(lastChild.textContent);
       lastChild.textContent = lastChild.textContent.substring(0, atPos);
-      console.log(lastChild.textContent);
       let mention = document.createElement("span");
       mention.innerHTML = "@" + possibleMentions[i];
       mention.style.backgroundColor = "rgb(70, 70, 70)";
