@@ -24,6 +24,7 @@
           placeholder="Chad is listening..."
           role="textbox"
           type="text"
+          spellcheck="false"
           @keydown="chatBoxKeyDown"
         ></div>
         <button
