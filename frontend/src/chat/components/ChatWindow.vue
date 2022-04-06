@@ -100,12 +100,6 @@ function parseSendMessage() {
 onMounted(() => {
   window.dropdownElementSelected = -1;
   const observer = new MutationObserver(function (mutations) {
-    //on any mutation, check if the dropdown is open and if so, close it
-    let oldDropdown = document.getElementById("mentionDropdown");
-    if (oldDropdown) {
-      oldDropdown.parentNode.removeChild(oldDropdown);
-    }
-
     mutations.forEach(function (mutation) {
       if (mutation.type == "characterData") {
         onElementChange(mutation);
@@ -122,6 +116,14 @@ onMounted(() => {
             type: "characterData",
             oldValue: "",
           });
+        } else {
+          //If the chat box was cleared, we need to remove the mention elements
+          if (document.getElementById("chatInput").innerText.trim() == "") {
+            let oldDropdown = document.getElementById("mentionDropdown");
+            if (oldDropdown) {
+              oldDropdown.parentNode.removeChild(oldDropdown);
+            }
+          }
         }
       }
     });
@@ -232,6 +234,13 @@ function plainTextElementChanged(mutation) {
   let caretPosition = document.getSelection().anchorOffset;
   let textBeforeCaret = text.substring(0, caretPosition);
   let textAfterCaret = text.substring(caretPosition);
+
+  //Here, we find out where to put the popup later so it follows the caret.
+  let dummySpan = document.createElement("span");
+  dummySpan.innerText = textBeforeCaret;
+  textElement.parentNode.insertBefore(dummySpan, textElement);
+  let caretX = dummySpan.getBoundingClientRect().right;
+  dummySpan.parentNode.removeChild(dummySpan);
 
   //Now that we know where the caret is, we can check if we have a mention in the text before the caret
   let firstMetion = textBeforeCaret.indexOf("@");
@@ -350,15 +359,12 @@ function plainTextElementChanged(mutation) {
   var navbar = document.getElementById("chatInput");
   document.body.appendChild(dropdown);
 
-  var offLeft = 0;
   var offBot = 0;
 
   var bounds = navbar.getBoundingClientRect();
-  offLeft = bounds.left;
   offBot = visualViewport.height - bounds.y + 5;
 
   dropdown.style.bottom = offBot + "px";
-  dropdown.style.left = offLeft + "px";
   dropdown.style.position = "absolute";
   dropdown.style.background = "#10141f";
   dropdown.style.border = "1px solid #de9e41";
@@ -378,9 +384,18 @@ function plainTextElementChanged(mutation) {
   window.dropdownElementSelected = possibleMentions.length - 1;
   dropdown.children[window.dropdownElementSelected].style.backgroundColor =
     "rgb(70, 70, 70)";
+  //make sure the dropdown always stays 5 pixels from the right window edge
+  caretX = Math.min(caretX, visualViewport.width - 5 - dropdown.offsetWidth);
+  dropdown.style.left = caretX + "px";
 }
 
 function onElementChange(mutation) {
+  //on any mutation, check if the dropdown is open and if so, close it
+  let oldDropdown = document.getElementById("mentionDropdown");
+  if (oldDropdown) {
+    oldDropdown.parentNode.removeChild(oldDropdown);
+  }
+
   let parent = mutation.target.parentElement;
   if (parent?.classList.contains("mention")) {
     mentionElementChanged(mutation);
@@ -533,6 +548,14 @@ onUpdated(() => {
 #chatInput {
   background-color: #10141f;
   color: #de9e41;
+  overflow-x: scroll;
+  //hide scrollbar
+
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .chat-header {
