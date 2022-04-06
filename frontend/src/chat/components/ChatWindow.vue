@@ -62,6 +62,8 @@ function sendMessage() {
     metadata: metadata,
   });
   message.value = "";
+  //Sometime the chat box is not cleared, so we do it manually
+  document.getElementById("chatInput").innerHTML = "";
 }
 
 function changeChat(event) {
