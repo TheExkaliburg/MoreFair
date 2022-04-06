@@ -65,7 +65,7 @@ function sendMessage() {
 }
 
 function changeChat(event) {
-  const targetChat = event.target.dataset.chat;
+  const targetChat = event.target.dataset.number;
   if (targetChat !== chat.value.currentChatNumber) {
     stompClient.unsubscribe("/topic/chat/" + chat.value.currentChatNumber);
     stompClient.subscribe("/topic/chat/" + targetChat, (message) => {
@@ -527,8 +527,7 @@ onUpdated(() => {
   height: 100%;
 }
 
-.chat-pagination {
-  white-space: nowrap;
+.dropdown-pagination {
   text-align: end;
   padding-right: 0px;
 }
