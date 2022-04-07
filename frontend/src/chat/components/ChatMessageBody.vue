@@ -47,6 +47,7 @@ const store = useStore();
 const highlightMentions = computed(() =>
   store.getters["options/getOptionValue"]("highlightMentions")
 );
+
 //Basically an enum
 const MessagePartType = {
   plain: Symbol("plain"),

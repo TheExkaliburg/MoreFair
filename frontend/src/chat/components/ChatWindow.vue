@@ -21,10 +21,9 @@
           id="chatInput"
           class="form-control shadow-none"
           contenteditable="true"
-          placeholder="Chad is listening..."
           role="textbox"
-          type="text"
           spellcheck="false"
+          type="text"
           @keydown="chatBoxKeyDown"
         ></div>
         <button
@@ -41,8 +40,7 @@
 
 <script setup>
 import { useStore } from "vuex";
-import { computed, inject, onUpdated, ref } from "vue";
-import { onMounted } from "vue";
+import { computed, inject, onMounted, onUpdated, ref } from "vue";
 import ChatMessage from "@/chat/components/ChatMessage";
 import PaginationGroup from "@/components/PaginationGroup";
 
@@ -82,10 +80,10 @@ function changeChat(event) {
 function parseSendMessage() {
   const msgBox = document.getElementById("chatInput");
   const children = msgBox.childNodes;
-  var msg = "";
-  var mentions = [];
+  let msg = "";
+  let mentions = [];
   for (let i = 0; i < children.length; i++) {
-    if (children[i].nodeType == 3) {
+    if (children[i].nodeType === 3) {
       msg += children[i].nodeValue;
     } else if (children[i].classList.contains("mention")) {
       mentions.push({
@@ -106,15 +104,15 @@ onMounted(() => {
   window.dropdownElementSelected = -1;
   const observer = new MutationObserver(function (mutations) {
     mutations.forEach(function (mutation) {
-      if (mutation.type == "characterData") {
+      if (mutation.type === "characterData") {
         onElementChange(mutation);
         return;
       }
-      if (mutation.type == "childList") {
+      if (mutation.type === "childList") {
         //if the child list changed and we now have a text node and a br, we can also handle that
         if (
-          mutation.addedNodes.length == 1 &&
-          mutation.addedNodes[0].nodeType == 3
+          mutation.addedNodes.length === 1 &&
+          mutation.addedNodes[0].nodeType === 3
         ) {
           onElementChange({
             target: mutation.addedNodes[0],
@@ -123,7 +121,7 @@ onMounted(() => {
           });
         } else {
           //If the chat box was cleared, we need to remove the mention elements
-          if (document.getElementById("chatInput").innerText.trim() == "") {
+          if (document.getElementById("chatInput").innerText.trim() === "") {
             let oldDropdown = document.getElementById("mentionDropdown");
             if (oldDropdown) {
               oldDropdown.style.display = "none";
@@ -146,10 +144,10 @@ onMounted(() => {
 function mentionElementChanged(mutation) {
   let parent = mutation.target.parentElement;
 
-  var oldText = `@${parent.getAttribute("data-user")}#${parent.getAttribute(
+  let oldText = `@${parent.getAttribute("data-user")}#${parent.getAttribute(
     "data-id"
   )}`;
-  var newText = mutation.target.parentElement.innerText;
+  let newText = mutation.target.parentElement.innerText;
 
   //Handling deletions
   if (oldText.length > newText.length) {
@@ -158,11 +156,11 @@ function mentionElementChanged(mutation) {
 
   //Handling insertions
   if (oldText.length < newText.length) {
-    var diffText = "";
-    var diffOffset = 0;
-    var firstDif = newText.length + 1; //keeping track of the first diff to determine if we inserted at the start or not
+    let diffText = "";
+    let diffOffset = 0;
+    let firstDif = newText.length + 1; //keeping track of the first diff to determine if we inserted at the start or not
     for (let i = 0; i < newText.length; i++) {
-      if (newText[i + diffOffset] != oldText[i]) {
+      if (newText[i + diffOffset] !== oldText[i]) {
         if (firstDif > i) {
           firstDif = i;
         }
@@ -179,31 +177,32 @@ function mentionElementChanged(mutation) {
       return; //no diff, nothing to do
     }
 
+    let newTextNode;
     //add the new text to the next or prev sibling of the mention
-    if (firstDif == 0) {
+    if (firstDif === 0) {
       //add to previous sibling
-      var prevSibling = parent.previousSibling;
-      if (prevSibling && prevSibling.tagName == "#text") {
+      let prevSibling = parent.previousSibling;
+      if (prevSibling && prevSibling.tagName === "#text") {
         prevSibling.textContent += diffText;
         return;
       }
-      var newTextNode = document.createTextNode(diffText);
+      newTextNode = document.createTextNode(diffText);
       parent.parentNode.insertBefore(newTextNode, parent);
       return;
     }
     //add to next sibling
-    var nextSibling = parent.nextSibling;
-    if (nextSibling && nextSibling.tagName == "#text") {
+    let nextSibling = parent.nextSibling;
+    if (nextSibling && nextSibling.tagName === "#text") {
       nextSibling.textContent = diffText + nextSibling.textContent;
     } else {
       newTextNode = document.createTextNode(diffText);
       parent.parentNode.insertBefore(newTextNode, parent.nextSibling);
     }
     //set document cursor to the end of the diff text
-    var range = document.createRange();
+    const range = document.createRange();
     range.setStart(newTextNode, diffText.length);
     range.collapse(true);
-    var sel = window.getSelection();
+    const sel = window.getSelection();
     sel.removeAllRanges();
     sel.addRange(range);
   }
@@ -231,7 +230,7 @@ function plainTextElementChanged(mutation) {
   let text = textElement.textContent;
 
   //If we have no text, all is good.
-  if (text.length == 0) {
+  if (text.length === 0) {
     return;
   }
   if (!textElement.parentNode) {
@@ -259,7 +258,7 @@ function plainTextElementChanged(mutation) {
     firstMetion = textBeforeCaret.indexOf("@");
 
     //Checking if any rankerName#id is in the text
-    var possibleMentionLower = textBeforeCaret.toLowerCase();
+    let possibleMentionLower = textBeforeCaret.toLowerCase();
     possibleMentions = [];
     for (let i = 0; i < rankers.value.length; i++) {
       if (
@@ -280,7 +279,7 @@ function plainTextElementChanged(mutation) {
     }
   }
   window.possibleMention = possibleMentions;
-  if (possibleMentions.length == 0) {
+  if (possibleMentions.length === 0) {
     return; //no possible mentions
   }
   //We have possible mentions, so now we should display our dropdown
@@ -307,7 +306,7 @@ function plainTextElementChanged(mutation) {
   dropdown.style.display = "block";
   dropdown.innerHTML = "";
   for (let i = 0; i < possibleMentions.length; i++) {
-    var option = document.createElement("option");
+    let option = document.createElement("option");
     option.innerHTML = `${possibleMentions[i].name}#${possibleMentions[i].id}`;
 
     option.style.border = "1px solid black";
@@ -335,7 +334,7 @@ function plainTextElementChanged(mutation) {
       msgBox.insertBefore(before, mention);
 
       //add a space after the mention and put the cursor at the end of the text
-      var textNode = document.createTextNode(" ");
+      let textNode = document.createTextNode(" ");
       msgBox.appendChild(textNode);
       msgBox.appendChild(document.createElement("br"));
       msgBox.focus();
@@ -351,10 +350,10 @@ function plainTextElementChanged(mutation) {
         }
       }
 
-      var range = document.createRange();
+      let range = document.createRange();
       range.setStart(textNode, 1);
       range.collapse(true);
-      var sel = window.getSelection();
+      let sel = window.getSelection();
       sel.removeAllRanges();
       sel.addRange(range);
       msgBox.focus();
@@ -363,12 +362,12 @@ function plainTextElementChanged(mutation) {
     dropdown.appendChild(option);
   }
   //add the dropdown to the document
-  var navbar = document.getElementById("chatInput");
+  let navbar = document.getElementById("chatInput");
   document.body.appendChild(dropdown);
 
-  var offBot = 0;
+  let offBot;
 
-  var bounds = navbar.getBoundingClientRect();
+  let bounds = navbar.getBoundingClientRect();
   offBot = visualViewport.height - bounds.y + 5;
 
   dropdown.style.bottom = offBot + "px";
@@ -401,14 +400,15 @@ function onElementChange(mutation) {
     mentionElementChanged(mutation);
     return;
   }
+
   plainTextElementChanged(mutation);
 }
 
 function chatBoxKeyDown(e) {
-  var textNodes = document.getElementById("chatInput").childNodes;
+  let textNodes = document.getElementById("chatInput").childNodes;
   for (let i = 0; i < textNodes.length; i++) {
-    if (textNodes[i].nodeType == 3) {
-      if (i + 1 < textNodes.length && textNodes[i + 1].nodeType == 3) {
+    if (textNodes[i].nodeType === 3) {
+      if (i + 1 < textNodes.length && textNodes[i + 1].nodeType === 3) {
         textNodes[i].textContent += textNodes[i + 1].textContent;
         textNodes[i + 1].remove();
       }
@@ -418,7 +418,7 @@ function chatBoxKeyDown(e) {
   const mentionDropdown = document.getElementById("mentionDropdown");
 
   //if the key is key up or down or tab
-  if (e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 9) {
+  if (e.keyCode === 38 || e.keyCode === 40 || e.keyCode === 9) {
     e.preventDefault();
     if (!mentionDropdown || mentionDropdown.style.display == "none") {
       return;
@@ -432,7 +432,7 @@ function chatBoxKeyDown(e) {
     //increment or decrement dropdownElementSelected
     if (e.keyCode === 38) {
       window.dropdownElementSelected--;
-    } else if (e.keyCode == 40) {
+    } else if (e.keyCode === 40) {
       window.dropdownElementSelected++;
     }
 
@@ -471,11 +471,12 @@ function chatBoxKeyDown(e) {
   }
 
   //if the key is enter or tab
-  if (e.keyCode == 13 || e.keyCode == 9) {
+  if (e.keyCode === 13 || e.keyCode === 9) {
     //if the mentionDropdown is open and we have a selection
     if (
       mentionDropdown?.style.display != "none" &&
       window.dropdownElementSelected != -1
+
     ) {
       //click the selected element
       e.preventDefault();
@@ -516,7 +517,7 @@ onUpdated(() => {
 
 .dropdown-pagination {
   text-align: end;
-  padding-right: 0px;
+  padding-right: 0;
 }
 
 .chat-content {
@@ -539,6 +540,7 @@ onUpdated(() => {
 
   -ms-overflow-style: none;
   scrollbar-width: none;
+
   &::-webkit-scrollbar {
     display: none;
   }
