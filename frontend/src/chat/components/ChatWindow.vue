@@ -211,13 +211,6 @@ function mentionElementChanged(mutation) {
 function getMentionElement({ name, id }) {
   let mention = document.createElement("span");
   mention.innerHTML = `@${name}#${id}`;
-  mention.style.backgroundColor = "rgb(70, 70, 70)";
-  mention.style.selectionColor = "rgb(70, 70, 70)";
-  mention.style.padding = "2px";
-  mention.style.border = "1px solid black";
-  mention.style.borderRadius = "5px";
-  mention.style.cursor = "pointer";
-  mention.style.fontWeight = "bold";
   mention.classList.add("mention");
   mention.setAttribute("data-user", name);
   mention.setAttribute("data-id", id);
@@ -495,6 +488,17 @@ onUpdated(() => {
   chatContent.value.scrollTop = chatContent.value.scrollHeight;
 });
 </script>
+
+<style lang="scss">
+.mention {
+  background-color: rgb(70, 70, 70);
+  padding: 2px;
+  border: 1px solid black;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+</style>
 
 <style lang="scss" scoped>
 @import "../../styles/styles";
