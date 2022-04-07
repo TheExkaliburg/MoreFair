@@ -476,7 +476,6 @@ function chatBoxKeyDown(e) {
     if (
       mentionDropdown?.style.display != "none" &&
       window.dropdownElementSelected != -1
-
     ) {
       //click the selected element
       e.preventDefault();
