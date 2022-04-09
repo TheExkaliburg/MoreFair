@@ -13,7 +13,7 @@
     >
       <thead>
         <tr class="thead-light">
-          <th class="col-1 text-start">-</th>
+          <th class="col-1 text-start">#</th>
           <th class="col-5 text-start">Username</th>
           <th class="col-3 text-end">Power</th>
           <th class="col-3 text-end">Points</th>
@@ -23,9 +23,15 @@
         <tr
           v-for="ranker in rankers"
           :key="ranker.accountId"
-          :class="[ranker.you ? 'you' : '', ranker.growing ? '' : 'promoted']"
+          :class="[
+            ranker.you ? 'you' : '',
+            ranker.growing || ranker.you ? '' : 'promoted',
+          ]"
         >
-          <td class="text-start">{{ ranker.rank }}</td>
+          <td class="text-start">
+            {{ ranker.rank }}
+            {{ settings.assholeTags[ranker.timesAsshole] }}
+          </td>
           <td class="text-start">{{ ranker.username }}</td>
           <td class="text-end">
             {{ numberFormatter.format(ranker.power) }} [+{{
@@ -53,6 +59,7 @@ const stompClient = inject("$stompClient");
 const numberFormatter = computed(() => store.state.numberFormatter);
 const ladder = computed(() => store.state.ladder.ladder);
 const user = computed(() => store.state.user);
+const settings = computed(() => store.state.settings);
 const rankers = computed(() => store.getters["ladder/shownRankers"]);
 
 function changeLadder(event) {

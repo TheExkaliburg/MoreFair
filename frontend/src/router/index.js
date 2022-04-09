@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
-import GameView from "../views/GameView.vue";
-import OptionsView from "../views/OptionsView.vue";
+import GameView from "@/views/GameView.vue";
+import OptionsView from "@/views/OptionsView.vue";
 
 const routes = [
   {
@@ -9,13 +9,13 @@ const routes = [
     component: GameView,
   },
   {
-    path: "/about",
-    name: "about",
+    path: "/help",
+    name: "help",
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () =>
-      import(/* webpackChunkName: "about" */ "../views/HelpView.vue"),
+      import(/* webpackChunkName: "about" */ "@/views/HelpView.vue"),
   },
   {
     path: "/options",

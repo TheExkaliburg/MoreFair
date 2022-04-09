@@ -3,15 +3,19 @@
     <div class="row py-0 message-header">
       <div class="col-4 message-username">
         <span class="message-user-name">
-          <strong>{{ settings.assholeTags[msg.timesAsshole] }}</strong>
-          {{ msg.timesAsshole > 0 ? "-" : "" }}
           <span v-html="msg.username" />
         </span>
         <span class="message-user-id">&nbsp;#{{ msg.accountId }}</span>
       </div>
+      <div class="col-4 message-status">
+        <strong>{{
+          msg.timesAsshole > 0
+            ? "[" + settings.assholeTags[msg.timesAsshole + 1] + "]"
+            : ""
+        }}</strong>
+      </div>
       <div class="col-3 message-date">{{ msg.timeCreated }}</div>
-      <div class="col-4 message-status"></div>
-      <div class="col-1 message-options">...</div>
+      <div class="col-1 message-options"></div>
     </div>
     <div class="row py-0 message-body">
       <ChatMessageBody :msg="msg" />

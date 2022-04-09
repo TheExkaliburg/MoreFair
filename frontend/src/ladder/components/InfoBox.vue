@@ -4,6 +4,43 @@
       <div class="container px-3">
         <div class="row py-0">
           <div class="col px-0 text-start">
+            {{ numberFormatter.format(yourRanker.power) }}/<span
+              class="text-highlight"
+              >{{ numberFormatter.format(multiCost) }}
+            </span>
+            Power
+          </div>
+          <div class="col px-0 text-end">
+            {{ numberFormatter.format(yourRanker.points) }}/<span
+              class="text-highlight"
+              >{{ numberFormatter.format(biasCost) }}
+            </span>
+            Points
+          </div>
+        </div>
+        <div class="row py-0">
+          <div class="col px-0 btn-group d-flex">
+            <button
+              :class="isMultiEnabled ? '' : 'disabled'"
+              class="btn btn-outline-primary shadow-none w-100"
+              @click="buyMulti"
+            >
+              <span v-if="isMultiEnabled">+1 Multi</span>
+              <span v-else>+M ({{ etaMulti }})</span>
+            </button>
+            <button
+              :class="isBiasEnabled ? '' : 'disabled'"
+              class="btn btn-outline-primary shadow-none w-100"
+              @click="buyBias"
+            >
+              <span v-if="isBiasEnabled">+1 Bias</span>
+              <span v-else>+B ({{ etaBias }})</span>
+            </button>
+          </div>
+        </div>
+        <br />
+        <div class="row py-0">
+          <div class="col px-0 text-start">
             {{ numberFormatter.format(yourRanker.grapes)
             }}<span v-if="ladder.ladderNumber >= settings.autoPromoteLadder"
               >/<span class="text-highlight">{{
@@ -25,7 +62,7 @@
           </div>
         </div>
         <div class="row py-0">
-          <div class="col px-0 btn-group">
+          <div v-if="true" class="col px-0 btn-group d-flex">
             <button
               :class="[
                 !yourRanker.autoPromote &&
@@ -37,67 +74,46 @@
                   : 'disabled',
                 ladder.ladderNumber >= settings.autoPromoteLadder ? '' : 'hide',
               ]"
-              class="btn btn-outline-primary shadow-none"
+              class="btn btn-outline-primary shadow-none w-100"
               @click="buyAutoPromote"
             >
               Buy Autopromote
             </button>
             <button
               :class="canThrowVinegar && !vinegarLastSecond ? '' : 'disabled'"
-              class="btn btn-outline-primary shadow-none"
+              class="btn btn-outline-primary shadow-none w-100"
+              @click="throwVinegar"
+            >
+              Throw Vinegar
+            </button>
+          </div>
+          <div v-else class="col px-0 btn-group d-flex">
+            <button
+              :class="[
+                !yourRanker.autoPromote &&
+                !autoPromoteLastSecond &&
+                yourRanker.grapes.cmp(
+                  ladder.getAutoPromoteCost(yourRanker.rank, settings)
+                ) >= 0
+                  ? ''
+                  : 'disabled',
+                ladder.ladderNumber >= settings.autoPromoteLadder ? '' : 'hide',
+              ]"
+              class="btn btn-outline-primary shadow-none w-100"
+              @click="buyAutoPromote"
+            >
+              Buy Autopromote
+            </button>
+            <button
+              :class="canThrowVinegar && !vinegarLastSecond ? '' : 'disabled'"
+              class="btn btn-outline-primary shadow-none w-100"
               @click="throwVinegar"
             >
               Throw Vinegar
             </button>
           </div>
         </div>
-      </div>
-    </div>
-    <div class="col-6 px-0">
-      <div class="container px-3">
-        <div class="row py-0">
-          <div class="col px-0 text-start">
-            {{ numberFormatter.format(yourRanker.power) }}/<span
-              class="text-highlight"
-              >{{ numberFormatter.format(multiCost) }}
-            </span>
-            Power
-          </div>
-          <div class="col px-0 text-end">
-            {{ numberFormatter.format(yourRanker.points) }}/<span
-              class="text-highlight"
-              >{{ numberFormatter.format(biasCost) }}
-            </span>
-            Points
-          </div>
-        </div>
-        <div class="row py-0">
-          <div class="col px-0 btn-group">
-            <button
-              :class="
-                yourRanker.power.cmp(multiCost) >= 0 && !multiLastSecond
-                  ? ''
-                  : 'disabled'
-              "
-              class="btn btn-outline-primary shadow-none"
-              @click="buyMulti"
-            >
-              +1 Multi
-            </button>
-            <button
-              :class="
-                yourRanker.points.cmp(biasCost) >= 0 && !biasLastSecond
-                  ? ''
-                  : 'disabled'
-              "
-              class="btn btn-outline-primary shadow-none"
-              @click="buyBias"
-            >
-              +1 Bias
-            </button>
-          </div>
-        </div>
-        <br />
+
         <div class="row py-0 text-start">
           {{
             ladder.ladderNumber >= settings.assholeLadder
@@ -132,6 +148,7 @@
         </div>
       </div>
     </div>
+
     <div class="col-6"></div>
   </div>
 </template>
@@ -144,6 +161,8 @@ const store = useStore();
 const stompClient = inject("$stompClient");
 
 // variables
+
+// Disables a button if its pressed in the last second
 const biasLastSecond = ref(false);
 const multiLastSecond = ref(false);
 const vinegarLastSecond = ref(false);
@@ -156,6 +175,7 @@ const stats = computed(() => store.state.ladder.stats);
 const settings = computed(() => store.state.settings);
 const numberFormatter = computed(() => store.state.numberFormatter);
 const yourRanker = computed(() => ladder.value.yourRanker);
+
 const biasCost = computed(() =>
   ladder.value.getNextUpgradeCost(yourRanker.value.bias)
 );
@@ -167,6 +187,31 @@ const multiCost = computed(() =>
 const canThrowVinegar = computed(() =>
   ladder.value.canThrowVinegar(settings.value)
 );
+
+const isBiasEnabled = computed(
+  () =>
+    yourRanker.value.points.cmp(biasCost.value) >= 0 && !biasLastSecond.value
+);
+const isMultiEnabled = computed(
+  () =>
+    yourRanker.value.power.cmp(multiCost.value) >= 0 && !multiLastSecond.value
+);
+//const isAutoPromoteEnabled = computed(() => false);
+//const isThrowVinegarEnabled = computed(() => false);
+
+// ETA
+const etaBias = computed(
+  () => (biasCost.value - yourRanker.value.points) / yourRanker.value.power
+);
+const etaMulti = computed(() =>
+  yourRanker.value.rank === 1
+    ? Infinity
+    : (multiCost.value - yourRanker.value.power) /
+      ((yourRanker.value.rank - 1 + yourRanker.value.bias) *
+        yourRanker.value.multiplier)
+);
+
+// Functions
 
 function throwVinegar(event) {
   vinegarLastSecond.value = true;
