@@ -83,6 +83,11 @@
               @click="buyMulti"
             >
               +1 Multi
+              {{
+                yourRanker.power.cmp(multiCost) >= 0
+                  ? ""
+                  : `(${secondsToHms(eta(yourRanker).toPower(multiCost))})`
+              }}
             </button>
             <button
               :class="
@@ -94,6 +99,11 @@
               @click="buyBias"
             >
               +1 Bias
+              {{
+                yourRanker.points.cmp(biasCost) >= 0
+                  ? ""
+                  : `(${secondsToHms(eta(yourRanker).toPoints(biasCost))})`
+              }}
             </button>
           </div>
         </div>
@@ -111,6 +121,13 @@
               yourRanker.points.mul(100).div(stats.pointsNeededForManualPromote)
             )
           }}%)
+          {{
+            yourRanker.points.cmp(stats.pointsNeededForManualPromote) >= 0
+              ? ""
+              : `(${secondsToHms(
+                  eta(yourRanker).toFirst() * 2 // TODO: fix this, it's wrong. But the number seems to be half of the actual time. I don't know why.
+                )})`
+          }}
         </div>
         <div class="row py-0">
           <button
@@ -159,6 +176,7 @@ const yourRanker = computed(() => ladder.value.yourRanker);
 const biasCost = computed(() =>
   ladder.value.getNextUpgradeCost(yourRanker.value.bias)
 );
+const allRankers = computed(() => store.getters["ladder/allRankers"]);
 
 const multiCost = computed(() =>
   ladder.value.getNextUpgradeCost(yourRanker.value.multiplier)
@@ -201,8 +219,163 @@ function promote(event) {
   } else {
     stompClient.send("/app/ladder/post/promote", { event: event });
   }
+}
 
-  // TODO: Remove Difference in asshole-event and promote
+// TODO: Remove Difference in asshole-event and promote
+
+/**
+ * Typedefs for stuff used here
+ * @typedef {import('../entities/ranker.js').default} Ranker
+ */
+
+/**
+ * @param {Ranker} ranker
+ */
+function eta(ranker) {
+  function powerPerSecond(ranker) {
+    if (ranker === undefined) {
+      throw new Error("ranker is undefined");
+    }
+    if (ranker.rank === 1 || !ranker.growing) return 0;
+    return (ranker.bias + ranker.rank - 1) * ranker.multiplier;
+  }
+  return {
+    /**
+     * @param {Ranker} ranker2 - ranker to reach
+     * @returns {number} - seconds
+     */
+    toRanker: (ranker2) => {
+      //Calculating the relative acceleration of the two players
+      const p1Acceleration = powerPerSecond(ranker);
+      const p2Acceleration = powerPerSecond(ranker2);
+      const accelerationDiff = p2Acceleration - p1Acceleration;
+
+      //Calculating the relative current speed of the two players
+      const p1Speed = ranker.growing ? ranker.power : 0;
+      const p2Speed = ranker2.growing ? ranker2.power : 0;
+      const speedDiff = p2Speed - p1Speed;
+
+      //Calculating the current distance between the two players
+      const p1Points = ranker.points;
+      const p2Points = ranker2.points;
+      const pointsDiff = p2Points - p1Points;
+
+      const timeLeftInSeconds = solveQuadratic(
+        accelerationDiff,
+        speedDiff,
+        pointsDiff
+      );
+      return timeLeftInSeconds;
+    },
+    /**
+     * @param {number} points - points to reach
+     * @returns {number} - seconds
+     */
+    toPoints: (points) => {
+      //To calculate the time to reach a certain point, we pretend to ty to catch up to a ranker that is not growing and has the exact points we want to reach
+      const accelerationDiff = -powerPerSecond(ranker);
+      const speedDiff = ranker.growing ? -ranker.power : 0;
+      const p1Points = ranker.points;
+      const p2Points = points;
+      const pointsDiff = p2Points - p1Points;
+
+      const timeLeftInSeconds = solveQuadratic(
+        accelerationDiff,
+        speedDiff,
+        pointsDiff
+      );
+      return timeLeftInSeconds;
+    },
+    /**
+     * @param {number} power - power to reach
+     * @returns {number} - seconds
+     */
+    toPower: (power) => {
+      return (power - ranker.power) / powerPerSecond(ranker);
+    },
+    /**
+     * @param {number} rank - rank to reach
+     * @returns {number} - seconds
+     */
+    toRank: (rank) => {
+      for (let i = 0; i < allRankers.value.length; i++) {
+        if (allRankers.value[i].rank === rank) {
+          return eta(ranker).toRanker(allRankers.value[i]);
+        }
+      }
+    },
+    /**
+     * @returns {number} - seconds to reach the first rank
+     */
+    toFirst: () => {
+      return eta(ranker).toRank(1);
+    },
+  };
+}
+window.eta = eta;
+
+function secondsToHms(s) {
+  if (s === 0) return "0s";
+  if (!Number.isFinite(s)) return "∞";
+  const negative = s < 0;
+  if (negative) s = -s;
+  let hours = Math.floor(s / 3600);
+  let minutes = Math.floor((s % 3600) / 60);
+  let seconds = (s % 3600) % 60;
+
+  if (hours == 0 && minutes == 0 && seconds !== 0) {
+    if (Math.abs(seconds) < 1) {
+      return "<1s";
+    }
+    return `${negative ? "-" : ""}${Math.floor(seconds)}s`;
+  }
+
+  let mayPadd = false;
+  const padd = (num, suff) => {
+    if (num == 0 && !mayPadd) return "";
+    if (num < 10 && mayPadd) {
+      return "0" + num + suff;
+    }
+    mayPadd = true;
+    return num + suff;
+  };
+
+  seconds = Math.floor(seconds);
+
+  return (
+    (negative ? "-" : "") +
+    padd(hours, ":", false) +
+    padd(minutes, ":") +
+    padd(seconds, "")
+  );
+}
+
+window.secondsToHms = secondsToHms;
+window.allRankers = allRankers;
+window.rankers = (i) => {
+  return allRankers.value[i];
+};
+
+function solveQuadratic(accelerationDiff, speedDiff, pointDiff) {
+  if (accelerationDiff == 0) {
+    return -pointDiff / speedDiff > 0
+      ? -pointDiff / speedDiff
+      : Number.POSITIVE_INFINITY;
+  } else {
+    let discriminant = speedDiff * speedDiff - 4 * accelerationDiff * pointDiff;
+    if (discriminant < 0) return Number.POSITIVE_INFINITY;
+    const root1 =
+      (-speedDiff + Math.sqrt(discriminant)) / (2 * accelerationDiff);
+    const root2 =
+      (-speedDiff - Math.sqrt(discriminant)) / (2 * accelerationDiff);
+    if (root1 > 0 && root2 > 0) {
+      return Math.min(root1, root2);
+    } else {
+      let maxRoot = Math.max(root1, root2);
+      if (maxRoot < 0) return Number.POSITIVE_INFINITY;
+      else return maxRoot;
+    }
+  }
 }
 </script>
 
