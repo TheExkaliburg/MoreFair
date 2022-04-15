@@ -124,9 +124,7 @@
           {{
             yourRanker.points.cmp(stats.pointsNeededForManualPromote) >= 0
               ? ""
-              : `(${secondsToHms(
-                  eta(yourRanker).toFirst() * 2 // TODO: fix this, it's wrong. But the number seems to be half of the actual time. I don't know why.
-                )})`
+              : `(${secondsToHms(eta(yourRanker).toFirst())})`
           }}
         </div>
         <div class="row py-0">
@@ -261,7 +259,7 @@ function eta(ranker) {
       const pointsDiff = p2Points - p1Points;
 
       const timeLeftInSeconds = solveQuadratic(
-        accelerationDiff,
+        accelerationDiff / 2,
         speedDiff,
         pointsDiff
       );
