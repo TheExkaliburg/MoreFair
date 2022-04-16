@@ -16,7 +16,8 @@
       />
     </div>
     <div class="chat-input row py-3">
-      <div class="input-group">
+      <div class="input-group relative">
+        <div class="chatInputPlaceholder">Chad is listening...</div>
         <div
           id="chatInput"
           class="form-control shadow-none"
@@ -103,6 +104,15 @@ onMounted(() => {
   document.getElementById("mentionDropdown").style.display = "none";
   window.dropdownElementSelected = -1;
   const observer = new MutationObserver(function (mutations) {
+    //If there is text in the box, we need to hide the placeholder, if not we need to show it.
+    if (document.getElementById("chatInput").textContent.trim() == "") {
+      document.getElementsByClassName("chatInputPlaceholder")[0].style.display =
+        "flex";
+    } else {
+      document.getElementsByClassName("chatInputPlaceholder")[0].style.display =
+        "none";
+    }
+
     mutations.forEach(function (mutation) {
       if (mutation.type === "characterData") {
         onElementChange(mutation);
@@ -507,6 +517,10 @@ onUpdated(() => {
   height: 100%;
 }
 
+.relative {
+  position: relative;
+}
+
 .mentionDropdown {
   display: block;
   position: absolute;
@@ -547,6 +561,28 @@ onUpdated(() => {
   &::-webkit-scrollbar {
     display: none;
   }
+}
+
+.chatInputPlaceholder {
+  z-index: 3;
+  color: #de9e41;
+  font-size: 1.2em;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  width: fit-content;
+  height: 100%;
+  position: absolute;
+
+  margin-left: 8px;
+
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  flex-direction: column;
+
+  pointer-events: none;
 }
 
 .chat-header {
