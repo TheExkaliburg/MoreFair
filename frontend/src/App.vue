@@ -83,6 +83,8 @@ import { useStore } from "vuex";
 import Cookies from "js-cookie";
 import { StompClient } from "@/websocket/stompClient";
 
+import { Sounds } from "@/modules/sounds";
+Sounds.init();
 //import { hooksSystemSetup } from "@/modules/hooks";
 
 //hooksSystemSetup();
