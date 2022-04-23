@@ -13,6 +13,7 @@ class Ranker {
     this.you = data.you;
     this.growing = data.growing;
     this.autoPromote = data.autoPromote;
+    this.timesAsshole = data.timesAsshole;
 
     if (this.you) {
       this.grapes = new Decimal(data.grapes);
