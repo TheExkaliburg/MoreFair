@@ -561,6 +561,7 @@ onUpdated(() => {
   &::-webkit-scrollbar {
     display: none;
   }
+  border: 1px solid #de9e41;
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
 }
