@@ -16,7 +16,8 @@
       />
     </div>
     <div class="chat-input row py-3">
-      <div class="input-group">
+      <div class="input-group relative">
+        <div class="chatInputPlaceholder">Chad is listening...</div>
         <div
           id="chatInput"
           class="form-control shadow-none"
@@ -103,6 +104,15 @@ onMounted(() => {
   document.getElementById("mentionDropdown").style.display = "none";
   window.dropdownElementSelected = -1;
   const observer = new MutationObserver(function (mutations) {
+    //If there is text in the box, we need to hide the placeholder, if not we need to show it.
+    if (document.getElementById("chatInput").textContent.trim() == "") {
+      document.getElementsByClassName("chatInputPlaceholder")[0].style.display =
+        "flex";
+    } else {
+      document.getElementsByClassName("chatInputPlaceholder")[0].style.display =
+        "none";
+    }
+
     mutations.forEach(function (mutation) {
       if (mutation.type === "characterData") {
         onElementChange(mutation);
@@ -211,13 +221,6 @@ function mentionElementChanged(mutation) {
 function getMentionElement({ name, id }) {
   let mention = document.createElement("span");
   mention.innerHTML = `@${name}#${id}`;
-  mention.style.backgroundColor = "rgb(70, 70, 70)";
-  mention.style.selectionColor = "rgb(70, 70, 70)";
-  mention.style.padding = "2px";
-  mention.style.border = "1px solid black";
-  mention.style.borderRadius = "5px";
-  mention.style.cursor = "pointer";
-  mention.style.fontWeight = "bold";
   mention.classList.add("mention");
   mention.setAttribute("data-user", name);
   mention.setAttribute("data-id", id);
@@ -476,7 +479,6 @@ function chatBoxKeyDown(e) {
     if (
       mentionDropdown?.style.display != "none" &&
       window.dropdownElementSelected != -1
-
     ) {
       //click the selected element
       e.preventDefault();
@@ -497,11 +499,26 @@ onUpdated(() => {
 });
 </script>
 
+<style lang="scss">
+.mention {
+  background-color: rgb(70, 70, 70);
+  padding: 2px;
+  border: 1px solid black;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+</style>
+
 <style lang="scss" scoped>
 @import "../../styles/styles";
 // .
 .chat-window {
   height: 100%;
+}
+
+.relative {
+  position: relative;
 }
 
 .mentionDropdown {
@@ -533,7 +550,7 @@ onUpdated(() => {
 }
 
 #chatInput {
-  background-color: #10141f;
+  background-color: rgba(0, 0, 0, 0);
   color: #de9e41;
   overflow-x: scroll;
   //hide scrollbar
@@ -544,6 +561,31 @@ onUpdated(() => {
   &::-webkit-scrollbar {
     display: none;
   }
+  border: 1px solid #de9e41;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+.chatInputPlaceholder {
+  z-index: 3;
+  color: $input-placeholder-color;
+  font-size: 1.2em;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  width: fit-content;
+  height: 100%;
+  position: absolute;
+
+  margin-left: 1em;
+
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  flex-direction: column;
+
+  pointer-events: none;
 }
 
 .chat-header {
