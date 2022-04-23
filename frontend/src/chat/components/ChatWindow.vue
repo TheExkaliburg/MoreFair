@@ -550,7 +550,7 @@ onUpdated(() => {
 }
 
 #chatInput {
-  background-color: #10141f;
+  background-color: rgba(0, 0, 0, 0);
   color: #de9e41;
   overflow-x: scroll;
   //hide scrollbar
@@ -578,7 +578,7 @@ onUpdated(() => {
   height: 100%;
   position: absolute;
 
-  margin-left: 8px;
+  margin-left: 1em;
 
   display: flex;
   justify-content: center;
