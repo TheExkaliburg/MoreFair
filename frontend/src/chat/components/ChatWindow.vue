@@ -561,6 +561,8 @@ onUpdated(() => {
   &::-webkit-scrollbar {
     display: none;
   }
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
 }
 
 .chatInputPlaceholder {
