@@ -92,7 +92,16 @@ function findMentions() {
     return;
   }
   //const message = msg.message;
-  const mentions = meta.filter((m) => "u" in m && "id" in m && "i" in m);
+  const mentions = meta.filter((m) => {
+    let isOk = false;
+    try {
+      isOk = "u" in m && "id" in m && "i" in m;
+    } catch (e) {
+      //This is a check for the case that the m is not an object
+      //We get really weird errors when we dont catch this but we dont care about the error here.
+    }
+    return isOk;
+  });
   mentions.sort((a, b) => a.i - b.i);
   let offset = 0;
   let currentPlainText = messageParts[0];
