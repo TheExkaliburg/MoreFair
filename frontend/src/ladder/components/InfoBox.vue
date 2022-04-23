@@ -127,6 +127,11 @@
               yourRanker.points.mul(100).div(stats.pointsNeededForManualPromote)
             )
           }}%)
+          {{
+            yourRanker.points.cmp(stats.pointsNeededForManualPromote) >= 0
+              ? ""
+              : `(${secondsToHms(eta(yourRanker).toFirst())})`
+          }}
         </div>
         <div class="row py-0">
           <button
@@ -156,6 +161,8 @@
 <script setup>
 import { useStore } from "vuex";
 import { computed, inject, ref } from "vue";
+import { eta } from "../../modules/eta";
+import { secondsToHms } from "../../modules/formatting";
 
 const store = useStore();
 const stompClient = inject("$stompClient");
@@ -179,6 +186,7 @@ const yourRanker = computed(() => ladder.value.yourRanker);
 const biasCost = computed(() =>
   ladder.value.getNextUpgradeCost(yourRanker.value.bias)
 );
+const allRankers = computed(() => store.getters["ladder/allRankers"]);
 
 const multiCost = computed(() =>
   ladder.value.getNextUpgradeCost(yourRanker.value.multiplier)
@@ -246,9 +254,26 @@ function promote(event) {
   } else {
     stompClient.send("/app/ladder/post/promote", { event: event });
   }
-
-  // TODO: Remove Difference in asshole-event and promote
 }
+
+// TODO: Remove Difference in asshole-event and promote
+
+/**
+ * Typedefs for stuff used here
+ * @typedef {import('../entities/ranker.js').default} Ranker
+ */
+
+/**
+ * @param {Ranker} ranker
+ */
+
+window.eta = eta;
+
+window.secondsToHms = secondsToHms;
+window.allRankers = allRankers;
+window.rankers = (i) => {
+  return allRankers.value[i];
+};
 </script>
 
 <style lang="scss" scoped>
