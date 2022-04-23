@@ -26,7 +26,7 @@
               @click="buyMulti"
             >
               <span v-if="isMultiEnabled">+1 Multi</span>
-              <span v-else>+M ({{ etaMulti }})</span>
+              <span v-else>+M ({{ secondsToHms(etaMulti) }})</span>
             </button>
             <button
               :class="isBiasEnabled ? '' : 'disabled'"
@@ -34,7 +34,7 @@
               @click="buyBias"
             >
               <span v-if="isBiasEnabled">+1 Bias</span>
-              <span v-else>+B ({{ etaBias }})</span>
+              <span v-else>+B ({{ secondsToHms(etaBias) }})</span>
             </button>
           </div>
         </div>
@@ -208,15 +208,11 @@ const isMultiEnabled = computed(
 //const isThrowVinegarEnabled = computed(() => false);
 
 // ETA
-const etaBias = computed(
-  () => (biasCost.value - yourRanker.value.points) / yourRanker.value.power
-);
+const etaBias = computed(() => eta(yourRanker.value).toPoints(biasCost.value));
 const etaMulti = computed(() =>
   yourRanker.value.rank === 1
     ? Infinity
-    : (multiCost.value - yourRanker.value.power) /
-      ((yourRanker.value.rank - 1 + yourRanker.value.bias) *
-        yourRanker.value.multiplier)
+    : eta(yourRanker.value).toPower(multiCost.value)
 );
 
 // Functions
@@ -260,7 +256,7 @@ function promote(event) {
 
 /**
  * Typedefs for stuff used here
- * @typedef {import('../entities/ranker.js').default} Ranker
+ * @typedef {import("../entities/ranker.js").default} Ranker
  */
 
 /**
