@@ -286,3 +286,6 @@ dist
 .svelte-kit
 
 # End of https://www.toptal.com/developers/gitignore/api/git,java,maven,intellij+all,node
+
+#VSCode folder
+.vscode/
