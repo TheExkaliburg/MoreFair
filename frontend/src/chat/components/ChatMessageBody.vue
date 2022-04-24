@@ -55,6 +55,10 @@ const mentionSound = computed(() =>
   store.getters["options/getOptionValue"]("mentionSound")
 );
 
+const mentionSoundVolume = computed(() =>
+  store.getters["options/getOptionValue"]("mentionSoundVolume")
+);
+
 //Basically an enum
 const MessagePartType = {
   plain: Symbol("plain"),
@@ -142,7 +146,7 @@ function findMentions() {
     if (mentionSound.value) {
       for (let i = 0; i < rankers.value.length; i++) {
         if (rankers.value[i].you && rankers.value[i].accountId === id) {
-          Sounds.play("mention");
+          Sounds.play("mention", mentionSoundVolume.value);
         }
       }
     }

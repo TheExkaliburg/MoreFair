@@ -56,6 +56,13 @@ const optionsModule = {
               name: "mentionSound",
               value: false,
             }),
+            new RangeOption({
+              displayName: "Sound Volume",
+              name: "mentionSoundVolume",
+              value: 100,
+              min: 0,
+              max: 100,
+            }),
           ],
         }),
       ],

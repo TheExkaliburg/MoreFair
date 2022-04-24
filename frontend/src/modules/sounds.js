@@ -14,8 +14,9 @@ Sounds = {
     }
   },
 
-  play: (sound) => {
+  play: (sound, volume = 100) => {
     if (Sounds.sounds[sound]) {
+      Sounds.sounds[sound].volume = volume / 100;
       Sounds.sounds[sound].play();
     } else {
       console.warn(new Error(`Sound ${sound} not registered`));
