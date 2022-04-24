@@ -63,15 +63,13 @@
 <script setup>
 import { defineProps } from "vue";
 
-const props = defineProps({
+defineProps({
   max: { type: Number, required: true },
   current: { type: Number, required: true },
   // TODO: make this dynamic; currently size does nothing
   size: { type: Number, default: 3 },
   onChange: Function,
 });
-
-console.log(props);
 </script>
 
 <style scoped></style>

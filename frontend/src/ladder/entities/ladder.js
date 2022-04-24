@@ -158,7 +158,7 @@ class Ladder {
     this.rankers.forEach((ranker) => {
       if (ranker.you && accountId === ranker.accountId) {
         ranker.grapes = ranker.grapes.sub(
-          this.getAutoPromoteCost(this.ladderNumber, ranker.rank, settings)
+          this.getAutoPromoteCost(ranker.rank, settings)
         );
         ranker.autoPromote = true;
       }
