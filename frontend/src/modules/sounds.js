@@ -1,23 +1,22 @@
+import store from "../store";
+
+const sounds = store.getters["sounds/getSound"];
+
 let Sounds;
 Sounds = {
-  init: () => {
-    Sounds.sounds = {};
-  },
-
   register: (name, url) => {
-    if (!Sounds.sounds[name]) {
-      Sounds.sounds[name] = new Audio(url);
-      console.warn(`Sound ${name} already registered`);
-      return true;
-    } else {
-      return false;
-    }
+    store.commit({
+      type: "sounds/loadSound",
+      name: name,
+      url: url,
+    });
   },
 
   play: (sound, volume = 100) => {
-    if (Sounds.sounds[sound]) {
-      Sounds.sounds[sound].volume = volume / 100;
-      Sounds.sounds[sound].play();
+    const soundObj = sounds(sound);
+    if (soundObj) {
+      soundObj.volume = volume / 100;
+      soundObj.play();
     } else {
       console.warn(new Error(`Sound ${sound} not registered`));
     }
