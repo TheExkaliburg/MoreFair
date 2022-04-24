@@ -35,6 +35,7 @@
 <script setup>
 import { useStore } from "vuex";
 import { computed, defineProps } from "vue";
+import { Sounds } from "@/modules/sounds";
 
 const props = defineProps({
   msg: Object,
@@ -42,10 +43,20 @@ const props = defineProps({
 
 const store = useStore();
 
+const rankers = computed(() => store.getters["ladder/allRankers"]);
+
 //const numberFormatter = computed(() => store.state.numberFormatter);
 //const ladder = computed(() => store.state.ladder);
 const highlightMentions = computed(() =>
   store.getters["options/getOptionValue"]("highlightMentions")
+);
+
+const mentionSound = computed(() =>
+  store.getters["options/getOptionValue"]("mentionSound")
+);
+
+const mentionSoundVolume = computed(() =>
+  store.getters["options/getOptionValue"]("mentionSoundVolume")
 );
 
 //Basically an enum
@@ -132,6 +143,13 @@ function findMentions() {
     spliceNewMessagePartsIntoArray(currentPlainText, newParts);
     offset += index + 3;
     currentPlainText = newParts[4];
+    if (mentionSound.value) {
+      for (let i = 0; i < rankers.value.length; i++) {
+        if (rankers.value[i].you && rankers.value[i].accountId === id) {
+          Sounds.play("mention", mentionSoundVolume.value);
+        }
+      }
+    }
   });
 }
 

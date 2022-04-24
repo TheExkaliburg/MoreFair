@@ -51,6 +51,18 @@ const optionsModule = {
               name: "highlightMentions",
               value: true,
             }),
+            new BoolOption({
+              displayName: "Play sound on mention",
+              name: "mentionSound",
+              value: false,
+            }),
+            new RangeOption({
+              displayName: "Sound Volume",
+              name: "mentionSoundVolume",
+              value: 100,
+              min: 0,
+              max: 100,
+            }),
           ],
         }),
       ],
