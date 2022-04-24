@@ -182,7 +182,11 @@ async function importCookie() {
     if (newUUID) {
       // TODO: Check if cookies are valid
       let oldUuid = Cookies.get("_uuid");
-      Cookies.set("_uuid", newUUID, { expires: 10 * 365 });
+      Cookies.set("_uuid", newUUID, {
+        expires: 10 * 365,
+        secure: true,
+        sameSite: "lax",
+      });
       await setTimeout(
         async () => await navigator.clipboard.writeText(oldUuid),
         1000

@@ -273,6 +273,9 @@ function plainTextElementChanged(mutation) {
       if (
         (rankers.value[i].username + "#" + rankers.value[i].accountId)
           .toLowerCase()
+          .startsWith(possibleMentionLower) ||
+        ("#" + rankers.value[i].accountId)
+          .toLowerCase()
           .startsWith(possibleMentionLower)
       ) {
         possibleMentions.push({

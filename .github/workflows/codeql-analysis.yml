@@ -37,6 +37,11 @@ jobs:
         # Learn more about CodeQL language support at https://git.io/codeql-language-support
 
     steps:
+    - name: Setup Java 
+      uses: actions/setup-java@v1
+      with:
+        java-version: 17
+    
     - name: Checkout repository
       uses: actions/checkout@v3
 
@@ -54,6 +59,7 @@ jobs:
     # If this step fails, then you should remove it and run the build manually (see below)
     - name: Autobuild
       uses: github/codeql-action/autobuild@v2
+      
 
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 https://git.io/JvXDl

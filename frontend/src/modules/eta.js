@@ -1,5 +1,10 @@
 import { computed } from "vue";
 import store from "../store";
+import Decimal from "break_infinity.js";
+
+/**
+ * @typedef {import("break_infinity.js").DecimalSource} DecimalSource
+ */
 
 const allRankers = computed(() => store.getters["ladder/allRankers"]);
 
@@ -40,7 +45,7 @@ export function eta(ranker) {
       return timeLeftInSeconds;
     },
     /**
-     * @param {number} points - points to reach
+     * @param {DecimalSource} points - points to reach
      * @returns {number} - seconds
      */
     toPoints: (points) => {
@@ -48,8 +53,8 @@ export function eta(ranker) {
       const accelerationDiff = -powerPerSecond(ranker);
       const speedDiff = ranker.growing ? -ranker.power : 0;
       const p1Points = ranker.points;
-      const p2Points = points;
-      const pointsDiff = p2Points - p1Points;
+      const p2Points = new Decimal(points);
+      const pointsDiff = p2Points.sub(p1Points);
 
       const timeLeftInSeconds = solveQuadratic(
         accelerationDiff,
@@ -59,11 +64,13 @@ export function eta(ranker) {
       return timeLeftInSeconds;
     },
     /**
-     * @param {number} power - power to reach
+     * @param {DecimalSource} power - power to reach
      * @returns {number} - seconds
      */
     toPower: (power) => {
-      return (power - ranker.power) / powerPerSecond(ranker);
+      //A bit weird, but ranker.power is guaranteed to be a Decimal object and power might not be.
+      power = new Decimal(power);
+      return power.sub(ranker.power).div(powerPerSecond(ranker));
     },
     /**
      * @param {number} rank - rank to reach
