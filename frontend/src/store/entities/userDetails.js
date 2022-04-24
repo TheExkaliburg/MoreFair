@@ -5,6 +5,7 @@ class UserDetails {
     this.uuid = data.uuid;
     this.accountId = data.accountId;
     this.highestCurrentLadder = data.highestCurrentLadder;
+    this.accessRole = data.accessRole;
   }
 
   static placeholder() {
@@ -12,6 +13,7 @@ class UserDetails {
       uuid: "",
       accountId: 1,
       highestCurrentLadder: 1,
+      accessRole: "PLAYER",
     });
   }
 
