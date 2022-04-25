@@ -1,14 +1,14 @@
 <template>
   <nav class="navbar px-2">
-    <a class="navbar-brand" href="#">
+    <router-link class="navbar-brand" to="/">
       <img
         class="d-inline-block align-top"
         height="30"
         src="/favicon.ico"
         width="30"
       />
-      More Fair Game
-    </a>
+      <span>More Fair Game</span>
+    </router-link>
     <button
       aria-controls="navbarNav"
       aria-expanded="false"
@@ -89,6 +89,9 @@ import { StompClient } from "@/websocket/stompClient";
 
 const store = useStore();
 const stompClient = new StompClient();
+
+//Prompt the store/options to load the options
+store.commit("options/loadOptions");
 
 let setupPromise = setupConnection();
 provide("$setupPromise", setupPromise);
@@ -244,10 +247,6 @@ nav {
 
   a {
     font-weight: bold;
-
-    &.router-link-exact-active {
-      color: #a4dddb;
-    }
   }
 }
 </style>
