@@ -71,6 +71,19 @@ defineProps({
 
 .message-options {
   text-align: end;
+
+  a {
+    text-decoration: none !important;
+    color: $main-color !important;
+  }
+
+  a:visited {
+    color: $main-color !important;
+  }
+
+  a:hover {
+    cursor: pointer;
+  }
 }
 
 .message-body {
