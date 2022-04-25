@@ -114,6 +114,7 @@ const optionsModule = {
               option.value = value;
             }
           });
+          allOptions.forEach((option) => option.updateDisplayProps());
         }
       } catch (e) {
         console.log(state.value);
