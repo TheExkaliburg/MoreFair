@@ -90,6 +90,9 @@ import { StompClient } from "@/websocket/stompClient";
 const store = useStore();
 const stompClient = new StompClient();
 
+//Prompt the store/options to load the options
+store.commit("options/loadOptions");
+
 let setupPromise = setupConnection();
 provide("$setupPromise", setupPromise);
 provide("$stompClient", stompClient);
