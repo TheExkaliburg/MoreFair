@@ -71,8 +71,28 @@ const optionsModule = {
   mutations: {
     init(state) {
       state.options = [];
-      //TODO: load locally
       //TODO: load from server
+    },
+    loadOptions(state) {
+      //TODO: load locally
+      try {
+        const savedOptions = JSON.parse(localStorage.getItem("options"));
+        if (savedOptions) {
+          //get all options
+          let allOptions = state.options.map(
+            (section) => section.options || [section]
+          );
+          allOptions = [].concat(...allOptions);
+          savedOptions.forEach(({ name, value }) => {
+            const option = allOptions.find((o) => o.name === name);
+            if (option) {
+              option.value = value;
+            }
+          });
+        }
+      } catch (e) {
+        console.log(state.value);
+      }
     },
     updateOption(state, { option, payload }) {
       option.set(payload);
