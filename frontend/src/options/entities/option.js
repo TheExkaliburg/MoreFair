@@ -1,6 +1,9 @@
 class Option {
   //eslint-disable-next-line no-unused-vars
-  constructor(payload) {}
+  constructor(payload) {
+    this.visible = true;
+    this.active = true;
+  }
 
   get() {
     throw new Error("Method not implemented.");
@@ -9,6 +12,25 @@ class Option {
   //eslint-disable-next-line no-unused-vars
   set(payload) {
     throw new Error("Method not implemented.");
+  }
+
+  updateDisplayProps() {
+    if (this.isVisible) {
+      this.visible = this.isVisible();
+    }
+    if (this.isActive) {
+      this.active = this.isActive();
+    }
+  }
+  setVisibleFn(fn) {
+    this.isVisible = fn;
+    setTimeout(this.updateDisplayProps, 10);
+    return this;
+  }
+  setActiveFn(fn) {
+    this.isActive = fn;
+    setTimeout(this.updateDisplayProps, 10);
+    return this;
   }
 }
 

@@ -81,9 +81,11 @@ let store = createStore({
   modules: {
     ladder: ladderModule,
     chat: chatModule,
-    options: optionsModule,
+    //options: optionsModule,
     sounds: soundsModule,
   },
 });
+optionsModule.setStore(store);
+store.registerModule("options", optionsModule);
 window.store = store;
 export default store;

@@ -16,6 +16,10 @@ import {
 
 const optionsModule = {
   namespaced: true,
+  store: {},
+  setStore(store) {
+    this.store = store;
+  },
   state: () => {
     return {
       options: [
@@ -34,11 +38,19 @@ const optionsModule = {
               value: 10,
               min: 0,
               max: 100,
+            }).setActiveFn(() => {
+              return !optionsModule.store.getters["options/getOptionValue"](
+                "showAllRankers"
+              );
             }),
             new IntegerOption({
               displayName: "Rankers padding",
               name: "rankersPadding",
               value: 100,
+            }).setActiveFn(() => {
+              return !optionsModule.store.getters["options/getOptionValue"](
+                "showAllRankers"
+              );
             }),
           ],
         }),
@@ -55,6 +67,10 @@ const optionsModule = {
               displayName: "Play sound on mention",
               name: "mentionSound",
               value: false,
+            }).setActiveFn(() => {
+              return optionsModule.store.getters["options/getOptionValue"](
+                "highlightMentions"
+              );
             }),
             new RangeOption({
               displayName: "Sound Volume",
@@ -62,6 +78,15 @@ const optionsModule = {
               value: 100,
               min: 0,
               max: 100,
+            }).setActiveFn(() => {
+              return (
+                optionsModule.store.getters["options/getOptionValue"](
+                  "mentionSound"
+                ) &&
+                optionsModule.store.getters["options/getOptionValue"](
+                  "highlightMentions"
+                )
+              );
             }),
           ],
         }),
@@ -93,6 +118,9 @@ const optionsModule = {
         };
       });
       localStorage.setItem("options", JSON.stringify(optionNamesAndValues));
+
+      //Now updating the option's display properties
+      allOptions.forEach((option) => option.updateDisplayProps());
 
       //TODO: save to server
 
