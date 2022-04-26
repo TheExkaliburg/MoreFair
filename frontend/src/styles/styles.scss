@@ -65,6 +65,12 @@ input.form-control {
   }
 }
 
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  filter: grayscale(100%);
+}
+
 div .offcanvas {
   background-color: $offcanvas-background-color;
   font-size: 24px;

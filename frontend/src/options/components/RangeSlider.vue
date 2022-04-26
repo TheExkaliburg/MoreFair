@@ -1,5 +1,5 @@
 <template>
-  <label>
+  <label v-if="visible" :class="active ? '' : 'disabled'">
     <span>{{ option.displayName }}: {{ value }}</span
     ><br />
     <input
@@ -26,6 +26,8 @@ const props = defineProps({
 const value = computed(() => props.option.value);
 const min = computed(() => props.option.min);
 const max = computed(() => props.option.max);
+const visible = computed(() => props.option.visible);
+const active = computed(() => props.option.active);
 
 function update({ target }) {
   const newValue = target.value;
