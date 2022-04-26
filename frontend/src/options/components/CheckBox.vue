@@ -1,5 +1,5 @@
 <template>
-  <label>
+  <label v-if="visible" :class="active ? '' : 'disabled'">
     <input :checked="value" type="checkbox" @change="update" />
     <span>{{ option.displayName }}</span>
   </label>
@@ -16,6 +16,8 @@ const props = defineProps({
 });
 
 const value = computed(() => props.option.value);
+const visible = computed(() => props.option.visible);
+const active = computed(() => props.option.active);
 
 function update({ target }) {
   const newChecked = target.checked;
