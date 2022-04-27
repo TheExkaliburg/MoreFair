@@ -95,7 +95,7 @@ class Ladder {
         );
     }
 
-    this.rankers = rankers;
+    this.rankers = Object.freeze(rankers);
     this.firstRanker = rankers[0];
     this.yourRanker = yourRanker;
   }

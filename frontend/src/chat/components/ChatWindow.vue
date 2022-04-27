@@ -4,7 +4,11 @@
       <!--div class="col chat-info">Chad #{{ chat.currentChatNumber }}</div-->
       <PaginationGroup
         :current="chat.currentChatNumber"
-        :max="user.highestCurrentLadder"
+        :max="
+          store.getters['options/getOptionValue']('enableUnrestrictedAccess')
+            ? Math.max(settings.assholeLadder, user.highestCurrentLadder)
+            : user.highestCurrentLadder
+        "
         :onChange="changeChat"
       />
     </div>
@@ -46,6 +50,7 @@ import ChatMessage from "@/chat/components/ChatMessage";
 import PaginationGroup from "@/components/PaginationGroup";
 
 import { Sounds } from "@/modules/sounds";
+
 Sounds.register(
   "mention",
   "https://assets.mixkit.co/sfx/download/mixkit-software-interface-start-2574.wav"
@@ -60,6 +65,7 @@ const chatContent = ref(null);
 const chat = computed(() => store.state.chat.chat);
 const user = computed(() => store.state.user);
 const rankers = computed(() => store.getters["ladder/allRankers"]);
+const settings = computed(() => store.state.settings);
 
 function sendMessage() {
   const [msg, metadata] = parseSendMessage();
@@ -570,6 +576,7 @@ onUpdated(() => {
   &::-webkit-scrollbar {
     display: none;
   }
+
   border: 1px solid #de9e41;
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;

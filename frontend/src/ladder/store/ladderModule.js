@@ -123,18 +123,21 @@ export default {
     },
   },
   getters: {
-    shownRankers(state) {
-      const numberAtTop = 10;
-      const padding = 50;
+    shownRankers(state, getters, rootState, rootGetters) {
+      const showAllRankers =
+        rootGetters["options/getOptionValue"]("showAllRankers");
+
+      if (showAllRankers) return getters.allRankers;
+
+      const numberAtTop = rootGetters["options/getOptionValue"]("rankersAtTop");
+      const padding = rootGetters["options/getOptionValue"]("rankersPadding");
       const rank = state.ladder.yourRanker.rank;
 
-      state.ladder.rankers.filter(
+      return state.ladder.rankers.filter(
         (ranker) =>
           ranker.rank <= numberAtTop ||
           (ranker.rank >= rank - padding && ranker.rank <= rank + padding)
       );
-
-      return state.ladder.rankers;
     },
     allRankers(state) {
       return state.ladder.rankers;
