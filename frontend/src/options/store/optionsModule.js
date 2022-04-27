@@ -82,31 +82,19 @@ const optionsModule = {
               displayName: "Enable Moderation Page",
               name: "enableModPage",
               value: false,
-            }).setVisibleFn(
-              () =>
-                !optionsModule.store.getters["options/getOption"]("modFeatures")
-                  .visible
-            ),
+            }),
             new BoolOption({
               displayName: "Enable Chat Features",
               name: "enableChatModFeatures",
               value: false,
-            }).setVisibleFn(
-              () =>
-                !optionsModule.store.getters["options/getOption"]("modFeatures")
-                  .visible
-            ),
+            }),
             new BoolOption({
               displayName: "Unrestricted Ladder & Chat Access",
               name: "enableUnrestrictedAccess",
               value: false,
-            }).setVisibleFn(
-              () =>
-                !optionsModule.store.getters["options/getOption"]("modFeatures")
-                  .visible
-            ),
+            }),
           ],
-        }),
+        }).setVisibleFn(() => optionsModule.store.getters.isMod),
       ],
     };
   },
@@ -131,6 +119,7 @@ const optionsModule = {
               option.value = value;
             }
           });
+          state.options.forEach((option) => option.updateDisplayProps());
           allOptions.forEach((option) => option.updateDisplayProps());
         }
       } catch (e) {
@@ -145,9 +134,7 @@ const optionsModule = {
       const newValue = payload.value;
 
       //Saving to localstorage
-      let allOptions = state.options.map(
-        (section) => section.options || [section]
-      );
+      let allOptions = state.options.map((section) => section.options);
       allOptions = [].concat(...allOptions);
       let optionNamesAndValues = allOptions.map((option) => {
         return {
@@ -158,6 +145,7 @@ const optionsModule = {
       localStorage.setItem("options", JSON.stringify(optionNamesAndValues));
 
       //Now updating the option's display properties
+      state.options.forEach((option) => option.updateDisplayProps());
       allOptions.forEach((option) => option.updateDisplayProps());
 
       //TODO: save to server

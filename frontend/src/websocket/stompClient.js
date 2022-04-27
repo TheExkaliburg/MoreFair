@@ -31,9 +31,9 @@ export class StompClient {
   async disconnect() {
     if (this.stompClient !== null) this.stompClient.disconnect();
     console.log(
-      "Currently disconnected, waiting 60sec before trying to reconnect..."
+      "Currently disconnected, waiting 120sec before trying to reconnect..."
     );
-    await new Promise((r) => setTimeout(r, 60000));
+    await new Promise((r) => setTimeout(r, 120000));
     location.reload();
   }
 
