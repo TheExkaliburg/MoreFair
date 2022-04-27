@@ -52,22 +52,29 @@ $color-conch: #a8b5b2;
 $color-jet-stream: #c7cfcc;
 $color-saltpan: #ebede9;
 
-
 // Colors
-$main-color: #de9e41;
-$background-color: #10141f;
-$navbar-color: #090a14;
-$offcanvas-background-color: #151d28;
-$link-color: #4f8fba;
-$link-hover-color: #3c5e8b;
-$button-color: #be772b;
-$button-hover-color: $offcanvas-background-color;
-$button-hover-background-color: $button-color;
-$input-placeholder-color: #752438;
-$header-color: $main-color;
-$text-color: #e7d5b3;
-$text-highlight-color: #cf573c;
+$main-color: $color-fire-bush;
+$background-color: $color-black-russian-1;
 
-// Fonts
-$text-font-size: 15px;
+// Buttons
+$button-color: $color-pirate-gold;
+$button-hover-color: $color-black-pearl;
+$button-hover-background-color: $color-pirate-gold;
+
+// Navbar
+$navbar-color: $color-black-russian-2;
+$offcanvas-background-color: $color-black-pearl;
+
+// Text
+$header-color: $color-fire-bush;
 $header-font-size: 14px;
+
+$text-font-size: 15px;
+$text-color: $color-givry;
+$text-highlight-color: $color-dark-coral;
+
+$placeholder-color: $color-claret;
+
+// Link
+$link-color: $color-steel-blue;
+$link-hover-color: $color-st-tropaz;

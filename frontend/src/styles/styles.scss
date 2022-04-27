@@ -22,7 +22,7 @@ input.form-control {
   color: $main-color !important;
 
   &::placeholder {
-    color: $input-placeholder-color !important;
+    color: $placeholder-color !important;
     opacity: 0.5;
   }
 }
