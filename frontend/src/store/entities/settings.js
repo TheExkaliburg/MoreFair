@@ -18,7 +18,7 @@ class Settings {
     return new Settings({
       pointsForPromote: new Decimal(Infinity),
       minimumPeopleForPromote: Infinity,
-      assholeLadder: Infinity,
+      assholeLadder: 1,
       assholeTags: [""],
       baseVinegarNeededToThrow: new Decimal(Infinity),
       baseGrapesNeededToAutoPromote: new Decimal(Infinity),

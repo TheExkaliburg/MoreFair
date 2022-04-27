@@ -70,7 +70,7 @@
       <div
         v-if="
           store.getters['options/getOptionValue']('enableModPage') &&
-          store.getters['isMod']
+          store.getters.isMod
         "
         class="row"
       >

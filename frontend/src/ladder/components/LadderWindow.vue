@@ -6,7 +6,8 @@
     <PaginationGroup
       :current="ladder.ladderNumber"
       :max="
-        store.getters['options/getOptionValue']('enableUnrestrictedAccess')
+        store.getters['options/getOptionValue']('enableUnrestrictedAccess') &&
+        store.getters.isMod
           ? Math.max(settings.assholeLadder, user.highestCurrentLadder)
           : user.highestCurrentLadder
       "

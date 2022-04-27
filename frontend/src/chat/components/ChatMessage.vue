@@ -18,7 +18,7 @@
       <div
         v-if="
           store.getters['options/getOptionValue']('enableChatModFeatures') &&
-          store.getters['isMod']
+          store.getters.isMod
         "
         class="col-1 message-options"
       >
