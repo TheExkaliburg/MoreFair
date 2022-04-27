@@ -17,7 +17,7 @@
       <div class="col-3 message-date">{{ msg.timeCreated }}</div>
       <div
         v-if="
-          store.getters['options/getOption']('enableChatModFeatures') &&
+          store.getters['options/getOptionValue']('enableChatModFeatures') &&
           store.getters['isMod']
         "
         class="col-1 message-options"
