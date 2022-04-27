@@ -1,8 +1,15 @@
 <template>
   <div class="row py-1">
+    <div class="col">
+      <span>Asshole Ladder: {{ store.state.settings.assholeLadder }}</span>
+    </div>
     <PaginationGroup
       :current="ladder.ladderNumber"
-      :max="user.highestCurrentLadder"
+      :max="
+        store.getters['options/getOptionValue']('enableUnrestrictedAccess')
+          ? Math.max(settings.assholeLadder, user.highestCurrentLadder)
+          : user.highestCurrentLadder
+      "
       :onChange="changeLadder"
     />
   </div>

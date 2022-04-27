@@ -64,12 +64,17 @@
 import { defineProps } from "vue";
 
 defineProps({
-  max: { type: Number, required: true },
-  current: { type: Number, required: true },
+  max: { type: Number, required: true, default: 1 },
+  current: { type: Number, required: true, default: 1 },
   // TODO: make this dynamic; currently size does nothing
   size: { type: Number, default: 3 },
   onChange: Function,
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+ul {
+  max-height: calc(16px + 32px * 5);
+  overflow-y: auto;
+}
+</style>

@@ -62,8 +62,9 @@
           </div>
         </div>
         <div class="row py-0">
-          <div v-if="true" class="col px-0 btn-group d-flex">
+          <div class="col px-0 btn-group d-flex">
             <button
+              v-if="ladder.ladderNumber !== settings.assholeLadder"
               :class="[
                 !yourRanker.autoPromote &&
                 !autoPromoteLastSecond &&
@@ -80,40 +81,44 @@
               Buy Autopromote
             </button>
             <button
-              :class="canThrowVinegar && !vinegarLastSecond ? '' : 'disabled'"
-              class="btn btn-outline-primary shadow-none w-100"
-              @click="throwVinegar"
-            >
-              Throw Vinegar
-            </button>
-          </div>
-          <div v-else class="col px-0 btn-group d-flex">
-            <button
+              v-else-if="ladder.ladderNumber === settings.assholeLadder"
               :class="[
-                !yourRanker.autoPromote &&
-                !autoPromoteLastSecond &&
-                yourRanker.grapes.cmp(
-                  ladder.getAutoPromoteCost(yourRanker.rank, settings)
-                ) >= 0
+                !promoteLastSecond &&
+                yourRanker.points.cmp(stats.pointsNeededForManualPromote) >= 0
                   ? ''
                   : 'disabled',
-                ladder.ladderNumber >= settings.autoPromoteLadder ? '' : 'hide',
               ]"
               class="btn btn-outline-primary shadow-none w-100"
-              @click="buyAutoPromote"
+              @click="promote"
             >
-              Buy Autopromote
+              Be Asshole
             </button>
             <button
+              v-if="yourRanker.rank !== 1"
               :class="canThrowVinegar && !vinegarLastSecond ? '' : 'disabled'"
               class="btn btn-outline-primary shadow-none w-100"
               @click="throwVinegar"
             >
               Throw Vinegar
+            </button>
+            <button
+              v-else-if="
+                yourRanker.rank === 1 &&
+                ladder.ladderNumber !== settings.assholeLadder
+              "
+              :class="[
+                !promoteLastSecond &&
+                yourRanker.points.cmp(stats.pointsNeededForManualPromote) >= 0
+                  ? ''
+                  : 'disabled',
+              ]"
+              class="btn btn-outline-primary shadow-none w-100"
+              @click="promote"
+            >
+              Promote
             </button>
           </div>
         </div>
-
         <div class="row py-0 text-start">
           {{
             ladder.ladderNumber >= settings.assholeLadder
@@ -132,24 +137,6 @@
               ? ""
               : `(${secondsToHms(eta(yourRanker).toFirst())})`
           }}
-        </div>
-        <div class="row py-0">
-          <button
-            :class="[
-              yourRanker.points.cmp(stats.pointsNeededForManualPromote) >= 0
-                ? ''
-                : 'hide',
-              !promoteLastSecond ? '' : 'disabled',
-            ]"
-            class="btn btn-outline-primary shadow-none"
-            @click="promote"
-          >
-            {{
-              ladder.ladderNumber >= settings.assholeLadder
-                ? "Be Asshole"
-                : "Promote"
-            }}
-          </button>
         </div>
       </div>
     </div>
@@ -186,7 +173,7 @@ const yourRanker = computed(() => ladder.value.yourRanker);
 const biasCost = computed(() =>
   ladder.value.getNextUpgradeCost(yourRanker.value.bias)
 );
-const allRankers = computed(() => store.getters["ladder/allRankers"]);
+//const allRankers = computed(() => store.getters["ladder/allRankers"]);
 
 const multiCost = computed(() =>
   ladder.value.getNextUpgradeCost(yourRanker.value.multiplier)
@@ -209,11 +196,7 @@ const isMultiEnabled = computed(
 
 // ETA
 const etaBias = computed(() => eta(yourRanker.value).toPoints(biasCost.value));
-const etaMulti = computed(() =>
-  yourRanker.value.rank === 1
-    ? Infinity
-    : eta(yourRanker.value).toPower(multiCost.value)
-);
+const etaMulti = computed(() => eta(yourRanker.value).toPower(multiCost.value));
 
 // Functions
 
@@ -263,13 +246,13 @@ function promote(event) {
  * @param {Ranker} ranker
  */
 
+/*
 window.eta = eta;
-
 window.secondsToHms = secondsToHms;
 window.allRankers = allRankers;
 window.rankers = (i) => {
   return allRankers.value[i];
-};
+};*/
 </script>
 
 <style lang="scss" scoped>

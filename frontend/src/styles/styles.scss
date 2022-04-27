@@ -124,3 +124,14 @@ span.input-group-text {
   background-color: $navbar-color;
   border-color: $button-color;
 }
+
+div {
+  &.accordion-item {
+    background-color: $background-color;
+
+    .accordion-button {
+      background: $navbar-color;
+      color: $main-color;
+    }
+  }
+}

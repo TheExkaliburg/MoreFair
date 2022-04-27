@@ -47,9 +47,9 @@ const rankers = computed(() => store.getters["ladder/allRankers"]);
 
 //const numberFormatter = computed(() => store.state.numberFormatter);
 //const ladder = computed(() => store.state.ladder);
-const highlightMentions = computed(() =>
+/*const highlightMentions = computed(() =>
   store.getters["options/getOptionValue"]("highlightMentions")
-);
+);*/
 
 const mentionSound = computed(() =>
   store.getters["options/getOptionValue"]("mentionSound")
@@ -76,14 +76,14 @@ class MessagePart {
   is(type) {
     if (this.type === type) return true;
     if (type === MessagePartType.plain) {
-      //Here we can disable the different types of highlighting
+      /*Here we could disable the different types of highlighting
       if (!highlightMentions.value) {
         return (
           this.type === MessagePartType.mentionName ||
           this.type === MessagePartType.mentionNumber ||
           this.type === MessagePartType.mentionAtsign
         );
-      }
+      }*/
     }
   }
 }

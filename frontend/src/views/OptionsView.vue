@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="scroller">
     <div v-for="option in options" :key="option">
       <OptionSection :options="option" />
     </div>
@@ -24,4 +24,9 @@ const options = computed(() => store.state.options.options);
 </script>
 <style lang="scss" scoped>
 @import "../styles/styles";
+
+.scroller {
+  max-height: calc(100vh - 56px);
+  overflow: auto !important;
+}
 </style>

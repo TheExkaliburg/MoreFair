@@ -85,7 +85,9 @@
       </div>
     </div>
   </div>
-  <router-view />
+  <div class="view">
+    <router-view />
+  </div>
 </template>
 
 <script setup>
@@ -258,5 +260,9 @@ nav {
   a {
     font-weight: bold;
   }
+}
+
+.view {
+  max-height: calc(100vh - 56px);
 }
 </style>

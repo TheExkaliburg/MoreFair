@@ -32,12 +32,10 @@ const optionsModule = {
               name: "showAllRankers",
               value: false,
             }),
-            new RangeOption({
+            new IntegerOption({
               displayName: "Rankers at top",
               name: "rankersAtTop",
-              value: 10,
-              min: 0,
-              max: 100,
+              value: 5,
             }).setActiveFn(() => {
               return !optionsModule.store.getters["options/getOptionValue"](
                 "showAllRankers"
@@ -59,35 +57,21 @@ const optionsModule = {
           name: "chatSettings",
           options: [
             new BoolOption({
-              displayName: "Highlight Mentions",
-              name: "highlightMentions",
-              value: true,
-            }),
-            new BoolOption({
               displayName: "Play sound on mention",
               name: "mentionSound",
               value: false,
-            }).setActiveFn(() => {
-              return optionsModule.store.getters["options/getOptionValue"](
-                "highlightMentions"
-              );
             }),
             new RangeOption({
               displayName: "Sound Volume",
               name: "mentionSoundVolume",
-              value: 100,
+              value: 50,
               min: 0,
               max: 100,
-            }).setActiveFn(() => {
-              return (
-                optionsModule.store.getters["options/getOptionValue"](
-                  "mentionSound"
-                ) &&
-                optionsModule.store.getters["options/getOptionValue"](
-                  "highlightMentions"
-                )
-              );
-            }),
+            }).setActiveFn(() =>
+              optionsModule.store.getters["options/getOptionValue"](
+                "mentionSound"
+              )
+            ),
           ],
         }),
         new OptionSection({
@@ -106,6 +90,15 @@ const optionsModule = {
             new BoolOption({
               displayName: "Enable Chat Features",
               name: "enableChatModFeatures",
+              value: false,
+            }).setVisibleFn(
+              () =>
+                !optionsModule.store.getters["options/getOption"]("modFeatures")
+                  .visible
+            ),
+            new BoolOption({
+              displayName: "Unrestricted Ladder & Chat Access",
+              name: "enableUnrestrictedAccess",
               value: false,
             }).setVisibleFn(
               () =>

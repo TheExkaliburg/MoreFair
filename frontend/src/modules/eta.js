@@ -16,6 +16,7 @@ export function eta(ranker) {
     if (ranker.rank === 1 || !ranker.growing) return 0;
     return (ranker.bias + ranker.rank - 1) * ranker.multiplier;
   }
+
   return {
     /**
      * @param {Ranker} ranker2 - ranker to reach
@@ -70,7 +71,7 @@ export function eta(ranker) {
     toPower: (power) => {
       //A bit weird, but ranker.power is guaranteed to be a Decimal object and power might not be.
       power = new Decimal(power);
-      return power.sub(ranker.power).div(powerPerSecond(ranker));
+      return power.sub(ranker.power).div(powerPerSecond(ranker)).toNumber();
     },
     /**
      * @param {number} rank - rank to reach
