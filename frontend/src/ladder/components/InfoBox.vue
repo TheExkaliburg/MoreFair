@@ -196,7 +196,11 @@ const isMultiEnabled = computed(
 
 // ETA
 const etaBias = computed(() => eta(yourRanker.value).toPoints(biasCost.value));
-const etaMulti = computed(() => eta(yourRanker.value).toPower(multiCost.value));
+const etaMulti = computed(() =>
+  yourRanker.value.rank === 1
+    ? Infinity
+    : eta(yourRanker.value).toPower(multiCost.value)
+);
 
 // Functions
 

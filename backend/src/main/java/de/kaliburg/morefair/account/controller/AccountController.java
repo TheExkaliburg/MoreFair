@@ -82,7 +82,7 @@ public class AccountController {
             String username = wsMessage.getContent();
             username = username.trim();
             if (username.length() > 32) username = username.substring(0, 32);
-            username = StringEscapeUtils.escapeJava(HtmlUtils.htmlEscape(username));
+            username = StringEscapeUtils.escapeJava(username);
 
             log.debug("/app/account/name {} {}", uuid, username);
 

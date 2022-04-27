@@ -87,7 +87,7 @@ public class ChatController {
             String metadata = wsMessage.getMetadata();
             message = message.trim();
             if (message.length() > 140) message = message.substring(0, 140);
-            message = StringEscapeUtils.escapeJava(HtmlUtils.htmlEscape(message));
+            message = StringEscapeUtils.escapeJava(message);
 
             Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null || account.getAccessRole().equals(AccountAccessRole.MUTED_PLAYER) || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER))

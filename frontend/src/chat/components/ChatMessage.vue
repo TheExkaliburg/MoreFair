@@ -3,14 +3,14 @@
     <div class="row py-0 message-header">
       <div class="col-4 message-username">
         <span class="message-user-name">
-          <span v-html="msg.username" />
+          <span>{{ msg.username }}</span>
         </span>
         <span class="message-user-id">&nbsp;#{{ msg.accountId }}</span>
       </div>
       <div class="col-4 message-status">
         <strong>{{
           msg.timesAsshole > 0
-            ? "[" + settings.assholeTags[msg.timesAsshole + 1] + "]"
+            ? "[" + settings.assholeTags[msg.timesAsshole] + "]"
             : ""
         }}</strong>
       </div>
