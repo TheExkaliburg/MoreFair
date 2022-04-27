@@ -67,6 +67,11 @@
           </button>
         </div>
       </div>
+      <div v-if="store.getters.isMod" class="row">
+        <div class="col-8">
+          <router-link to="/mod">Moderation</router-link>
+        </div>
+      </div>
       <div class="row">
         <div class="col-8">
           <a href="https://discord.gg/ThKzCknfFr">Discord</a>

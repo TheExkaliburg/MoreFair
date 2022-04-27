@@ -22,7 +22,10 @@
         <a data-bs-toggle="dropdown">...</a>
         <ul class="dropdown-menu">
           <li>
-            <a class="dropdown-item" href="#" @click="onChange">test</a>
+            <a class="dropdown-item" href="#" @click="ban">Ban</a>
+            <a class="dropdown-item" href="#" @click="mute">Mute</a>
+            <a class="dropdown-item" href="#" @click="rename">Rename</a>
+            <a class="dropdown-item" href="#" @click="free">Free</a>
           </li>
         </ul>
       </div>
@@ -34,17 +37,59 @@
 </template>
 
 <script setup>
-import { computed, defineProps } from "vue";
+import { computed, defineProps, inject } from "vue";
 import { useStore } from "vuex";
 import ChatMessageBody from "@/chat/components/ChatMessageBody";
 
 const store = useStore();
+const stompClient = inject("$stompClient");
 const settings = computed(() => store.state.settings);
 const accessRole = computed(() => store.state.user.accessRole);
 
-defineProps({
+const props = defineProps({
   msg: Object,
 });
+
+function ban() {
+  if (
+    confirm(
+      `Are you sure you want to ban "${props.msg.username}" (#${props.msg.accountId})`
+    )
+  ) {
+    stompClient.send("/app/mod/ban/" + props.msg.accountId);
+  }
+}
+
+function mute() {
+  if (
+    confirm(
+      `Are you sure you want to mute "${props.msg.username}" (#${props.msg.accountId})`
+    )
+  ) {
+    stompClient.send("/app/mod/mute/" + props.msg.accountId);
+  }
+}
+
+function rename() {
+  const newName = prompt(
+    `What would you like to name "${props.msg.username}" (#${props.msg.accountId})`
+  );
+  if (newName) {
+    stompClient.send("/app/mod/name/" + props.msg.accountId, {
+      content: newName,
+    });
+  }
+}
+
+function free() {
+  if (
+    confirm(
+      `Are you sure you want to free "${props.msg.username}" (#${props.msg.accountId})`
+    )
+  ) {
+    stompClient.send("/app/mod/free/" + props.msg.accountId);
+  }
+}
 </script>
 
 <style lang="scss" scoped>

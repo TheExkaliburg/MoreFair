@@ -23,7 +23,14 @@ let store = createStore({
       }),
     };
   },
-  getters: {},
+  getters: {
+    isMod(state) {
+      return (
+        state.user.accessRole === "OWNER" ||
+        state.user.accessRole === "MODERATOR"
+      );
+    },
+  },
   mutations: {
     initSettings(state, payload) {
       if (payload.message.content) {
@@ -85,6 +92,7 @@ let store = createStore({
     sounds: soundsModule,
   },
 });
+
 optionsModule.setStore(store);
 store.registerModule("options", optionsModule);
 window.store = store;
