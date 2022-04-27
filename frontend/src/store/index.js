@@ -6,6 +6,7 @@ import UserDetails from "@/store/entities/userDetails";
 import { numberformat } from "swarm-numberformat";
 import optionsModule from "@/options/store/optionsModule";
 import soundsModule from "@/sounds/store/soundsModule";
+import moderationModule from "@/moderation/store/moderationModule";
 
 let store = createStore({
   strict: process.env.NODE_ENV !== "production",
@@ -90,6 +91,7 @@ let store = createStore({
     chat: chatModule,
     //options: optionsModule,
     sounds: soundsModule,
+    mod: moderationModule,
   },
 });
 

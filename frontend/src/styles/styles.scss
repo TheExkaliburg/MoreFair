@@ -118,3 +118,9 @@ table tbody tr {
 .dropdown-pagination {
   white-space: nowrap;
 }
+
+span.input-group-text {
+  color: $main-color;
+  background-color: $navbar-color;
+  border-color: $button-color;
+}

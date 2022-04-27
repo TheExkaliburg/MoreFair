@@ -15,15 +15,19 @@ import de.kaliburg.morefair.utils.WSUtils;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.HtmlUtils;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Controller
 @Log4j2
@@ -225,6 +229,30 @@ public class ModerationController {
             wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
             log.error(e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    @GetMapping(value = "/mod/search/user", produces = "application/json")
+    public ResponseEntity<Map<Long, String>> searchUsername(@CookieValue(name="_uuid", defaultValue = "") String uuid,  @RequestParam("name") String name){
+        try{
+            uuid = StringEscapeUtils.escapeJava(uuid);
+            name = StringEscapeUtils.escapeJava(name);
+            Account account = accountService.findAccountByUUID(UUID.fromString(uuid));
+            if(account ==  null || !(account.hasModPowers())){
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+            List<Account> accountsWithName = accountService.findUsername(name);
+
+            if(accountsWithName.size() >= 100){
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            Map<Long, String> result = accountsWithName.stream().collect(Collectors.toMap(Account::getId, Account::getUsername));
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        }catch(Exception e){
+            log.error(e.getMessage());
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

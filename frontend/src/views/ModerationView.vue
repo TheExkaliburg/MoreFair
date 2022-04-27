@@ -2,61 +2,80 @@
   <div v-if="store.getters.isMod" class="m-1">
     <div class="container-fluid">
       <div class="row">
-        <div class="col-6">
+        <div class="col">
           <div class="row m-1">
             <div class="input-group">
               <span class="input-group-text"> Find Account-ID: </span>
               <input
-                id="usernameLookup"
+                v-model="searchUsernameInput"
                 class="form-control shadow-none"
                 maxlength="64"
+                name="name"
                 placeholder="Username"
                 type="text"
+                @keydown.enter="searchUserName"
               />
               <button
-                id="lookupButton"
-                class="btn btn-primary shadow-none"
+                class="btn btn-outline-primary shadow-none"
                 href="#"
+                type="submit"
+                @click="searchUserName"
               >
                 Send
               </button>
             </div>
           </div>
           <div class="row m-2">
-            <div id="lookupResult">Result: [0]</div>
+            <div>Result: {{ moderation.userNameSearchResults }}</div>
           </div>
           <div class="row m-1">
             <div class="input-group">
-              <span class="input-group-text"> Force Event: </span>
+              <span class="input-group-text"> Take Action: </span>
               <input
-                id="idInput"
+                v-model="actionUserIdInput"
                 class="form-control shadow-none"
                 maxlength="64"
                 placeholder="Account-ID"
                 type="text"
               />
               <button
-                id="idButton"
-                class="btn btn-primary shadow-none"
+                class="btn btn-outline-primary shadow-none"
                 href="#"
+                @click="ban"
               >
-                Send
+                Ban
+              </button>
+              <button
+                class="btn btn-outline-primary shadow-none"
+                href="#"
+                @click="mute"
+              >
+                Mute
+              </button>
+              <button
+                class="btn btn-outline-primary shadow-none"
+                href="#"
+                @click="rename"
+              >
+                Rename
+              </button>
+              <button
+                class="btn btn-outline-primary shadow-none"
+                href="#"
+                @click="free"
+              >
+                Free
+              </button>
+              <button
+                v-if="store.state.user.accessRole === 'OWNER'"
+                class="btn btn-outline-primary shadow-none"
+                href="#"
+                @click="mod"
+              >
+                Mod
               </button>
             </div>
           </div>
-          <table class="table table-sm table-striped table-borderless">
-            <thead>
-              <tr>
-                <th class="col-4"></th>
-                <th class="col-2"></th>
-                <th class="col"></th>
-              </tr>
-            </thead>
-            <tbody id="updateBody"></tbody>
-          </table>
-        </div>
-        <div class="col-6">
-          <ChatWindow />
         </div>
       </div>
     </div>
@@ -65,9 +84,54 @@
 
 <script setup>
 import { useStore } from "vuex";
-import ChatWindow from "@/chat/components/ChatWindow";
-
+import { computed, inject, ref } from "vue";
+// sdad
 const store = useStore();
+const stompClient = inject("$stompClient");
+
+const moderation = computed(() => store.state.mod);
+
+const searchUsernameInput = ref("");
+const actionUserIdInput = ref("");
+
+function searchUserName() {
+  store.dispatch({ type: "mod/searchName", name: searchUsernameInput.value });
+}
+
+function ban() {
+  if (confirm(`Are you sure you want to ban (#${actionUserIdInput.value})`)) {
+    stompClient.send("/app/mod/ban/" + actionUserIdInput.value);
+  }
+}
+
+function mute() {
+  if (confirm(`Are you sure you want to mute (#${actionUserIdInput.value})`)) {
+    stompClient.send("/app/mod/mute/" + actionUserIdInput.value);
+  }
+}
+
+function rename() {
+  const newName = prompt(
+    `What would you like to name (#${actionUserIdInput.value})`
+  );
+  if (newName) {
+    stompClient.send("/app/mod/name/" + actionUserIdInput.value, {
+      content: newName,
+    });
+  }
+}
+
+function free() {
+  if (confirm(`Are you sure you want to free (#${actionUserIdInput.value})`)) {
+    stompClient.send("/app/mod/free/" + actionUserIdInput.value);
+  }
+}
+
+function mod() {
+  if (confirm(`Are you sure you want to mod (#${actionUserIdInput.value})`)) {
+    stompClient.send("/app/mod/mod/" + actionUserIdInput.value);
+  }
+}
 </script>
 
 <style lang="scss" scoped></style>

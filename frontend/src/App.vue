@@ -94,7 +94,7 @@ import { useStore } from "vuex";
 import Cookies from "js-cookie";
 import { StompClient } from "@/websocket/stompClient";
 
-//import { hooksSystemSetup } from "@/modules/hooks";
+//import { hooksSystemSetup } from "@/store/hooks";
 
 //hooksSystemSetup();
 
@@ -197,7 +197,6 @@ async function importCookie() {
       Cookies.set("_uuid", newUUID, {
         expires: 10 * 365,
         secure: true,
-        sameSite: "lax",
       });
       await setTimeout(
         async () => await navigator.clipboard.writeText(oldUuid),

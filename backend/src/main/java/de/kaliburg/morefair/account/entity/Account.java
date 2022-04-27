@@ -51,4 +51,8 @@ public class Account {
     public AccountDetailsDTO convertToDTO() {
         return new AccountDetailsDTO(this);
     }
+
+    public boolean hasModPowers(){
+        return getAccessRole().equals(AccountAccessRole.MODERATOR) || getAccessRole().equals(AccountAccessRole.OWNER);
+    }
 }

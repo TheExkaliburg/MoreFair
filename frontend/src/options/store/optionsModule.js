@@ -5,7 +5,7 @@ import {
   RangeOption,
 } from "../entities/option";
 
-//import { createHookEndpoint } from "@/modules/hooks";
+//import { createHookEndpoint } from "@/store/hooks";
 
 //const optionChangedHook = createHookEndpoint(
 //  "optionChanged",

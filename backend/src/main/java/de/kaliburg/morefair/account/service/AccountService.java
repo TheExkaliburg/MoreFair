@@ -14,8 +14,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -156,5 +154,9 @@ public class AccountService {
             account.setAccessRole(AccountAccessRole.MODERATOR);
             saveAccount(account);
         }
+    }
+
+    public List<Account> findUsername(String username){
+        return accountRepository.findAccountsByUsernameIsContaining(username);
     }
 }

@@ -2,6 +2,7 @@ package de.kaliburg.morefair.account.repository;
 
 import de.kaliburg.morefair.account.entity.Account;
 import de.kaliburg.morefair.account.type.AccountAccessRole;
+import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,4 +27,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     @Query("SELECT a FROM Account a WHERE a.accessRole = :role")
     List<Account> findAllAccountsByAccessRole(@Param("role") AccountAccessRole accessRole);
+
+    @Query("select a from Account a where lower( a.username) like concat('%', lower(:username), '%')")
+    List<Account> findAccountsByUsernameIsContaining(@Param("username") @NonNull String username);
 }
