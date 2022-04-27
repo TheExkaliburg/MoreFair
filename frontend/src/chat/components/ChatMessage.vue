@@ -16,7 +16,10 @@
       </div>
       <div class="col-3 message-date">{{ msg.timeCreated }}</div>
       <div
-        v-if="accessRole === 'OWNER' || accessRole === 'MODERATOR'"
+        v-if="
+          store.getters['options/getOption']('enableChatModFeatures') &&
+          store.getters['isMod']
+        "
         class="col-1 message-options"
       >
         <a data-bs-toggle="dropdown">...</a>
@@ -44,7 +47,6 @@ import ChatMessageBody from "@/chat/components/ChatMessageBody";
 const store = useStore();
 const stompClient = inject("$stompClient");
 const settings = computed(() => store.state.settings);
-const accessRole = computed(() => store.state.user.accessRole);
 
 const props = defineProps({
   msg: Object,

@@ -1,8 +1,8 @@
 import {
   BoolOption,
-  RangeOption,
   IntegerOption,
   OptionSection,
+  RangeOption,
 } from "../entities/option";
 
 //import { createHookEndpoint } from "@/modules/hooks";
@@ -88,6 +88,30 @@ const optionsModule = {
                 )
               );
             }),
+          ],
+        }),
+        new OptionSection({
+          displayName: "Mod Features",
+          name: "modFeatures",
+          options: [
+            new BoolOption({
+              displayName: "Enable Moderation Page",
+              name: "enableModPage",
+              value: false,
+            }).setVisibleFn(
+              () =>
+                !optionsModule.store.getters["options/getOption"]("modFeatures")
+                  .visible
+            ),
+            new BoolOption({
+              displayName: "Enable Chat Features",
+              name: "enableChatModFeatures",
+              value: false,
+            }).setVisibleFn(
+              () =>
+                !optionsModule.store.getters["options/getOption"]("modFeatures")
+                  .visible
+            ),
           ],
         }),
       ],

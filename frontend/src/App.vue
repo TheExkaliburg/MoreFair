@@ -67,7 +67,13 @@
           </button>
         </div>
       </div>
-      <div v-if="store.getters.isMod" class="row">
+      <div
+        v-if="
+          store.getters['options/getOption']('enableModPage') &&
+          store.getters['isMod']
+        "
+        class="row"
+      >
         <div class="col-8">
           <router-link to="/mod">Moderation</router-link>
         </div>

@@ -22,11 +22,13 @@ class Option {
       this.active = this.isActive();
     }
   }
+
   setVisibleFn(fn) {
     this.isVisible = fn;
     setTimeout(this.updateDisplayProps, 10);
     return this;
   }
+
   setActiveFn(fn) {
     this.isActive = fn;
     setTimeout(this.updateDisplayProps, 10);
