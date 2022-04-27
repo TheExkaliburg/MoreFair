@@ -585,9 +585,9 @@ onUpdated(() => {
 
 .chatInputPlaceholder {
   z-index: 3;
-  color: $input-placeholder-color;
+  color: $input-placeholder-color !important;
   font-size: 1.2em;
-  font-weight: bold;
+  //font-weight: bold;
   white-space: nowrap;
   overflow-x: hidden;
   text-overflow: ellipsis;
@@ -595,7 +595,7 @@ onUpdated(() => {
   height: 100%;
   position: absolute;
 
-  margin-left: 1em;
+  margin-left: 0.6em;
 
   display: flex;
   justify-content: center;

@@ -22,11 +22,11 @@ import java.util.List;
 public class FairController {
     public final static Integer MINIMUM_PEOPLE_FOR_PROMOTE = 10;
     // 250 Millionen
-    public final static BigInteger POINTS_FOR_PROMOTE = new BigInteger("200");
+    public final static BigInteger POINTS_FOR_PROMOTE = new BigInteger("100000000");
     // 500 Thousand
     public final static BigInteger BASE_VINEGAR_NEEDED_TO_THROW = new BigInteger("500000");
     // 2 Thousand
-    public final static BigInteger BASE_GRAPES_NEEDED_TO_AUTO_PROMOTE = new BigInteger("200");
+    public final static BigInteger BASE_GRAPES_NEEDED_TO_AUTO_PROMOTE = new BigInteger("5000");
     public final static Integer AUTO_PROMOTE_LADDER = 1;
     public final static Integer MANUAL_PROMOTE_WAIT_TIME = 30;
     public final static Integer BASE_ASSHOLE_LADDER = 10;
