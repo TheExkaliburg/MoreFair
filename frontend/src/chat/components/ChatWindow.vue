@@ -599,8 +599,8 @@ onUpdated(() => {
   background-color: rgba(0, 0, 0, 0);
   color: #de9e41;
   overflow-x: scroll;
+  white-space: nowrap;
   //hide scrollbar
-
   -ms-overflow-style: none;
   scrollbar-width: none;
 
