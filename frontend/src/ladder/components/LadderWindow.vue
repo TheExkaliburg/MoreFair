@@ -1,6 +1,13 @@
 <template>
   <div class="row py-1">
     <div class="col">
+      <span
+        >Active Rankers: {{ store.getters["ladder/activeRankers"].length }}/{{
+          store.state.ladder.ladder.rankers.length
+        }}</span
+      >
+    </div>
+    <div class="col">
       <span>Asshole Ladder: {{ store.state.settings.assholeLadder }}</span>
     </div>
     <PaginationGroup

@@ -142,5 +142,8 @@ export default {
     allRankers(state) {
       return state.ladder.rankers;
     },
+    activeRankers(state) {
+      return state.ladder.rankers.filter((ranker) => ranker.growing);
+    },
   },
 };
