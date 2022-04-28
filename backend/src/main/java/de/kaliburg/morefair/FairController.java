@@ -2,8 +2,8 @@ package de.kaliburg.morefair;
 
 import de.kaliburg.morefair.account.service.AccountService;
 import de.kaliburg.morefair.dto.InfoDTO;
-import de.kaliburg.morefair.websockets.messages.WSMessage;
 import de.kaliburg.morefair.utils.WSUtils;
+import de.kaliburg.morefair.websockets.messages.WSMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.http.HttpStatus;
@@ -11,7 +11,6 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -59,14 +58,13 @@ public class FairController {
     private final AccountService accountService;
     private final WSUtils wsUtils;
 
-
     public FairController(AccountService accountService, WSUtils wsUtils) {
         this.accountService = accountService;
         this.wsUtils = wsUtils;
     }
 
-    @GetMapping(value = "/**/{path:[^\\.]*}")
-    public String forwardVuePaths(){
+    @GetMapping(value = {"/options", "/help", "/mod"})
+    public String forward() {
         return "forward:/";
     }
 
