@@ -380,10 +380,8 @@ function plainTextElementChanged(mutation) {
 
     dropdown.appendChild(option);
   }
-  //add the dropdown to the document
-  let navbar = document.getElementById("chatInput");
-  document.body.appendChild(dropdown);
 
+  let navbar = document.getElementById("chatInput");
   let offBot;
 
   let bounds = navbar.getBoundingClientRect();
