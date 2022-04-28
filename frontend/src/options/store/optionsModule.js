@@ -94,7 +94,7 @@ const optionsModule = {
               value: false,
             }),
           ],
-        }).setVisibleFn(() => optionsModule.store.getters.isMod),
+        }).setVisibleFn(() => optionsModule.store.getters["isMod"]),
       ],
     };
   },

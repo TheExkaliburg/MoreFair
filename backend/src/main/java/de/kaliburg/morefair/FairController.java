@@ -11,6 +11,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -64,14 +65,9 @@ public class FairController {
         this.wsUtils = wsUtils;
     }
 
-    @GetMapping("/legacy")
-    public String getLegacy() {
-        return "fair";
-    }
-
-    @GetMapping("/legacy/help")
-    public String getHelp() {
-        return "help";
+    @GetMapping(value = "/**/{path:[^\\.]*}")
+    public String forwardVuePaths(){
+        return "forward:/";
     }
 
     @MessageMapping("/info")
