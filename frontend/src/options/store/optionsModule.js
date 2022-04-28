@@ -105,6 +105,7 @@ const optionsModule = {
         (section) => section.options || [section]
       );
       allOptions = [].concat(...allOptions);
+      state.options.forEach((option) => option.updateDisplayProps());
       allOptions.forEach((option) => option.updateDisplayProps());
     },
     loadOptions(state) {
@@ -123,6 +124,7 @@ const optionsModule = {
               option.value = value;
             }
           });
+          state.options.forEach((option) => option.updateDisplayProps());
           allOptions.forEach((option) => option.updateDisplayProps());
         }
       } catch (e) {
