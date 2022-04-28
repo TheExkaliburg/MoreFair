@@ -100,8 +100,13 @@ const optionsModule = {
   },
   mutations: {
     init(state) {
-      state.options = [];
       //TODO: load from server
+      let allOptions = state.options.map(
+        (section) => section.options || [section]
+      );
+      allOptions = [].concat(...allOptions);
+      state.options.forEach((option) => option.updateDisplayProps());
+      allOptions.forEach((option) => option.updateDisplayProps());
     },
     loadOptions(state) {
       //TODO: load locally

@@ -143,6 +143,26 @@ onMounted(() => {
             oldValue: "",
           });
         } else {
+          if (mutation.addedNodes.length > 0) {
+            //validate any potential added spans
+            mutation.addedNodes.forEach(function (node) {
+              if (node.tagName === "SPAN") {
+                if (node.classList.contains("mention")) {
+                  onElementChange({
+                    target: node,
+                    type: "characterData",
+                    oldValue: "",
+                  });
+                  console.info(node.innerText);
+                }
+              } else {
+                //convert it to a text node
+                const textNode = document.createTextNode(node.innerText);
+                node.parentNode.replaceChild(textNode, node);
+                console.info(node.innerText);
+              }
+            });
+          }
           //If the chat box was cleared, we need to remove the mention elements
           if (document.getElementById("chatInput").innerText.trim() === "") {
             let oldDropdown = document.getElementById("mentionDropdown");
@@ -153,6 +173,18 @@ onMounted(() => {
         }
       }
     });
+    //Remove all nodes that are not text nodes, spans, or brs
+    const msgBox = document.getElementById("chatInput");
+    const children = msgBox.childNodes;
+    for (let i = 0; i < children.length; i++) {
+      if (
+        children[i].nodeType !== 3 &&
+        children[i].tagName !== "SPAN" &&
+        children[i].tagName !== "BR"
+      ) {
+        msgBox.removeChild(children[i]);
+      }
+    }
   });
   let config = {
     attributes: true,
@@ -380,10 +412,8 @@ function plainTextElementChanged(mutation) {
 
     dropdown.appendChild(option);
   }
-  //add the dropdown to the document
-  let navbar = document.getElementById("chatInput");
-  document.body.appendChild(dropdown);
 
+  let navbar = document.getElementById("chatInput");
   let offBot;
 
   let bounds = navbar.getBoundingClientRect();
@@ -569,8 +599,8 @@ onUpdated(() => {
   background-color: rgba(0, 0, 0, 0);
   color: #de9e41;
   overflow-x: scroll;
+  white-space: nowrap;
   //hide scrollbar
-
   -ms-overflow-style: none;
   scrollbar-width: none;
 

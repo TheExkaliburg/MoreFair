@@ -104,6 +104,7 @@ const store = useStore();
 const stompClient = new StompClient();
 
 //Prompt the store/options to load the options
+store.commit("options/init");
 store.commit("options/loadOptions");
 
 let setupPromise = setupConnection();
