@@ -5,6 +5,7 @@ import de.kaliburg.morefair.account.entity.Account;
 import de.kaliburg.morefair.account.events.AccountServiceEvent;
 import de.kaliburg.morefair.account.service.AccountService;
 import de.kaliburg.morefair.chat.MessageService;
+import de.kaliburg.morefair.dto.LadderResultsDTO;
 import de.kaliburg.morefair.dto.LadderViewDTO;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.EventType;
@@ -46,6 +47,8 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
     @Getter
     private final Map<Integer, Ladder> ladders = new HashMap<>();
     private final AccountService accountService;
+    @Getter
+    private LadderResultsDTO lastRoundResults;
 
     public RankerService(RankerRepository rankerRepository, LadderRepository ladderRepository, MessageService messageService, @Lazy AccountService accountService) {
         this.rankerRepository = rankerRepository;
@@ -431,6 +434,7 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
             int neededAssholesForReset = Math.max(FairController.ASSHOLES_FOR_RESET, (assholeLadder + 1) >> 1);
 
             if (assholeCount >= neededAssholesForReset) {
+                lastRoundResults = new LadderResultsDTO(ladders);
                 deleteAllRanker();
                 for (Ladder ladder : ladders.values()) {
                     ladder = ladderRepository.findLadderByUUIDWithRanker(ladder.getUuid());
