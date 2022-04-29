@@ -146,6 +146,9 @@ onMounted(() => {
           if (mutation.addedNodes.length > 0) {
             //validate any potential added spans
             mutation.addedNodes.forEach(function (node) {
+              if (node.tagName === "BR") {
+                return;
+              }
               if (node.tagName === "SPAN") {
                 if (node.classList.contains("mention")) {
                   onElementChange({
@@ -153,13 +156,11 @@ onMounted(() => {
                     type: "characterData",
                     oldValue: "",
                   });
-                  console.info(node.innerText);
                 }
               } else {
                 //convert it to a text node
                 const textNode = document.createTextNode(node.innerText);
                 node.parentNode.replaceChild(textNode, node);
-                console.info(node.innerText);
               }
             });
           }
