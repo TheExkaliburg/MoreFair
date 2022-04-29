@@ -156,13 +156,11 @@ onMounted(() => {
                     type: "characterData",
                     oldValue: "",
                   });
-                  console.info(node.innerText);
                 }
               } else {
                 //convert it to a text node
                 const textNode = document.createTextNode(node.innerText);
                 node.parentNode.replaceChild(textNode, node);
-                console.log(node, node.innerText);
               }
             });
           }
