@@ -26,8 +26,8 @@ const props = defineProps({
 const value = computed(() => props.option.value);
 const min = computed(() => props.option.min);
 const max = computed(() => props.option.max);
-const visible = computed(() => props.option.visible);
-const active = computed(() => props.option.active);
+const visible = computed(() => props.option.isVisible());
+const active = computed(() => props.option.isActive());
 
 function update({ target }) {
   const newValue = target.value;

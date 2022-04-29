@@ -4,6 +4,7 @@ import de.kaliburg.morefair.FairController;
 import de.kaliburg.morefair.account.entity.Account;
 import de.kaliburg.morefair.account.service.AccountService;
 import de.kaliburg.morefair.account.type.AccountAccessRole;
+import de.kaliburg.morefair.dto.LadderResultsDTO;
 import de.kaliburg.morefair.dto.LadderViewDTO;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.EventType;
@@ -15,10 +16,12 @@ import de.kaliburg.morefair.utils.WSUtils;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.UUID;
 
@@ -39,6 +42,19 @@ public class RankerController {
         this.wsUtils = wsUtils;
     }
 
+
+    @GetMapping(value = "/lastRound", produces = "application/json")
+    public ResponseEntity<LadderResultsDTO> getStatistics(){
+        try{
+            if(rankerService.getLastRoundResults() == null)
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(rankerService.getLastRoundResults(), HttpStatus.OK);
+        }catch(Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @MessageMapping("/ladder/init/{number}")
     public void initLadder(SimpMessageHeaderAccessor sha, WSMessage wsMessage, @DestinationVariable("number") Integer number) {

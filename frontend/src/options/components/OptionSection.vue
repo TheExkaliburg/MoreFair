@@ -1,5 +1,5 @@
 <template>
-  <div v-if="options.visible" class="option-section">
+  <div v-if="options.isVisible()" class="option-section">
     <h2 class="title">{{ props.options.displayName }}</h2>
     <div v-for="option in props.options.options" :key="option">
       <CheckBox v-if="option instanceof BoolOption" :option="option" />

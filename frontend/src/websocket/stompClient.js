@@ -6,7 +6,7 @@ export class StompClient {
   constructor() {
     let isInDevelop = process.env.NODE_ENV === "development";
     let connection = isInDevelop
-      ? "http://fair.kaliburg.de/fairsocket"
+      ? "http://localhost:8080/fairsocket"
       : "/fairsocket";
     let socket = SockJs(connection);
     this.subscribeMap = new Map();

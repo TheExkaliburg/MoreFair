@@ -94,6 +94,11 @@ class Ladder {
           new Decimal(3).mul(delta).floor()
         );
     }
+    rankers.sort((a, b) => b.points.sub(a.points));
+
+    rankers.forEach((ranker, index) => {
+      ranker.rank = index + 1;
+    });
 
     this.rankers = rankers;
     this.firstRanker = rankers[0];
