@@ -1,8 +1,8 @@
 class Option {
   //eslint-disable-next-line no-unused-vars
   constructor(payload) {
-    this.visible = true;
-    this.active = true;
+    this.isVisible = () => true;
+    this.isActive = () => true;
   }
 
   get() {
@@ -14,24 +14,13 @@ class Option {
     throw new Error("Method not implemented.");
   }
 
-  updateDisplayProps() {
-    if (this.isVisible) {
-      this.visible = this.isVisible();
-    }
-    if (this.isActive) {
-      this.active = this.isActive();
-    }
-  }
-
   setVisibleFn(fn) {
     this.isVisible = fn;
-    setTimeout(this.updateDisplayProps, 10);
     return this;
   }
 
   setActiveFn(fn) {
     this.isActive = fn;
-    setTimeout(this.updateDisplayProps, 10);
     return this;
   }
 }
@@ -130,28 +119,11 @@ export class OptionSection {
     this.displayName = displayName;
     this.name = name;
     this.options = options;
-    this.visible = true;
-    this.active = true;
-  }
-
-  updateDisplayProps() {
-    if (this.isVisible) {
-      this.visible = this.isVisible();
-    }
-    if (this.isActive) {
-      this.active = this.isActive();
-    }
+    this.isVisible = () => true;
   }
 
   setVisibleFn(fn) {
     this.isVisible = fn;
-    setTimeout(this.updateDisplayProps, 10);
-    return this;
-  }
-
-  setActiveFn(fn) {
-    this.isActive = fn;
-    setTimeout(this.updateDisplayProps, 10);
     return this;
   }
 }

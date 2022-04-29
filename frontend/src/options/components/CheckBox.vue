@@ -16,8 +16,8 @@ const props = defineProps({
 });
 
 const value = computed(() => props.option.value);
-const visible = computed(() => props.option.visible);
-const active = computed(() => props.option.active);
+const visible = computed(() => props.option.isVisible());
+const active = computed(() => props.option.isActive());
 
 function update({ target }) {
   const newChecked = target.checked;
