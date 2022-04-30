@@ -17,6 +17,9 @@ const chatModule = {
     update(state, payload) {
       state.chat.update(payload.message);
     },
+    msgFlag(state, payload) {
+      state.chat.msgFlag(payload);
+    },
   },
   actions: {},
   getters: {},
