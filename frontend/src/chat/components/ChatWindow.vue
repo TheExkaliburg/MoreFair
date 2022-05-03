@@ -336,8 +336,22 @@ function plainTextElementChanged(mutation) {
   }
   //We have possible mentions, so now we should display our dropdown
 
+  let numberMention = textBeforeCaret.toLowerCase().startsWith("#");
+
   //First, sorting the mentions by their name and accountId
   possibleMentions.sort((a, b) => {
+    if (numberMention) {
+      //If we are looking for a number, we want a different order to put the numbers lower than the names (and select them easier)
+      if (("#" + a.id).startsWith(textBeforeCaret.toLowerCase())) {
+        if (("#" + b.id).startsWith(textBeforeCaret.toLowerCase())) {
+          return a.id - b.id;
+        }
+        return 1;
+      }
+      if (("#" + b.id).startsWith(textBeforeCaret.toLowerCase())) {
+        return -1;
+      }
+    }
     if (a.name < b.name) {
       return 1;
     }
