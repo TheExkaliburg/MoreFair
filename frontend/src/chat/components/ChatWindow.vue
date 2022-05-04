@@ -630,7 +630,7 @@ onUpdated(() => {
 
 .chatInputPlaceholder {
   z-index: 3;
-  color: $placeholder-color !important;
+  color: var(--placeholder-color) !important;
   font-size: 1.2em;
   //font-weight: bold;
   white-space: nowrap;

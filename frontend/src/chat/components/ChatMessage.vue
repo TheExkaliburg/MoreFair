@@ -106,7 +106,7 @@ function free() {
 }
 
 .message-header {
-  font-size: $header-font-size;
+  font-size: var(--header-font-size);
   color: var(--main-color);
   white-space: nowrap;
 }
@@ -134,8 +134,8 @@ function free() {
 }
 
 .message-body {
-  font-size: $text-font-size;
+  font-size: var(--text-font-size);
   text-align: start;
-  color: $text-color;
+  color: var(--text-color);
 }
 </style>

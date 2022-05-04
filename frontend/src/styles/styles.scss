@@ -5,59 +5,59 @@ body {
   color: var(--main-color);
   overflow-x: hidden;
   overflow-y: hidden;
-  font-size: $text-font-size;
+  font-size: var(--text-font-size);
 }
 
 a {
-  color: $link-color;
+  color: var(--link-color);
 
   &:hover {
-    color: $link-hover-color;
+    color: var(--link-hover-color);
   }
 }
 
 input.form-control {
-  background-color: $navbar-color !important;
-  border-color: $button-color !important;
+  background-color: var(--navbar-color) !important;
+  border-color: var(--button-color) !important;
   color: var(--main-color) !important;
 
   &::placeholder {
-    color: $placeholder-color !important;
+    color: var(--placeholder-color) !important;
     opacity: 0.5;
   }
 }
 
 .navbar {
-  background-color: $navbar-color;
+  background-color: var(--navbar-color);
 }
 
 .btn-outline-primary {
   color: var(--main-color) !important;
-  border-color: $button-color !important;
-  outline-color: $button-color !important;
+  border-color: var(--button-color) !important;
+  outline-color: var(--button-color) !important;
 
   &.active {
-    color: $button-hover-color !important;
+    color: var(--button-hover-color) !important;
     background-color: var(--main-color) !important;
-    outline-color: $button-color !important;
+    outline-color: var(--button-color) !important;
   }
 
   &.show {
-    color: $button-hover-color !important;
-    background-color: $button-hover-background-color !important;
-    outline-color: $button-color !important;
+    color: var(--button-hover-color) !important;
+    background-color: var(--button-hover-background-color) !important;
+    outline-color: var(--button-color) !important;
   }
 
   &:hover {
-    color: $button-hover-color !important;
-    background-color: $button-hover-background-color !important;
-    outline-color: $button-color !important;
+    color: var(--button-hover-color) !important;
+    background-color: var(--button-hover-background-color) !important;
+    outline-color: var(--button-color) !important;
   }
 }
 
 .navbar .navbar-toggler {
-  color: $button-color;
-  border-color: $button-color;
+  color: var(--button-color);
+  border-color: var(--button-color);
 
   i {
     font-size: 1.75rem;
@@ -72,19 +72,19 @@ input.form-control {
 }
 
 div .offcanvas {
-  background-color: $offcanvas-background-color;
+  background-color: var(--offcanvas-background-color);
   font-size: 24px;
 }
 
 .dropdown-menu {
-  background-color: $offcanvas-background-color !important;
+  background-color: var(--offcanvas-background-color) !important;
 
   li .dropdown-item {
     color: var(--main-color) !important;
 
     &:hover {
-      color: $offcanvas-background-color !important;
-      background-color: $button-hover-background-color !important;
+      color: var(--offcanvas-background-color) !important;
+      background-color: var(--button-hover-background-color) !important;
     }
   }
 }
@@ -98,21 +98,21 @@ table {
 }
 
 table thead tr {
-  color: $header-color;
-  font-size: $header-font-size;
+  color: var(--header-color);
+  font-size: var(--header-font-size);
   white-space: nowrap;
   overflow-x: hidden;
 }
 
 table tbody tr {
-  color: $text-color;
-  font-size: $text-font-size;
+  color: var(--text-color);
+  font-size: var(--text-font-size);
   white-space: nowrap;
   overflow-x: hidden;
 }
 
 .text-highlight {
-  color: $text-highlight-color;
+  color: var(--text-highlight-color);
 }
 
 .dropdown-pagination {
@@ -121,8 +121,8 @@ table tbody tr {
 
 span.input-group-text {
   color: var(--main-color);
-  background-color: $navbar-color;
-  border-color: $button-color;
+  background-color: var(--navbar-color);
+  border-color: var(--button-color);
 }
 
 div {
@@ -130,7 +130,7 @@ div {
     background-color: var(--background-color);
 
     .accordion-button {
-      background: $navbar-color;
+      background: var(--navbar-color);
       color: var(--main-color);
     }
   }

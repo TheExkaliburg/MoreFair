@@ -234,7 +234,7 @@ async function exportCookie() {
 }
 
 .navbar-brand:hover {
-  color: $link-color;
+  color: var(--link-color);
 }
 
 .row {
