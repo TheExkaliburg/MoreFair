@@ -55,7 +55,7 @@ const optionsModule = {
             new DropdownOption({
               displayName: "Theme",
               name: "themeSelection",
-              options: ["Default", "Light", "Dark", "GreyScaled"],
+              options: ["Default", "Light"],
               callback: (ctx) => {
                 themeSelector.changeTheme(ctx.get());
               },

@@ -623,7 +623,7 @@ onUpdated(() => {
     display: none;
   }
 
-  border: 1px solid #de9e41;
+  border: 1px solid var(--button-color);
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
 }

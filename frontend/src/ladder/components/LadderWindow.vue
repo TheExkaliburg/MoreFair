@@ -124,11 +124,12 @@ function changeLadder(event) {
 }
 
 .you {
-  background-color: var(--button-color);
-  color: var(--button-hover-color);
+  background-color: var(--you-background-color);
+  color: var(--you-color);
 }
 
 .promoted {
-  background-color: var(--text-highlight-color);
+  background-color: var(--promoted-background-color);
+  color: var(--promoted-color);
 }
 </style>

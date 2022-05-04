@@ -57,57 +57,77 @@ $color-saltpan: #ebede9;
 :root {
   // Colors
   --main-color: #{$color-fire-bush};
+  --main-secondary-color: #{$color-pirate-gold};
   --background-color: #{$color-black-russian-1};
-
-  // Buttons
-  --button-color: #{$color-pirate-gold};
-  --button-hover-color: #{$color-black-pearl};
-  --button-hover-background-color: #{$color-pirate-gold};
-
-  // Navbar
-  --navbar-color: #{$color-black-russian-2};
-  --offcanvas-background-color: #{$color-black-pearl};
-
-  // Text
-  --header-color: #{$color-fire-bush};
-  --header-font-size: 14px;
-
-  --text-font-size: 15px;
-  --text-color: #{$color-givry};
-  --text-highlight-color: #{$color-dark-coral};
-
+  --background-dark-color: #{$color-black-russian-2};
+  --background-light-color: #{$color-black-pearl};
   --placeholder-color: #{$color-claret};
 
+  // Text
+  --text-font-size: 15px;
+  --text-color: #{$color-givry};
+  --text-light-hightlight-color: var(--main-secondary-color);
+  --text-dark-hightlight-color: #{$color-dark-coral};
+
+  // Buttons
+  --button-color: var(--main-secondary-color);
+  --button-hover-color: var(--background-color);
+  --button-hover-background-color: var(--button-color);
+
+  // Ladder
+  --you-color: var(--background-dark-color);
+  --you-background-color: var(--text-dark-hightlight-color);
+  --promoted-color: var(--text-light-hightlight-color);
+  --promoted-background-color: var(--background-dark-color);
+
+  // Chat
+  --header-color: var(--main-color);
+  --header-font-size: 14px;
+
+  // Navbar
+  --navbar-color: var(--background-dark-color);
+  --offcanvas-background-color: var(--background-light-color);
+
   // Link
-  --link-color: #{$color-steel-blue};
   --link-hover-color: #{$color-st-tropaz};
+  --link-color: #{$color-steel-blue};
 }
 
 :root.light {
   // Colors
-  --main-color: #{$color-black-russian-2};
+  --main-color: #{$color-black-pearl};
+  --main-secondary-color: #{$color-black-russian-2};
   --background-color: #{$color-saltpan};
-
-  // Buttons
-  --button-color: #{$color-black-russian-2};
-  --button-hover-color: #{$color-jet-stream};
-  --button-hover-background-color: #{$color-black-russian-2};
-
-  // Navbar
-  --navbar-color: #{$color-black-russian-2};
-  --offcanvas-background-color: #{$color-black-pearl};
-
-  // Text
-  --header-color: #{$color-black-russian-2};
-  --header-font-size: 14px;
-
-  --text-font-size: 15px;
-  --text-color: #{$color-black-russian-1};
-  --text-highlight-color: #{$color-pale-sky};
-
+  --background-dark-color: #{$color-conch};
+  --background-light-color: #{$color-jet-stream};
   --placeholder-color: #{$color-claret};
 
+  // Text
+  --text-font-size: 15px;
+  --text-color: #{$color-black-russian-1};
+  --text-light-hightlight-color: var(--main-secondary-color);
+  --text-dark-hightlight-color: #{$color-blackberry};
+
+  // Buttons
+  --button-color: var(--main-secondary-color);
+  --button-hover-color: var(--background-color);
+  --button-hover-background-color: var(--button-color);
+
+  // Ladder
+  --you-color: var(--background-dark-color);
+  --you-background-color: var(--text-dark-hightlight-color);
+  --promoted-color: var(--text-light-hightlight-color);
+  --promoted-background-color: var(--background-dark-color);
+
+  // Chat
+  --header-color: var(--main-color);
+  --header-font-size: 14px;
+
+  // Navbar
+  --navbar-color: var(--background-dark-color);
+  --offcanvas-background-color: var(--background-light-color);
+
   // Link
-  --link-color: #{$color-steel-blue};
   --link-hover-color: #{$color-st-tropaz};
+  --link-color: #{$color-steel-blue};
 }

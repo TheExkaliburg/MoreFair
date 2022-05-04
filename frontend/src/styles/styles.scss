@@ -32,7 +32,7 @@ input.form-control {
 }
 
 .btn-outline-primary {
-  color: var(--main-color) !important;
+  color: var(--text-color) !important;
   border-color: var(--button-color) !important;
   outline-color: var(--button-color) !important;
 
@@ -112,7 +112,7 @@ table tbody tr {
 }
 
 .text-highlight {
-  color: var(--text-highlight-color);
+  color: var(--text-dark-hightlight-color);
 }
 
 .dropdown-pagination {

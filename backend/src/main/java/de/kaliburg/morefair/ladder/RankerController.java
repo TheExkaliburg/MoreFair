@@ -49,7 +49,7 @@ public class RankerController {
             if(rankerService.getLastRoundResults() == null)
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             return new ResponseEntity<>(rankerService.getLastRoundResults(), HttpStatus.OK);
-        }catch(Exception e) {
+        } catch(Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
