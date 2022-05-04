@@ -32,9 +32,10 @@ class Ladder {
     // ladderStats.growingRankerCount = 0;
 
     for (let i = 0; i < rankers.length; i++) {
+      rankers[i].rank = i + 1;
       let ranker = new Ranker(rankers[i]);
       if (yourRanker.accountId === ranker.accountId) yourRanker = ranker;
-      ranker.rank = i + 1;
+
       // If the ranker is currently still on ladder
       if (ranker.growing) {
         // ladderStats.growingRankerCount += 1;
@@ -94,11 +95,11 @@ class Ladder {
           new Decimal(3).mul(delta).floor()
         );
     }
-    rankers.sort((a, b) => b.points.sub(a.points));
+    /*rankers.sort((a, b) => b.points.sub(a.points));
 
     rankers.forEach((ranker, index) => {
       ranker.rank = index + 1;
-    });
+    });*/
 
     this.rankers = rankers;
     this.firstRanker = rankers[0];
