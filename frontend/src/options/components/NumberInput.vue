@@ -44,18 +44,18 @@ label > span {
 
 input {
   width: 100px;
-  background: $background-color;
-  color: $main-color;
-  border: 1px dashed $main-color;
-  box-shadow: 0 0 0px $main-color;
+  background: var(--background-color);
+  color: var(--main-color);
+  border: 1px dashed var(--main-color);
+  box-shadow: 0 0 0px var(--main-color);
   transition: all 0.2s ease;
 
   //animate the border
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 1px $main-color;
+    box-shadow: 0 0 0 1px var(--main-color);
     transition: all 0.2s ease;
-    border: 1px dashed $background-color;
+    border: 1px dashed var(--background-color);
   }
 }
 

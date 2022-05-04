@@ -250,7 +250,7 @@ async function exportCookie() {
     }
 
     a:not(:hover) {
-      color: $main-color !important;
+      color: var(--main-color) !important;
     }
   }
 }

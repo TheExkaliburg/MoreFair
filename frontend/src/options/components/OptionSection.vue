@@ -34,7 +34,7 @@ const props = defineProps({
 @import "../../styles/styles";
 
 .option-section {
-  border: 1px solid $main-color;
+  border: 1px solid var(--main-color);
   padding: 10px;
   width: 50%;
   position: relative;
@@ -46,7 +46,7 @@ const props = defineProps({
 }
 
 .title {
-  border-bottom: 1px solid $main-color;
+  border-bottom: 1px solid var(--main-color);
   width: max-content;
   display: inline-block;
 }

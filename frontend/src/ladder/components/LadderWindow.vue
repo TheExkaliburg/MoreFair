@@ -108,7 +108,7 @@ function changeLadder(event) {
   align-content: start;
 
   thead {
-    background-color: $background-color;
+    background-color: var(--background-color);
     position: sticky;
     top: 0;
   }

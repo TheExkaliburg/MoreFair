@@ -1,8 +1,8 @@
 @import "variables";
 
 body {
-  background-color: $background-color;
-  color: $main-color;
+  background-color: var(--background-color);
+  color: var(--main-color);
   overflow-x: hidden;
   overflow-y: hidden;
   font-size: $text-font-size;
@@ -19,7 +19,7 @@ a {
 input.form-control {
   background-color: $navbar-color !important;
   border-color: $button-color !important;
-  color: $main-color !important;
+  color: var(--main-color) !important;
 
   &::placeholder {
     color: $placeholder-color !important;
@@ -32,13 +32,13 @@ input.form-control {
 }
 
 .btn-outline-primary {
-  color: $main-color !important;
+  color: var(--main-color) !important;
   border-color: $button-color !important;
   outline-color: $button-color !important;
 
   &.active {
     color: $button-hover-color !important;
-    background-color: $main-color !important;
+    background-color: var(--main-color) !important;
     outline-color: $button-color !important;
   }
 
@@ -61,7 +61,7 @@ input.form-control {
 
   i {
     font-size: 1.75rem;
-    color: $main-color;
+    color: var(--main-color);
   }
 }
 
@@ -80,7 +80,7 @@ div .offcanvas {
   background-color: $offcanvas-background-color !important;
 
   li .dropdown-item {
-    color: $main-color !important;
+    color: var(--main-color) !important;
 
     &:hover {
       color: $offcanvas-background-color !important;
@@ -120,18 +120,18 @@ table tbody tr {
 }
 
 span.input-group-text {
-  color: $main-color;
+  color: var(--main-color);
   background-color: $navbar-color;
   border-color: $button-color;
 }
 
 div {
   &.accordion-item {
-    background-color: $background-color;
+    background-color: var(--background-color);
 
     .accordion-button {
       background: $navbar-color;
-      color: $main-color;
+      color: var(--main-color);
     }
   }
 }

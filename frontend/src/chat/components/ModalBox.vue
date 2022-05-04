@@ -78,7 +78,7 @@ function openModal() {
 
   background-color: rgb(200, 200, 200);
   border-radius: 15px;
-  border: 1px solid $main-color;
+  border: 1px solid var(--main-color);
   padding: 20px;
   z-index: 9999999; //always on top!
 }

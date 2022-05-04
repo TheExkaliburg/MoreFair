@@ -55,63 +55,33 @@ $color-saltpan: #ebede9;
 
 
 :root {
-  --color-midnight-express: $color-midnight-express;
-  --color-catalina-blue: $color-catalina-blue;
-  --color-st-tropaz: $color-st-tropaz;
-  --color-steel-blue: $color-steel-blue;
-  --color-seagull: $color-seagull;
-  --color-sinbad: $color-sinbad;
+  // Colors
+  --main-color: #{$color-fire-bush};
+  --background-color: #{$color-black-russian-1};
 
-  --color-racing-green: $color-racing-green;
-  --color-parsley: $color-parsley;
-  --color-la-palma: $color-la-palma;
-  --color-asparagus: $color-asparagus;
-  --color-conifer: $color-conifer;
-  --color-deco: $color-deco;
+  // Buttons
+  --button-color: #{$color-pirate-gold};
+  --button-hover-color: #{$color-black-pearl};
+  --button-hover-background-color: #{$color-pirate-gold};
 
-  --color-toledo-1: $color-toledo-1;
-  --color-bole: $color-bole;
-  --color-santa-fe: $color-santa-fe;
-  --color-pale-taupe: $color-pale-taupe;
-  --color-cashmere: $color-cashmere;
-  --color-givry: $color-givry;
+  // Navbar
+  --navbar-color: #{$color-black-russian-2};
+  --offcanvas-background-color: #{$color-black-pearl};
 
-  --color-toledo-2: $color-toledo-2;
-  --color-moccaccino: $color-moccaccino;
-  --color-korma: $color-korma;
-  --color-pirate-gold: $color-pirate-gold;
-  --color-fire-bush: $color-fire-bush;
-  --color-chenin: $color-chenin;
+  // Text
+  --header-color: #{$color-fire-bush};
+  --header-font-size: 14px;
 
-  --color-blackcurrant: $color-blackcurrant;
-  --color-blackberry: $color-blackberry;
-  --color-claret: $color-claret;
-  --color-milano-red: $color-milano-red;
-  --color-dark-coral: $color-dark-coral;
-  --color-tree-poppy: $color-tree-poppy;
+  --text-font-size: 15px;
+  --text-color: #{$color-givry};
+  --text-highlight-color: #{$color-dark-coral};
 
-  --color-jaguar: $color-jaguar;
-  --color-jagger: $color-jagger;
-  --color-eminence: $color-eminence;
-  --color-medium-red-violet: $color-medium-red-violet;
-  --color-mulberry: $color-mulberry;
-  --color-kobi: $color-kobi;
+  --placeholder-color: #{$color-claret};
 
-  --color-black-russian-2: $color-black-russian-2;
-  --color-black-russian-1: $color-black-russian-1;
-  --color-black-pearl: $color-black-pearl;
-  --color-tangaroa: $color-tangaroa;
-  --color-atomic: $color-atomic;
-  --color-pale-sky: $color-pale-sky;
-  --color-submarine: $color-submarine;
-  --color-conch: $color-conch;
-  --color-jet-stream: $color-jet-stream;
-  --color-saltpan: $color-saltpan;
+  // Link
+  --link-color: #{$color-steel-blue};
+  --link-hover-color: #{$color-st-tropaz};
 }
-
-// Colors
-$main-color: var(--color-fire-bush);
-$background-color: var(--color-black-russian-1);
 
 // Buttons
 $button-color: var(--color-pirate-gold);

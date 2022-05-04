@@ -168,7 +168,7 @@ findMentions();
 
 .chat-mention-at,
 .chat-mention {
-  color: $main-color;
+  color: var(--main-color);
 }
 
 //This hurts my eyes and exactly that is what I want.

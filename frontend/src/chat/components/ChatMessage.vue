@@ -107,7 +107,7 @@ function free() {
 
 .message-header {
   font-size: $header-font-size;
-  color: $main-color;
+  color: var(--main-color);
   white-space: nowrap;
 }
 
@@ -121,11 +121,11 @@ function free() {
 
   a {
     text-decoration: none !important;
-    color: $main-color !important;
+    color: var(--main-color) !important;
   }
 
   a:visited {
-    color: $main-color !important;
+    color: var(--main-color) !important;
   }
 
   a:hover {
