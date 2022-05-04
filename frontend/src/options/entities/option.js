@@ -114,6 +114,37 @@ export class IntegerOption extends NumberOption {
   }
 }
 
+export class DropdownOption extends Option {
+  constructor({ displayName, name, options, callback }) {
+    super({ displayName, name, options, callback });
+    this.displayName = displayName;
+    this.name = name;
+    this.options = options;
+    this.selectedIndex = 0;
+    if (callback) this.callback = callback;
+    else this.callback = () => {};
+  }
+
+  get value() {
+    return this.get();
+  }
+
+  set value(val) {
+    this.set({ selectedIndex: Math.max(this.options.indexOf(val), 0) });
+  }
+
+  get() {
+    return this.options[this.selectedIndex];
+  }
+
+  set({ selectedIndex }) {
+    this.selectedIndex = selectedIndex;
+    if (this.callback) {
+      this.callback(this);
+    }
+  }
+}
+
 export class OptionSection {
   constructor({ displayName, name, options }) {
     this.displayName = displayName;
