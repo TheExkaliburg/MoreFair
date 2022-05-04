@@ -3,6 +3,7 @@ import Decimal from "break_infinity.js";
 //
 class Ranker {
   constructor(data) {
+    if (!data) data = Ranker.placeholder();
     this.accountId = data.accountId;
     this.username = data.username;
     this.rank = data.rank;
