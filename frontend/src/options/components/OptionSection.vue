@@ -8,6 +8,7 @@
         v-else-if="option instanceof NumberOption"
         :option="option"
       />
+      <DropDown v-else-if="option instanceof DropdownOption" :option="option" />
       <div v-else>
         Unimplemented Option {{ option.name }} {{ option.value }}
       </div>
@@ -19,11 +20,13 @@
 import CheckBox from "@/options/components/CheckBox";
 import RangeSlider from "@/options/components/RangeSlider";
 import NumberInput from "@/options/components/NumberInput";
+import DropDown from "@/options/components/DropDown";
 import { defineProps } from "vue";
 import {
   BoolOption,
   NumberOption,
   RangeOption,
+  DropdownOption,
 } from "@/options/entities/option";
 
 const props = defineProps({
