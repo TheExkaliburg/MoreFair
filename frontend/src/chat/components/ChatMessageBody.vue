@@ -143,7 +143,14 @@ function findMentions() {
     spliceNewMessagePartsIntoArray(currentPlainText, newParts);
     offset += index + 3;
     currentPlainText = newParts[4];
-    if (mentionSound.value) {
+    if (mentionSound.value && !msg.hasFlag("mentionSoundPlayed")) {
+      //Mark the message as having played the sound even if it does not mention us.
+      //This is to prevent it from playing when we dont expect it to.
+      store.commit("chat/msgFlag", {
+        message: msg,
+        flag: "mentionSoundPlayed",
+        type: "set",
+      });
       for (let i = 0; i < rankers.value.length; i++) {
         if (rankers.value[i].you && rankers.value[i].accountId === id) {
           Sounds.play("mention", mentionSoundVolume.value);

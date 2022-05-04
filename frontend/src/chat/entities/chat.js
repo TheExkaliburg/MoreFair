@@ -33,6 +33,14 @@ class Chat {
     }
   }
 
+  msgFlag({ message, flag, type }) {
+    if (type === "set") {
+      message.setFlag(flag);
+    } else if (type === "unset") {
+      message.unsetFlag(flag);
+    }
+  }
+
   removeMessages(event) {
     this.messages = this.messages.filter(
       (m) => event.accountId !== m.accountId
