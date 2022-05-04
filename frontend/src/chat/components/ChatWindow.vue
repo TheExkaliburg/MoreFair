@@ -612,7 +612,7 @@ onUpdated(() => {
 
 #chatInput {
   background-color: rgba(0, 0, 0, 0);
-  color: #de9e41;
+  color: var(--main-color);
   overflow-x: scroll;
   white-space: nowrap;
   //hide scrollbar

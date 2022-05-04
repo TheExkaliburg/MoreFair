@@ -180,6 +180,6 @@ findMentions();
 }
 
 .chat-mention-user-id {
-  color: #cf573c;
+  color: var(--text-highlight-color);
 }
 </style>

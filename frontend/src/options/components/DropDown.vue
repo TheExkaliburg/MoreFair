@@ -1,8 +1,8 @@
 <template>
   <label v-if="visible" :class="active ? '' : 'disabled'">
     <span>{{ option.displayName }}: </span>
-    <select class="mySelect" @change="update" :value="option.selectedIndex">
-      <option :value="index" v-for="(option, index) in options" :key="option">
+    <select :value="option.selectedIndex" class="mySelect" @change="update">
+      <option v-for="(option, index) in options" :key="option" :value="index">
         {{ option }}
       </option>
     </select>
@@ -48,22 +48,23 @@ label > span {
 
 select.mySelect {
   border: none;
-  background: $background-color;
-  border: 1px dashed $main-color;
-  box-shadow: 0 0 0px $main-color;
-  color: $main-color;
+  background: var(--background-color);
+  border: 1px dashed var(--main-color);
+  box-shadow: 0 0 0px var(--main-color);
+  color: var(--main-color);
   padding: 0 10px;
 
   //animate the border
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 1px $main-color;
+    box-shadow: 0 0 0 1px var(--main-color);
     transition: all 0.2s ease;
-    border: 1px dashed $background-color;
+    border: 1px dashed var(--background-color);
   }
 }
+
 select.mySelect option {
-  color: $main-color;
+  color: var(--main-color);
   padding: 0 10px;
   border: none;
 }

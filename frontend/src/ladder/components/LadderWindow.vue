@@ -129,6 +129,6 @@ function changeLadder(event) {
 }
 
 .promoted {
-  background-color: #1e1d39;
+  background-color: var(--text-highlight-color);
 }
 </style>

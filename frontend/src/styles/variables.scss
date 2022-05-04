@@ -82,3 +82,32 @@ $color-saltpan: #ebede9;
   --link-color: #{$color-steel-blue};
   --link-hover-color: #{$color-st-tropaz};
 }
+
+:root.light {
+  // Colors
+  --main-color: #{$color-black-russian-2};
+  --background-color: #{$color-saltpan};
+
+  // Buttons
+  --button-color: #{$color-black-russian-2};
+  --button-hover-color: #{$color-jet-stream};
+  --button-hover-background-color: #{$color-black-russian-2};
+
+  // Navbar
+  --navbar-color: #{$color-black-russian-2};
+  --offcanvas-background-color: #{$color-black-pearl};
+
+  // Text
+  --header-color: #{$color-black-russian-2};
+  --header-font-size: 14px;
+
+  --text-font-size: 15px;
+  --text-color: #{$color-black-russian-1};
+  --text-highlight-color: #{$color-pale-sky};
+
+  --placeholder-color: #{$color-claret};
+
+  // Link
+  --link-color: #{$color-steel-blue};
+  --link-hover-color: #{$color-st-tropaz};
+}

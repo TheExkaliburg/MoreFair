@@ -1,9 +1,11 @@
 import {
   BoolOption,
+  DropdownOption,
   IntegerOption,
   OptionSection,
   RangeOption,
 } from "../entities/option";
+import themeSelector from "@/modules/themeSelector";
 
 //import { createHookEndpoint } from "@/store/hooks";
 
@@ -49,6 +51,14 @@ const optionsModule = {
               return !optionsModule.store.getters["options/getOptionValue"](
                 "showAllRankers"
               );
+            }),
+            new DropdownOption({
+              displayName: "Theme",
+              name: "themeSelection",
+              options: ["Default", "Light", "Dark", "GreyScaled"],
+              callback: (ctx) => {
+                themeSelector.changeTheme(ctx.get());
+              },
             }),
           ],
         }),

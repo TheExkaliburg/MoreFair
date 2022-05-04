@@ -102,7 +102,7 @@ function free() {
 }
 
 .message-user-id {
-  color: #cf573c;
+  color: var(--text-highlight-color);
 }
 
 .message-header {
