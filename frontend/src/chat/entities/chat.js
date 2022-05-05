@@ -5,7 +5,9 @@ class Chat {
     this.currentChatNumber = data.currentChatNumber;
     this.messages = [];
     data.messages.forEach((message) => {
-      this.messages.unshift(new Message(message));
+      let msg = new Message(message);
+      msg.setFlag("old"); //Info for all components, that this message is not recieved in real time.
+      this.messages.unshift(msg);
     });
   }
 
