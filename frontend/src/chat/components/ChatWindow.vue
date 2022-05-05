@@ -659,7 +659,7 @@ onUpdated(() => {
 }
 
 .red {
-  color: red;
+  color: var(--bs-danger);
 }
 
 .chat-header {
