@@ -6,6 +6,7 @@ import {
   RangeOption,
 } from "../entities/option";
 import themeSelector from "@/modules/themeSelector";
+import { getThemeNames } from "@/modules/themeManager";
 
 //import { createHookEndpoint } from "@/store/hooks";
 
@@ -55,7 +56,15 @@ const optionsModule = {
             new DropdownOption({
               displayName: "Theme",
               name: "themeSelection",
-              options: ["Default", "Light"],
+              options: (() => {
+                const themeNames = getThemeNames();
+                //insert the default theme
+                themeNames.unshift("Default");
+                //capitalize the first letter of each string
+                return themeNames.map((themeName) => {
+                  return themeName.charAt(0).toUpperCase() + themeName.slice(1);
+                });
+              })(),
               callback: (ctx) => {
                 themeSelector.changeTheme(ctx.get());
               },

@@ -137,14 +137,23 @@ export class DropdownOption extends Option {
     return this.options[this.selectedIndex];
   }
 
-  set({ selectedIndex }) {
+  set({
+    selectedIndex = this.selectedIndex,
+    options = this.options,
+    callback = this.callback,
+  }) {
     this.selectedIndex = selectedIndex;
+    if (options) {
+      this.options = options;
+    }
     if (this.callback) {
       this.callback(this);
     }
+    if (callback) {
+      this.callback = callback;
+    }
   }
 }
-
 export class OptionSection {
   constructor({ displayName, name, options }) {
     this.displayName = displayName;
