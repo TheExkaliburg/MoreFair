@@ -143,7 +143,11 @@ function findMentions() {
     spliceNewMessagePartsIntoArray(currentPlainText, newParts);
     offset += index + 3;
     currentPlainText = newParts[4];
-    if (mentionSound.value && !msg.hasFlag("mentionSoundPlayed")) {
+    if (
+      mentionSound.value &&
+      !msg.hasFlag("mentionSoundPlayed") &&
+      !msg.hasFlag("old")
+    ) {
       //Mark the message as having played the sound even if it does not mention us.
       //This is to prevent it from playing when we dont expect it to.
       store.commit("chat/msgFlag", {
