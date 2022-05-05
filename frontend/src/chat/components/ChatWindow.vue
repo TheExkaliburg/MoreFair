@@ -39,7 +39,7 @@
           Send
         </button>
       </div>
-      <div class="msgLength" :class="msgLength > 280 ? 'red' : ''">
+      <div class="msgLength" :class="msgLength > 280 ? 'error' : ''">
         Message length: {{ msgLength }} / 280
       </div>
     </div>
@@ -658,8 +658,8 @@ onUpdated(() => {
   pointer-events: none;
 }
 
-.red {
-  color: var(--bs-danger);
+.error {
+  color: var(--text-error-color);
 }
 
 .chat-header {
