@@ -14,7 +14,12 @@
               data-bs-toggle="collapse"
               type="button"
             >
-              {{ version.number }} [{{ version.data.type }}]:
+              {{ version.number }}
+              {{
+                version.data.name
+                  ? `[${version.data.type}]:`
+                  : `[${version.data.type}]`
+              }}
               {{ version.data.name }}
             </button>
           </h5>

@@ -14,7 +14,12 @@ class Version {
     }
     this.type = type;
     this.name = name ? name : "";
-    this.changes = { features, balancing, improvements, fixes };
+    this.changes = {
+      features: features ? features : [],
+      balancing: balancing ? balancing : [],
+      improvements: improvements ? improvements : [],
+      fixes: fixes ? fixes : [],
+    };
   }
 }
 
