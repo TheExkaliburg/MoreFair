@@ -67,6 +67,11 @@
           </button>
         </div>
       </div>
+      <div class="row">
+        <div class="col-8">
+          <router-link to="/changelog">Changelog</router-link>
+        </div>
+      </div>
       <div
         v-if="
           store.getters['options/getOptionValue']('enableModPage') &&

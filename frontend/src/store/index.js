@@ -7,6 +7,7 @@ import { numberformat } from "swarm-numberformat";
 import optionsModule from "@/options/store/optionsModule";
 import soundsModule from "@/sounds/store/soundsModule";
 import moderationModule from "@/moderation/store/moderationModule";
+import versioningModule from "@/versioning/store/versioningModule";
 
 let store = createStore({
   strict: process.env.NODE_ENV !== "production",
@@ -92,6 +93,7 @@ let store = createStore({
     //options: optionsModule,
     sounds: soundsModule,
     mod: moderationModule,
+    versioning: versioningModule,
   },
 });
 
