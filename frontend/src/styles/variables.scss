@@ -66,8 +66,8 @@ $color-saltpan: #ebede9;
   // Text
   --text-font-size: 15px;
   --text-color: #{$color-givry};
-  --text-light-hightlight-color: var(--main-secondary-color);
-  --text-dark-hightlight-color: #{$color-dark-coral};
+  --text-light-highlight-color: var(--main-secondary-color);
+  --text-dark-highlight-color: #{$color-dark-coral};
 
   // Buttons
   --button-color: var(--main-secondary-color);
@@ -76,8 +76,8 @@ $color-saltpan: #ebede9;
 
   // Ladder
   --you-color: var(--background-dark-color);
-  --you-background-color: var(--text-dark-hightlight-color);
-  --promoted-color: var(--text-light-hightlight-color);
+  --you-background-color: var(--text-dark-highlight-color);
+  --promoted-color: var(--text-light-highlight-color);
   --promoted-background-color: var(--background-dark-color);
 
   // Chat
@@ -105,8 +105,8 @@ $color-saltpan: #ebede9;
   // Text
   --text-font-size: 15px;
   --text-color: #{$color-black-russian-1};
-  --text-light-hightlight-color: var(--main-secondary-color);
-  --text-dark-hightlight-color: #{$color-blackberry};
+  --text-light-highlight-color: var(--main-secondary-color);
+  --text-dark-highlight-color: #{$color-blackberry};
 
   // Buttons
   --button-color: var(--main-secondary-color);
@@ -115,8 +115,8 @@ $color-saltpan: #ebede9;
 
   // Ladder
   --you-color: var(--background-dark-color);
-  --you-background-color: var(--text-dark-hightlight-color);
-  --promoted-color: var(--text-light-hightlight-color);
+  --you-background-color: var(--text-dark-highlight-color);
+  --promoted-color: var(--text-light-highlight-color);
   --promoted-background-color: var(--background-dark-color);
 
   // Chat
