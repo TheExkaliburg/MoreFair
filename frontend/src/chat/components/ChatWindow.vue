@@ -39,6 +39,9 @@
           Send
         </button>
       </div>
+      <div class="msgLength" :class="msgLength > 280 ? 'red' : ''">
+        Message length: {{ msgLength }} / 280
+      </div>
     </div>
     <div id="mentionDropdown" class="mentionDropdown"></div>
   </div>
@@ -62,6 +65,8 @@ const stompClient = inject("$stompClient");
 
 const message = ref("");
 const chatContent = ref(null);
+
+const msgLength = ref(0);
 
 const chat = computed(() => store.state.chat.chat);
 const user = computed(() => store.state.user);
@@ -186,6 +191,9 @@ onMounted(() => {
         msgBox.removeChild(children[i]);
       }
     }
+
+    //finally, update the message length counter
+    msgLength.value = parseSendMessage()[0].length;
   });
   let config = {
     attributes: true,
@@ -602,7 +610,7 @@ onUpdated(() => {
   overflow-y: auto;
   overflow-x: hidden;
   align-content: start;
-  height: calc(100% - calc(70px + 40px));
+  height: calc(100% - calc(70px + 60px));
 }
 
 .chat-info {
@@ -648,6 +656,10 @@ onUpdated(() => {
   flex-direction: column;
 
   pointer-events: none;
+}
+
+.red {
+  color: red;
 }
 
 .chat-header {
