@@ -5,6 +5,15 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "Changelog", {
+          features: [
+            "Adding a Changelog and a versioning System on the Main Page",
+            "Adding a Message-Length-Indicator",
+          ],
+          improvements: [
+            "Mention-Sounds should now only be played if you have the chat open the moment you receive them",
+          ],
+        }),
         new Version("MINOR", "Theme Selector", {
           features: [
             "Adding Theme Selector in Options ((creation of themes in the source code is easy, so we can also host some nice looking ones, that are community made)",
