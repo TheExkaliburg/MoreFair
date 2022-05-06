@@ -100,10 +100,13 @@ import { provide } from "vue";
 import { useStore } from "vuex";
 import Cookies from "js-cookie";
 import { StompClient } from "@/websocket/stompClient";
+import { exposeThemeManagerToConsole } from "@/modules/themeManager";
 
 //import { hooksSystemSetup } from "@/store/hooks";
 
 //hooksSystemSetup();
+
+exposeThemeManagerToConsole();
 
 const store = useStore();
 const stompClient = new StompClient();

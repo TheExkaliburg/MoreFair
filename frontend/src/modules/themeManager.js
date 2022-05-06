@@ -1,3 +1,5 @@
+import store from "../store";
+
 function getCSSRuleList(ruleName) {
   let styleSheets = document.styleSheets;
   let cssRules = [];
@@ -69,4 +71,36 @@ export function loadNewTheme(url, callback) {
     }
   };
   xhr.send();
+}
+
+export function exposeThemeManagerToConsole() {
+  window.loadTheme = function (url) {
+    const oldThemes = getThemeNames();
+    loadNewTheme(url, () => {
+      const option = store.getters["options/getOption"]("themeSelection");
+      const themeNames = getThemeNames();
+
+      //find the new theme name
+      const newThemeName = themeNames.find((name) => !oldThemes.includes(name));
+      //capitalize the first letter
+      const newThemeNameCapitalized =
+        newThemeName.charAt(0).toUpperCase() + newThemeName.slice(1);
+
+      //insert the default theme
+      themeNames.unshift("Default");
+      //capitalize the first letter of each string
+      let options = themeNames.map((themeName) => {
+        return themeName.charAt(0).toUpperCase() + themeName.slice(1);
+      });
+
+      store.commit({
+        type: "options/updateOption",
+        option: option,
+        payload: {
+          selectedIndex: options.indexOf(newThemeNameCapitalized),
+          options: options,
+        },
+      });
+    });
+  };
 }
