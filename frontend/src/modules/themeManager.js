@@ -73,26 +73,35 @@ export function loadNewTheme(url, callback) {
   xhr.send();
 }
 
-export function exposeThemeManagerToConsole() {
-  window.loadTheme = function (url) {
-    const oldThemes = getThemeNames();
-    loadNewTheme(url, () => {
-      const option = store.getters["options/getOption"]("themeSelection");
-      const themeNames = getThemeNames();
+export function loadTheme(url, onlyLoad = false) {
+  const oldThemes = getThemeNames();
+  loadNewTheme(url, () => {
+    const option = store.getters["options/getOption"]("themeSelection");
+    const themeNames = getThemeNames();
 
-      //find the new theme name
-      const newThemeName = themeNames.find((name) => !oldThemes.includes(name));
+    //find the new theme name
+    const newThemeName = themeNames.find((name) => !oldThemes.includes(name));
+    let newThemeNameCapitalized = "";
+    try {
       //capitalize the first letter
-      const newThemeNameCapitalized =
+      newThemeNameCapitalized =
         newThemeName.charAt(0).toUpperCase() + newThemeName.slice(1);
+    } catch (e) {
+      deleteThemeURL(url, oldThemes); //This url is not a valid theme.
+      console.log("Invalid theme " + url);
+      return;
+    }
 
-      //insert the default theme
-      themeNames.unshift("Default");
-      //capitalize the first letter of each string
-      let options = themeNames.map((themeName) => {
-        return themeName.charAt(0).toUpperCase() + themeName.slice(1);
-      });
+    //insert the default theme
+    themeNames.unshift("Default");
+    //capitalize the first letter of each string
+    let options = themeNames.map((themeName) => {
+      return themeName.charAt(0).toUpperCase() + themeName.slice(1);
+    });
 
+    saveTheme(newThemeNameCapitalized, url);
+
+    if (!onlyLoad) {
       store.commit({
         type: "options/updateOption",
         option: option,
@@ -101,6 +110,76 @@ export function exposeThemeManagerToConsole() {
           options: options,
         },
       });
-    });
-  };
+    } else {
+      store.commit({
+        type: "options/updateOption",
+        option: option,
+        payload: {
+          options: options,
+        },
+      });
+    }
+  });
+}
+
+function deleteThemeURL(url, preventDelete = []) {
+  const themeDatabase = localStorage.getItem("themeDatabase");
+  if (!themeDatabase) {
+    return;
+  }
+  const themeDatabaseObject = JSON.parse(themeDatabase);
+  Object.keys(themeDatabaseObject).forEach((key) => {
+    if (themeDatabaseObject[key] === url && !preventDelete.includes(key)) {
+      delete themeDatabaseObject[key];
+    }
+  });
+}
+
+export function deleteNamedTheme(themeName) {
+  console.log("Deleting theme: " + themeName);
+  const themeDatabase = localStorage.getItem("themeDatabase");
+  if (!themeDatabase) {
+    return;
+  }
+  const themeDatabaseObject = JSON.parse(themeDatabase);
+  delete themeDatabaseObject[themeName];
+  localStorage.setItem("themeDatabase", JSON.stringify(themeDatabaseObject));
+}
+
+function saveTheme(themeName, themeUrl) {
+  let themeDatabase = localStorage.getItem("themeDatabase");
+  if (!themeDatabase) {
+    themeDatabase = JSON.stringify({});
+  }
+  const themeDatabaseObject = JSON.parse(themeDatabase);
+  themeDatabaseObject[themeName] = themeUrl;
+  localStorage.setItem("themeDatabase", JSON.stringify(themeDatabaseObject));
+}
+
+export function requestTheme(themeName) {
+  const themeDatabase = localStorage.getItem("themeDatabase");
+  if (!themeDatabase) {
+    return;
+  }
+  const themeDatabaseObject = JSON.parse(themeDatabase);
+  const theme = themeDatabaseObject[themeName];
+  if (!theme) {
+    return;
+  }
+  loadTheme(theme);
+}
+
+export function requestAllThemes() {
+  const themeDatabase = localStorage.getItem("themeDatabase");
+  if (!themeDatabase) {
+    return;
+  }
+  const themeDatabaseObject = JSON.parse(themeDatabase);
+  Object.values(themeDatabaseObject).forEach((theme) => {
+    loadTheme(theme, true);
+  });
+}
+
+export function exposeThemeManagerToConsole() {
+  window.loadTheme = loadTheme;
 }

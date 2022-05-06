@@ -154,6 +154,34 @@ export class DropdownOption extends Option {
     }
   }
 }
+
+export class StringInputOption extends Option {
+  constructor({ displayName, name, callback, buttonText }) {
+    super();
+    this.displayName = displayName;
+    this.name = name;
+    this.callback = callback;
+    this.buttonText = buttonText;
+  }
+  get() {
+    return undefined;
+  }
+  set() {}
+}
+
+export class ButtonOption extends Option {
+  constructor({ displayName, name, callback }) {
+    super();
+    this.displayName = displayName;
+    this.name = name;
+    this.callback = callback;
+  }
+  get() {
+    return undefined;
+  }
+  set() {}
+}
+
 export class OptionSection {
   constructor({ displayName, name, options }) {
     this.displayName = displayName;

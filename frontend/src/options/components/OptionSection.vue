@@ -3,6 +3,11 @@
     <h2 class="title">{{ props.options.displayName }}</h2>
     <div v-for="option in props.options.options" :key="option">
       <CheckBox v-if="option instanceof BoolOption" :option="option" />
+      <Button v-if="option instanceof ButtonOption" :option="option" />
+      <StringInput
+        v-else-if="option instanceof StringInputOption"
+        :option="option"
+      />
       <RangeSlider v-else-if="option instanceof RangeOption" :option="option" />
       <NumberInput
         v-else-if="option instanceof NumberOption"
@@ -21,12 +26,16 @@ import CheckBox from "@/options/components/CheckBox";
 import RangeSlider from "@/options/components/RangeSlider";
 import NumberInput from "@/options/components/NumberInput";
 import DropDown from "@/options/components/DropDown";
+import StringInput from "@/options/components/StringInput";
+import Button from "@/options/components/Button";
 import { defineProps } from "vue";
 import {
   BoolOption,
   NumberOption,
   RangeOption,
   DropdownOption,
+  StringInputOption,
+  ButtonOption,
 } from "@/options/entities/option";
 
 const props = defineProps({
