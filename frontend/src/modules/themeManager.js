@@ -39,7 +39,13 @@ export function getThemeNames() {
   let cssRules = getCSSUniqueRuleNames(":root");
   return cssRules
     .map((rule) => {
-      return rule.replace(":root.", ""); //To text
+      return rule.replace(":root.", "");
+    })
+    .map((rule) => {
+      return rule.split(" ")[0]; //Only first word
+    })
+    .filter((rule, index, self) => {
+      return self.indexOf(rule) === index; //Unique
     })
     .filter((rule) => {
       return rule !== ":root";
