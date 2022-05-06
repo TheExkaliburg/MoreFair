@@ -7,7 +7,9 @@ const versioningModule = {
       versions: [
         new Version("PATCH", "Theme Loader", {
           features: [
-            "Added a theme loader (usable in the options menu in the console with the command loadTheme(URL))",
+            "Added a theme loader to the Options menu.",
+            "Load themes from URLs or load previously saved themes.",
+            "You can also delete themes you don't like.",
           ],
         }),
         new Version("PATCH", "Changelog", {
