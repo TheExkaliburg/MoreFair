@@ -3,7 +3,7 @@
     <h2 class="title">{{ props.options.displayName }}</h2>
     <div v-for="option in props.options.options" :key="option">
       <CheckBox v-if="option instanceof BoolOption" :option="option" />
-      <Button v-if="option instanceof ButtonOption" :option="option" />
+      <Button v-else-if="option instanceof ButtonOption" :option="option" />
       <StringInput
         v-else-if="option instanceof StringInputOption"
         :option="option"
