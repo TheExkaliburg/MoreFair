@@ -454,7 +454,7 @@ function plainTextElementChanged(mutation) {
   //select the last element
   window.dropdownElementSelected = possibleMentions.length - 1;
   dropdown.children[window.dropdownElementSelected].style.backgroundColor =
-    "rgb(70, 70, 70)";
+    "var(--item-selected-color)";
   //make sure the dropdown always stays 5 pixels from the right window edge
   caretX = Math.min(caretX, visualViewport.width - 5 - dropdown.offsetWidth);
   dropdown.style.left = caretX + "px";
@@ -539,7 +539,7 @@ function chatBoxKeyDown(e) {
     }
 
     //highlight the selected element
-    selectedElement.style.backgroundColor = "rgb(70, 70, 70)";
+    selectedElement.style.backgroundColor = "var(--item-selected-color)";
   }
 
   //if the key is enter or tab
@@ -593,8 +593,8 @@ onUpdated(() => {
 .mentionDropdown {
   display: block;
   position: absolute;
-  background: rgb(16, 20, 31);
-  border: 1px solid rgb(222, 158, 65);
+  background: var(--background-color);
+  border: 1px solid var(--main-color);
   border-radius: 5px;
   z-index: 1000;
   padding: 5px;
