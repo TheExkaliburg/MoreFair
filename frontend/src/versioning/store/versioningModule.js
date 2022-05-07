@@ -5,6 +5,13 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "Theme Loader", {
+          features: [
+            "Added a theme loader to the Options menu.",
+            "Load themes from URLs or load previously saved themes.",
+            "You can also delete themes you don't like.",
+          ],
+        }),
         new Version("PATCH", "Changelog", {
           features: [
             "Adding a Changelog and a versioning System on the Main Page",

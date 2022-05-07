@@ -1,11 +1,20 @@
 import {
   BoolOption,
+  ButtonOption,
   DropdownOption,
   IntegerOption,
   OptionSection,
   RangeOption,
+  StringInputOption,
 } from "../entities/option";
 import themeSelector from "@/modules/themeSelector";
+import {
+  getThemeNames,
+  loadTheme,
+  requestAllThemes,
+  requestTheme,
+  deleteNamedTheme,
+} from "@/modules/themeManager";
 
 //import { createHookEndpoint } from "@/store/hooks";
 
@@ -55,9 +64,33 @@ const optionsModule = {
             new DropdownOption({
               displayName: "Theme",
               name: "themeSelection",
-              options: ["Default", "Light"],
+              options: (() => {
+                const themeNames = getThemeNames();
+                //insert the default theme
+                themeNames.unshift("Default");
+                //capitalize the first letter of each string
+                return themeNames.map((themeName) => {
+                  return themeName.charAt(0).toUpperCase() + themeName.slice(1);
+                });
+              })(),
               callback: (ctx) => {
                 themeSelector.changeTheme(ctx.get());
+              },
+            }),
+            new StringInputOption({
+              displayName: "Custom theme",
+              name: "customTheme",
+              callback: (val) => {
+                loadTheme(val);
+              },
+              buttonText: "Load",
+            }),
+            new ButtonOption({
+              displayName: "Delete current theme",
+              name: "deleteCurrentTheme",
+              callback: () => {
+                deleteNamedTheme(themeSelector.getCurrentTheme());
+                location.reload();
               },
             }),
           ],
@@ -117,6 +150,7 @@ const optionsModule = {
     loadOptions(state) {
       //TODO: load locally
       try {
+        requestAllThemes();
         const savedOptions = JSON.parse(localStorage.getItem("options"));
         if (savedOptions) {
           //get all options
@@ -128,6 +162,9 @@ const optionsModule = {
             const option = allOptions.find((o) => o.name === name);
             if (option) {
               option.value = value;
+              if (option.name === "themeSelection") {
+                requestTheme(value);
+              }
             }
           });
         }
@@ -145,12 +182,14 @@ const optionsModule = {
       //Saving to localstorage
       let allOptions = state.options.map((section) => section.options);
       allOptions = [].concat(...allOptions);
-      let optionNamesAndValues = allOptions.map((option) => {
-        return {
-          name: option.name,
-          value: option.value,
-        };
-      });
+      let optionNamesAndValues = allOptions
+        .map((option) => {
+          return {
+            name: option.name,
+            value: option.value,
+          };
+        })
+        .filter((o) => o.value);
       localStorage.setItem("options", JSON.stringify(optionNamesAndValues));
 
       //Now updating the option's display properties

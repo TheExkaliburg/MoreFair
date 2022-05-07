@@ -137,12 +137,49 @@ export class DropdownOption extends Option {
     return this.options[this.selectedIndex];
   }
 
-  set({ selectedIndex }) {
+  set({
+    selectedIndex = this.selectedIndex,
+    options = this.options,
+    callback = this.callback,
+  }) {
     this.selectedIndex = selectedIndex;
+    if (options) {
+      this.options = options;
+    }
     if (this.callback) {
       this.callback(this);
     }
+    if (callback) {
+      this.callback = callback;
+    }
   }
+}
+
+export class StringInputOption extends Option {
+  constructor({ displayName, name, callback, buttonText }) {
+    super();
+    this.displayName = displayName;
+    this.name = name;
+    this.callback = callback;
+    this.buttonText = buttonText;
+  }
+  get() {
+    return undefined;
+  }
+  set() {}
+}
+
+export class ButtonOption extends Option {
+  constructor({ displayName, name, callback }) {
+    super();
+    this.displayName = displayName;
+    this.name = name;
+    this.callback = callback;
+  }
+  get() {
+    return undefined;
+  }
+  set() {}
 }
 
 export class OptionSection {
