@@ -593,8 +593,8 @@ onUpdated(() => {
 .mentionDropdown {
   display: block;
   position: absolute;
-  background: rgb(16, 20, 31);
-  border: 1px solid rgb(222, 158, 65);
+  background: var(--background-color);
+  border: 1px solid var(--main-color);
   border-radius: 5px;
   z-index: 1000;
   padding: 5px;
