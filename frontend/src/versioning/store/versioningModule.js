@@ -11,6 +11,9 @@ const versioningModule = {
             "Load themes from URLs or load previously saved themes.",
             "You can also delete themes you don't like.",
           ],
+          fixes: [
+            "Added a new color variable. This is used in the mention popup for theming.",
+          ],
         }),
         new Version("PATCH", "Changelog", {
           features: [
