@@ -29,7 +29,7 @@
   >
     <div class="container">
       <div class="row">
-        <div class="col-8">
+        <div class="col-8" data-bs-toggle="offcanvas">
           <router-link to="/">Game</router-link>
         </div>
         <div class="col-4">
@@ -42,7 +42,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-8">
+        <div class="col-8" data-bs-toggle="offcanvas">
           <router-link to="/options">Options</router-link>
         </div>
         <div class="col-4">
@@ -55,7 +55,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-8">
+        <div class="col-8" data-bs-toggle="offcanvas">
           <router-link to="/help">Help</router-link>
         </div>
         <div class="col-4">
@@ -68,7 +68,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-8">
+        <div class="col-8" data-bs-toggle="offcanvas">
           <router-link to="/changelog">Changelog</router-link>
         </div>
       </div>
@@ -79,7 +79,7 @@
         "
         class="row"
       >
-        <div class="col-8">
+        <div class="col-8" data-bs-toggle="offcanvas">
           <router-link to="/mod">Moderation</router-link>
         </div>
       </div>

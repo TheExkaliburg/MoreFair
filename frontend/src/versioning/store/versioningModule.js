@@ -10,6 +10,14 @@ const versioningModule = {
             "Added a theme loader to the Options menu.",
             "Load themes from URLs or load previously saved themes.",
             "You can also delete themes you don't like.",
+            "You can now hide you vinegar and grape count.",
+            "There will now be an ETA until your vinegar is enough to be thrown.",
+            "You can now hide your Chat.",
+            "You are now able to hide promoted players from the game.",
+          ],
+          improvements: [
+            "Clicking on a navbar item that changes the view will now close the navbar.",
+            "Better ETA to promotion.",
           ],
           fixes: [
             "Added a new color variable. This is used in the mention popup for theming.",

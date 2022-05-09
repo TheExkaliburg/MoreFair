@@ -39,8 +39,18 @@ const optionsModule = {
           name: "general",
           options: [
             new BoolOption({
+              displayName: "Hide vinegar and grape count",
+              name: "hideVinAndGrapeCount",
+              value: false,
+            }),
+            new BoolOption({
               displayName: "Show all rankers",
               name: "showAllRankers",
+              value: false,
+            }),
+            new BoolOption({
+              displayName: "Hide promoted players",
+              name: "hidePromotedPlayers",
               value: false,
             }),
             new IntegerOption({
@@ -99,6 +109,11 @@ const optionsModule = {
           displayName: "Chat Settings",
           name: "chatSettings",
           options: [
+            new BoolOption({
+              displayName: "Hide chat",
+              name: "hideChat",
+              value: false,
+            }),
             new BoolOption({
               displayName: "Play sound on mention",
               name: "mentionSound",

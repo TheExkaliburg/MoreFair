@@ -41,7 +41,10 @@
         <br />
         <div class="row py-0">
           <div class="col px-0 text-start">
-            {{ numberFormatter.format(yourRanker.grapes)
+            {{
+              hideVinegarAndGrapes
+                ? "[[Hidden]]"
+                : numberFormatter.format(yourRanker.grapes)
             }}<span v-if="ladder.ladderNumber >= settings.autoPromoteLadder"
               >/<span class="text-highlight">{{
                 numberFormatter.format(
@@ -52,12 +55,13 @@
             Grapes <span v-if="yourRanker.autoPromote">(Active)</span>
           </div>
           <div class="col px-0 text-end">
-            {{ numberFormatter.format(yourRanker.vinegar) }}/<span
-              class="text-highlight"
-              >{{
-                numberFormatter.format(ladder.getVinegarThrowCost(settings))
-              }}</span
-            >
+            {{
+              hideVinegarAndGrapes
+                ? "[[Hidden]]"
+                : numberFormatter.format(yourRanker.vinegar)
+            }}/<span class="text-highlight">{{
+              numberFormatter.format(ladder.getVinegarThrowCost(settings))
+            }}</span>
             Vinegar
           </div>
         </div>
@@ -100,6 +104,14 @@
               @click="throwVinegar"
             >
               Throw Vinegar
+              {{
+                yourRanker.vinegar.cmp(ladder.getVinegarThrowCost(settings)) >=
+                0
+                  ? ""
+                  : `(${secondsToHms(
+                      (vinegarCost - yourRanker.vinegar) / yourRanker.grapes
+                    )})`
+              }}
             </button>
             <button
               v-else-if="
@@ -135,7 +147,7 @@
           {{
             yourRanker.points.cmp(stats.pointsNeededForManualPromote) >= 0
               ? ""
-              : `(${secondsToHms(eta(yourRanker).toFirst())})`
+              : `(${secondsToHms(etaPromote)})`
           }}
         </div>
       </div>
@@ -170,6 +182,10 @@ const settings = computed(() => store.state.settings);
 const numberFormatter = computed(() => store.state.numberFormatter);
 const yourRanker = computed(() => ladder.value.yourRanker);
 
+const hideVinegarAndGrapes = computed(() =>
+  store.getters["options/getOptionValue"]("hideVinAndGrapeCount")
+);
+
 const biasCost = computed(() =>
   ladder.value.getNextUpgradeCost(yourRanker.value.bias)
 );
@@ -181,6 +197,10 @@ const multiCost = computed(() =>
 
 const canThrowVinegar = computed(() =>
   ladder.value.canThrowVinegar(settings.value)
+);
+
+const vinegarCost = computed(() =>
+  ladder.value.getVinegarThrowCost(settings.value)
 );
 
 const isBiasEnabled = computed(
@@ -201,6 +221,20 @@ const etaMulti = computed(() =>
     ? Infinity
     : eta(yourRanker.value).toPower(multiCost.value)
 );
+
+const etaPromote = computed(() => {
+  const etaToPromotionLimit = eta(yourRanker.value).toPoints(
+    stats.value.pointsNeededForManualPromote
+  );
+  const etaToFirstPlace = eta(yourRanker.value).toFirst();
+  if (!Number.isFinite(etaToPromotionLimit)) {
+    return Number.POSITIVE_INFINITY; // We cannot promote yet. The ladder is not full.
+  }
+  if (yourRanker.value.rank === 1) {
+    return etaToPromotionLimit; // We are already first place. So we only need to reach the promotion limit.
+  }
+  return Math.max(etaToPromotionLimit, etaToFirstPlace); // We need to reach the promotion limit and the first place, so we take the max.
+});
 
 // Functions
 
