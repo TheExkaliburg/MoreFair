@@ -1,6 +1,25 @@
 <template>
   <div class="row py-1">
     <div class="col-6">
+      <div class="safetyChecks">
+        <label>
+          <input
+            :checked="blockButtons"
+            type="checkbox"
+            @change="updateBlock"
+          />
+          <span>Lock Bias / Multi</span>
+        </label>
+        <div class="brLine"></div>
+        <label :class="blockButtons ? '' : 'disabled'">
+          <input
+            :checked="unblockOnce"
+            type="checkbox"
+            @change="updateUnblock"
+          />
+          <span>Unlock Once</span>
+        </label>
+      </div>
       <div class="container px-3">
         <div class="row py-0">
           <div class="col px-0 text-start">
@@ -25,7 +44,10 @@
               class="btn btn-outline-primary shadow-none w-100"
               @click="buyMulti"
             >
-              <span v-if="isMultiEnabled">+1 Multi</span>
+              <span v-if="isMultiEnabled"
+                >+1 Multi
+                <span v-if="blockButtons && !unblockOnce">(Locked)</span></span
+              >
               <span v-else>+M ({{ secondsToHms(etaMulti) }})</span>
             </button>
             <button
@@ -33,7 +55,10 @@
               class="btn btn-outline-primary shadow-none w-100"
               @click="buyBias"
             >
-              <span v-if="isBiasEnabled">+1 Bias</span>
+              <span v-if="isBiasEnabled"
+                >+1 Bias
+                <span v-if="blockButtons && !unblockOnce">(Locked)</span>
+              </span>
               <span v-else>+B ({{ secondsToHms(etaBias) }})</span>
             </button>
           </div>
@@ -167,6 +192,9 @@ const vinegarLastSecond = ref(false);
 const autoPromoteLastSecond = ref(false);
 const promoteLastSecond = ref(false);
 
+const blockButtons = ref(true);
+const unblockOnce = ref(false);
+
 // computed
 const ladder = computed(() => store.state.ladder.ladder);
 const stats = computed(() => store.state.ladder.stats);
@@ -212,6 +240,16 @@ const etaMulti = computed(() =>
 
 // Functions
 
+function updateBlock({ target }) {
+  const newChecked = target.checked;
+  blockButtons.value = newChecked;
+}
+
+function updateUnblock({ target }) {
+  const newChecked = target.checked;
+  unblockOnce.value = newChecked;
+}
+
 function throwVinegar(event) {
   vinegarLastSecond.value = true;
   setTimeout(() => (vinegarLastSecond.value = false), 1000);
@@ -225,12 +263,26 @@ function buyAutoPromote(event) {
 }
 
 function buyBias(event) {
+  if (blockButtons.value) {
+    if (!unblockOnce.value) {
+      return;
+    } else {
+      unblockOnce.value = false;
+    }
+  }
   biasLastSecond.value = true;
   setTimeout(() => (biasLastSecond.value = false), 1000);
   stompClient.send("/app/ladder/post/bias", { event: event });
 }
 
 function buyMulti(event) {
+  if (blockButtons.value) {
+    if (!unblockOnce.value) {
+      return;
+    } else {
+      unblockOnce.value = false;
+    }
+  }
   multiLastSecond.value = true;
   setTimeout(() => (multiLastSecond.value = false), 1000);
   stompClient.send("/app/ladder/post/multi", { event: event });
