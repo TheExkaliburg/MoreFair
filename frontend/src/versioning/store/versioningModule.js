@@ -14,6 +14,7 @@ const versioningModule = {
           ],
           improvements: [
             "Clicking on a navbar item that changes the view will now close the navbar.",
+            "Better ETA to promotion.",
           ],
         }),
         new Version("PATCH", "Changelog", {
