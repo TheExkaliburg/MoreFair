@@ -1,6 +1,10 @@
 <template>
   <div class="game-view container">
-    <div class="row py-0" style="height: 100%; max-height: 100%">
+    <div
+      v-if="!hideChat"
+      class="row py-0"
+      style="height: 100%; max-height: 100%"
+    >
       <div class="col-7">
         <div class="container py-1 px-3">
           <LadderWindow />
@@ -11,6 +15,16 @@
         <ChatWindow />
       </div>
     </div>
+    <div
+      v-if="hideChat"
+      class="row py-0"
+      style="height: 100%; max-height: 100%"
+    >
+      <div class="container py-1 px-3">
+        <LadderWindow />
+        <InfoBox />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -19,6 +33,14 @@
 import LadderWindow from "@/ladder/components/LadderWindow";
 import ChatWindow from "@/chat/components/ChatWindow";
 import InfoBox from "@/ladder/components/InfoBox";
+
+import { useStore } from "vuex";
+import { computed } from "vue";
+
+const store = useStore();
+const hideChat = computed(() =>
+  store.getters["options/getOptionValue"]("hideChat")
+);
 </script>
 
 <style lang="scss" scoped>
