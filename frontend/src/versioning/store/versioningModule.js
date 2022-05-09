@@ -11,6 +11,7 @@ const versioningModule = {
             "Load themes from URLs or load previously saved themes.",
             "You can also delete themes you don't like.",
             "You can now hide you vinegar and grape count.",
+            "You can now hide your Chat.",
           ],
           improvements: [
             "Clicking on a navbar item that changes the view will now close the navbar.",
