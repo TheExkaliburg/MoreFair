@@ -60,7 +60,7 @@
                 ? "[[Hidden]]"
                 : numberFormatter.format(yourRanker.vinegar)
             }}/<span class="text-highlight">{{
-                numberFormatter.format(ladder.getVinegarThrowCost(settings))
+              numberFormatter.format(ladder.getVinegarThrowCost(settings))
             }}</span>
             Vinegar
           </div>
