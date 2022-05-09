@@ -36,7 +36,7 @@
       </thead>
       <tbody id="ladderBody" class="">
         <tr
-          v-for="ranker in rankers"
+          v-for="ranker in shownRankers"
           :key="ranker.accountId"
           :class="[
             ranker.you ? 'you' : '',
@@ -76,6 +76,16 @@ const ladder = computed(() => store.state.ladder.ladder);
 const user = computed(() => store.state.user);
 const settings = computed(() => store.state.settings);
 const rankers = computed(() => store.getters["ladder/shownRankers"]);
+const hidePromotedPlayers = computed(() =>
+  store.getters["options/getOptionValue"]("hidePromotedPlayers")
+);
+const shownRankers = computed(() => {
+  if (hidePromotedPlayers.value) {
+    return rankers.value.filter((ranker) => ranker.growing || ranker.you);
+  } else {
+    return rankers.value;
+  }
+});
 
 function changeLadder(event) {
   const targetLadder = event.target.dataset.number;
