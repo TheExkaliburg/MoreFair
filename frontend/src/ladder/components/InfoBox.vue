@@ -335,6 +335,17 @@ div .col-6 {
   // border: white solid 1px;
 }
 
+.safetyChecks {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 10px;
+  > * {
+    margin: 0 5px;
+  }
+}
+
 .hide {
   display: none !important;
 }
