@@ -104,6 +104,14 @@
               @click="throwVinegar"
             >
               Throw Vinegar
+              {{
+                yourRanker.vinegar.cmp(ladder.getVinegarThrowCost(settings)) >=
+                0
+                  ? ""
+                  : `(${secondsToHms(
+                      (vinegarCost - yourRanker.vinegar) / yourRanker.grapes
+                    )})`
+              }}
             </button>
             <button
               v-else-if="
@@ -189,6 +197,10 @@ const multiCost = computed(() =>
 
 const canThrowVinegar = computed(() =>
   ladder.value.canThrowVinegar(settings.value)
+);
+
+const vinegarCost = computed(() =>
+  ladder.value.getVinegarThrowCost(settings.value)
 );
 
 const isBiasEnabled = computed(
