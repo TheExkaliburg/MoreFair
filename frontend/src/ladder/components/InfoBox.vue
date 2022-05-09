@@ -139,7 +139,7 @@
           {{
             yourRanker.points.cmp(stats.pointsNeededForManualPromote) >= 0
               ? ""
-              : `(${secondsToHms(eta(yourRanker).toFirst())})`
+              : `(${secondsToHms(etaPromote)})`
           }}
         </div>
       </div>
@@ -209,6 +209,20 @@ const etaMulti = computed(() =>
     ? Infinity
     : eta(yourRanker.value).toPower(multiCost.value)
 );
+
+const etaPromote = computed(() => {
+  const etaToPromotionLimit = eta(yourRanker.value).toPoints(
+    stats.value.pointsNeededForManualPromote
+  );
+  const etaToFirstPlace = eta(yourRanker.value).toFirst();
+  if (!Number.isFinite(etaToPromotionLimit)) {
+    return Number.POSITIVE_INFINITY; // We cannot promote yet. The ladder is not full.
+  }
+  if (yourRanker.value.rank === 1) {
+    return etaToPromotionLimit; // We are already first place. So we only need to reach the promotion limit.
+  }
+  return Math.max(etaToPromotionLimit, etaToFirstPlace); // We need to reach the promotion limit and the first place, so we take the max.
+});
 
 // Functions
 
