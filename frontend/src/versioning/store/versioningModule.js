@@ -11,6 +11,9 @@ const versioningModule = {
             "Load themes from URLs or load previously saved themes.",
             "You can also delete themes you don't like.",
           ],
+          improvements: [
+            "Clicking on a navbar item that changes the view will now close the navbar.",
+          ],
         }),
         new Version("PATCH", "Changelog", {
           features: [
