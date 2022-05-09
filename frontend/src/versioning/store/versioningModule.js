@@ -10,6 +10,7 @@ const versioningModule = {
             "Added a theme loader to the Options menu.",
             "Load themes from URLs or load previously saved themes.",
             "You can also delete themes you don't like.",
+            "You can now hide you vinegar and grape count.",
           ],
           improvements: [
             "Clicking on a navbar item that changes the view will now close the navbar.",

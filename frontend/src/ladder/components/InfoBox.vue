@@ -41,7 +41,10 @@
         <br />
         <div class="row py-0">
           <div class="col px-0 text-start">
-            {{ numberFormatter.format(yourRanker.grapes)
+            {{
+              hideVinegarAndGrapes
+                ? "[[Hidden]]"
+                : numberFormatter.format(yourRanker.grapes)
             }}<span v-if="ladder.ladderNumber >= settings.autoPromoteLadder"
               >/<span class="text-highlight">{{
                 numberFormatter.format(
@@ -52,12 +55,13 @@
             Grapes <span v-if="yourRanker.autoPromote">(Active)</span>
           </div>
           <div class="col px-0 text-end">
-            {{ numberFormatter.format(yourRanker.vinegar) }}/<span
-              class="text-highlight"
-              >{{
-                numberFormatter.format(ladder.getVinegarThrowCost(settings))
-              }}</span
-            >
+            {{
+              hideVinegarAndGrapes
+                ? "[[Hidden]]"
+                : numberFormatter.format(yourRanker.vinegar)
+            }}/<span class="text-highlight">{{
+              numberFormatter.format(ladder.getVinegarThrowCost(settings))
+            }}</span>
             Vinegar
           </div>
         </div>
@@ -169,6 +173,10 @@ const stats = computed(() => store.state.ladder.stats);
 const settings = computed(() => store.state.settings);
 const numberFormatter = computed(() => store.state.numberFormatter);
 const yourRanker = computed(() => ladder.value.yourRanker);
+
+const hideVinegarAndGrapes = computed(() =>
+  store.getters["options/getOptionValue"]("hideVinAndGrapeCount")
+);
 
 const biasCost = computed(() =>
   ladder.value.getNextUpgradeCost(yourRanker.value.bias)

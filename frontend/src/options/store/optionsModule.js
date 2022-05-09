@@ -39,6 +39,11 @@ const optionsModule = {
           name: "general",
           options: [
             new BoolOption({
+              displayName: "Hide vinegar and grape count",
+              name: "hideVinAndGrapeCount",
+              value: false,
+            }),
+            new BoolOption({
               displayName: "Show all rankers",
               name: "showAllRankers",
               value: false,
