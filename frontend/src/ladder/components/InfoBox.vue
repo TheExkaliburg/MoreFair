@@ -129,6 +129,14 @@
               @click="throwVinegar"
             >
               Throw Vinegar
+              {{
+                yourRanker.vinegar.cmp(ladder.getVinegarThrowCost(settings)) >=
+                0
+                  ? ""
+                  : `(${secondsToHms(
+                      (vinegarCost - yourRanker.vinegar) / yourRanker.grapes
+                    )})`
+              }}
             </button>
             <button
               v-else-if="
@@ -164,7 +172,7 @@
           {{
             yourRanker.points.cmp(stats.pointsNeededForManualPromote) >= 0
               ? ""
-              : `(${secondsToHms(eta(yourRanker).toFirst())})`
+              : `(${secondsToHms(etaPromote)})`
           }}
         </div>
       </div>
@@ -223,6 +231,10 @@ const canThrowVinegar = computed(() =>
   ladder.value.canThrowVinegar(settings.value)
 );
 
+const vinegarCost = computed(() =>
+  ladder.value.getVinegarThrowCost(settings.value)
+);
+
 const isBiasEnabled = computed(
   () =>
     yourRanker.value.points.cmp(biasCost.value) >= 0 && !biasLastSecond.value
@@ -241,6 +253,20 @@ const etaMulti = computed(() =>
     ? Infinity
     : eta(yourRanker.value).toPower(multiCost.value)
 );
+
+const etaPromote = computed(() => {
+  const etaToPromotionLimit = eta(yourRanker.value).toPoints(
+    stats.value.pointsNeededForManualPromote
+  );
+  const etaToFirstPlace = eta(yourRanker.value).toFirst();
+  if (!Number.isFinite(etaToPromotionLimit)) {
+    return Number.POSITIVE_INFINITY; // We cannot promote yet. The ladder is not full.
+  }
+  if (yourRanker.value.rank === 1) {
+    return etaToPromotionLimit; // We are already first place. So we only need to reach the promotion limit.
+  }
+  return Math.max(etaToPromotionLimit, etaToFirstPlace); // We need to reach the promotion limit and the first place, so we take the max.
+});
 
 // Functions
 

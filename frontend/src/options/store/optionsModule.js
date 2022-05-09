@@ -110,6 +110,11 @@ const optionsModule = {
           name: "chatSettings",
           options: [
             new BoolOption({
+              displayName: "Hide chat",
+              name: "hideChat",
+              value: false,
+            }),
+            new BoolOption({
               displayName: "Play sound on mention",
               name: "mentionSound",
               value: false,
