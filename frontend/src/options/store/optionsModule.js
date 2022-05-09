@@ -48,6 +48,11 @@ const optionsModule = {
               name: "showAllRankers",
               value: false,
             }),
+            new BoolOption({
+              displayName: "Hide promoted players",
+              name: "hidePromotedPlayers",
+              value: false,
+            }),
             new IntegerOption({
               displayName: "Rankers at top",
               name: "rankersAtTop",
