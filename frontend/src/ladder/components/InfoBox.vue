@@ -346,6 +346,16 @@ div .col-6 {
   }
 }
 
+label > input {
+  margin-right: 5px;
+}
+
+.brLine {
+  width: 100%;
+  border: none;
+  margin: 0;
+}
+
 .hide {
   display: none !important;
 }
