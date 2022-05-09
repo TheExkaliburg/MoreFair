@@ -48,6 +48,11 @@ const optionsModule = {
               name: "showAllRankers",
               value: false,
             }),
+            new BoolOption({
+              displayName: "Lock multi / bias by default",
+              name: "lockButtonsByDefault",
+              value: false,
+            }),
             new IntegerOption({
               displayName: "Rankers at top",
               name: "rankersAtTop",

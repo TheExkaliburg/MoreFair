@@ -192,8 +192,12 @@ const vinegarLastSecond = ref(false);
 const autoPromoteLastSecond = ref(false);
 const promoteLastSecond = ref(false);
 
-const blockButtons = ref(true);
+const blockButtons = ref(false);
 const unblockOnce = ref(false);
+
+blockButtons.value = store.getters["options/getOptionValue"](
+  "lockButtonsByDefault"
+);
 
 // computed
 const ladder = computed(() => store.state.ladder.ladder);
