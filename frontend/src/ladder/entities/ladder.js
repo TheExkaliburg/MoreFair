@@ -187,6 +187,14 @@ class Ladder {
     });
   }
 
+  reduceVinegarOfRanker(accountId, amount) {
+    this.rankers.forEach((ranker) => {
+      if (accountId === ranker.accountId) {
+        if (ranker.you) ranker.vinegar.sub(amount);
+      }
+    });
+  }
+
   getMinimumPointsForPromote(settings) {
     return settings.pointsForPromote.mul(this.ladderNumber);
   }
