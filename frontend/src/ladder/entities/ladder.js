@@ -190,7 +190,7 @@ class Ladder {
   reduceVinegarOfRanker(accountId, amount) {
     this.rankers.forEach((ranker) => {
       if (accountId === ranker.accountId) {
-        if (ranker.you) ranker.vinegar.sub(amount);
+        if (ranker.you) ranker.vinegar = ranker.vinegar.sub(amount);
       }
     });
   }
