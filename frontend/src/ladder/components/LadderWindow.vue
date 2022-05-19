@@ -54,7 +54,7 @@
             }}
             x{{ ("" + ranker.multiplier).padStart(2, "0") }}]
           </td>
-          <td class="text-end">
+          <td class="text-end" :style="[rankerEtaColor(ranker)]">
             {{ numberFormatter.format(ranker.points) }}
           </td>
         </tr>
@@ -66,6 +66,7 @@
 <script setup>
 import { useStore } from "vuex";
 import { computed, inject } from "vue";
+import { eta } from "../../modules/eta";
 import PaginationGroup from "@/components/PaginationGroup";
 
 const store = useStore();
@@ -76,6 +77,94 @@ const ladder = computed(() => store.state.ladder.ladder);
 const user = computed(() => store.state.user);
 const settings = computed(() => store.state.settings);
 const rankers = computed(() => store.getters["ladder/shownRankers"]);
+const yourRanker = computed(() => ladder.value.yourRanker);
+const etaColorSetting = computed(() =>
+  store.getters["options/getOptionValue"]("etaColors")
+);
+
+const rankerEtaColor = (ranker) => {
+  if (etaColorSetting.value === "Off") {
+    return {};
+  }
+  if (etaColorSetting.value === "3-Color") {
+    return rankerEtaClass(ranker);
+  }
+  return rankerEtaPoints(ranker);
+};
+
+const rankerEtaClass = (ranker) => {
+  if (ranker.you) {
+    return {};
+  }
+  if (!ranker.growing) {
+    return {};
+  }
+
+  const theirETAToFirst = eta(ranker).toFirst();
+  const yourETAToFirst = eta(yourRanker.value).toFirst();
+
+  if (!ranker.growing) {
+    return {};
+  }
+
+  if (theirETAToFirst < yourETAToFirst + 29) {
+    if (theirETAToFirst < yourETAToFirst) {
+      return { color: "var(--eta-worst)" }; //they will be first to first
+    }
+    return { color: "var(--eta-mid)" }; //they will be second to first but will overtake you befor the 30 second mark for manual promote
+  }
+  if (yourETAToFirst < theirETAToFirst) {
+    if (yourETAToFirst + 31 < theirETAToFirst) {
+      return { color: "var(--eta-best)" }; //you will be first to first and have time to manually promote
+    }
+    return { color: "var(--eta-mid)" }; //they will be second to first but will overtake you befor the 30 second mark for manual promote
+  }
+  return {};
+};
+
+const rankerEtaPoints = (ranker) => {
+  if (ranker.you) {
+    return {};
+  }
+  if (!ranker.growing) {
+    return {};
+  }
+
+  const etaToRanker = eta(ranker).toRanker(yourRanker.value);
+  const youEtaToFirst = eta(yourRanker.value).toFirst();
+  //  const theirEtaToFirst = eta(ranker).toFirst();
+
+  //check if the ranker is in front of us
+  if (ranker.rank < yourRanker.value.rank) {
+    //we want to return a color on a hsl scale
+    //hsl scale is green over orange to red
+    //green is 0 seconds to overtake
+    //orange is eta to overtake equals eta to first
+    //red is eta to overtake equals eta to first * 2
+
+    let gradientPercent = (etaToRanker / youEtaToFirst) * 50;
+
+    gradientPercent = Math.min(Math.max(gradientPercent, 0), 100);
+
+    //return a color in hsl format
+    return {
+      color: `hsl(${100 - gradientPercent}, 100%, 50%)`,
+    };
+  }
+  //we want to return a color on a hsl scale
+  //hsl scale is green over orange to red
+  //green is eta to overtake equals eta to first
+  //red is 0 seconds to overtake
+
+  let gradientPercent = (etaToRanker / youEtaToFirst) * 100;
+
+  gradientPercent = Math.min(Math.max(gradientPercent, 0), 100);
+
+  //return a color in hsl format
+  return {
+    color: `hsl(${gradientPercent}, 100%, 50%)`,
+  };
+};
 
 function changeLadder(event) {
   const targetLadder = event.target.dataset.number;
