@@ -38,6 +38,12 @@ const optionsModule = {
           displayName: "General",
           name: "general",
           options: [
+            new DropdownOption({
+              displayName: "ETA Colors",
+              name: "etaColors",
+              options: ["Gradient", "3-Color", "Off"],
+              callback: () => {},
+            }),
             new BoolOption({
               displayName: "Hide vinegar and grape count",
               name: "hideVinAndGrapeCount",

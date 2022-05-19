@@ -5,7 +5,7 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
-        new Version("PATCH", "Theme Loader", {
+        new Version("PATCH", "Theme Loader, ETA, Streamer QOL", {
           features: [
             "Added a theme loader to the Options menu.",
             "Load themes from URLs or load previously saved themes.",
@@ -13,6 +13,7 @@ const versioningModule = {
             "You can now hide you vinegar and grape count.",
             "There will now be an ETA until your vinegar is enough to be thrown.",
             "You can now hide your Chat.",
+            "You can now display some eta information in color in the ladder.",
             "You are now able to hide promoted players from the game.",
           ],
           improvements: [

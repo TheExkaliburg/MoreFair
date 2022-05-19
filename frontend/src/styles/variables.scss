@@ -64,6 +64,11 @@ $color-saltpan: #ebede9;
   --placeholder-color: #{$color-claret};
   --item-selected-color: #{$color-tangaroa};
 
+  //ETA
+  --eta-best: green;
+  --eta-mid: orange;
+  --eta-worst: red;
+
   // Text
   --text-font-size: 15px;
   --text-color: #{$color-givry};
