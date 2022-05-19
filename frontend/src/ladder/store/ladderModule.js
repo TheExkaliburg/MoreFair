@@ -40,6 +40,11 @@ export default {
       // const vinegarThrown = new Decimal(event.data.amount);
       state.ladder.resetVinegarOfRanker(event.accountId);
       // TODO: Show if you've been graped
+      const yourRanker = state.ladder.yourRanker;
+      if (yourRanker.rank === 1) {
+        //We are in the graped position
+        state.ladder.reduceVinegarOfRanker(event.accountId, event.data.amount);
+      }
     },
     handleMultiplier(state, { event }) {
       state.ladder.multiRanker(event.accountId);
