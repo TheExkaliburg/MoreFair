@@ -1,8 +1,8 @@
 package de.kaliburg.morefair.dto;
 
-import de.kaliburg.morefair.account.entity.Account;
-import de.kaliburg.morefair.ladder.Ladder;
-import de.kaliburg.morefair.ladder.Ranker;
+import de.kaliburg.morefair.account.entity.AccountEntity;
+import de.kaliburg.morefair.game.ladder.LadderEntity;
+import de.kaliburg.morefair.game.ranker.RankerEntity;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -16,10 +16,10 @@ public class LadderViewDTO {
     private RankerPrivateDTO yourRanker;
     private Integer startRank = 0;
 
-    public LadderViewDTO(List<Ranker> rankers, Ladder currentLadder, Account account, Ranker firstRanker) {
+    public LadderViewDTO(List<RankerEntity> rankers, LadderEntity currentLadder, AccountEntity account, RankerEntity firstRanker) {
         this.firstRanker = firstRanker.convertToDto();
         startRank = rankers.get(0).getRank();
-        for (Ranker ranker : rankers) {
+        for (RankerEntity ranker : rankers) {
             RankerDTO dto = ranker.convertToDto();
             if (ranker.getAccount().getUuid().equals(account.getUuid())) {
                 yourRanker = ranker.convertToPrivateDto();

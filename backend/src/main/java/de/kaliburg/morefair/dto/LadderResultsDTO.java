@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.dto;
 
-import de.kaliburg.morefair.ladder.Ladder;
+import de.kaliburg.morefair.game.ladder.LadderEntity;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ public class LadderResultsDTO
 {
     private Map<Integer, List<RankerPrivateDTO>> allLadders = new HashMap<>();
 
-    public LadderResultsDTO(Map<Integer, Ladder> ladders){
+    public LadderResultsDTO(Map<Integer, LadderEntity> ladders){
         ladders.forEach((integer, ladder) -> {
             List<RankerPrivateDTO> allRankers = new ArrayList<>();
             ladder.getRankers().forEach(ranker -> {

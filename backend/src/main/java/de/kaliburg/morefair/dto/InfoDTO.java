@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.dto;
 
-import de.kaliburg.morefair.FairController;
+import de.kaliburg.morefair.api.FairController;
 import lombok.Data;
 
 import java.util.List;

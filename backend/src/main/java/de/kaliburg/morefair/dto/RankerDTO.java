@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.dto;
 
-import de.kaliburg.morefair.ladder.Ranker;
+import de.kaliburg.morefair.game.ranker.RankerEntity;
 import lombok.Data;
 import org.apache.commons.text.StringEscapeUtils;
 
@@ -17,7 +17,7 @@ public class RankerDTO {
     private Integer timesAsshole;
     private boolean isGrowing;
 
-    public RankerDTO(Ranker ranker) {
+    public RankerDTO(RankerEntity ranker) {
         this.accountId = ranker.getAccount().getId();
         this.username = StringEscapeUtils.unescapeJava(ranker.getAccount().getUsername());
         this.rank = ranker.getRank();
