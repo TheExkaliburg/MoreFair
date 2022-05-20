@@ -64,11 +64,6 @@ $color-saltpan: #ebede9;
   --placeholder-color: #{$color-claret};
   --item-selected-color: #{$color-tangaroa};
 
-  //ETA
-  --eta-best: green;
-  --eta-mid: orange;
-  --eta-worst: red;
-
   // Text
   --text-font-size: 15px;
   --text-color: #{$color-givry};
@@ -86,6 +81,11 @@ $color-saltpan: #ebede9;
   --you-background-color: var(--text-dark-highlight-color);
   --promoted-color: var(--text-light-highlight-color);
   --promoted-background-color: var(--background-dark-color);
+
+  //ETA
+  --eta-best: #{$color-la-palma};
+  --eta-mid: var(--text-color);
+  --eta-worst: #{$color-claret};
 
   // Chat
   --header-color: var(--main-color);
@@ -126,6 +126,11 @@ $color-saltpan: #ebede9;
   --you-background-color: var(--text-dark-highlight-color);
   --promoted-color: var(--text-light-highlight-color);
   --promoted-background-color: var(--background-dark-color);
+
+  //ETA
+  --eta-best: #{$color-la-palma};
+  --eta-mid: var(--text-color);
+  --eta-worst: #{$color-claret};
 
   // Chat
   --header-color: var(--main-color);

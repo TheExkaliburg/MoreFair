@@ -54,7 +54,10 @@
             }}
             x{{ ("" + ranker.multiplier).padStart(2, "0") }}]
           </td>
-          <td class="text-end" :style="[rankerEtaColor(ranker)]">
+          <td
+            :style="'animation-delay: ' + rankerEtaPercentage(ranker) + 's'"
+            class="text-end etaProgress"
+          >
             {{ numberFormatter.format(ranker.points) }}
           </td>
         </tr>
@@ -66,8 +69,8 @@
 <script setup>
 import { useStore } from "vuex";
 import { computed, inject } from "vue";
-import { eta } from "../../modules/eta";
 import PaginationGroup from "@/components/PaginationGroup";
+import { eta } from "@/modules/eta";
 
 const store = useStore();
 const stompClient = inject("$stompClient");
@@ -82,92 +85,56 @@ const etaColorSetting = computed(() =>
   store.getters["options/getOptionValue"]("etaColors")
 );
 
-const rankerEtaColor = (ranker) => {
+// should return the value from fastest (0%) to as long as it takes for the top (50%) to double as long (100%)
+// as a negative, because the animation-delay only sets the start value if the delay is negative, otherwise it's an actual delay
+function rankerEtaPercentage(ranker) {
   if (etaColorSetting.value === "Off") {
-    return {};
+    return 1;
   }
-  if (etaColorSetting.value === "3-Color") {
-    return rankerEtaClass(ranker);
-  }
-  return rankerEtaPoints(ranker);
-};
-
-const rankerEtaClass = (ranker) => {
   if (ranker.you) {
-    return {};
+    return 1;
   }
   if (!ranker.growing) {
-    return {};
-  }
-
-  const theirETAToFirst = eta(ranker).toFirst();
-  const yourETAToFirst = eta(yourRanker.value).toFirst();
-
-  if (!ranker.growing) {
-    return {};
-  }
-
-  if (theirETAToFirst < yourETAToFirst + 29) {
-    if (theirETAToFirst < yourETAToFirst) {
-      return { color: "var(--eta-worst)" }; //they will be first to first
-    }
-    return { color: "var(--eta-mid)" }; //they will be second to first but will overtake you befor the 30 second mark for manual promote
-  }
-  if (yourETAToFirst < theirETAToFirst) {
-    if (yourETAToFirst + 31 < theirETAToFirst) {
-      return { color: "var(--eta-best)" }; //you will be first to first and have time to manually promote
-    }
-    return { color: "var(--eta-mid)" }; //they will be second to first but will overtake you befor the 30 second mark for manual promote
-  }
-  return {};
-};
-
-const rankerEtaPoints = (ranker) => {
-  if (ranker.you) {
-    return {};
-  }
-  if (!ranker.growing) {
-    return {};
+    return 1;
   }
 
   const etaToRanker = eta(ranker).toRanker(yourRanker.value);
   const youEtaToFirst = eta(yourRanker.value).toFirst();
-  //  const theirEtaToFirst = eta(ranker).toFirst();
 
-  //check if the ranker is in front of us
-  if (ranker.rank < yourRanker.value.rank) {
-    //we want to return a color on a hsl scale
-    //hsl scale is green over orange to red
-    //green is 0 seconds to overtake
-    //orange is eta to overtake equals eta to first
-    //red is eta to overtake equals eta to first * 2
-
-    let gradientPercent = (etaToRanker / youEtaToFirst) * 50;
-
-    gradientPercent = Math.min(Math.max(gradientPercent, 0), 100);
-
-    //return a color in hsl format
-    return {
-      color: `hsl(${100 - gradientPercent}, 100%, 50%)`,
-    };
-  }
-  //we want to return a color on a hsl scale
-  //hsl scale is green over orange to red
-  //green is eta to overtake equals eta to first
-  //red is 0 seconds to overtake
-
-  let gradientPercent = (etaToRanker / youEtaToFirst) * 100;
-
+  // we want to return a percentage for our animation interpolation
+  // 0 is to overtake now
+  // 50 is eta to overtake equals eta to first
+  // 100 is eta to overtake equals eta to first * 2
+  let gradientPercent = (etaToRanker / youEtaToFirst) * 50;
   gradientPercent = Math.min(Math.max(gradientPercent, 0), 100);
 
-  //return a color in hsl format
-  return {
-    color: `hsl(${gradientPercent}, 100%, 50%)`,
-  };
-};
+  //check if the ranker is behind us
+  if (ranker.rank > yourRanker.value.rank) {
+    // we want to return a percentage for our animation interpolation
+    // 0 is eta to overtake equals eta to first * 2
+    // 50 is eta to overtake equals eta to first
+    // 100 is 0 seconds to overtake
+    gradientPercent = 100 - gradientPercent;
+  }
+
+  if (etaColorSetting.value === "3-Color") {
+    if (gradientPercent < 100 / 3) {
+      gradientPercent = 0;
+    } else if (gradientPercent < 200 / 3) {
+      gradientPercent = 50;
+    } else {
+      gradientPercent = 100;
+    }
+    return -gradientPercent;
+  }
+
+  return -gradientPercent;
+}
+
 const hidePromotedPlayers = computed(() =>
   store.getters["options/getOptionValue"]("hidePromotedPlayers")
 );
+
 const shownRankers = computed(() => {
   if (hidePromotedPlayers.value) {
     return rankers.value.filter((ranker) => ranker.growing || ranker.you);
@@ -230,5 +197,23 @@ function changeLadder(event) {
 .promoted {
   background-color: var(--promoted-background-color);
   color: var(--promoted-color);
+}
+
+@keyframes etaProgress {
+  0% {
+    color: var(--eta-best);
+  }
+  50% {
+    color: var(--eta-mid);
+  }
+  100% {
+    color: var(--eta-worst);
+  }
+}
+
+.etaProgress {
+  // The Animation moves through the keyframes but is paused,
+  // so only the negative delay can change anything for it
+  animation: 101s linear paused etaProgress;
 }
 </style>
