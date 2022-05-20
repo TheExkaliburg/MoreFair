@@ -6,7 +6,7 @@ const versioningModule = {
     return {
       versions: [
         new Version("PATCH", "", {
-          fixes: [""],
+          improvements: ["The Account id is now shown as subscript"],
         }),
         new Version("PATCH", "Theme Loader, ETA, Streamer QOL", {
           features: [

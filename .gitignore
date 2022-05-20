@@ -289,3 +289,4 @@ dist
 
 #VSCode folder
 .vscode/
+backend/game.uml

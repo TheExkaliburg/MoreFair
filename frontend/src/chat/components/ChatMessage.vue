@@ -3,9 +3,9 @@
     <div class="row py-0 message-header">
       <div class="col-4 message-username">
         <span class="message-user-name">
-          <span>{{ msg.username }}</span>
+          {{ msg.username }}
         </span>
-        <span class="message-user-id">&nbsp;#{{ msg.accountId }}</span>
+        <sub class="message-user-id">&nbsp;#{{ msg.accountId }}</sub>
       </div>
       <div class="col-4 message-status">
         <strong>{{
