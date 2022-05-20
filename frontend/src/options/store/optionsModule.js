@@ -76,10 +76,16 @@ const optionsModule = {
           displayName: "Ladder Settings",
           name: "ladderSettings",
           options: [
+            new BoolOption({
+              displayName: "Show ETA to Top/Ranker",
+              name: "showETA",
+              value: false,
+            }),
             new DropdownOption({
               displayName: "ETA Colors",
               name: "etaColors",
-              options: ["Gradient", "3-Color", "Off"],
+              options: ["Off", "3-Color", "Gradient"],
+              value: "Gradient",
             }),
             new BoolOption({
               displayName: "Show all rankers",

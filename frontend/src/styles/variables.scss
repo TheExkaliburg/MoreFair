@@ -69,7 +69,7 @@ $color-saltpan: #ebede9;
   --text-color: #{$color-givry};
   --text-light-highlight-color: var(--main-secondary-color);
   --text-dark-highlight-color: #{$color-dark-coral};
-  --text-error-color: var(--bs-danger);
+  --text-error-color: var(--placeholder-color);
 
   // Buttons
   --button-color: var(--main-secondary-color);
@@ -84,7 +84,7 @@ $color-saltpan: #ebede9;
 
   //ETA
   --eta-best: #{$color-la-palma};
-  --eta-mid: var(--text-color);
+  --eta-mid: var(--main-color);
   --eta-worst: #{$color-claret};
 
   // Chat
@@ -128,9 +128,9 @@ $color-saltpan: #ebede9;
   --promoted-background-color: var(--background-dark-color);
 
   //ETA
-  --eta-best: #{$color-la-palma};
-  --eta-mid: var(--text-color);
-  --eta-worst: #{$color-claret};
+  --eta-best: #{$color-asparagus};
+  --eta-mid: #{$color-catalina-blue};
+  --eta-worst: #{$color-milano-red};
 
   // Chat
   --header-color: var(--main-color);

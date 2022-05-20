@@ -27,7 +27,15 @@
       style="border: 0px solid yellow"
     >
       <thead>
-        <tr class="thead-light">
+        <tr v-if="showEtaSetting" class="thead-light">
+          <th class="col-1 text-start">#</th>
+          <th class="col-3 text-start">Username</th>
+          <th class="col-1 text-end">ETA -> Top</th>
+          <th class="col-1 text-end">ETA -> You</th>
+          <th class="col-3 text-end">Power</th>
+          <th class="col-3 text-end">Points</th>
+        </tr>
+        <tr v-else class="thead-light">
           <th class="col-1 text-start">#</th>
           <th class="col-5 text-start">Username</th>
           <th class="col-3 text-end">Power</th>
@@ -48,6 +56,20 @@
             {{ settings.assholeTags[ranker.timesAsshole] }}
           </td>
           <td class="text-start">{{ ranker.username }}</td>
+          <td
+            v-if="showEtaSetting"
+            :style="'animation-delay: ' + rankerEtaPercentage(ranker) + 's'"
+            class="text-end etaProgressAnim"
+          >
+            {{ secondsToHms(eta(ranker).toFirst()) }}
+          </td>
+          <td
+            v-if="showEtaSetting"
+            :style="'animation-delay: ' + rankerEtaPercentage(ranker) + 's'"
+            class="text-end etaProgressAnim"
+          >
+            {{ secondsToHms(eta(ranker).toRanker(yourRanker)) }}
+          </td>
           <td class="text-end">
             {{ numberFormatter.format(ranker.power) }} [+{{
               ("" + ranker.bias).padStart(2, "0")
@@ -56,7 +78,7 @@
           </td>
           <td
             :style="'animation-delay: ' + rankerEtaPercentage(ranker) + 's'"
-            class="text-end etaProgress"
+            class="text-end etaProgressAnim"
           >
             {{ numberFormatter.format(ranker.points) }}
           </td>
@@ -71,6 +93,7 @@ import { useStore } from "vuex";
 import { computed, inject } from "vue";
 import PaginationGroup from "@/components/PaginationGroup";
 import { eta } from "@/modules/eta";
+import { secondsToHms } from "@/modules/formatting";
 
 const store = useStore();
 const stompClient = inject("$stompClient");
@@ -84,6 +107,19 @@ const yourRanker = computed(() => ladder.value.yourRanker);
 const etaColorSetting = computed(() =>
   store.getters["options/getOptionValue"]("etaColors")
 );
+const showEtaSetting = computed(() =>
+  store.getters["options/getOptionValue"]("showETA")
+);
+const hidePromotedPlayers = computed(() =>
+  store.getters["options/getOptionValue"]("hidePromotedPlayers")
+);
+const shownRankers = computed(() => {
+  if (hidePromotedPlayers.value) {
+    return rankers.value.filter((ranker) => ranker.growing || ranker.you);
+  } else {
+    return rankers.value;
+  }
+});
 
 // should return the value from fastest (0%) to as long as it takes for the top (50%) to double as long (100%)
 // as a negative, because the animation-delay only sets the start value if the delay is negative, otherwise it's an actual delay
@@ -118,30 +154,17 @@ function rankerEtaPercentage(ranker) {
   }
 
   if (etaColorSetting.value === "3-Color") {
-    if (gradientPercent < 100 / 3) {
+    if (gradientPercent < 45) {
       gradientPercent = 0;
-    } else if (gradientPercent < 200 / 3) {
+    } else if (gradientPercent < 55) {
       gradientPercent = 50;
     } else {
       gradientPercent = 100;
     }
-    return -gradientPercent;
   }
 
   return -gradientPercent;
 }
-
-const hidePromotedPlayers = computed(() =>
-  store.getters["options/getOptionValue"]("hidePromotedPlayers")
-);
-
-const shownRankers = computed(() => {
-  if (hidePromotedPlayers.value) {
-    return rankers.value.filter((ranker) => ranker.growing || ranker.you);
-  } else {
-    return rankers.value;
-  }
-});
 
 function changeLadder(event) {
   const targetLadder = event.target.dataset.number;
@@ -211,7 +234,7 @@ function changeLadder(event) {
   }
 }
 
-.etaProgress {
+.etaProgressAnim {
   // The Animation moves through the keyframes but is paused,
   // so only the negative delay can change anything for it
   animation: 101s linear paused etaProgress;
