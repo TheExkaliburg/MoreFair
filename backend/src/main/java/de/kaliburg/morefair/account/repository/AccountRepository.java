@@ -14,7 +14,8 @@ import java.util.UUID;
 
 @Repository
 public interface AccountRepository extends JpaRepository<AccountEntity, Long> {
-    @Query("SELECT a FROM AccountEntity a LEFT JOIN FETCH a.rankers WHERE a.uuid = :uuid") AccountEntity findByUuid(@Param("uuid") UUID uuid);
+    @Query("SELECT a FROM AccountEntity a LEFT JOIN FETCH a.rankers WHERE a.uuid = :uuid") AccountEntity findByUuid(
+            @Param("uuid") UUID uuid);
 
     @Query("SELECT MAX(a.timesAsshole) FROM AccountEntity a")
     Integer findMaxTimesAsshole();

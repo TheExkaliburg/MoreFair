@@ -1,9 +1,9 @@
 package de.kaliburg.morefair.api;
 
 import de.kaliburg.morefair.account.AccountService;
-import de.kaliburg.morefair.dto.InfoDTO;
 import de.kaliburg.morefair.api.utils.WSUtils;
 import de.kaliburg.morefair.api.websockets.messages.WSMessage;
+import de.kaliburg.morefair.dto.InfoDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.http.HttpStatus;
@@ -63,7 +63,7 @@ public class FairController {
         this.wsUtils = wsUtils;
     }
 
-    @GetMapping(value = {"/options", "/help", "/mod"})
+    @GetMapping(value = { "/options", "/help", "/mod" })
     public String forward() {
         return "forward:/";
     }
@@ -86,6 +86,5 @@ public class FairController {
             e.printStackTrace();
         }
     }
-
 
 }

@@ -1,17 +1,17 @@
 package de.kaliburg.morefair.api;
 
-import de.kaliburg.morefair.account.entity.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
+import de.kaliburg.morefair.account.entity.AccountEntity;
 import de.kaliburg.morefair.account.type.AccountAccessRole;
-import de.kaliburg.morefair.game.message.MessageEntity;
-import de.kaliburg.morefair.game.message.MessageService;
-import de.kaliburg.morefair.events.Event;
-import de.kaliburg.morefair.events.EventType;
-import de.kaliburg.morefair.game.ranker.RankerService;
+import de.kaliburg.morefair.api.utils.WSUtils;
 import de.kaliburg.morefair.api.websockets.messages.WSMessage;
 import de.kaliburg.morefair.data.ModChatData;
 import de.kaliburg.morefair.data.ModerationInfoData;
-import de.kaliburg.morefair.api.utils.WSUtils;
+import de.kaliburg.morefair.events.Event;
+import de.kaliburg.morefair.events.EventType;
+import de.kaliburg.morefair.game.chat.message.MessageEntity;
+import de.kaliburg.morefair.game.chat.message.MessageService;
+import de.kaliburg.morefair.game.ladder.ranker.RankerService;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.http.HttpStatus;
@@ -20,7 +20,9 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.util.HtmlUtils;
 
 import java.util.ArrayList;
@@ -43,7 +45,8 @@ public class ModerationController {
     private final RankerService ladderService;
     private final MessageService messageService;
 
-    public ModerationController(AccountService accountService, WSUtils wsUtils, RankerService ladderService, MessageService messageService) {
+    public ModerationController(AccountService accountService, WSUtils wsUtils, RankerService ladderService,
+            MessageService messageService) {
         this.accountService = accountService;
         this.wsUtils = wsUtils;
         this.ladderService = ladderService;
@@ -61,7 +64,8 @@ public class ModerationController {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
 
             AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));
-            if (account == null || !(account.getAccessRole().equals(AccountAccessRole.MODERATOR) || account.getAccessRole().equals(AccountAccessRole.OWNER))) {
+            if (account == null || !(account.getAccessRole()
+                    .equals(AccountAccessRole.MODERATOR) || account.getAccessRole().equals(AccountAccessRole.OWNER))) {
                 wsUtils.convertAndSendToUser(sha, INFO_DESTINATION, HttpStatus.FORBIDDEN);
             } else {
                 Integer highestLadder = ladderService.getHighestLadder().getNumber();
@@ -83,7 +87,8 @@ public class ModerationController {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
 
             AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));
-            if (account == null || !(account.getAccessRole().equals(AccountAccessRole.MODERATOR) || account.getAccessRole().equals(AccountAccessRole.OWNER))) {
+            if (account == null || !(account.getAccessRole()
+                    .equals(AccountAccessRole.MODERATOR) || account.getAccessRole().equals(AccountAccessRole.OWNER))) {
                 wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.FORBIDDEN);
             } else {
                 ArrayList<MessageEntity> messages = messageService.getAllMessages();
@@ -99,12 +104,14 @@ public class ModerationController {
     }
 
     @MessageMapping("/mod/ban/{id}")
-    public void ban(SimpMessageHeaderAccessor sha, WSMessage wsMessage, @DestinationVariable("id") Long id) throws Exception {
+    public void ban(SimpMessageHeaderAccessor sha, WSMessage wsMessage, @DestinationVariable("id") Long id)
+            throws Exception {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
 
             AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));
-            if (account == null || !(account.getAccessRole().equals(AccountAccessRole.MODERATOR) || account.getAccessRole().equals(AccountAccessRole.OWNER))) {
+            if (account == null || !(account.getAccessRole()
+                    .equals(AccountAccessRole.MODERATOR) || account.getAccessRole().equals(AccountAccessRole.OWNER))) {
                 wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.FORBIDDEN);
             } else {
                 log.info("{} is banning the account with id {}", account.getUsername(), id);
@@ -121,12 +128,14 @@ public class ModerationController {
     }
 
     @MessageMapping("/mod/mute/{id}")
-    public void mute(SimpMessageHeaderAccessor sha, WSMessage wsMessage, @DestinationVariable("id") Long id) throws Exception {
+    public void mute(SimpMessageHeaderAccessor sha, WSMessage wsMessage, @DestinationVariable("id") Long id)
+            throws Exception {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
 
             AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));
-            if (account == null || !(account.getAccessRole().equals(AccountAccessRole.MODERATOR) || account.getAccessRole().equals(AccountAccessRole.OWNER))) {
+            if (account == null || !(account.getAccessRole()
+                    .equals(AccountAccessRole.MODERATOR) || account.getAccessRole().equals(AccountAccessRole.OWNER))) {
                 wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.FORBIDDEN);
             } else {
                 log.info("{} is muting the account with id {}", account.getUsername(), id);
@@ -142,12 +151,14 @@ public class ModerationController {
     }
 
     @MessageMapping("/mod/free/{id}")
-    public void free(SimpMessageHeaderAccessor sha, WSMessage wsMessage, @DestinationVariable("id") Long id) throws Exception {
+    public void free(SimpMessageHeaderAccessor sha, WSMessage wsMessage, @DestinationVariable("id") Long id)
+            throws Exception {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
 
             AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));
-            if (account == null || !(account.getAccessRole().equals(AccountAccessRole.MODERATOR) || account.getAccessRole().equals(AccountAccessRole.OWNER))) {
+            if (account == null || !(account.getAccessRole()
+                    .equals(AccountAccessRole.MODERATOR) || account.getAccessRole().equals(AccountAccessRole.OWNER))) {
                 wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.FORBIDDEN);
             } else {
                 log.info("{} is freeing the account with id {}", account.getUsername(), id);
@@ -163,16 +174,19 @@ public class ModerationController {
     }
 
     @MessageMapping("/mod/name/{id}")
-    public void changeName(SimpMessageHeaderAccessor sha, WSMessage wsMessage, @DestinationVariable("id") Long id) throws Exception {
+    public void changeName(SimpMessageHeaderAccessor sha, WSMessage wsMessage, @DestinationVariable("id") Long id)
+            throws Exception {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
             String username = wsMessage.getContent();
             username = username.trim();
-            if (username.length() > 64) username = username.substring(0, 64);
+            if (username.length() > 64)
+                username = username.substring(0, 64);
             username = StringEscapeUtils.escapeJava(HtmlUtils.htmlEscape(username));
 
             AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));
-            if (account == null || !(account.getAccessRole().equals(AccountAccessRole.MODERATOR) || account.getAccessRole().equals(AccountAccessRole.OWNER))) {
+            if (account == null || !(account.getAccessRole()
+                    .equals(AccountAccessRole.MODERATOR) || account.getAccessRole().equals(AccountAccessRole.OWNER))) {
                 wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.FORBIDDEN);
                 return;
             } else {
@@ -189,17 +203,20 @@ public class ModerationController {
     }
 
     @MessageMapping("/mod/confirm/{id}")
-    public void promptConfirm(SimpMessageHeaderAccessor sha, WSMessage wsMessage, @DestinationVariable("id") Long id) throws Exception {
+    public void promptConfirm(SimpMessageHeaderAccessor sha, WSMessage wsMessage, @DestinationVariable("id") Long id)
+            throws Exception {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
             String text = StringEscapeUtils.escapeJava(HtmlUtils.htmlEscape(wsMessage.getContent()));
 
             AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));
-            if (account == null || !(account.getAccessRole().equals(AccountAccessRole.MODERATOR) || account.getAccessRole().equals(AccountAccessRole.OWNER))) {
+            if (account == null || !(account.getAccessRole()
+                    .equals(AccountAccessRole.MODERATOR) || account.getAccessRole().equals(AccountAccessRole.OWNER))) {
                 wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.FORBIDDEN);
                 return;
             } else {
-                log.info("{} is prompting an confirm to the account with id {} with '{}'", account.getUsername(), id, text);
+                log.info("{} is prompting an confirm to the account with id {} with '{}'", account.getUsername(), id,
+                        text);
                 accountService.addModEvent(new Event(EventType.CONFIRM, id, text));
             }
         } catch (IllegalArgumentException e) {
@@ -212,7 +229,8 @@ public class ModerationController {
     }
 
     @MessageMapping("/mod/mod/{id}")
-    public void mod(SimpMessageHeaderAccessor sha, WSMessage wsMessage, @DestinationVariable("id") Long id) throws Exception {
+    public void mod(SimpMessageHeaderAccessor sha, WSMessage wsMessage, @DestinationVariable("id") Long id)
+            throws Exception {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
 
@@ -233,27 +251,29 @@ public class ModerationController {
     }
 
     @GetMapping(value = "/mod/search/user", produces = "application/json")
-    public ResponseEntity<Map<Long, String>> searchUsername(@CookieValue(name="_uuid", defaultValue = "") String uuid,  @RequestParam("name") String name){
-        try{
-            if (uuid.isBlank()){
+    public ResponseEntity<Map<Long, String>> searchUsername(@CookieValue(name = "_uuid", defaultValue = "") String uuid,
+            @RequestParam("name") String name) {
+        try {
+            if (uuid.isBlank()) {
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             }
 
             uuid = StringEscapeUtils.escapeJava(uuid);
             name = StringEscapeUtils.escapeJava(name);
             AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));
-            if(account ==  null || !(account.hasModPowers())){
+            if (account == null || !(account.hasModPowers())) {
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             }
             List<AccountEntity> accountsWithName = accountService.findUsername(name);
 
-            if(accountsWithName.size() >= 100){
+            if (accountsWithName.size() >= 100) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
-            Map<Long, String> result = accountsWithName.stream().collect(Collectors.toMap(AccountEntity::getId, AccountEntity::getUsername));
+            Map<Long, String> result = accountsWithName.stream()
+                    .collect(Collectors.toMap(AccountEntity::getId, AccountEntity::getUsername));
             return new ResponseEntity<>(result, HttpStatus.OK);
-        }catch(Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

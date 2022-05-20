@@ -10,7 +10,8 @@ import java.util.UUID;
 
 @Repository
 public interface LadderRepository extends JpaRepository<LadderEntity, Long> {
-    @Query("SELECT l FROM LadderEntity l WHERE l.number = :number") LadderEntity findByNumber(@Param("number") int number);
+    @Query("SELECT l FROM LadderEntity l WHERE l.number = :number") LadderEntity findByNumber(
+            @Param("number") int number);
 
     @Query("SELECT l FROM LadderEntity l LEFT JOIN FETCH l.messages")
     Set<LadderEntity> findAllLaddersJoinedWithMessages();
@@ -18,7 +19,9 @@ public interface LadderRepository extends JpaRepository<LadderEntity, Long> {
     @Query("SELECT l FROM LadderEntity l LEFT JOIN FETCH l.rankers")
     Set<LadderEntity> findAllLaddersJoinedWithRankers();
 
-    @Query("SELECT l FROM LadderEntity l LEFT JOIN FETCH l.messages WHERE l.uuid = :uuid") LadderEntity findLadderByUUIDWithMessage(@Param("uuid") UUID uuid);
+    @Query("SELECT l FROM LadderEntity l LEFT JOIN FETCH l.messages WHERE l.uuid = :uuid")
+    LadderEntity findLadderByUUIDWithMessage(@Param("uuid") UUID uuid);
 
-    @Query("SELECT l FROM LadderEntity l LEFT JOIN FETCH l.rankers WHERE l.uuid = :uuid") LadderEntity findLadderByUUIDWithRanker(@Param("uuid") UUID uuid);
+    @Query("SELECT l FROM LadderEntity l LEFT JOIN FETCH l.rankers WHERE l.uuid = :uuid")
+    LadderEntity findLadderByUUIDWithRanker(@Param("uuid") UUID uuid);
 }

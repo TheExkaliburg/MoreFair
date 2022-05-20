@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.game.message;
+package de.kaliburg.morefair.game.chat.message;
 
 import de.kaliburg.morefair.game.ladder.LadderEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

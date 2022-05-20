@@ -24,6 +24,7 @@ public class InfoDTO {
         manualPromoteWaitTime = FairController.MANUAL_PROMOTE_WAIT_TIME;
         baseGrapesNeededToAutoPromote = FairController.BASE_GRAPES_NEEDED_TO_AUTO_PROMOTE.toString();
         assholeLadder = FairController.BASE_ASSHOLE_LADDER + maxTimeAssholes;
-        assholeTags = FairController.ASSHOLE_TAGS.subList(0, Math.min(maxTimeAssholes + 2, FairController.ASSHOLE_TAGS.size()));
+        assholeTags = FairController.ASSHOLE_TAGS.subList(0,
+                Math.min(maxTimeAssholes + 2, FairController.ASSHOLE_TAGS.size()));
     }
 }

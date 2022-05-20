@@ -1,16 +1,16 @@
-package de.kaliburg.morefair.game.message;
+package de.kaliburg.morefair.game.chat.message;
 
 import de.kaliburg.morefair.account.entity.AccountEntity;
-import de.kaliburg.morefair.game.ladder.LadderEntity;
+import de.kaliburg.morefair.game.chat.ChatEntity;
 import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "message" , uniqueConstraints = @UniqueConstraint(name = "uk_uuid", columnNames = "uuid"))
+@Table(name = "message", uniqueConstraints = @UniqueConstraint(name = "uk_uuid", columnNames = "uuid"))
 @Getter
 @Setter
 @Accessors(chain = true)
@@ -26,6 +26,7 @@ public class MessageEntity {
     private UUID uuid;
     @NonNull
     @ManyToOne
+    @JoinColumn(name = "account_id", nullable = false, foreignKey = @ForeignKey(name = "fk_message_account"))
     private AccountEntity account;
     @NonNull
     @Column(nullable = false, length = 500)
@@ -34,11 +35,11 @@ public class MessageEntity {
     private String metadata;
     @NonNull
     @ManyToOne
-    @JoinColumn(name = "ladder_id", nullable = false)
-    private LadderEntity ladder;
+    @JoinColumn(name = "chat_id", nullable = false, foreignKey = @ForeignKey(name = "fk_message_chat"))
+    private ChatEntity chat;
     @NonNull
     @Column(nullable = false)
-    private LocalDateTime createdOn = LocalDateTime.now();
+    private ZonedDateTime createdOn = ZonedDateTime.now();
 
     public MessageDTO convertToDTO() {
         return new MessageDTO(this);

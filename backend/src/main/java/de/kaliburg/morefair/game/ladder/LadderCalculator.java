@@ -2,13 +2,13 @@ package de.kaliburg.morefair.game.ladder;
 
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.RankerController;
-import de.kaliburg.morefair.game.message.MessageService;
+import de.kaliburg.morefair.api.utils.WSUtils;
 import de.kaliburg.morefair.dto.HeartbeatDTO;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.EventType;
-import de.kaliburg.morefair.game.ranker.RankerEntity;
-import de.kaliburg.morefair.game.ranker.RankerService;
-import de.kaliburg.morefair.api.utils.WSUtils;
+import de.kaliburg.morefair.game.chat.message.MessageService;
+import de.kaliburg.morefair.game.ladder.ranker.RankerEntity;
+import de.kaliburg.morefair.game.ladder.ranker.RankerService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -36,7 +36,7 @@ public class LadderCalculator {
     private long lastTimeMeasured = System.nanoTime();
 
     public LadderCalculator(RankerService rankerService, AccountService accountService, WSUtils wsUtils,
-                            MessageService messageService) {
+            MessageService messageService) {
         this.rankerService = rankerService;
         this.accountService = accountService;
         this.wsUtils = wsUtils;
@@ -80,7 +80,8 @@ public class LadderCalculator {
                 // Otherwise, just send the default Broadcasts
                 for (LadderEntity ladder : rankerService.getLadders().values()) {
                     heartbeatMap.get(ladder.getNumber()).setSecondsPassed(deltaSec);
-                    wsUtils.convertAndSendToAll(RankerController.LADDER_UPDATE_DESTINATION + ladder.getNumber(), heartbeatMap.get(ladder.getNumber()));
+                    wsUtils.convertAndSendToAll(RankerController.LADDER_UPDATE_DESTINATION + ladder.getNumber(),
+                            heartbeatMap.get(ladder.getNumber()));
                 }
 
                 // Calculate Ladder yourself
@@ -112,21 +113,21 @@ public class LadderCalculator {
                 for (int i = 0; i < modEvents.size(); i++) {
                     Event e = modEvents.get(i);
                     switch (e.getEventType()) {
-                        case BAN -> {
-                            accountService.ban(e.getAccountId(), e);
-                        }
-                        case FREE -> {
-                            accountService.free(e.getAccountId(), e);
-                        }
-                        case MUTE -> {
-                            accountService.mute(e.getAccountId(), e);
-                        }
-                        case NAME_CHANGE -> {
-                            accountService.updateUsername(e.getAccountId(), e);
-                        }
-                        case MOD -> {
-                            accountService.mod(e.getAccountId(), e);
-                        }
+                    case BAN -> {
+                        accountService.ban(e.getAccountId(), e);
+                    }
+                    case FREE -> {
+                        accountService.free(e.getAccountId(), e);
+                    }
+                    case MUTE -> {
+                        accountService.mute(e.getAccountId(), e);
+                    }
+                    case NAME_CHANGE -> {
+                        accountService.updateUsername(e.getAccountId(), e);
+                    }
+                    case MOD -> {
+                        accountService.mod(e.getAccountId(), e);
+                    }
                     }
                 }
 
@@ -152,40 +153,40 @@ public class LadderCalculator {
                     for (int j = 0; j < events.size(); j++) {
                         Event e = events.get(j);
                         switch (e.getEventType()) {
-                            case BIAS -> {
-                                if (!rankerService.buyBias(e.getAccountId(), ladder))
-                                    eventsToBeRemoved.add(e);
+                        case BIAS -> {
+                            if (!rankerService.buyBias(e.getAccountId(), ladder))
+                                eventsToBeRemoved.add(e);
+                        }
+                        case MULTI -> {
+                            if (!rankerService.buyMulti(e.getAccountId(), ladder))
+                                eventsToBeRemoved.add(e);
+                        }
+                        case PROMOTE -> {
+                            if (!rankerService.promote(e.getAccountId(), ladder, false))
+                                eventsToBeRemoved.add(e);
+                        }
+                        case ASSHOLE -> {
+                            if (rankerService.promote(e.getAccountId(), ladder, true)) {
+                                e.setEventType(EventType.PROMOTE);
+                                didPressAssholeButton = true;
+                            } else {
+                                eventsToBeRemoved.add(e);
                             }
-                            case MULTI -> {
-                                if (!rankerService.buyMulti(e.getAccountId(), ladder))
-                                    eventsToBeRemoved.add(e);
-                            }
-                            case PROMOTE -> {
-                                if (!rankerService.promote(e.getAccountId(), ladder, false))
-                                    eventsToBeRemoved.add(e);
-                            }
-                            case ASSHOLE -> {
-                                if (rankerService.promote(e.getAccountId(), ladder, true)) {
-                                    e.setEventType(EventType.PROMOTE);
-                                    didPressAssholeButton = true;
-                                } else {
-                                    eventsToBeRemoved.add(e);
-                                }
-                            }
-                            case VINEGAR -> {
-                                if (!rankerService.throwVinegar(e.getAccountId(), ladder, e))
-                                    eventsToBeRemoved.add(e);
-                            }
-                            case AUTO_PROMOTE -> {
-                                if (!rankerService.buyAutoPromote(e.getAccountId(), ladder))
-                                    eventsToBeRemoved.add(e);
-                            }
-                            case SOFT_RESET_POINTS -> {
-                                rankerService.softResetPoints(e.getAccountId(), ladder);
-                            }
-                            default -> {
+                        }
+                        case VINEGAR -> {
+                            if (!rankerService.throwVinegar(e.getAccountId(), ladder, e))
+                                eventsToBeRemoved.add(e);
+                        }
+                        case AUTO_PROMOTE -> {
+                            if (!rankerService.buyAutoPromote(e.getAccountId(), ladder))
+                                eventsToBeRemoved.add(e);
+                        }
+                        case SOFT_RESET_POINTS -> {
+                            rankerService.softResetPoints(e.getAccountId(), ladder);
+                        }
+                        default -> {
 
-                            }
+                        }
                         }
                     }
                     for (Event e : eventsToBeRemoved) {
@@ -197,12 +198,12 @@ public class LadderCalculator {
                 for (int i = 0; i < globalEvents.size(); i++) {
                     Event e = globalEvents.get(i);
                     switch (e.getEventType()) {
-                        case NAME_CHANGE -> {
-                            accountService.updateUsername(e.getAccountId(), e);
-                        }
-                        case SYSTEM_MESSAGE -> {
-                            messageService.writeSystemMessage(rankerService.getHighestLadder(),(String)e.getData());
-                        }
+                    case NAME_CHANGE -> {
+                        accountService.updateUsername(e.getAccountId(), e);
+                    }
+                    case SYSTEM_MESSAGE -> {
+                        messageService.writeSystemMessage(rankerService.getHighestLadder(), (String) e.getData());
+                    }
                     }
                 }
 
@@ -269,8 +270,10 @@ public class LadderCalculator {
         if (rankers.size() >= 1 && rankers.get(0).isAutoPromote() && rankers.get(0).isGrowing()
                 && rankers.get(0).getPoints().compareTo(ladder.getRequiredPointsToUnlock()) >= 0
                 && rankers.size() >= ladder.getRequiredRankerCountToUnlock()) {
-            log.info("[L{}] Trying to auto-promote {} (#{})", ladder.getNumber(), rankers.get(0).getAccount().getUsername(), rankers.get(0).getAccount().getId());
-            rankerService.addEvent(ladder.getNumber(), new Event(EventType.PROMOTE, rankers.get(0).getAccount().getId()));
+            log.info("[L{}] Trying to auto-promote {} (#{})", ladder.getNumber(),
+                    rankers.get(0).getAccount().getUsername(), rankers.get(0).getAccount().getId());
+            rankerService.addEvent(ladder.getNumber(),
+                    new Event(EventType.PROMOTE, rankers.get(0).getAccount().getId()));
         }
     }
 }

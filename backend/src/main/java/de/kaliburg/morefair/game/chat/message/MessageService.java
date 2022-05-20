@@ -1,12 +1,12 @@
-package de.kaliburg.morefair.game.message;
+package de.kaliburg.morefair.game.chat.message;
 
+import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.account.entity.AccountEntity;
 import de.kaliburg.morefair.account.events.AccountServiceEvent;
-import de.kaliburg.morefair.account.AccountService;
+import de.kaliburg.morefair.api.utils.WSUtils;
 import de.kaliburg.morefair.dto.ChatDTO;
 import de.kaliburg.morefair.game.ladder.LadderEntity;
 import de.kaliburg.morefair.game.ladder.LadderRepository;
-import de.kaliburg.morefair.api.utils.WSUtils;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
@@ -34,7 +34,8 @@ public class MessageService implements ApplicationListener<AccountServiceEvent> 
     private Map<Integer, LadderEntity> chats = new HashMap<>();
     private Semaphore chatSem = new Semaphore(1);
 
-    public MessageService(MessageRepository messageRepository, LadderRepository ladderRepository, AccountService accountService, WSUtils wsUtils) {
+    public MessageService(MessageRepository messageRepository, LadderRepository ladderRepository,
+            AccountService accountService, WSUtils wsUtils) {
         this.messageRepository = messageRepository;
         this.ladderRepository = ladderRepository;
         this.accountService = accountService;
@@ -96,16 +97,16 @@ public class MessageService implements ApplicationListener<AccountServiceEvent> 
             log.debug("SystemMessager is " + (systemMessager != null ? systemMessager.getUsername() : " null"));
             if (systemMessager != null) {
                 chats.values().forEach(ladder -> {
-                            MessageEntity answer = writeMessage(systemMessager,ladder.getNumber(),messageString);
-                            wsUtils.convertAndSendToAll(CHAT_UPDATE_DESTINATION + ladder, answer.convertToDTO());
-                        });
+                    MessageEntity answer = writeMessage(systemMessager, ladder.getNumber(), messageString);
+                    wsUtils.convertAndSendToAll(CHAT_UPDATE_DESTINATION + ladder, answer.convertToDTO());
+                });
             }
         } catch (RuntimeException re) {
-            log.error("Error processing System Message: " + messageString,re);
+            log.error("Error processing System Message: " + messageString, re);
         }
     }
 
-    public MessageEntity writeMessage(AccountEntity account, Integer ladderNum, String messageString){
+    public MessageEntity writeMessage(AccountEntity account, Integer ladderNum, String messageString) {
         return writeMessage(account, ladderNum, messageString, null);
     }
 
@@ -113,13 +114,14 @@ public class MessageService implements ApplicationListener<AccountServiceEvent> 
         LadderEntity ladder = chats.get(ladderNum);
         MessageEntity message = new MessageEntity(UUID.randomUUID(), account, messageString, ladder);
 
-        if(!StringUtils.isBlank(metadata)){
+        if (!StringUtils.isBlank(metadata)) {
             message.setMetadata(metadata);
         }
 
         List<MessageEntity> messages = ladder.getMessages();
         messages.add(0, message);
-        if (messages.size() > 30) messages.remove(messages.size() - 1);
+        if (messages.size() > 30)
+            messages.remove(messages.size() - 1);
         ladder.setMessages(messages);
         return message;
     }

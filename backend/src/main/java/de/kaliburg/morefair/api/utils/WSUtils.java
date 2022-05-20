@@ -1,7 +1,7 @@
 package de.kaliburg.morefair.api.utils;
 
-import de.kaliburg.morefair.api.websockets.messages.WSMessageAnswer;
 import de.kaliburg.morefair.api.websockets.StompPrincipal;
+import de.kaliburg.morefair.api.websockets.messages.WSMessageAnswer;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -29,7 +29,8 @@ public class WSUtils {
     }
 
     public void convertAndSendToUser(SimpMessageHeaderAccessor sha, String dest, Object content, HttpStatus status) {
-        simpMessagingTemplate.convertAndSendToUser(sha.getUser().getName(), dest, new WSMessageAnswer<>(content, status));
+        simpMessagingTemplate.convertAndSendToUser(sha.getUser().getName(), dest,
+                new WSMessageAnswer<>(content, status));
     }
 
     public void convertAndSendToUser(SimpMessageHeaderAccessor sha, String dest, HttpStatus status) {

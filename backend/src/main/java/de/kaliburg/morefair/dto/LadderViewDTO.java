@@ -2,7 +2,7 @@ package de.kaliburg.morefair.dto;
 
 import de.kaliburg.morefair.account.entity.AccountEntity;
 import de.kaliburg.morefair.game.ladder.LadderEntity;
-import de.kaliburg.morefair.game.ranker.RankerEntity;
+import de.kaliburg.morefair.game.ladder.ranker.RankerEntity;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -16,7 +16,8 @@ public class LadderViewDTO {
     private RankerPrivateDTO yourRanker;
     private Integer startRank = 0;
 
-    public LadderViewDTO(List<RankerEntity> rankers, LadderEntity currentLadder, AccountEntity account, RankerEntity firstRanker) {
+    public LadderViewDTO(List<RankerEntity> rankers, LadderEntity currentLadder, AccountEntity account,
+            RankerEntity firstRanker) {
         this.firstRanker = firstRanker.convertToDto();
         startRank = rankers.get(0).getRank();
         for (RankerEntity ranker : rankers) {
@@ -27,7 +28,8 @@ public class LadderViewDTO {
                 dto.setYou(true);
             }
             this.rankers.add(dto);
-            if (ranker.getRank() < startRank) startRank = ranker.getRank();
+            if (ranker.getRank() < startRank)
+                startRank = ranker.getRank();
         }
         this.currentLadder = currentLadder.convertToLadderDTO();
     }

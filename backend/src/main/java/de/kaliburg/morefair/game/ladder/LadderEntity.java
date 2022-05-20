@@ -1,10 +1,8 @@
 package de.kaliburg.morefair.game.ladder;
 
 import de.kaliburg.morefair.api.FairController;
-import de.kaliburg.morefair.game.message.MessageEntity;
 import de.kaliburg.morefair.dto.ChatDTO;
-import de.kaliburg.morefair.dto.LadderDTO;
-import de.kaliburg.morefair.game.ranker.RankerEntity;
+import de.kaliburg.morefair.game.ladder.ranker.RankerEntity;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -15,7 +13,9 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "ladder", uniqueConstraints = @UniqueConstraint(name = "uk_uuid", columnNames = "uuid"))
+@Table(name = "ladder", uniqueConstraints = { @UniqueConstraint(name = "uq_uuid", columnNames = "uuid"),
+        @UniqueConstraint(name = "uk_number_round", columnNames = { "number", "round_id" })
+})
 @Getter
 @Setter
 @Accessors(chain = true)
@@ -32,14 +32,12 @@ public class LadderEntity {
     @NonNull
     @Column(nullable = false)
     private Integer number;
+    // TODO: @NonNull
+    @ManyToOne
+    @JoinColumn(name = "round_id", nullable = false, foreignKey = @ForeignKey(name = "fk_ladder_round"))
+    private RoundEntity round;
     @OneToMany(mappedBy = "ladder", fetch = FetchType.LAZY)
     private List<RankerEntity> rankers = new ArrayList<>();
-    @OneToMany(mappedBy = "ladder", fetch = FetchType.LAZY)
-    private List<MessageEntity> messages = new ArrayList<>();
-
-    public LadderDTO convertToLadderDTO() {
-        return new LadderDTO(this);
-    }
 
     public ChatDTO convertToChatDTO() {
         return new ChatDTO(this);

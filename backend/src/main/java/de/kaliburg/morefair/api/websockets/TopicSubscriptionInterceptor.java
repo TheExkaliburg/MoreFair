@@ -1,9 +1,9 @@
 package de.kaliburg.morefair.api.websockets;
 
-import de.kaliburg.morefair.api.FairController;
-import de.kaliburg.morefair.account.entity.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
+import de.kaliburg.morefair.account.entity.AccountEntity;
 import de.kaliburg.morefair.account.type.AccountAccessRole;
+import de.kaliburg.morefair.api.FairController;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.messaging.Message;
@@ -32,18 +32,21 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
         if (StompCommand.SUBSCRIBE.equals(headerAccessor.getCommand())) {
-            log.trace("Payload: {} Headers: {}", new String((byte[]) message.getPayload(), StandardCharsets.UTF_8), message.getHeaders().toString());
+            log.trace("Payload: {} Headers: {}", new String((byte[]) message.getPayload(), StandardCharsets.UTF_8),
+                    message.getHeaders().toString());
             Principal userPrincipal = headerAccessor.getUser();
             String uuid = Objects.requireNonNull(headerAccessor.getNativeHeader("uuid")).get(0);
             if (!validateSubscription(userPrincipal, headerAccessor.getDestination(), uuid)) {
-                throw new MessagingException("No permission for this topic (" + StringEscapeUtils.escapeJava(headerAccessor.getDestination()) + ") with principal: " + userPrincipal);
+                throw new MessagingException("No permission for this topic (" + StringEscapeUtils.escapeJava(
+                        headerAccessor.getDestination()) + ") with principal: " + userPrincipal);
             }
         }
         return message;
     }
 
     private boolean validateSubscription(Principal principal, String topicDestination, String uuid) {
-        if (principal == null) return false;
+        if (principal == null)
+            return false;
         topicDestination = StringEscapeUtils.escapeJava(topicDestination);
         uuid = StringEscapeUtils.escapeJava(uuid);
 
@@ -53,7 +56,8 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
         if (topicDestination.contains("/topic/")) {
             AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account != null) {
-                if (account.getAccessRole().equals(AccountAccessRole.OWNER) || account.getAccessRole().equals(AccountAccessRole.MODERATOR)) {
+                if (account.getAccessRole().equals(AccountAccessRole.OWNER) || account.getAccessRole()
+                        .equals(AccountAccessRole.MODERATOR)) {
                     return true;
                 }
                 if (account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
@@ -65,22 +69,27 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
 
         if (topicDestination.contains("/topic/chat/")) {
             AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));
-            if (account == null) return false;
+            if (account == null)
+                return false;
             int chatDestination = Integer.parseInt(topicDestination.substring("/topic/chat/".length()));
             int highestLadder = account.getRankers().stream().mapToInt(v -> v.getLadder().getNumber()).max().orElse(1);
-            if (chatDestination > highestLadder) return false;
+            if (chatDestination > highestLadder)
+                return false;
         }
         if (topicDestination.contains("/topic/ladder/")) {
             AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));
-            if (account == null) return false;
+            if (account == null)
+                return false;
             int ladderDestination = Integer.parseInt(topicDestination.substring("/topic/ladder/".length()));
             if (ladderDestination == FairController.BASE_ASSHOLE_LADDER + accountService.findMaxTimesAsshole())
                 return true;
             int highestLadder = account.getRankers().stream().mapToInt(v -> v.getLadder().getNumber()).max().orElse(1);
-            if (ladderDestination > highestLadder) return false;
+            if (ladderDestination > highestLadder)
+                return false;
         }
 
-        if (topicDestination.contains("/topic/mod/")) return false;
+        if (topicDestination.contains("/topic/mod/"))
+            return false;
 
         return true;
     }

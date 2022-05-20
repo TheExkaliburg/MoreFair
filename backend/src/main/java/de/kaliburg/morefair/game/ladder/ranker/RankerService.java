@@ -1,20 +1,20 @@
-package de.kaliburg.morefair.game.ranker;
+package de.kaliburg.morefair.game.ladder.ranker;
 
-import de.kaliburg.morefair.api.FairController;
+import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.account.entity.AccountEntity;
 import de.kaliburg.morefair.account.events.AccountServiceEvent;
-import de.kaliburg.morefair.account.AccountService;
-import de.kaliburg.morefair.game.message.MessageService;
+import de.kaliburg.morefair.api.FairController;
+import de.kaliburg.morefair.data.ModUpdateData;
 import de.kaliburg.morefair.dto.LadderResultsDTO;
 import de.kaliburg.morefair.dto.LadderViewDTO;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.EventType;
 import de.kaliburg.morefair.events.data.JoinData;
 import de.kaliburg.morefair.events.data.VinegarData;
+import de.kaliburg.morefair.game.UpgradeUtils;
+import de.kaliburg.morefair.game.chat.message.MessageService;
 import de.kaliburg.morefair.game.ladder.LadderEntity;
 import de.kaliburg.morefair.game.ladder.LadderRepository;
-import de.kaliburg.morefair.data.ModUpdateData;
-import de.kaliburg.morefair.game.UpgradeUtils;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.math.BigInteger;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.Semaphore;
@@ -52,7 +52,8 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
     @Getter
     private LadderResultsDTO lastRoundResults;
 
-    public RankerService(RankerRepository rankerRepository, LadderRepository ladderRepository, MessageService messageService, @Lazy AccountService accountService) {
+    public RankerService(RankerRepository rankerRepository, LadderRepository ladderRepository,
+            MessageService messageService, @Lazy AccountService accountService) {
         this.rankerRepository = rankerRepository;
         this.ladderRepository = ladderRepository;
         this.messageService = messageService;
@@ -133,7 +134,8 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
 
         List<RankerEntity> result = findAllRankerByLadderOrderedByPoints(currentLadder);
 
-        LadderViewDTO ladderView = new LadderViewDTO(result, currentLadder, account, findHighestRankerByLadder(currentLadder));
+        LadderViewDTO ladderView = new LadderViewDTO(result, currentLadder, account,
+                findHighestRankerByLadder(currentLadder));
         return ladderView;
     }
 
@@ -164,7 +166,6 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
     public LadderEntity findLadder(LadderEntity ladder) {
         return this.ladders.get(ladder.getNumber());
     }
-
 
     public void addEvent(Integer ladderNum, Event event) {
         try {
@@ -216,7 +217,8 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
             ranker = saveRanker(new RankerEntity(UUID.randomUUID(), ladder, account, ladder.getRankers().size() + 1));
             ladder.getRankers().add(ranker);
             Event event = new Event(EventType.JOIN, account.getId());
-            event.setData(new JoinData(StringEscapeUtils.unescapeJava(account.getUsername()), account.getTimesAsshole()));
+            event.setData(
+                    new JoinData(StringEscapeUtils.unescapeJava(account.getUsername()), account.getTimesAsshole()));
             eventMap.get(ladderNum).add(event);
         } else {
             ranker = activeRankersInLadder.get(0);
@@ -229,7 +231,6 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
     protected RankerEntity saveRanker(RankerEntity ranker) {
         return rankerRepository.save(ranker);
     }
-
 
     protected LadderEntity createNewLadder(Integer ladderNum) {
         LadderEntity ladder = saveLadder(new LadderEntity(UUID.randomUUID(), ladderNum));
@@ -286,13 +287,16 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
     public boolean promote(Long accountId, LadderEntity ladder, Boolean isAssholeEvent) {
         try {
             RankerEntity ranker = findActiveRankerOfAccountOnLadder(accountId, ladder);
-            if (ranker == null) return false;
+            if (ranker == null)
+                return false;
 
             BigInteger neededPointDiff = BigInteger.ZERO;
 
-            if (ladder.getRankers().size() <= ranker.getRank()) return false;
+            if (ladder.getRankers().size() <= ranker.getRank())
+                return false;
             RankerEntity pursuingRanker = ladder.getRankers().get(ranker.getRank());
-            if (pursuingRanker == null) return false;
+            if (pursuingRanker == null)
+                return false;
 
             // How many points the ranker is in front of his pursuer
             BigInteger pointDiff = ranker.getPoints().subtract(pursuingRanker.getPoints());
@@ -312,14 +316,17 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
             // - Ranker has either:
             //      - Auto-Promote
             //      - enough points to be in front of the next ranker
-            if (ranker.getRank() == 1 && ranker.getLadder().getRankers().size() >= Math.max(FairController.MINIMUM_PEOPLE_FOR_PROMOTE, ladder.getNumber())
-                    && ranker.getPoints().compareTo(FairController.POINTS_FOR_PROMOTE.multiply(BigInteger.valueOf(ranker.getLadder().getNumber()))) >= 0
+            if (ranker.getRank() == 1 && ranker.getLadder().getRankers().size() >= Math.max(
+                    FairController.MINIMUM_PEOPLE_FOR_PROMOTE, ladder.getNumber())
+                    && ranker.getPoints().compareTo(
+                    FairController.POINTS_FOR_PROMOTE.multiply(BigInteger.valueOf(ranker.getLadder().getNumber()))) >= 0
                     && (ranker.isAutoPromote() || pointDiff.compareTo(neededPointDiff) >= 0)) {
 
                 log.info("[L{}] Promotion for {}", ladder.getNumber(), ranker.getAccount().getUsername());
                 ranker.setGrowing(false);
                 saveRanker(ranker);
-                RankerEntity newRanker = createNewActiveRankerForAccountOnLadder(ranker.getAccount(), ranker.getLadder().getNumber() + 1);
+                RankerEntity newRanker = createNewActiveRankerForAccountOnLadder(ranker.getAccount(),
+                        ranker.getLadder().getNumber() + 1);
                 newRanker.setVinegar(ranker.getVinegar());
                 newRanker.setGrapes(ranker.getGrapes());
                 LadderEntity newLadder = findLadder(newRanker.getLadder());
@@ -327,7 +334,8 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
                 if (newLadder.getRankers().size() == 1) {
                     newRanker.setAutoPromote(true);
                 }
-                if ((isAssholeEvent || ranker.isAutoPromote()) && ranker.getLadder().getNumber().compareTo(FairController.BASE_ASSHOLE_LADDER + accountService.findMaxTimesAsshole()) == 0) {
+                if ((isAssholeEvent || ranker.isAutoPromote()) && ranker.getLadder().getNumber()
+                        .compareTo(FairController.BASE_ASSHOLE_LADDER + accountService.findMaxTimesAsshole()) == 0) {
                     AccountEntity account = accountService.findByUuid(ranker.getAccount().getUuid());
                     account.setIsAsshole(true);
                     accountService.saveAccount(account);
@@ -350,7 +358,6 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
         return false;
     }
 
-
     @Deprecated
     public boolean beAsshole(Long accountId, LadderEntity ladder) {
         try {
@@ -360,9 +367,12 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
             // - There are enough people to promote
             // - Ranker got enough points to promote
             // - The current Ladder is the assholeLadder or higher
-            if (ranker.getRank() == 1 && ranker.getLadder().getRankers().size() >= Math.max(FairController.MINIMUM_PEOPLE_FOR_PROMOTE, ladder.getNumber())
-                    && ranker.getPoints().compareTo(FairController.POINTS_FOR_PROMOTE.multiply(BigInteger.valueOf(ladder.getNumber()))) >= 0
-                    && ranker.getLadder().getNumber().compareTo(FairController.BASE_ASSHOLE_LADDER + accountService.findMaxTimesAsshole()) >= 0) {
+            if (ranker.getRank() == 1 && ranker.getLadder().getRankers().size() >= Math.max(
+                    FairController.MINIMUM_PEOPLE_FOR_PROMOTE, ladder.getNumber())
+                    && ranker.getPoints()
+                    .compareTo(FairController.POINTS_FOR_PROMOTE.multiply(BigInteger.valueOf(ladder.getNumber()))) >= 0
+                    && ranker.getLadder().getNumber()
+                    .compareTo(FairController.BASE_ASSHOLE_LADDER + accountService.findMaxTimesAsshole()) >= 0) {
                 AccountEntity account = accountService.findByUuid(ranker.getAccount().getUuid());
                 account.setIsAsshole(true);
                 accountService.saveAccount(account);
@@ -379,7 +389,6 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
         return false;
     }
 
-
     public boolean throwVinegar(Long accountId, LadderEntity ladder, Event event) {
         try {
             RankerEntity ranker = findActiveRankerOfAccountOnLadder(accountId, ladder);
@@ -393,18 +402,24 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
             // - Target got enough points to promote
             // - Ranker got enough Vinegar to throw
             if (target.getRank() == 1 && ranker.getUuid() != target.getUuid() && target.isGrowing()
-                    && target.getLadder().getRankers().size() >= Math.max(FairController.MINIMUM_PEOPLE_FOR_PROMOTE, ladder.getNumber())
-                    && target.getPoints().compareTo(FairController.POINTS_FOR_PROMOTE.multiply(BigInteger.valueOf(ladder.getNumber()))) >= 0
-                    && ranker.getVinegar().compareTo(UpgradeUtils.throwVinegarCost(target.getLadder().getNumber())) >= 0) {
+                    && target.getLadder().getRankers().size() >= Math.max(FairController.MINIMUM_PEOPLE_FOR_PROMOTE,
+                    ladder.getNumber())
+                    && target.getPoints()
+                    .compareTo(FairController.POINTS_FOR_PROMOTE.multiply(BigInteger.valueOf(ladder.getNumber()))) >= 0
+                    && ranker.getVinegar()
+                    .compareTo(UpgradeUtils.throwVinegarCost(target.getLadder().getNumber())) >= 0) {
                 if (target.isAutoPromote()) {
-                    log.info("[L{}] User {} tried to throw Vinegar at {}, but they had Auto-Promote!", ladder.getNumber(), ranker.getAccount().getUsername(), target.getAccount().getUsername());
+                    log.info("[L{}] User {} tried to throw Vinegar at {}, but they had Auto-Promote!",
+                            ladder.getNumber(), ranker.getAccount().getUsername(), target.getAccount().getUsername());
                     eventMap.get(ladder.getNumber()).add(new Event(EventType.PROMOTE, target.getAccount().getId()));
                     return false;
                 }
 
                 BigInteger rankerVinegar = ranker.getVinegar();
                 BigInteger targetVinegar = target.getVinegar();
-                log.info("[L{}] User {} is using their {} Vinegar on the User {} with {} Vinegar", ladder.getNumber(), ranker.getAccount().getUsername(), rankerVinegar, target.getAccount().getUsername(), targetVinegar);
+                log.info("[L{}] User {} is using their {} Vinegar on the User {} with {} Vinegar", ladder.getNumber(),
+                        ranker.getAccount().getUsername(), rankerVinegar, target.getAccount().getUsername(),
+                        targetVinegar);
                 VinegarData data = new VinegarData(rankerVinegar.toString());
                 if (targetVinegar.compareTo(rankerVinegar) > 0) {
                     targetVinegar = targetVinegar.subtract(rankerVinegar);
@@ -413,7 +428,8 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
 
                     data.setSuccess(true);
                     eventMap.get(ladder.getNumber()).add(new Event(EventType.MULTI, target.getAccount().getId()));
-                    eventMap.get(ladder.getNumber()).add(new Event(EventType.SOFT_RESET_POINTS, target.getAccount().getId()));
+                    eventMap.get(ladder.getNumber())
+                            .add(new Event(EventType.SOFT_RESET_POINTS, target.getAccount().getId()));
                 }
                 event.setData(data);
                 ranker.setVinegar(BigInteger.ZERO);
@@ -449,7 +465,7 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
                     account.setIsAsshole(false);
                     // If Account was active in the last 7 days
                     // This should prevent old and inactive accounts from getting a ranker on Restart
-                    if (account.getLastLogin().plus(0, ChronoUnit.HOURS).isAfter(LocalDateTime.now())) {
+                    if (account.getLastLogin().plus(0, ChronoUnit.HOURS).isAfter(ZonedDateTime.now())) {
                         // Create New Ranker
                         // createNewActiveRankerForAccountOnLadder(account, 1);
                     }
@@ -471,9 +487,9 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
     }
 
     private RankerEntity findActiveRankerOfAccountOnLadder(Long accountId, LadderEntity ladder) {
-        return findLadder(ladder).getRankers().stream().filter(r -> r.getAccount().getId().equals(accountId) && r.isGrowing()).findFirst().orElse(null);
+        return findLadder(ladder).getRankers().stream()
+                .filter(r -> r.getAccount().getId().equals(accountId) && r.isGrowing()).findFirst().orElse(null);
     }
-
 
     public boolean buyAutoPromote(Long accountId, LadderEntity ladder) {
         try {
@@ -516,8 +532,8 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
     @Override
     public void onApplicationEvent(AccountServiceEvent event) {
         switch (event.getEventType()) {
-            case CREATE -> onCreatedAccount(event);
-            case UPDATE -> onUpdatedAccount(event);
+        case CREATE -> onCreatedAccount(event);
+        case UPDATE -> onUpdatedAccount(event);
         }
     }
 

@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.game.ranker;
+package de.kaliburg.morefair.game.ladder.ranker;
 
 import de.kaliburg.morefair.account.entity.AccountEntity;
 import de.kaliburg.morefair.dto.RankerDTO;
@@ -21,7 +21,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @SequenceGenerator(name = "seq_ranker", sequenceName = "seq_ranker", allocationSize = 1)
 public class RankerEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_ranker")
     private Long id;
@@ -43,11 +42,11 @@ public class RankerEntity {
     private boolean isGrowing = true;
     @NonNull
     @ManyToOne
-    @JoinColumn(name = "ladder_id", nullable = false)
+    @JoinColumn(name = "ladder_id", nullable = false, foreignKey = @ForeignKey(name = "fk_ranker_ladder"))
     private LadderEntity ladder;
     @NonNull
     @ManyToOne
-    @JoinColumn(name = "account_id", nullable = false)
+    @JoinColumn(name = "account_id", nullable = false, foreignKey = @ForeignKey(name = "fk_ranker_account"))
     private AccountEntity account;
     @NonNull
     @Column(nullable = false)

@@ -28,17 +28,20 @@ public class CustomHandshakeHandler extends DefaultHandshakeHandler {
     public CustomHandshakeHandler() {
         super();
 
-        connectionsPerIpAddress = Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build(new CacheLoader<>() {
-            @Override
-            public @Nullable Integer load(@NonNull Integer s) throws Exception {
-                return 0;
-            }
-        });
+        connectionsPerIpAddress = Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES)
+                .build(new CacheLoader<>() {
+                    @Override
+                    public @Nullable Integer load(@NonNull Integer s) throws Exception {
+                        return 0;
+                    }
+                });
     }
 
     @Override
-    protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler, Map<String, Object> attributes) {
-        String ipString = request.getHeaders().getOrDefault("x-forwarded-for", List.of(request.getRemoteAddress().getHostName())).get(0);
+    protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler,
+            Map<String, Object> attributes) {
+        String ipString = request.getHeaders()
+                .getOrDefault("x-forwarded-for", List.of(request.getRemoteAddress().getHostName())).get(0);
         Integer ip = 0;
         try {
             ip = new BigInteger(InetAddress.getByName(ipString).getAddress()).intValue();

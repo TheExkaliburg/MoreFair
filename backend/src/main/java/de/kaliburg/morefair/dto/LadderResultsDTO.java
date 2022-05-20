@@ -9,11 +9,10 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-public class LadderResultsDTO
-{
+public class LadderResultsDTO {
     private Map<Integer, List<RankerPrivateDTO>> allLadders = new HashMap<>();
 
-    public LadderResultsDTO(Map<Integer, LadderEntity> ladders){
+    public LadderResultsDTO(Map<Integer, LadderEntity> ladders) {
         ladders.forEach((integer, ladder) -> {
             List<RankerPrivateDTO> allRankers = new ArrayList<>();
             ladder.getRankers().forEach(ranker -> {

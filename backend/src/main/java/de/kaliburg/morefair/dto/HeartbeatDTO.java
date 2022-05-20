@@ -13,5 +13,4 @@ public class HeartbeatDTO {
     @NonNull
     Double secondsPassed = 1d;
 
-
 }

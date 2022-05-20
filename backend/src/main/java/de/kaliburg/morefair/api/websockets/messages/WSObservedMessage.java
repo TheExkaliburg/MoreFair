@@ -12,7 +12,6 @@ public class WSObservedMessage extends WSMessage {
     @NonNull
     private String event;
 
-
     public WSObservedMessage(@NonNull String uuid, @NonNull String content, @NonNull String event) {
         super(uuid, content);
         this.event = event;

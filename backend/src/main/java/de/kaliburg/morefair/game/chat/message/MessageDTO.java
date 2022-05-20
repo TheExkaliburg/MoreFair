@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.game.message;
+package de.kaliburg.morefair.game.chat.message;
 
 import de.kaliburg.morefair.api.FairController;
 import lombok.Data;

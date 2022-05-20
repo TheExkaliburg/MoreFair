@@ -1,17 +1,17 @@
 package de.kaliburg.morefair.api;
 
-import de.kaliburg.morefair.account.entity.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
+import de.kaliburg.morefair.account.entity.AccountEntity;
 import de.kaliburg.morefair.account.type.AccountAccessRole;
-import de.kaliburg.morefair.game.message.MessageEntity;
-import de.kaliburg.morefair.game.message.MessageService;
-import de.kaliburg.morefair.dto.ChatDTO;
-import de.kaliburg.morefair.game.ranker.RankerEntity;
-import de.kaliburg.morefair.game.ranker.RankerService;
-import de.kaliburg.morefair.api.websockets.messages.WSEmptyMessage;
-import de.kaliburg.morefair.api.websockets.messages.WSMetaMessage;
 import de.kaliburg.morefair.api.utils.RequestThrottler;
 import de.kaliburg.morefair.api.utils.WSUtils;
+import de.kaliburg.morefair.api.websockets.messages.WSEmptyMessage;
+import de.kaliburg.morefair.api.websockets.messages.WSMetaMessage;
+import de.kaliburg.morefair.dto.ChatDTO;
+import de.kaliburg.morefair.game.chat.message.MessageEntity;
+import de.kaliburg.morefair.game.chat.message.MessageService;
+import de.kaliburg.morefair.game.ladder.ranker.RankerEntity;
+import de.kaliburg.morefair.game.ladder.ranker.RankerService;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.http.HttpStatus;
@@ -33,7 +33,8 @@ public class ChatController {
     private final WSUtils wsUtils;
     private final RequestThrottler throttler;
 
-    public ChatController(MessageService messageService, AccountService accountService, RankerService rankerService, WSUtils wsUtils, RequestThrottler throttler) {
+    public ChatController(MessageService messageService, AccountService accountService, RankerService rankerService,
+            WSUtils wsUtils, RequestThrottler throttler) {
         this.messageService = messageService;
         this.accountService = accountService;
         this.rankerService = rankerService;
@@ -42,7 +43,8 @@ public class ChatController {
     }
 
     @MessageMapping("/chat/init/{number}")
-    public void initChat(SimpMessageHeaderAccessor sha, WSEmptyMessage wsMessage, @DestinationVariable("number") Integer number) {
+    public void initChat(SimpMessageHeaderAccessor sha, WSEmptyMessage wsMessage,
+            @DestinationVariable("number") Integer number) {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
             log.debug("/app/chat/init/{} from {}", number, uuid);
@@ -63,7 +65,8 @@ public class ChatController {
                 }
             }
 
-            if (account.getAccessRole().equals(AccountAccessRole.OWNER) || account.getAccessRole().equals(AccountAccessRole.MODERATOR)
+            if (account.getAccessRole().equals(AccountAccessRole.OWNER) || account.getAccessRole()
+                    .equals(AccountAccessRole.MODERATOR)
                     || number <= ranker.getLadder().getNumber()) {
                 ChatDTO c = messageService.getChat(number);
                 wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, c);
@@ -87,13 +90,17 @@ public class ChatController {
             String message = wsMessage.getContent();
             String metadata = wsMessage.getMetadata();
             message = message.trim();
-            if (message.length() > 140) message = message.substring(0, 140);
+            if (message.length() > 140)
+                message = message.substring(0, 140);
             message = StringEscapeUtils.escapeJava(message);
 
             AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));
-            if (account == null || account.getAccessRole().equals(AccountAccessRole.MUTED_PLAYER) || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER))
+            if (account == null || account.getAccessRole()
+                    .equals(AccountAccessRole.MUTED_PLAYER) || account.getAccessRole()
+                    .equals(AccountAccessRole.BANNED_PLAYER))
                 return;
-            if (account.getAccessRole().equals(AccountAccessRole.MODERATOR) || account.getAccessRole().equals(AccountAccessRole.OWNER)
+            if (account.getAccessRole().equals(AccountAccessRole.MODERATOR) || account.getAccessRole()
+                    .equals(AccountAccessRole.OWNER)
                     || (number <= rankerService.findHighestActiveRankerByAccount(account).getLadder().getNumber()
                     && throttler.canPostMessage(account.getUuid()))) {
                 MessageEntity answer = messageService.writeMessage(account, number, message, metadata);

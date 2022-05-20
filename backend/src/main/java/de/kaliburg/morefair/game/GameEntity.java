@@ -1,6 +1,7 @@
 package de.kaliburg.morefair.game;
 
-import de.kaliburg.morefair.game.round.RoundEntity;
+import de.kaliburg.morefair.game.chat.ChatEntity;
+import de.kaliburg.morefair.game.ladder.RoundEntity;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -16,7 +17,7 @@ import java.util.UUID;
 @Accessors(chain = true)
 @NoArgsConstructor
 @RequiredArgsConstructor
-@SequenceGenerator(name= "seq_game", sequenceName = "seq_game", allocationSize = 1)
+@SequenceGenerator(name = "seq_game", sequenceName = "seq_game", allocationSize = 1)
 public class GameEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_game")
@@ -26,4 +27,6 @@ public class GameEntity {
     private UUID uuid;
     @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
     private List<RoundEntity> rounds = new ArrayList<>();
+    @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
+    private List<ChatEntity> chats = new ArrayList<>();
 }

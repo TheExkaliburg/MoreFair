@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.game.ranker;
+package de.kaliburg.morefair.game.ladder.ranker;
 
 import de.kaliburg.morefair.account.entity.AccountEntity;
 import de.kaliburg.morefair.game.ladder.LadderEntity;
@@ -6,10 +6,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
 
+@Repository
 public interface RankerRepository extends JpaRepository<RankerEntity, Long> {
     @Query("SELECT r FROM RankerEntity r WHERE r.account = :account")
     List<RankerEntity> findByAccount(@Param("account") AccountEntity account);
@@ -44,7 +46,8 @@ public interface RankerRepository extends JpaRepository<RankerEntity, Long> {
 
     @Modifying(clearAutomatically = true)
     @Query("UPDATE RankerEntity r SET r.rank = :rank, r.points = :points, r.power = :power WHERE r.id = :id")
-    void updateRankerStatsById(@Param("id") Long id, @Param("rank") Integer rank, @Param("points") BigInteger points, @Param("power") BigInteger power);
+    void updateRankerStatsById(@Param("id") Long id, @Param("rank") Integer rank, @Param("points") BigInteger points,
+            @Param("power") BigInteger power);
 
     @Query("SELECT r FROM RankerEntity r WHERE r.ladder = :ladder AND " +
             "r.points = (SELECT Max(r.points) FROM RankerEntity r WHERE r.ladder = :ladder)")

@@ -1,15 +1,15 @@
 package de.kaliburg.morefair.api;
 
-import de.kaliburg.morefair.account.entity.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
+import de.kaliburg.morefair.account.entity.AccountEntity;
 import de.kaliburg.morefair.account.type.AccountAccessRole;
-import de.kaliburg.morefair.events.Event;
-import de.kaliburg.morefair.events.EventType;
-import de.kaliburg.morefair.game.ranker.RankerService;
-import de.kaliburg.morefair.api.websockets.messages.WSMessage;
 import de.kaliburg.morefair.api.utils.RequestThrottler;
 import de.kaliburg.morefair.api.utils.WSUtils;
 import de.kaliburg.morefair.api.websockets.StompPrincipal;
+import de.kaliburg.morefair.api.websockets.messages.WSMessage;
+import de.kaliburg.morefair.events.Event;
+import de.kaliburg.morefair.events.EventType;
+import de.kaliburg.morefair.game.ladder.ranker.RankerService;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.http.HttpStatus;
@@ -29,7 +29,8 @@ public class AccountController {
     private final RequestThrottler requestThrottler;
     private final WSUtils wsUtils;
 
-    public AccountController(AccountService accountService, RankerService rankerService, RequestThrottler requestThrottler, WSUtils wsUtils) {
+    public AccountController(AccountService accountService, RankerService rankerService,
+            RequestThrottler requestThrottler, WSUtils wsUtils) {
         this.accountService = accountService;
         this.rankerService = rankerService;
         this.requestThrottler = requestThrottler;
@@ -43,7 +44,8 @@ public class AccountController {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
             if (uuid == null || uuid.isBlank()) {
                 if (requestThrottler.canCreateAccount(principal)) {
-                    wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, accountService.createNewAccount(principal), HttpStatus.CREATED);
+                    wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, accountService.createNewAccount(principal),
+                            HttpStatus.CREATED);
                 } else {
                     wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
                 }
@@ -52,7 +54,8 @@ public class AccountController {
             AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));
             if (account == null) {
                 if (requestThrottler.canCreateAccount(principal)) {
-                    wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, accountService.createNewAccount(principal), HttpStatus.CREATED);
+                    wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, accountService.createNewAccount(principal),
+                            HttpStatus.CREATED);
                 } else {
                     wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
                 }
@@ -80,13 +83,16 @@ public class AccountController {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
             String username = wsMessage.getContent();
             username = username.trim();
-            if (username.length() > 32) username = username.substring(0, 32);
+            if (username.length() > 32)
+                username = username.substring(0, 32);
             username = StringEscapeUtils.escapeJava(username);
 
             log.debug("/app/account/name {} {}", uuid, username);
 
             AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));
-            if (account == null || account.getAccessRole().equals(AccountAccessRole.MUTED_PLAYER) || account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
+            if (account == null || account.getAccessRole()
+                    .equals(AccountAccessRole.MUTED_PLAYER) || account.getAccessRole()
+                    .equals(AccountAccessRole.BANNED_PLAYER)) {
                 return;
             }
             Event event = new Event(EventType.NAME_CHANGE, account.getId());

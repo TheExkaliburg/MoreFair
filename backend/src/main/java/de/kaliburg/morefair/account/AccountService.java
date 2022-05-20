@@ -4,9 +4,9 @@ import de.kaliburg.morefair.account.entity.AccountEntity;
 import de.kaliburg.morefair.account.events.AccountServiceEvent;
 import de.kaliburg.morefair.account.repository.AccountRepository;
 import de.kaliburg.morefair.account.type.AccountAccessRole;
+import de.kaliburg.morefair.api.websockets.StompPrincipal;
 import de.kaliburg.morefair.dto.AccountDetailsDTO;
 import de.kaliburg.morefair.events.Event;
-import de.kaliburg.morefair.api.websockets.StompPrincipal;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
@@ -14,7 +14,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -38,12 +38,14 @@ public class AccountService {
 
     public AccountDetailsDTO createNewAccount(StompPrincipal principal) {
         AccountEntity result = new AccountEntity(UUID.randomUUID(), "");
-        if (principal != null) result.setLastIp(principal.getIpAddress());
+        if (principal != null)
+            result.setLastIp(principal.getIpAddress());
         result = saveAccount(result);
         result.setUsername("Mystery Guest #" + result.getId());
         result = saveAccount(result);
 
-        eventPublisher.publishEvent(new AccountServiceEvent(this, result, AccountServiceEvent.AccountServiceEventType.CREATE));
+        eventPublisher.publishEvent(
+                new AccountServiceEvent(this, result, AccountServiceEvent.AccountServiceEventType.CREATE));
 
         result = accountRepository.findByUuid(result.getUuid());
         log.info("Created Mystery Guest #{}.", result.getId());
@@ -53,7 +55,8 @@ public class AccountService {
     @Transactional
     public AccountEntity saveAccount(AccountEntity account) {
         AccountEntity result = accountRepository.save(account);
-        eventPublisher.publishEvent(new AccountServiceEvent(this, result, AccountServiceEvent.AccountServiceEventType.UPDATE));
+        eventPublisher.publishEvent(
+                new AccountServiceEvent(this, result, AccountServiceEvent.AccountServiceEventType.UPDATE));
         return result;
     }
 
@@ -72,7 +75,7 @@ public class AccountService {
 
     public void login(AccountEntity account, StompPrincipal principal) {
         // Set Login Date
-        account.setLastLogin(LocalDateTime.now());
+        account.setLastLogin(ZonedDateTime.now());
         account.setLastIp(principal.getIpAddress());
         saveAccount(account);
     }
@@ -92,7 +95,7 @@ public class AccountService {
 
     public AccountEntity findOwnerAccount() {
         List<AccountEntity> accounts = accountRepository.findAllAccountsByAccessRole(AccountAccessRole.OWNER);
-        if(accounts.size() == 1) {
+        if (accounts.size() == 1) {
             return accounts.get(0);
         } else {
             log.error("Single OWNER account access roles not found.");
@@ -123,7 +126,8 @@ public class AccountService {
         if (account != null && !account.getAccessRole().equals(AccountAccessRole.OWNER)) {
             account.setAccessRole(AccountAccessRole.BANNED_PLAYER);
             account = saveAccount(account);
-            eventPublisher.publishEvent(new AccountServiceEvent(e, account, AccountServiceEvent.AccountServiceEventType.BAN));
+            eventPublisher.publishEvent(
+                    new AccountServiceEvent(e, account, AccountServiceEvent.AccountServiceEventType.BAN));
         }
     }
 
@@ -132,7 +136,8 @@ public class AccountService {
         if (account != null && !account.getAccessRole().equals(AccountAccessRole.OWNER)) {
             account.setAccessRole(AccountAccessRole.MUTED_PLAYER);
             account = saveAccount(account);
-            eventPublisher.publishEvent(new AccountServiceEvent(e, account, AccountServiceEvent.AccountServiceEventType.MUTE));
+            eventPublisher.publishEvent(
+                    new AccountServiceEvent(e, account, AccountServiceEvent.AccountServiceEventType.MUTE));
         }
     }
 
@@ -156,7 +161,7 @@ public class AccountService {
         }
     }
 
-    public List<AccountEntity> findUsername(String username){
+    public List<AccountEntity> findUsername(String username) {
         return accountRepository.findAccountsByUsernameIsContaining(username);
     }
 }

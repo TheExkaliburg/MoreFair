@@ -2,12 +2,12 @@ package de.kaliburg.morefair.account.entity;
 
 import de.kaliburg.morefair.account.type.AccountAccessRole;
 import de.kaliburg.morefair.dto.AccountDetailsDTO;
-import de.kaliburg.morefair.game.ranker.RankerEntity;
+import de.kaliburg.morefair.game.ladder.ranker.RankerEntity;
 import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -42,7 +42,7 @@ public class AccountEntity {
     private Integer lastIp;
     @NonNull
     @Column(nullable = false)
-    private LocalDateTime lastLogin = LocalDateTime.now();
+    private ZonedDateTime lastLogin = ZonedDateTime.now();
     @NonNull
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -52,7 +52,7 @@ public class AccountEntity {
         return new AccountDetailsDTO(this);
     }
 
-    public boolean hasModPowers(){
+    public boolean hasModPowers() {
         return getAccessRole().equals(AccountAccessRole.MODERATOR) || getAccessRole().equals(AccountAccessRole.OWNER);
     }
 }
