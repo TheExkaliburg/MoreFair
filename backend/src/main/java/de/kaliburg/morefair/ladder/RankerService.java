@@ -334,7 +334,7 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
                     List<Account> accounts = accountService.findAllAccountsJoinedWithRankers().stream().toList();
                     long assholeCount = accounts.stream().filter(Account::getIsAsshole).count();
                     globalEventList.add(new Event(EventType.SYSTEM_MESSAGE,0L, account.getUsername() +
-                            " is an asshole.  Number " + assholeCount + "of " + neededAssholesForReset + " needed assholes."));
+                            " was welcomed by Chad. They are number " + assholeCount + " of the lucky few (" + neededAssholesForReset + ") initiates, still needed for the ritual."));
                 }
                 saveRanker(newRanker);
                 return true;
