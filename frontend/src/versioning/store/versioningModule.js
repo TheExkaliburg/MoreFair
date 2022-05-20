@@ -5,6 +5,9 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "", {
+          fixes: [""],
+        }),
         new Version("PATCH", "Theme Loader, ETA, Streamer QOL", {
           features: [
             "Added a theme loader to the Options menu.",
