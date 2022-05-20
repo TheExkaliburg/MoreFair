@@ -8,7 +8,11 @@
       >
     </div>
     <div class="col">
-      <span>Asshole Ladder: {{ store.state.settings.assholeLadder }}</span>
+      <span
+        >Ladder: {{ store.state.ladder.ladder.ladderNumber }}/{{
+          store.state.settings.assholeLadder
+        }}</span
+      >
     </div>
     <PaginationGroup
       :current="ladder.ladderNumber"
@@ -55,7 +59,10 @@
             {{ ranker.rank }}
             {{ settings.assholeTags[ranker.timesAsshole] }}
           </td>
-          <td class="text-start">{{ ranker.username }}</td>
+          <td class="text-start">
+            {{ ranker.username }}
+            <sub class="account-id">#{{ ranker.accountId }}</sub>
+          </td>
           <td
             v-if="showEtaSetting"
             :style="'animation-delay: ' + rankerEtaPercentage(ranker) + 's'"
@@ -207,6 +214,10 @@ function changeLadder(event) {
   }
 }
 
+.account-id {
+  color: var(--text-dark-highlight-color);
+}
+
 .dropdown-pagination {
   text-align: end;
   padding-right: 0px;
@@ -215,6 +226,10 @@ function changeLadder(event) {
 .you {
   background-color: var(--you-background-color);
   color: var(--you-color);
+
+  .account-id {
+    color: var(--you-color);
+  }
 }
 
 .promoted {
