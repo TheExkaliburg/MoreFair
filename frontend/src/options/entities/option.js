@@ -115,14 +115,15 @@ export class IntegerOption extends NumberOption {
 }
 
 export class DropdownOption extends Option {
-  constructor({ displayName, name, options, callback }) {
+  constructor({ displayName, name, options, callback, selectedIndex }) {
     super({ displayName, name, options, callback });
     this.displayName = displayName;
     this.name = name;
     this.options = options;
     this.selectedIndex = 0;
+    if (selectedIndex) this.selectedIndex = selectedIndex;
+    this.callback = () => {};
     if (callback) this.callback = callback;
-    else this.callback = () => {};
   }
 
   get value() {
@@ -163,9 +164,11 @@ export class StringInputOption extends Option {
     this.callback = callback;
     this.buttonText = buttonText;
   }
+
   get() {
     return undefined;
   }
+
   set() {}
 }
 
@@ -176,9 +179,11 @@ export class ButtonOption extends Option {
     this.name = name;
     this.callback = callback;
   }
+
   get() {
     return undefined;
   }
+
   set() {}
 }
 

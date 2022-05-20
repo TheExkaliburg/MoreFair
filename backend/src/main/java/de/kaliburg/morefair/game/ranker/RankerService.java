@@ -335,8 +335,9 @@ public class RankerService implements ApplicationListener<AccountServiceEvent> {
                     int neededAssholesForReset = Math.max(FairController.ASSHOLES_FOR_RESET, (assholeLadder + 1) >> 1);
                     List<AccountEntity> accounts = accountService.findAllAccountsJoinedWithRankers().stream().toList();
                     long assholeCount = accounts.stream().filter(AccountEntity::getIsAsshole).count();
-                    globalEventList.add(new Event(EventType.SYSTEM_MESSAGE,0L, account.getUsername() +
-                            " is an asshole.  Number " + assholeCount + "of " + neededAssholesForReset + " needed assholes."));
+                    messageService.writeSystemMessage(getHighestLadder(), account.getUsername() +
+                            " was welcomed by Chad. They are number " + assholeCount + " of the lucky few (" +
+                            neededAssholesForReset + ") initiates, still needed for the ritual.");
                 }
                 saveRanker(newRanker);
                 return true;

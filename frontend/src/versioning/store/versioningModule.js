@@ -5,7 +5,10 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
-        new Version("PATCH", "Theme Loader", {
+        new Version("PATCH", "", {
+          fixes: [""],
+        }),
+        new Version("PATCH", "Theme Loader, ETA, Streamer QOL", {
           features: [
             "Added a theme loader to the Options menu.",
             "Load themes from URLs or load previously saved themes.",
@@ -13,14 +16,20 @@ const versioningModule = {
             "You can now hide you vinegar and grape count.",
             "There will now be an ETA until your vinegar is enough to be thrown.",
             "You can now hide your Chat.",
+            "You can now display some eta information in a color in the ladder.",
+            "You can now display the eta for everyone to the top and to you",
             "You are now able to hide promoted players from the game.",
           ],
           improvements: [
             "Clicking on a navbar item that changes the view will now close the navbar.",
             "Better ETA to promotion.",
+            "Better announcement Message for promotion",
+            "Now also shows current ladder above the ladder-table",
+            "Showing account-id in the ladder",
           ],
           fixes: [
             "Added a new color variable. This is used in the mention popup for theming.",
+            "Fixing typo in the Help-Section",
           ],
         }),
         new Version("PATCH", "Changelog", {

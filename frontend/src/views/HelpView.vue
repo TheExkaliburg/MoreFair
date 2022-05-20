@@ -220,7 +220,7 @@
               rank 1. If they have more vinegar than you, you just subtract your
               amount of vinegar from theirs, but if you throw more than they can
               handle, you force them to buy a multi or reset their points to 0
-              if they can't afford it. The person on the top spot also looses
+              if they can't afford it. The person on the top spot also loses
               0.25% of their vinegar count every second.
             </div>
           </div>

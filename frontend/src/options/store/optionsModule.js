@@ -9,11 +9,11 @@ import {
 } from "../entities/option";
 import themeSelector from "@/modules/themeSelector";
 import {
+  deleteNamedTheme,
   getThemeNames,
   loadTheme,
   requestAllThemes,
   requestTheme,
-  deleteNamedTheme,
 } from "@/modules/themeManager";
 
 //import { createHookEndpoint } from "@/store/hooks";
@@ -38,39 +38,6 @@ const optionsModule = {
           displayName: "General",
           name: "general",
           options: [
-            new BoolOption({
-              displayName: "Hide vinegar and grape count",
-              name: "hideVinAndGrapeCount",
-              value: false,
-            }),
-            new BoolOption({
-              displayName: "Show all rankers",
-              name: "showAllRankers",
-              value: false,
-            }),
-            new BoolOption({
-              displayName: "Hide promoted players",
-              name: "hidePromotedPlayers",
-              value: false,
-            }),
-            new IntegerOption({
-              displayName: "Rankers at top",
-              name: "rankersAtTop",
-              value: 5,
-            }).setActiveFn(() => {
-              return !optionsModule.store.getters["options/getOptionValue"](
-                "showAllRankers"
-              );
-            }),
-            new IntegerOption({
-              displayName: "Rankers padding",
-              name: "rankersPadding",
-              value: 100,
-            }).setActiveFn(() => {
-              return !optionsModule.store.getters["options/getOptionValue"](
-                "showAllRankers"
-              );
-            }),
             new DropdownOption({
               displayName: "Theme",
               name: "themeSelection",
@@ -102,6 +69,56 @@ const optionsModule = {
                 deleteNamedTheme(themeSelector.getCurrentTheme());
                 location.reload();
               },
+            }),
+          ],
+        }),
+        new OptionSection({
+          displayName: "Ladder Settings",
+          name: "ladderSettings",
+          options: [
+            new BoolOption({
+              displayName: "Show ETA to Top/Ranker",
+              name: "showETA",
+              value: false,
+            }),
+            new DropdownOption({
+              displayName: "ETA Colors",
+              name: "etaColors",
+              options: ["Off", "3-Color", "Gradient"],
+              selectedIndex: 2,
+            }),
+            new BoolOption({
+              displayName: "Show all rankers",
+              name: "showAllRankers",
+              value: false,
+            }),
+            new IntegerOption({
+              displayName: "Rankers at top",
+              name: "rankersAtTop",
+              value: 5,
+            }).setActiveFn(() => {
+              return !optionsModule.store.getters["options/getOptionValue"](
+                "showAllRankers"
+              );
+            }),
+            new IntegerOption({
+              displayName: "Rankers padding",
+              name: "rankersPadding",
+              value: 100,
+            }).setActiveFn(() => {
+              return !optionsModule.store.getters["options/getOptionValue"](
+                "showAllRankers"
+              );
+            }),
+            new BoolOption({
+              displayName: "Hide promoted players",
+              name: "hidePromotedPlayers",
+              value: false,
+            }),
+            new BoolOption({
+              displayName: "Hide vinegar and grape count",
+              name: "hideVinAndGrapeCount",
+              value: false,
             }),
           ],
         }),
