@@ -18,12 +18,12 @@
       >
         {{ part.text }}
       </span>
-      <span
+      <sub
         v-else-if="part.is(MessagePartType.mentionNumber)"
         class="chat-mention-user-id"
       >
         {{ part.text }}
-      </span>
+      </sub>
       <!-- Unimplemented -->
       <span v-else class="chat-unknown-part-type">
         {{ part.text }}
