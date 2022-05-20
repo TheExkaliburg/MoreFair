@@ -1,6 +1,7 @@
-package de.kaliburg.morefair.game.ladder;
+package de.kaliburg.morefair.game.round;
 
 import de.kaliburg.morefair.game.GameEntity;
+import de.kaliburg.morefair.game.round.ladder.LadderEntity;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -12,7 +13,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "round", uniqueConstraints = { @UniqueConstraint(name = "uk_uuid", columnNames = "uuid"),
-        @UniqueConstraint(name = "uk_number", columnNames = "number") })
+        @UniqueConstraint(name = "uk_number_game", columnNames = {"number", "game_id"}) })
 @Getter
 @Setter
 @Accessors(chain = true)

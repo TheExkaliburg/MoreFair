@@ -63,7 +63,7 @@ public class FairController {
         this.wsUtils = wsUtils;
     }
 
-    @GetMapping(value = { "/options", "/help", "/mod" })
+    @GetMapping(value = { "/options", "/help", "/mod", "/changelog"})
     public String forward() {
         return "forward:/";
     }

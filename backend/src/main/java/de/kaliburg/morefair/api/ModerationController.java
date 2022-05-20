@@ -11,7 +11,7 @@ import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.EventType;
 import de.kaliburg.morefair.game.chat.message.MessageEntity;
 import de.kaliburg.morefair.game.chat.message.MessageService;
-import de.kaliburg.morefair.game.ladder.ranker.RankerService;
+import de.kaliburg.morefair.game.round.ranker.RankerService;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.http.HttpStatus;
@@ -40,6 +40,7 @@ public class ModerationController {
     private final static String INFO_DESTINATION = "/queue/mod/info/";
     private final static String CHAT_DESTINATION = "/queue/mod/chat/";
     private final static String GAME_DESTINATION = "/queue/mod/game/";
+    private final static String INFO_REQUEST = "/mod/info";
     private final AccountService accountService;
     private final WSUtils wsUtils;
     private final RankerService ladderService;
@@ -53,12 +54,7 @@ public class ModerationController {
         this.messageService = messageService;
     }
 
-    @GetMapping("/moderation")
-    public String getIndex() {
-        return "moderation";
-    }
-
-    @MessageMapping("/mod/info")
+    @MessageMapping(INFO_REQUEST)
     public void info(SimpMessageHeaderAccessor sha, WSMessage wsMessage) throws Exception {
         try {
             String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());

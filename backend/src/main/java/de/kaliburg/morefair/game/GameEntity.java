@@ -1,7 +1,7 @@
 package de.kaliburg.morefair.game;
 
 import de.kaliburg.morefair.game.chat.ChatEntity;
-import de.kaliburg.morefair.game.ladder.RoundEntity;
+import de.kaliburg.morefair.game.round.RoundEntity;
 import lombok.*;
 import lombok.experimental.Accessors;
 

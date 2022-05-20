@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.game.ladder.ranker;
+package de.kaliburg.morefair.game.round.ranker;
 
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.account.entity.AccountEntity;
@@ -13,8 +13,8 @@ import de.kaliburg.morefair.events.data.JoinData;
 import de.kaliburg.morefair.events.data.VinegarData;
 import de.kaliburg.morefair.game.UpgradeUtils;
 import de.kaliburg.morefair.game.chat.message.MessageService;
-import de.kaliburg.morefair.game.ladder.LadderEntity;
-import de.kaliburg.morefair.game.ladder.LadderRepository;
+import de.kaliburg.morefair.game.round.ladder.LadderEntity;
+import de.kaliburg.morefair.game.round.ladder.LadderRepository;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;

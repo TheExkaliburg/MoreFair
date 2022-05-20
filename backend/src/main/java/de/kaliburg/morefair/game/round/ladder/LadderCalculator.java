@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.game.ladder;
+package de.kaliburg.morefair.game.round.ladder;
 
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.RankerController;
@@ -7,8 +7,8 @@ import de.kaliburg.morefair.dto.HeartbeatDTO;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.EventType;
 import de.kaliburg.morefair.game.chat.message.MessageService;
-import de.kaliburg.morefair.game.ladder.ranker.RankerEntity;
-import de.kaliburg.morefair.game.ladder.ranker.RankerService;
+import de.kaliburg.morefair.game.round.ranker.RankerEntity;
+import de.kaliburg.morefair.game.round.ranker.RankerService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;

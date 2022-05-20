@@ -1,8 +1,9 @@
-package de.kaliburg.morefair.game.ladder;
+package de.kaliburg.morefair.game.round.ladder;
 
 import de.kaliburg.morefair.api.FairController;
 import de.kaliburg.morefair.dto.ChatDTO;
-import de.kaliburg.morefair.game.ladder.ranker.RankerEntity;
+import de.kaliburg.morefair.game.round.RoundEntity;
+import de.kaliburg.morefair.game.round.ranker.RankerEntity;
 import lombok.*;
 import lombok.experimental.Accessors;
 

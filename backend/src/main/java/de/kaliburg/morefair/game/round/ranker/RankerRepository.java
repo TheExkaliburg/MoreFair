@@ -1,7 +1,7 @@
-package de.kaliburg.morefair.game.ladder.ranker;
+package de.kaliburg.morefair.game.round.ranker;
 
 import de.kaliburg.morefair.account.entity.AccountEntity;
-import de.kaliburg.morefair.game.ladder.LadderEntity;
+import de.kaliburg.morefair.game.round.ladder.LadderEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

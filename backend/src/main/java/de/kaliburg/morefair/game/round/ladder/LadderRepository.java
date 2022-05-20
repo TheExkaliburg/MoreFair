@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.game.ladder;
+package de.kaliburg.morefair.game.round.ladder;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
