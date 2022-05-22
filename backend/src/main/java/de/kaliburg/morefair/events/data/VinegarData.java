@@ -5,8 +5,9 @@ import lombok.NonNull;
 
 @Data
 public class VinegarData {
-    @NonNull
-    private String amount;
-    @NonNull
-    private boolean success = false;
+
+  @NonNull
+  private String amount;
+  @NonNull
+  private boolean success = false;
 }

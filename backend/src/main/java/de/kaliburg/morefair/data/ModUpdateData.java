@@ -4,5 +4,6 @@ import lombok.Data;
 
 @Data
 public class ModUpdateData {
-    Integer ladderNumber;
+
+  Integer ladderNumber;
 }

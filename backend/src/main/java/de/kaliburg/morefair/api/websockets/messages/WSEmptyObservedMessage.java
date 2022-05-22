@@ -9,11 +9,12 @@ import lombok.NonNull;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class WSEmptyObservedMessage extends WSEmptyMessage {
-    @NonNull
-    private String event;
 
-    public WSEmptyObservedMessage(@NonNull String uuid, @NonNull String event) {
-        super(uuid);
-        this.event = event;
-    }
+  @NonNull
+  private String event;
+
+  public WSEmptyObservedMessage(@NonNull String uuid, @NonNull String event) {
+    super(uuid);
+    this.event = event;
+  }
 }

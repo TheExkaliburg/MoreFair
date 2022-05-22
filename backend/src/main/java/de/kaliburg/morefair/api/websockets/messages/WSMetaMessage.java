@@ -9,11 +9,12 @@ import lombok.NonNull;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class WSMetaMessage extends WSMessage {
-    @NonNull
-    private String metadata;
 
-    public WSMetaMessage(@NonNull String uuid, @NonNull String content, @NonNull String metadata) {
-        super(uuid, content);
-        this.metadata = metadata;
-    }
+  @NonNull
+  private String metadata;
+
+  public WSMetaMessage(@NonNull String uuid, @NonNull String content, @NonNull String metadata) {
+    super(uuid, content);
+    this.metadata = metadata;
+  }
 }

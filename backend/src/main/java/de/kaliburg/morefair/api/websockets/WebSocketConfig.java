@@ -11,26 +11,27 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-    private final ChannelInterceptor interceptor;
 
-    public WebSocketConfig(ChannelInterceptor interceptor) {
-        this.interceptor = interceptor;
-    }
+  private final ChannelInterceptor interceptor;
 
-    @Override
-    public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic", "/queue");
-        config.setApplicationDestinationPrefixes("/app");
-    }
+  public WebSocketConfig(ChannelInterceptor interceptor) {
+    this.interceptor = interceptor;
+  }
 
-    @Override
-    public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/fairsocket").setHandshakeHandler(new CustomHandshakeHandler())
-                .setAllowedOriginPatterns("*").withSockJS();
-    }
+  @Override
+  public void configureMessageBroker(MessageBrokerRegistry config) {
+    config.enableSimpleBroker("/topic", "/queue");
+    config.setApplicationDestinationPrefixes("/app");
+  }
 
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(interceptor);
-    }
+  @Override
+  public void registerStompEndpoints(StompEndpointRegistry registry) {
+    registry.addEndpoint("/fairsocket").setHandshakeHandler(new CustomHandshakeHandler())
+        .setAllowedOriginPatterns("*").withSockJS();
+  }
+
+  @Override
+  public void configureClientInboundChannel(ChannelRegistration registration) {
+    registration.interceptors(interceptor);
+  }
 }

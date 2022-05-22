@@ -5,8 +5,9 @@ import lombok.NonNull;
 
 @Data
 public class JoinData {
-    @NonNull
-    private String username;
-    @NonNull
-    private Integer timesAsshole;
+
+  @NonNull
+  private String username;
+  @NonNull
+  private Integer timesAsshole;
 }

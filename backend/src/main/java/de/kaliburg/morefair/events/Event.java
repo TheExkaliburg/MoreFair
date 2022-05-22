@@ -9,10 +9,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class Event {
-    @NonNull
-    private EventType eventType;
-    @NonNull
-    private Long accountId;
-    private Object data;
+
+  @NonNull
+  private EventType eventType;
+  @NonNull
+  private Long accountId;
+  private Object data;
 
 }

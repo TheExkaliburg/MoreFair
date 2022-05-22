@@ -5,9 +5,10 @@ import lombok.Data;
 
 @Data
 public class LadderDTO {
-    private Integer number;
 
-    public LadderDTO(LadderEntity ladder) {
-        this.number = ladder.getNumber();
-    }
+  private Integer number;
+
+  public LadderDTO(LadderEntity ladder) {
+    this.number = ladder.getNumber();
+  }
 }
