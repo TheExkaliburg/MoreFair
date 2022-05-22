@@ -6,7 +6,10 @@ const versioningModule = {
     return {
       versions: [
         new Version("PATCH", "", {
-          improvements: ["The Account id is now shown as subscript"],
+          balancing: [
+            "Removing the restriction from floor-grapes for the top ladder.",
+          ],
+          improvements: ["The Account id is now shown as subscript."],
         }),
         new Version("PATCH", "Theme Loader, ETA, Streamer QOL", {
           features: [
