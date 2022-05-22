@@ -85,10 +85,7 @@ class Ladder {
     }
 
     // Ranker on Last Place gains 1 Grape, only if he isn't the only one
-    if (
-      rankers.length >=
-      Math.max(settings.minimumPeopleForPromote, this.ladderNumber)
-    ) {
+    if (rankers.length >= 1) {
       let index = rankers.length - 1;
       if (rankers[index].growing && rankers[index].you)
         rankers[index].grapes = rankers[index].grapes.add(
