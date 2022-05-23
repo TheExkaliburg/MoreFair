@@ -8,10 +8,10 @@ import de.kaliburg.morefair.api.utils.WSUtils;
 import de.kaliburg.morefair.api.websockets.messages.WSEmptyMessage;
 import de.kaliburg.morefair.api.websockets.messages.WSMetaMessage;
 import de.kaliburg.morefair.dto.ChatDTO;
-import de.kaliburg.morefair.game.chat.message.MessageEntity;
-import de.kaliburg.morefair.game.chat.message.MessageService;
-import de.kaliburg.morefair.game.round.ranker.RankerEntity;
-import de.kaliburg.morefair.game.round.ranker.RankerService;
+import de.kaliburg.morefair.game.message.MessageEntity;
+import de.kaliburg.morefair.game.message.MessageService;
+import de.kaliburg.morefair.game.ranker.RankerEntity;
+import de.kaliburg.morefair.game.ranker.RankerService;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
@@ -93,8 +93,8 @@ public class ChatController {
       String message = wsMessage.getContent();
       String metadata = wsMessage.getMetadata();
       message = message.trim();
-      if (message.length() > 280) {
-        message = message.substring(0, 280);
+      if (message.length() > 140) {
+        message = message.substring(0, 140);
       }
       message = StringEscapeUtils.escapeJava(message);
 

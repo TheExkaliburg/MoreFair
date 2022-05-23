@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.game.round.ladder;
+package de.kaliburg.morefair.game.ladder;
 
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.RankerController;
@@ -6,9 +6,9 @@ import de.kaliburg.morefair.api.utils.WSUtils;
 import de.kaliburg.morefair.dto.HeartbeatDTO;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.EventType;
-import de.kaliburg.morefair.game.chat.message.MessageService;
-import de.kaliburg.morefair.game.round.ranker.RankerEntity;
-import de.kaliburg.morefair.game.round.ranker.RankerService;
+import de.kaliburg.morefair.game.message.MessageService;
+import de.kaliburg.morefair.game.ranker.RankerEntity;
+import de.kaliburg.morefair.game.ranker.RankerService;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;

@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.game.chat.message;
+package de.kaliburg.morefair.game.message;
 
 import de.kaliburg.morefair.api.FairController;
 import java.time.format.DateTimeFormatter;

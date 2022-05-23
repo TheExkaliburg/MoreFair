@@ -1,8 +1,8 @@
 package de.kaliburg.morefair.dto;
 
 import de.kaliburg.morefair.account.entity.AccountEntity;
-import de.kaliburg.morefair.game.round.ladder.LadderEntity;
-import de.kaliburg.morefair.game.round.ranker.RankerEntity;
+import de.kaliburg.morefair.game.ladder.LadderEntity;
+import de.kaliburg.morefair.game.ranker.RankerEntity;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
@@ -33,6 +33,5 @@ public class LadderViewDTO {
         startRank = ranker.getRank();
       }
     }
-    this.currentLadder = currentLadder.convertToLadderDTO();
   }
 }

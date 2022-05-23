@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.dto;
 
-import de.kaliburg.morefair.game.round.ranker.RankerEntity;
+import de.kaliburg.morefair.game.ranker.RankerEntity;
 import lombok.Data;
 import org.apache.commons.text.StringEscapeUtils;
 

@@ -21,7 +21,6 @@ import javax.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -34,7 +33,6 @@ import lombok.experimental.Accessors;
 @Setter
 @Accessors(chain = true)
 @NoArgsConstructor
-@RequiredArgsConstructor
 @SequenceGenerator(name = "seq_game", sequenceName = "seq_game", allocationSize = 1)
 public class GameEntity {
 
@@ -43,12 +41,11 @@ public class GameEntity {
   private Long id;
   @NonNull
   @Column(nullable = false)
-  private UUID uuid;
+  private UUID uuid = UUID.randomUUID();
   @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
   private List<RoundEntity> rounds = new ArrayList<>();
-  @NonNull
   @ManyToOne
-  @JoinColumn(name = "current_round_id", nullable = false, foreignKey = @ForeignKey(name = "fk_game_round"))
+  @JoinColumn(name = "current_round_id", foreignKey = @ForeignKey(name = "fk_game_round"))
   private RoundEntity currentRound;
   @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
   private List<ChatEntity> chats = new ArrayList<>();

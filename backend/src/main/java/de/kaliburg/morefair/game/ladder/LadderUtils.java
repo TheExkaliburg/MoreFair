@@ -1,6 +1,6 @@
-package de.kaliburg.morefair.game.round.ladder;
+package de.kaliburg.morefair.game.ladder;
 
-import de.kaliburg.morefair.game.round.ranker.RankerEntity;
+import de.kaliburg.morefair.game.ranker.RankerEntity;
 import java.util.Comparator;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;

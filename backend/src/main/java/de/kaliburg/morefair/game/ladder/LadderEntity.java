@@ -1,9 +1,9 @@
-package de.kaliburg.morefair.game.round.ladder;
+package de.kaliburg.morefair.game.ladder;
 
 import de.kaliburg.morefair.api.FairController;
 import de.kaliburg.morefair.dto.ChatDTO;
+import de.kaliburg.morefair.game.ranker.RankerEntity;
 import de.kaliburg.morefair.game.round.RoundEntity;
-import de.kaliburg.morefair.game.round.ranker.RankerEntity;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,11 +46,11 @@ public final class LadderEntity {
   private Long id;
   @NonNull
   @Column(nullable = false)
-  private UUID uuid;
+  private UUID uuid = UUID.randomUUID();
   @NonNull
   @Column(nullable = false)
   private Integer number;
-  // TODO: @NonNull
+  @NonNull
   @ManyToOne
   @JoinColumn(name = "round_id", nullable = false, foreignKey = @ForeignKey(name = "fk_ladder_round"))
   private RoundEntity round;

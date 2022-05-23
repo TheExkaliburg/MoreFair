@@ -39,8 +39,8 @@
           Send
         </button>
       </div>
-      <div class="msgLength" :class="msgLength > 280 ? 'error' : ''">
-        Message length: {{ msgLength }} / 280
+      <div :class="msgLength > 140 ? 'error' : ''" class="msgLength">
+        Message length: {{ msgLength }} / 140
       </div>
     </div>
     <div id="mentionDropdown" class="mentionDropdown"></div>

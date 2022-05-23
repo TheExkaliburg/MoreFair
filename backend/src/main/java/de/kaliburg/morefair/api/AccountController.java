@@ -9,7 +9,7 @@ import de.kaliburg.morefair.api.websockets.StompPrincipal;
 import de.kaliburg.morefair.api.websockets.messages.WSMessage;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.EventType;
-import de.kaliburg.morefair.game.round.ranker.RankerService;
+import de.kaliburg.morefair.game.ranker.RankerService;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;

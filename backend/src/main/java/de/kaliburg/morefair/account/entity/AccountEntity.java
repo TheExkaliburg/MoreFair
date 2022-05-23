@@ -2,7 +2,7 @@ package de.kaliburg.morefair.account.entity;
 
 import de.kaliburg.morefair.account.type.AccountAccessRole;
 import de.kaliburg.morefair.dto.AccountDetailsDTO;
-import de.kaliburg.morefair.game.round.ranker.RankerEntity;
+import de.kaliburg.morefair.game.ranker.RankerEntity;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;

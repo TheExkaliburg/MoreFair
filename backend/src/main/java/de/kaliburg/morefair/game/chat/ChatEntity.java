@@ -1,7 +1,7 @@
 package de.kaliburg.morefair.game.chat;
 
 import de.kaliburg.morefair.game.GameEntity;
-import de.kaliburg.morefair.game.chat.message.MessageEntity;
+import de.kaliburg.morefair.game.message.MessageEntity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -40,10 +40,14 @@ public class ChatEntity {
   private Long id;
   @NonNull
   @Column(nullable = false)
-  private UUID uuid;
+  private UUID uuid = UUID.randomUUID();
+  @NonNull
   @ManyToOne
   @JoinColumn(name = "game_id", nullable = false, foreignKey = @ForeignKey(name = "fk_chat_game"))
   private GameEntity game;
   @OneToMany(mappedBy = "chat", fetch = FetchType.EAGER)
   private List<MessageEntity> messages = new ArrayList<>();
+  @NonNull
+  @Column(nullable = false)
+  private Integer number;
 }

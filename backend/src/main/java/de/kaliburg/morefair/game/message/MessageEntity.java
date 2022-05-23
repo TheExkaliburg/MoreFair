@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.game.chat.message;
+package de.kaliburg.morefair.game.message;
 
 import de.kaliburg.morefair.account.entity.AccountEntity;
 import de.kaliburg.morefair.game.chat.ChatEntity;

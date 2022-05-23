@@ -1,7 +1,7 @@
 package de.kaliburg.morefair.game.round;
 
 import de.kaliburg.morefair.game.GameEntity;
-import de.kaliburg.morefair.game.round.ladder.LadderEntity;
+import de.kaliburg.morefair.game.ladder.LadderEntity;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,24 +39,25 @@ import lombok.experimental.Accessors;
 @SequenceGenerator(name = "seq_round", sequenceName = "seq_round", allocationSize = 1)
 public class RoundEntity {
 
+
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_round")
   private Long id;
   @NonNull
   @Column(nullable = false)
-  private UUID uuid;
+  private UUID uuid = UUID.randomUUID();
   @NonNull
   @Column(nullable = false)
   private Integer number;
+  @OneToMany(mappedBy = "round", fetch = FetchType.LAZY)
+  private List<LadderEntity> ladders = new ArrayList<>();
   @NonNull
   @ManyToOne
   @JoinColumn(name = "game_id", nullable = false, foreignKey = @ForeignKey(name = "fk_round_game"))
   private GameEntity game;
-  @OneToMany(mappedBy = "round", fetch = FetchType.LAZY)
-  private List<LadderEntity> ladders = new ArrayList<>();
   private ZonedDateTime createdOn = ZonedDateTime.now();
 
-  public void test() {
-
+  public boolean isCurrentRound() {
+    return getGame().getCurrentRound().equals(this);
   }
 }

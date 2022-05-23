@@ -1,6 +1,6 @@
-package de.kaliburg.morefair.game.chat.message;
+package de.kaliburg.morefair.game.message;
 
-import de.kaliburg.morefair.game.round.ladder.LadderEntity;
+import de.kaliburg.morefair.game.ladder.LadderEntity;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

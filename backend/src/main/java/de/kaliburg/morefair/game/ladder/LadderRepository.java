@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.game.round.ladder;
+package de.kaliburg.morefair.game.ladder;
 
 import java.util.Set;
 import java.util.UUID;
