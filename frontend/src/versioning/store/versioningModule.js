@@ -10,6 +10,9 @@ const versioningModule = {
             "Removing the restriction from floor-grapes for the top ladder.",
           ],
           improvements: ["The Account id is now shown as subscript."],
+          fixes: [
+            "Message length indicator will have the right length while writing now",
+          ],
         }),
         new Version("PATCH", "Theme Loader, ETA, Streamer QOL", {
           features: [
