@@ -15,13 +15,14 @@ class LadderStats {
 
   calculatePointsNeededForPromote(ladder, settings) {
     // If not enough Players -> Infinity
+    /*
     if (
       ladder.rankers.length <
       Math.max(settings.minimumPeopleForPromote, ladder.ladderNumber)
     ) {
       this.pointsNeededForManualPromote = new Decimal(Infinity);
       return;
-    }
+    }*/
 
     // If not enough points -> minimum required Points
     if (
