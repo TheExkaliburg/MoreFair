@@ -1,5 +1,6 @@
 package de.kaliburg.morefair.game;
 
+import de.kaliburg.morefair.account.entity.AccountEntity;
 import de.kaliburg.morefair.game.chat.ChatEntity;
 import de.kaliburg.morefair.game.chat.ChatService;
 import de.kaliburg.morefair.game.round.RoundEntity;
@@ -72,6 +73,10 @@ public class GameService {
     chatService.updateChats(game.getChats());
 
     return game;
+  }
+
+  public void addEvent(AccountEntity account) {
+
   }
 
 }
