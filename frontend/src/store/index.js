@@ -9,6 +9,11 @@ import soundsModule from "@/sounds/store/soundsModule";
 import moderationModule from "@/moderation/store/moderationModule";
 import versioningModule from "@/versioning/store/versioningModule";
 
+import { computed } from "vue";
+
+let promotionJingleVolume;
+let reachingFirstSound;
+
 let store = createStore({
   strict: process.env.NODE_ENV !== "production",
   namespaced: true,
@@ -62,6 +67,11 @@ let store = createStore({
         "/topic/chat/" + state.chat.chat.currentChatNumber
       );
 
+      //now doing a jingle for boozle <3
+      if (reachingFirstSound.value) {
+        Sounds.play("promotionJingle", promotionJingleVolume.value);
+      }
+
       commit({
         type: "setHighestLadder",
         payload: state.user.highestCurrentLadder + 1,
@@ -96,6 +106,20 @@ let store = createStore({
     versioning: versioningModule,
   },
 });
+
+import { Sounds } from "@/modules/sounds";
+
+promotionJingleVolume = computed(() =>
+  store.getters["options/getOptionValue"]("notificationVolume")
+);
+
+reachingFirstSound = computed(() =>
+  store.getters["options/getOptionValue"]("reachingFirstSound")
+);
+
+Sounds.setStore(store);
+
+Sounds.register("promotionJingle", require("@/assets/promotionJingle.wav"));
 
 optionsModule.setStore(store);
 store.registerModule("options", optionsModule);

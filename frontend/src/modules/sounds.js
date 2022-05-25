@@ -1,11 +1,9 @@
-import store from "../store";
-
-const sounds = store.getters["sounds/getSound"];
-
-let Sounds;
-Sounds = {
+let Sounds = {
+  setStore: (store) => {
+    Sounds.store = store;
+  },
   register: (name, url) => {
-    store.commit({
+    Sounds.store.commit({
       type: "sounds/loadSound",
       name: name,
       url: url,
@@ -13,6 +11,7 @@ Sounds = {
   },
 
   play: (sound, volume = 100) => {
+    const sounds = Sounds.store.getters["sounds/getSound"];
     const soundObj = sounds(sound);
     if (soundObj) {
       soundObj.volume = volume / 100;
@@ -22,5 +21,7 @@ Sounds = {
     }
   },
 };
+
+window.Sounds = Sounds;
 
 export { Sounds };

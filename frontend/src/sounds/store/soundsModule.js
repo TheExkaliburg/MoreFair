@@ -12,9 +12,9 @@ const optionsModule = {
     loadSound(state, { name, url }) {
       if (!state.sounds[name]) {
         state.sounds[name] = new Audio(url);
-        console.warn(`Sound ${name} already registered`);
         return true;
       } else {
+        console.warn(`Sound ${name} already registered`);
         return false;
       }
     },

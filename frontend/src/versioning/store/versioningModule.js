@@ -6,6 +6,10 @@ const versioningModule = {
     return {
       versions: [
         new Version("PATCH", "", {
+          features: [
+            "An old known sound now chimes whenever you promoted (thank you for requesting it, boozle)",
+            "Another sound now rings when you reached the top of a ladder",
+          ],
           improvements: [
             "ETA to Top is now showing the eta until you could promote instead of the eta to the first place",
           ],
