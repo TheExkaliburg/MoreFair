@@ -3,7 +3,7 @@ package de.kaliburg.morefair.api;
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.account.entity.AccountEntity;
 import de.kaliburg.morefair.account.type.AccountAccessRole;
-import de.kaliburg.morefair.api.utils.WSUtils;
+import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WSMessage;
 import de.kaliburg.morefair.data.ModChatData;
 import de.kaliburg.morefair.data.ModerationInfoData;
@@ -42,11 +42,11 @@ public class ModerationController {
   private final static String GAME_DESTINATION = "/queue/mod/game/";
   private final static String INFO_REQUEST = "/mod/info";
   private final AccountService accountService;
-  private final WSUtils wsUtils;
+  private final WsUtils wsUtils;
   private final RankerService ladderService;
   private final MessageService messageService;
 
-  public ModerationController(AccountService accountService, WSUtils wsUtils,
+  public ModerationController(AccountService accountService, WsUtils wsUtils,
       RankerService ladderService,
       MessageService messageService) {
     this.accountService = accountService;

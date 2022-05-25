@@ -74,7 +74,8 @@ public class LadderService {
   }
 
   /**
-   * Adds an event to the list of events inside of the eventMap
+   * Adds an event to the list of events inside the eventMap. This calls a semaphore and should
+   * thereby only be done by the Controllers/API.
    *
    * @param ladderNumber the key for the eventMap, that identifies which ladder is targeted by the
    *                     event

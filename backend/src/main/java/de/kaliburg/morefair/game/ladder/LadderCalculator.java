@@ -2,7 +2,7 @@ package de.kaliburg.morefair.game.ladder;
 
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.RankerController;
-import de.kaliburg.morefair.api.utils.WSUtils;
+import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.dto.HeartbeatDTO;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.EventType;
@@ -33,7 +33,7 @@ public class LadderCalculator {
   private final RankerService rankerService;
   private final AccountService accountService;
   private final MessageService messageService;
-  private final WSUtils wsUtils;
+  private final WsUtils wsUtils;
   private Map<Integer, HeartbeatDTO> heartbeatMap = new HashMap<>();
   private List<Event> globalEvents = new ArrayList<>();
   private List<Event> modEvents = new ArrayList<>();
@@ -41,7 +41,7 @@ public class LadderCalculator {
   private long lastTimeMeasured = System.nanoTime();
 
   public LadderCalculator(RankerService rankerService, AccountService accountService,
-      WSUtils wsUtils,
+      WsUtils wsUtils,
       MessageService messageService) {
     this.rankerService = rankerService;
     this.accountService = accountService;
@@ -74,25 +74,25 @@ public class LadderCalculator {
         // If someone was an Asshole and the reset worked, should notify all and end calculation
         if (didPressAssholeButton && rankerService.resetAllLadders()) {
           globalEvents.add(new Event(EventType.RESET, 0L));
-          wsUtils.convertAndSendToAll(RankerController.GLOBAL_UPDATE_DESTINATION,
+          wsUtils.convertAndSendToTopic(RankerController.GLOBAL_UPDATE_DESTINATION,
               globalEvents);
           return;
         }
 
         if (!modEvents.isEmpty()) {
-          wsUtils.convertAndSendToAll(RankerController.GLOBAL_UPDATE_DESTINATION,
+          wsUtils.convertAndSendToTopic(RankerController.GLOBAL_UPDATE_DESTINATION,
               modEvents);
         }
 
         if (!globalEvents.isEmpty()) {
-          wsUtils.convertAndSendToAll(RankerController.GLOBAL_UPDATE_DESTINATION,
+          wsUtils.convertAndSendToTopic(RankerController.GLOBAL_UPDATE_DESTINATION,
               globalEvents);
         }
 
         // Otherwise, just send the default Broadcasts
         for (LadderEntity ladder : rankerService.getLadders().values()) {
           heartbeatMap.get(ladder.getNumber()).setSecondsPassed(deltaSec);
-          wsUtils.convertAndSendToAll(
+          wsUtils.convertAndSendToTopic(
               RankerController.LADDER_UPDATE_DESTINATION + ladder.getNumber(),
               heartbeatMap.get(ladder.getNumber()));
         }

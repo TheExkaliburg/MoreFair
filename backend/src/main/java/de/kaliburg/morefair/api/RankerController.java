@@ -3,7 +3,7 @@ package de.kaliburg.morefair.api;
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.account.entity.AccountEntity;
 import de.kaliburg.morefair.account.type.AccountAccessRole;
-import de.kaliburg.morefair.api.utils.WSUtils;
+import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WSMessage;
 import de.kaliburg.morefair.api.websockets.messages.WSObservedMessage;
 import de.kaliburg.morefair.data.ModServerMessageData;
@@ -34,10 +34,10 @@ public class RankerController {
   public static final String GLOBAL_UPDATE_DESTINATION = "/topic/global/";
   private final RankerService rankerService;
   private final AccountService accountService;
-  private final WSUtils wsUtils;
+  private final WsUtils wsUtils;
 
   public RankerController(RankerService rankerService, AccountService accountService,
-      WSUtils wsUtils) {
+      WsUtils wsUtils) {
     this.rankerService = rankerService;
     this.accountService = accountService;
     this.wsUtils = wsUtils;
@@ -121,7 +121,7 @@ public class RankerController {
       ModServerMessageData data = new ModServerMessageData(account.getId(),
           sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
-      wsUtils.convertAndSendToAll(ModerationController.GAME_UPDATE_DESTINATION + num, data);
+      wsUtils.convertAndSendToTopic(ModerationController.GAME_UPDATE_DESTINATION + num, data);
       rankerService.addEvent(num, new Event(EventType.BIAS, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
@@ -145,7 +145,7 @@ public class RankerController {
       ModServerMessageData data = new ModServerMessageData(account.getId(),
           sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
-      wsUtils.convertAndSendToAll(ModerationController.GAME_UPDATE_DESTINATION + num, data);
+      wsUtils.convertAndSendToTopic(ModerationController.GAME_UPDATE_DESTINATION + num, data);
       rankerService.addEvent(num, new Event(EventType.MULTI, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
@@ -169,7 +169,7 @@ public class RankerController {
       ModServerMessageData data = new ModServerMessageData(account.getId(),
           sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
-      wsUtils.convertAndSendToAll(ModerationController.GAME_UPDATE_DESTINATION + num, data);
+      wsUtils.convertAndSendToTopic(ModerationController.GAME_UPDATE_DESTINATION + num, data);
       rankerService.addEvent(num, new Event(EventType.VINEGAR, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
@@ -193,7 +193,7 @@ public class RankerController {
       ModServerMessageData data = new ModServerMessageData(account.getId(),
           sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
-      wsUtils.convertAndSendToAll(ModerationController.GAME_UPDATE_DESTINATION + num, data);
+      wsUtils.convertAndSendToTopic(ModerationController.GAME_UPDATE_DESTINATION + num, data);
       rankerService.addEvent(num, new Event(EventType.PROMOTE, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
@@ -217,7 +217,7 @@ public class RankerController {
       ModServerMessageData data = new ModServerMessageData(account.getId(),
           sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
-      wsUtils.convertAndSendToAll(ModerationController.GAME_UPDATE_DESTINATION + num, data);
+      wsUtils.convertAndSendToTopic(ModerationController.GAME_UPDATE_DESTINATION + num, data);
       rankerService.addEvent(num, new Event(EventType.ASSHOLE, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
@@ -241,7 +241,7 @@ public class RankerController {
       ModServerMessageData data = new ModServerMessageData(account.getId(),
           sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
-      wsUtils.convertAndSendToAll(ModerationController.GAME_UPDATE_DESTINATION + num, data);
+      wsUtils.convertAndSendToTopic(ModerationController.GAME_UPDATE_DESTINATION + num, data);
       rankerService.addEvent(num, new Event(EventType.AUTO_PROMOTE, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());

@@ -1,7 +1,7 @@
 package de.kaliburg.morefair.game.message;
 
 import de.kaliburg.morefair.account.AccountService;
-import de.kaliburg.morefair.api.utils.WSUtils;
+import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.game.ladder.LadderRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ public class MessageService {
   private final AccountService accountService;
 
   public MessageService(MessageRepository messageRepository, LadderRepository ladderRepository,
-      AccountService accountService, WSUtils wsUtils) {
+      AccountService accountService, WsUtils wsUtils) {
     this.messageRepository = messageRepository;
     this.accountService = accountService;
   }

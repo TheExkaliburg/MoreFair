@@ -4,7 +4,7 @@ import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.account.entity.AccountEntity;
 import de.kaliburg.morefair.account.type.AccountAccessRole;
 import de.kaliburg.morefair.api.utils.RequestThrottler;
-import de.kaliburg.morefair.api.utils.WSUtils;
+import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WSEmptyMessage;
 import de.kaliburg.morefair.api.websockets.messages.WSMetaMessage;
 import de.kaliburg.morefair.dto.ChatDTO;
@@ -30,12 +30,12 @@ public class ChatController {
   private final MessageService messageService;
   private final AccountService accountService;
   private final RankerService rankerService;
-  private final WSUtils wsUtils;
+  private final WsUtils wsUtils;
   private final RequestThrottler throttler;
 
   public ChatController(MessageService messageService, AccountService accountService,
       RankerService rankerService,
-      WSUtils wsUtils, RequestThrottler throttler) {
+      WsUtils wsUtils, RequestThrottler throttler) {
     this.messageService = messageService;
     this.accountService = accountService;
     this.rankerService = rankerService;
@@ -112,7 +112,7 @@ public class ChatController {
               account.getUuid()))) {
         MessageEntity answer = messageService.writeMessage(account, number, message,
             metadata);
-        wsUtils.convertAndSendToAll(CHAT_UPDATE_DESTINATION + number,
+        wsUtils.convertAndSendToTopic(CHAT_UPDATE_DESTINATION + number,
             answer.convertToDTO());
       }
     } catch (Exception e) {

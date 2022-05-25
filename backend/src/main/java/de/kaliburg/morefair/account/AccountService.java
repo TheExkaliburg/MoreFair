@@ -4,7 +4,7 @@ import de.kaliburg.morefair.account.entity.AccountEntity;
 import de.kaliburg.morefair.account.events.AccountServiceEvent;
 import de.kaliburg.morefair.account.repository.AccountRepository;
 import de.kaliburg.morefair.account.type.AccountAccessRole;
-import de.kaliburg.morefair.api.websockets.StompPrincipal;
+import de.kaliburg.morefair.api.websockets.UserPrincipal;
 import de.kaliburg.morefair.dto.AccountDetailsDTO;
 import de.kaliburg.morefair.events.Event;
 import java.time.ZonedDateTime;
@@ -37,7 +37,7 @@ public class AccountService {
     this.eventPublisher = eventPublisher;
   }
 
-  public AccountDetailsDTO createNewAccount(StompPrincipal principal) {
+  public AccountDetailsDTO createNewAccount(UserPrincipal principal) {
     AccountEntity result = new AccountEntity(UUID.randomUUID(), "");
     if (principal != null) {
       result.setLastIp(principal.getIpAddress());
@@ -77,7 +77,7 @@ public class AccountService {
     return true;
   }
 
-  public void login(AccountEntity account, StompPrincipal principal) {
+  public void login(AccountEntity account, UserPrincipal principal) {
     // Set Login Date
     account.setLastLogin(ZonedDateTime.now());
     account.setLastIp(principal.getIpAddress());

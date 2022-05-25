@@ -1,7 +1,7 @@
 package de.kaliburg.morefair.api;
 
 import de.kaliburg.morefair.account.AccountService;
-import de.kaliburg.morefair.api.utils.WSUtils;
+import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WSMessage;
 import de.kaliburg.morefair.dto.InfoDTO;
 import java.math.BigInteger;
@@ -55,9 +55,9 @@ public class FairController {
       ));
   public final static String INFO_DESTINATION = "/queue/info";
   private final AccountService accountService;
-  private final WSUtils wsUtils;
+  private final WsUtils wsUtils;
 
-  public FairController(AccountService accountService, WSUtils wsUtils) {
+  public FairController(AccountService accountService, WsUtils wsUtils) {
     this.accountService = accountService;
     this.wsUtils = wsUtils;
   }

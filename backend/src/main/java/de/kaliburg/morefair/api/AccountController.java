@@ -4,8 +4,8 @@ import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.account.entity.AccountEntity;
 import de.kaliburg.morefair.account.type.AccountAccessRole;
 import de.kaliburg.morefair.api.utils.RequestThrottler;
-import de.kaliburg.morefair.api.utils.WSUtils;
-import de.kaliburg.morefair.api.websockets.StompPrincipal;
+import de.kaliburg.morefair.api.utils.WsUtils;
+import de.kaliburg.morefair.api.websockets.UserPrincipal;
 import de.kaliburg.morefair.api.websockets.messages.WSMessage;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.EventType;
@@ -27,10 +27,10 @@ public class AccountController {
   private final AccountService accountService;
   private final RankerService rankerService;
   private final RequestThrottler requestThrottler;
-  private final WSUtils wsUtils;
+  private final WsUtils wsUtils;
 
   public AccountController(AccountService accountService, RankerService rankerService,
-      RequestThrottler requestThrottler, WSUtils wsUtils) {
+      RequestThrottler requestThrottler, WsUtils wsUtils) {
     this.accountService = accountService;
     this.rankerService = rankerService;
     this.requestThrottler = requestThrottler;
@@ -40,7 +40,7 @@ public class AccountController {
   @MessageMapping("/account/login")
   public void login(SimpMessageHeaderAccessor sha, WSMessage wsMessage) throws Exception {
     try {
-      StompPrincipal principal = wsUtils.convertMessageHeaderAccessorToStompPrincipal(sha);
+      UserPrincipal principal = wsUtils.convertMessageHeaderAccessorToUserPrincipal(sha);
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
       if (uuid == null || uuid.isBlank()) {
         if (requestThrottler.canCreateAccount(principal)) {
