@@ -6,6 +6,11 @@ const versioningModule = {
     return {
       versions: [
         new Version("PATCH", "", {
+          improvements: [
+            "ETA to Top is now showing the eta until you could promote instead of the eta to the first place",
+          ],
+        }),
+        new Version("PATCH", "", {
           balancing: [
             "Removing the restriction from floor-grapes for the top ladder.",
           ],

@@ -7,6 +7,9 @@ import Decimal from "break_infinity.js";
  */
 
 const allRankers = computed(() => store.getters["ladder/allRankers"]);
+const pointsRequirement = computed(
+  () => store.state.ladder.stats.pointsNeededForManualPromote
+);
 
 export function eta(ranker) {
   function powerPerSecond(ranker) {
@@ -89,6 +92,34 @@ export function eta(ranker) {
      */
     toFirst: () => {
       return eta(ranker).toRank(1);
+    },
+    /**
+     * @returns {number} - seconds to reach the promotion requirement
+     */
+    toPromotionRequirement: () => {
+      return eta(ranker).toPoints(pointsRequirement.value);
+    },
+    /**
+     * @returns {number} - seconds to reach the point where the ranker is able to promote
+     */
+    toPromote: () => {
+      const etaRequirement = eta(ranker).toPromotionRequirement();
+
+      // We cannot promote yet. The ladder is not full.
+      if (!Number.isFinite(etaRequirement)) {
+        return Number.POSITIVE_INFINITY; // We cannot promote yet. The ladder is not full.
+      }
+
+      // We are already first place. So we only need to reach the promotion limit.
+      if (ranker.rank === 1) {
+        return etaRequirement;
+      }
+
+      // We need to reach the promotion limit and the first place, so we take the max.
+      return Math.max(
+        eta(ranker).toPromotionRequirement(),
+        eta(ranker).toFirst()
+      );
     },
   };
 }

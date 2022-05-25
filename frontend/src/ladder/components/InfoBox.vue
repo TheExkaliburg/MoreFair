@@ -138,7 +138,7 @@
               : "Promote"
           }}
           at
-          {{ numberFormatter.format(stats.pointsNeededForManualPromote) }}
+          {{ numberFormatter.format(pointsForPromote) }}
           Points ({{
             numberFormatter.format(
               yourRanker.points.mul(100).div(stats.pointsNeededForManualPromote)
@@ -162,6 +162,7 @@ import { useStore } from "vuex";
 import { computed, inject, ref } from "vue";
 import { eta } from "../../modules/eta";
 import { secondsToHms } from "../../modules/formatting";
+import Decimal from "break_infinity.js";
 
 const store = useStore();
 const stompClient = inject("$stompClient");
@@ -221,20 +222,19 @@ const etaMulti = computed(() =>
     ? Infinity
     : eta(yourRanker.value).toPower(multiCost.value)
 );
-
 const etaPromote = computed(() => {
-  const etaToPromotionLimit = eta(yourRanker.value).toPoints(
-    stats.value.pointsNeededForManualPromote
-  );
-  const etaToFirstPlace = eta(yourRanker.value).toFirst();
-  if (!Number.isFinite(etaToPromotionLimit)) {
-    return Number.POSITIVE_INFINITY; // We cannot promote yet. The ladder is not full.
-  }
-  if (yourRanker.value.rank === 1) {
-    return etaToPromotionLimit; // We are already first place. So we only need to reach the promotion limit.
-  }
-  return Math.max(etaToPromotionLimit, etaToFirstPlace); // We need to reach the promotion limit and the first place, so we take the max.
+  if (pointsForPromoteIsInfinity.value) return new Decimal(Infinity);
+  return eta(yourRanker).toPromote();
 });
+const pointsForPromote = computed(() => {
+  if (pointsForPromoteIsInfinity.value) return new Decimal(Infinity);
+  return stats.value.pointsNeededForManualPromote;
+});
+const pointsForPromoteIsInfinity = computed(
+  () =>
+    ladder.value.rankers.length <
+    Math.max(settings.value.minimumPeopleForPromote, ladder.value.ladderNumber)
+);
 
 // Functions
 

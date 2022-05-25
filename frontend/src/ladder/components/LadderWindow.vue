@@ -34,7 +34,7 @@
         <tr v-if="showEtaSetting" class="thead-light">
           <th class="col-1 text-start">#</th>
           <th class="col-3 text-start">Username</th>
-          <th class="col-1 text-end">ETA -> Top</th>
+          <th class="col-1 text-end">ETA -> L{{ ladder.ladderNumber + 1 }}</th>
           <th class="col-1 text-end">ETA -> You</th>
           <th class="col-3 text-end">Power</th>
           <th class="col-3 text-end">Points</th>
