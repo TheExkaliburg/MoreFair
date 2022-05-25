@@ -113,7 +113,7 @@ function free() {
 
 .message-username {
   text-align: start;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .message-options {
