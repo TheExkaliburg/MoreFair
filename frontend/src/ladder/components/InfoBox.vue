@@ -224,7 +224,7 @@ const etaMulti = computed(() =>
 );
 const etaPromote = computed(() => {
   if (pointsForPromoteIsInfinity.value) return new Decimal(Infinity);
-  return eta(yourRanker).toPromote();
+  return eta(yourRanker.value).toPromote();
 });
 const pointsForPromote = computed(() => {
   if (pointsForPromoteIsInfinity.value) return new Decimal(Infinity);

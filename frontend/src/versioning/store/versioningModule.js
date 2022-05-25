@@ -9,6 +9,10 @@ const versioningModule = {
           improvements: [
             "ETA to Top is now showing the eta until you could promote instead of the eta to the first place",
           ],
+          fixes: [
+            "Trying to fix that you can scroll the username in the chat-messages.",
+            "Fixing the eta under The auto-promote to always show infinity.",
+          ],
         }),
         new Version("PATCH", "", {
           balancing: [

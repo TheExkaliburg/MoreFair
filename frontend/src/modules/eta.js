@@ -105,11 +105,6 @@ export function eta(ranker) {
     toPromote: () => {
       const etaRequirement = eta(ranker).toPromotionRequirement();
 
-      // We cannot promote yet. The ladder is not full.
-      if (!Number.isFinite(etaRequirement)) {
-        return Number.POSITIVE_INFINITY; // We cannot promote yet. The ladder is not full.
-      }
-
       // We are already first place. So we only need to reach the promotion limit.
       if (ranker.rank === 1) {
         return etaRequirement;
