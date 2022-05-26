@@ -68,7 +68,7 @@
             :style="'animation-delay: ' + rankerEtaPercentage(ranker) + 's'"
             class="text-end etaProgressAnim"
           >
-            {{ secondsToHms(eta(ranker).toFirst()) }}
+            {{ secondsToHms(eta(ranker).toPromote()) }}
           </td>
           <td
             v-if="showEtaSetting"
