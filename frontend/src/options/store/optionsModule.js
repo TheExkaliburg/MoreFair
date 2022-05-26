@@ -35,8 +35,8 @@ const optionsModule = {
     return {
       options: [
         new OptionSection({
-          displayName: "General",
-          name: "general",
+          displayName: "Themes",
+          name: "themes",
           options: [
             new DropdownOption({
               displayName: "Theme",
@@ -136,9 +136,19 @@ const optionsModule = {
               name: "mentionSound",
               value: false,
             }),
+            new BoolOption({
+              displayName: "Play sound on reaching first",
+              name: "reachingFirstSound",
+              value: false,
+            }),
+            new BoolOption({
+              displayName: "Play sound on promote",
+              name: "promoteSound",
+              value: false,
+            }),
             new RangeOption({
-              displayName: "Sound Volume",
-              name: "mentionSoundVolume",
+              displayName: "Notification Volume",
+              name: "notificationVolume",
               value: 50,
               min: 0,
               max: 100,
