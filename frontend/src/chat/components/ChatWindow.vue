@@ -100,22 +100,46 @@ function parseSendMessage() {
   const msgBox = document.getElementById("chatInput");
   const children = msgBox.childNodes;
   let msg = "";
-  let mentions = [];
+  let metadata = [];
   for (let i = 0; i < children.length; i++) {
     if (children[i].nodeType === 3) {
       msg += children[i].nodeValue;
     } else if (children[i].classList.contains("mention")) {
-      mentions.push({
-        u: children[i].getAttribute("data-user"),
-        id: children[i].getAttribute("data-id"),
-        i: msg.length,
-      });
-      msg += `{@}`;
+      let dict = {
+        user: "u",
+        id: "id",
+        group: "g",
+      };
+      let dataAttributeNames = children[i]
+        .getAttributeNames()
+        .filter(
+          (attr) => attr.startsWith("data-") && attr !== "data-replacechar"
+        );
+      let dataAttributes = {};
+      for (let j = 0; j < dataAttributeNames.length; j++) {
+        let key =
+          dict[dataAttributeNames[j].substring("data-".length)] ??
+          dataAttributeNames[j];
+        dataAttributes[key] = children[i].getAttribute(dataAttributeNames[j]);
+      }
+      dataAttributes["i"] = msg.length;
+
+      let replaceChar = children[i].getAttribute("data-replaceChar");
+      if (replaceChar) {
+        replaceChar = `{${replaceChar}}`;
+      } else {
+        replaceChar = children[i].innerText;
+      }
+
+      metadata.push(dataAttributes);
+      msg += replaceChar;
+    } else {
+      msg += children[i].innerText;
     }
   }
   //finally, replace all non-breaking spaces with regular spaces so vue doesn't choke on them
   msg = msg.replace(/\u00a0/g, " ");
-  return [msg, mentions];
+  return [msg, metadata];
 }
 
 onMounted(() => {
@@ -203,6 +227,14 @@ onMounted(() => {
     subtree: true,
   };
   observer.observe(document.getElementById("chatInput"), config);
+
+  document.getElementById("chatInput").addEventListener("paste", function (e) {
+    e.preventDefault();
+    var text = e.clipboardData.getData("text/plain");
+
+    //execCommand is deprecated, but it's the only way to do this and there is literally no other function with the same functionality...
+    document.execCommand("insertHTML", false, text);
+  });
 });
 
 function mentionElementChanged(mutation) {
@@ -278,8 +310,79 @@ function getMentionElement({ name, id }) {
   mention.classList.add("mention");
   mention.setAttribute("data-user", name);
   mention.setAttribute("data-id", id);
+  mention.setAttribute("data-replaceChar", "@");
 
   return mention;
+}
+
+function getGroupMentionElement({ name }) {
+  let mention = document.createElement("span");
+  mention.innerHTML = `$${name}$`;
+  mention.classList.add("mention");
+  mention.setAttribute("data-group", name);
+  mention.setAttribute("data-replaceChar", "$");
+
+  return mention;
+  }
+
+function getUserMentionsFromString(text) {
+  let firstMetion = text.indexOf("@");
+  let possibleMentionLength = 0;
+  let possibleMentions = [];
+
+  while (firstMetion > -1) {
+    text = text.substring(firstMetion + 1);
+    firstMetion = text.indexOf("@");
+
+    //Checking if any rankerName#id is in the text
+    let possibleMentionLower = text.toLowerCase();
+    possibleMentions = [];
+    for (let i = 0; i < rankers.value.length; i++) {
+      if (
+        (rankers.value[i].username + "#" + rankers.value[i].accountId)
+          .toLowerCase()
+          .startsWith(possibleMentionLower) ||
+        ("#" + rankers.value[i].accountId)
+          .toLowerCase()
+          .startsWith(possibleMentionLower)
+      ) {
+        possibleMentions.push({
+          name: rankers.value[i].username,
+          id: rankers.value[i].accountId,
+        });
+      }
+    }
+    possibleMentionLength = possibleMentionLower.length + 1;
+    //If we found any, we can exit this loop
+    if (possibleMentions.length > 0) {
+      break;
+    }
+  }
+
+  return [possibleMentions, possibleMentionLength];
+}
+
+const MentionType = {
+  USER: "USER",
+  GROUP: "GROUP",
+};
+
+function getGroupMentionsFromString(text) {
+  let lastPossibleMention = text.lastIndexOf("$");
+
+  let possibleMention = text.substring(lastPossibleMention + 1);
+  if (possibleMention.indexOf(" ") > -1 || lastPossibleMention == -1) {
+    return [[], 0];
+  }
+
+  return [
+    [
+      {
+        name: possibleMention,
+      },
+    ],
+    text.length,
+  ];
 }
 
 function plainTextElementChanged(mutation) {
@@ -307,37 +410,21 @@ function plainTextElementChanged(mutation) {
   dummySpan.parentNode.removeChild(dummySpan);
 
   //Now that we know where the caret is, we can check if we have a mention in the text before the caret
-  let firstMetion = textBeforeCaret.indexOf("@");
-  let possibleMentionLength = 0;
-  let possibleMentions = [];
-  while (firstMetion > -1) {
-    textBeforeCaret = textBeforeCaret.substring(firstMetion + 1);
-    firstMetion = textBeforeCaret.indexOf("@");
 
-    //Checking if any rankerName#id is in the text
-    let possibleMentionLower = textBeforeCaret.toLowerCase();
-    possibleMentions = [];
-    for (let i = 0; i < rankers.value.length; i++) {
-      if (
-        (rankers.value[i].username + "#" + rankers.value[i].accountId)
-          .toLowerCase()
-          .startsWith(possibleMentionLower) ||
-        ("#" + rankers.value[i].accountId)
-          .toLowerCase()
-          .startsWith(possibleMentionLower)
-      ) {
-        possibleMentions.push({
-          name: rankers.value[i].username,
-          id: rankers.value[i].accountId,
-        });
-      }
-    }
-    possibleMentionLength = possibleMentionLower.length + 1;
-    //If we found any, we can exit this loop
-    if (possibleMentions.length > 0) {
-      break;
-    }
+  let userMentions = getUserMentionsFromString(textBeforeCaret);
+  let groupMentions = getGroupMentionsFromString(textBeforeCaret);
+
+  let possibleMentions = userMentions[0];
+  let possibleMentionLength = userMentions[1];
+  let mentionType = MentionType.USER;
+
+  if (possibleMentions.length === 0) {
+    //We don't have any user mentions, so we check for group mentions
+    possibleMentions = groupMentions[0];
+    possibleMentionLength = groupMentions[1];
+    mentionType = MentionType.GROUP;
   }
+
   window.possibleMention = possibleMentions;
   if (possibleMentions.length === 0) {
     return; //no possible mentions
@@ -347,6 +434,7 @@ function plainTextElementChanged(mutation) {
   let numberMention = textBeforeCaret.toLowerCase().startsWith("#");
 
   //First, sorting the mentions by their name and accountId
+  if (mentionType === MentionType.USER) {
   possibleMentions.sort((a, b) => {
     if (numberMention) {
       //If we are looking for a number, we want a different order to put the numbers lower than the names (and select them easier)
@@ -374,6 +462,7 @@ function plainTextElementChanged(mutation) {
     }
     return 0;
   });
+  }
 
   //Now we can create the dropdown
   let dropdown = document.getElementById("mentionDropdown");
@@ -381,7 +470,12 @@ function plainTextElementChanged(mutation) {
   dropdown.innerHTML = "";
   for (let i = 0; i < possibleMentions.length; i++) {
     let option = document.createElement("option");
+    if (mentionType === MentionType.USER) {
     option.innerHTML = `${possibleMentions[i].name}#${possibleMentions[i].id}`;
+    }
+    if (mentionType === MentionType.GROUP) {
+      option.innerHTML = `$${possibleMentions[i].name}$`;
+    }
 
     option.style.border = "1px solid black";
 
@@ -391,6 +485,9 @@ function plainTextElementChanged(mutation) {
     option.addEventListener("click", function () {
       let msgBox = document.getElementById("chatInput");
       let mention = getMentionElement(possibleMentions[i]);
+      if (mentionType === MentionType.GROUP) {
+        mention = getGroupMentionElement(possibleMentions[i]);
+      }
 
       //split the text node into two
       textBeforeCaret = text.substring(0, caretPosition);

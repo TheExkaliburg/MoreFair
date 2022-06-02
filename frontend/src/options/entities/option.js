@@ -187,6 +187,80 @@ export class ButtonOption extends Option {
   set() {}
 }
 
+export class FileLoaderOption extends Option {
+  constructor({ displayName, name, callback }) {
+    super();
+    this.displayName = displayName;
+    this.name = name;
+    this.callback = callback;
+  }
+
+  get() {
+    return undefined;
+  }
+
+  set() {}
+}
+
+export class EditableStringListOption extends Option {
+  constructor({ displayName, name, callback }) {
+    super();
+    this.displayName = displayName;
+    this.name = name;
+    this.callback = callback;
+    this.items = [];
+  }
+
+  get() {
+    return this.items;
+  }
+
+  get value() {
+    return this.items;
+  }
+
+  set value(val) {
+    this.items = val;
+  }
+
+  set(payload) {
+    let { method: method, value, newValue } = payload;
+    if (method === "add") {
+      this.addItem(value);
+    } else if (method === "remove") {
+      this.removeItem(value);
+    } else if (method === "edit") {
+      this.editItem(value, newValue);
+    } else {
+      if (value) this.items = value;
+    }
+  }
+
+  contains(item) {
+    return this.items.indexOf(item) !== -1;
+  }
+
+  addItem(item) {
+    if (!this.contains(item)) {
+      this.items.push(item);
+    }
+  }
+
+  removeItem(item) {
+    this.items = this.items.filter((i) => i !== item);
+  }
+
+  editItem(item, newItem) {
+    if (this.contains(newItem)) {
+      return;
+    }
+    const index = this.items.indexOf(item);
+    if (index !== -1) {
+      this.items[index] = newItem;
+    }
+  }
+}
+
 export class OptionSection {
   constructor({ displayName, name, options }) {
     this.displayName = displayName;

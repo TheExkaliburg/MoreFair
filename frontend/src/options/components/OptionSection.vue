@@ -4,6 +4,10 @@
     <div v-for="option in props.options.options" :key="option">
       <CheckBox v-if="option instanceof BoolOption" :option="option" />
       <Button v-else-if="option instanceof ButtonOption" :option="option" />
+      <EditableStringList
+        v-else-if="option instanceof EditableStringListOption"
+        :option="option"
+      />
       <StringInput
         v-else-if="option instanceof StringInputOption"
         :option="option"
@@ -28,6 +32,7 @@ import NumberInput from "@/options/components/NumberInput";
 import DropDown from "@/options/components/DropDown";
 import StringInput from "@/options/components/StringInput";
 import Button from "@/options/components/Button";
+import EditableStringList from "./EditableStringList.vue";
 import { defineProps } from "vue";
 import {
   BoolOption,
@@ -36,6 +41,7 @@ import {
   DropdownOption,
   StringInputOption,
   ButtonOption,
+  EditableStringListOption,
 } from "@/options/entities/option";
 
 const props = defineProps({

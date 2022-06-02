@@ -2,6 +2,7 @@ import {
   BoolOption,
   ButtonOption,
   DropdownOption,
+  EditableStringListOption,
   IntegerOption,
   OptionSection,
   RangeOption,
@@ -126,6 +127,13 @@ const optionsModule = {
           displayName: "Chat Settings",
           name: "chatSettings",
           options: [
+            new EditableStringListOption({
+              displayName: "Subscribed mentions",
+              name: "subscribedMentions",
+              callback: (val) => {
+                console.log(val);
+              },
+            }),
             new BoolOption({
               displayName: "Hide chat",
               name: "hideChat",
