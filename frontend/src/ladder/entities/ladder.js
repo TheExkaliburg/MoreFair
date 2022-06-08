@@ -27,7 +27,7 @@ class Ladder {
   }
 
   async asyncCalculateLadder(delta, settings) {
-    const waiter = getWaiter(2);
+    const waiter = getWaiter(10);
 
     let rankers = this.rankers.map((ranker) => {
       return new Ranker(ranker);

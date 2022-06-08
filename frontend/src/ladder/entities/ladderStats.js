@@ -1,20 +1,19 @@
 import { Sounds } from "@/modules/sounds";
 import store from "@/store";
 import Decimal from "break_infinity.js";
-import { computed } from "vue";
+import { computed, markRaw } from "vue";
 
 const gotFirstJingleVolume = computed(() =>
   store.getters["options/getOptionValue"]("notificationVolume")
-);
-const reachingFirstSound = computed(() =>
-  store.getters["options/getOptionValue"]("reachingFirstSound")
 );
 
 class LadderStats {
   constructor() {
     this.growingRankerCount = 1;
     this.pointsNeededForManualPromote = new Decimal(Infinity);
-    this.playerWasFirstLastTick = true; //assume we were first so we dont jingle every time we change the ladder.
+    this.nonReactive = markRaw({
+      playerWasFirstLastTick: true,
+    });
 
     //Since we get instanciated in a store sub module, we need to do a setTimeout to make sure the store is ready.
     //This ensures that the store is fully created and in the next tick we can access the store normally.
@@ -23,29 +22,46 @@ class LadderStats {
     }, 0);
   }
 
-  calculateStats(ladder, settings) {
-    this.calculatePointsNeededForPromote(ladder, settings);
+  async calculateStats(ladder, rankers) {
+    //calculate vinegar decay
+    let vinDecay = 0.9975;
+
+    for (var i = 1; i < rankers.length; i++) {
+      let ranker = rankers[i];
+      if (ranker.timeSinceTop > 60 * 5) {
+        //only reset the vin decay after 5 minutes off the top
+        ranker.estimatedVinegarLeft = 1;
+      }
+      ranker.timeSinceTop += 1;
+    }
+
+    if (rankers[0].growing && !this.pointsNeededForManualPromote.eq(Infinity)) {
+      rankers[0].estimatedVinegarLeft =
+        rankers[0].estimatedVinegarLeft * vinDecay;
+      rankers[0].timeSinceTop = 0;
+    }
+
+    //Now we calc the logic for the "hey you just came first" jingle
+    if (
+      !this.nonReactive.playerWasFirstLastTick &&
+      ladder.yourRanker.you &&
+      ladder.yourRanker.rank === 1
+    ) {
+      this.nonReactive.playerWasFirstLastTick = true;
+      Sounds.play("gotFirstJingle", gotFirstJingleVolume.value);
+    }
+    if (ladder.yourRanker.you && ladder.yourRanker.rank !== 1) {
+      this.nonReactive.playerWasFirstLastTick = false;
+    }
+
+    return rankers;
+  }
+
+  calculatePointsNeededForPromote(ladder, settings) {
     this.growingRankerCount = ladder.rankers.filter(
       (ranker) => ranker.growing
     ).length;
 
-    //Now we calc the logic for the "hey you just came first" jingle
-    if (
-      !this.playerWasFirstLastTick &&
-      ladder.yourRanker.you &&
-      ladder.yourRanker.rank === 1
-    ) {
-      this.playerWasFirstLastTick = true;
-      if (reachingFirstSound.value) {
-        Sounds.play("gotFirstJingle", gotFirstJingleVolume.value);
-      }
-    }
-    if (ladder.yourRanker.you && ladder.yourRanker.rank !== 1) {
-      this.playerWasFirstLastTick = false;
-    }
-  }
-
-  calculatePointsNeededForPromote(ladder, settings) {
     // If not enough Players -> Infinity
     /*
     if (

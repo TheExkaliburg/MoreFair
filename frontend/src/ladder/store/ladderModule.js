@@ -15,10 +15,12 @@ export default {
     },
     calculate(state, { delta, settings }) {
       state.ladder.calculate(delta, settings);
-      state.stats.calculateStats(state.ladder, settings);
     },
     updateRankers(state, { rankers }) {
       state.ladder.rankers = [...rankers];
+    },
+    calculatePointsNeededForPromote(state, { ladder, settings }) {
+      state.stats.calculatePointsNeededForPromote(ladder, settings);
     },
     handleNameChange(state, { event }) {
       state.ladder.changeName(event.accountId, event.data);
@@ -73,6 +75,19 @@ export default {
       );
 
       //then update the state with the new ladder data
+
+      if (rankers) {
+        commit({
+          type: "calculatePointsNeededForPromote",
+          ladder: rootState.ladder.ladder,
+          settings: rootState.settings,
+        });
+        rankers = await rootState.ladder.stats.calculateStats(
+          rootState.ladder.ladder,
+          rankers,
+          rootState.settings
+        );
+      }
 
       if (rankers) {
         commit({
