@@ -17,6 +17,9 @@ export default {
       state.ladder.calculate(delta, settings);
       state.stats.calculateStats(state.ladder, settings);
     },
+    updateRankers(state, { rankers }) {
+      state.ladder.rankers = [...rankers];
+    },
     handleNameChange(state, { event }) {
       state.ladder.changeName(event.accountId, event.data);
     },
@@ -62,11 +65,27 @@ export default {
           stompClient: stompClient,
         })
       );
-      commit({
-        type: "calculate",
-        delta: message.secondsPassed,
-        settings: rootState.settings,
-      });
+
+      //calculate the ladder asynchronously
+      let { rankers } = await rootState.ladder.ladder.asyncCalculateLadder(
+        message.secondsPassed,
+        rootState.settings
+      );
+
+      //then update the state with the new ladder data
+
+      if (rankers) {
+        commit({
+          type: "updateRankers",
+          rankers: rankers,
+        });
+      }
+
+      //commit({
+      //  type: "calculate",
+      //  delta: message.secondsPassed,
+      //  settings: rootState.settings,
+      //});
     },
     async updateGlobal({ dispatch }, { message, stompClient }) {
       if (message) {
