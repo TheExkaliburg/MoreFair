@@ -19,6 +19,7 @@ export default {
     updateRankers(state, { rankers, yourRanker }) {
       state.ladder.rankers = [...rankers];
       state.ladder.yourRanker = yourRanker;
+      state.ladder.firstRanker = rankers[0];
     },
     calculatePointsNeededForPromote(state, { ladder, settings }) {
       state.stats.calculatePointsNeededForPromote(ladder, settings);
