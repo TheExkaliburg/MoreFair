@@ -16,8 +16,9 @@ export default {
     calculate(state, { delta, settings }) {
       state.ladder.calculate(delta, settings);
     },
-    updateRankers(state, { rankers }) {
+    updateRankers(state, { rankers, yourRanker }) {
       state.ladder.rankers = [...rankers];
+      state.ladder.yourRanker = yourRanker;
     },
     calculatePointsNeededForPromote(state, { ladder, settings }) {
       state.stats.calculatePointsNeededForPromote(ladder, settings);
@@ -69,10 +70,11 @@ export default {
       );
 
       //calculate the ladder asynchronously
-      let { rankers } = await rootState.ladder.ladder.asyncCalculateLadder(
-        message.secondsPassed,
-        rootState.settings
-      );
+      let { rankers, yourRanker } =
+        await rootState.ladder.ladder.asyncCalculateLadder(
+          message.secondsPassed,
+          rootState.settings
+        );
 
       //then update the state with the new ladder data
 
@@ -93,6 +95,7 @@ export default {
         commit({
           type: "updateRankers",
           rankers: rankers,
+          yourRanker: yourRanker,
         });
       }
 
