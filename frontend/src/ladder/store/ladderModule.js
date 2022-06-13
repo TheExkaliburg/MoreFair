@@ -13,9 +13,6 @@ export default {
     init(state, { message }) {
       state.ladder = new Ladder(message.content);
     },
-    calculate(state, { delta, settings }) {
-      state.ladder.calculate(delta, settings);
-    },
     updateRankers(state, { rankers, yourRanker }) {
       state.ladder.rankers = [...rankers];
       state.ladder.yourRanker = yourRanker;
@@ -99,12 +96,6 @@ export default {
           yourRanker: yourRanker,
         });
       }
-
-      //commit({
-      //  type: "calculate",
-      //  delta: message.secondsPassed,
-      //  settings: rootState.settings,
-      //});
     },
     async updateGlobal({ dispatch }, { message, stompClient }) {
       if (message) {
