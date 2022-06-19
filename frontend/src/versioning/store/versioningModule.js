@@ -5,6 +5,12 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "Quickfix for the Chat Error", {
+          fixes: [
+            "Shown Symbol is capped at the highest available Symbol",
+            "15 new Symbols (may change at a later date)",
+          ],
+        }),
         new Version("PATCH", "", {
           features: [
             "An old known sound now chimes whenever you promoted.",
