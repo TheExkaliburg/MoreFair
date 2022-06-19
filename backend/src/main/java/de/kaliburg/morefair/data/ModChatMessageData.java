@@ -1,6 +1,5 @@
 package de.kaliburg.morefair.data;
 
-import de.kaliburg.morefair.api.FairController;
 import de.kaliburg.morefair.game.message.MessageEntity;
 import java.time.format.DateTimeFormatter;
 import lombok.Data;
@@ -19,7 +18,9 @@ public class ModChatMessageData {
   public ModChatMessageData(MessageEntity message) {
     this.message = StringEscapeUtils.unescapeJava(message.getMessage());
     this.username = StringEscapeUtils.unescapeJava(message.getAccount().getUsername());
-    this.assholeTag = FairController.ASSHOLE_TAGS.get(message.getAccount().getTimesAsshole());
+    this.assholeTag = de.kaliburg.morefair.FairController.ASSHOLE_TAGS.get(
+        Math.min(message.getAccount().getTimesAsshole(),
+            FairController.ASSHOLE_TAGS.size() - 1));
     this.accountId = message.getAccount().getId();
     this.timeCreated = message.getCreatedOn().format(DateTimeFormatter.ofPattern("EE HH:mm"));
   }

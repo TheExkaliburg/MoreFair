@@ -51,7 +51,22 @@ public class FairController {
           "♛",     // 17♛
           "♕",     // 18♕
           "♚",     // 19♚
-          "♔"      // 20♔
+          "♔",     // 20♔
+          "🂠",
+          "🂡",
+          "🂢",
+          "🂣",
+          "🂣",
+          "🂥",
+          "🂦",
+          "🂧",
+          "🂧",
+          "🂩",
+          "🂪",
+          "🂫",
+          "🂬",
+          "🂭",
+          "🂮"
       ));
   public final static String INFO_DESTINATION = "/queue/info";
   private final AccountService accountService;

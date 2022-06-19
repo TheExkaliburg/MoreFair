@@ -5,6 +5,17 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "", {}),
+        new Version("PATCH", "Fixing Asshole-Badge Limit", {
+          features: [
+            "An old known sound now chimes whenever you promoted.",
+            "Another sound now rings when you reached the top of a ladder",
+          ],
+          fixes: [
+            "Shown Symbol is capped at the highest available Symbol",
+            "Adding 15 new Symbols (may change at a later date)",
+          ],
+        }),
         new Version("PATCH", "", {
           improvements: [
             "ETA to Top is now showing the eta until you could promote instead of the eta to the first place",

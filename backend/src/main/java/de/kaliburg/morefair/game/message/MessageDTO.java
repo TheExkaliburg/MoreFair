@@ -1,6 +1,5 @@
 package de.kaliburg.morefair.game.message;
 
-import de.kaliburg.morefair.api.FairController;
 import java.time.format.DateTimeFormatter;
 import lombok.Data;
 import org.apache.commons.text.StringEscapeUtils;
@@ -17,8 +16,12 @@ public class MessageDTO {
   private final String metadata;
 
   public MessageDTO(MessageEntity message) {
-    this.timesAsshole = message.getAccount().getTimesAsshole();
-    this.assholeTag = FairController.ASSHOLE_TAGS.get(message.getAccount().getTimesAsshole());
+    this.timesAsshole = Math.min(message.getAccount().getTimesAsshole(),
+        de.kaliburg.morefair.FairController.ASSHOLE_TAGS.size() - 1);
+    this.assholeTag =
+        de.kaliburg.morefair.FairController.ASSHOLE_TAGS.get(
+            Math.min(message.getAccount().getTimesAsshole(),
+                FairController.ASSHOLE_TAGS.size() - 1));
     this.message = StringEscapeUtils.unescapeJava(message.getMessage());
     this.username = StringEscapeUtils.unescapeJava(message.getAccount().getUsername());
     this.accountId = message.getAccount().getId();

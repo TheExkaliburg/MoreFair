@@ -1,9 +1,26 @@
+import { Sounds } from "@/modules/sounds";
+import store from "@/store";
 import Decimal from "break_infinity.js";
+import { computed } from "vue";
+
+const gotFirstJingleVolume = computed(() =>
+  store.getters["options/getOptionValue"]("notificationVolume")
+);
+const reachingFirstSound = computed(() =>
+  store.getters["options/getOptionValue"]("reachingFirstSound")
+);
 
 class LadderStats {
   constructor() {
     this.growingRankerCount = 1;
     this.pointsNeededForManualPromote = new Decimal(Infinity);
+    this.playerWasFirstLastTick = true; //assume we were first so we dont jingle every time we change the ladder.
+
+    //Since we get instanciated in a store sub module, we need to do a setTimeout to make sure the store is ready.
+    //This ensures that the store is fully created and in the next tick we can access the store normally.
+    setTimeout(() => {
+      Sounds.register("gotFirstJingle", require("@/assets/gotFirstJingle.wav"));
+    }, 0);
   }
 
   calculateStats(ladder, settings) {
@@ -11,6 +28,21 @@ class LadderStats {
     this.growingRankerCount = ladder.rankers.filter(
       (ranker) => ranker.growing
     ).length;
+
+    //Now we calc the logic for the "hey you just came first" jingle
+    if (
+      !this.playerWasFirstLastTick &&
+      ladder.yourRanker.you &&
+      ladder.yourRanker.rank === 1
+    ) {
+      this.playerWasFirstLastTick = true;
+      if (reachingFirstSound.value) {
+        Sounds.play("gotFirstJingle", gotFirstJingleVolume.value);
+      }
+    }
+    if (ladder.yourRanker.you && ladder.yourRanker.rank !== 1) {
+      this.playerWasFirstLastTick = false;
+    }
   }
 
   calculatePointsNeededForPromote(ladder, settings) {
