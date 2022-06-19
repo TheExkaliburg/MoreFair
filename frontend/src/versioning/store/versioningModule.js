@@ -5,13 +5,7 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
-        new Version("PATCH", "Quickfix for the Chat Error", {
-          fixes: [
-            "Shown Symbol is capped at the highest available Symbol",
-            "15 new Symbols (may change at a later date)",
-          ],
-        }),
-        new Version("PATCH", "", {
+        new Version("PATCH", "Fixing Asshole-Badge Limit", {
           features: [
             "An old known sound now chimes whenever you promoted.",
             "Another sound now rings when you reached the top of a ladder",
@@ -22,6 +16,8 @@ const versioningModule = {
           fixes: [
             "Trying to fix that you can scroll the username in the chat-messages.",
             "Fixing the eta under The auto-promote to always show infinity.",
+            "Shown Symbol is capped at the highest available Symbol",
+            "Adding 15 new Symbols (may change at a later date)",
           ],
         }),
         new Version("PATCH", "", {
