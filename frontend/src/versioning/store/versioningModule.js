@@ -5,6 +5,12 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "Quickfix for the Chat Error", {
+          fixes: [
+            "Shown Symbol is capped at the highest available Symbol",
+            "15 new Symbols (may change at a later date)",
+          ],
+        }),
         new Version("PATCH", "", {
           improvements: [
             "ETA to Top is now showing the eta until you could promote instead of the eta to the first place",
