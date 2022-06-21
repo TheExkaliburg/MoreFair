@@ -5,6 +5,7 @@ import de.kaliburg.morefair.dto.AccountDetailsDTO;
 import de.kaliburg.morefair.game.ranker.RankerEntity;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import javax.persistence.Column;
@@ -70,5 +71,10 @@ public class AccountEntity {
   public boolean hasModPowers() {
     return getAccessRole().equals(AccountAccessRole.MODERATOR) || getAccessRole().equals(
         AccountAccessRole.OWNER);
+  }
+
+  public RankerEntity getHighestActiveRanker() {
+    return rankers.stream().filter(r -> r.isGrowing() && r.getLadder().getRound().isCurrentRound())
+        .max(Comparator.comparingInt(r -> r.getLadder().getNumber())).orElse(null);
   }
 }

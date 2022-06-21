@@ -1,5 +1,7 @@
 package de.kaliburg.morefair.game.round;
 
+import de.kaliburg.morefair.account.entity.AccountEntity;
+import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.game.GameEntity;
 import de.kaliburg.morefair.game.ladder.LadderEntity;
 import de.kaliburg.morefair.game.ladder.LadderService;
@@ -58,5 +60,9 @@ public class RoundService {
    */
   public void loadIntoCache(GameEntity game) {
     ladderService.loadIntoCache(game.getCurrentRound());
+  }
+
+  public void addEvent(AccountEntity account, Event event) {
+    ladderService.addEvent(account.getHighestActiveRanker().getLadder().getNumber(), event);
   }
 }
