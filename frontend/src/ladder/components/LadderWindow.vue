@@ -32,6 +32,7 @@
     >
       <thead>
         <tr v-if="showEtaSetting" class="thead-light">
+          <th class="text-start" style="width: 0px"></th>
           <th class="col-1 text-start">#</th>
           <th class="col-3 text-start">Username</th>
           <th class="col-1 text-end">ETA -> L{{ ladder.ladderNumber + 1 }}</th>
@@ -40,6 +41,7 @@
           <th class="col-3 text-end">Points</th>
         </tr>
         <tr v-else class="thead-light">
+          <th class="text-start" style="width: 0px"></th>
           <th class="col-1 text-start">#</th>
           <th class="col-5 text-start">Username</th>
           <th class="col-3 text-end">Power</th>
@@ -54,6 +56,7 @@
             ranker.you ? 'you' : '',
             ranker.growing || ranker.you ? '' : 'promoted',
           ]"
+          @contextmenu="openModMenu"
         >
           <td class="text-start">
             {{ ranker.rank }}
@@ -89,6 +92,39 @@
           >
             {{ numberFormatter.format(ranker.points) }}
           </td>
+          <ul
+            v-if="
+              store.getters['options/getOptionValue'](
+                'enableChatModFeatures'
+              ) && store.getters.isMod
+            "
+            @focus="focus"
+            @blur="blur"
+            class="dropdown-menu"
+            tabindex="-1"
+            :data-name="ranker.username"
+            :data-id="ranker.accountId"
+          >
+            <span
+              style="
+                color: var(--text-color);
+                padding: 5px;
+                margin: 0px;
+                width: 100%;
+                display: inline-block;
+              "
+              >{{ ranker.username
+              }}<sub style="color: var(--text-dark-highlight-color)"
+                >#{{ ranker.accountId }}</sub
+              ></span
+            >
+            <li>
+              <a class="dropdown-item" href="#" @click="ban">Ban</a>
+              <a class="dropdown-item" href="#" @click="mute">Mute</a>
+              <a class="dropdown-item" href="#" @click="rename">Rename</a>
+              <a class="dropdown-item" href="#" @click="free">Free</a>
+            </li>
+          </ul>
         </tr>
       </tbody>
     </table>
@@ -127,6 +163,76 @@ const shownRankers = computed(() => {
     return rankers.value;
   }
 });
+
+//---- Moderation ----
+
+function blur(event) {
+  let ddMenu = event.target;
+  if (!ddMenu) return;
+  event.preventDefault();
+  if (event.relatedTarget) {
+    setTimeout(() => {
+      ddMenu.focus();
+    }, 0);
+    return;
+  }
+  ddMenu.classList.remove("show");
+}
+
+function openModMenu(event) {
+  let ddMenu =
+    event.target.parentElement.getElementsByClassName("dropdown-menu")[0];
+  if (!ddMenu) return;
+  event.preventDefault();
+  if (!ddMenu.classList.contains("show")) {
+    ddMenu.classList.add("show");
+    ddMenu.focus();
+  } else {
+    ddMenu.classList.remove("show");
+  }
+
+  setTimeout(() => {
+    ddMenu.style.left = event.clientX + "px";
+    ddMenu.style.top = event.clientY + "px";
+  }, 0);
+}
+
+function ban(elem) {
+  let data = elem.target.parentElement.parentElement.dataset;
+  let { name, id } = data;
+  if (confirm(`Are you sure you want to ban "${name}" (#${id})`)) {
+    stompClient.send("/app/mod/ban/" + id);
+  }
+}
+
+function mute(elem) {
+  let data = elem.target.parentElement.parentElement.dataset;
+  let { name, id } = data;
+  if (confirm(`Are you sure you want to mute "${name}" (#${id})`)) {
+    stompClient.send("/app/mod/mute/" + id);
+  }
+}
+
+function rename(elem) {
+  let data = elem.target.parentElement.parentElement.dataset;
+  let { name, id } = data;
+  const newName = prompt(`What would you like to name "${name}" (#${id})`);
+  if (newName) {
+    stompClient.send("/app/mod/name/" + id, {
+      content: newName,
+    });
+  }
+}
+
+function free(elem) {
+  let data = elem.target.parentElement.parentElement.dataset;
+  let { name, id } = data;
+  if (confirm(`Are you sure you want to free "${name}" (#${id})`)) {
+    stompClient.send("/app/mod/free/" + id);
+  }
+}
+
+//----/Moderation ----
 
 // should return the value from fastest (0%) to as long as it takes for the top (50%) to double as long (100%)
 // as a negative, because the animation-delay only sets the start value if the delay is negative, otherwise it's an actual delay
@@ -247,6 +353,17 @@ function changeLadder(event) {
   100% {
     color: var(--eta-worst);
   }
+}
+
+.dropdown-menu {
+  // position it without disturbing the normal flow of the page
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 1px solid var(--secondary-color);
+  border-radius: 0.25rem;
+  padding: 0px;
+  margin: 0px;
 }
 
 .etaProgressAnim {
