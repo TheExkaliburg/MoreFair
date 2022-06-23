@@ -197,25 +197,22 @@ function openModMenu(event) {
   }, 0);
 }
 
-function ban(elem) {
-  let data = elem.target.parentElement.parentElement.dataset;
-  let { name, id } = data;
+function ban(event) {
+  let { name, id } = event.target.parentElement.parentElement.dataset;
   if (confirm(`Are you sure you want to ban "${name}" (#${id})`)) {
     stompClient.send("/app/mod/ban/" + id);
   }
 }
 
-function mute(elem) {
-  let data = elem.target.parentElement.parentElement.dataset;
-  let { name, id } = data;
+function mute(event) {
+  let { name, id } = event.target.parentElement.parentElement.dataset;
   if (confirm(`Are you sure you want to mute "${name}" (#${id})`)) {
     stompClient.send("/app/mod/mute/" + id);
   }
 }
 
-function rename(elem) {
-  let data = elem.target.parentElement.parentElement.dataset;
-  let { name, id } = data;
+function rename(event) {
+  let { name, id } = event.target.parentElement.parentElement.dataset;
   const newName = prompt(`What would you like to name "${name}" (#${id})`);
   if (newName) {
     stompClient.send("/app/mod/name/" + id, {
@@ -224,9 +221,8 @@ function rename(elem) {
   }
 }
 
-function free(elem) {
-  let data = elem.target.parentElement.parentElement.dataset;
-  let { name, id } = data;
+function free(event) {
+  let { name, id } = event.target.parentElement.parentElement.dataset;
   if (confirm(`Are you sure you want to free "${name}" (#${id})`)) {
     stompClient.send("/app/mod/free/" + id);
   }
@@ -364,6 +360,10 @@ function changeLadder(event) {
   border-radius: 0.25rem;
   padding: 0px;
   margin: 0px;
+
+  &:focus {
+    outline: 0;
+  }
 }
 
 .etaProgressAnim {
