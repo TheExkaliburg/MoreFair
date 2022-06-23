@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class ChatDTO {
 
-  private final Long currentChatNumber;
+  private final Integer currentChatNumber;
   private final List<MessageDTO> messages = new ArrayList<>();
 
   public ChatDTO(ChatEntity chat) {

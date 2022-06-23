@@ -50,5 +50,5 @@ public class ChatEntity {
   private List<MessageEntity> messages = new ArrayList<>();
   @NonNull
   @Column(nullable = false)
-  private Long number;
+  private Integer number;
 }

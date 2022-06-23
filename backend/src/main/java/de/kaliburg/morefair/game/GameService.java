@@ -74,8 +74,8 @@ public class GameService {
 
   private GameEntity createGame() {
     GameEntity result = gameRepository.save(new GameEntity());
-    RoundEntity round = roundService.create(1L);
-    ChatEntity chat = chatService.create(1L);
+    RoundEntity round = roundService.create(1);
+    ChatEntity chat = chatService.create(1);
 
     result.setCurrentRound(round);
 

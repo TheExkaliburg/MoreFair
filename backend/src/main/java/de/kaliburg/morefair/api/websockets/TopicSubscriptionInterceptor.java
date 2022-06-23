@@ -4,6 +4,7 @@ import de.kaliburg.morefair.account.AccountAccessRole;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.FairController;
+import de.kaliburg.morefair.game.round.RoundService;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Objects;
@@ -23,9 +24,11 @@ import org.springframework.stereotype.Component;
 public class TopicSubscriptionInterceptor implements ChannelInterceptor {
 
   private final AccountService accountService;
+  private final RoundService roundService;
 
-  public TopicSubscriptionInterceptor(AccountService accountService) {
+  public TopicSubscriptionInterceptor(AccountService accountService, RoundService roundService) {
     this.accountService = accountService;
+    this.roundService = roundService;
   }
 
   @Override
@@ -58,7 +61,7 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
 
     // Give free pass for all moderators and above
     if (topicDestination.contains("/topic/")) {
-      AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));
+      AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account != null) {
         if (account.getAccessRole().equals(AccountAccessRole.OWNER)
             || account.getAccessRole()
@@ -73,7 +76,7 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
     }
 
     if (topicDestination.contains("/topic/chat/")) {
-      AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));
+      AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null) {
         return false;
       }
@@ -85,19 +88,20 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
         return false;
       }
     }
+
     if (topicDestination.contains("/topic/ladder/")) {
-      AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));
+      AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null) {
         return false;
       }
       int ladderDestination = Integer.parseInt(
           topicDestination.substring("/topic/ladder/".length()));
-      if (ladderDestination
-          == FairController.BASE_ASSHOLE_LADDER + accountService.findMaxTimesAsshole()) {
+      if (ladderDestination == FairController.BASE_ASSHOLE_LADDER + roundService.getCurrentRound()
+          .getHighestAssholeCount()) {
         return true;
       }
-      int highestLadder = account.getRankers().stream()
-          .mapToInt(v -> v.getLadder().getNumber()).max().orElse(1);
+      int highestLadder = account.getRankers().stream().mapToInt(v -> v.getLadder().getNumber())
+          .max().orElse(1);
       if (ladderDestination > highestLadder) {
         return false;
       }

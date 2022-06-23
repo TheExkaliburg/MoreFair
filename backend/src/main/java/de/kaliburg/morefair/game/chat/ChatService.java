@@ -26,7 +26,7 @@ public class ChatService {
   private final ChatRepository chatRepository;
   private final MessageService messageService;
   private final WsUtils wsUtils;
-  private Map<Long, ChatEntity> currentChatMap = new HashMap<>();
+  private Map<Integer, ChatEntity> currentChatMap = new HashMap<>();
 
   public ChatService(ChatRepository chatRepository, MessageService messageService,
       WsUtils wsUtils) {
@@ -43,7 +43,7 @@ public class ChatService {
    * @return the newly created and saved Chat
    */
   @Transactional
-  public ChatEntity create(Long number) {
+  public ChatEntity create(Integer number) {
     ChatEntity result = chatRepository.save(new ChatEntity(number));
     currentChatMap.put(result.getNumber(), result);
     return result;
@@ -89,7 +89,7 @@ public class ChatService {
    * @param metadata the metadata of the message
    * @return the message entity
    */
-  public MessageEntity sendMessageToChat(AccountEntity account, Long number,
+  public MessageEntity sendMessageToChat(AccountEntity account, Integer number,
       String message, String metadata) {
     ChatEntity cachedChat = getChat(number);
     MessageEntity result = messageService.create(account, cachedChat, message, metadata);
@@ -128,7 +128,7 @@ public class ChatService {
    * @param number the number the chat has
    * @return the Chat Entity from the cache
    */
-  public ChatEntity getChat(Long number) {
+  public ChatEntity getChat(Integer number) {
     if (currentChatMap.isEmpty()) {
       return null;
     }

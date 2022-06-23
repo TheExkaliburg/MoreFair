@@ -52,6 +52,8 @@ public class AccountController {
       UserPrincipal principal = wsUtils.convertMessageHeaderAccessorToUserPrincipal(sha);
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
 
+      log.trace("/app/{} {}", LOGIN_DESTINATION, uuid);
+
       // Empty UUID
       if (uuid == null || uuid.isBlank()) {
         if (requestThrottler.canCreateAccount(principal)) {
@@ -106,7 +108,7 @@ public class AccountController {
       username = StringEscapeUtils.escapeJava(username);
 
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-      log.debug("/app/account/name {} {}", uuid, username);
+      log.trace("/app/{} {} {}", RENAME_DESTINATION, uuid, username);
 
       AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null || account.getAccessRole()

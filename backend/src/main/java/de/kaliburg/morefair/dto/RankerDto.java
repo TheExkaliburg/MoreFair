@@ -5,7 +5,7 @@ import lombok.Data;
 import org.apache.commons.text.StringEscapeUtils;
 
 @Data
-public class RankerDTO {
+public class RankerDto {
 
   private Long accountId;
   private Integer bias;
@@ -18,7 +18,7 @@ public class RankerDTO {
   private Integer timesAsshole;
   private boolean isGrowing;
 
-  public RankerDTO(RankerEntity ranker) {
+  public RankerDto(RankerEntity ranker) {
     this.accountId = ranker.getAccount().getId();
     this.username = StringEscapeUtils.unescapeJava(ranker.getAccount().getUsername());
     this.rank = ranker.getRank();
@@ -30,7 +30,7 @@ public class RankerDTO {
     this.timesAsshole = ranker.getAccount().getTimesAsshole();
   }
 
-  public RankerDTO() {
+  public RankerDto() {
 
   }
 }

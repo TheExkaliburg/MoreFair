@@ -34,7 +34,7 @@ public class RoundService {
    * @return the newly created and saved RoundEntity with 1 Ladder
    */
   @Transactional
-  public RoundEntity create(Long number) {
+  public RoundEntity create(Integer number) {
     RoundEntity result = roundRepository.save(new RoundEntity(number));
     LadderEntity ladder = ladderService.createLadder(result, 1);
     result.getLadders().add(ladder);
@@ -53,16 +53,16 @@ public class RoundService {
   }
 
   /**
-   * Overwrites the existing cached rounds with the ones from this game.
+   * Overwrites the existing cached rounds with the current one round.
    *
-   * @param game the game that will have its current round cached
+   * @param round the current round
    */
   public void loadIntoCache(RoundEntity round) {
     ladderService.loadIntoCache(round);
   }
 
   /**
-   * Adds and handles a global Event
+   * Adds and handles a global Event.
    *
    * @param event the event to process
    */
@@ -75,5 +75,9 @@ public class RoundService {
             (String) event.getData());
       }
     }
+  }
+
+  public RoundEntity getCurrentRound() {
+    return ladderService.getCurrentRound();
   }
 }

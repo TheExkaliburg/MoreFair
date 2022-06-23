@@ -60,7 +60,7 @@ public class ModerationController {
     try {
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
 
-      AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));
+      AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null || !(account.getAccessRole()
           .equals(AccountAccessRole.MODERATOR) || account.getAccessRole()
           .equals(AccountAccessRole.OWNER))) {

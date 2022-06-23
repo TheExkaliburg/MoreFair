@@ -10,13 +10,13 @@ import lombok.Data;
 @Data
 public class LadderResultsDTO {
 
-  private Map<Integer, List<RankerPrivateDTO>> allLadders = new HashMap<>();
+  private Map<Integer, List<RankerPrivateDto>> allLadders = new HashMap<>();
 
   public LadderResultsDTO(Map<Integer, LadderEntity> ladders) {
     ladders.forEach((integer, ladder) -> {
-      List<RankerPrivateDTO> allRankers = new ArrayList<>();
+      List<RankerPrivateDto> allRankers = new ArrayList<>();
       ladder.getRankers().forEach(ranker -> {
-        RankerPrivateDTO dto = ranker.convertToPrivateDto();
+        RankerPrivateDto dto = ranker.convertToPrivateDto();
         allRankers.add(dto);
       });
 

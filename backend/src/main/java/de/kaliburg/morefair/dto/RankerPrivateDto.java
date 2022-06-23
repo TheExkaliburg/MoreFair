@@ -6,13 +6,13 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class RankerPrivateDTO extends RankerDTO {
+public class RankerPrivateDto extends RankerDto {
 
   private String grapes;
   private String vinegar;
   private boolean autoPromote = false;
 
-  public RankerPrivateDTO(RankerEntity ranker) {
+  public RankerPrivateDto(RankerEntity ranker) {
     super(ranker);
     this.grapes = ranker.getGrapes().toString();
     this.vinegar = ranker.getVinegar().toString();

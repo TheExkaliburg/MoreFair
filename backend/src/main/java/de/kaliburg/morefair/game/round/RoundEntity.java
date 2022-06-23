@@ -42,7 +42,7 @@ public class RoundEntity {
   private UUID uuid = UUID.randomUUID();
   @NonNull
   @Column(nullable = false)
-  private Long number;
+  private Integer number;
   @OneToMany(mappedBy = "round", fetch = FetchType.LAZY)
   private Set<LadderEntity> ladders = new HashSet<>();
 
@@ -56,4 +56,9 @@ public class RoundEntity {
   */
 
   private ZonedDateTime createdOn = ZonedDateTime.now();
+  @NonNull
+  @Column(nullable = false)
+  private Integer highestAssholeCount = 0;
+
+
 }

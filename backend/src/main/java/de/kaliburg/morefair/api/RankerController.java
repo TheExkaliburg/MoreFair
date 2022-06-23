@@ -8,11 +8,14 @@ import de.kaliburg.morefair.api.websockets.messages.WsMessage;
 import de.kaliburg.morefair.api.websockets.messages.WsObservedMessage;
 import de.kaliburg.morefair.data.ModServerMessageData;
 import de.kaliburg.morefair.dto.LadderResultsDTO;
-import de.kaliburg.morefair.dto.LadderViewDTO;
+import de.kaliburg.morefair.dto.LadderViewDto;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.EventType;
+import de.kaliburg.morefair.game.GameService;
+import de.kaliburg.morefair.game.ladder.LadderService;
 import de.kaliburg.morefair.game.ranker.RankerEntity;
 import de.kaliburg.morefair.game.ranker.RankerService;
+import de.kaliburg.morefair.game.round.RoundService;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
@@ -35,12 +38,19 @@ public class RankerController {
   private final RankerService rankerService;
   private final AccountService accountService;
   private final WsUtils wsUtils;
+  private final RoundService roundService;
+  private final LadderService ladderService;
+  private final GameService gameService;
 
   public RankerController(RankerService rankerService, AccountService accountService,
-      WsUtils wsUtils) {
+      WsUtils wsUtils, RoundService roundService, LadderService ladderService,
+      GameService gameService) {
     this.rankerService = rankerService;
     this.accountService = accountService;
     this.wsUtils = wsUtils;
+    this.roundService = roundService;
+    this.ladderService = ladderService;
+    this.gameService = gameService;
   }
 
   @GetMapping(value = "/lastRound", produces = "application/json")
@@ -63,31 +73,30 @@ public class RankerController {
     try {
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
       log.debug("/app/ladder/init/{} from {}", number, uuid);
-      AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));
+      AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null || account.getAccessRole()
           .equals(AccountAccessRole.BANNED_PLAYER)) {
         wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, HttpStatus.FORBIDDEN);
         return;
       }
 
-      RankerEntity ranker = rankerService.findHighestActiveRankerByAccount(account);
+      RankerEntity ranker = rankerService.findHighestActiveRankerOfAccount(account);
+
+      // TODO: be an event
 
       if (ranker == null) {
-        rankerService.getLadderSem().acquire();
+        ladderService.getLadderSem().acquire();
         try {
-          ranker = rankerService.createNewActiveRankerForAccountOnLadder(account, 1);
+          ranker = ladderService.createRanker(account);
         } finally {
-          rankerService.getLadderSem().release();
+          ladderService.getLadderSem().release();
         }
       }
 
-      if (account.getAccessRole().equals(AccountAccessRole.OWNER) || account.getAccessRole()
-          .equals(AccountAccessRole.MODERATOR)
-          || number
-          == FairController.BASE_ASSHOLE_LADDER + accountService.findMaxTimesAsshole()
-          || number <= ranker.getLadder().getNumber()) {
-        LadderViewDTO l = rankerService.findAllRankerByLadderAreaAndAccount(number,
-            account);
+      if (account.isMod()
+          || number == FairController.BASE_ASSHOLE_LADDER + roundService.getCurrentRound()
+          .getHighestAssholeCount() || number <= ranker.getLadder().getNumber()) {
+        LadderViewDto l = new LadderViewDto(ladderService.find(number), account);
         wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, l);
       } else {
         wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION,

@@ -1,9 +1,9 @@
 package de.kaliburg.morefair.api;
 
-import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WsMessage;
 import de.kaliburg.morefair.dto.InfoDTO;
+import de.kaliburg.morefair.game.round.RoundService;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -69,11 +69,11 @@ public class FairController {
           "🂮"
       ));
   public final static String INFO_DESTINATION = "/queue/info";
-  private final AccountService accountService;
+  private final RoundService roundService;
   private final WsUtils wsUtils;
 
-  public FairController(AccountService accountService, WsUtils wsUtils) {
-    this.accountService = accountService;
+  public FairController(RoundService roundService, WsUtils wsUtils) {
+    this.roundService = roundService;
     this.wsUtils = wsUtils;
   }
 
@@ -88,7 +88,7 @@ public class FairController {
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
       log.debug("/app/info {}", uuid);
 
-      Integer maxTimesAssholes = accountService.findMaxTimesAsshole();
+      Integer maxTimesAssholes = roundService.getCurrentRound().getHighestAssholeCount();
       InfoDTO info = new InfoDTO(maxTimesAssholes);
 
       wsUtils.convertAndSendToUser(sha, INFO_DESTINATION, info);

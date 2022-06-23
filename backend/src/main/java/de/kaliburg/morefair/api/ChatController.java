@@ -58,7 +58,7 @@ public class ChatController {
 
   @MessageMapping(CHAT_INIT_DESTINATION + "{number}")
   public void initChat(SimpMessageHeaderAccessor sha, WsEmptyMessage wsMessage,
-      @DestinationVariable("number") Long number) {
+      @DestinationVariable("number") Integer number) {
     try {
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
       log.trace("/app/chat/init/{} from {}", number, uuid);
@@ -91,7 +91,7 @@ public class ChatController {
   }
 
   @MessageMapping("/chat/post/{number}")
-  public void postChat(WsMetaMessage wsMessage, @DestinationVariable("number") Long number) {
+  public void postChat(WsMetaMessage wsMessage, @DestinationVariable("number") Integer number) {
     try {
       String message = wsMessage.getContent();
       String metadata = wsMessage.getMetadata();
