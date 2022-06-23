@@ -5,8 +5,8 @@ import de.kaliburg.morefair.api.RankerController;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.dto.HeartbeatDTO;
 import de.kaliburg.morefair.events.Event;
-import de.kaliburg.morefair.events.EventType;
-import de.kaliburg.morefair.game.message.MessageService;
+import de.kaliburg.morefair.events.types.EventType;
+import de.kaliburg.morefair.game.chat.message.MessageService;
 import de.kaliburg.morefair.game.ranker.RankerEntity;
 import de.kaliburg.morefair.game.ranker.RankerService;
 import java.math.BigInteger;
@@ -136,7 +136,8 @@ public class LadderCalculator {
               accountService.mute(e.getAccountId(), e);
             }
             case NAME_CHANGE -> {
-              accountService.updateUsername(e.getAccountId(), e);
+              accountService.updateUsername(accountService.find(e.getAccountId()),
+                  (String) e.getData());
             }
             case MOD -> {
               accountService.mod(e.getAccountId(), e);
@@ -217,7 +218,8 @@ public class LadderCalculator {
           Event e = globalEvents.get(i);
           switch (e.getEventType()) {
             case NAME_CHANGE -> {
-              accountService.updateUsername(e.getAccountId(), e);
+              accountService.updateUsername(accountService.find(e.getAccountId()),
+                  (String) e.getData());
             }
             case SYSTEM_MESSAGE -> {
               messageService.writeSystemMessage(rankerService.getHighestLadder(),

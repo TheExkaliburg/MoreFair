@@ -1,20 +1,16 @@
 package de.kaliburg.morefair.game.round;
 
-import de.kaliburg.morefair.game.GameEntity;
 import de.kaliburg.morefair.game.ladder.LadderEntity;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -29,8 +25,7 @@ import lombok.experimental.Accessors;
 @Entity
 @Table(name = "round", uniqueConstraints = {
     @UniqueConstraint(name = "uk_uuid", columnNames = "uuid"),
-    @UniqueConstraint(name = "uk_number_game", columnNames = {"number",
-        "game_id"})})
+    @UniqueConstraint(name = "uk_number", columnNames = "number")})
 @Getter
 @Setter
 @Accessors(chain = true)
@@ -38,7 +33,6 @@ import lombok.experimental.Accessors;
 @RequiredArgsConstructor
 @SequenceGenerator(name = "seq_round", sequenceName = "seq_round", allocationSize = 1)
 public class RoundEntity {
-
 
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_round")
@@ -48,16 +42,18 @@ public class RoundEntity {
   private UUID uuid = UUID.randomUUID();
   @NonNull
   @Column(nullable = false)
-  private Integer number;
+  private Long number;
   @OneToMany(mappedBy = "round", fetch = FetchType.LAZY)
-  private List<LadderEntity> ladders = new ArrayList<>();
+  private Set<LadderEntity> ladders = new HashSet<>();
+
+  /* The game doesn't need multiple game instances, so we don't need to differentiate between
+  rounds from a different game
+
   @NonNull
   @ManyToOne
   @JoinColumn(name = "game_id", nullable = false, foreignKey = @ForeignKey(name = "fk_round_game"))
   private GameEntity game;
-  private ZonedDateTime createdOn = ZonedDateTime.now();
+  */
 
-  public boolean isCurrentRound() {
-    return getGame().getCurrentRound().equals(this);
-  }
+  private ZonedDateTime createdOn = ZonedDateTime.now();
 }

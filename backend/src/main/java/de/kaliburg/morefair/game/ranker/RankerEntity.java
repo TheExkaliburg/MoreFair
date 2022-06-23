@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.game.ranker;
 
-import de.kaliburg.morefair.account.entity.AccountEntity;
+import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.dto.RankerDTO;
 import de.kaliburg.morefair.dto.RankerPrivateDTO;
 import de.kaliburg.morefair.game.ladder.LadderEntity;

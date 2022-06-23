@@ -1,17 +1,21 @@
 package de.kaliburg.morefair.api;
 
+import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
-import de.kaliburg.morefair.account.entity.AccountEntity;
-import de.kaliburg.morefair.account.type.AccountAccessRole;
 import de.kaliburg.morefair.api.utils.RequestThrottler;
 import de.kaliburg.morefair.api.utils.WsUtils;
-import de.kaliburg.morefair.api.websockets.messages.WSEmptyMessage;
-import de.kaliburg.morefair.api.websockets.messages.WSMetaMessage;
-import de.kaliburg.morefair.dto.ChatDTO;
-import de.kaliburg.morefair.game.message.MessageEntity;
-import de.kaliburg.morefair.game.message.MessageService;
+import de.kaliburg.morefair.api.websockets.messages.WsEmptyMessage;
+import de.kaliburg.morefair.api.websockets.messages.WsMetaMessage;
+import de.kaliburg.morefair.game.GameService;
+import de.kaliburg.morefair.game.chat.ChatDTO;
+import de.kaliburg.morefair.game.chat.ChatService;
+import de.kaliburg.morefair.game.chat.message.MessageDTO;
+import de.kaliburg.morefair.game.chat.message.MessageEntity;
+import de.kaliburg.morefair.game.chat.message.MessageService;
+import de.kaliburg.morefair.game.ladder.LadderService;
 import de.kaliburg.morefair.game.ranker.RankerEntity;
 import de.kaliburg.morefair.game.ranker.RankerService;
+import de.kaliburg.morefair.game.round.RoundService;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
@@ -25,71 +29,70 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class ChatController {
 
-  public static final String CHAT_DESTINATION = "/queue/chat/";
-  public static final String CHAT_UPDATE_DESTINATION = "/topic/chat/";
+  public static final String CHAT_INIT_DESTINATION = "/chat/init/";
+  public static final String CHAT_UPDATE_DESTINATION = "/chat/updates/";
   private final MessageService messageService;
   private final AccountService accountService;
   private final RankerService rankerService;
   private final WsUtils wsUtils;
   private final RequestThrottler throttler;
+  private final RoundService roundService;
+  private final LadderService ladderService;
+  private final ChatService chatService;
+  private final GameService gameService;
 
   public ChatController(MessageService messageService, AccountService accountService,
       RankerService rankerService,
-      WsUtils wsUtils, RequestThrottler throttler) {
+      WsUtils wsUtils, RequestThrottler throttler, RoundService roundService,
+      LadderService ladderService, ChatService chatService, GameService gameService) {
     this.messageService = messageService;
     this.accountService = accountService;
     this.rankerService = rankerService;
     this.wsUtils = wsUtils;
     this.throttler = throttler;
+    this.roundService = roundService;
+    this.ladderService = ladderService;
+    this.chatService = chatService;
+    this.gameService = gameService;
   }
 
-  @MessageMapping("/chat/init/{number}")
-  public void initChat(SimpMessageHeaderAccessor sha, WSEmptyMessage wsMessage,
-      @DestinationVariable("number") Integer number) {
+  @MessageMapping(CHAT_INIT_DESTINATION + "{number}")
+  public void initChat(SimpMessageHeaderAccessor sha, WsEmptyMessage wsMessage,
+      @DestinationVariable("number") Long number) {
     try {
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-      log.debug("/app/chat/init/{} from {}", number, uuid);
-      AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));
-      if (account == null || account.getAccessRole()
-          .equals(AccountAccessRole.BANNED_PLAYER)) {
-        wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.FORBIDDEN);
+      log.trace("/app/chat/init/{} from {}", number, uuid);
+      AccountEntity account = accountService.find(UUID.fromString(uuid));
+      if (account == null || account.isBanned()) {
+        wsUtils.convertAndSendToUser(sha, CHAT_INIT_DESTINATION, HttpStatus.FORBIDDEN);
         return;
       }
 
-      RankerEntity ranker = rankerService.findHighestActiveRankerByAccount(account);
-
+      RankerEntity ranker = rankerService.findHighestActiveRankerOfAccount(account);
       if (ranker == null) {
-        rankerService.getLadderSem().acquire();
-        try {
-          ranker = rankerService.createNewActiveRankerForAccountOnLadder(account, 1);
-        } finally {
-          rankerService.getLadderSem().release();
-        }
+        wsUtils.convertAndSendToUser(sha, CHAT_INIT_DESTINATION, HttpStatus.FORBIDDEN);
+        return;
       }
 
-      if (account.getAccessRole().equals(AccountAccessRole.OWNER) || account.getAccessRole()
-          .equals(AccountAccessRole.MODERATOR) || number <= ranker.getLadder().getNumber()) {
-        ChatDTO c = messageService.getChat(number);
-        wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, c);
+      if (account.isMod() || number <= ranker.getLadder().getNumber()) {
+        ChatDTO c = new ChatDTO(chatService.getChat(number));
+        wsUtils.convertAndSendToUser(sha, CHAT_INIT_DESTINATION, c);
       } else {
-        wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION,
-            HttpStatus.INTERNAL_SERVER_ERROR);
+        wsUtils.convertAndSendToUser(sha, CHAT_INIT_DESTINATION, HttpStatus.FORBIDDEN);
       }
 
     } catch (IllegalArgumentException e) {
-      wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.BAD_REQUEST);
+      wsUtils.convertAndSendToUser(sha, CHAT_INIT_DESTINATION, HttpStatus.BAD_REQUEST);
     } catch (Exception e) {
-      wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
+      wsUtils.convertAndSendToUser(sha, CHAT_INIT_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
       log.error(e.getMessage());
       e.printStackTrace();
     }
   }
 
   @MessageMapping("/chat/post/{number}")
-  public void postChat(WSMetaMessage wsMessage,
-      @DestinationVariable("number") Integer number) {
+  public void postChat(WsMetaMessage wsMessage, @DestinationVariable("number") Long number) {
     try {
-      String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
       String message = wsMessage.getContent();
       String metadata = wsMessage.getMetadata();
       message = message.trim();
@@ -98,22 +101,16 @@ public class ChatController {
       }
       message = StringEscapeUtils.escapeJava(message);
 
-      AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));
-      if (account == null || account.getAccessRole()
-          .equals(AccountAccessRole.MUTED_PLAYER) || account.getAccessRole()
-          .equals(AccountAccessRole.BANNED_PLAYER)) {
+      String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
+      AccountEntity account = accountService.find(UUID.fromString(uuid));
+      if (account == null || account.isMuted()) {
         return;
       }
-      if (account.getAccessRole().equals(AccountAccessRole.MODERATOR)
-          || account.getAccessRole()
-          .equals(AccountAccessRole.OWNER) || (
-          number <= rankerService.findHighestActiveRankerByAccount(
-              account).getLadder().getNumber() && throttler.canPostMessage(
-              account.getUuid()))) {
-        MessageEntity answer = messageService.writeMessage(account, number, message,
-            metadata);
-        wsUtils.convertAndSendToTopic(CHAT_UPDATE_DESTINATION + number,
-            answer.convertToDTO());
+      RankerEntity ranker = rankerService.findHighestActiveRankerOfAccount(account);
+      if (account.isMod() || (number <= ranker.getLadder().getNumber() && throttler.canPostMessage(
+          account))) {
+        MessageEntity answer = chatService.sendMessageToChat(account, number, message, metadata);
+        wsUtils.convertAndSendToTopic(CHAT_UPDATE_DESTINATION + number, new MessageDTO(answer));
       }
     } catch (Exception e) {
       log.error(e.getMessage());

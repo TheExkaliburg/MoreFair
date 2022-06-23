@@ -37,8 +37,7 @@ public class WsUtils {
    * @param content the content that gets send with the message
    */
   public void convertAndSendToUser(SimpMessageHeaderAccessor sha, String dest, Object content) {
-    simpMessagingTemplate.convertAndSendToUser(sha.getUser().getName(), dest,
-        new WSMessageAnswer<>(content));
+    convertAndSendToUser(sha, dest, content, HttpStatus.OK);
   }
 
   /**
@@ -52,7 +51,16 @@ public class WsUtils {
    */
   public void convertAndSendToUser(SimpMessageHeaderAccessor sha, String dest, Object content,
       HttpStatus status) {
-    simpMessagingTemplate.convertAndSendToUser(sha.getUser().getName(), dest,
+    StringBuilder sb = new StringBuilder("/user/queue");
+    if (!dest.startsWith("/")) {
+      sb.append("/");
+    }
+    sb.append(dest);
+    if (!dest.endsWith("/")) {
+      sb.append("/");
+    }
+
+    simpMessagingTemplate.convertAndSendToUser(sha.getUser().getName(), sb.toString(),
         new WSMessageAnswer<>(content, status));
   }
 
@@ -65,8 +73,7 @@ public class WsUtils {
    * @param status the status of the request this is the answer to, in the format of a HttpRequest
    */
   public void convertAndSendToUser(SimpMessageHeaderAccessor sha, String dest, HttpStatus status) {
-    simpMessagingTemplate.convertAndSendToUser(sha.getUser().getName(), dest,
-        new WSMessageAnswer<>("", status));
+    convertAndSendToUser(sha, dest, "", status);
   }
 
   /**
@@ -79,12 +86,16 @@ public class WsUtils {
    */
   public void convertAndSendToUser(UUID uuid, String dest, Object content) {
     StringBuilder sb =
-        new StringBuilder().append("/private/").append(uuid.toString()).append("/").append(dest);
+        new StringBuilder("/private/").append(uuid.toString());
+    if (!dest.startsWith("/")) {
+      sb.append("/");
+    }
+    sb.append(dest);
     if (!dest.endsWith("/")) {
       sb.append("/");
     }
 
-    simpMessagingTemplate.convertAndSend(dest, content);
+    simpMessagingTemplate.convertAndSend(sb.toString(), content);
   }
 
   /**
@@ -94,12 +105,16 @@ public class WsUtils {
    * @param content the content that gets send with the message
    */
   public void convertAndSendToTopic(String dest, Object content) {
-    StringBuilder sb = new StringBuilder().append("/topic/").append(dest);
+    StringBuilder sb = new StringBuilder("/topic");
+    if (!dest.startsWith("/")) {
+      sb.append("/");
+    }
+    sb.append(dest);
     if (!dest.endsWith("/")) {
       sb.append("/");
     }
 
-    simpMessagingTemplate.convertAndSend(dest, content);
+    simpMessagingTemplate.convertAndSend(sb.toString(), content);
   }
 
   /**

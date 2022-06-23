@@ -8,13 +8,13 @@ import lombok.NonNull;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class WSEmptyObservedMessage extends WSEmptyMessage {
+public class WsMetaMessage extends WsMessage {
 
   @NonNull
-  private String event;
+  private String metadata;
 
-  public WSEmptyObservedMessage(@NonNull String uuid, @NonNull String event) {
-    super(uuid);
-    this.event = event;
+  public WsMetaMessage(@NonNull String uuid, @NonNull String content, @NonNull String metadata) {
+    super(uuid, content);
+    this.metadata = metadata;
   }
 }

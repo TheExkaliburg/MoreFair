@@ -2,6 +2,7 @@ package de.kaliburg.morefair.api.utils;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.api.websockets.UserPrincipal;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -37,6 +38,10 @@ public class RequestThrottler {
     }
     hasCreatedAccountRecently.put(ipAddress, true);
     return true;
+  }
+
+  public boolean canPostMessage(AccountEntity account) {
+    return canPostMessage(account.getUuid());
   }
 
   public boolean canPostMessage(UUID uuid) {

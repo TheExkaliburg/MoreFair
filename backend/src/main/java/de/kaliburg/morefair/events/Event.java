@@ -1,5 +1,6 @@
 package de.kaliburg.morefair.events;
 
+import de.kaliburg.morefair.events.types.EventType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
@@ -15,5 +16,4 @@ public class Event {
   @NonNull
   private Long accountId;
   private Object data;
-
 }

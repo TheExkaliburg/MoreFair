@@ -2,7 +2,7 @@ package de.kaliburg.morefair.api;
 
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.utils.WsUtils;
-import de.kaliburg.morefair.api.websockets.messages.WSMessage;
+import de.kaliburg.morefair.api.websockets.messages.WsMessage;
 import de.kaliburg.morefair.dto.InfoDTO;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -83,7 +83,7 @@ public class FairController {
   }
 
   @MessageMapping("/info")
-  public void login(SimpMessageHeaderAccessor sha, WSMessage wsMessage) throws Exception {
+  public void login(SimpMessageHeaderAccessor sha, WsMessage wsMessage) throws Exception {
     try {
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
       log.debug("/app/info {}", uuid);

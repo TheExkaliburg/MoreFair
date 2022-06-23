@@ -1,8 +1,8 @@
 package de.kaliburg.morefair.api.websockets;
 
+import de.kaliburg.morefair.account.AccountAccessRole;
+import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
-import de.kaliburg.morefair.account.entity.AccountEntity;
-import de.kaliburg.morefair.account.type.AccountAccessRole;
 import de.kaliburg.morefair.api.FairController;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;

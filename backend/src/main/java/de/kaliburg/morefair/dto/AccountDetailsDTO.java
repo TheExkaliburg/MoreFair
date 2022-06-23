@@ -1,7 +1,7 @@
 package de.kaliburg.morefair.dto;
 
-import de.kaliburg.morefair.account.entity.AccountEntity;
-import de.kaliburg.morefair.account.type.AccountAccessRole;
+import de.kaliburg.morefair.account.AccountAccessRole;
+import de.kaliburg.morefair.account.AccountEntity;
 import java.util.UUID;
 import lombok.Data;
 import lombok.NoArgsConstructor;

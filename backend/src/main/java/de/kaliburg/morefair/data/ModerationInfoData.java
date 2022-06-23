@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.data;
 
-import de.kaliburg.morefair.account.type.AccountAccessRole;
+import de.kaliburg.morefair.account.AccountAccessRole;
 import lombok.Data;
 import lombok.NonNull;
 

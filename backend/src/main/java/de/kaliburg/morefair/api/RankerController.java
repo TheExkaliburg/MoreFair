@@ -1,16 +1,16 @@
 package de.kaliburg.morefair.api;
 
+import de.kaliburg.morefair.account.AccountAccessRole;
+import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
-import de.kaliburg.morefair.account.entity.AccountEntity;
-import de.kaliburg.morefair.account.type.AccountAccessRole;
 import de.kaliburg.morefair.api.utils.WsUtils;
-import de.kaliburg.morefair.api.websockets.messages.WSMessage;
-import de.kaliburg.morefair.api.websockets.messages.WSObservedMessage;
+import de.kaliburg.morefair.api.websockets.messages.WsMessage;
+import de.kaliburg.morefair.api.websockets.messages.WsObservedMessage;
 import de.kaliburg.morefair.data.ModServerMessageData;
 import de.kaliburg.morefair.dto.LadderResultsDTO;
 import de.kaliburg.morefair.dto.LadderViewDTO;
 import de.kaliburg.morefair.events.Event;
-import de.kaliburg.morefair.events.EventType;
+import de.kaliburg.morefair.events.types.EventType;
 import de.kaliburg.morefair.game.ranker.RankerEntity;
 import de.kaliburg.morefair.game.ranker.RankerService;
 import java.util.UUID;
@@ -58,7 +58,7 @@ public class RankerController {
   }
 
   @MessageMapping("/ladder/init/{number}")
-  public void initLadder(SimpMessageHeaderAccessor sha, WSMessage wsMessage,
+  public void initLadder(SimpMessageHeaderAccessor sha, WsMessage wsMessage,
       @DestinationVariable("number") Integer number) {
     try {
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
@@ -106,7 +106,7 @@ public class RankerController {
   }
 
   @MessageMapping("/ladder/post/bias")
-  public void buyBias(SimpMessageHeaderAccessor sha, WSObservedMessage wsMessage) {
+  public void buyBias(SimpMessageHeaderAccessor sha, WsObservedMessage wsMessage) {
     try {
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
       AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));
@@ -130,7 +130,7 @@ public class RankerController {
   }
 
   @MessageMapping("/ladder/post/multi")
-  public void buyMulti(SimpMessageHeaderAccessor sha, WSObservedMessage wsMessage) {
+  public void buyMulti(SimpMessageHeaderAccessor sha, WsObservedMessage wsMessage) {
     try {
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
       AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));
@@ -154,7 +154,7 @@ public class RankerController {
   }
 
   @MessageMapping("/ladder/post/vinegar")
-  public void throwVinegar(SimpMessageHeaderAccessor sha, WSObservedMessage wsMessage) {
+  public void throwVinegar(SimpMessageHeaderAccessor sha, WsObservedMessage wsMessage) {
     try {
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
       AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));
@@ -178,7 +178,7 @@ public class RankerController {
   }
 
   @MessageMapping("/ladder/post/promote")
-  public void promote(SimpMessageHeaderAccessor sha, WSObservedMessage wsMessage) {
+  public void promote(SimpMessageHeaderAccessor sha, WsObservedMessage wsMessage) {
     try {
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
       AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));
@@ -202,7 +202,7 @@ public class RankerController {
   }
 
   @MessageMapping("/ladder/post/asshole")
-  public void beAsshole(SimpMessageHeaderAccessor sha, WSObservedMessage wsMessage) {
+  public void beAsshole(SimpMessageHeaderAccessor sha, WsObservedMessage wsMessage) {
     try {
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
       AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));
@@ -226,7 +226,7 @@ public class RankerController {
   }
 
   @MessageMapping("/ladder/post/auto-promote")
-  public void buyAutoPromote(SimpMessageHeaderAccessor sha, WSObservedMessage wsMessage) {
+  public void buyAutoPromote(SimpMessageHeaderAccessor sha, WsObservedMessage wsMessage) {
     try {
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
       AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));

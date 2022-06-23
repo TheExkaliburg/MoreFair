@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.dto;
 
-import de.kaliburg.morefair.account.entity.AccountEntity;
+import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.game.ladder.LadderEntity;
 import de.kaliburg.morefair.game.ranker.RankerEntity;
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.data;
 
-import de.kaliburg.morefair.game.message.MessageEntity;
+import de.kaliburg.morefair.game.chat.message.MessageEntity;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;

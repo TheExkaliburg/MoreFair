@@ -1,0 +1,61 @@
+account:
+  - id: 1
+    uuid: ecc70b72-5d20-4199-b600-af82eaa78765
+    username: Mystery Guest 1
+    isAsshole: false
+    timesAsshole: 0
+    lastLogin: null
+    accessRole: OWNER
+  - id: 2
+    uuid: f392a1b9-1bbd-4e17-af19-58b0d8d307e5
+    username: Mystery Guest 2
+    isAsshole: false
+    timesAsshole: 0
+    lastLogin: null
+    accessRole: MODERATOR
+  - id: 3
+    uuid: 9698e009-3785-465b-bb7a-aa1dea7ee8dc
+    username: Mystery Guest 3
+    isAsshole: false
+    timesAsshole: 0
+    lastLogin: null
+    accessRole: PLAYER
+
+game:
+  - id: 1
+    uuid: ce0415f3-9e5b-4142-94d6-8bb7b65c9a4a
+    currentRound: 1
+
+round:
+  - id: 1
+    uuid: 03888f2d-65d2-4fc4-8c68-ca7e84be3987
+    number: 1
+    game: 1
+    createdOn: null
+
+ladder:
+  - id: 1
+    uuid: 31c55055-6ec2-41bf-8038-a32fd2c0ce52
+    number: 1
+    round: 1
+
+ranker:
+  - id: 1
+    uuid: 0f6b4c82-38ae-4a3a-8879-bfc9b0f759de
+    points: 100
+    power: 10
+    bias: 1
+    multiplier: 1
+    isGrowing: true
+    ladder: 1
+    account: 1
+    rank: 1
+    grapes: 0
+    vinegar: 0
+    autoPromote: false
+
+chat:
+  - id: 1
+    uuid: 493a2b3c-6469-4745-8389-a4f3159a7380
+    game: 1
+    number: 1

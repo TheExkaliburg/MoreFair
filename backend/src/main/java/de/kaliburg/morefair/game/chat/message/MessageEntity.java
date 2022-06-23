@@ -1,6 +1,6 @@
-package de.kaliburg.morefair.game.message;
+package de.kaliburg.morefair.game.chat.message;
 
-import de.kaliburg.morefair.account.entity.AccountEntity;
+import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.game.chat.ChatEntity;
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -37,7 +37,7 @@ public class MessageEntity {
   private Long id;
   @NonNull
   @Column(nullable = false)
-  private UUID uuid;
+  private UUID uuid = UUID.randomUUID();
   @NonNull
   @ManyToOne
   @JoinColumn(name = "account_id", nullable = false, foreignKey = @ForeignKey(name = "fk_message_account"))
@@ -54,8 +54,4 @@ public class MessageEntity {
   @NonNull
   @Column(nullable = false)
   private ZonedDateTime createdOn = ZonedDateTime.now();
-
-  public MessageDTO convertToDTO() {
-    return new MessageDTO(this);
-  }
 }

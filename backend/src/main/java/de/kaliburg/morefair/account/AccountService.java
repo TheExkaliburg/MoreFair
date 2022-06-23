@@ -1,35 +1,23 @@
 package de.kaliburg.morefair.account;
 
-import de.kaliburg.morefair.account.entity.AccountEntity;
-import de.kaliburg.morefair.account.events.AccountServiceEvent;
-import de.kaliburg.morefair.account.repository.AccountRepository;
-import de.kaliburg.morefair.account.type.AccountAccessRole;
 import de.kaliburg.morefair.api.websockets.UserPrincipal;
-import de.kaliburg.morefair.dto.AccountDetailsDTO;
-import de.kaliburg.morefair.events.Event;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Semaphore;
-import lombok.Getter;
+import javax.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * This Service handles all the accounts.
+ */
 @Service
 @Log4j2
 public class AccountService {
 
   private final AccountRepository accountRepository;
   private final ApplicationEventPublisher eventPublisher;
-  @Getter
-  private List<Event> modEventList = new ArrayList<>();
-  @Getter
-  private Semaphore modEventSem = new Semaphore(1);
 
   public AccountService(AccountRepository accountRepository,
       ApplicationEventPublisher eventPublisher) {
@@ -37,139 +25,60 @@ public class AccountService {
     this.eventPublisher = eventPublisher;
   }
 
-  public AccountDetailsDTO createNewAccount(UserPrincipal principal) {
-    AccountEntity result = new AccountEntity(UUID.randomUUID(), "");
+  /**
+   * Creates and saves a new account.
+   *
+   * @return the account
+   */
+  @Transactional
+  public AccountEntity create(UserPrincipal principal) {
+    AccountEntity result = new AccountEntity();
+
     if (principal != null) {
       result.setLastIp(principal.getIpAddress());
     }
-    result = saveAccount(result);
-    result.setUsername("Mystery Guest #" + result.getId());
-    result = saveAccount(result);
-
-    eventPublisher.publishEvent(
-        new AccountServiceEvent(this, result,
-            AccountServiceEvent.AccountServiceEventType.CREATE));
-
-    result = accountRepository.findByUuid(result.getUuid());
-    log.info("Created Mystery Guest #{}.", result.getId());
-    return result.convertToDTO();
-  }
-
-  @Transactional
-  public AccountEntity saveAccount(AccountEntity account) {
-    AccountEntity result = accountRepository.save(account);
-    eventPublisher.publishEvent(
-        new AccountServiceEvent(this, result,
-            AccountServiceEvent.AccountServiceEventType.UPDATE));
+    result = save(result);
+    log.info("Created Mystery Guest (#{})", result.getId());
     return result;
   }
 
-  public AccountEntity findAccountByUUID(UUID uuid) {
-    return accountRepository.findByUuid(uuid);
+  @Transactional
+  AccountEntity save(AccountEntity account) {
+    return accountRepository.save(account);
   }
 
-  public boolean updateUsername(Long accountId, Event event) {
-    AccountEntity account = findAccountById(accountId);
-    String newUsername = (String) event.getData();
-    account.setUsername(newUsername);
-    account = saveAccount(account);
-    event.setData(StringEscapeUtils.unescapeJava(newUsername));
-    return true;
-  }
-
-  public void login(AccountEntity account, UserPrincipal principal) {
-    // Set Login Date
+  /**
+   * Tracks the last login of an account and saves the corresponding data.
+   *
+   * @param account   the account
+   * @param principal the principal that contains the ip-address
+   * @return the updated account
+   */
+  public AccountEntity login(AccountEntity account, UserPrincipal principal) {
     account.setLastLogin(ZonedDateTime.now());
     account.setLastIp(principal.getIpAddress());
-    saveAccount(account);
+    return save(account);
   }
 
-  public Integer findMaxTimesAsshole() {
-    Integer result = accountRepository.findMaxTimesAsshole();
-    return (result != null) ? result : 0;
+  public AccountEntity find(Long id) {
+    return accountRepository.findById(id).orElseThrow();
   }
 
-  public AccountEntity findAccountById(Long accountId) {
-    return accountRepository.findById(accountId).get();
+  public AccountEntity find(UUID uuid) {
+    return accountRepository.findByUuid(uuid).orElseThrow();
   }
 
-  public Set<AccountEntity> findAllAccountsJoinedWithRankers() {
-    return accountRepository.findAllAccountsJoinedWithRankers();
+  public AccountEntity find(AccountEntity account) {
+    return find(account.getId());
   }
 
-  public AccountEntity findOwnerAccount() {
-    List<AccountEntity> accounts = accountRepository.findAllAccountsByAccessRole(
-        AccountAccessRole.OWNER);
-    if (accounts.size() == 1) {
-      return accounts.get(0);
-    } else {
-      log.error("Single OWNER account access roles not found.");
-      throw new RuntimeException(
-          "Single OWNER account not found, found " + accounts.size() + " owner accounts.");
-    }
-  }
-
-  public AccountEntity findByUuid(UUID uuid) {
-    return accountRepository.findByUuid(uuid);
-  }
-
-  public void addModEvent(Event event) {
-    try {
-      modEventSem.acquire();
-      try {
-        modEventList.add(event);
-      } finally {
-        modEventSem.release();
-      }
-    } catch (InterruptedException e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
-    }
-  }
-
-  public void ban(long accountId, Event e) {
-    AccountEntity account = findAccountById(accountId);
-    if (account != null && !account.getAccessRole().equals(AccountAccessRole.OWNER)) {
-      account.setAccessRole(AccountAccessRole.BANNED_PLAYER);
-      account = saveAccount(account);
-      eventPublisher.publishEvent(
-          new AccountServiceEvent(e, account,
-              AccountServiceEvent.AccountServiceEventType.BAN));
-    }
-  }
-
-  public void mute(long accountId, Event e) {
-    AccountEntity account = findAccountById(accountId);
-    if (account != null && !account.getAccessRole().equals(AccountAccessRole.OWNER)) {
-      account.setAccessRole(AccountAccessRole.MUTED_PLAYER);
-      account = saveAccount(account);
-      eventPublisher.publishEvent(
-          new AccountServiceEvent(e, account,
-              AccountServiceEvent.AccountServiceEventType.MUTE));
-    }
-  }
-
-  public void free(long accountId, Event e) {
-    AccountEntity account = findAccountById(accountId);
-    if (account != null && !account.getAccessRole().equals(AccountAccessRole.OWNER)) {
-      account.setAccessRole(AccountAccessRole.PLAYER);
-      saveAccount(account);
-    }
-  }
-
-  public void resetEvents() {
-    modEventList.clear();
-  }
-
-  public void mod(Long accountId, Event e) {
-    AccountEntity account = findAccountById(accountId);
-    if (account != null && !account.getAccessRole().equals(AccountAccessRole.OWNER)) {
-      account.setAccessRole(AccountAccessRole.MODERATOR);
-      saveAccount(account);
-    }
-  }
-
-  public List<AccountEntity> findUsername(String username) {
+  public List<AccountEntity> findByUsername(String username) {
     return accountRepository.findAccountsByUsernameIsContaining(username);
+  }
+
+
+  public AccountEntity updateUsername(AccountEntity account, String username) {
+    account.setUsername(username);
+    return save(account);
   }
 }

@@ -1,7 +1,6 @@
 package de.kaliburg.morefair.game.ladder;
 
 import de.kaliburg.morefair.api.FairController;
-import de.kaliburg.morefair.dto.ChatDTO;
 import de.kaliburg.morefair.game.ranker.RankerEntity;
 import de.kaliburg.morefair.game.round.RoundEntity;
 import java.math.BigInteger;
@@ -56,10 +55,6 @@ public final class LadderEntity {
   private RoundEntity round;
   @OneToMany(mappedBy = "ladder", fetch = FetchType.LAZY)
   private List<RankerEntity> rankers = new ArrayList<>();
-
-  public ChatDTO convertToChatDTO() {
-    return new ChatDTO(this);
-  }
 
   public Integer getRequiredRankerCountToUnlock() {
     return Math.max(FairController.MINIMUM_PEOPLE_FOR_PROMOTE, getNumber());

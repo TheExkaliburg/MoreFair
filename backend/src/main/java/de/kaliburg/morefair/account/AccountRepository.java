@@ -1,8 +1,7 @@
-package de.kaliburg.morefair.account.repository;
+package de.kaliburg.morefair.account;
 
-import de.kaliburg.morefair.account.entity.AccountEntity;
-import de.kaliburg.morefair.account.type.AccountAccessRole;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import lombok.NonNull;
@@ -15,8 +14,7 @@ import org.springframework.stereotype.Repository;
 public interface AccountRepository extends JpaRepository<AccountEntity, Long> {
 
   @Query("SELECT a FROM AccountEntity a LEFT JOIN FETCH a.rankers WHERE a.uuid = :uuid")
-  AccountEntity findByUuid(
-      @Param("uuid") UUID uuid);
+  Optional<AccountEntity> findByUuid(@Param("uuid") UUID uuid);
 
   @Query("SELECT MAX(a.timesAsshole) FROM AccountEntity a")
   Integer findMaxTimesAsshole();

@@ -6,12 +6,12 @@ import lombok.NonNull;
 
 @Data
 @NoArgsConstructor
-public class WSEmptyMessage {
+public class WsEmptyMessage {
 
   @NonNull
   private String uuid;
 
-  public WSEmptyMessage(@NonNull String uuid) {
+  public WsEmptyMessage(@NonNull String uuid) {
     this.uuid = uuid;
   }
 }

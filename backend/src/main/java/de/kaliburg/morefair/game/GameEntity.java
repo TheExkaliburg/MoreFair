@@ -1,20 +1,15 @@
 package de.kaliburg.morefair.game;
 
-import de.kaliburg.morefair.game.chat.ChatEntity;
 import de.kaliburg.morefair.game.round.RoundEntity;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -42,11 +37,8 @@ public class GameEntity {
   @NonNull
   @Column(nullable = false)
   private UUID uuid = UUID.randomUUID();
-  @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
-  private List<RoundEntity> rounds = new ArrayList<>();
   @ManyToOne
   @JoinColumn(name = "current_round_id", foreignKey = @ForeignKey(name = "fk_game_round"))
   private RoundEntity currentRound;
-  @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
-  private List<ChatEntity> chats = new ArrayList<>();
+
 }

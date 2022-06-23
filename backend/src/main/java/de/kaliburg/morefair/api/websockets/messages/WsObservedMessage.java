@@ -8,12 +8,12 @@ import lombok.NonNull;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class WSObservedMessage extends WSMessage {
+public class WsObservedMessage extends WsMessage {
 
   @NonNull
   private String event;
 
-  public WSObservedMessage(@NonNull String uuid, @NonNull String content, @NonNull String event) {
+  public WsObservedMessage(@NonNull String uuid, @NonNull String content, @NonNull String event) {
     super(uuid, content);
     this.event = event;
   }

@@ -1,7 +1,6 @@
-package de.kaliburg.morefair.dto;
+package de.kaliburg.morefair.game.chat;
 
-import de.kaliburg.morefair.game.ladder.LadderEntity;
-import de.kaliburg.morefair.game.message.MessageDTO;
+import de.kaliburg.morefair.game.chat.message.MessageDTO;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
@@ -9,11 +8,11 @@ import lombok.Data;
 @Data
 public class ChatDTO {
 
-  private final Integer currentChatNumber;
+  private final Long currentChatNumber;
   private final List<MessageDTO> messages = new ArrayList<>();
 
-  public ChatDTO(LadderEntity ladder) {
-    currentChatNumber = ladder.getNumber();
+  public ChatDTO(ChatEntity chat) {
+    currentChatNumber = chat.getNumber();
     /*
     List<MessageEntity> sortedMessages = ladder.getMessages();
     sortedMessages.sort((o1, o2) -> o2.getCreatedOn().compareTo(o1.getCreatedOn()));

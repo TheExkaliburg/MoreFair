@@ -1,16 +1,16 @@
 package de.kaliburg.morefair.api;
 
+import de.kaliburg.morefair.account.AccountAccessRole;
+import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
-import de.kaliburg.morefair.account.entity.AccountEntity;
-import de.kaliburg.morefair.account.type.AccountAccessRole;
 import de.kaliburg.morefair.api.utils.WsUtils;
-import de.kaliburg.morefair.api.websockets.messages.WSMessage;
+import de.kaliburg.morefair.api.websockets.messages.WsMessage;
 import de.kaliburg.morefair.data.ModChatData;
 import de.kaliburg.morefair.data.ModerationInfoData;
 import de.kaliburg.morefair.events.Event;
-import de.kaliburg.morefair.events.EventType;
-import de.kaliburg.morefair.game.message.MessageEntity;
-import de.kaliburg.morefair.game.message.MessageService;
+import de.kaliburg.morefair.events.types.EventType;
+import de.kaliburg.morefair.game.chat.message.MessageEntity;
+import de.kaliburg.morefair.game.chat.message.MessageService;
 import de.kaliburg.morefair.game.ranker.RankerService;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +56,7 @@ public class ModerationController {
   }
 
   @MessageMapping(INFO_REQUEST)
-  public void info(SimpMessageHeaderAccessor sha, WSMessage wsMessage) throws Exception {
+  public void info(SimpMessageHeaderAccessor sha, WsMessage wsMessage) throws Exception {
     try {
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
 
@@ -81,7 +81,7 @@ public class ModerationController {
   }
 
   @MessageMapping("/mod/chat")
-  public void chat(SimpMessageHeaderAccessor sha, WSMessage wsMessage) throws Exception {
+  public void chat(SimpMessageHeaderAccessor sha, WsMessage wsMessage) throws Exception {
     try {
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
 
@@ -104,7 +104,7 @@ public class ModerationController {
   }
 
   @MessageMapping("/mod/ban/{id}")
-  public void ban(SimpMessageHeaderAccessor sha, WSMessage wsMessage,
+  public void ban(SimpMessageHeaderAccessor sha, WsMessage wsMessage,
       @DestinationVariable("id") Long id)
       throws Exception {
     try {
@@ -130,7 +130,7 @@ public class ModerationController {
   }
 
   @MessageMapping("/mod/mute/{id}")
-  public void mute(SimpMessageHeaderAccessor sha, WSMessage wsMessage,
+  public void mute(SimpMessageHeaderAccessor sha, WsMessage wsMessage,
       @DestinationVariable("id") Long id)
       throws Exception {
     try {
@@ -155,7 +155,7 @@ public class ModerationController {
   }
 
   @MessageMapping("/mod/free/{id}")
-  public void free(SimpMessageHeaderAccessor sha, WSMessage wsMessage,
+  public void free(SimpMessageHeaderAccessor sha, WsMessage wsMessage,
       @DestinationVariable("id") Long id)
       throws Exception {
     try {
@@ -180,7 +180,7 @@ public class ModerationController {
   }
 
   @MessageMapping("/mod/name/{id}")
-  public void changeName(SimpMessageHeaderAccessor sha, WSMessage wsMessage,
+  public void changeName(SimpMessageHeaderAccessor sha, WsMessage wsMessage,
       @DestinationVariable("id") Long id)
       throws Exception {
     try {
@@ -213,7 +213,7 @@ public class ModerationController {
   }
 
   @MessageMapping("/mod/confirm/{id}")
-  public void promptConfirm(SimpMessageHeaderAccessor sha, WSMessage wsMessage,
+  public void promptConfirm(SimpMessageHeaderAccessor sha, WsMessage wsMessage,
       @DestinationVariable("id") Long id)
       throws Exception {
     try {
@@ -243,7 +243,7 @@ public class ModerationController {
   }
 
   @MessageMapping("/mod/mod/{id}")
-  public void mod(SimpMessageHeaderAccessor sha, WSMessage wsMessage,
+  public void mod(SimpMessageHeaderAccessor sha, WsMessage wsMessage,
       @DestinationVariable("id") Long id)
       throws Exception {
     try {
@@ -277,7 +277,7 @@ public class ModerationController {
       uuid = StringEscapeUtils.escapeJava(uuid);
       name = StringEscapeUtils.escapeJava(name);
       AccountEntity account = accountService.findAccountByUUID(UUID.fromString(uuid));
-      if (account == null || !(account.hasModPowers())) {
+      if (account == null || !(account.isMod())) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       }
       List<AccountEntity> accountsWithName = accountService.findUsername(name);

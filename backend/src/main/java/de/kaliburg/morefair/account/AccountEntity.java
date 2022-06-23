@@ -1,13 +1,11 @@
-package de.kaliburg.morefair.account.entity;
+package de.kaliburg.morefair.account;
 
-import de.kaliburg.morefair.account.type.AccountAccessRole;
-import de.kaliburg.morefair.dto.AccountDetailsDTO;
 import de.kaliburg.morefair.game.ranker.RankerEntity;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -42,10 +40,10 @@ public class AccountEntity {
   private Long id;
   @NonNull
   @Column(nullable = false)
-  private UUID uuid;
+  private UUID uuid = UUID.randomUUID();
   @NonNull
   @Column(nullable = false)
-  private String username;
+  private String username = "Mystery Guest";
   @OneToMany(mappedBy = "account", fetch = FetchType.EAGER)
   private List<RankerEntity> rankers = new ArrayList<>();
   @NonNull
@@ -64,17 +62,21 @@ public class AccountEntity {
   @Enumerated(EnumType.STRING)
   private AccountAccessRole accessRole = AccountAccessRole.PLAYER;
 
-  public AccountDetailsDTO convertToDTO() {
-    return new AccountDetailsDTO(this);
+  public boolean isMod() {
+    return accessRole.equals(AccountAccessRole.MODERATOR)
+        || accessRole.equals(AccountAccessRole.OWNER);
   }
 
-  public boolean hasModPowers() {
-    return getAccessRole().equals(AccountAccessRole.MODERATOR) || getAccessRole().equals(
-        AccountAccessRole.OWNER);
+  public boolean isBanned() {
+    return accessRole.equals(AccountAccessRole.BANNED_PLAYER);
   }
 
-  public RankerEntity getHighestActiveRanker() {
-    return rankers.stream().filter(r -> r.isGrowing() && r.getLadder().getRound().isCurrentRound())
-        .max(Comparator.comparingInt(r -> r.getLadder().getNumber())).orElse(null);
+  public boolean isMuted() {
+    return accessRole.equals(AccountAccessRole.MODERATOR) || isBanned();
+  }
+
+  public List<RankerEntity> getActiveRankers() {
+    return rankers.stream().filter(RankerEntity::isGrowing)
+        .collect(Collectors.toList());
   }
 }

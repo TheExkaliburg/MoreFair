@@ -1,9 +1,10 @@
 package de.kaliburg.morefair.game.ranker;
 
-import de.kaliburg.morefair.account.entity.AccountEntity;
+import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.game.ladder.LadderEntity;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -26,12 +27,16 @@ public interface RankerRepository extends JpaRepository<RankerEntity, Long> {
         ON ranker.ladder_id = ladder.id
         WHERE ranker.account_id = ?);
    */
-  @Query("SELECT r FROM RankerEntity r " + "INNER JOIN LadderEntity l ON r.ladder = l "
-      + "WHERE r.account = :account " + "GROUP BY r.id, l.number " + "HAVING l.number = ("
-      + "   SELECT MAX(l.number) FROM RankerEntity r "
-      + "   INNER JOIN LadderEntity l ON r.ladder = l " + "   WHERE r.account = :account)")
-  List<RankerEntity> findHighestRankerByAccount(
-      @Param("account") AccountEntity account);
+  @Query("SELECT r FROM RankerEntity r INNER JOIN LadderEntity l ON r.ladder = l "
+      + "WHERE r.account = :account GROUP BY r.id, l.number HAVING l.number = "
+      + "(SELECT MAX(l.number) FROM RankerEntity r "
+      + "INNER JOIN LadderEntity l ON r.ladder = l "
+      + "WHERE r.account = :account)")
+  RankerEntity findHighestRankerByAccount(@Param("account") AccountEntity account);
+
+  Optional<RankerEntity> findFirstByAccountAndGrowingIsTrueOrderByLadder_Round_NumberDescLadder_NumberDesc(
+      AccountEntity account);
+
 
   @Query("SELECT r FROM RankerEntity r WHERE r.ladder = :ladder")
   List<RankerEntity> findAllRankerByLadder(

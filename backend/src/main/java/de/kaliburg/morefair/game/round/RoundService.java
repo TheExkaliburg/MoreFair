@@ -1,8 +1,7 @@
 package de.kaliburg.morefair.game.round;
 
-import de.kaliburg.morefair.account.entity.AccountEntity;
+import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.events.Event;
-import de.kaliburg.morefair.game.GameEntity;
 import de.kaliburg.morefair.game.ladder.LadderEntity;
 import de.kaliburg.morefair.game.ladder.LadderService;
 import java.util.List;
@@ -19,26 +18,26 @@ public class RoundService {
 
   private final RoundRepository roundRepository;
   private final LadderService ladderService;
+  private final AccountService accountService;
 
-  public RoundService(RoundRepository roundRepository, LadderService ladderService) {
+  public RoundService(RoundRepository roundRepository, LadderService ladderService,
+      AccountService accountService) {
     this.roundRepository = roundRepository;
     this.ladderService = ladderService;
+    this.accountService = accountService;
   }
 
   /**
    * Creates a new RoundEntity for the parent GameEntity, filled with an initial LadderEntity and
    * saves it.
    *
-   * @param parent the parent GameEntity, that this round is part of
    * @return the newly created and saved RoundEntity with 1 Ladder
    */
   @Transactional
-  public RoundEntity createRound(GameEntity parent, Integer number) {
-    RoundEntity result = roundRepository.save(new RoundEntity(number, parent));
+  public RoundEntity create(Long number) {
+    RoundEntity result = roundRepository.save(new RoundEntity(number));
     LadderEntity ladder = ladderService.createLadder(result, 1);
-
     result.getLadders().add(ladder);
-
     return result;
   }
 
@@ -58,11 +57,23 @@ public class RoundService {
    *
    * @param game the game that will have its current round cached
    */
-  public void loadIntoCache(GameEntity game) {
-    ladderService.loadIntoCache(game.getCurrentRound());
+  public void loadIntoCache(RoundEntity round) {
+    ladderService.loadIntoCache(round);
   }
 
-  public void addEvent(AccountEntity account, Event event) {
-    ladderService.addEvent(account.getHighestActiveRanker().getLadder().getNumber(), event);
+  /**
+   * Adds and handles a global Event
+   *
+   * @param event the event to process
+   */
+  public void handleGlobalEvent(Event event) {
+    // TODO: Switch case for all the events
+
+    switch (event.getEventType()) {
+      case NAME_CHANGE -> {
+        accountService.updateUsername(accountService.find(event.getAccountId()),
+            (String) event.getData());
+      }
+    }
   }
 }

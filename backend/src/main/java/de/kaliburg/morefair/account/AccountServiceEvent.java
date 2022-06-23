@@ -1,6 +1,5 @@
-package de.kaliburg.morefair.account.events;
+package de.kaliburg.morefair.account;
 
-import de.kaliburg.morefair.account.entity.AccountEntity;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
