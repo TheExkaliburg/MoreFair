@@ -93,7 +93,7 @@
           <ul
             v-if="
               store.getters['options/getOptionValue'](
-                'enableChatModFeatures'
+                'enableLadderModFeatures'
               ) && store.getters.isMod
             "
             @focus="focus"
