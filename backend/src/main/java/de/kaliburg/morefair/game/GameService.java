@@ -4,9 +4,9 @@ import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.game.chat.ChatEntity;
 import de.kaliburg.morefair.game.chat.ChatService;
-import de.kaliburg.morefair.game.ladder.LadderService;
-import de.kaliburg.morefair.game.ranker.RankerEntity;
-import de.kaliburg.morefair.game.ranker.RankerService;
+import de.kaliburg.morefair.game.round.LadderService;
+import de.kaliburg.morefair.game.round.RankerEntity;
+import de.kaliburg.morefair.game.round.RankerService;
 import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
 import java.util.List;
@@ -83,7 +83,7 @@ public class GameService {
   }
 
   private GameEntity updateGame(GameEntity game) {
-    roundService.updateRounds(List.of(game.getCurrentRound()));
+    roundService.save(List.of(game.getCurrentRound()));
 
     return game;
   }
@@ -100,7 +100,7 @@ public class GameService {
     }
 
     switch (event.getEventType()) {
-      case BIAS, MULTI, PROMOTE, VINEGAR, AUTO_PROMOTE -> {
+      case BUY_BIAS, BUY_MULTI, PROMOTE, THROW_VINEGAR, BUY_AUTO_PROMOTE -> {
         RankerEntity highestActiveRanker = rankerService.findHighestActiveRankerOfAccount(account);
         ladderService.addEvent(highestActiveRanker.getLadder().getNumber(), event);
       }

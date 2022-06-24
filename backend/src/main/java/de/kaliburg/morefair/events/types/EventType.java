@@ -7,15 +7,15 @@ public enum EventType {
   /**
    * A User is supposed to increase their bias and loose all their points
    */
-  BIAS,
-  MULTI,
+  BUY_BIAS,
+  BUY_MULTI,
   PROMOTE,
   ASSHOLE,
-  VINEGAR,
+  THROW_VINEGAR,
   JOIN,
   NAME_CHANGE,
   SOFT_RESET_POINTS,
-  AUTO_PROMOTE,
+  BUY_AUTO_PROMOTE,
   RESET,
   BAN,
   FREE,

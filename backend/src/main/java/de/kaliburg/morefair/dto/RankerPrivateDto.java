@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.dto;
 
-import de.kaliburg.morefair.game.ranker.RankerEntity;
+import de.kaliburg.morefair.game.round.RankerEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

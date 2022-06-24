@@ -1,6 +1,5 @@
 package de.kaliburg.morefair.game.round;
 
-import de.kaliburg.morefair.game.ladder.LadderEntity;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -59,6 +58,4 @@ public class RoundEntity {
   @NonNull
   @Column(nullable = false)
   private Integer highestAssholeCount = 0;
-
-
 }

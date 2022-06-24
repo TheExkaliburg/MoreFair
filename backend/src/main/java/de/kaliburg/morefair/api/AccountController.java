@@ -8,10 +8,8 @@ import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.UserPrincipal;
 import de.kaliburg.morefair.api.websockets.messages.WsMessage;
 import de.kaliburg.morefair.dto.AccountDetailsDTO;
-import de.kaliburg.morefair.events.Event;
-import de.kaliburg.morefair.events.types.EventType;
 import de.kaliburg.morefair.game.GameService;
-import de.kaliburg.morefair.game.ranker.RankerService;
+import de.kaliburg.morefair.game.round.RankerService;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
@@ -111,14 +109,11 @@ public class AccountController {
       log.trace("/app/{} {} {}", RENAME_DESTINATION, uuid, username);
 
       AccountEntity account = accountService.find(UUID.fromString(uuid));
-      if (account == null || account.getAccessRole()
-          .equals(AccountAccessRole.MUTED_PLAYER) || account.getAccessRole()
-          .equals(AccountAccessRole.BANNED_PLAYER)) {
+      if (account == null || account.isMuted()) {
         return;
       }
-      Event event = new Event(EventType.NAME_CHANGE, account.getId());
-      event.setData(username);
-      gameService.addEvent(account, event);
+      account.setUsername(username);
+      accountService.save(account);
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();

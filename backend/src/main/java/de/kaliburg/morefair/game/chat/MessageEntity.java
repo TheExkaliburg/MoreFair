@@ -1,7 +1,6 @@
-package de.kaliburg.morefair.game.chat.message;
+package de.kaliburg.morefair.game.chat;
 
 import de.kaliburg.morefair.account.AccountEntity;
-import de.kaliburg.morefair.game.chat.ChatEntity;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 import javax.persistence.Column;

@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.account;
 
-import de.kaliburg.morefair.game.ranker.RankerEntity;
+import de.kaliburg.morefair.game.round.RankerEntity;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,9 +62,12 @@ public class AccountEntity {
   @Enumerated(EnumType.STRING)
   private AccountAccessRole accessRole = AccountAccessRole.PLAYER;
 
+  public boolean isOwner() {
+    return accessRole.equals(AccountAccessRole.OWNER);
+  }
+
   public boolean isMod() {
-    return accessRole.equals(AccountAccessRole.MODERATOR)
-        || accessRole.equals(AccountAccessRole.OWNER);
+    return accessRole.equals(AccountAccessRole.MODERATOR) || isOwner();
   }
 
   public boolean isBanned() {

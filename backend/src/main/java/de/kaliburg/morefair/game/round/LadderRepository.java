@@ -1,6 +1,5 @@
-package de.kaliburg.morefair.game.ladder;
+package de.kaliburg.morefair.game.round;
 
-import de.kaliburg.morefair.game.round.RoundEntity;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;

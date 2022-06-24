@@ -7,8 +7,17 @@ import java.math.RoundingMode;
 
 public class UpgradeUtils {
 
-  public static BigInteger buyUpgradeCost(Integer ladderNum, Integer currentUpgrade) {
-    BigInteger ladder = BigInteger.valueOf(ladderNum + 1);
+  /**
+   * Calculates the cost of the next bias/multi upgrade.
+   *
+   * <p><code>cost = (ladder + 1) ^ (currentUpgrade + 1)</code>
+   *
+   * @param currentUpgrade the current amount of upgrades
+   * @param ladderNumber   the ladder where you would buy the upgrade
+   * @return the cost of the (currentUpgrade + 1)th bias/multi
+   */
+  public static BigInteger buyUpgradeCost(Integer ladderNumber, Integer currentUpgrade) {
+    BigInteger ladder = BigInteger.valueOf(ladderNumber + 1);
     BigInteger result = ladder.pow(currentUpgrade + 1);
 
     return result;

@@ -43,7 +43,7 @@ public class AccountService {
   }
 
   @Transactional
-  AccountEntity save(AccountEntity account) {
+  public AccountEntity save(AccountEntity account) {
     return accountRepository.save(account);
   }
 
@@ -74,11 +74,5 @@ public class AccountService {
 
   public List<AccountEntity> findByUsername(String username) {
     return accountRepository.findAccountsByUsernameIsContaining(username);
-  }
-
-
-  public AccountEntity updateUsername(AccountEntity account, String username) {
-    account.setUsername(username);
-    return save(account);
   }
 }

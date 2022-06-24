@@ -1,8 +1,8 @@
 package de.kaliburg.morefair.dto;
 
 import de.kaliburg.morefair.account.AccountEntity;
-import de.kaliburg.morefair.game.ladder.LadderEntity;
-import de.kaliburg.morefair.game.ranker.RankerEntity;
+import de.kaliburg.morefair.game.round.LadderEntity;
+import de.kaliburg.morefair.game.round.RankerEntity;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;

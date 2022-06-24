@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.game.ladder;
+package de.kaliburg.morefair.game.round;
 
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.RankerController;
@@ -6,9 +6,7 @@ import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.dto.HeartbeatDTO;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.EventType;
-import de.kaliburg.morefair.game.chat.message.MessageService;
-import de.kaliburg.morefair.game.ranker.RankerEntity;
-import de.kaliburg.morefair.game.ranker.RankerService;
+import de.kaliburg.morefair.game.chat.MessageService;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,38 +28,40 @@ import org.springframework.stereotype.Component;
 public class LadderCalculator {
 
   private static final double NANOS_IN_SECONDS = TimeUnit.SECONDS.toNanos(1);
-  private final RankerService rankerService;
+  private final LadderService ladderService;
   private final AccountService accountService;
   private final MessageService messageService;
   private final WsUtils wsUtils;
+  private final LadderUtils ladderUtils;
+  private final RoundService roundService;
+  private final RoundUtils roundUtils;
   private Map<Integer, HeartbeatDTO> heartbeatMap = new HashMap<>();
-  private List<Event> globalEvents = new ArrayList<>();
-  private List<Event> modEvents = new ArrayList<>();
   private boolean didPressAssholeButton = false;
   private long lastTimeMeasured = System.nanoTime();
 
-  public LadderCalculator(RankerService rankerService, AccountService accountService,
+  public LadderCalculator(LadderService ladderService, AccountService accountService,
       WsUtils wsUtils,
-      MessageService messageService) {
-    this.rankerService = rankerService;
+      MessageService messageService, LadderUtils ladderUtils, RoundService roundService,
+      RoundUtils roundUtils) {
+    this.ladderService = ladderService;
     this.accountService = accountService;
     this.wsUtils = wsUtils;
     this.messageService = messageService;
+    this.ladderUtils = ladderUtils;
+    this.roundService = roundService;
+    this.roundUtils = roundUtils;
   }
 
   @Scheduled(initialDelay = 1000, fixedRate = 1000)
   public void update() {
     // Reset the Heartbeat
     heartbeatMap = new HashMap<>();
-    globalEvents = new ArrayList<>();
-    modEvents = new ArrayList<>();
     didPressAssholeButton = false;
     try {
-      rankerService.getLadderSem().acquire();
+      ladderService.getLadderSemaphore().acquire();
       try {
         // Process and filter all events since the last Calculation Step
         handlePlayerEvents();
-        handleModEvents();
 
         // Calculate Time passed
         long currentNanos = System.nanoTime();
@@ -72,25 +72,12 @@ public class LadderCalculator {
         // Send Broadcasts
 
         // If someone was an Asshole and the reset worked, should notify all and end calculation
-        if (didPressAssholeButton && rankerService.resetAllLadders()) {
-          globalEvents.add(new Event(EventType.RESET, 0L));
-          wsUtils.convertAndSendToTopic(RankerController.GLOBAL_UPDATE_DESTINATION,
-              globalEvents);
-          return;
-        }
-
-        if (!modEvents.isEmpty()) {
-          wsUtils.convertAndSendToTopic(RankerController.GLOBAL_UPDATE_DESTINATION,
-              modEvents);
-        }
-
-        if (!globalEvents.isEmpty()) {
-          wsUtils.convertAndSendToTopic(RankerController.GLOBAL_UPDATE_DESTINATION,
-              globalEvents);
+        if (didPressAssholeButton) {
+          // TODO: Reset Game Logic
         }
 
         // Otherwise, just send the default Broadcasts
-        for (LadderEntity ladder : rankerService.getLadders().values()) {
+        for (LadderEntity ladder : ladderService.getCurrentLadderMap().values()) {
           heartbeatMap.get(ladder.getNumber()).setSecondsPassed(deltaSec);
           wsUtils.convertAndSendToTopic(
               RankerController.LADDER_UPDATE_DESTINATION + ladder.getNumber(),
@@ -98,7 +85,7 @@ public class LadderCalculator {
         }
 
         // Calculate Ladder yourself
-        Collection<LadderEntity> ladders = rankerService.getLadders().values();
+        Collection<LadderEntity> ladders = ladderService.getCurrentLadderMap().values();
         List<CompletableFuture<Void>> futures = ladders.stream()
             .map(ladder -> CompletableFuture.runAsync(
                 () -> calculateLadder(ladder, deltaSec))).toList();
@@ -109,7 +96,7 @@ public class LadderCalculator {
           e.printStackTrace();
         }
       } finally {
-        rankerService.getLadderSem().release();
+        ladderService.getLadderSemaphore().release();
       }
     } catch (InterruptedException e) {
       log.error(e.getMessage());
@@ -117,91 +104,45 @@ public class LadderCalculator {
     }
   }
 
-  private void handleModEvents() {
-    try {
-      accountService.getModEventSem().acquire();
-      try {
-        modEvents = new ArrayList<>(accountService.getModEventList());
-
-        for (int i = 0; i < modEvents.size(); i++) {
-          Event e = modEvents.get(i);
-          switch (e.getEventType()) {
-            case BAN -> {
-              accountService.ban(e.getAccountId(), e);
-            }
-            case FREE -> {
-              accountService.free(e.getAccountId(), e);
-            }
-            case MUTE -> {
-              accountService.mute(e.getAccountId(), e);
-            }
-            case NAME_CHANGE -> {
-              accountService.updateUsername(accountService.find(e.getAccountId()),
-                  (String) e.getData());
-            }
-            case MOD -> {
-              accountService.mod(e.getAccountId(), e);
-            }
-          }
-        }
-
-        accountService.resetEvents();
-      } finally {
-        accountService.getModEventSem().release();
-      }
-    } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
-    }
-  }
-
   private void handlePlayerEvents() {
     try {
-      rankerService.getEventSem().acquire();
+      ladderService.getEventSemaphore().acquire();
       try {
-        for (int i = 1; i <= rankerService.getLadders().size(); i++) {
+        for (int i = 1; i <= ladderService.getCurrentLadderMap().size(); i++) {
           // Handle the events since the last update
-          LadderEntity ladder = rankerService.getLadders().get(i);
-          List<Event> events = rankerService.getEventMap().get(ladder.getNumber());
+          LadderEntity ladder = ladderService.getCurrentLadderMap().get(i);
+          List<Event> events = ladderService.getEventMap().get(ladder.getNumber());
           List<Event> eventsToBeRemoved = new ArrayList<>();
           for (int j = 0; j < events.size(); j++) {
             Event e = events.get(j);
             switch (e.getEventType()) {
-              case BIAS -> {
-                if (!rankerService.buyBias(e.getAccountId(), ladder)) {
+              case BUY_BIAS -> {
+                if (!ladderService.buyBias(e.getAccountId(), ladder)) {
                   eventsToBeRemoved.add(e);
                 }
               }
-              case MULTI -> {
-                if (!rankerService.buyMulti(e.getAccountId(), ladder)) {
+              case BUY_MULTI -> {
+                if (!ladderService.buyMulti(e.getAccountId(), ladder)) {
                   eventsToBeRemoved.add(e);
                 }
               }
               case PROMOTE -> {
-                if (!rankerService.promote(e.getAccountId(), ladder, false)) {
+                if (!ladderService.promote(e.getAccountId(), ladder)) {
                   eventsToBeRemoved.add(e);
-                }
-              }
-              case ASSHOLE -> {
-                if (rankerService.promote(e.getAccountId(), ladder, true)) {
-                  e.setEventType(EventType.PROMOTE);
+                } else if (roundUtils.getAssholeLadderNumber(roundService.getCurrentRound())
+                    .equals(ladder.getNumber())) {
                   didPressAssholeButton = true;
-                } else {
+                }
+              }
+              case THROW_VINEGAR -> {
+                if (!ladderService.throwVinegar(e.getAccountId(), ladder, e)) {
                   eventsToBeRemoved.add(e);
                 }
               }
-              case VINEGAR -> {
-                if (!rankerService.throwVinegar(e.getAccountId(), ladder, e)) {
+              case BUY_AUTO_PROMOTE -> {
+                if (!ladderService.buyAutoPromote(e.getAccountId(), ladder)) {
                   eventsToBeRemoved.add(e);
                 }
-              }
-              case AUTO_PROMOTE -> {
-                if (!rankerService.buyAutoPromote(e.getAccountId(), ladder)) {
-                  eventsToBeRemoved.add(e);
-                }
-              }
-              case SOFT_RESET_POINTS -> {
-                rankerService.softResetPoints(e.getAccountId(), ladder);
               }
               default -> {
 
@@ -213,24 +154,9 @@ public class LadderCalculator {
           }
           heartbeatMap.put(ladder.getNumber(), new HeartbeatDTO(new ArrayList<>(events)));
         }
-        globalEvents = new ArrayList<>(rankerService.getGlobalEventList());
-        for (int i = 0; i < globalEvents.size(); i++) {
-          Event e = globalEvents.get(i);
-          switch (e.getEventType()) {
-            case NAME_CHANGE -> {
-              accountService.updateUsername(accountService.find(e.getAccountId()),
-                  (String) e.getData());
-            }
-            case SYSTEM_MESSAGE -> {
-              messageService.writeSystemMessage(rankerService.getHighestLadder(),
-                  (String) e.getData());
-            }
-          }
-        }
-
-        rankerService.resetEvents();
+        ladderService.getEventMap().values().forEach(List::clear);
       } finally {
-        rankerService.getEventSem().release();
+        ladderService.getEventSemaphore().release();
       }
     } catch (Exception e) {
       log.error(e.getMessage());
@@ -258,8 +184,7 @@ public class LadderCalculator {
         if (currentRanker.getRank() != 1) {
           currentRanker.addVinegar(currentRanker.getGrapes(), deltaSec);
         }
-        if (currentRanker.getRank() == 1 && LadderUtils.isLadderUnlocked(ladder,
-            rankers.get(0))) {
+        if (currentRanker.getRank() == 1 && ladderUtils.isLadderUnlocked(ladder)) {
           currentRanker.mulVinegar(0.9975, deltaSec);
         }
 
@@ -299,7 +224,7 @@ public class LadderCalculator {
         && rankers.size() >= ladder.getRequiredRankerCountToUnlock()) {
       log.info("[L{}] Trying to auto-promote {} (#{})", ladder.getNumber(),
           rankers.get(0).getAccount().getUsername(), rankers.get(0).getAccount().getId());
-      rankerService.addEvent(ladder.getNumber(),
+      ladderService.addEvent(ladder.getNumber(),
           new Event(EventType.PROMOTE, rankers.get(0).getAccount().getId()));
     }
   }

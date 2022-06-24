@@ -9,12 +9,12 @@ import de.kaliburg.morefair.api.websockets.messages.WsMetaMessage;
 import de.kaliburg.morefair.game.GameService;
 import de.kaliburg.morefair.game.chat.ChatDTO;
 import de.kaliburg.morefair.game.chat.ChatService;
-import de.kaliburg.morefair.game.chat.message.MessageDTO;
-import de.kaliburg.morefair.game.chat.message.MessageEntity;
-import de.kaliburg.morefair.game.chat.message.MessageService;
-import de.kaliburg.morefair.game.ladder.LadderService;
-import de.kaliburg.morefair.game.ranker.RankerEntity;
-import de.kaliburg.morefair.game.ranker.RankerService;
+import de.kaliburg.morefair.game.chat.MessageDTO;
+import de.kaliburg.morefair.game.chat.MessageEntity;
+import de.kaliburg.morefair.game.chat.MessageService;
+import de.kaliburg.morefair.game.round.LadderService;
+import de.kaliburg.morefair.game.round.RankerEntity;
+import de.kaliburg.morefair.game.round.RankerService;
 import de.kaliburg.morefair.game.round.RoundService;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
@@ -70,8 +70,7 @@ public class ChatController {
 
       RankerEntity ranker = rankerService.findHighestActiveRankerOfAccount(account);
       if (ranker == null) {
-        wsUtils.convertAndSendToUser(sha, CHAT_INIT_DESTINATION, HttpStatus.FORBIDDEN);
-        return;
+        ranker = roundService.createNewRanker(account);
       }
 
       if (account.isMod() || number <= ranker.getLadder().getNumber()) {

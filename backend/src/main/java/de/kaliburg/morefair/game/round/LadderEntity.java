@@ -1,8 +1,6 @@
-package de.kaliburg.morefair.game.ladder;
+package de.kaliburg.morefair.game.round;
 
 import de.kaliburg.morefair.api.FairController;
-import de.kaliburg.morefair.game.ranker.RankerEntity;
-import de.kaliburg.morefair.game.round.RoundEntity;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;

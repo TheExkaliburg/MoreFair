@@ -3,9 +3,6 @@ package de.kaliburg.morefair.game.chat;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.api.ChatController;
 import de.kaliburg.morefair.api.utils.WsUtils;
-import de.kaliburg.morefair.game.chat.message.MessageDTO;
-import de.kaliburg.morefair.game.chat.message.MessageEntity;
-import de.kaliburg.morefair.game.chat.message.MessageService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -134,5 +131,9 @@ public class ChatService {
     }
 
     return currentChatMap.get(number);
+  }
+
+  public void sendPromptToAccount(AccountEntity target, String text) {
+    // TODO: implement
   }
 }

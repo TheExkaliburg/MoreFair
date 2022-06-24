@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.game.ranker;
+package de.kaliburg.morefair.game.round;
 
 import de.kaliburg.morefair.account.AccountEntity;
 import java.util.Optional;

@@ -1,9 +1,8 @@
-package de.kaliburg.morefair.game.ranker;
+package de.kaliburg.morefair.game.round;
 
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.dto.RankerDto;
 import de.kaliburg.morefair.dto.RankerPrivateDto;
-import de.kaliburg.morefair.game.ladder.LadderEntity;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.UUID;

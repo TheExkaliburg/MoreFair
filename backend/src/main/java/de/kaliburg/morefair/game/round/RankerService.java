@@ -1,8 +1,7 @@
-package de.kaliburg.morefair.game.ranker;
+package de.kaliburg.morefair.game.round;
 
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
-import de.kaliburg.morefair.game.ladder.LadderEntity;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Lazy;

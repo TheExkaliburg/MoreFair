@@ -1,6 +1,5 @@
-package de.kaliburg.morefair.game.chat.message;
+package de.kaliburg.morefair.game.chat;
 
-import de.kaliburg.morefair.game.chat.ChatEntity;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

@@ -1,7 +1,7 @@
 package de.kaliburg.morefair.data;
 
 import de.kaliburg.morefair.api.FairController;
-import de.kaliburg.morefair.game.chat.message.MessageEntity;
+import de.kaliburg.morefair.game.chat.MessageEntity;
 import java.time.format.DateTimeFormatter;
 import lombok.Data;
 import org.apache.commons.text.StringEscapeUtils;

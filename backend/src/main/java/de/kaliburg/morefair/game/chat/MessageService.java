@@ -1,10 +1,10 @@
-package de.kaliburg.morefair.game.chat.message;
+package de.kaliburg.morefair.game.chat;
 
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.utils.WsUtils;
-import de.kaliburg.morefair.game.chat.ChatEntity;
-import de.kaliburg.morefair.game.ladder.LadderRepository;
+import de.kaliburg.morefair.game.round.LadderRepository;
+import java.util.ArrayList;
 import java.util.UUID;
 import javax.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
@@ -71,4 +71,7 @@ public class MessageService {
   }
 
 
+  public ArrayList<MessageEntity> getAllMessages() {
+    return new ArrayList<>();
+  }
 }

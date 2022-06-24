@@ -1,9 +1,9 @@
 package de.kaliburg.morefair.game.round;
 
+import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
+import de.kaliburg.morefair.dto.LadderResultsDTO;
 import de.kaliburg.morefair.events.Event;
-import de.kaliburg.morefair.game.ladder.LadderEntity;
-import de.kaliburg.morefair.game.ladder.LadderService;
 import java.util.List;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -19,6 +19,7 @@ public class RoundService {
   private final RoundRepository roundRepository;
   private final LadderService ladderService;
   private final AccountService accountService;
+  private LadderResultsDTO lastRoundResults;
 
   public RoundService(RoundRepository roundRepository, LadderService ladderService,
       AccountService accountService) {
@@ -41,15 +42,14 @@ public class RoundService {
     return result;
   }
 
-  /**
-   * Updates existing RoundEntities and saves them.
-   *
-   * @param rounds the RoundEntities that need to be updated
-   * @return the updated and saved RoundEntities
-   */
   @Transactional
-  public List<RoundEntity> updateRounds(List<RoundEntity> rounds) {
+  public List<RoundEntity> save(List<RoundEntity> rounds) {
     return roundRepository.saveAll(rounds);
+  }
+
+  @Transactional
+  public RoundEntity save(RoundEntity round) {
+    return roundRepository.save(round);
   }
 
   /**
@@ -79,5 +79,29 @@ public class RoundService {
 
   public RoundEntity getCurrentRound() {
     return ladderService.getCurrentRound();
+  }
+
+  /**
+   * Create a new Ranker and updates the highestAssholeCount if necessary.
+   *
+   * @param account the account that the ranker is part of
+   * @return the ranker
+   */
+  public RankerEntity createNewRanker(AccountEntity account) {
+    RankerEntity result = ladderService.createRanker(account);
+    Integer timesAsshole = result.getAccount().getTimesAsshole();
+
+    if (timesAsshole > getCurrentRound().getHighestAssholeCount()) {
+      // TODO: Global Event to update the highestLadder
+      getCurrentRound().setHighestAssholeCount(timesAsshole);
+      ladderService.setCurrentRound(save(getCurrentRound()));
+    }
+
+    return result;
+  }
+
+
+  public LadderResultsDTO getLastRoundResults() {
+    return lastRoundResults;
   }
 }
