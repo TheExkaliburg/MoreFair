@@ -7,6 +7,11 @@ const versioningModule = {
       versions: [
         new Version("PATCH", "", {
           features: [
+            "Moderators can now moderate via the ladder for easyer access.",
+          ],
+        }),
+        new Version("PATCH", "", {
+          features: [
             "An old known sound now chimes whenever you promoted.",
             "Another sound now rings when you reached the top of a ladder",
           ],
