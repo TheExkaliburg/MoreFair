@@ -24,6 +24,19 @@
       >
         <a data-bs-toggle="dropdown">...</a>
         <ul class="dropdown-menu">
+          <span
+            style="
+              color: var(--text-color);
+              padding: 5px;
+              margin: 0px;
+              width: 100%;
+              display: inline-block;
+            "
+            >{{ msg.username
+            }}<sub style="color: var(--text-dark-highlight-color)"
+              >#{{ msg.accountId }}</sub
+            ></span
+          >
           <li>
             <a class="dropdown-item" href="#" @click="ban">Ban</a>
             <a class="dropdown-item" href="#" @click="mute">Mute</a>
@@ -114,6 +127,13 @@ function free() {
 .message-username {
   text-align: start;
   overflow: hidden;
+}
+
+.dropdown-menu {
+  border: 1px solid var(--secondary-color);
+  border-radius: 0.25rem;
+  padding: 0px;
+  margin: 0px;
 }
 
 .message-options {

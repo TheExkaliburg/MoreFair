@@ -8,6 +8,11 @@ const versioningModule = {
         new Version("PATCH", "", {}),
         new Version("PATCH", "Fixing Asshole-Badge Limit", {
           features: [
+            "Moderators can now moderate via the ladder for easyer access.",
+          ],
+        }),
+        new Version("PATCH", "", {
+          features: [
             "An old known sound now chimes whenever you promoted.",
             "Another sound now rings when you reached the top of a ladder",
           ],
