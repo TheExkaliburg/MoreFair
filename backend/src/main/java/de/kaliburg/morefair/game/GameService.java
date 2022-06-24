@@ -1,11 +1,8 @@
 package de.kaliburg.morefair.game;
 
-import de.kaliburg.morefair.account.AccountEntity;
-import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.game.chat.ChatEntity;
 import de.kaliburg.morefair.game.chat.ChatService;
 import de.kaliburg.morefair.game.round.LadderService;
-import de.kaliburg.morefair.game.round.RankerEntity;
 import de.kaliburg.morefair.game.round.RankerService;
 import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
@@ -86,25 +83,5 @@ public class GameService {
     roundService.save(List.of(game.getCurrentRound()));
 
     return game;
-  }
-
-  /**
-   * Adding an event and routing it to the specific Service to handle that event
-   *
-   * @param account The account that the event is about
-   * @param event   the event
-   */
-  public void addEvent(AccountEntity account, Event event) {
-    if (!account.getId().equals(event.getAccountId())) {
-      event.setAccountId(account.getId());
-    }
-
-    switch (event.getEventType()) {
-      case BUY_BIAS, BUY_MULTI, PROMOTE, THROW_VINEGAR, BUY_AUTO_PROMOTE -> {
-        RankerEntity highestActiveRanker = rankerService.findHighestActiveRankerOfAccount(account);
-        ladderService.addEvent(highestActiveRanker.getLadder().getNumber(), event);
-      }
-      default -> roundService.handleGlobalEvent(event);
-    }
   }
 }

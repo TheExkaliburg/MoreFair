@@ -19,7 +19,6 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -30,7 +29,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-@NoArgsConstructor
+// @NoArgsConstructor
 @RequiredArgsConstructor
 @SequenceGenerator(name = "seq_account", sequenceName = "seq_account", allocationSize = 1)
 public class AccountEntity {
@@ -79,7 +78,7 @@ public class AccountEntity {
   }
 
   public List<RankerEntity> getActiveRankers() {
-    return rankers.stream().filter(RankerEntity::isGrowing)
+    return rankers.stream().filter(r -> r.isGrowing())
         .collect(Collectors.toList());
   }
 }

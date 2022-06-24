@@ -55,10 +55,10 @@ public final class LadderEntity {
   private List<RankerEntity> rankers = new ArrayList<>();
 
   public Integer getRequiredRankerCountToUnlock() {
-    return Math.max(FairController.MINIMUM_PEOPLE_FOR_PROMOTE, getNumber());
+    return Math.max(FairController.MINIMUM_PEOPLE_FOR_PROMOTE, number);
   }
 
   public BigInteger getRequiredPointsToUnlock() {
-    return FairController.POINTS_FOR_PROMOTE.multiply(BigInteger.valueOf(getNumber()));
+    return FairController.POINTS_FOR_PROMOTE.multiply(BigInteger.valueOf(number));
   }
 }

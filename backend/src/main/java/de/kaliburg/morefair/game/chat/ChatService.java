@@ -104,19 +104,30 @@ public class ChatService {
   }
 
   /**
+   * Sends a message without metadata from a user to a specific chat.
+   *
+   * @param account the account of the user
+   * @param number  the number of the chat
+   * @param message the message
+   * @return the message entity
+   */
+  public MessageEntity sendMessageToChat(AccountEntity account, Integer number, String message) {
+    return sendMessageToChat(account, number, message, null);
+  }
+
+  /**
    * Sends a message (and the metadata) from a user to all chats.
    *
-   * @param account  the account of the user
-   * @param message  the message
-   * @param metadata the metadata of that message
+   * @param account the account of the user
+   * @param message the message
    * @return the list of all the messages, sent to different chats
    */
-  public List<MessageEntity> sendGlobalMessage(AccountEntity account, String message,
-      String metadata) {
+  public List<MessageEntity> sendGlobalMessage(AccountEntity account, String message) {
     return currentChatMap.values().stream()
-        .map(chat -> sendMessageToChat(account, chat.getNumber(), message, metadata))
+        .map(chat -> sendMessageToChat(account, chat.getNumber(), message))
         .collect(Collectors.toList());
   }
+
 
   /**
    * gets the instance of a chat, if there is no cached chat, it will first look for a chat version

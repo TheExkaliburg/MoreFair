@@ -9,8 +9,4 @@ public class RoundUtils {
   public Integer getAssholeLadderNumber(RoundEntity currentRound) {
     return FairController.BASE_ASSHOLE_LADDER + currentRound.getHighestAssholeCount();
   }
-
-  public Integer getNewAssholeCount(RoundEntity) {
-
-  }
 }

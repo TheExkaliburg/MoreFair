@@ -4,6 +4,7 @@ import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.data.JoinData;
+import de.kaliburg.morefair.events.data.VinegarData;
 import de.kaliburg.morefair.events.types.EventType;
 import de.kaliburg.morefair.game.UpgradeUtils;
 import de.kaliburg.morefair.game.chat.ChatService;
@@ -14,7 +15,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.Semaphore;
@@ -48,6 +48,7 @@ public class LadderService {
   private final RoundUtils roundUtils;
   private final Random randomGenerator = new Random();
   private final ChatService chatService;
+  private final UpgradeUtils upgradeUtils;
   @Getter(AccessLevel.PACKAGE)
   @Setter(AccessLevel.PACKAGE)
   private RoundEntity currentRound;
@@ -58,13 +59,14 @@ public class LadderService {
 
   public LadderService(RankerService rankerService, LadderRepository ladderRepository,
       LadderUtils ladderUtils, AccountService accountService, RoundUtils roundUtils,
-      ChatService chatService) {
+      ChatService chatService, UpgradeUtils upgradeUtils) {
     this.rankerService = rankerService;
     this.ladderRepository = ladderRepository;
     this.ladderUtils = ladderUtils;
     this.accountService = accountService;
     this.roundUtils = roundUtils;
     this.chatService = chatService;
+    this.upgradeUtils = upgradeUtils;
   }
 
   /**
@@ -201,15 +203,15 @@ public class LadderService {
    * that the ladder is part of the current round (which should be already cached)
    *
    * @param number the number of the ladder
-   * @return the ladder
+   * @return the ladder, might be null if there is no ladder with the number
    */
   public LadderEntity find(Integer number) {
-    LadderEntity result = currentLadderMap.get(number);
-    if (result == null) {
-      throw new NoSuchElementException();
+    LadderEntity ladder = currentLadderMap.get(number);
+    if (ladder == null) {
+      ladder = find(currentRound, number);
     }
 
-    return result;
+    return ladder;
   }
 
   /**
@@ -257,8 +259,9 @@ public class LadderService {
       ladder = createLadder(currentRound, number);
     }
 
+    final LadderEntity finalLadder = ladder;
     List<RankerEntity> activeRankersInLadder = account.getActiveRankers().stream()
-        .filter(ranker -> ranker.getLadder().getUuid().equals(ladder.getUuid())).toList();
+        .filter(ranker -> ranker.getLadder().getUuid().equals(finalLadder.getUuid())).toList();
 
     // Only 1 active ranker per ladder
     if (!activeRankersInLadder.isEmpty()) {
@@ -287,10 +290,17 @@ public class LadderService {
         .orElseThrow();
   }
 
+  /**
+   * Buy Bias for the active ranker of an account on a specific ladder.
+   *
+   * @param accountId the id of the account
+   * @param ladder    the ladder the ranker is on
+   * @return if the ranker can buy bias
+   */
   boolean buyBias(Long accountId, LadderEntity ladder) {
     try {
       RankerEntity ranker = findActiveRankerOfAccountOnLadder(accountId, ladder);
-      BigInteger cost = UpgradeUtils.buyUpgradeCost(ladder.getNumber(), ranker.getBias());
+      BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getNumber(), ranker.getBias());
       if (ranker.getPoints().compareTo(cost) >= 0) {
         ranker.setPoints(BigInteger.ZERO);
         ranker.setBias(ranker.getBias() + 1);
@@ -303,10 +313,17 @@ public class LadderService {
     return false;
   }
 
+  /**
+   * Buy multi for the active ranker of an account on a specific ladder.
+   *
+   * @param accountId the id of the account
+   * @param ladder    the ladder the ranker is on
+   * @return if the ranker can buy multi
+   */
   boolean buyMulti(Long accountId, LadderEntity ladder) {
     try {
       RankerEntity ranker = findActiveRankerOfAccountOnLadder(accountId, ladder);
-      BigInteger cost = UpgradeUtils.buyUpgradeCost(ladder.getNumber(), ranker.getMultiplier());
+      BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getNumber(), ranker.getMultiplier());
       if (ranker.getPower().compareTo(cost) >= 0) {
         ranker.setPoints(BigInteger.ZERO);
         ranker.setPower(BigInteger.ZERO);
@@ -321,10 +338,41 @@ public class LadderService {
     return false;
   }
 
+  /**
+   * Buy auto-promote for the active ranker of an account on a specific ladder.
+   *
+   * @param accountId the id of the account
+   * @param ladder    the ladder the ranker is on
+   * @return if the ranker can buy auto-promote
+   */
+  boolean buyAutoPromote(Long accountId, LadderEntity ladder) {
+    try {
+      RankerEntity ranker = findActiveRankerOfAccountOnLadder(accountId, ladder);
+      BigInteger cost = upgradeUtils.buyAutoPromoteCost(ranker.getRank(), ladder.getNumber());
+
+      if (ladderUtils.canBuyAutoPromote(ladder, ranker, currentRound)) {
+        ranker.setGrapes(ranker.getGrapes().subtract(cost));
+        ranker.setAutoPromote(true);
+        return true;
+      }
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      e.printStackTrace();
+    }
+
+    return false;
+  }
+
+  /**
+   * Promote the active ranker of an account on a specific ladder.
+   *
+   * @param accountId the id of the account
+   * @param ladder    the ladder the ranker is on
+   * @return if the ranker can promote
+   */
   boolean promote(Long accountId, LadderEntity ladder) {
     try {
       RankerEntity ranker = findActiveRankerOfAccountOnLadder(accountId, ladder);
-      BigInteger requiredPoints = ladderUtils.getPointsForPromoteWithLead(ladder, ranker);
       if (ladderUtils.canPromote(ladder, ranker)) {
         AccountEntity account = accountService.find(ranker.getAccount());
         log.info("[L{}] Promotion for {} (#{})", ladder.getRankers(), account.getUsername(),
@@ -340,20 +388,96 @@ public class LadderService {
           newRanker.setAutoPromote(true);
         }
 
+        account = accountService.save(accountService.find(account));
         if (newLadder.getNumber() > roundUtils.getAssholeLadderNumber(currentRound)) {
-          account = accountService.save(accountService.find(account));
-
-          // TODO: i was somewhere here before i went to bed
-
-          chatService.sendGlobalMessage(account, account.getUsername() +
-              " was welcomed by Chad. They are number " + newLadder.getRankers().size() + " of the "
-              + "lucky few initiates for the big ritual.", null);
-
+          chatService.sendGlobalMessage(account,
+              account.getUsername() + " was welcomed by Chad. They are number "
+                  + newLadder.getRankers().size()
+                  + " of the lucky few initiates for the big ritual.");
         }
+        return true;
+      }
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      e.printStackTrace();
+    }
 
+    return false;
+  }
+
+
+  /**
+   * Throw vinegar as the active ranker of an account on a specific ladder.
+   *
+   * @param accountId the id of the account
+   * @param ladder    the ladder the ranker is on
+   * @return if the ranker can throw vinegar at the rank-1-ranker
+   */
+  boolean throwVinegar(Long accountId, LadderEntity ladder, Event event) {
+    try {
+      ladder = find(ladder);
+      RankerEntity ranker = findActiveRankerOfAccountOnLadder(accountId, ladder);
+      RankerEntity target = ladder.getRankers().get(0);
+      AccountEntity rankerAccount = accountService.find(ranker.getAccount());
+      AccountEntity targetAccount = accountService.find(target.getAccount());
+
+      if (target.isAutoPromote()) {
+        log.info("[L{}] {} (#{}) tried to throw Vinegar at {} (#{}), but they had Auto-Promote!",
+            ladder.getNumber(), rankerAccount.getUsername(), rankerAccount.getId(),
+            targetAccount.getUsername(), targetAccount.getId());
+        return false;
       }
 
+      if (ladderUtils.canThrowVinegarAt(ladder, ranker, target)) {
+        BigInteger rankerVinegar = ranker.getVinegar();
+        BigInteger targetVinegar = target.getVinegar();
+
+        log.info("[L{}] {} (#{}) is using their {} Vinegar on {} (#{}) with {} Vinegar",
+            ladder.getNumber(), rankerAccount.getUsername(), rankerAccount.getId(), rankerVinegar,
+            targetAccount.getUsername(), targetAccount.getId(), targetVinegar);
+
+        VinegarData data = new VinegarData(rankerVinegar.toString());
+        if (targetVinegar.compareTo(rankerVinegar) > 0) {
+          targetVinegar = targetVinegar.subtract(rankerVinegar);
+        } else {
+          targetVinegar = BigInteger.ZERO;
+          data.setSuccess(true);
+          if (!buyMulti(targetAccount.getId(), ladder)) {
+            softResetPoints(targetAccount.getId(), ladder);
+          }
+        }
+
+        event.setData(data);
+        ranker.setVinegar(BigInteger.ZERO);
+        target.setVinegar(targetVinegar);
+        return true;
+      }
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      e.printStackTrace();
     }
+
+    return false;
+  }
+
+  /**
+   * Soft-reset the points of the active ranker of an account on a specific ladder.
+   *
+   * @param accountId the id of the account
+   * @param ladder    the ladder the ranker is on
+   * @return if the ranker can be soft-reset
+   */
+  boolean softResetPoints(Long accountId, LadderEntity ladder) {
+    try {
+      RankerEntity ranker = findActiveRankerOfAccountOnLadder(accountId, ladder);
+      ranker.setPoints(BigInteger.ZERO);
+      return true;
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      e.printStackTrace();
+    }
+
+    return false;
   }
 
 

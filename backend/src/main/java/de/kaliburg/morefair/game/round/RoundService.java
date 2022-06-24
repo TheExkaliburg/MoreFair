@@ -3,7 +3,6 @@ package de.kaliburg.morefair.game.round;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.dto.LadderResultsDTO;
-import de.kaliburg.morefair.events.Event;
 import java.util.List;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -59,22 +58,6 @@ public class RoundService {
    */
   public void loadIntoCache(RoundEntity round) {
     ladderService.loadIntoCache(round);
-  }
-
-  /**
-   * Adds and handles a global Event.
-   *
-   * @param event the event to process
-   */
-  public void handleGlobalEvent(Event event) {
-    // TODO: Switch case for all the events
-
-    switch (event.getEventType()) {
-      case NAME_CHANGE -> {
-        accountService.updateUsername(accountService.find(event.getAccountId()),
-            (String) event.getData());
-      }
-    }
   }
 
   public RoundEntity getCurrentRound() {

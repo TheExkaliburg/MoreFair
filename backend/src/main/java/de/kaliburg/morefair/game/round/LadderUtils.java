@@ -1,12 +1,21 @@
 package de.kaliburg.morefair.game.round;
 
 import de.kaliburg.morefair.api.FairController;
+import de.kaliburg.morefair.game.UpgradeUtils;
 import java.math.BigInteger;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 @Component
 public class LadderUtils {
+
+  private final UpgradeUtils upgradeUtils;
+  private final RoundUtils roundUtils;
+
+  public LadderUtils(UpgradeUtils upgradeUtils, RoundUtils roundUtils) {
+    this.upgradeUtils = upgradeUtils;
+    this.roundUtils = roundUtils;
+  }
 
   /**
    * Return the points the ranker needs on a specific ladder to promote. (including the short wait
@@ -52,7 +61,6 @@ public class LadderUtils {
         .getPoints().add(neededPointDifference).max(getBasePointsForPromote(ladder));
   }
 
-
   public BigInteger getBasePointsForPromote(@NonNull LadderEntity ladder) {
     return FairController.POINTS_FOR_PROMOTE.multiply(BigInteger.valueOf(ladder.getNumber()));
   }
@@ -70,9 +78,9 @@ public class LadderUtils {
    * <li>Ranker has either:
    *   <ul>
    *      <li>Auto-Promote </li>
-   *      <li>enough points to be in front of thenext ranker</li></ul>
-   *   </ul>
+   *      <li>enough points to be in front of the next ranker</li></ul>
    * </li>
+   * </ul>
    *
    * @param ladder the ladder the ranker is on
    * @param ranker the ranker that gets checked
@@ -84,6 +92,7 @@ public class LadderUtils {
     }
 
     return ranker.getRank() == 1 && ladder.getRankers().get(0).getUuid().equals(ranker.getUuid())
+        && ranker.isGrowing()
         && (ranker.isAutoPromote()
         || ranker.getPoints().compareTo(getPointsForPromoteWithLead(ladder, ranker)) >= 0);
   }
@@ -97,5 +106,53 @@ public class LadderUtils {
         && ladder.getRankers().get(0).getPoints().compareTo(getBasePointsForPromote(ladder)) >= 0;
   }
 
+  /**
+   * If following conditions are given the ranker can throw vinegar at the target.
+   * <ul>
+   *  <li>Target is #1</li>
+   *  <li>Target is not you</li>
+   *  <li>Target is active on that Ladder</li>
+   *  <li>Target does not have auto-promote</li>
+   *  <li>There are enough people to promote</li>
+   *  <li>Target got enough points to promote</li>
+   *  <li>Ranker got enough Vinegar to throw</li>
+   * </ul>
+   *
+   * @param ladder the ladder the vinegar would get thrown on
+   * @param ranker the ranker that want to throw vinegar
+   * @param target the target of the rankers vinegar-throw
+   * @return if the ranker can throw the vinegar
+   */
+  public boolean canThrowVinegarAt(LadderEntity ladder, RankerEntity ranker, RankerEntity target) {
+    if (!isLadderPromotable(ladder)) {
+      return false;
+    }
 
+    return target.getRank() == 1 && !ranker.getUuid().equals(target.getUuid()) && target.isGrowing()
+        && !target.isAutoPromote()
+        && ranker.getVinegar().compareTo(upgradeUtils.throwVinegarCost(ladder.getNumber())) >= 0;
+  }
+
+
+  /**
+   * If following conditions are given the ranker can buy auto-promote.
+   * <ul>
+   *  <li>Ranker does not already have auto-promote</li>
+   *  <li>Ranker has enough grapes to buy auto-promote</li>
+   *  <li>The ladder is not before the auto-promote-ladder</li>
+   *  <li>The ladder is not the asshole-ladder</li>
+   * </ul>
+   *
+   * @param ladder the ladder the ranker wants to buy auto-promote on
+   * @param ranker the ranker that wants to buy auto-promote
+   * @param round  the current round, so we can find out if this ladder is an asshole-ladder
+   * @return if the ranker can buy auto-promote
+   */
+  public boolean canBuyAutoPromote(LadderEntity ladder, RankerEntity ranker, RoundEntity round) {
+    return !ranker.isAutoPromote() && ranker.getGrapes()
+        .compareTo(upgradeUtils.buyAutoPromoteCost(ranker.getRank(), ladder.getNumber())) >= 0
+        && ladder.getNumber() >= FairController.AUTO_PROMOTE_LADDER
+        && ladder.getNumber() < roundUtils.getAssholeLadderNumber(round);
+
+  }
 }

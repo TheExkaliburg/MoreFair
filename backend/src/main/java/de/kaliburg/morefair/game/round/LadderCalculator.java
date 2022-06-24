@@ -184,7 +184,7 @@ public class LadderCalculator {
         if (currentRanker.getRank() != 1) {
           currentRanker.addVinegar(currentRanker.getGrapes(), deltaSec);
         }
-        if (currentRanker.getRank() == 1 && ladderUtils.isLadderUnlocked(ladder)) {
+        if (currentRanker.getRank() == 1 && ladderUtils.isLadderPromotable(ladder)) {
           currentRanker.mulVinegar(0.9975, deltaSec);
         }
 
@@ -218,9 +218,7 @@ public class LadderCalculator {
     }
 
     if (rankers.size() >= 1 && rankers.get(0).isAutoPromote() && rankers.get(0).isGrowing()
-        && rankers.get(0)
-        .getPoints().compareTo(
-            ladder.getRequiredPointsToUnlock()) >= 0
+        && rankers.get(0).getPoints().compareTo(ladder.getRequiredPointsToUnlock()) >= 0
         && rankers.size() >= ladder.getRequiredRankerCountToUnlock()) {
       log.info("[L{}] Trying to auto-promote {} (#{})", ladder.getNumber(),
           rankers.get(0).getAccount().getUsername(), rankers.get(0).getAccount().getId());
