@@ -174,6 +174,11 @@ const optionsModule = {
               value: false,
             }),
             new BoolOption({
+              displayName: "Enable Chat Features",
+              name: "enableLadderModFeatures",
+              value: false,
+            }),
+            new BoolOption({
               displayName: "Unrestricted Ladder & Chat Access",
               name: "enableUnrestrictedAccess",
               value: false,
