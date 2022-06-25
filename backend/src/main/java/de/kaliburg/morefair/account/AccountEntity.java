@@ -50,7 +50,7 @@ public class AccountEntity {
   private Boolean isAsshole = false;
   @NonNull
   @Column(nullable = false)
-  private Integer timesAsshole = 0;
+  private Integer assholeCount = 0;
   @Column
   private Integer lastIp;
   @NonNull

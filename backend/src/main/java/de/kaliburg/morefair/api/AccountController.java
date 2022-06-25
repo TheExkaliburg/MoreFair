@@ -22,8 +22,9 @@ import org.springframework.stereotype.Controller;
 @Log4j2
 public class AccountController {
 
-  private static final String LOGIN_DESTINATION = "/account/login/";
-  private static final String RENAME_DESTINATION = "/account/name/";
+  private static final String APP_LOGIN_DESTINATION = "/account/login/";
+  private static final String APP_RENAME_DESTINATION = "/account/name/";
+  private static final String QUEUE_LOGIN_DESTINATION = APP_LOGIN_DESTINATION;
 
   private final AccountService accountService;
   private final GameService gameService;
@@ -44,21 +45,21 @@ public class AccountController {
    * @param sha
    * @param wsMessage
    */
-  @MessageMapping(LOGIN_DESTINATION)
+  @MessageMapping(APP_LOGIN_DESTINATION)
   public void login(SimpMessageHeaderAccessor sha, WsMessage wsMessage) {
     try {
       UserPrincipal principal = wsUtils.convertMessageHeaderAccessorToUserPrincipal(sha);
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
 
-      log.trace("/app/{} {}", LOGIN_DESTINATION, uuid);
+      log.trace("/app/{} {}", QUEUE_LOGIN_DESTINATION, uuid);
 
       // Empty UUID
       if (uuid == null || uuid.isBlank()) {
         if (requestThrottler.canCreateAccount(principal)) {
-          wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION,
+          wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION,
               accountService.create(principal), HttpStatus.CREATED);
         } else {
-          wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
+          wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
         }
         return;
       }
@@ -67,35 +68,35 @@ public class AccountController {
       // Can't find account with valid UUID
       if (account == null) {
         if (requestThrottler.canCreateAccount(principal)) {
-          wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION,
+          wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION,
               accountService.create(principal),
               HttpStatus.CREATED);
         } else {
-          wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
+          wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
         }
         return;
       }
 
       // BANNED Players
       if (account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
-        wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
+        wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
       }
 
       account = accountService.login(account, principal);
-      wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, new AccountDetailsDTO(account));
+      wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, new AccountDetailsDTO(account));
 
 
     } catch (IllegalArgumentException e) {
-      wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION, HttpStatus.BAD_REQUEST);
+      wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, HttpStatus.BAD_REQUEST);
     } catch (Exception e) {
-      wsUtils.convertAndSendToUser(sha, LOGIN_DESTINATION,
+      wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION,
           HttpStatus.INTERNAL_SERVER_ERROR);
       log.error(e.getMessage());
       e.printStackTrace();
     }
   }
 
-  @MessageMapping(RENAME_DESTINATION)
+  @MessageMapping(APP_RENAME_DESTINATION)
   public void changeUsername(SimpMessageHeaderAccessor sha, WsMessage wsMessage) {
     try {
       String username = wsMessage.getContent();
@@ -106,7 +107,7 @@ public class AccountController {
       username = StringEscapeUtils.escapeJava(username);
 
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-      log.trace("/app/{} {} {}", RENAME_DESTINATION, uuid, username);
+      log.trace("/app/{} {} {}", APP_RENAME_DESTINATION, uuid, username);
 
       AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null || account.isMuted()) {

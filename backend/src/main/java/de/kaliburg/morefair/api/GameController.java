@@ -28,12 +28,21 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 @Log4j2
-public class RankerController {
+public class GameController {
 
-  public static final String LADDER_DESTINATION = "/queue/ladder/";
-  public static final String LADDER_PRIVATE_UPDATE_DESTINATION = "/queue/ladder/updates/";
-  public static final String LADDER_UPDATE_DESTINATION = "/topic/ladder/";
-  public static final String GLOBAL_UPDATE_DESTINATION = "/topic/global/";
+  public static final String TOPIC_EVENTS_DESTINATION = "/game/events";
+
+  public static final String QUEUE_INIT_DESTINATION = "/game/init";
+
+  public static final String PRIVATE_EVENTS_DESTINATION = "/game/events";
+
+  public static final String APP_INIT_DESTINATION = QUEUE_INIT_DESTINATION + "/{number}";
+  public static final String APP_BIAS_DESTINATION = "/game/bias";
+  public static final String APP_MULTI_DESTINATION = "/game/multi";
+  public static final String APP_VINEGAR_DESTINATION = "/game/vinegar";
+  public static final String APP_PROMOTE_DESTINATION = "/game/promote";
+  public static final String APP_AUTOPROMOTE_DESTINATION = "/game/autopromote";
+
   private final RankerService rankerService;
   private final AccountService accountService;
   private final WsUtils wsUtils;
@@ -41,7 +50,7 @@ public class RankerController {
   private final LadderService ladderService;
   private final GameService gameService;
 
-  public RankerController(RankerService rankerService, AccountService accountService,
+  public GameController(RankerService rankerService, AccountService accountService,
       WsUtils wsUtils, RoundService roundService, LadderService ladderService,
       GameService gameService) {
     this.rankerService = rankerService;
@@ -67,7 +76,7 @@ public class RankerController {
     }
   }
 
-  @MessageMapping("/ladder/init/{number}")
+  @MessageMapping(APP_INIT_DESTINATION)
   public void initLadder(SimpMessageHeaderAccessor sha, WsMessage wsMessage,
       @DestinationVariable("number") Integer number) {
     try {
@@ -75,7 +84,7 @@ public class RankerController {
       log.debug("/app/ladder/init/{} from {}", number, uuid);
       AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null || account.isBanned()) {
-        wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, HttpStatus.FORBIDDEN);
+        wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION, HttpStatus.FORBIDDEN);
         return;
       }
 
@@ -89,24 +98,24 @@ public class RankerController {
           || number == FairController.BASE_ASSHOLE_LADDER + roundService.getCurrentRound()
           .getHighestAssholeCount() || number <= ranker.getLadder().getNumber()) {
         LadderViewDto l = new LadderViewDto(ladderService.find(number), account);
-        wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, l);
+        wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION, l);
       } else {
-        wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION,
+        wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION,
             "Can't get permission to view the ladder.",
             HttpStatus.FORBIDDEN);
       }
 
     } catch (IllegalArgumentException e) {
-      wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, HttpStatus.BAD_REQUEST);
+      wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION, HttpStatus.BAD_REQUEST);
     } catch (Exception e) {
-      wsUtils.convertAndSendToUser(sha, LADDER_DESTINATION, e.getMessage(),
+      wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION, e.getMessage(),
           HttpStatus.INTERNAL_SERVER_ERROR);
       log.error(e.getMessage());
       e.printStackTrace();
     }
   }
 
-  @MessageMapping("/ladder/post/bias")
+  @MessageMapping(APP_BIAS_DESTINATION)
   public void buyBias(SimpMessageHeaderAccessor sha, WsObservedMessage wsMessage) {
     try {
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
@@ -129,7 +138,7 @@ public class RankerController {
     }
   }
 
-  @MessageMapping("/ladder/post/multi")
+  @MessageMapping(APP_MULTI_DESTINATION)
   public void buyMulti(SimpMessageHeaderAccessor sha, WsObservedMessage wsMessage) {
     try {
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
@@ -152,7 +161,7 @@ public class RankerController {
     }
   }
 
-  @MessageMapping("/ladder/post/vinegar")
+  @MessageMapping(APP_VINEGAR_DESTINATION)
   public void throwVinegar(SimpMessageHeaderAccessor sha, WsObservedMessage wsMessage) {
     try {
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
@@ -175,7 +184,7 @@ public class RankerController {
     }
   }
 
-  @MessageMapping("/ladder/post/promote")
+  @MessageMapping(APP_PROMOTE_DESTINATION)
   public void promote(SimpMessageHeaderAccessor sha, WsObservedMessage wsMessage) {
     try {
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
@@ -198,30 +207,7 @@ public class RankerController {
     }
   }
 
-  @MessageMapping("/ladder/post/asshole")
-  public void beAsshole(SimpMessageHeaderAccessor sha, WsObservedMessage wsMessage) {
-    try {
-      String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-      AccountEntity account = accountService.find(UUID.fromString(uuid));
-      if (account == null || account.isBanned()) {
-        return;
-      }
-      Integer num = rankerService.findHighestActiveRankerOfAccount(account).getLadder()
-          .getNumber();
-      log.info("[L{}] ASSHOLE: {} (#{}) {}", num, account.getUsername(), account.getId(),
-          wsMessage.getEvent());
-      ModServerMessageData data = new ModServerMessageData(account.getId(),
-          sha.getDestination(),
-          wsMessage.getContent(), wsMessage.getEvent());
-      wsUtils.convertAndSendToTopic(ModerationController.GAME_UPDATE_DESTINATION + num, data);
-      ladderService.addEvent(num, new Event(EventType.ASSHOLE, account.getId()));
-    } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
-    }
-  }
-
-  @MessageMapping("/ladder/post/auto-promote")
+  @MessageMapping(APP_AUTOPROMOTE_DESTINATION)
   public void buyAutoPromote(SimpMessageHeaderAccessor sha, WsObservedMessage wsMessage) {
     try {
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());

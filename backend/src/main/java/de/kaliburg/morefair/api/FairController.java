@@ -68,7 +68,8 @@ public class FairController {
           "🂭",
           "🂮"
       ));
-  public final static String INFO_DESTINATION = "/queue/info";
+  public final static String APP_INFO_DESTINATION = "/info/";
+  public final static String QUEUE_INFO_DESTINATION = APP_INFO_DESTINATION;
   private final RoundService roundService;
   private final WsUtils wsUtils;
 
@@ -82,7 +83,7 @@ public class FairController {
     return "forward:/";
   }
 
-  @MessageMapping("/info")
+  @MessageMapping(APP_INFO_DESTINATION)
   public void login(SimpMessageHeaderAccessor sha, WsMessage wsMessage) throws Exception {
     try {
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
@@ -91,11 +92,11 @@ public class FairController {
       Integer maxTimesAssholes = roundService.getCurrentRound().getHighestAssholeCount();
       InfoDTO info = new InfoDTO(maxTimesAssholes);
 
-      wsUtils.convertAndSendToUser(sha, INFO_DESTINATION, info);
+      wsUtils.convertAndSendToUser(sha, QUEUE_INFO_DESTINATION, info);
     } catch (IllegalArgumentException e) {
-      wsUtils.convertAndSendToUser(sha, INFO_DESTINATION, HttpStatus.BAD_REQUEST);
+      wsUtils.convertAndSendToUser(sha, QUEUE_INFO_DESTINATION, HttpStatus.BAD_REQUEST);
     } catch (Exception e) {
-      wsUtils.convertAndSendToUser(sha, INFO_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
+      wsUtils.convertAndSendToUser(sha, QUEUE_INFO_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
       log.error(e.getMessage());
       e.printStackTrace();
     }

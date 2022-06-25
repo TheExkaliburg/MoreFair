@@ -99,7 +99,8 @@ public class ChatService {
     }
 
     result = messageService.save(result);
-    wsUtils.convertAndSendToTopic(ChatController.CHAT_UPDATE_DESTINATION + number,
+    wsUtils.convertAndSendToTopic(
+        ChatController.TOPIC_EVENTS_DESTINATION.replace("{number}", number.toString()),
         new MessageDTO(result));
     return result;
   }

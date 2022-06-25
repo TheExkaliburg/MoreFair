@@ -27,7 +27,7 @@ public class RankerDto {
     this.bias = ranker.getBias();
     this.multiplier = ranker.getMultiplier();
     this.isGrowing = ranker.isGrowing();
-    this.timesAsshole = ranker.getAccount().getTimesAsshole();
+    this.timesAsshole = ranker.getAccount().getAssholeCount();
   }
 
   public RankerDto() {

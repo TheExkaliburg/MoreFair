@@ -6,13 +6,10 @@ import de.kaliburg.morefair.api.utils.RequestThrottler;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WsEmptyMessage;
 import de.kaliburg.morefair.api.websockets.messages.WsMetaMessage;
-import de.kaliburg.morefair.game.GameService;
 import de.kaliburg.morefair.game.chat.ChatDTO;
 import de.kaliburg.morefair.game.chat.ChatService;
 import de.kaliburg.morefair.game.chat.MessageDTO;
 import de.kaliburg.morefair.game.chat.MessageEntity;
-import de.kaliburg.morefair.game.chat.MessageService;
-import de.kaliburg.morefair.game.round.LadderService;
 import de.kaliburg.morefair.game.round.RankerEntity;
 import de.kaliburg.morefair.game.round.RankerService;
 import de.kaliburg.morefair.game.round.RoundService;
@@ -29,34 +26,32 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class ChatController {
 
-  public static final String CHAT_INIT_DESTINATION = "/chat/init/";
-  public static final String CHAT_UPDATE_DESTINATION = "/chat/updates/";
-  private final MessageService messageService;
+  public static final String TOPIC_EVENTS_DESTINATION = "/chat/events/{number}";
+
+  public static final String QUEUE_INIT_DESTINATION = "/chat/init";
+  public static final String PRIVATE_PROMPT_DESTINATION = "/chat/prompt";
+
+  public static final String APP_INIT_DESTINATION = QUEUE_INIT_DESTINATION + "/{number}";
+  public static final String APP_CHAT_DESTINATION = "/chat/{number}";
+
   private final AccountService accountService;
   private final RankerService rankerService;
   private final WsUtils wsUtils;
   private final RequestThrottler throttler;
   private final RoundService roundService;
-  private final LadderService ladderService;
   private final ChatService chatService;
-  private final GameService gameService;
 
-  public ChatController(MessageService messageService, AccountService accountService,
-      RankerService rankerService,
-      WsUtils wsUtils, RequestThrottler throttler, RoundService roundService,
-      LadderService ladderService, ChatService chatService, GameService gameService) {
-    this.messageService = messageService;
+  public ChatController(AccountService accountService, RankerService rankerService, WsUtils wsUtils,
+      RequestThrottler throttler, RoundService roundService, ChatService chatService) {
     this.accountService = accountService;
     this.rankerService = rankerService;
     this.wsUtils = wsUtils;
     this.throttler = throttler;
     this.roundService = roundService;
-    this.ladderService = ladderService;
     this.chatService = chatService;
-    this.gameService = gameService;
   }
 
-  @MessageMapping(CHAT_INIT_DESTINATION + "{number}")
+  @MessageMapping(APP_INIT_DESTINATION)
   public void initChat(SimpMessageHeaderAccessor sha, WsEmptyMessage wsMessage,
       @DestinationVariable("number") Integer number) {
     try {
@@ -64,7 +59,7 @@ public class ChatController {
       log.trace("/app/chat/init/{} from {}", number, uuid);
       AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null || account.isBanned()) {
-        wsUtils.convertAndSendToUser(sha, CHAT_INIT_DESTINATION, HttpStatus.FORBIDDEN);
+        wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION, HttpStatus.FORBIDDEN);
         return;
       }
 
@@ -75,21 +70,21 @@ public class ChatController {
 
       if (account.isMod() || number <= ranker.getLadder().getNumber()) {
         ChatDTO c = new ChatDTO(chatService.getChat(number));
-        wsUtils.convertAndSendToUser(sha, CHAT_INIT_DESTINATION, c);
+        wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION, c);
       } else {
-        wsUtils.convertAndSendToUser(sha, CHAT_INIT_DESTINATION, HttpStatus.FORBIDDEN);
+        wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION, HttpStatus.FORBIDDEN);
       }
 
     } catch (IllegalArgumentException e) {
-      wsUtils.convertAndSendToUser(sha, CHAT_INIT_DESTINATION, HttpStatus.BAD_REQUEST);
+      wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION, HttpStatus.BAD_REQUEST);
     } catch (Exception e) {
-      wsUtils.convertAndSendToUser(sha, CHAT_INIT_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
+      wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
       log.error(e.getMessage());
       e.printStackTrace();
     }
   }
 
-  @MessageMapping("/chat/post/{number}")
+  @MessageMapping(APP_CHAT_DESTINATION)
   public void postChat(WsMetaMessage wsMessage, @DestinationVariable("number") Integer number) {
     try {
       String message = wsMessage.getContent();
@@ -109,7 +104,7 @@ public class ChatController {
       if (account.isMod() || (number <= ranker.getLadder().getNumber() && throttler.canPostMessage(
           account))) {
         MessageEntity answer = chatService.sendMessageToChat(account, number, message, metadata);
-        wsUtils.convertAndSendToTopic(CHAT_UPDATE_DESTINATION + number, new MessageDTO(answer));
+        wsUtils.convertAndSendToTopic(TOPIC_EVENTS_DESTINATION + number, new MessageDTO(answer));
       }
     } catch (Exception e) {
       log.error(e.getMessage());

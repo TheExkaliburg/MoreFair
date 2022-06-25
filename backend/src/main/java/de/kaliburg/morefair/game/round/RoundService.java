@@ -72,7 +72,7 @@ public class RoundService {
    */
   public RankerEntity createNewRanker(AccountEntity account) {
     RankerEntity result = ladderService.createRanker(account);
-    Integer timesAsshole = result.getAccount().getTimesAsshole();
+    Integer timesAsshole = result.getAccount().getAssholeCount();
 
     if (timesAsshole > getCurrentRound().getHighestAssholeCount()) {
       // TODO: Global Event to update the highestLadder

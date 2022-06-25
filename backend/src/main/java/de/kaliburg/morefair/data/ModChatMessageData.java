@@ -20,7 +20,7 @@ public class ModChatMessageData {
     this.message = StringEscapeUtils.unescapeJava(message.getMessage());
     this.username = StringEscapeUtils.unescapeJava(message.getAccount().getUsername());
     this.assholeTag = FairController.ASSHOLE_TAGS.get(
-        Math.min(message.getAccount().getTimesAsshole(), FairController.ASSHOLE_TAGS.size() - 1));
+        Math.min(message.getAccount().getAssholeCount(), FairController.ASSHOLE_TAGS.size() - 1));
     this.accountId = message.getAccount().getId();
     this.timeCreated = message.getCreatedOn().format(DateTimeFormatter.ofPattern("EE HH:mm"));
   }

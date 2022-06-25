@@ -1,7 +1,7 @@
 package de.kaliburg.morefair.game.round;
 
 import de.kaliburg.morefair.account.AccountService;
-import de.kaliburg.morefair.api.RankerController;
+import de.kaliburg.morefair.api.GameController;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.dto.HeartbeatDTO;
 import de.kaliburg.morefair.events.Event;
@@ -80,7 +80,7 @@ public class LadderCalculator {
         for (LadderEntity ladder : ladderService.getCurrentLadderMap().values()) {
           heartbeatMap.get(ladder.getNumber()).setSecondsPassed(deltaSec);
           wsUtils.convertAndSendToTopic(
-              RankerController.LADDER_UPDATE_DESTINATION + ladder.getNumber(),
+              GameController.LADDER_UPDATE_DESTINATION + ladder.getNumber(),
               heartbeatMap.get(ladder.getNumber()));
         }
 

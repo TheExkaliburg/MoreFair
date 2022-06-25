@@ -274,7 +274,7 @@ public class LadderService {
     ladder.getRankers().add(result);
 
     Event joinEvent = new Event(EventType.JOIN, account.getId());
-    joinEvent.setData(new JoinData(account.getUsername(), account.getTimesAsshole()));
+    joinEvent.setData(new JoinData(account.getUsername(), account.getAssholeCount()));
     eventMap.get(number).add(joinEvent);
 
     return result;
