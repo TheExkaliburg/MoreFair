@@ -51,7 +51,7 @@ public class WsUtils {
    */
   public void convertAndSendToUser(SimpMessageHeaderAccessor sha, String dest, Object content,
       HttpStatus status) {
-    StringBuilder sb = new StringBuilder("/user/queue");
+    StringBuilder sb = new StringBuilder("/queue");
     if (!dest.startsWith("/")) {
       sb.append("/");
     }
@@ -60,6 +60,7 @@ public class WsUtils {
       sb.append("/");
     }
 
+    log.debug("Message to {} at /user{}", sha.getUser().getName(), sb.toString());
     simpMessagingTemplate.convertAndSendToUser(sha.getUser().getName(), sb.toString(),
         new WSMessageAnswer<>(content, status));
   }

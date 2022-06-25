@@ -55,7 +55,7 @@ public class CustomHandshakeHandler extends DefaultHandshakeHandler {
     }
 
     UUID uuid = UUID.randomUUID();
-    log.trace("Determining user for session {} with ip {} as {}", request.getURI().toString(),
+    log.info("Determining user for session {} with ip {} as {}", request.getURI().toString(),
         ip, uuid);
     return new UserPrincipal(uuid.toString(), ip);
   }
