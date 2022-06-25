@@ -9,6 +9,7 @@ const versioningModule = {
         new Version("PATCH", "Fixing Asshole-Badge Limit", {
           features: [
             "Moderators can now moderate via the ladder for easyer access.",
+            "You can now mention a user by clicking on their name in the chat.",
           ],
         }),
         new Version("PATCH", "", {

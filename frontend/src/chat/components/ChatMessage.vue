@@ -2,10 +2,19 @@
   <div class="container px-3 py-1 message">
     <div class="row py-0 message-header">
       <div class="col-4 message-username">
-        <span class="message-user-name">
+        <span
+          class="message-user-name"
+          style="cursor: pointer"
+          @click="mentionUser"
+        >
           {{ msg.username }}
         </span>
-        <sub class="message-user-id">&nbsp;#{{ msg.accountId }}</sub>
+        <sub
+          class="message-user-id"
+          style="cursor: pointer"
+          @click="mentionUser"
+          >&nbsp;#{{ msg.accountId }}</sub
+        >
       </div>
       <div class="col-4 message-status">
         <strong>{{
@@ -64,6 +73,38 @@ const settings = computed(() => store.state.settings);
 const props = defineProps({
   msg: Object,
 });
+
+function mentionUser() {
+  let msgBox = document.getElementById("chatInput");
+  let mention = document.createElement("span");
+  mention.innerHTML = `@${props.msg.username}#${props.msg.accountId}`;
+  mention.classList.add("mention");
+  mention.setAttribute("data-user", props.msg.username);
+  mention.setAttribute("data-id", props.msg.accountId);
+  msgBox.appendChild(mention);
+
+  //add a space after the mention and put the cursor at the end of the text
+  let textNode = document.createTextNode(" ");
+  msgBox.appendChild(textNode);
+  msgBox.appendChild(document.createElement("br"));
+  msgBox.focus();
+
+  //remove all br tags that have nextsibling
+  let brs = msgBox.getElementsByTagName("br");
+  for (let i = 0; i < brs.length; i++) {
+    if (brs[i].nextSibling) {
+      brs[i].remove();
+    }
+  }
+
+  let range = document.createRange();
+  range.setStart(textNode, 1);
+  range.collapse(true);
+  let sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+  msgBox.focus();
+}
 
 function ban() {
   if (
