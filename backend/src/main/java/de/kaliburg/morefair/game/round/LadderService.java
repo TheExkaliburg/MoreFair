@@ -82,7 +82,7 @@ public class LadderService {
   public LadderEntity createLadder(RoundEntity round, Integer ladderNumber) {
     LadderEntity result = new LadderEntity(ladderNumber, round);
     result = ladderRepository.save(result);
-    if (currentRound.getUuid().equals(round.getUuid())) {
+    if (currentRound != null && currentRound.getUuid().equals(round.getUuid())) {
       currentLadderMap.put(ladderNumber, result);
     }
     return result;
@@ -106,7 +106,9 @@ public class LadderService {
   public void loadIntoCache(RoundEntity round) {
     currentRound = round;
     currentLadderMap = new HashMap<>();
-    round.getLadders().forEach(ladder -> {
+    List<LadderEntity> ladders = ladderRepository.findByRoundOrderByNumberAsc(round);
+
+    ladders.forEach(ladder -> {
       currentLadderMap.put(ladder.getNumber(), ladder);
       eventMap.put(ladder.getNumber(), new ArrayList<>());
     });

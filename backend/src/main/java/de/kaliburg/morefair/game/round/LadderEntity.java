@@ -28,8 +28,7 @@ import lombok.experimental.Accessors;
 @Entity
 @Table(name = "ladder", uniqueConstraints = {
     @UniqueConstraint(name = "uq_uuid", columnNames = "uuid"),
-    @UniqueConstraint(name = "uk_number_round", columnNames = {"number",
-        "round_id"})})
+    @UniqueConstraint(name = "uk_number_round", columnNames = {"number", "round_id"})})
 @Getter
 @Setter
 @Accessors(chain = true)
@@ -51,7 +50,7 @@ public final class LadderEntity {
   @ManyToOne
   @JoinColumn(name = "round_id", nullable = false, foreignKey = @ForeignKey(name = "fk_ladder_round"))
   private RoundEntity round;
-  @OneToMany(mappedBy = "ladder", fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "ladder", fetch = FetchType.EAGER)
   private List<RankerEntity> rankers = new ArrayList<>();
 
   public Integer getRequiredRankerCountToUnlock() {

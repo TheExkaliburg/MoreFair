@@ -21,7 +21,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Entity
-@Table(name = "game", uniqueConstraints = {
+@Table(name = "chat", uniqueConstraints = {
     @UniqueConstraint(name = "uk_uuid", columnNames = "uuid"),
     @UniqueConstraint(name = "uk_number", columnNames = "number")})
 @Getter

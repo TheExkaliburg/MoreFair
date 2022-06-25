@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +27,7 @@ public class ChatService {
   private Map<Integer, ChatEntity> currentChatMap = new HashMap<>();
 
   public ChatService(ChatRepository chatRepository, MessageService messageService,
-      WsUtils wsUtils) {
+      @Lazy WsUtils wsUtils) {
     this.chatRepository = chatRepository;
     this.messageService = messageService;
     this.wsUtils = wsUtils;

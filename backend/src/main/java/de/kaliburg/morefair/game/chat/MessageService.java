@@ -2,7 +2,6 @@ package de.kaliburg.morefair.game.chat;
 
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
-import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.game.round.LadderRepository;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -21,7 +20,7 @@ public class MessageService {
   private final AccountService accountService;
 
   public MessageService(MessageRepository messageRepository, LadderRepository ladderRepository,
-      AccountService accountService, WsUtils wsUtils) {
+      AccountService accountService) {
     this.messageRepository = messageRepository;
     this.accountService = accountService;
   }

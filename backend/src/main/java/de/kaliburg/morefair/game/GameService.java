@@ -50,16 +50,17 @@ public class GameService {
   void initialGameSetup() {
     try {
       List<GameEntity> allGames = gameRepository.findAll();
-      game = allGames.isEmpty() ? createGame() : allGames.get(0);
+      game = allGames.isEmpty() ? create() : allGames.get(0);
       roundService.loadIntoCache(game.getCurrentRound());
       chatService.loadIntoCache();
     } catch (Exception e) {
+      log.error(e.getMessage());
       e.printStackTrace();
     }
   }
 
-  @Scheduled(fixedDelay = 60000, fixedRate = 60000)
   @Transactional
+  @Scheduled(initialDelay = 60000, fixedRate = 60000)
   void saveToDatabase() {
     try {
       updateGame(this.game);
@@ -69,8 +70,9 @@ public class GameService {
     }
   }
 
-  private GameEntity createGame() {
-    GameEntity result = gameRepository.save(new GameEntity());
+  private GameEntity create() {
+    GameEntity result = new GameEntity();
+    result = gameRepository.save(result);
     RoundEntity round = roundService.create(1);
     ChatEntity chat = chatService.create(1);
 

@@ -52,7 +52,7 @@ public class RankerEntity {
   @NonNull
   @Column(nullable = false)
   private Integer multiplier = 1;
-  private boolean isGrowing = true;
+  private boolean growing = true;
   @NonNull
   @ManyToOne
   @JoinColumn(name = "ladder_id", nullable = false, foreignKey = @ForeignKey(name = "fk_ranker_ladder"))
