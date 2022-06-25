@@ -20,18 +20,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Slf4j
 public class FairController {
 
-  public final static Integer MINIMUM_PEOPLE_FOR_PROMOTE = 1;
+  public static final String APP_INFO_DESTINATION = "/info";
+  public static final String QUEUE_INFO_DESTINATION = APP_INFO_DESTINATION;
+  public static final Integer MINIMUM_PEOPLE_FOR_PROMOTE = 1;
   // 250 Millionen
-  public final static BigInteger POINTS_FOR_PROMOTE = new BigInteger("100");
+  public static final BigInteger POINTS_FOR_PROMOTE = new BigInteger("100");
   // 500 Thousand
-  public final static BigInteger BASE_VINEGAR_NEEDED_TO_THROW = new BigInteger("500000");
+  public static final BigInteger BASE_VINEGAR_NEEDED_TO_THROW = new BigInteger("500000");
   // 2 Thousand
-  public final static BigInteger BASE_GRAPES_NEEDED_TO_AUTO_PROMOTE = new BigInteger("5000");
-  public final static Integer AUTO_PROMOTE_LADDER = 1;
-  public final static Integer MANUAL_PROMOTE_WAIT_TIME = 30;
-  public final static Integer BASE_ASSHOLE_LADDER = 1;
-  public final static Integer ASSHOLES_FOR_RESET = 1;
-  public final static List<String> ASSHOLE_TAGS = new ArrayList<>(
+  public static final BigInteger BASE_GRAPES_NEEDED_TO_AUTO_PROMOTE = new BigInteger("5000");
+  public static final Integer AUTO_PROMOTE_LADDER = 1;
+  public static final Integer MANUAL_PROMOTE_WAIT_TIME = 30;
+  public static final Integer BASE_ASSHOLE_LADDER = 1;
+  public static final Integer ASSHOLES_FOR_RESET = 1;
+  public static final List<String> ASSHOLE_TAGS = new ArrayList<>(
       Arrays.asList("", "♠",     // 01♠
           "♣",     // 02♣
           "♥",     // 03♥
@@ -68,8 +70,7 @@ public class FairController {
           "🂭",
           "🂮"
       ));
-  public final static String APP_INFO_DESTINATION = "/info/";
-  public final static String QUEUE_INFO_DESTINATION = APP_INFO_DESTINATION;
+
   private final RoundService roundService;
   private final WsUtils wsUtils;
 
