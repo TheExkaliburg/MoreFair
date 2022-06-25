@@ -120,6 +120,10 @@ function setupConnection() {
   return new Promise((resolve) => {
     stompClient.connect(() => {
       stompClient.subscribe("/user/queue/info", (message) => {
+        let uuid = Cookies.get("_uuid");
+        if (uuid === "" && !confirm("Do you want to create a new account?")) {
+          return;
+        }
         store.commit({ type: "initSettings", message: message });
 
         stompClient.subscribe("/user/queue/account/login", (message) => {
@@ -127,10 +131,6 @@ function setupConnection() {
           setupData(resolve);
         });
 
-        let uuid = Cookies.get("_uuid");
-        if (uuid === "" && !confirm("Do you want to create a new account?")) {
-          return;
-        }
         stompClient.send("/app/account/login");
       });
 
