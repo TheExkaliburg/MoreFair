@@ -30,18 +30,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Log4j2
 public class GameController {
 
-  public static final String TOPIC_EVENTS_DESTINATION = "/game/events";
-
-  public static final String QUEUE_INIT_DESTINATION = "/game/init";
-
-  public static final String PRIVATE_EVENTS_DESTINATION = "/game/events";
-
-  public static final String APP_INIT_DESTINATION = QUEUE_INIT_DESTINATION + "/{number}";
+  public static final String APP_INIT_DESTINATION = "/game/init/{number}";
   public static final String APP_BIAS_DESTINATION = "/game/bias";
   public static final String APP_MULTI_DESTINATION = "/game/multi";
   public static final String APP_VINEGAR_DESTINATION = "/game/vinegar";
   public static final String APP_PROMOTE_DESTINATION = "/game/promote";
   public static final String APP_AUTOPROMOTE_DESTINATION = "/game/autopromote";
+  public static final String TOPIC_EVENTS_DESTINATION = "/game/events";
+  public static final String QUEUE_INIT_DESTINATION = "/game/init";
+
+  public static final String PRIVATE_EVENTS_DESTINATION = "/game/events";
 
   private final RankerService rankerService;
   private final AccountService accountService;

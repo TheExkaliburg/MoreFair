@@ -33,13 +33,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Log4j2
 public class ModerationController {
 
-  public final static String CHAT_UPDATE_DESTINATION = "/topic/mod/chat/";
-  public final static String GAME_UPDATE_DESTINATION = "/topic/mod/ladder/";
-  public final static String GLOBAL_UPDATE_DESTINATION = "/topic/mod/global/";
-  private final static String INFO_DESTINATION = "/queue/mod/info/";
-  private final static String CHAT_DESTINATION = "/queue/mod/chat/";
-  private final static String GAME_DESTINATION = "/queue/mod/game/";
-  private final static String INFO_REQUEST = "/mod/info";
+  public static final String APP_CHAT_INIT_DESTINATION = "/mod/chat/init";
+  public static final String APP_BAN_DESTINATION = "/mod/ban/{id}";
+  public static final String APP_MUTE_DESTINATION = "/mod/mute/{id}";
+  public static final String APP_FREE_DESTINATION = "/mod/free/{id}";
+  public static final String APP_RENAME_DESTINATION = "/mod/rename/{id}";
+  public static final String APP_CONFIRM_DESTINATION = "/mod/confirm/{id}";
+  public static final String APP_MOD_DESTINATION = "/mod/mod/{id}";
+  public static final String TOPIC_CHAT_EVENTS_DESTINATION = "/mod/chat/events";
+  public static final String TOPIC_EVENTS_DESTINATION = "/mod/events";
+  public static final String QUEUE_CHAT_INIT_DESTINATION = "/mod/chat/init";
+
   private final AccountService accountService;
   private final WsUtils wsUtils;
   private final LadderService ladderService;

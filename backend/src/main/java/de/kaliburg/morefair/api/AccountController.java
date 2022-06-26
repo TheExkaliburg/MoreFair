@@ -22,9 +22,9 @@ import org.springframework.stereotype.Controller;
 @Log4j2
 public class AccountController {
 
-  private static final String APP_LOGIN_DESTINATION = "/account/login/";
+  private static final String APP_LOGIN_DESTINATION = "/account/login";
   private static final String APP_RENAME_DESTINATION = "/account/name/";
-  private static final String QUEUE_LOGIN_DESTINATION = APP_LOGIN_DESTINATION;
+  private static final String QUEUE_LOGIN_DESTINATION = "/account/login/";
 
   private final AccountService accountService;
   private final GameService gameService;

@@ -31,7 +31,7 @@ public class ChatController {
   public static final String QUEUE_INIT_DESTINATION = "/chat/init";
   public static final String PRIVATE_PROMPT_DESTINATION = "/chat/prompt";
 
-  public static final String APP_INIT_DESTINATION = QUEUE_INIT_DESTINATION + "/{number}";
+  public static final String APP_INIT_DESTINATION = "/chat/init/{number}";
   public static final String APP_CHAT_DESTINATION = "/chat/{number}";
 
   private final AccountService accountService;

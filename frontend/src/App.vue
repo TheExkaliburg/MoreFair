@@ -119,18 +119,20 @@ provide("$stompClient", stompClient);
 function setupConnection() {
   return new Promise((resolve) => {
     stompClient.connect(() => {
-      stompClient.subscribe("/user/queue/info", (message) => {
+      let uuid = Cookies.get("_uuid");
+
+      stompClient.subscribe("/user/queue/info/", (message) => {
         store.commit({ type: "initSettings", message: message });
+
+        if (uuid === "" && !confirm("Do you want to create a new account?")) {
+          return;
+        }
 
         stompClient.subscribe("/user/queue/account/login", (message) => {
           store.commit({ type: "initUser", message: message });
           setupData(resolve);
         });
 
-        let uuid = Cookies.get("_uuid");
-        if (uuid === "" && !confirm("Do you want to create a new account?")) {
-          return;
-        }
         stompClient.send("/app/account/login");
       });
 
