@@ -73,7 +73,7 @@ export function loadNewTheme(url, callback) {
   xhr.send();
 }
 
-export function loadTheme(url, onlyLoad = false) {
+export function loadTheme(url, onlyLoad = false, callback = () => {}) {
   const oldThemes = getThemeNames();
   loadNewTheme(url, () => {
     const option = store.getters["options/getOption"]("themeSelection");
@@ -119,6 +119,7 @@ export function loadTheme(url, onlyLoad = false) {
         },
       });
     }
+    callback();
   });
 }
 
@@ -169,15 +170,24 @@ export function requestTheme(themeName) {
   loadTheme(theme);
 }
 
-export function requestAllThemes() {
+export function requestAllThemes(callback = () => {}) {
   const themeDatabase = localStorage.getItem("themeDatabase");
   if (!themeDatabase) {
     return;
   }
   const themeDatabaseObject = JSON.parse(themeDatabase);
+  let mutex = 1;
   Object.values(themeDatabaseObject).forEach((theme) => {
-    loadTheme(theme, true);
+    mutex++;
+    loadTheme(theme, true, () => {
+      mutex--;
+      if (mutex === 0) callback();
+    });
   });
+  mutex--;
+  if (mutex === 0) {
+    callback();
+  }
 }
 
 export function exposeThemeManagerToConsole() {
