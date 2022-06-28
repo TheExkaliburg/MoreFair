@@ -23,7 +23,10 @@ const versioningModule = {
           balancing: [
             "Doesn't Replace No-Auto Ladders with Free-Auto anymore.",
           ],
-          fixes: ["Now saving all options (hopefully) correctly."],
+          fixes: [
+            "Now saving all options (hopefully) correctly.",
+            "Fixed theme loading issues.",
+          ],
         }),
         new Version("PATCH", "Grape reward changes", {
           balancing: [
