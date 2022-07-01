@@ -128,7 +128,7 @@ public class GameController {
       ModServerMessageData data = new ModServerMessageData(account.getId(),
           sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
-      wsUtils.convertAndSendToTopic(ModerationController.GAME_UPDATE_DESTINATION + num, data);
+      wsUtils.convertAndSendToTopic(ModerationController.TOPIC_EVENTS_DESTINATION + num, data);
       ladderService.addEvent(num, new Event(EventType.BUY_BIAS, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
@@ -151,7 +151,7 @@ public class GameController {
       ModServerMessageData data = new ModServerMessageData(account.getId(),
           sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
-      wsUtils.convertAndSendToTopic(ModerationController.GAME_UPDATE_DESTINATION + num, data);
+      wsUtils.convertAndSendToTopic(ModerationController.TOPIC_EVENTS_DESTINATION + num, data);
       ladderService.addEvent(num, new Event(EventType.BUY_MULTI, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
@@ -174,7 +174,7 @@ public class GameController {
       ModServerMessageData data = new ModServerMessageData(account.getId(),
           sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
-      wsUtils.convertAndSendToTopic(ModerationController.GAME_UPDATE_DESTINATION + num, data);
+      wsUtils.convertAndSendToTopic(ModerationController.TOPIC_EVENTS_DESTINATION + num, data);
       ladderService.addEvent(num, new Event(EventType.THROW_VINEGAR, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
@@ -197,7 +197,7 @@ public class GameController {
       ModServerMessageData data = new ModServerMessageData(account.getId(),
           sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
-      wsUtils.convertAndSendToTopic(ModerationController.GAME_UPDATE_DESTINATION + num, data);
+      wsUtils.convertAndSendToTopic(ModerationController.TOPIC_EVENTS_DESTINATION + num, data);
       ladderService.addEvent(num, new Event(EventType.PROMOTE, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
@@ -220,7 +220,7 @@ public class GameController {
       ModServerMessageData data = new ModServerMessageData(account.getId(),
           sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
-      wsUtils.convertAndSendToTopic(ModerationController.GAME_UPDATE_DESTINATION + num, data);
+      wsUtils.convertAndSendToTopic(ModerationController.TOPIC_EVENTS_DESTINATION + num, data);
       ladderService.addEvent(num, new Event(EventType.BUY_AUTO_PROMOTE, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());

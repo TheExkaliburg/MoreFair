@@ -32,7 +32,7 @@ const API = {
     APP_MUTE_DESTINATION: "/mod/mute/{id}",
     APP_FREE_DESTINATION: "/mod/free/{id}",
     APP_RENAME_DESTINATION: "/mod/rename/{id}",
-    APP_CONFIRM_DESTINATION: "/mod/confirm/{id}",
+    APP_CONFIRM_DESTINATION: "/mod/prompt/{id}",
     APP_MOD_DESTINATION: "/mod/mod/{id}",
     TOPIC_CHAT_EVENTS_DESTINATION: "/mod/chat/events",
     TOPIC_EVENTS_DESTINATION: "/mod/events",

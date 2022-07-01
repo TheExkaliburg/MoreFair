@@ -6,7 +6,6 @@ import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WsMessage;
 import de.kaliburg.morefair.data.ModChatData;
-import de.kaliburg.morefair.data.ModerationInfoData;
 import de.kaliburg.morefair.game.chat.ChatService;
 import de.kaliburg.morefair.game.chat.MessageEntity;
 import de.kaliburg.morefair.game.chat.MessageService;
@@ -14,7 +13,6 @@ import de.kaliburg.morefair.game.round.LadderService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
@@ -38,7 +36,7 @@ public class ModerationController {
   public static final String APP_MUTE_DESTINATION = "/mod/mute/{id}";
   public static final String APP_FREE_DESTINATION = "/mod/free/{id}";
   public static final String APP_RENAME_DESTINATION = "/mod/rename/{id}";
-  public static final String APP_CONFIRM_DESTINATION = "/mod/confirm/{id}";
+  public static final String APP_PROMPT_DESTINATION = "/mod/prompt/{id}";
   public static final String APP_MOD_DESTINATION = "/mod/mod/{id}";
   public static final String TOPIC_CHAT_EVENTS_DESTINATION = "/mod/chat/events";
   public static final String TOPIC_EVENTS_DESTINATION = "/mod/events";
@@ -60,7 +58,7 @@ public class ModerationController {
     this.chatService = chatService;
   }
 
-  @MessageMapping(INFO_REQUEST)
+  /*@MessageMapping(INFO_REQUEST)
   public void info(SimpMessageHeaderAccessor sha, WsMessage wsMessage) throws Exception {
     try {
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
@@ -82,9 +80,9 @@ public class ModerationController {
       log.error(e.getMessage());
       e.printStackTrace();
     }
-  }
+  }*/
 
-  @MessageMapping("/mod/chat")
+  @MessageMapping(APP_CHAT_INIT_DESTINATION)
   public void chat(SimpMessageHeaderAccessor sha, WsMessage wsMessage) throws Exception {
     try {
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
@@ -93,21 +91,22 @@ public class ModerationController {
       if (account == null || !(account.getAccessRole()
           .equals(AccountAccessRole.MODERATOR) || account.getAccessRole()
           .equals(AccountAccessRole.OWNER))) {
-        wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.FORBIDDEN);
+        wsUtils.convertAndSendToUser(sha, QUEUE_CHAT_INIT_DESTINATION, HttpStatus.FORBIDDEN);
       } else {
         ArrayList<MessageEntity> messages = messageService.getAllMessages();
-        wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, new ModChatData(messages));
+        wsUtils.convertAndSendToUser(sha, QUEUE_CHAT_INIT_DESTINATION, new ModChatData(messages));
       }
     } catch (IllegalArgumentException e) {
-      wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.BAD_REQUEST);
+      wsUtils.convertAndSendToUser(sha, QUEUE_CHAT_INIT_DESTINATION, HttpStatus.BAD_REQUEST);
     } catch (Exception e) {
-      wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
+      wsUtils.convertAndSendToUser(sha, QUEUE_CHAT_INIT_DESTINATION,
+          HttpStatus.INTERNAL_SERVER_ERROR);
       log.error(e.getMessage());
       e.printStackTrace();
     }
   }
 
-  @MessageMapping("/mod/ban/{id}")
+  @MessageMapping(APP_BAN_DESTINATION)
   public void ban(SimpMessageHeaderAccessor sha, WsMessage wsMessage,
       @DestinationVariable("id") Long id)
       throws Exception {
@@ -116,7 +115,6 @@ public class ModerationController {
 
       AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null || !account.isMod()) {
-        wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.FORBIDDEN);
         return;
       }
 
@@ -129,18 +127,13 @@ public class ModerationController {
       target = accountService.save(target);
       log.info("{} (#{}) is banning the account {} (#{})", account.getUsername(), account.getId(),
           target.getUsername(), target.getId());
-    } catch (IllegalArgumentException e) {
-      wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.BAD_REQUEST);
-    } catch (NoSuchElementException e) {
-      wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.NOT_FOUND);
     } catch (Exception e) {
-      wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
       log.error(e.getMessage());
       e.printStackTrace();
     }
   }
 
-  @MessageMapping("/mod/mute/{id}")
+  @MessageMapping(APP_MUTE_DESTINATION)
   public void mute(SimpMessageHeaderAccessor sha, WsMessage wsMessage,
       @DestinationVariable("id") Long id)
       throws Exception {
@@ -149,7 +142,6 @@ public class ModerationController {
 
       AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null || !account.isMod()) {
-        wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.FORBIDDEN);
         return;
       }
 
@@ -162,18 +154,13 @@ public class ModerationController {
       target = accountService.save(target);
       log.info("{} (#{}) is muting the account {} (#{})", account.getUsername(), account.getId(),
           target.getUsername(), target.getId());
-    } catch (IllegalArgumentException e) {
-      wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.BAD_REQUEST);
-    } catch (NoSuchElementException e) {
-      wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.NOT_FOUND);
     } catch (Exception e) {
-      wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
       log.error(e.getMessage());
       e.printStackTrace();
     }
   }
 
-  @MessageMapping("/mod/free/{id}")
+  @MessageMapping(APP_FREE_DESTINATION)
   public void free(SimpMessageHeaderAccessor sha, WsMessage wsMessage,
       @DestinationVariable("id") Long id) {
     try {
@@ -181,7 +168,6 @@ public class ModerationController {
 
       AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null || !account.isMod()) {
-        wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.FORBIDDEN);
         return;
       }
 
@@ -193,18 +179,13 @@ public class ModerationController {
       target = accountService.save(target);
       log.info("{} (#{}) is freeing the account {} (#{})", account.getUsername(), account.getId(),
           target.getUsername(), target.getId());
-    } catch (IllegalArgumentException e) {
-      wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.BAD_REQUEST);
-    } catch (NoSuchElementException e) {
-      wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.NOT_FOUND);
     } catch (Exception e) {
-      wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
       log.error(e.getMessage());
       e.printStackTrace();
     }
   }
 
-  @MessageMapping("/mod/name/{id}")
+  @MessageMapping(APP_RENAME_DESTINATION)
   public void changeName(SimpMessageHeaderAccessor sha, WsMessage wsMessage,
       @DestinationVariable("id") Long id)
       throws Exception {
@@ -220,7 +201,6 @@ public class ModerationController {
 
       AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null || !account.isMod()) {
-        wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.FORBIDDEN);
         return;
       }
 
@@ -232,18 +212,13 @@ public class ModerationController {
       target = accountService.save(target);
       log.info("{} (#{}) is renaming the account {} (#{}) to {}", account.getUsername(),
           account.getId(), target.getUsername(), target.getId(), username);
-    } catch (IllegalArgumentException e) {
-      wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.BAD_REQUEST);
-    } catch (NoSuchElementException e) {
-      wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.NOT_FOUND);
     } catch (Exception e) {
-      wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
       log.error(e.getMessage());
       e.printStackTrace();
     }
   }
 
-  @MessageMapping("/mod/confirm/{id}")
+  @MessageMapping(APP_PROMPT_DESTINATION)
   public void promptConfirm(SimpMessageHeaderAccessor sha, WsMessage wsMessage,
       @DestinationVariable("id") Long id) {
     try {
@@ -252,7 +227,6 @@ public class ModerationController {
 
       AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null || !account.isMod()) {
-        wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.FORBIDDEN);
         return;
       }
 
@@ -260,18 +234,13 @@ public class ModerationController {
       chatService.sendPromptToAccount(target, text);
       log.info("{} (#{}) is prompting the account {} (#{}) with {}", account.getUsername(),
           account.getId(), target.getUsername(), target.getId(), text);
-    } catch (IllegalArgumentException e) {
-      wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.BAD_REQUEST);
-    } catch (NoSuchElementException e) {
-      wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.NOT_FOUND);
     } catch (Exception e) {
-      wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
       log.error(e.getMessage());
       e.printStackTrace();
     }
   }
 
-  @MessageMapping("/mod/mod/{id}")
+  @MessageMapping(APP_MOD_DESTINATION)
   public void mod(SimpMessageHeaderAccessor sha, WsMessage wsMessage,
       @DestinationVariable("id") Long id)
       throws Exception {
@@ -280,7 +249,6 @@ public class ModerationController {
 
       AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null || !account.isOwner()) {
-        wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.FORBIDDEN);
         return;
       }
 
@@ -293,12 +261,7 @@ public class ModerationController {
       target = accountService.save(target);
       log.info("{} (#{}) is modding the account {} (#{})", account.getUsername(),
           account.getId(), target.getUsername(), target.getId());
-    } catch (IllegalArgumentException e) {
-      wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.BAD_REQUEST);
-    } catch (NoSuchElementException e) {
-      wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.NOT_FOUND);
     } catch (Exception e) {
-      wsUtils.convertAndSendToUser(sha, CHAT_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
       log.error(e.getMessage());
       e.printStackTrace();
     }
