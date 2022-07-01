@@ -56,9 +56,6 @@ public class WsUtils {
       sb.append("/");
     }
     sb.append(dest);
-    if (!dest.endsWith("/")) {
-      sb.append("/");
-    }
 
     log.debug("Message to {} at /user{}", sha.getUser().getName(), sb.toString());
     simpMessagingTemplate.convertAndSendToUser(sha.getUser().getName(), sb.toString(),
@@ -92,9 +89,6 @@ public class WsUtils {
       sb.append("/");
     }
     sb.append(dest);
-    if (!dest.endsWith("/")) {
-      sb.append("/");
-    }
 
     simpMessagingTemplate.convertAndSend(sb.toString(), content);
   }
@@ -111,9 +105,6 @@ public class WsUtils {
       sb.append("/");
     }
     sb.append(dest);
-    if (!dest.endsWith("/")) {
-      sb.append("/");
-    }
 
     simpMessagingTemplate.convertAndSend(sb.toString(), content);
   }

@@ -63,9 +63,7 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
     if (topicDestination.contains("/topic/")) {
       AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account != null) {
-        if (account.getAccessRole().equals(AccountAccessRole.OWNER)
-            || account.getAccessRole()
-            .equals(AccountAccessRole.MODERATOR)) {
+        if (account.isMod()) {
           return true;
         }
         if (account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
@@ -75,13 +73,13 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
       // Otherwise, just normal approval
     }
 
-    if (topicDestination.contains("/topic/chat/")) {
+    if (topicDestination.contains("/topic/chat/events/")) {
       AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null) {
         return false;
       }
       int chatDestination = Integer.parseInt(
-          topicDestination.substring("/topic/chat/".length()));
+          topicDestination.substring("/topic/chat/events/".length()));
       int highestLadder = account.getRankers().stream()
           .mapToInt(v -> v.getLadder().getNumber()).max().orElse(1);
       if (chatDestination > highestLadder) {
@@ -89,13 +87,13 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
       }
     }
 
-    if (topicDestination.contains("/topic/ladder/")) {
+    if (topicDestination.contains("/topic/game/events/")) {
       AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null) {
         return false;
       }
       int ladderDestination = Integer.parseInt(
-          topicDestination.substring("/topic/ladder/".length()));
+          topicDestination.substring("/topic/game/events/".length()));
       if (ladderDestination == FairController.BASE_ASSHOLE_LADDER + roundService.getCurrentRound()
           .getHighestAssholeCount()) {
         return true;

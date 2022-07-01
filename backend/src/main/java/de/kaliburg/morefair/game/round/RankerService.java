@@ -22,7 +22,7 @@ public class RankerService {
 
   public RankerEntity findHighestActiveRankerOfAccount(AccountEntity account) {
     return rankerRepository.findFirstByAccountAndGrowingIsTrueOrderByLadder_Round_NumberDescLadder_NumberDesc(
-        account).orElseThrow();
+        account).orElse(null);
   }
 
   public RankerEntity create(AccountEntity account, LadderEntity ladder, Integer rank) {

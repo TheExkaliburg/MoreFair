@@ -100,6 +100,7 @@ import { provide } from "vue";
 import { useStore } from "vuex";
 import Cookies from "js-cookie";
 import { StompClient } from "@/websocket/stompClient";
+import API from "@/websocket/wsApi";
 
 //import { hooksSystemSetup } from "@/store/hooks";
 
@@ -112,64 +113,59 @@ const stompClient = new StompClient();
 store.commit("options/init");
 store.commit("options/loadOptions");
 
-let setupPromise = setupConnection();
-provide("$setupPromise", setupPromise);
 provide("$stompClient", stompClient);
+setupConnection();
 
 function setupConnection() {
-  return new Promise((resolve) => {
-    stompClient.connect(() => {
-      let uuid = Cookies.get("_uuid");
+  stompClient.connect(() => {
+    let uuid = Cookies.get("_uuid");
+    if (
+      (!uuid || uuid === "") &&
+      !confirm("Do you want to create a new account?")
+    ) {
+      return;
+    }
+    stompClient.subscribe(API.FAIR.QUEUE_INFO_DESTINATION, (message) => {
+      console.log("Test");
+      store.commit({ type: "initSettings", message: message });
 
-      stompClient.subscribe("/user/queue/info/", (message) => {
-        store.commit({ type: "initSettings", message: message });
-
-        if (uuid === "" && !confirm("Do you want to create a new account?")) {
-          return;
-        }
-
-        stompClient.subscribe("/user/queue/account/login", (message) => {
-          store.commit({ type: "initUser", message: message });
-          setupData(resolve);
-        });
-
-        stompClient.send("/app/account/login");
+      stompClient.subscribe(API.ACCOUNT.QUEUE_LOGIN_DESTINATION, (message) => {
+        store.commit({ type: "initUser", message: message });
+        setupData();
       });
-
-      stompClient.send("/app/info");
+      stompClient.send(API.ACCOUNT.APP_LOGIN_DESTINATION);
     });
+
+    stompClient.send(API.FAIR.APP_INFO_DESTINATION);
   });
 }
 
-function setupData(resolve) {
+function setupData() {
   let highestLadderReached = store.state.user.highestCurrentLadder;
-  stompClient.subscribe("/topic/chat/" + highestLadderReached, (message) => {
-    store.commit({ type: "chat/addMessage", message: message });
-  });
-  stompClient.subscribe("/user/queue/chat/", (message) => {
+  stompClient.subscribe(
+    API.CHAT.TOPIC_EVENTS_DESTINATION(highestLadderReached),
+    (message) => {
+      store.commit({ type: "chat/addMessage", message: message });
+    }
+  );
+  stompClient.subscribe(API.CHAT.QUEUE_INIT_DESTINATION, (message) => {
     store.commit({ type: "chat/init", message: message });
   });
-  stompClient.send("/app/chat/init/" + highestLadderReached);
-  stompClient.subscribe("/topic/ladder/" + highestLadderReached, (message) => {
-    store.dispatch({
-      type: "ladder/update",
-      message: message,
-      stompClient: stompClient,
-    });
-    resolve();
-  });
-  stompClient.subscribe("/topic/global/", (message) => {
-    store.commit({ type: "chat/update", message: message });
-    store.dispatch({
-      type: "ladder/updateGlobal",
-      message: message,
-      stompClient: stompClient,
-    });
-  });
-  stompClient.subscribe("/user/queue/ladder/", (message) => {
+  stompClient.send(API.CHAT.APP_INIT_DESTINATION(highestLadderReached));
+  stompClient.subscribe(
+    API.GAME.TOPIC_EVENTS_DESTINATION(highestLadderReached),
+    (message) => {
+      store.dispatch({
+        type: "ladder/update",
+        message: message,
+        stompClient: stompClient,
+      });
+    }
+  );
+  stompClient.subscribe(API.GAME.QUEUE_INIT_DESTINATION, (message) => {
     store.commit({ type: "ladder/init", message: message });
   });
-  stompClient.send("/app/ladder/init/" + highestLadderReached);
+  stompClient.send(API.GAME.APP_INIT_DESTINATION(highestLadderReached));
 }
 
 function promptNameChange() {
@@ -192,7 +188,9 @@ function promptNameChange() {
     newUsername.trim() !== "" &&
     newUsername !== store.state.ladder.ladder.yourRanker.username
   ) {
-    stompClient.send("/app/account/name", { content: newUsername });
+    stompClient.send(API.ACCOUNT.APP_RENAME_DESTINATION, {
+      content: newUsername,
+    });
   }
 }
 

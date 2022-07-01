@@ -36,7 +36,7 @@ public class GameController {
   public static final String APP_VINEGAR_DESTINATION = "/game/vinegar";
   public static final String APP_PROMOTE_DESTINATION = "/game/promote";
   public static final String APP_AUTOPROMOTE_DESTINATION = "/game/autopromote";
-  public static final String TOPIC_EVENTS_DESTINATION = "/game/events";
+  public static final String TOPIC_EVENTS_DESTINATION = "/game/events/{number}";
   public static final String QUEUE_INIT_DESTINATION = "/game/init";
 
   public static final String PRIVATE_EVENTS_DESTINATION = "/game/events";
@@ -79,7 +79,7 @@ public class GameController {
       @DestinationVariable("number") Integer number) {
     try {
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-      log.debug("/app/ladder/init/{} from {}", number, uuid);
+      log.debug("/app/game/init/{} from {}", number, uuid);
       AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null || account.isBanned()) {
         wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION, HttpStatus.FORBIDDEN);

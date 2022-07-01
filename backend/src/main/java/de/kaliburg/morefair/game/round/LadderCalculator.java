@@ -80,7 +80,8 @@ public class LadderCalculator {
         for (LadderEntity ladder : ladderService.getCurrentLadderMap().values()) {
           heartbeatMap.get(ladder.getNumber()).setSecondsPassed(deltaSec);
           wsUtils.convertAndSendToTopic(
-              GameController.TOPIC_EVENTS_DESTINATION + ladder.getNumber(),
+              GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
+                  ladder.getNumber().toString()),
               heartbeatMap.get(ladder.getNumber()));
         }
 

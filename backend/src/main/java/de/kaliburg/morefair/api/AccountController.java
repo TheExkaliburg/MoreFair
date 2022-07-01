@@ -23,8 +23,8 @@ import org.springframework.stereotype.Controller;
 public class AccountController {
 
   private static final String APP_LOGIN_DESTINATION = "/account/login";
-  private static final String APP_RENAME_DESTINATION = "/account/name/";
-  private static final String QUEUE_LOGIN_DESTINATION = "/account/login/";
+  private static final String APP_RENAME_DESTINATION = "/account/name";
+  private static final String QUEUE_LOGIN_DESTINATION = "/account/login";
 
   private final AccountService accountService;
   private final GameService gameService;
@@ -57,7 +57,7 @@ public class AccountController {
       if (uuid == null || uuid.isBlank()) {
         if (requestThrottler.canCreateAccount(principal)) {
           wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION,
-              accountService.create(principal), HttpStatus.CREATED);
+              new AccountDetailsDTO(accountService.create(principal)), HttpStatus.CREATED);
         } else {
           wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
         }
@@ -69,7 +69,7 @@ public class AccountController {
       if (account == null) {
         if (requestThrottler.canCreateAccount(principal)) {
           wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION,
-              accountService.create(principal),
+              new AccountDetailsDTO(accountService.create(principal)),
               HttpStatus.CREATED);
         } else {
           wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
