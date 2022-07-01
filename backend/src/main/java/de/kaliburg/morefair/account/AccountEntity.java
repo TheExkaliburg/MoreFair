@@ -4,6 +4,7 @@ import de.kaliburg.morefair.game.round.RankerEntity;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.Column;
@@ -78,7 +79,21 @@ public class AccountEntity {
   }
 
   public List<RankerEntity> getActiveRankers() {
-    return rankers.stream().filter(r -> r.isGrowing())
-        .collect(Collectors.toList());
+    return rankers.stream().filter(RankerEntity::isGrowing).collect(Collectors.toList());
+  }
+
+  public List<RankerEntity> getCurrentRankers() {
+    return rankers.stream().collect(Collectors.groupingBy(r -> r.getLadder().getRound().getNumber(),
+        TreeMap::new, Collectors.toList())).lastEntry().getValue();
+  }
+
+  public List<RankerEntity> getCurrentActiveRankers() {
+    return rankers.stream().filter(RankerEntity::isGrowing)
+        .collect(Collectors.groupingBy(r -> r.getLadder().getRound().getNumber(),
+            TreeMap::new, Collectors.toList())).lastEntry().getValue();
+  }
+
+  public Integer getHighestCurrentLadder() {
+    return getCurrentRankers().stream().mapToInt(r -> r.getLadder().getNumber()).max().orElse(1);
   }
 }
