@@ -56,7 +56,7 @@ const mentionSound = computed(() =>
 );
 
 const mentionSoundVolume = computed(() =>
-  store.getters["options/getOptionValue"]("mentionSoundVolume")
+  store.getters["options/getOptionValue"]("notificationVolume")
 );
 
 //Basically an enum
