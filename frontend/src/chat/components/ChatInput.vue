@@ -20,6 +20,16 @@
 </template>
 
 <script>
+export function getMentionElement({ name, id }) {
+  let mention = document.createElement("span");
+  mention.innerHTML = `@${name}#${id}`;
+  mention.classList.add("mention");
+  mention.setAttribute("data-user", name);
+  mention.setAttribute("data-id", id);
+
+  return mention;
+}
+
 /**
  *
  * @param {"START"|"END"|"START ELEMENT"|"END ELEMENT"} [caretEndPosition] - Where to put the caret after the element is inserted.
@@ -445,16 +455,6 @@ function mentionElementChanged(mutation) {
     sel.removeAllRanges();
     sel.addRange(range);
   }
-}
-
-function getMentionElement({ name, id }) {
-  let mention = document.createElement("span");
-  mention.innerHTML = `@${name}#${id}`;
-  mention.classList.add("mention");
-  mention.setAttribute("data-user", name);
-  mention.setAttribute("data-id", id);
-
-  return mention;
 }
 
 function parseSendMessage() {
