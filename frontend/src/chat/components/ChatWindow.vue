@@ -84,6 +84,11 @@ onUpdated(() => {
   height: 100%;
 }
 
+.dropdown-pagination {
+  text-align: end;
+  padding-right: 0;
+}
+
 .mentionDropdown {
   display: block;
   position: absolute;

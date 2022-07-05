@@ -19,6 +19,110 @@
   </div>
 </template>
 
+<script>
+/**
+ *
+ * @param {"START"|"END"|"START ELEMENT"|"END ELEMENT"} [caretEndPosition] - Where to put the caret after the element is inserted.
+ * @param {"CARET" | "START" | "END"} [insertionPosition] - Where to insert the element.
+ * @param {Number} [removeCharsAfterCaret] - Where to insert the element.
+ */
+export function insertSpecialChatElement(
+  element,
+  insertionPosition,
+  caretEndPosition,
+  removeCharsAfterCaret = 0
+) {
+  const chatInput = document.getElementById("chatInput");
+
+  //explicit hoisting of variables used in the switch statement
+  let textNode, brs;
+
+  switch (insertionPosition) {
+    case "START":
+      if (chatInput.hasChildNodes()) {
+        chatInput.insertBefore(element, chatInput.firstChild);
+      } else {
+        chatInput.appendChild(element);
+      }
+      //add a space after the element
+      textNode = document.createTextNode(" ");
+      chatInput.appendChild(textNode);
+      chatInput.appendChild(document.createElement("br"));
+      break;
+
+    case "CARET":
+      //using var here because i dont want to hoist the variables myself
+      var selection = document.getSelection();
+      var text = selection.anchorNode.textContent;
+
+      var caretPosition = document.getSelection().anchorOffset;
+      var textBeforeCaret = text.substring(0, caretPosition);
+      var textAfterCaret = text.substring(caretPosition);
+
+      //Create the before and after text nodes fo surround the new element
+      var before = document.createTextNode(
+        textBeforeCaret.substring(
+          0,
+          textBeforeCaret.length - removeCharsAfterCaret
+        )
+      );
+      var after = document.createTextNode(textAfterCaret);
+
+      chatInput.replaceChild(after, selection.anchorNode);
+      chatInput.insertBefore(element, after);
+      chatInput.insertBefore(before, element);
+
+      //add a space after the mention and put the cursor at the end of the text
+      textNode = document.createTextNode(" ");
+      chatInput.appendChild(textNode);
+      chatInput.appendChild(document.createElement("br"));
+      break;
+
+    default:
+    case "END":
+      chatInput.appendChild(element);
+      //add a space after the element
+      textNode = document.createTextNode(" ");
+      chatInput.appendChild(textNode);
+      chatInput.appendChild(document.createElement("br"));
+
+      break;
+  }
+  chatInput.focus();
+  //remove all br tags that have nextsibling
+  brs = chatInput.getElementsByTagName("br");
+  for (let i = 0; i < brs.length; i++) {
+    if (brs[i].nextSibling) {
+      brs[i].remove();
+    }
+  }
+
+  //hoisting of variables used in the switch statement
+  let range = document.createRange();
+
+  switch (caretEndPosition) {
+    case "START":
+      range.setStart(chatInput.firstChild, 0);
+      break;
+    case "START ELEMENT":
+      range.setStartBefore(element);
+      break;
+    case "END ELEMENT":
+      range.setStartAfter(textNode);
+      break;
+    default:
+    case "END":
+      range.setStart(chatInput.lastChild, 0);
+      break;
+  }
+  range.collapse(true);
+  let sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+  chatInput.focus();
+}
+</script>
+
 <script setup>
 import { ref, onMounted, computed, inject } from "vue";
 import { useStore } from "vuex";
@@ -29,6 +133,7 @@ const store = useStore();
 const chat = computed(() => store.state.chat.chat);
 const rankers = computed(() => store.getters["ladder/allRankers"]);
 const stompClient = inject("$stompClient");
+
 onMounted(() => {
   document.getElementById("mentionDropdown").style.display = "none";
   window.dropdownElementSelected = -1;
@@ -145,7 +250,6 @@ function plainTextElementChanged(mutation) {
   //now we are getting the caret position and the text before and after the caret
   let caretPosition = document.getSelection().anchorOffset;
   let textBeforeCaret = text.substring(0, caretPosition);
-  let textAfterCaret = text.substring(caretPosition);
 
   //Here, we find out where to put the popup later so it follows the caret.
   let dummySpan = document.createElement("span");
@@ -237,48 +341,16 @@ function plainTextElementChanged(mutation) {
     option.style.paddingLeft = "5px";
 
     option.addEventListener("click", function () {
-      let msgBox = document.getElementById("chatInput");
       let mention = getMentionElement(possibleMentions[i]);
-
-      //split the text node into two
-      textBeforeCaret = text.substring(0, caretPosition);
-      textAfterCaret = text.substring(caretPosition);
-      let before = document.createTextNode(
-        textBeforeCaret.substring(
-          0,
-          textBeforeCaret.length - possibleMentionLength
-        )
+      //We need to insert the mention into the text
+      insertSpecialChatElement(
+        mention,
+        "CARET",
+        "END ELEMENT",
+        possibleMentionLength
       );
-      let after = document.createTextNode(textAfterCaret);
-
-      msgBox.replaceChild(after, textElement);
-      msgBox.insertBefore(mention, after);
-      msgBox.insertBefore(before, mention);
-
-      //add a space after the mention and put the cursor at the end of the text
-      let textNode = document.createTextNode(" ");
-      msgBox.appendChild(textNode);
-      msgBox.appendChild(document.createElement("br"));
-      msgBox.focus();
-
-      //remove the dropdown
+      //We need to close the dropdown
       dropdown.style.display = "none";
-
-      //remove all br tags that have nextsibling
-      let brs = msgBox.getElementsByTagName("br");
-      for (let i = 0; i < brs.length; i++) {
-        if (brs[i].nextSibling) {
-          brs[i].remove();
-        }
-      }
-
-      let range = document.createRange();
-      range.setStart(textNode, 1);
-      range.collapse(true);
-      let sel = window.getSelection();
-      sel.removeAllRanges();
-      sel.addRange(range);
-      msgBox.focus();
     });
 
     dropdown.appendChild(option);
@@ -510,17 +582,10 @@ const message = ref("");
 </script>
 
 <style lang="scss" scoped>
-.chat-info {
-  white-space: nowrap;
-  overflow-x: hidden;
-}
-.dropdown-pagination {
-  text-align: end;
-  padding-right: 0;
-}
 .relative {
   position: relative;
 }
+
 #chatInput {
   background-color: rgba(0, 0, 0, 0);
   color: var(--main-color);
