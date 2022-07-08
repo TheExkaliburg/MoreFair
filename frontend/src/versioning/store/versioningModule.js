@@ -6,7 +6,9 @@ const versioningModule = {
     return {
       versions: [
         new Version("PATCH", "", {
-          features: ["Group mentions are now supported in the chat. $Train$ Choo! Choo!"],
+          features: [
+            "Group mentions are now supported in the chat. $Train$ Choo! Choo!",
+          ],
           fixes: ["Fixed mention sound not playing."],
         }),
         new Version("PATCH", "Fixing Asshole-Badge Limit", {
