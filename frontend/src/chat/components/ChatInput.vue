@@ -26,6 +26,17 @@ export function getMentionElement({ name, id }) {
   mention.classList.add("mention");
   mention.setAttribute("data-user", name);
   mention.setAttribute("data-id", id);
+  mention.setAttribute("data-replaceChar", "@");
+
+  return mention;
+}
+
+export function getGroupMentionElement(groupName) {
+  let mention = document.createElement("span");
+  mention.innerHTML = `$${groupName}$`;
+  mention.classList.add("mention");
+  mention.setAttribute("data-group", groupName);
+  mention.setAttribute("data-replaceChar", "$");
 
   return mention;
 }
@@ -248,6 +259,51 @@ function onElementChange(mutation) {
   plainTextElementChanged(mutation);
 }
 
+function findMentionsInString(str) {
+  let firstMetion = str.indexOf("@");
+  let possibleMentionLength = 0;
+  let possibleMentions = [];
+  while (firstMetion > -1) {
+    str = str.substring(firstMetion + 1);
+    firstMetion = str.indexOf("@");
+
+    //Checking if any rankerName#id is in the text
+    let possibleMentionLower = str.toLowerCase();
+    possibleMentions = [];
+    for (let i = 0; i < rankers.value.length; i++) {
+      if (
+        (rankers.value[i].username + "#" + rankers.value[i].accountId)
+          .toLowerCase()
+          .startsWith(possibleMentionLower) ||
+        ("#" + rankers.value[i].accountId)
+          .toLowerCase()
+          .startsWith(possibleMentionLower)
+      ) {
+        possibleMentions.push({
+          name: rankers.value[i].username,
+          id: rankers.value[i].accountId,
+        });
+      }
+    }
+    possibleMentionLength = possibleMentionLower.length + 1;
+    //If we found any, we can exit this loop
+    if (possibleMentions.length > 0) {
+      break;
+    }
+  }
+  return [possibleMentions, possibleMentionLength];
+}
+
+function findGroupMentionsInString(str) {
+  let index = str.lastIndexOf("$");
+  str = str.substring(str.lastIndexOf("$") + 1);
+
+  //Checking if any rankerName#id is in the text
+  let possibleMentionLower = str.toLowerCase();
+
+  return [index > -1 ? str : "", possibleMentionLower.length + 1];
+}
+
 function plainTextElementChanged(mutation) {
   let textElement = mutation.target;
   let text = textElement.textContent;
@@ -272,81 +328,85 @@ function plainTextElementChanged(mutation) {
   dummySpan.parentNode.removeChild(dummySpan);
 
   //Now that we know where the caret is, we can check if we have a mention in the text before the caret
-  let firstMetion = textBeforeCaret.indexOf("@");
-  let possibleMentionLength = 0;
-  let possibleMentions = [];
-  while (firstMetion > -1) {
-    textBeforeCaret = textBeforeCaret.substring(firstMetion + 1);
-    firstMetion = textBeforeCaret.indexOf("@");
+  let [possibleMentions, possibleMentionLength] =
+    findMentionsInString(textBeforeCaret);
+  let [possibleGroupMentions, possibleGroupMentionLength] =
+    findGroupMentionsInString(textBeforeCaret);
 
-    //Checking if any rankerName#id is in the text
-    let possibleMentionLower = textBeforeCaret.toLowerCase();
-    possibleMentions = [];
-    for (let i = 0; i < rankers.value.length; i++) {
-      if (
-        (rankers.value[i].username + "#" + rankers.value[i].accountId)
-          .toLowerCase()
-          .startsWith(possibleMentionLower) ||
-        ("#" + rankers.value[i].accountId)
-          .toLowerCase()
-          .startsWith(possibleMentionLower)
-      ) {
-        possibleMentions.push({
-          name: rankers.value[i].username,
-          id: rankers.value[i].accountId,
-        });
-      }
-    }
-    possibleMentionLength = possibleMentionLower.length + 1;
-    //If we found any, we can exit this loop
-    if (possibleMentions.length > 0) {
-      break;
-    }
-  }
-  window.possibleMention = possibleMentions;
-  if (possibleMentions.length === 0) {
+  if (possibleMentions.length === 0 && possibleGroupMentions.length === 0) {
     return; //no possible mentions
   }
   //We have possible mentions, so now we should display our dropdown
 
-  let numberMention = textBeforeCaret.toLowerCase().startsWith("#");
+  let dropdown = document.getElementById("mentionDropdown");
+  dropdown.innerHTML = "";
 
-  //First, sorting the mentions by their name and accountId
-  possibleMentions.sort((a, b) => {
-    if (numberMention) {
-      //If we are looking for a number, we want a different order to put the numbers lower than the names (and select them easier)
-      if (("#" + a.id).startsWith(textBeforeCaret.toLowerCase())) {
-        if (("#" + b.id).startsWith(textBeforeCaret.toLowerCase())) {
-          return a.id - b.id;
+  if (possibleMentions.length > 0) {
+    let numberMention = textBeforeCaret.toLowerCase().startsWith("#");
+
+    //First, sorting the mentions by their name and accountId
+    possibleMentions.sort((a, b) => {
+      if (numberMention) {
+        //If we are looking for a number, we want a different order to put the numbers lower than the names (and select them easier)
+        if (("#" + a.id).startsWith(textBeforeCaret.toLowerCase())) {
+          if (("#" + b.id).startsWith(textBeforeCaret.toLowerCase())) {
+            return a.id - b.id;
+          }
+          return 1;
         }
+        if (("#" + b.id).startsWith(textBeforeCaret.toLowerCase())) {
+          return -1;
+        }
+      }
+      if (a.name < b.name) {
         return 1;
       }
-      if (("#" + b.id).startsWith(textBeforeCaret.toLowerCase())) {
+      if (a.name > b.name) {
         return -1;
       }
-    }
-    if (a.name < b.name) {
-      return 1;
-    }
-    if (a.name > b.name) {
-      return -1;
-    }
-    if (a.id < b.id) {
-      return 1;
-    }
-    if (a.id > b.id) {
-      return -1;
-    }
-    return 0;
-  });
+      if (a.id < b.id) {
+        return 1;
+      }
+      if (a.id > b.id) {
+        return -1;
+      }
+      return 0;
+    });
 
-  //Now we can create the dropdown
-  let dropdown = document.getElementById("mentionDropdown");
-  dropdown.style.display = "block";
-  dropdown.innerHTML = "";
-  for (let i = 0; i < possibleMentions.length; i++) {
+    //Now we can create the dropdown
+    dropdown.style.display = "block";
+    for (let i = 0; i < possibleMentions.length; i++) {
+      let option = document.createElement("option");
+      option.innerHTML = `${possibleMentions[i].name}#${possibleMentions[i].id}`;
+
+      option.style.border = "1px solid black";
+
+      option.style.paddingRight = "5px";
+      option.style.paddingLeft = "5px";
+
+      option.addEventListener("click", function () {
+        let mention = getMentionElement(possibleMentions[i]);
+        //We need to insert the mention into the text
+        insertSpecialChatElement(
+          mention,
+          "CARET",
+          "END ELEMENT",
+          possibleMentionLength
+        );
+        //We need to close the dropdown
+        dropdown.style.display = "none";
+      });
+
+      dropdown.appendChild(option);
+    }
+  }
+
+  if (possibleMentions.length === 0 && possibleGroupMentions.length > 0) {
+    //Now we can create the dropdown
+    dropdown.style.display = "block";
+
     let option = document.createElement("option");
-    option.innerHTML = `${possibleMentions[i].name}#${possibleMentions[i].id}`;
+    option.innerHTML = `$${possibleGroupMentions}$`;
 
     option.style.border = "1px solid black";
 
@@ -354,13 +414,13 @@ function plainTextElementChanged(mutation) {
     option.style.paddingLeft = "5px";
 
     option.addEventListener("click", function () {
-      let mention = getMentionElement(possibleMentions[i]);
+      let mention = getGroupMentionElement(possibleGroupMentions);
       //We need to insert the mention into the text
       insertSpecialChatElement(
         mention,
         "CARET",
         "END ELEMENT",
-        possibleMentionLength
+        possibleGroupMentionLength
       );
       //We need to close the dropdown
       dropdown.style.display = "none";
@@ -385,7 +445,7 @@ function plainTextElementChanged(mutation) {
   }
 
   //select the last element
-  window.dropdownElementSelected = possibleMentions.length - 1;
+  window.dropdownElementSelected = 0;
   dropdown.children[window.dropdownElementSelected].style.backgroundColor =
     "var(--item-selected-color)";
   //make sure the dropdown always stays 5 pixels from the right window edge
@@ -399,6 +459,9 @@ function mentionElementChanged(mutation) {
   let oldText = `@${parent.getAttribute("data-user")}#${parent.getAttribute(
     "data-id"
   )}`;
+  if (parent.getAttribute("data-group")) {
+    oldText = `$${parent.getAttribute("data-group")}$`;
+  }
   let newText = mutation.target.parentElement.innerText;
 
   //Handling deletions
@@ -464,22 +527,46 @@ function parseSendMessage() {
   const msgBox = document.getElementById("chatInput");
   const children = msgBox.childNodes;
   let msg = "";
-  let mentions = [];
+  let metadata = [];
   for (let i = 0; i < children.length; i++) {
     if (children[i].nodeType === 3) {
       msg += children[i].nodeValue;
     } else if (children[i].classList.contains("mention")) {
-      mentions.push({
-        u: children[i].getAttribute("data-user"),
-        id: children[i].getAttribute("data-id"),
-        i: msg.length,
-      });
-      msg += `{@}`;
+      let dict = {
+        user: "u",
+        id: "id",
+        group: "g",
+      };
+      let dataAttributeNames = children[i]
+        .getAttributeNames()
+        .filter(
+          (attr) => attr.startsWith("data-") && attr !== "data-replacechar"
+        );
+      let dataAttributes = {};
+      for (let j = 0; j < dataAttributeNames.length; j++) {
+        let key =
+          dict[dataAttributeNames[j].substring("data-".length)] ??
+          dataAttributeNames[j];
+        dataAttributes[key] = children[i].getAttribute(dataAttributeNames[j]);
+      }
+      dataAttributes["i"] = msg.length;
+
+      let replaceChar = children[i].getAttribute("data-replaceChar");
+      if (replaceChar) {
+        replaceChar = `{${replaceChar}}`;
+      } else {
+        replaceChar = children[i].innerText;
+      }
+
+      metadata.push(dataAttributes);
+      msg += replaceChar;
+    } else {
+      msg += children[i].innerText;
     }
   }
   //finally, replace all non-breaking spaces with regular spaces so vue doesn't choke on them
   msg = msg.replace(/\u00a0/g, " ");
-  return [msg, mentions];
+  return [msg, metadata];
 }
 
 function chatBoxKeyDown(e) {
