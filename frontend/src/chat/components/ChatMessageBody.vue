@@ -18,6 +18,12 @@
       >
         {{ part.text }}
       </span>
+      <span
+        v-else-if="part.is(MessagePartType.mentionGroupBoundary)"
+        class="chat-mention-group-boundary"
+      >
+        {{ part.text }}
+      </span>
       <sub
         v-else-if="part.is(MessagePartType.mentionNumber)"
         class="chat-mention-user-id"
@@ -63,6 +69,7 @@ const mentionSoundVolume = computed(() =>
 const MessagePartType = {
   plain: Symbol("plain"),
   mentionName: Symbol("mentionName"),
+  mentionGroupBoundary: Symbol("mentionGroupBoundary"),
   mentionNumber: Symbol("mentionNumber"),
   mentionAtsign: Symbol("mentionAtsign"),
 };
@@ -113,32 +120,72 @@ function findMentions() {
     }
     return isOk;
   });
+  const groupMentions = meta.filter((m) => {
+    let isOk = false;
+    try {
+      isOk = "g" in m && "i" in m;
+      isOk &= m.g.length <= 20; //We dont want to parse too long groups...
+    } catch (e) {
+      //This is a check for the case that the m is not an object
+      //We get really weird errors when we dont catch this but we dont care about the error here.
+    }
+    return isOk;
+  });
   mentions.sort((a, b) => a.i - b.i);
+  groupMentions.sort((a, b) => a.i - b.i);
+  const combinedMentions = [...mentions, ...groupMentions];
+  combinedMentions.sort((a, b) => a.i - b.i);
   let offset = 0;
   let currentPlainText = messageParts[0];
-  mentions.forEach((m) => {
+  combinedMentions.forEach((m) => {
+    const group = m.g ? true : false;
+    let newParts = [];
     let index = m.i - offset;
-    let id = parseInt(m.id);
-    let name = m.u;
-    name = name.trim();
+    let id = -1;
+    if (group) {
+      let name = m.g;
+      name = name.trim();
 
-    if (currentPlainText.text.slice(index, index + 3) !== "{@}") {
-      return;
+      if (currentPlainText.text.slice(index, index + 3) !== "{$}") {
+        return;
+      }
+
+      newParts = [
+        new MessagePart(
+          MessagePartType.plain,
+          currentPlainText.text.slice(0, index)
+        ),
+        new MessagePart(MessagePartType.mentionGroupBoundary, "$"),
+        new MessagePart(MessagePartType.mentionName, name),
+        new MessagePart(MessagePartType.mentionGroupBoundary, "$"),
+        new MessagePart(
+          MessagePartType.plain,
+          currentPlainText.text.slice(index + 3)
+        ),
+      ];
+    } else {
+      id = parseInt(m.id);
+      let name = m.u;
+      name = name.trim();
+
+      if (currentPlainText.text.slice(index, index + 3) !== "{@}") {
+        return;
+      }
+
+      newParts = [
+        new MessagePart(
+          MessagePartType.plain,
+          currentPlainText.text.slice(0, index)
+        ),
+        new MessagePart(MessagePartType.mentionAtsign, "@"),
+        new MessagePart(MessagePartType.mentionName, name),
+        new MessagePart(MessagePartType.mentionNumber, "#" + id),
+        new MessagePart(
+          MessagePartType.plain,
+          currentPlainText.text.slice(index + 3)
+        ),
+      ];
     }
-
-    let newParts = [
-      new MessagePart(
-        MessagePartType.plain,
-        currentPlainText.text.slice(0, index)
-      ),
-      new MessagePart(MessagePartType.mentionAtsign, "@"),
-      new MessagePart(MessagePartType.mentionName, name),
-      new MessagePart(MessagePartType.mentionNumber, "#" + id),
-      new MessagePart(
-        MessagePartType.plain,
-        currentPlainText.text.slice(index + 3)
-      ),
-    ];
 
     spliceNewMessagePartsIntoArray(currentPlainText, newParts);
     offset += index + 3;
@@ -155,6 +202,16 @@ function findMentions() {
         flag: "mentionSoundPlayed",
         type: "set",
       });
+      /**@type Array<String> */
+      let subMentions =
+        store.getters["options/getOptionValue"]("subscribedMentions");
+
+      if (
+        group &&
+        subMentions.map((m) => m.toLowerCase()).includes(m.g.toLowerCase())
+      ) {
+        Sounds.play("mention", mentionSoundVolume.value);
+      }
       for (let i = 0; i < rankers.value.length; i++) {
         if (rankers.value[i].you && rankers.value[i].accountId === id) {
           Sounds.play("mention", mentionSoundVolume.value);
@@ -181,6 +238,11 @@ findMentions();
   font-weight: bold;
   color: white;
   background-color: red;
+}
+
+.chat-mention-group-boundary {
+  color: var(--text-dark-highlight-color);
+  opacity: 0.5;
 }
 
 .chat-mention-user-id {
