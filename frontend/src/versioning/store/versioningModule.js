@@ -10,6 +10,7 @@ const versioningModule = {
           features: [
             "Moderators can now moderate via the ladder for easyer access.",
           ],
+          fixes: ["Fixed mention sound not playing."],
         }),
         new Version("PATCH", "", {
           features: [
