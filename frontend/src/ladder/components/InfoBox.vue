@@ -45,7 +45,7 @@
               hideVinegarAndGrapes
                 ? "[[Hidden]]"
                 : numberFormatter.format(yourRanker.grapes)
-            }}<span v-if="ladder.ladderNumber >= settings.autoPromoteLadder"
+            }}<span v-if="ladder.number >= settings.autoPromoteLadder"
               >/<span class="text-highlight">{{
                 numberFormatter.format(
                   ladder.getAutoPromoteCost(yourRanker.rank, settings)
@@ -68,7 +68,7 @@
         <div class="row py-0">
           <div class="col px-0 btn-group d-flex">
             <button
-              v-if="ladder.ladderNumber !== settings.assholeLadder"
+              v-if="ladder.number !== settings.assholeLadder"
               :class="[
                 !yourRanker.autoPromote &&
                 !autoPromoteLastSecond &&
@@ -77,7 +77,7 @@
                 ) >= 0
                   ? ''
                   : 'disabled',
-                ladder.ladderNumber >= settings.autoPromoteLadder ? '' : 'hide',
+                ladder.number >= settings.autoPromoteLadder ? '' : 'hide',
               ]"
               class="btn btn-outline-primary shadow-none w-100"
               @click="buyAutoPromote"
@@ -85,7 +85,7 @@
               Buy Autopromote
             </button>
             <button
-              v-else-if="ladder.ladderNumber === settings.assholeLadder"
+              v-else-if="ladder.number === settings.assholeLadder"
               :class="[
                 !promoteLastSecond &&
                 yourRanker.points.cmp(stats.pointsNeededForManualPromote) >= 0
@@ -116,7 +116,7 @@
             <button
               v-else-if="
                 yourRanker.rank === 1 &&
-                ladder.ladderNumber !== settings.assholeLadder
+                ladder.number !== settings.assholeLadder
               "
               :class="[
                 !promoteLastSecond &&
@@ -133,9 +133,7 @@
         </div>
         <div class="row py-0 text-start">
           {{
-            ladder.ladderNumber >= settings.assholeLadder
-              ? "Be Asshole"
-              : "Promote"
+            ladder.number >= settings.assholeLadder ? "Be Asshole" : "Promote"
           }}
           at
           {{ numberFormatter.format(pointsForPromote) }}
@@ -163,6 +161,7 @@ import { computed, inject, ref } from "vue";
 import { eta } from "../../modules/eta";
 import { secondsToHms } from "../../modules/formatting";
 import Decimal from "break_infinity.js";
+import API from "@/websocket/wsApi";
 
 const store = useStore();
 const stompClient = inject("$stompClient");
@@ -233,7 +232,7 @@ const pointsForPromote = computed(() => {
 const pointsForPromoteIsInfinity = computed(
   () =>
     ladder.value.rankers.length <
-    Math.max(settings.value.minimumPeopleForPromote, ladder.value.ladderNumber)
+    Math.max(settings.value.minimumPeopleForPromote, ladder.value.number)
 );
 
 // Functions
@@ -241,56 +240,37 @@ const pointsForPromoteIsInfinity = computed(
 function throwVinegar(event) {
   vinegarLastSecond.value = true;
   setTimeout(() => (vinegarLastSecond.value = false), 1000);
-  stompClient.send("/app/ladder/post/vinegar", { event: event });
+  stompClient.send(API.GAME.APP_VINEGAR_DESTINATION, { event: event });
 }
 
 function buyAutoPromote(event) {
   autoPromoteLastSecond.value = true;
   setTimeout(() => (autoPromoteLastSecond.value = false), 1000);
-  stompClient.send("/app/ladder/post/auto-promote", { event: event });
+  stompClient.send(API.GAME.APP_AUTOPROMOTE_DESTINATION, { event: event });
 }
 
 function buyBias(event) {
   biasLastSecond.value = true;
   setTimeout(() => (biasLastSecond.value = false), 1000);
-  stompClient.send("/app/ladder/post/bias", { event: event });
+  stompClient.send(API.GAME.APP_BIAS_DESTINATION, { event: event });
 }
 
 function buyMulti(event) {
   multiLastSecond.value = true;
   setTimeout(() => (multiLastSecond.value = false), 1000);
-  stompClient.send("/app/ladder/post/multi", { event: event });
+  stompClient.send(API.GAME.APP_MULTI_DESTINATION, { event: event });
 }
 
 function promote(event) {
   promoteLastSecond.value = true;
   setTimeout(() => (promoteLastSecond.value = false), 1000);
-  if (ladder.value.ladderNumber >= settings.value.assholeLadder) {
+  if (ladder.value.number >= settings.value.assholeLadder) {
     if (confirm("Do you really wanna be an Asshole?!"))
-      stompClient.send("/app/ladder/post/asshole", { event: event });
+      stompClient.send(API.GAME.APP_PROMOTE_DESTINATION, { event: event });
   } else {
-    stompClient.send("/app/ladder/post/promote", { event: event });
+    stompClient.send(API.GAME.APP_PROMOTE_DESTINATION, { event: event });
   }
 }
-
-// TODO: Remove Difference in asshole-event and promote
-
-/**
- * Typedefs for stuff used here
- * @typedef {import("../entities/ranker.js").default} Ranker
- */
-
-/**
- * @param {Ranker} ranker
- */
-
-/*
-window.eta = eta;
-window.secondsToHms = secondsToHms;
-window.allRankers = allRankers;
-window.rankers = (i) => {
-  return allRankers.value[i];
-};*/
 </script>
 
 <style lang="scss" scoped>

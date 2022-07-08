@@ -3,25 +3,21 @@ import Decimal from "break_infinity.js";
 
 class Ladder {
   constructor(data) {
-    this.ladderNumber = data.currentLadder.number;
+    this.number = data.number;
     this.rankers = [];
     data.rankers.forEach((ranker) => {
       const r = new Ranker(ranker);
       this.rankers.push(r);
     });
-    this.startRank = data.startRank;
-    this.yourRanker = new Ranker(data.yourRanker);
-    this.firstRanker = new Ranker(data.firstRanker);
+    this.yourRanker = this.rankers.find((r) => r.you);
+    this.firstRanker = this.rankers[0];
   }
 
   static placeholder() {
     const ranker = Ranker.placeholder();
     return new Ladder({
-      currentLadder: { number: 1 },
+      number: 1,
       rankers: [ranker],
-      startRank: 1,
-      yourRanker: ranker,
-      firstRanker: ranker,
     });
   }
 
@@ -29,7 +25,7 @@ class Ladder {
     let rankers = [...this.rankers];
     rankers.sort((a, b) => b.points.sub(a.points));
     let yourRanker = new Ranker(this.yourRanker);
-    // ladderStats.growingRankerCount = 0;
+    // ladderStats.growingRankerCount = 0 ;
 
     for (let i = 0; i < rankers.length; i++) {
       rankers[i].rank = i + 1;
@@ -193,7 +189,7 @@ class Ladder {
   }
 
   getMinimumPointsForPromote(settings) {
-    return settings.pointsForPromote.mul(this.ladderNumber);
+    return settings.pointsForPromote.mul(new Decimal(this.number));
   }
 
   getAutoPromoteCost(rank, settings) {
@@ -203,16 +199,13 @@ class Ladder {
   }
 
   getMinimumPeopleForPromote(settings) {
-    return Math.max(settings.minimumPeopleForPromote, this.ladderNumber);
+    return Math.max(settings.minimumPeopleForPromote, this.number);
   }
 
   isLadderUnlocked(settings) {
     if (this.rankers.length <= 0) return false;
     let rankerCount = this.rankers.length;
-    if (
-      rankerCount < this.getMinimumPeopleForPromote(this.ladderNumber, settings)
-    )
-      return false;
+    if (rankerCount < this.getMinimumPeopleForPromote(settings)) return false;
     return (
       this.firstRanker.points.cmp(this.getMinimumPointsForPromote(settings)) >=
       0
@@ -231,14 +224,12 @@ class Ladder {
 
   getNextUpgradeCost(currentUpgrade) {
     return new Decimal(
-      Math.round(Math.pow(this.ladderNumber + 1, currentUpgrade + 1))
+      Math.round(Math.pow(this.number + 1, currentUpgrade + 1))
     );
   }
 
   getVinegarThrowCost(settings) {
-    return settings.baseVinegarNeededToThrow.mul(
-      new Decimal(this.ladderNumber)
-    );
+    return settings.baseVinegarNeededToThrow.mul(new Decimal(this.number));
   }
 }
 

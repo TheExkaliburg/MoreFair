@@ -9,13 +9,13 @@
     </div>
     <div class="col">
       <span
-        >Ladder: {{ store.state.ladder.ladder.ladderNumber }}/{{
+        >Ladder: {{ store.state.ladder.ladder.number }}/{{
           store.state.settings.assholeLadder
         }}</span
       >
     </div>
     <PaginationGroup
-      :current="ladder.ladderNumber"
+      :current="ladder.number"
       :max="
         store.getters['options/getOptionValue']('enableUnrestrictedAccess') &&
         store.getters.isMod
@@ -34,7 +34,7 @@
         <tr v-if="showEtaSetting" class="thead-light">
           <th class="col-1 text-start">#</th>
           <th class="col-3 text-start">Username</th>
-          <th class="col-1 text-end">ETA -> L{{ ladder.ladderNumber + 1 }}</th>
+          <th class="col-1 text-end">ETA -> L{{ ladder.number + 1 }}</th>
           <th class="col-1 text-end">ETA -> You</th>
           <th class="col-3 text-end">Power</th>
           <th class="col-3 text-end">Points</th>
@@ -49,7 +49,7 @@
       <tbody id="ladderBody" class="">
         <tr
           v-for="ranker in shownRankers"
-          :key="ranker.accountId"
+          :key="ranker"
           :class="[
             ranker.you ? 'you' : '',
             ranker.growing || ranker.you ? '' : 'promoted',
@@ -96,12 +96,12 @@
                 'enableLadderModFeatures'
               ) && store.getters.isMod
             "
-            @focus="focus"
-            @blur="blur"
+            :data-id="ranker.accountId"
+            :data-name="ranker.username"
             class="dropdown-menu"
             tabindex="-1"
-            :data-name="ranker.username"
-            :data-id="ranker.accountId"
+            @blur="blur"
+            @focus="focus"
           >
             <span
               style="
@@ -276,8 +276,8 @@ function rankerEtaPercentage(ranker) {
 function changeLadder(event) {
   const targetLadder = event.target.dataset.number;
 
-  if (targetLadder !== ladder.value.ladderNumber) {
-    stompClient.unsubscribe("/topic/ladder/" + ladder.value.ladderNumber);
+  if (targetLadder !== ladder.value.number) {
+    stompClient.unsubscribe("/topic/ladder/" + ladder.value.number);
     stompClient.subscribe("/topic/ladder/" + targetLadder, (message) => {
       store.dispatch({
         type: "ladder/update",

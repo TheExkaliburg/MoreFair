@@ -205,6 +205,7 @@ async function importCookie() {
       Cookies.set("_uuid", newUUID, {
         expires: 10 * 365,
         secure: true,
+        sameSite: "Lax",
       });
       await setTimeout(
         async () => await navigator.clipboard.writeText(oldUuid),

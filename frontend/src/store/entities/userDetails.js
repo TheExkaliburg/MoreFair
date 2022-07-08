@@ -21,6 +21,7 @@ class UserDetails {
     Cookies.set("_uuid", this.uuid, {
       expires: 10 * 365,
       secure: true,
+      sameSite: "Lax",
     });
   }
 }

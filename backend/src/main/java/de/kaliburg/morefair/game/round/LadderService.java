@@ -256,11 +256,13 @@ public class LadderService {
    */
   RankerEntity createRanker(AccountEntity account, Integer number) {
     LadderEntity ladder = find(number);
+    account = accountService.find(account);
 
     if (ladder == null) {
       ladder = createLadder(currentRound, number);
     }
 
+    // Final to be able to use it in a lambda
     final LadderEntity finalLadder = ladder;
     List<RankerEntity> activeRankersInLadder = account.getActiveRankers().stream()
         .filter(ranker -> ranker.getLadder().getUuid().equals(finalLadder.getUuid())).toList();
@@ -270,7 +272,8 @@ public class LadderService {
       return activeRankersInLadder.get(0);
     }
 
-    RankerEntity result = rankerService.create(account, ladder, ladder.getRankers().size() + 1);
+    RankerEntity result = rankerService.create(account, ladder,
+        ladder.getRankers().size() + 1);
     ladder.getRankers().add(result);
 
     Event joinEvent = new Event(EventType.JOIN, account.getId());

@@ -61,11 +61,11 @@ public class AccountService {
   }
 
   public AccountEntity find(Long id) {
-    return accountRepository.findById(id).orElseThrow();
+    return accountRepository.findById(id).orElse(null);
   }
 
   public AccountEntity find(UUID uuid) {
-    return accountRepository.findByUuid(uuid).orElseThrow();
+    return accountRepository.findByUuid(uuid).orElse(null);
   }
 
   public AccountEntity find(AccountEntity account) {

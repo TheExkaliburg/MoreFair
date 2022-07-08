@@ -50,7 +50,7 @@ class LadderStats {
     /*
     if (
       ladder.rankers.length <
-      Math.max(settings.minimumPeopleForPromote, ladder.ladderNumber)
+      Math.max(settings.minimumPeopleForPromote, ladder.number)
     ) {
       this.pointsNeededForManualPromote = new Decimal(Infinity);
       return;
@@ -59,17 +59,17 @@ class LadderStats {
     // If not enough points -> minimum required Points
     if (
       ladder.firstRanker.points.cmp(
-        settings.pointsForPromote.mul(ladder.ladderNumber)
+        ladder.getMinimumPointsForPromote(settings)
       ) < 0
     ) {
       this.pointsNeededForManualPromote = settings.pointsForPromote.mul(
-        ladder.ladderNumber
+        ladder.number
       );
       return;
     }
 
     // If before autopromote unlocks -> 1st place
-    if (ladder.ladderNumber < settings.autoPromoteLadder) {
+    if (ladder.number < settings.autoPromoteLadder) {
       this.pointsNeededForManualPromote = ladder.firstRanker.you
         ? ladder.rankers[1].points.add(1)
         : ladder.firstRanker.points.add(1);
@@ -94,7 +94,7 @@ class LadderStats {
       (leadingRanker.you ? pursuingRanker : leadingRanker).points.add(
         neededPointDiff
       ),
-      settings.pointsForPromote.mul(ladder.ladderNumber)
+      ladder.getMinimumPointsForPromote(settings)
     );
   }
 }

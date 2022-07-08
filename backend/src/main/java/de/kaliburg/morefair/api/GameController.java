@@ -6,8 +6,8 @@ import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WsMessage;
 import de.kaliburg.morefair.api.websockets.messages.WsObservedMessage;
 import de.kaliburg.morefair.data.ModServerMessageData;
+import de.kaliburg.morefair.dto.LadderDto;
 import de.kaliburg.morefair.dto.LadderResultsDTO;
-import de.kaliburg.morefair.dto.LadderViewDto;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.EventType;
 import de.kaliburg.morefair.game.GameService;
@@ -15,6 +15,7 @@ import de.kaliburg.morefair.game.round.LadderService;
 import de.kaliburg.morefair.game.round.RankerEntity;
 import de.kaliburg.morefair.game.round.RankerService;
 import de.kaliburg.morefair.game.round.RoundService;
+import de.kaliburg.morefair.game.round.RoundUtils;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
@@ -47,16 +48,18 @@ public class GameController {
   private final RoundService roundService;
   private final LadderService ladderService;
   private final GameService gameService;
+  private final RoundUtils roundUtils;
 
   public GameController(RankerService rankerService, AccountService accountService,
       WsUtils wsUtils, RoundService roundService, LadderService ladderService,
-      GameService gameService) {
+      GameService gameService, RoundUtils roundUtils) {
     this.rankerService = rankerService;
     this.accountService = accountService;
     this.wsUtils = wsUtils;
     this.roundService = roundService;
     this.ladderService = ladderService;
     this.gameService = gameService;
+    this.roundUtils = roundUtils;
   }
 
   @GetMapping(value = "/lastRound", produces = "application/json")
@@ -93,9 +96,9 @@ public class GameController {
       }
 
       if (account.isMod()
-          || number == FairController.BASE_ASSHOLE_LADDER + roundService.getCurrentRound()
-          .getHighestAssholeCount() || number <= ranker.getLadder().getNumber()) {
-        LadderViewDto l = new LadderViewDto(ladderService.find(number), account);
+          || number.equals(roundUtils.getAssholeLadderNumber(roundService.getCurrentRound()))
+          || number <= ranker.getLadder().getNumber()) {
+        LadderDto l = new LadderDto(ladderService.find(number), account);
         wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION, l);
       } else {
         wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION,

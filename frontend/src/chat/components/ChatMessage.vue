@@ -56,6 +56,7 @@
 import { computed, defineProps, inject } from "vue";
 import { useStore } from "vuex";
 import ChatMessageBody from "@/chat/components/ChatMessageBody";
+import API from "@/websocket/wsApi";
 
 const store = useStore();
 const stompClient = inject("$stompClient");
@@ -71,7 +72,7 @@ function ban() {
       `Are you sure you want to ban "${props.msg.username}" (#${props.msg.accountId})`
     )
   ) {
-    stompClient.send("/app/mod/ban/" + props.msg.accountId);
+    stompClient.send(API.MODERATION.APP_BAN_DESTINATION(props.msg.accountId));
   }
 }
 
@@ -81,7 +82,7 @@ function mute() {
       `Are you sure you want to mute "${props.msg.username}" (#${props.msg.accountId})`
     )
   ) {
-    stompClient.send("/app/mod/mute/" + props.msg.accountId);
+    stompClient.send(API.MODERATION.APP_MUTE_DESTINATION(props.msg.accountId));
   }
 }
 
@@ -90,9 +91,12 @@ function rename() {
     `What would you like to name "${props.msg.username}" (#${props.msg.accountId})`
   );
   if (newName) {
-    stompClient.send("/app/mod/name/" + props.msg.accountId, {
-      content: newName,
-    });
+    stompClient.send(
+      API.MODERATION.APP_RENAME_DESTINATION(props.msg.accountId),
+      {
+        content: newName,
+      }
+    );
   }
 }
 

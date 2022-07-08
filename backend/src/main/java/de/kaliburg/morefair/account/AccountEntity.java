@@ -4,6 +4,7 @@ import de.kaliburg.morefair.game.round.RankerEntity;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -83,14 +84,24 @@ public class AccountEntity {
   }
 
   public List<RankerEntity> getCurrentRankers() {
-    return rankers.stream().collect(Collectors.groupingBy(r -> r.getLadder().getRound().getNumber(),
-        TreeMap::new, Collectors.toList())).lastEntry().getValue();
+    Entry<Integer, List<RankerEntity>> integerListEntry = rankers.stream()
+        .collect(Collectors.groupingBy(r -> r.getLadder().getRound().getNumber(),
+            TreeMap::new, Collectors.toList())).lastEntry();
+    if (integerListEntry == null) {
+      return new ArrayList<>();
+    }
+    return integerListEntry.getValue();
   }
 
   public List<RankerEntity> getCurrentActiveRankers() {
-    return rankers.stream().filter(RankerEntity::isGrowing)
+    Entry<Integer, List<RankerEntity>> integerListEntry = rankers.stream()
+        .filter(RankerEntity::isGrowing)
         .collect(Collectors.groupingBy(r -> r.getLadder().getRound().getNumber(),
-            TreeMap::new, Collectors.toList())).lastEntry().getValue();
+            TreeMap::new, Collectors.toList())).lastEntry();
+    if (integerListEntry == null) {
+      return new ArrayList<>();
+    }
+    return integerListEntry.getValue();
   }
 
   public Integer getHighestCurrentLadder() {

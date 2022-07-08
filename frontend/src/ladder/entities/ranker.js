@@ -34,7 +34,7 @@ class Ranker {
       power: new Decimal(1),
       bias: 0,
       multiplier: 1,
-      you: false,
+      you: true,
       growing: true,
       autoPromote: false,
       grapes: new Decimal(0),

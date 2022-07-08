@@ -81,13 +81,13 @@ export default {
     },
     async handleEvent({ commit, rootState, dispatch }, { event, stompClient }) {
       switch (event.eventType) {
-        case "BIAS":
+        case "BUY_BIAS":
           commit({ type: "handleBias", event: event });
           break;
-        case "MULTI":
+        case "BUY_MULTI":
           commit({ type: "handleMultiplier", event: event });
           break;
-        case "VINEGAR":
+        case "THROW_VINEGAR":
           commit({ type: "handleVinegar", event: event });
           break;
         case "SOFT_RESET_POINTS":
@@ -105,7 +105,7 @@ export default {
             );
           }
           break;
-        case "AUTO_PROMOTE":
+        case "BUY_AUTO_PROMOTE":
           commit({
             type: "handleAutoPromote",
             event: event,

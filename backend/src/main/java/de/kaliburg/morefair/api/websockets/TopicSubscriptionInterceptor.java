@@ -3,8 +3,8 @@ package de.kaliburg.morefair.api.websockets;
 import de.kaliburg.morefair.account.AccountAccessRole;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
-import de.kaliburg.morefair.api.FairController;
 import de.kaliburg.morefair.game.round.RoundService;
+import de.kaliburg.morefair.game.round.RoundUtils;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Objects;
@@ -26,9 +26,13 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
   private final AccountService accountService;
   private final RoundService roundService;
 
-  public TopicSubscriptionInterceptor(AccountService accountService, RoundService roundService) {
+  private final RoundUtils roundUtils;
+
+  public TopicSubscriptionInterceptor(AccountService accountService, RoundService roundService,
+      RoundUtils roundUtils) {
     this.accountService = accountService;
     this.roundService = roundService;
+    this.roundUtils = roundUtils;
   }
 
   @Override
@@ -80,7 +84,7 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
       }
       int chatDestination = Integer.parseInt(
           topicDestination.substring("/topic/chat/events/".length()));
-      int highestLadder = account.getRankers().stream()
+      int highestLadder = account.getCurrentRankers().stream()
           .mapToInt(v -> v.getLadder().getNumber()).max().orElse(1);
       if (chatDestination > highestLadder) {
         return false;
@@ -94,11 +98,11 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
       }
       int ladderDestination = Integer.parseInt(
           topicDestination.substring("/topic/game/events/".length()));
-      if (ladderDestination == FairController.BASE_ASSHOLE_LADDER + roundService.getCurrentRound()
-          .getHighestAssholeCount()) {
+      if (ladderDestination == roundUtils.getAssholeLadderNumber(roundService.getCurrentRound())) {
         return true;
       }
-      int highestLadder = account.getRankers().stream().mapToInt(v -> v.getLadder().getNumber())
+      int highestLadder = account.getCurrentRankers().stream()
+          .mapToInt(v -> v.getLadder().getNumber())
           .max().orElse(1);
       if (ladderDestination > highestLadder) {
         return false;

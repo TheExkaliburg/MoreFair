@@ -8,12 +8,13 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class LadderViewDto {
+public class LadderDto {
 
   private List<RankerDto> rankers = new ArrayList<>();
-  private LadderDTO ladder;
+  private Integer number;
 
-  public LadderViewDto(LadderEntity ladder, AccountEntity account) {
+  public LadderDto(LadderEntity ladder, AccountEntity account) {
+    number = ladder.getNumber();
     for (RankerEntity ranker : ladder.getRankers()) {
       RankerDto rankerDto = new RankerDto(ranker);
       if (ranker.getAccount().getUuid().equals(account.getUuid())) {
@@ -22,6 +23,5 @@ public class LadderViewDto {
       }
       this.rankers.add(rankerDto);
     }
-    this.ladder = new LadderDTO(ladder);
   }
 }
