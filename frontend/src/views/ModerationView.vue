@@ -85,6 +85,7 @@
 <script setup>
 import { useStore } from "vuex";
 import { computed, inject, ref } from "vue";
+import API from "@/websocket/wsApi";
 // sdad
 const store = useStore();
 const stompClient = inject("$stompClient");
@@ -100,13 +101,17 @@ function searchUserName() {
 
 function ban() {
   if (confirm(`Are you sure you want to ban (#${actionUserIdInput.value})`)) {
-    stompClient.send("/app/mod/ban/" + actionUserIdInput.value);
+    stompClient.send(
+      API.MODERATION.APP_BAN_DESTINATION(actionUserIdInput.value)
+    );
   }
 }
 
 function mute() {
   if (confirm(`Are you sure you want to mute (#${actionUserIdInput.value})`)) {
-    stompClient.send("/app/mod/mute/" + actionUserIdInput.value);
+    stompClient.send(
+      API.MODERATION.APP_MUTE_DESTINATION(actionUserIdInput.value)
+    );
   }
 }
 
@@ -115,21 +120,28 @@ function rename() {
     `What would you like to name (#${actionUserIdInput.value})`
   );
   if (newName) {
-    stompClient.send("/app/mod/name/" + actionUserIdInput.value, {
-      content: newName,
-    });
+    stompClient.send(
+      API.MODERATION.APP_RENAME_DESTINATION(actionUserIdInput.value),
+      {
+        content: newName,
+      }
+    );
   }
 }
 
 function free() {
   if (confirm(`Are you sure you want to free (#${actionUserIdInput.value})`)) {
-    stompClient.send("/app/mod/free/" + actionUserIdInput.value);
+    stompClient.send(
+      API.MODERATION.APP_FREE_DESTINATION(actionUserIdInput.value)
+    );
   }
 }
 
 function mod() {
   if (confirm(`Are you sure you want to mod (#${actionUserIdInput.value})`)) {
-    stompClient.send("/app/mod/mod/" + actionUserIdInput.value);
+    stompClient.send(
+      API.MODERATION.APP_MOD_DESTINATION(actionUserIdInput.value)
+    );
   }
 }
 </script>
