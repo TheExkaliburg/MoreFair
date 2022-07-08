@@ -6,6 +6,7 @@ import {
   OptionSection,
   RangeOption,
   StringInputOption,
+  EditableStringListOption,
 } from "../entities/option";
 import themeSelector from "@/modules/themeSelector";
 import {
@@ -101,6 +102,11 @@ const optionsModule = {
                 "showAllRankers"
               );
             }),
+            new BoolOption({
+              displayName: "Follow own Ranker",
+              name: "followOwnRanker",
+              value: false,
+            }),
             new IntegerOption({
               displayName: "Rankers padding",
               name: "rankersPadding",
@@ -126,6 +132,13 @@ const optionsModule = {
           displayName: "Chat Settings",
           name: "chatSettings",
           options: [
+            new EditableStringListOption({
+              displayName: "Subscribed mentions",
+              name: "subscribedMentions",
+              callback: (val) => {
+                console.log(val);
+              },
+            }),
             new BoolOption({
               displayName: "Hide chat",
               name: "hideChat",
@@ -174,7 +187,7 @@ const optionsModule = {
               value: false,
             }),
             new BoolOption({
-              displayName: "Enable Chat Features",
+              displayName: "Enable Ladder Features",
               name: "enableLadderModFeatures",
               value: false,
             }),
