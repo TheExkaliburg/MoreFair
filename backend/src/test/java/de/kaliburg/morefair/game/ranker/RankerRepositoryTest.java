@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.game.ranker;
+/*package de.kaliburg.morefair.game.ranker;
 
 
 import com.github.database.rider.core.api.dataset.DataSet;
@@ -19,4 +19,4 @@ class RankerRepositoryTest {
 
   }
 
-}
+}*/
