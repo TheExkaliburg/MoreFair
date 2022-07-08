@@ -9,6 +9,10 @@ const versioningModule = {
           features: [
             "Group mentions are now supported in the chat. $Train$ Choo! Choo!",
           ],
+          improvements: [
+            "You can now click on a username in the chat to mention them.",
+            "Moderators can now right click on the ladder to moderate people.",
+          ],
           fixes: ["Fixed mention sound not playing."],
         }),
         new Version("PATCH", "Fixing Asshole-Badge Limit", {
