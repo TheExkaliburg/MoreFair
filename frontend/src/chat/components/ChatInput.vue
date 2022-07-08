@@ -136,6 +136,7 @@ export function insertSpecialChatElement(
 <script setup>
 import { ref, onMounted, computed, inject } from "vue";
 import { useStore } from "vuex";
+import API from "@/websocket/wsApi";
 
 const msgLength = ref(0);
 
@@ -230,6 +231,7 @@ onMounted(() => {
   };
   observer.observe(document.getElementById("chatInput"), config);
 });
+
 function onElementChange(mutation) {
   //on any mutation, check if the dropdown is open and if so, close it
   let oldDropdown = document.getElementById("mentionDropdown");
@@ -245,6 +247,7 @@ function onElementChange(mutation) {
 
   plainTextElementChanged(mutation);
 }
+
 function plainTextElementChanged(mutation) {
   let textElement = mutation.target;
   let text = textElement.textContent;
@@ -569,10 +572,13 @@ function chatBoxKeyDown(e) {
 function sendMessage() {
   const [msg, metadata] = parseSendMessage();
 
-  stompClient.send("/app/chat/post/" + chat.value.currentChatNumber, {
-    content: msg,
-    metadata: metadata,
-  });
+  stompClient.send(
+    API.CHAT.APP_CHAT_DESTINATION(chat.value.currentChatNumber),
+    {
+      content: msg,
+      metadata: metadata,
+    }
+  );
   message.value = "";
   //Sometime the chat box is not cleared, so we do it manually
   document.getElementById("chatInput").innerHTML = "";
