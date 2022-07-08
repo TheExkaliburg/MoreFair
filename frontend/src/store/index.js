@@ -10,6 +10,7 @@ import moderationModule from "@/moderation/store/moderationModule";
 import versioningModule from "@/versioning/store/versioningModule";
 
 import { computed } from "vue";
+import { Sounds } from "@/modules/sounds";
 
 let promotionJingleVolume;
 let reachingFirstSound;
@@ -106,8 +107,6 @@ let store = createStore({
     versioning: versioningModule,
   },
 });
-
-import { Sounds } from "@/modules/sounds";
 
 promotionJingleVolume = computed(() =>
   store.getters["options/getOptionValue"]("notificationVolume")
