@@ -108,7 +108,7 @@ const optionsModule = {
               value: false,
             }),
             new IntegerOption({
-              displayNaF: "Rankers padding",
+              displayName: "Rankers padding",
               name: "rankersPadding",
               value: 100,
             }).setActiveFn(() => {
