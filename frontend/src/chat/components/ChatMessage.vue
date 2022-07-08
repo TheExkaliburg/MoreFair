@@ -2,10 +2,19 @@
   <div class="container px-3 py-1 message">
     <div class="row py-0 message-header">
       <div class="col-4 message-username">
-        <span class="message-user-name">
+        <span
+          class="message-user-name"
+          style="cursor: pointer"
+          @click="mentionUser"
+        >
           {{ msg.username }}
         </span>
-        <sub class="message-user-id">&nbsp;#{{ msg.accountId }}</sub>
+        <sub
+          class="message-user-id"
+          style="cursor: pointer"
+          @click="mentionUser"
+          >&nbsp;#{{ msg.accountId }}</sub
+        >
       </div>
       <div class="col-4 message-status">
         <strong>{{
@@ -56,6 +65,7 @@
 import { computed, defineProps, inject } from "vue";
 import { useStore } from "vuex";
 import ChatMessageBody from "@/chat/components/ChatMessageBody";
+import { getMentionElement, insertSpecialChatElement } from "./ChatInput.vue";
 
 const store = useStore();
 const stompClient = inject("$stompClient");
@@ -64,6 +74,14 @@ const settings = computed(() => store.state.settings);
 const props = defineProps({
   msg: Object,
 });
+
+function mentionUser() {
+  let mention = getMentionElement({
+    name: props.msg.username,
+    id: props.msg.accountId,
+  });
+  insertSpecialChatElement(mention, "END", "END");
+}
 
 function ban() {
   if (
