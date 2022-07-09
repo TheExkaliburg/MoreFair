@@ -4,16 +4,14 @@
       <div class="container px-3">
         <div class="row py-0">
           <div class="col px-0 text-start">
-            {{ numberFormatter.format(yourRanker.power) }}/<span
-              class="text-highlight"
-              >{{ numberFormatter.format(multiCost) }}
+            {{ yourPowerFormatted }}/<span class="text-highlight"
+              >{{ multiCostFormatted }}
             </span>
             Power
           </div>
           <div class="col px-0 text-end">
-            {{ numberFormatter.format(yourRanker.points) }}/<span
-              class="text-highlight"
-              >{{ numberFormatter.format(biasCost) }}
+            {{ yourPointsFormatted }}/<span class="text-highlight"
+              >{{ biasCostFormatted }}
             </span>
             Points
           </div>
@@ -26,7 +24,7 @@
               @click="buyMulti"
             >
               <span v-if="isMultiEnabled">+1 Multi</span>
-              <span v-else>+M ({{ secondsToHms(etaMulti) }})</span>
+              <span v-else>+M ({{ etaMulti }})</span>
             </button>
             <button
               :class="isBiasEnabled ? '' : 'disabled'"
@@ -34,33 +32,24 @@
               @click="buyBias"
             >
               <span v-if="isBiasEnabled">+1 Bias</span>
-              <span v-else>+B ({{ secondsToHms(etaBias) }})</span>
+              <span v-else>+B ({{ etaBias }})</span>
             </button>
           </div>
         </div>
         <br />
         <div class="row py-0">
           <div class="col px-0 text-start">
-            {{
-              hideVinegarAndGrapes
-                ? "[[Hidden]]"
-                : numberFormatter.format(yourRanker.grapes)
-            }}<span v-if="ladder.number >= settings.autoPromoteLadder"
+            {{ yourGrapesFormatted }}
+            <span v-if="ladder.number >= settings.autoPromoteLadder"
               >/<span class="text-highlight">{{
-                numberFormatter.format(
-                  ladder.getAutoPromoteCost(yourRanker.rank, settings)
-                )
+                numberFormatter.format(autoPromoteCost)
               }}</span></span
             >
             Grapes <span v-if="yourRanker.autoPromote">(Active)</span>
           </div>
           <div class="col px-0 text-end">
-            {{
-              hideVinegarAndGrapes
-                ? "[[Hidden]]"
-                : numberFormatter.format(yourRanker.vinegar)
-            }}/<span class="text-highlight">{{
-              numberFormatter.format(ladder.getVinegarThrowCost(settings))
+            {{ yourVinegarFormatted }}/<span class="text-highlight">{{
+              numberFormatter.format(vinegarCost)
             }}</span>
             Vinegar
           </div>
@@ -72,9 +61,7 @@
               :class="[
                 !yourRanker.autoPromote &&
                 !autoPromoteLastSecond &&
-                yourRanker.grapes.cmp(
-                  ladder.getAutoPromoteCost(yourRanker.rank, settings)
-                ) >= 0
+                yourRanker.grapes.cmp(autoPromoteCost) >= 0
                   ? ''
                   : 'disabled',
                 ladder.number >= settings.autoPromoteLadder ? '' : 'hide',
@@ -105,8 +92,7 @@
             >
               Throw Vinegar
               {{
-                yourRanker.vinegar.cmp(ladder.getVinegarThrowCost(settings)) >=
-                0
+                yourRanker.vinegar.cmp(vinegarCost) >= 0
                   ? ""
                   : `(${secondsToHms(
                       (vinegarCost - yourRanker.vinegar) / yourRanker.grapes
@@ -158,15 +144,36 @@
 <script setup>
 import { useStore } from "vuex";
 import { computed, inject, ref } from "vue";
-import { eta } from "../../modules/eta";
-import { secondsToHms } from "../../modules/formatting";
+import { eta } from "@/modules/eta";
+import { secondsToHms } from "@/modules/formatting";
 import Decimal from "break_infinity.js";
 import API from "@/websocket/wsApi";
 
 const store = useStore();
 const stompClient = inject("$stompClient");
 
-// variables
+const yourPowerFormatted = computed(() =>
+  numberFormatter.value.format(yourRanker.value.power)
+);
+const yourPointsFormatted = computed(() =>
+  numberFormatter.value.format(yourRanker.value.power)
+);
+const biasCostFormatted = computed(() =>
+  numberFormatter.value.format(biasCost.value)
+);
+const multiCostFormatted = computed(() =>
+  numberFormatter.value.format(multiCost.value)
+);
+const yourGrapesFormatted = computed(() =>
+  hideVinegarAndGrapes.value
+    ? "[[Hidden]]"
+    : numberFormatter.value.format(yourRanker.value.grapes)
+);
+const yourVinegarFormatted = computed(() =>
+  hideVinegarAndGrapes.value
+    ? "[[Hidden]]"
+    : numberFormatter.value.format(yourRanker.value.vinegar)
+);
 
 // Disables a button if its pressed in the last second
 const biasLastSecond = ref(false);
@@ -176,33 +183,25 @@ const autoPromoteLastSecond = ref(false);
 const promoteLastSecond = ref(false);
 
 // computed
-const ladder = computed(() => store.state.ladder.ladder);
+const ladder = computed(() => store.state.ladder);
 const stats = computed(() => store.state.ladder.stats);
 const settings = computed(() => store.state.settings);
 const numberFormatter = computed(() => store.state.numberFormatter);
-const yourRanker = computed(() => ladder.value.yourRanker);
-
+const yourRanker = computed(() => store.state.ladder.yourRanker);
 const hideVinegarAndGrapes = computed(() =>
   store.getters["options/getOptionValue"]("hideVinAndGrapeCount")
 );
-
 const biasCost = computed(() =>
-  ladder.value.getNextUpgradeCost(yourRanker.value.bias)
+  store.getters["ladder/getNextUpgradeCost"](yourRanker.value.bias)
 );
-//const allRankers = computed(() => store.getters["ladder/allRankers"]);
-
 const multiCost = computed(() =>
-  ladder.value.getNextUpgradeCost(yourRanker.value.multiplier)
+  store.getters["ladder/getNextUpgradeCost"](yourRanker.value.multi)
 );
-
-const canThrowVinegar = computed(() =>
-  ladder.value.canThrowVinegar(settings.value)
+const canThrowVinegar = computed(() => store.getters["ladder/canThrowVinegar"]);
+const vinegarCost = computed(() => store.getters["ladder/getVinegarThrowCost"]);
+const autoPromoteCost = computed(
+  () => store.getters["ladder/getAutoPromoteCost"]
 );
-
-const vinegarCost = computed(() =>
-  ladder.value.getVinegarThrowCost(settings.value)
-);
-
 const isBiasEnabled = computed(
   () =>
     yourRanker.value.points.cmp(biasCost.value) >= 0 && !biasLastSecond.value
@@ -211,15 +210,17 @@ const isMultiEnabled = computed(
   () =>
     yourRanker.value.power.cmp(multiCost.value) >= 0 && !multiLastSecond.value
 );
-//const isAutoPromoteEnabled = computed(() => false);
-//const isThrowVinegarEnabled = computed(() => false);
 
 // ETA
-const etaBias = computed(() => eta(yourRanker.value).toPoints(biasCost.value));
+const etaBias = computed(() =>
+  secondsToHms(eta(yourRanker.value).toPoints(biasCost.value))
+);
 const etaMulti = computed(() =>
-  yourRanker.value.rank === 1
-    ? Infinity
-    : eta(yourRanker.value).toPower(multiCost.value)
+  secondsToHms(
+    yourRanker.value.rank === 1
+      ? Infinity
+      : eta(yourRanker.value).toPower(multiCost.value)
+  )
 );
 const etaPromote = computed(() => {
   if (pointsForPromoteIsInfinity.value) return new Decimal(Infinity);

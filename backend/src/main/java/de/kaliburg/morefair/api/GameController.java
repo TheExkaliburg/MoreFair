@@ -37,7 +37,9 @@ public class GameController {
   public static final String APP_VINEGAR_DESTINATION = "/game/vinegar";
   public static final String APP_PROMOTE_DESTINATION = "/game/promote";
   public static final String APP_AUTOPROMOTE_DESTINATION = "/game/autopromote";
+  public static final String TOPIC_TICK_DESTINATION = "/game/tick";
   public static final String TOPIC_EVENTS_DESTINATION = "/game/events/{number}";
+  public static final String TOPIC_GLOBAL_EVENTS_DESTINATION = "/game/events";
   public static final String QUEUE_INIT_DESTINATION = "/game/init";
 
   public static final String PRIVATE_EVENTS_DESTINATION = "/game/events";

@@ -23,18 +23,21 @@ export class StompClient {
         });
       },
       async () => {
-        await this.disconnect();
+        await this.reconnect();
       }
     );
   }
 
-  async disconnect() {
-    if (this.stompClient !== null) this.stompClient.disconnect();
-    console.log(
-      "Currently disconnected, waiting 120sec before trying to reconnect..."
-    );
+  async reconnect() {
+    this.disconnect();
+    console.log("Waiting 5min before trying to automatically reconnect...");
     await new Promise((r) => setTimeout(r, 300000));
     location.reload();
+  }
+
+  disconnect() {
+    if (this.stompClient !== null) this.stompClient.disconnect();
+    console.log("Your Client got disconnect from the Server.");
   }
 
   subscribe(destination, func) {

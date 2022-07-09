@@ -17,7 +17,7 @@ export function eta(ranker) {
       throw new Error("ranker is undefined");
     }
     if (ranker.rank === 1 || !ranker.growing) return 0;
-    return (ranker.bias + ranker.rank - 1) * ranker.multiplier;
+    return (ranker.bias + ranker.rank - 1) * ranker.multi;
   }
 
   return {

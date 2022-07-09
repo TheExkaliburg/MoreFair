@@ -17,11 +17,7 @@
         >
       </div>
       <div class="col-4 message-status">
-        <strong>{{
-          msg.timesAsshole > 0
-            ? "[" + settings.assholeTags[msg.timesAsshole] + "]"
-            : ""
-        }}</strong>
+        <strong>{{ msg.tag }}</strong>
       </div>
       <div class="col-3 message-date">{{ msg.timeCreated }}</div>
       <div
@@ -62,7 +58,7 @@
 </template>
 
 <script setup>
-import { computed, defineProps, inject } from "vue";
+import { defineProps, inject } from "vue";
 import { useStore } from "vuex";
 import ChatMessageBody from "@/chat/components/ChatMessageBody";
 import API from "@/websocket/wsApi";
@@ -70,7 +66,6 @@ import { getMentionElement, insertSpecialChatElement } from "./ChatInput.vue";
 
 const store = useStore();
 const stompClient = inject("$stompClient");
-const settings = computed(() => store.state.settings);
 
 const props = defineProps({
   msg: Object,

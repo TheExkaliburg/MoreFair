@@ -51,10 +51,10 @@ const store = useStore();
 
 const rankers = computed(() => store.getters["ladder/allRankers"]);
 
-//const numberFormatter = computed(() => store.state.numberFormatter);
-//const ladder = computed(() => store.state.ladder);
+//const numberFormatter = computed(() => modules.state.numberFormatter);
+//const ladder = computed(() => modules.state.ladder);
 /*const highlightMentions = computed(() =>
-  store.getters["options/getOptionValue"]("highlightMentions")
+  modules.getters["options/getOptionValue"]("highlightMentions")
 );*/
 
 const mentionSound = computed(() =>

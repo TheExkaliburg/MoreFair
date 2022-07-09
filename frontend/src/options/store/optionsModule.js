@@ -2,11 +2,11 @@ import {
   BoolOption,
   ButtonOption,
   DropdownOption,
+  EditableStringListOption,
   IntegerOption,
   OptionSection,
   RangeOption,
   StringInputOption,
-  EditableStringListOption,
 } from "../entities/option";
 import themeSelector from "@/modules/themeSelector";
 import {
@@ -17,7 +17,7 @@ import {
   requestTheme,
 } from "@/modules/themeManager";
 
-//import { createHookEndpoint } from "@/store/hooks";
+//import { createHookEndpoint } from "@/modules/hooks";
 
 //const optionChangedHook = createHookEndpoint(
 //  "optionChanged",
@@ -135,9 +135,6 @@ const optionsModule = {
             new EditableStringListOption({
               displayName: "Subscribed mentions",
               name: "subscribedMentions",
-              callback: (val) => {
-                console.log(val);
-              },
             }),
             new BoolOption({
               displayName: "Hide chat",
@@ -229,7 +226,7 @@ const optionsModule = {
           });
         }
       } catch (e) {
-        console.log(state.value);
+        console.error(state.value);
       }
     },
     updateOption(state, { option, payload }) {

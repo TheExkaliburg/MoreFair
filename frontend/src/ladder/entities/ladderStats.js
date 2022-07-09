@@ -11,13 +11,17 @@ const reachingFirstSound = computed(() =>
 );
 
 class LadderStats {
-  constructor() {
-    this.growingRankerCount = 1;
-    this.pointsNeededForManualPromote = new Decimal(Infinity);
-    this.playerWasFirstLastTick = true; //assume we were first so we dont jingle every time we change the ladder.
+  constructor({
+    growingRankerCount = 1,
+    pointsNeededForManualPromote = new Decimal(Infinity),
+    playerWasFirstLastTick = true, //assume we were first so we dont jingle every time we change the ladder.
+  } = {}) {
+    this.growingRankerCount = growingRankerCount;
+    this.pointsNeededForManualPromote = pointsNeededForManualPromote;
+    this.playerWasFirstLastTick = playerWasFirstLastTick;
 
-    //Since we get instanciated in a store sub module, we need to do a setTimeout to make sure the store is ready.
-    //This ensures that the store is fully created and in the next tick we can access the store normally.
+    //Since we get instanciated in a modules sub module, we need to do a setTimeout to make sure the modules is ready.
+    //This ensures that the modules is fully created and in the next tick we can access the modules normally.
     setTimeout(() => {
       Sounds.register("gotFirstJingle", require("@/assets/gotFirstJingle.wav"));
     }, 0);
@@ -30,11 +34,7 @@ class LadderStats {
     ).length;
 
     //Now we calc the logic for the "hey you just came first" jingle
-    if (
-      !this.playerWasFirstLastTick &&
-      ladder.yourRanker.you &&
-      ladder.yourRanker.rank === 1
-    ) {
+    if (!this.playerWasFirstLastTick && ladder.yourRanker.rank === 1) {
       this.playerWasFirstLastTick = true;
       if (reachingFirstSound.value) {
         Sounds.play("gotFirstJingle", gotFirstJingleVolume.value);
@@ -58,7 +58,7 @@ class LadderStats {
 
     // If not enough points -> minimum required Points
     if (
-      ladder.firstRanker.points.cmp(
+      ladder.rankers[0].points.cmp(
         ladder.getMinimumPointsForPromote(settings)
       ) < 0
     ) {
@@ -72,14 +72,14 @@ class LadderStats {
     if (ladder.number < settings.autoPromoteLadder) {
       this.pointsNeededForManualPromote = ladder.firstRanker.you
         ? ladder.rankers[1].points.add(1)
-        : ladder.firstRanker.points.add(1);
+        : ladder.rankers[0].points.add(1);
       return;
     }
 
-    let leadingRanker = ladder.firstRanker.you
+    let leadingRanker = ladder.rankers[0].you
       ? ladder.yourRanker
-      : ladder.firstRanker;
-    let pursuingRanker = ladder.firstRanker.you
+      : ladder.rankers[0];
+    let pursuingRanker = ladder.rankers[0].you
       ? ladder.rankers[1]
       : ladder.yourRanker;
 

@@ -10,7 +10,7 @@ public class RankerDto {
   private Long accountId;
   private Integer bias;
   private boolean isYou = false;
-  private Integer multiplier;
+  private Integer multi;
   private String points;
   private String power;
   private Integer rank;
@@ -25,7 +25,7 @@ public class RankerDto {
     this.points = ranker.getPoints().toString();
     this.power = ranker.getPower().toString();
     this.bias = ranker.getBias();
-    this.multiplier = ranker.getMultiplier();
+    this.multi = ranker.getMultiplier();
     this.isGrowing = ranker.isGrowing();
     this.timesAsshole = ranker.getAccount().getAssholeCount();
   }

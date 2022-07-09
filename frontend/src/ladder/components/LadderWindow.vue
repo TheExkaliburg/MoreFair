@@ -3,13 +3,13 @@
     <div class="col">
       <span
         >Active Rankers: {{ store.getters["ladder/activeRankers"].length }}/{{
-          store.state.ladder.ladder.rankers.length
+          store.state.ladder.rankers.length
         }}</span
       >
     </div>
     <div class="col">
       <span
-        >Ladder: {{ store.state.ladder.ladder.number }}/{{
+        >Ladder: {{ store.state.ladder.number }}/{{
           store.state.settings.assholeLadder
         }}</span
       >
@@ -58,7 +58,7 @@
         >
           <td class="text-start">
             {{ ranker.rank }}
-            {{ settings.assholeTags[ranker.timesAsshole] }}
+            {{ ranker.tag }}
           </td>
           <td class="text-start">
             {{ ranker.username }}
@@ -82,7 +82,7 @@
             {{ numberFormatter.format(ranker.power) }} [+{{
               ("" + ranker.bias).padStart(2, "0")
             }}
-            x{{ ("" + ranker.multiplier).padStart(2, "0") }}]
+            x{{ ("" + ranker.multi).padStart(2, "0") }}]
           </td>
           <td
             :style="'animation-delay: ' + rankerEtaPercentage(ranker) + 's'"
@@ -135,12 +135,13 @@ import { computed, inject } from "vue";
 import PaginationGroup from "@/components/PaginationGroup";
 import { eta } from "@/modules/eta";
 import { secondsToHms } from "@/modules/formatting";
+import API from "@/websocket/wsApi";
 
 const store = useStore();
 const stompClient = inject("$stompClient");
 
 const numberFormatter = computed(() => store.state.numberFormatter);
-const ladder = computed(() => store.state.ladder.ladder);
+const ladder = computed(() => store.state.ladder);
 const user = computed(() => store.state.user);
 const settings = computed(() => store.state.settings);
 const rankers = computed(() => store.getters["ladder/shownRankers"]);
@@ -277,15 +278,19 @@ function changeLadder(event) {
   const targetLadder = event.target.dataset.number;
 
   if (targetLadder !== ladder.value.number) {
-    stompClient.unsubscribe("/topic/ladder/" + ladder.value.number);
-    stompClient.subscribe("/topic/ladder/" + targetLadder, (message) => {
-      store.dispatch({
-        type: "ladder/update",
-        message: message,
-        stompClient: stompClient,
-      });
-    });
-    stompClient.send("/app/ladder/init/" + targetLadder);
+    stompClient.unsubscribe(
+      API.GAME.TOPIC_EVENTS_DESTINATION(ladder.value.number)
+    );
+    stompClient.subscribe(
+      API.GAME.TOPIC_EVENTS_DESTINATION(targetLadder),
+      (message) => {
+        store.dispatch({
+          type: "ladder/update",
+          message: message,
+        });
+      }
+    );
+    stompClient.send(API.GAME.APP_INIT_DESTINATION(targetLadder));
   }
 }
 </script>

@@ -96,82 +96,31 @@
 </template>
 
 <script setup>
-import { provide } from "vue";
 import { useStore } from "vuex";
 import Cookies from "js-cookie";
-import { StompClient } from "@/websocket/stompClient";
 import API from "@/websocket/wsApi";
+import { provide } from "vue";
+import { StompClient } from "@/websocket/stompClient";
 
-//import { hooksSystemSetup } from "@/store/hooks";
+//import { hooksSystemSetup } from "@/modules/hooks";
 
 //hooksSystemSetup();
 
-const store = useStore();
 const stompClient = new StompClient();
+provide("$stompClient", stompClient);
 
-//Prompt the store/options to load the options
+const store = useStore();
+
+//Prompt the modules/options to load the options
 store.commit("options/init");
 store.commit("options/loadOptions");
 
-provide("$stompClient", stompClient);
-setupConnection();
-
-function setupConnection() {
-  stompClient.connect(() => {
-    let uuid = Cookies.get("_uuid");
-    if (
-      (!uuid || uuid === "") &&
-      !confirm("Do you want to create a new account?")
-    ) {
-      return;
-    }
-    stompClient.subscribe(API.FAIR.QUEUE_INFO_DESTINATION, (message) => {
-      console.log("Test");
-      store.commit({ type: "initSettings", message: message });
-
-      stompClient.subscribe(API.ACCOUNT.QUEUE_LOGIN_DESTINATION, (message) => {
-        store.commit({ type: "initUser", message: message });
-        setupData();
-      });
-      stompClient.send(API.ACCOUNT.APP_LOGIN_DESTINATION);
-    });
-
-    stompClient.send(API.FAIR.APP_INFO_DESTINATION);
-  });
-}
-
-function setupData() {
-  let highestLadderReached = store.state.user.highestCurrentLadder;
-  stompClient.subscribe(
-    API.CHAT.TOPIC_EVENTS_DESTINATION(highestLadderReached),
-    (message) => {
-      store.commit({ type: "chat/addMessage", message: message });
-    }
-  );
-  stompClient.subscribe(API.CHAT.QUEUE_INIT_DESTINATION, (message) => {
-    store.commit({ type: "chat/init", message: message });
-  });
-  stompClient.send(API.CHAT.APP_INIT_DESTINATION(highestLadderReached));
-  stompClient.subscribe(
-    API.GAME.TOPIC_EVENTS_DESTINATION(highestLadderReached),
-    (message) => {
-      store.dispatch({
-        type: "ladder/update",
-        message: message,
-        stompClient: stompClient,
-      });
-    }
-  );
-  stompClient.subscribe(API.GAME.QUEUE_INIT_DESTINATION, (message) => {
-    store.commit({ type: "ladder/init", message: message });
-  });
-  stompClient.send(API.GAME.APP_INIT_DESTINATION(highestLadderReached));
-}
+store.dispatch({ type: "setupConnection", stompClient: stompClient });
 
 function promptNameChange() {
   let newUsername = window.prompt(
     "What shall be your new name? (max. 32 characters)",
-    store.state.ladder.ladder.yourRanker.username
+    store.state.ladder.yourRanker.username
   );
   if (newUsername && newUsername.length > 32) {
     let temp = newUsername.substring(0, 32);
@@ -186,7 +135,7 @@ function promptNameChange() {
   if (
     newUsername &&
     newUsername.trim() !== "" &&
-    newUsername !== store.state.ladder.ladder.yourRanker.username
+    newUsername !== store.state.ladder.yourRanker.username
   ) {
     stompClient.send(API.ACCOUNT.APP_RENAME_DESTINATION, {
       content: newUsername,

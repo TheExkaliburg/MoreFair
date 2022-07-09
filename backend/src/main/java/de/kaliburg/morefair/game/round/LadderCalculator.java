@@ -11,9 +11,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -35,7 +33,7 @@ public class LadderCalculator {
   private final LadderUtils ladderUtils;
   private final RoundService roundService;
   private final RoundUtils roundUtils;
-  private Map<Integer, HeartbeatDTO> heartbeatMap = new HashMap<>();
+  private HeartbeatDTO heartbeat = new HeartbeatDTO();
   private boolean didPressAssholeButton = false;
   private long lastTimeMeasured = System.nanoTime();
 
@@ -55,7 +53,6 @@ public class LadderCalculator {
   @Scheduled(initialDelay = 1000, fixedRate = 1000)
   public void update() {
     // Reset the Heartbeat
-    heartbeatMap = new HashMap<>();
     didPressAssholeButton = false;
     try {
       ladderService.getLadderSemaphore().acquire();
@@ -76,14 +73,9 @@ public class LadderCalculator {
           // TODO: Reset Game Logic
         }
 
-        // Otherwise, just send the default Broadcasts
-        for (LadderEntity ladder : ladderService.getCurrentLadderMap().values()) {
-          heartbeatMap.get(ladder.getNumber()).setSecondsPassed(deltaSec);
-          wsUtils.convertAndSendToTopic(
-              GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
-                  ladder.getNumber().toString()),
-              heartbeatMap.get(ladder.getNumber()));
-        }
+        // Otherwise, just send the default Heartbeat-Tick
+        heartbeat.setDelta(deltaSec);
+        wsUtils.convertAndSendToTopic(GameController.TOPIC_TICK_DESTINATION, heartbeat);
 
         // Calculate Ladder yourself
         Collection<LadderEntity> ladders = ladderService.getCurrentLadderMap().values();
@@ -118,17 +110,17 @@ public class LadderCalculator {
             Event e = events.get(j);
             switch (e.getEventType()) {
               case BUY_BIAS -> {
-                if (!ladderService.buyBias(e.getAccountId(), ladder)) {
+                if (!ladderService.buyBias(e, ladder)) {
                   eventsToBeRemoved.add(e);
                 }
               }
               case BUY_MULTI -> {
-                if (!ladderService.buyMulti(e.getAccountId(), ladder)) {
+                if (!ladderService.buyMulti(e, ladder)) {
                   eventsToBeRemoved.add(e);
                 }
               }
               case PROMOTE -> {
-                if (!ladderService.promote(e.getAccountId(), ladder)) {
+                if (!ladderService.promote(e, ladder)) {
                   eventsToBeRemoved.add(e);
                 } else if (roundUtils.getAssholeLadderNumber(roundService.getCurrentRound())
                     .equals(ladder.getNumber())) {
@@ -136,12 +128,12 @@ public class LadderCalculator {
                 }
               }
               case THROW_VINEGAR -> {
-                if (!ladderService.throwVinegar(e.getAccountId(), ladder, e)) {
+                if (!ladderService.throwVinegar(e, ladder)) {
                   eventsToBeRemoved.add(e);
                 }
               }
               case BUY_AUTO_PROMOTE -> {
-                if (!ladderService.buyAutoPromote(e.getAccountId(), ladder)) {
+                if (!ladderService.buyAutoPromote(e, ladder)) {
                   eventsToBeRemoved.add(e);
                 }
               }
@@ -153,7 +145,6 @@ public class LadderCalculator {
           for (Event e : eventsToBeRemoved) {
             events.remove(e);
           }
-          heartbeatMap.put(ladder.getNumber(), new HeartbeatDTO(new ArrayList<>(events)));
         }
         ladderService.getEventMap().values().forEach(List::clear);
       } finally {

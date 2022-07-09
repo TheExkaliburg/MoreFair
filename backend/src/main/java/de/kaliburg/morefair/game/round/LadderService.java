@@ -2,6 +2,9 @@ package de.kaliburg.morefair.game.round;
 
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
+import de.kaliburg.morefair.account.AccountServiceEvent;
+import de.kaliburg.morefair.api.GameController;
+import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.data.JoinData;
 import de.kaliburg.morefair.events.data.VinegarData;
@@ -15,7 +18,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.Semaphore;
 import lombok.AccessLevel;
@@ -23,6 +25,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 /**
@@ -35,7 +39,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Log4j2
-public class LadderService {
+public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
   private final RankerService rankerService;
   private final LadderRepository ladderRepository;
@@ -46,20 +50,20 @@ public class LadderService {
   private final LadderUtils ladderUtils;
   private final AccountService accountService;
   private final RoundUtils roundUtils;
-  private final Random randomGenerator = new Random();
   private final ChatService chatService;
   private final UpgradeUtils upgradeUtils;
+  @Getter(AccessLevel.PACKAGE)
+  private final Map<Integer, List<Event>> eventMap = new HashMap<>();
+  private final WsUtils wsUtils;
   @Getter(AccessLevel.PACKAGE)
   @Setter(AccessLevel.PACKAGE)
   private RoundEntity currentRound;
   @Getter(AccessLevel.PACKAGE)
   private Map<Integer, LadderEntity> currentLadderMap = new HashMap<>();
-  @Getter(AccessLevel.PACKAGE)
-  private Map<Integer, List<Event>> eventMap = new HashMap<>();
 
   public LadderService(RankerService rankerService, LadderRepository ladderRepository,
       LadderUtils ladderUtils, AccountService accountService, RoundUtils roundUtils,
-      ChatService chatService, UpgradeUtils upgradeUtils) {
+      ChatService chatService, UpgradeUtils upgradeUtils, @Lazy WsUtils wsUtils) {
     this.rankerService = rankerService;
     this.ladderRepository = ladderRepository;
     this.ladderUtils = ladderUtils;
@@ -67,6 +71,7 @@ public class LadderService {
     this.roundUtils = roundUtils;
     this.chatService = chatService;
     this.upgradeUtils = upgradeUtils;
+    this.wsUtils = wsUtils;
   }
 
   /**
@@ -298,17 +303,19 @@ public class LadderService {
   /**
    * Buy Bias for the active ranker of an account on a specific ladder.
    *
-   * @param accountId the id of the account
-   * @param ladder    the ladder the ranker is on
+   * @param event  the event that contains the information for the buy
+   * @param ladder the ladder the ranker is on
    * @return if the ranker can buy bias
    */
-  boolean buyBias(Long accountId, LadderEntity ladder) {
+  boolean buyBias(Event event, LadderEntity ladder) {
     try {
-      RankerEntity ranker = findActiveRankerOfAccountOnLadder(accountId, ladder);
+      RankerEntity ranker = findActiveRankerOfAccountOnLadder(event.getAccountId(), ladder);
       BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getNumber(), ranker.getBias());
       if (ranker.getPoints().compareTo(cost) >= 0) {
         ranker.setPoints(BigInteger.ZERO);
         ranker.setBias(ranker.getBias() + 1);
+        wsUtils.convertAndSendToTopic(GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
+            ladder.getNumber().toString()), event);
         return true;
       }
     } catch (Exception e) {
@@ -321,19 +328,21 @@ public class LadderService {
   /**
    * Buy multi for the active ranker of an account on a specific ladder.
    *
-   * @param accountId the id of the account
-   * @param ladder    the ladder the ranker is on
+   * @param event  the event that contains the information for the buy
+   * @param ladder the ladder the ranker is on
    * @return if the ranker can buy multi
    */
-  boolean buyMulti(Long accountId, LadderEntity ladder) {
+  boolean buyMulti(Event event, LadderEntity ladder) {
     try {
-      RankerEntity ranker = findActiveRankerOfAccountOnLadder(accountId, ladder);
+      RankerEntity ranker = findActiveRankerOfAccountOnLadder(event.getAccountId(), ladder);
       BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getNumber(), ranker.getMultiplier());
       if (ranker.getPower().compareTo(cost) >= 0) {
         ranker.setPoints(BigInteger.ZERO);
         ranker.setPower(BigInteger.ZERO);
         ranker.setBias(0);
         ranker.setMultiplier(ranker.getMultiplier() + 1);
+        wsUtils.convertAndSendToTopic(GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
+            ladder.getNumber().toString()), event);
         return true;
       }
     } catch (Exception e) {
@@ -346,18 +355,20 @@ public class LadderService {
   /**
    * Buy auto-promote for the active ranker of an account on a specific ladder.
    *
-   * @param accountId the id of the account
-   * @param ladder    the ladder the ranker is on
+   * @param event  the event that contains the information for the buy
+   * @param ladder the ladder the ranker is on
    * @return if the ranker can buy auto-promote
    */
-  boolean buyAutoPromote(Long accountId, LadderEntity ladder) {
+  boolean buyAutoPromote(Event event, LadderEntity ladder) {
     try {
-      RankerEntity ranker = findActiveRankerOfAccountOnLadder(accountId, ladder);
+      RankerEntity ranker = findActiveRankerOfAccountOnLadder(event.getAccountId(), ladder);
       BigInteger cost = upgradeUtils.buyAutoPromoteCost(ranker.getRank(), ladder.getNumber());
 
       if (ladderUtils.canBuyAutoPromote(ladder, ranker, currentRound)) {
         ranker.setGrapes(ranker.getGrapes().subtract(cost));
         ranker.setAutoPromote(true);
+        wsUtils.convertAndSendToTopic(GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
+            ladder.getNumber().toString()), event);
         return true;
       }
     } catch (Exception e) {
@@ -371,13 +382,13 @@ public class LadderService {
   /**
    * Promote the active ranker of an account on a specific ladder.
    *
-   * @param accountId the id of the account
-   * @param ladder    the ladder the ranker is on
+   * @param event  the event that contains the information for the buy
+   * @param ladder the ladder the ranker is on
    * @return if the ranker can promote
    */
-  boolean promote(Long accountId, LadderEntity ladder) {
+  boolean promote(Event event, LadderEntity ladder) {
     try {
-      RankerEntity ranker = findActiveRankerOfAccountOnLadder(accountId, ladder);
+      RankerEntity ranker = findActiveRankerOfAccountOnLadder(event.getAccountId(), ladder);
       if (ladderUtils.canPromote(ladder, ranker)) {
         AccountEntity account = accountService.find(ranker.getAccount());
         log.info("[L{}] Promotion for {} (#{})", ladder.getRankers(), account.getUsername(),
@@ -400,6 +411,9 @@ public class LadderService {
                   + newLadder.getRankers().size()
                   + " of the lucky few initiates for the big ritual.");
         }
+
+        wsUtils.convertAndSendToTopic(GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
+            ladder.getNumber().toString()), event);
         return true;
       }
     } catch (Exception e) {
@@ -414,14 +428,14 @@ public class LadderService {
   /**
    * Throw vinegar as the active ranker of an account on a specific ladder.
    *
-   * @param accountId the id of the account
-   * @param ladder    the ladder the ranker is on
+   * @param event  the event that contains the information for the buy
+   * @param ladder the ladder the ranker is on
    * @return if the ranker can throw vinegar at the rank-1-ranker
    */
-  boolean throwVinegar(Long accountId, LadderEntity ladder, Event event) {
+  boolean throwVinegar(Event event, LadderEntity ladder) {
     try {
       ladder = find(ladder);
-      RankerEntity ranker = findActiveRankerOfAccountOnLadder(accountId, ladder);
+      RankerEntity ranker = findActiveRankerOfAccountOnLadder(event.getAccountId(), ladder);
       RankerEntity target = ladder.getRankers().get(0);
       AccountEntity rankerAccount = accountService.find(ranker.getAccount());
       AccountEntity targetAccount = accountService.find(target.getAccount());
@@ -447,14 +461,19 @@ public class LadderService {
         } else {
           targetVinegar = BigInteger.ZERO;
           data.setSuccess(true);
-          if (!buyMulti(targetAccount.getId(), ladder)) {
-            softResetPoints(targetAccount.getId(), ladder);
+
+          if (!buyMulti(new Event(EventType.BUY_MULTI, event.getAccountId()), ladder)) {
+            softResetPoints(new Event(EventType.SOFT_RESET_POINTS, event.getAccountId()), ladder);
           }
         }
 
         event.setData(data);
         ranker.setVinegar(BigInteger.ZERO);
         target.setVinegar(targetVinegar);
+        wsUtils.convertAndSendToUser(ranker.getAccount().getUuid(),
+            GameController.PRIVATE_EVENTS_DESTINATION, event);
+        wsUtils.convertAndSendToUser(target.getAccount().getUuid(),
+            GameController.PRIVATE_EVENTS_DESTINATION, event);
         return true;
       }
     } catch (Exception e) {
@@ -468,14 +487,16 @@ public class LadderService {
   /**
    * Soft-reset the points of the active ranker of an account on a specific ladder.
    *
-   * @param accountId the id of the account
-   * @param ladder    the ladder the ranker is on
+   * @param event  the event that contains the information for the buy
+   * @param ladder the ladder the ranker is on
    * @return if the ranker can be soft-reset
    */
-  boolean softResetPoints(Long accountId, LadderEntity ladder) {
+  boolean softResetPoints(Event event, LadderEntity ladder) {
     try {
-      RankerEntity ranker = findActiveRankerOfAccountOnLadder(accountId, ladder);
+      RankerEntity ranker = findActiveRankerOfAccountOnLadder(event.getAccountId(), ladder);
       ranker.setPoints(BigInteger.ZERO);
+      wsUtils.convertAndSendToTopic(GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
+          ladder.getNumber().toString()), event);
       return true;
     } catch (Exception e) {
       log.error(e.getMessage());
@@ -486,4 +507,16 @@ public class LadderService {
   }
 
 
+  @Override
+  public void onApplicationEvent(AccountServiceEvent event) {
+    for (RankerEntity currentRanker : event.getAccount().getCurrentRankers()) {
+      LadderEntity ladder = find(currentRanker.getLadder());
+      for (RankerEntity ranker : ladder.getRankers()) {
+        if (ranker.getAccount().getUuid().equals(event.getAccount().getUuid())) {
+          ranker.setAccount(event.getAccount());
+        }
+      }
+    }
+
+  }
 }

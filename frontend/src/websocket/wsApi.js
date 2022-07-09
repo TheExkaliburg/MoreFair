@@ -1,7 +1,6 @@
 function replace(destination, placeholder, value) {
   let result = destination;
   result = result.replace(placeholder, value);
-  console.log(destination, placeholder, value, result);
   return result;
 }
 
@@ -21,8 +20,11 @@ const API = {
     APP_AUTOPROMOTE_DESTINATION: "/app/game/autopromote",
     TOPIC_EVENTS_DESTINATION: (number) =>
       replace("/topic/game/events/{number}", "{number}", number),
+    TOPIC_GLOBAL_EVENTS_DESTINATION: "/topic/game/events",
+    TOPIC_TICK_DESTINATION: "/topic/game/tick",
     QUEUE_INIT_DESTINATION: "/user/queue/game/init",
-    PRIVATE_EVENTS_DESTINATION: "/private/game/events",
+    PRIVATE_EVENTS_DESTINATION: (uuid) =>
+      replace("/private/{uuid}/game/events", "{uuid}", uuid),
   },
   CHAT: {
     APP_INIT_DESTINATION: (number) =>
@@ -32,7 +34,8 @@ const API = {
     TOPIC_EVENTS_DESTINATION: (number) =>
       replace("/topic/chat/events/{number}", "{number}", number),
     QUEUE_INIT_DESTINATION: "/user/queue/chat/init",
-    PRIVATE_PROMPT_DESTINATION: "/private/chat/prompt",
+    PRIVATE_PROMPT_DESTINATION: (uuid) =>
+      replace("/private/{uuid}/chat/prompt", "{uuid}", uuid),
   },
   FAIR: {
     APP_INFO_DESTINATION: "/app/info",

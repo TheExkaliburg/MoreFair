@@ -44,7 +44,9 @@ public class AccountService {
 
   @Transactional
   public AccountEntity save(AccountEntity account) {
-    return accountRepository.save(account);
+    AccountEntity result = accountRepository.save(account);
+    eventPublisher.publishEvent(new AccountServiceEvent(this, result));
+    return result;
   }
 
   /**

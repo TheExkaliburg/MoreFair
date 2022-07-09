@@ -15,6 +15,7 @@ public class RankerService {
   private final RankerRepository rankerRepository;
   private final AccountService accountService;
 
+
   public RankerService(RankerRepository rankerRepository, @Lazy AccountService accountService) {
     this.rankerRepository = rankerRepository;
     this.accountService = accountService;

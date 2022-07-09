@@ -9,8 +9,8 @@
       <EditableStringItem
         v-for="item in options"
         :key="item"
-        :value="item"
         :option="props.option"
+        :value="item"
       />
     </div>
   </label>
@@ -41,7 +41,7 @@ function add(target) {
   target.target.previousSibling.value = "";
 }
 
-//store.commit({type: "options/registerNewOption", option: new BoolOption({ name: props.optionID, value: props.checked }) });
+//modules.commit({type: "options/registerNewOption", option: new BoolOption({ name: props.optionID, value: props.checked }) });
 </script>
 
 <style lang="scss" scoped>

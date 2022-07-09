@@ -28,7 +28,7 @@ function update({ target }) {
   });
 }
 
-//store.commit({type: "options/registerNewOption", option: new BoolOption({ name: props.optionID, value: props.checked }) });
+//modules.commit({type: "options/registerNewOption", option: new BoolOption({ name: props.optionID, value: props.checked }) });
 </script>
 
 <style lang="scss" scoped>

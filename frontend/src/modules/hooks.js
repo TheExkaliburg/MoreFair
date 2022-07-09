@@ -113,8 +113,6 @@ function sortHooks(event) {
     }
   });
 
-  console.log(sorted);
-
   const sortedHooks = sorted.map((name) => {
     return oldHooks.find((hook) => hook.name == name);
   });

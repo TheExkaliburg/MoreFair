@@ -1,5 +1,5 @@
 import { createStore } from "vuex";
-import ladderModule from "@/ladder/store/ladderModule";
+import ladderModule from "@/store/modules/ladder/ladderModule";
 import chatModule from "@/chat/store/chatModule";
 import Settings from "@/store/entities/settings";
 import UserDetails from "@/store/entities/userDetails";
@@ -11,6 +11,8 @@ import versioningModule from "@/versioning/store/versioningModule";
 
 import { computed } from "vue";
 import { Sounds } from "@/modules/sounds";
+import Cookies from "js-cookie";
+import API from "@/websocket/wsApi";
 
 let promotionJingleVolume;
 let reachingFirstSound;
@@ -60,8 +62,106 @@ let store = createStore({
     },
   },
   actions: {
+    setupConnection({ dispatch }, { stompClient }) {
+      stompClient.connect(() => {
+        let uuid = Cookies.get("_uuid");
+        if (
+          (!uuid || uuid === "") &&
+          !confirm("Do you want to create a new account?")
+        ) {
+          return;
+        }
+        stompClient.subscribe(
+          API.ACCOUNT.QUEUE_LOGIN_DESTINATION,
+          (message) => {
+            store.commit({ type: "initUser", message: message });
+            dispatch({
+              type: "setupGame",
+              stompClient: stompClient,
+            });
+            dispatch({
+              type: "setupChat",
+              stompClient: stompClient,
+            });
+          }
+        );
+        stompClient.send(API.ACCOUNT.APP_LOGIN_DESTINATION);
+      });
+    },
+    setupGame({ dispatch }, { stompClient }) {
+      let highestLadderReached = store.state.user.highestCurrentLadder;
+      stompClient.subscribe(API.FAIR.QUEUE_INFO_DESTINATION, (message) => {
+        store.commit({ type: "initSettings", message: message });
+
+        stompClient.subscribe(API.GAME.QUEUE_INIT_DESTINATION, (message) => {
+          dispatch({
+            type: "ladder/setup",
+            message: message,
+          });
+        });
+
+        stompClient.subscribe(
+          API.GAME.TOPIC_EVENTS_DESTINATION(highestLadderReached),
+          (message) => {
+            dispatch({
+              type: "ladder/handleLadderEvent",
+              message: message,
+              stompClient: stompClient,
+            });
+          }
+        );
+
+        stompClient.subscribe(
+          API.GAME.TOPIC_GLOBAL_EVENTS_DESTINATION,
+          (message) => {
+            dispatch({
+              type: "ladder/handleGlobalEvent",
+              message: message,
+              stompClient: stompClient,
+            });
+          }
+        );
+
+        stompClient.subscribe(
+          API.GAME.PRIVATE_EVENTS_DESTINATION(Cookies.get("_uuid")),
+          (message) => {
+            dispatch({
+              type: "ladder/handlePrivateEvent",
+              message: message,
+              stompClient: stompClient,
+            });
+          }
+        );
+
+        stompClient.subscribe(API.GAME.TOPIC_TICK_DESTINATION, (message) => {
+          dispatch({
+            type: "ladder/calculate",
+            message: message,
+          });
+        });
+
+        stompClient.send(API.GAME.APP_INIT_DESTINATION(highestLadderReached));
+      });
+      stompClient.send(API.FAIR.APP_INFO_DESTINATION);
+    },
+    setupChat({ commit }, { stompClient }) {
+      let highestLadderReached = store.state.user.highestCurrentLadder;
+
+      stompClient.subscribe(API.CHAT.QUEUE_INIT_DESTINATION, (message) => {
+        commit({ type: "chat/init", message: message });
+      });
+
+      stompClient.subscribe(
+        API.CHAT.TOPIC_EVENTS_DESTINATION(highestLadderReached),
+        (message) => {
+          commit({ type: "chat/addMessage", message: message });
+        }
+      );
+
+      stompClient.send(API.CHAT.APP_INIT_DESTINATION(highestLadderReached));
+    },
     incrementHighestLadder({ state, commit, dispatch }, { stompClient }) {
-      stompClient.unsubscribe("/topic/ladder/" + state.ladder.ladder.number);
+      stompClient.unsubscribe("/topic/ladder/" + state.ladder.number);
       stompClient.unsubscribe(
         "/topic/chat/" + state.chat.chat.currentChatNumber
       );

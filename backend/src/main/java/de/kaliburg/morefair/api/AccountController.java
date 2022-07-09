@@ -8,8 +8,9 @@ import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.UserPrincipal;
 import de.kaliburg.morefair.api.websockets.messages.WsMessage;
 import de.kaliburg.morefair.dto.AccountDetailsDTO;
-import de.kaliburg.morefair.game.GameService;
-import de.kaliburg.morefair.game.round.RankerService;
+import de.kaliburg.morefair.events.Event;
+import de.kaliburg.morefair.events.types.EventType;
+import de.kaliburg.morefair.game.round.RoundService;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.text.StringEscapeUtils;
@@ -27,16 +28,17 @@ public class AccountController {
   private static final String QUEUE_LOGIN_DESTINATION = "/account/login";
 
   private final AccountService accountService;
-  private final GameService gameService;
   private final RequestThrottler requestThrottler;
   private final WsUtils wsUtils;
+  private final RoundService roundService;
 
-  public AccountController(AccountService accountService, RankerService rankerService,
-      GameService gameService, RequestThrottler requestThrottler, WsUtils wsUtils) {
+  public AccountController(AccountService accountService,
+      RequestThrottler requestThrottler, WsUtils wsUtils,
+      RoundService roundService) {
     this.accountService = accountService;
-    this.gameService = gameService;
     this.requestThrottler = requestThrottler;
     this.wsUtils = wsUtils;
+    this.roundService = roundService;
   }
 
   /**
@@ -115,6 +117,10 @@ public class AccountController {
       }
       account.setUsername(username);
       accountService.save(account);
+
+      wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION,
+          new Event(EventType.NAME_CHANGE, account.getId(), account.getUsername()));
+
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();

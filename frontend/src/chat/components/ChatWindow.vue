@@ -35,6 +35,7 @@ import ChatInput from "@/chat/components/ChatInput";
 import PaginationGroup from "@/components/PaginationGroup";
 
 import { Sounds } from "@/modules/sounds";
+import API from "@/websocket/wsApi";
 
 Sounds.register(
   "mention",
@@ -53,11 +54,16 @@ const settings = computed(() => store.state.settings);
 function changeChat(event) {
   const targetChat = event.target.dataset.number;
   if (targetChat !== chat.value.currentChatNumber) {
-    stompClient.unsubscribe("/topic/chat/" + chat.value.currentChatNumber);
-    stompClient.subscribe("/topic/chat/" + targetChat, (message) => {
-      store.commit({ type: "chat/addMessage", message: message });
-    });
-    stompClient.send("/app/chat/init/" + targetChat);
+    stompClient.unsubscribe(
+      API.CHAT.TOPIC_EVENTS_DESTINATION(chat.value.currentChatNumber)
+    );
+    stompClient.subscribe(
+      API.CHAT.TOPIC_EVENTS_DESTINATION(targetChat),
+      (message) => {
+        store.commit({ type: "chat/addMessage", message: message });
+      }
+    );
+    stompClient.send(API.CHAT.APP_INIT_DESTINATION(targetChat));
   }
 }
 

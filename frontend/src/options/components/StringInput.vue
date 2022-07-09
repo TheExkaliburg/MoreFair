@@ -12,7 +12,7 @@
 import { computed, defineProps } from "vue";
 //import { useStore } from "vuex";
 
-//const store = useStore();
+//const modules = useStore();
 
 const props = defineProps({
   option: Object,
@@ -27,7 +27,7 @@ function send(target) {
   target.target.previousSibling.value = "";
 }
 
-//store.commit({type: "options/registerNewOption", option: new BoolOption({ name: props.optionID, value: props.checked }) });
+//modules.commit({type: "options/registerNewOption", option: new BoolOption({ name: props.optionID, value: props.checked }) });
 </script>
 
 <style lang="scss" scoped>
