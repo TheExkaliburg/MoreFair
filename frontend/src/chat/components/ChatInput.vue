@@ -301,7 +301,10 @@ function findGroupMentionsInString(str) {
   //Checking if any rankerName#id is in the text
   let possibleMentionLower = str.toLowerCase();
 
-  return [index > -1 ? str : "", possibleMentionLower.length + 1];
+  return [
+    index > -1 && !str.includes(" ") ? str : "",
+    possibleMentionLower.length + 1,
+  ];
 }
 
 function plainTextElementChanged(mutation) {

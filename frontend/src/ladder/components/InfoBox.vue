@@ -238,30 +238,35 @@ const pointsForPromoteIsInfinity = computed(
 // Functions
 
 function throwVinegar(event) {
+  if (vinegarLastSecond.value) return;
   vinegarLastSecond.value = true;
   setTimeout(() => (vinegarLastSecond.value = false), 1000);
   stompClient.send(API.GAME.APP_VINEGAR_DESTINATION, { event: event });
 }
 
 function buyAutoPromote(event) {
+  if (autoPromoteLastSecond.value) return;
   autoPromoteLastSecond.value = true;
   setTimeout(() => (autoPromoteLastSecond.value = false), 1000);
   stompClient.send(API.GAME.APP_AUTOPROMOTE_DESTINATION, { event: event });
 }
 
 function buyBias(event) {
+  if (biasLastSecond.value) return;
   biasLastSecond.value = true;
   setTimeout(() => (biasLastSecond.value = false), 1000);
   stompClient.send(API.GAME.APP_BIAS_DESTINATION, { event: event });
 }
 
 function buyMulti(event) {
+  if (multiLastSecond.value) return;
   multiLastSecond.value = true;
   setTimeout(() => (multiLastSecond.value = false), 1000);
   stompClient.send(API.GAME.APP_MULTI_DESTINATION, { event: event });
 }
 
 function promote(event) {
+  if (promoteLastSecond.value) return;
   promoteLastSecond.value = true;
   setTimeout(() => (promoteLastSecond.value = false), 1000);
   if (ladder.value.number >= settings.value.assholeLadder) {

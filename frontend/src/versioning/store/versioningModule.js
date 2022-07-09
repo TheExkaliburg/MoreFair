@@ -5,9 +5,13 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
-        new Version("PATCH", "", {
+        new Version("PATCH", "Group Mentions", {
           features: [
             "Group mentions are now supported in the chat. $Train$ Choo! Choo!",
+          ],
+          improvements: [
+            "You can now click on a username in the chat to mention them.",
+            "Moderators can now right click on the ladder to moderate people.",
           ],
           fixes: ["Fixed mention sound not playing."],
         }),
