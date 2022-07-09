@@ -11,7 +11,6 @@ export default {
     });
   },
   async handleLadderEvent({ dispatch }, { message, stompClient }) {
-    console.log(message);
     if (message) {
       dispatch({
         type: "handleEvent",
@@ -21,7 +20,6 @@ export default {
     }
   },
   async handleGlobalEvent({ dispatch }, { message, stompClient }) {
-    console.log(message);
     if (message) {
       dispatch({
         type: "handleEvent",
@@ -31,7 +29,6 @@ export default {
     }
   },
   async handlePrivateEvent({ dispatch }, { message, stompClient }) {
-    console.log(message);
     if (message) {
       dispatch({
         type: "handleEvent",
@@ -158,6 +155,15 @@ export default {
         break;
       case "CONFIRM":
         // TODO: CONFIRM
+        break;
+      case "INCREASE_ASSHOLE_LADDER":
+        commit(
+          {
+            type: "increaseAssholeLadder",
+            event: event,
+          },
+          { root: true }
+        );
         break;
       case "RESET":
         await stompClient.reconnect();

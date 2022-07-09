@@ -47,6 +47,9 @@ let store = createStore({
         state.settings = new Settings(payload.message.content);
       }
     },
+    increaseAssholeLadder(state, { event }) {
+      if (event.data) state.settings.assholeLadder = event.data;
+    },
     initUser(state, payload) {
       if (
         (payload.message.status === "OK" ||

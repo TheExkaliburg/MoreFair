@@ -18,7 +18,6 @@ public class AccountDetailsDto {
   public AccountDetailsDto(AccountEntity account) {
     this.uuid = account.getUuid();
     this.accountId = account.getId();
-    // TODO: Actual value
     this.highestCurrentLadder = account.getHighestCurrentLadder();
     this.accessRole = account.getAccessRole();
   }

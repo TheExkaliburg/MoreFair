@@ -7,7 +7,6 @@ public enum EventType {
   BUY_BIAS,
   BUY_MULTI,
   PROMOTE,
-  ASSHOLE,
   THROW_VINEGAR,
   JOIN,
   NAME_CHANGE,
@@ -19,5 +18,5 @@ public enum EventType {
   MUTE,
   CONFIRM,
   MOD,
-  SYSTEM_MESSAGE
+  INCREASE_ASSHOLE_LADDER,
 }

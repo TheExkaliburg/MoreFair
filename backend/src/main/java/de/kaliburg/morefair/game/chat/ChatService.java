@@ -159,9 +159,5 @@ public class ChatService {
     return currentChatMap.get(number);
   }
 
-  public void sendPromptToAccount(AccountEntity target, String text) {
-    // TODO: implement
-  }
-
 
 }

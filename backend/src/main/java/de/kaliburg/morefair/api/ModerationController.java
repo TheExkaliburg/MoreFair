@@ -6,6 +6,8 @@ import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WsMessage;
 import de.kaliburg.morefair.data.ModChatData;
+import de.kaliburg.morefair.events.Event;
+import de.kaliburg.morefair.events.types.EventType;
 import de.kaliburg.morefair.game.chat.ChatService;
 import de.kaliburg.morefair.game.chat.MessageEntity;
 import de.kaliburg.morefair.game.chat.MessageService;
@@ -127,6 +129,8 @@ public class ModerationController {
       target = accountService.save(target);
       log.info("{} (#{}) is banning the account {} (#{})", account.getUsername(), account.getId(),
           target.getUsername(), target.getId());
+      wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
+          EventType.BAN, target.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
@@ -154,6 +158,8 @@ public class ModerationController {
       target = accountService.save(target);
       log.info("{} (#{}) is muting the account {} (#{})", account.getUsername(), account.getId(),
           target.getUsername(), target.getId());
+      wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
+          EventType.MUTE, target.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
@@ -179,6 +185,8 @@ public class ModerationController {
       target = accountService.save(target);
       log.info("{} (#{}) is freeing the account {} (#{})", account.getUsername(), account.getId(),
           target.getUsername(), target.getId());
+      wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
+          EventType.FREE, target.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
@@ -212,6 +220,8 @@ public class ModerationController {
       target = accountService.save(target);
       log.info("{} (#{}) is renaming the account {} (#{}) to {}", account.getUsername(),
           account.getId(), target.getUsername(), target.getId(), username);
+      wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
+          EventType.NAME_CHANGE, target.getId(), StringEscapeUtils.unescapeJava(username)));
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
@@ -231,7 +241,8 @@ public class ModerationController {
       }
 
       AccountEntity target = accountService.find(id);
-      chatService.sendPromptToAccount(target, text);
+      wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
+          EventType.MOD, target.getId(), text));
       log.info("{} (#{}) is prompting the account {} (#{}) with {}", account.getUsername(),
           account.getId(), target.getUsername(), target.getId(), text);
     } catch (Exception e) {
@@ -257,10 +268,11 @@ public class ModerationController {
         return;
       }
       target.setAccessRole(AccountAccessRole.MODERATOR);
-      ;
       target = accountService.save(target);
       log.info("{} (#{}) is modding the account {} (#{})", account.getUsername(),
           account.getId(), target.getUsername(), target.getId());
+      wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
+          EventType.MOD, target.getId(), account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();

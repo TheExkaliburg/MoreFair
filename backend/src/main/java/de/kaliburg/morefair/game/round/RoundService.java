@@ -2,9 +2,14 @@ package de.kaliburg.morefair.game.round;
 
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
+import de.kaliburg.morefair.api.GameController;
+import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.dto.LadderResultsDto;
+import de.kaliburg.morefair.events.Event;
+import de.kaliburg.morefair.events.types.EventType;
 import java.util.List;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,13 +23,17 @@ public class RoundService {
   private final RoundRepository roundRepository;
   private final LadderService ladderService;
   private final AccountService accountService;
+  private final WsUtils wsUtils;
+  private final RoundUtils roundUtils;
   private LadderResultsDto lastRoundResults;
 
   public RoundService(RoundRepository roundRepository, LadderService ladderService,
-      AccountService accountService) {
+      AccountService accountService, @Lazy WsUtils wsUtils, RoundUtils roundUtils) {
     this.roundRepository = roundRepository;
     this.ladderService = ladderService;
     this.accountService = accountService;
+    this.wsUtils = wsUtils;
+    this.roundUtils = roundUtils;
   }
 
   /**
@@ -72,12 +81,15 @@ public class RoundService {
    */
   public RankerEntity createNewRanker(AccountEntity account) {
     RankerEntity result = ladderService.createRanker(account);
-    Integer timesAsshole = result.getAccount().getAssholeCount();
+    Integer assholeCount = result.getAccount().getAssholeCount();
 
-    if (timesAsshole > getCurrentRound().getHighestAssholeCount()) {
+    if (assholeCount > getCurrentRound().getHighestAssholeCount()) {
       // TODO: Global Event to update the highestLadder
-      getCurrentRound().setHighestAssholeCount(timesAsshole);
+      getCurrentRound().setHighestAssholeCount(assholeCount);
       ladderService.setCurrentRound(save(getCurrentRound()));
+      wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
+          EventType.INCREASE_ASSHOLE_LADDER, account.getId(),
+          roundUtils.getAssholeLadderNumber(getCurrentRound())));
     }
 
     return result;
