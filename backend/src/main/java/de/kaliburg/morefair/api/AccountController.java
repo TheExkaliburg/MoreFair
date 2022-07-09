@@ -7,7 +7,7 @@ import de.kaliburg.morefair.api.utils.RequestThrottler;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.UserPrincipal;
 import de.kaliburg.morefair.api.websockets.messages.WsMessage;
-import de.kaliburg.morefair.dto.AccountDetailsDTO;
+import de.kaliburg.morefair.dto.AccountDetailsDto;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.EventType;
 import de.kaliburg.morefair.game.round.RoundService;
@@ -59,7 +59,7 @@ public class AccountController {
       if (uuid == null || uuid.isBlank()) {
         if (requestThrottler.canCreateAccount(principal)) {
           wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION,
-              new AccountDetailsDTO(accountService.create(principal)), HttpStatus.CREATED);
+              new AccountDetailsDto(accountService.create(principal)), HttpStatus.CREATED);
         } else {
           wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
         }
@@ -71,7 +71,7 @@ public class AccountController {
       if (account == null) {
         if (requestThrottler.canCreateAccount(principal)) {
           wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION,
-              new AccountDetailsDTO(accountService.create(principal)),
+              new AccountDetailsDto(accountService.create(principal)),
               HttpStatus.CREATED);
         } else {
           wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
@@ -85,7 +85,7 @@ public class AccountController {
       }
 
       account = accountService.login(account, principal);
-      wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, new AccountDetailsDTO(account));
+      wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, new AccountDetailsDto(account));
 
 
     } catch (IllegalArgumentException e) {

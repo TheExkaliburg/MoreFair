@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.NonNull;
 
 @Data
-public class HeartbeatDTO {
+public class HeartbeatDto {
 
   @NonNull
   Double delta = 1d;

@@ -7,7 +7,7 @@ import de.kaliburg.morefair.api.websockets.messages.WsMessage;
 import de.kaliburg.morefair.api.websockets.messages.WsObservedMessage;
 import de.kaliburg.morefair.data.ModServerMessageData;
 import de.kaliburg.morefair.dto.LadderDto;
-import de.kaliburg.morefair.dto.LadderResultsDTO;
+import de.kaliburg.morefair.dto.LadderResultsDto;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.EventType;
 import de.kaliburg.morefair.game.GameService;
@@ -65,7 +65,7 @@ public class GameController {
   }
 
   @GetMapping(value = "/lastRound", produces = "application/json")
-  public ResponseEntity<LadderResultsDTO> getStatistics() {
+  public ResponseEntity<LadderResultsDto> getStatistics() {
     try {
       if (roundService.getLastRoundResults() == null) {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);

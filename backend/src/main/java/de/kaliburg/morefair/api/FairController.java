@@ -2,7 +2,7 @@ package de.kaliburg.morefair.api;
 
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WsMessage;
-import de.kaliburg.morefair.dto.InfoDTO;
+import de.kaliburg.morefair.dto.InfoDto;
 import de.kaliburg.morefair.game.round.RoundService;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -91,7 +91,7 @@ public class FairController {
       log.debug("/app/info {}", uuid);
 
       Integer maxTimesAssholes = roundService.getCurrentRound().getHighestAssholeCount();
-      InfoDTO info = new InfoDTO(maxTimesAssholes);
+      InfoDto info = new InfoDto(maxTimesAssholes);
 
       wsUtils.convertAndSendToUser(sha, QUEUE_INFO_DESTINATION, info);
     } catch (IllegalArgumentException e) {

@@ -5,20 +5,19 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class ChatDTO {
+public class ChatDto {
 
   private final Integer currentChatNumber;
-  private final List<MessageDTO> messages = new ArrayList<>();
+  private final List<MessageDto> messages = new ArrayList<>();
 
-  public ChatDTO(ChatEntity chat) {
+  public ChatDto(ChatEntity chat) {
     currentChatNumber = chat.getNumber();
-    /*
-    List<MessageEntity> sortedMessages = ladder.getMessages();
+
+    List<MessageEntity> sortedMessages = chat.getMessages();
     sortedMessages.sort((o1, o2) -> o2.getCreatedOn().compareTo(o1.getCreatedOn()));
     sortedMessages = sortedMessages.subList(0, Math.min(30, sortedMessages.size()));
     for (MessageEntity m : sortedMessages) {
-      messages.add(m.convertToDTO());
+      messages.add(new MessageDto(m));
     }
-    */
   }
 }

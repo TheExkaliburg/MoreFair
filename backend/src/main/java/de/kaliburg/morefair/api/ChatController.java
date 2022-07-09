@@ -6,9 +6,9 @@ import de.kaliburg.morefair.api.utils.RequestThrottler;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WsEmptyMessage;
 import de.kaliburg.morefair.api.websockets.messages.WsMetaMessage;
-import de.kaliburg.morefair.game.chat.ChatDTO;
+import de.kaliburg.morefair.game.chat.ChatDto;
 import de.kaliburg.morefair.game.chat.ChatService;
-import de.kaliburg.morefair.game.chat.MessageDTO;
+import de.kaliburg.morefair.game.chat.MessageDto;
 import de.kaliburg.morefair.game.chat.MessageEntity;
 import de.kaliburg.morefair.game.round.RankerEntity;
 import de.kaliburg.morefair.game.round.RankerService;
@@ -69,7 +69,7 @@ public class ChatController {
       }
 
       if (account.isMod() || number <= ranker.getLadder().getNumber()) {
-        ChatDTO c = new ChatDTO(chatService.getChat(number));
+        ChatDto c = new ChatDto(chatService.getChat(number));
         wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION, c);
       } else {
         wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION, HttpStatus.FORBIDDEN);
@@ -104,7 +104,7 @@ public class ChatController {
       if (account.isMod() || (number <= ranker.getLadder().getNumber() && throttler.canPostMessage(
           account))) {
         MessageEntity answer = chatService.sendMessageToChat(account, number, message, metadata);
-        wsUtils.convertAndSendToTopic(TOPIC_EVENTS_DESTINATION + number, new MessageDTO(answer));
+        wsUtils.convertAndSendToTopic(TOPIC_EVENTS_DESTINATION + number, new MessageDto(answer));
       }
     } catch (Exception e) {
       log.error(e.getMessage());

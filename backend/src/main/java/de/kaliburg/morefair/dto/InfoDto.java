@@ -5,7 +5,7 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class InfoDTO {
+public class InfoDto {
 
   private String pointsForPromote;
   private Integer minimumPeopleForPromote;
@@ -16,7 +16,7 @@ public class InfoDTO {
   private Integer autoPromoteLadder;
   private Integer manualPromoteWaitTime;
 
-  public InfoDTO(Integer maxTimeAssholes) {
+  public InfoDto(Integer maxTimeAssholes) {
     pointsForPromote = FairController.POINTS_FOR_PROMOTE.toString();
     minimumPeopleForPromote = FairController.MINIMUM_PEOPLE_FOR_PROMOTE;
     baseVinegarNeededToThrow = FairController.BASE_VINEGAR_NEEDED_TO_THROW.toString();

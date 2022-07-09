@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.game;
 
-import de.kaliburg.morefair.dto.HeartbeatDTO;
+import de.kaliburg.morefair.dto.HeartbeatDto;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -12,5 +12,5 @@ public class GameCalculator {
 
   private static final double NANOS_IN_SECONDS = TimeUnit.SECONDS.toNanos(1);
 
-  private Map<Integer, HeartbeatDTO> heartbeatDTOMap = new HashMap<>();
+  private Map<Integer, HeartbeatDto> heartbeatDTOMap = new HashMap<>();
 }

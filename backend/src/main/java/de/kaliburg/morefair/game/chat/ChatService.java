@@ -33,6 +33,19 @@ public class ChatService {
     this.wsUtils = wsUtils;
   }
 
+  @Transactional
+  public void saveStateToDatabase() {
+    try {
+      for (ChatEntity chat : currentChatMap.values()) {
+        messageService.save(chat.getMessages());
+      }
+      chatRepository.saveAll(currentChatMap.values());
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      e.printStackTrace();
+    }
+  }
+
   /**
    * Creates a new Chat for the game with the specific number, saves it in the db and adds it to the
    * cache.
@@ -56,9 +69,9 @@ public class ChatService {
    * Overwrites the existing cached chats with the ones from this game.
    */
   public void loadIntoCache() {
-
     currentChatMap = new HashMap<>();
     chatRepository.findAll().forEach(chat -> currentChatMap.put(chat.getNumber(), chat));
+    log.info(currentChatMap);
   }
 
   @Transactional
@@ -101,7 +114,7 @@ public class ChatService {
     result = messageService.save(result);
     wsUtils.convertAndSendToTopic(
         ChatController.TOPIC_EVENTS_DESTINATION.replace("{number}", number.toString()),
-        new MessageDTO(result));
+        new MessageDto(result));
     return result;
   }
 
@@ -149,4 +162,6 @@ public class ChatService {
   public void sendPromptToAccount(AccountEntity target, String text) {
     // TODO: implement
   }
+
+
 }

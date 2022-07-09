@@ -6,20 +6,17 @@ import lombok.Data;
 import org.apache.commons.text.StringEscapeUtils;
 
 @Data
-public class MessageDTO {
+public class MessageDto {
 
   private final String message;
   private final String username;
-  private final Integer timesAsshole;
   private final Long accountId;
   private final String timeCreated;
-  private final String assholeTag;
+  private final String tag;
   private final String metadata;
 
-  public MessageDTO(MessageEntity message) {
-    this.timesAsshole = Math.min(message.getAccount().getAssholeCount(),
-        FairController.ASSHOLE_TAGS.size() - 1);
-    this.assholeTag = FairController.ASSHOLE_TAGS.get(
+  public MessageDto(MessageEntity message) {
+    this.tag = FairController.ASSHOLE_TAGS.get(
         Math.min(message.getAccount().getAssholeCount(), FairController.ASSHOLE_TAGS.size() - 1));
     this.message = StringEscapeUtils.unescapeJava(message.getMessage());
     this.username = StringEscapeUtils.unescapeJava(message.getAccount().getUsername());

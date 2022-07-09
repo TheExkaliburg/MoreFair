@@ -28,6 +28,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * The LadderService that setups and manages the LadderEntities contained in a RoundEntity. This
@@ -72,6 +73,24 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
     this.chatService = chatService;
     this.upgradeUtils = upgradeUtils;
     this.wsUtils = wsUtils;
+  }
+
+  @Transactional
+  public void saveStateToDatabase() {
+    try {
+      ladderSemaphore.acquire();
+      try {
+        for (LadderEntity ladder : currentLadderMap.values()) {
+          rankerService.save(ladder.getRankers());
+        }
+        ladderRepository.saveAll(currentLadderMap.values());
+      } finally {
+        ladderSemaphore.release();
+      }
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      e.printStackTrace();
+    }
   }
 
   /**

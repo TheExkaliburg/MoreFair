@@ -8,14 +8,14 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class AccountDetailsDTO {
+public class AccountDetailsDto {
 
   private UUID uuid;
   private Long accountId;
   private Integer highestCurrentLadder;
   private AccountAccessRole accessRole;
 
-  public AccountDetailsDTO(AccountEntity account) {
+  public AccountDetailsDto(AccountEntity account) {
     this.uuid = account.getUuid();
     this.accountId = account.getId();
     // TODO: Actual value

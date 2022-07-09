@@ -8,6 +8,7 @@ import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
 import java.util.List;
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -61,9 +62,12 @@ public class GameService {
 
   @Transactional
   @Scheduled(initialDelay = 60000, fixedRate = 60000)
-  void saveToDatabase() {
+  @PreDestroy
+  void saveStateToDatabase() {
     try {
-      updateGame(this.game);
+      gameRepository.save(game);
+      ladderService.saveStateToDatabase();
+      chatService.saveStateToDatabase();
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
@@ -79,11 +83,5 @@ public class GameService {
     result.setCurrentRound(round);
 
     return gameRepository.save(result);
-  }
-
-  private GameEntity updateGame(GameEntity game) {
-    roundService.save(List.of(game.getCurrentRound()));
-
-    return game;
   }
 }

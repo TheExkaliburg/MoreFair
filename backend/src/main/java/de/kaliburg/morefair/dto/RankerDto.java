@@ -1,5 +1,6 @@
 package de.kaliburg.morefair.dto;
 
+import de.kaliburg.morefair.api.FairController;
 import de.kaliburg.morefair.game.round.RankerEntity;
 import lombok.Data;
 import org.apache.commons.text.StringEscapeUtils;
@@ -15,7 +16,7 @@ public class RankerDto {
   private String power;
   private Integer rank;
   private String username;
-  private Integer timesAsshole;
+  private String tag;
   private boolean isGrowing;
 
   public RankerDto(RankerEntity ranker) {
@@ -27,10 +28,7 @@ public class RankerDto {
     this.bias = ranker.getBias();
     this.multi = ranker.getMultiplier();
     this.isGrowing = ranker.isGrowing();
-    this.timesAsshole = ranker.getAccount().getAssholeCount();
-  }
-
-  public RankerDto() {
-
+    this.tag = FairController.ASSHOLE_TAGS.get(
+        Math.min(ranker.getAccount().getAssholeCount(), FairController.ASSHOLE_TAGS.size() - 1));
   }
 }

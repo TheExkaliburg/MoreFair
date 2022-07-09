@@ -8,11 +8,11 @@ import java.util.Map;
 import lombok.Data;
 
 @Data
-public class LadderResultsDTO {
+public class LadderResultsDto {
 
   private Map<Integer, List<RankerPrivateDto>> allLadders = new HashMap<>();
 
-  public LadderResultsDTO(Map<Integer, LadderEntity> ladders) {
+  public LadderResultsDto(Map<Integer, LadderEntity> ladders) {
     ladders.forEach((integer, ladder) -> {
       List<RankerPrivateDto> allRankers = new ArrayList<>();
       ladder.getRankers().forEach(ranker -> {

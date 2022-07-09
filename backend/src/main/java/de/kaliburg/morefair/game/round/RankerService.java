@@ -2,6 +2,7 @@ package de.kaliburg.morefair.game.round;
 
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
+import java.util.List;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Lazy;
@@ -43,5 +44,10 @@ public class RankerService {
 
   public RankerEntity find(Long id) {
     return rankerRepository.findById(id).orElseThrow();
+  }
+
+  @Transactional
+  public List<RankerEntity> save(List<RankerEntity> rankers) {
+    return rankerRepository.saveAll(rankers);
   }
 }

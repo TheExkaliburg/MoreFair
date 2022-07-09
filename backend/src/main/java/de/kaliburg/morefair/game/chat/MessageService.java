@@ -4,6 +4,7 @@ import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.game.round.LadderRepository;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import javax.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
@@ -72,5 +73,10 @@ public class MessageService {
 
   public ArrayList<MessageEntity> getAllMessages() {
     return new ArrayList<>();
+  }
+
+  @Transactional
+  public List<MessageEntity> save(List<MessageEntity> messages) {
+    return messageRepository.saveAll(messages);
   }
 }
