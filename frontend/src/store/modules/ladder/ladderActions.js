@@ -40,7 +40,10 @@ export default {
       });
     }
   },
-  async calculate({ state, rootState, commit, getters }, { message }) {
+  async calculate(
+    { state, rootState, commit, getters, dispatch },
+    { message }
+  ) {
     const delta = new Decimal(message.delta);
     let rankers = [...state.rankers];
     rankers.sort((a, b) => b.points.sub(a.points));
@@ -109,6 +112,9 @@ export default {
       rankers: rankers,
       number: state.number,
       settings: rootState.settings,
+    });
+    dispatch({
+      type: "stats/calculate",
     });
   },
   async handleEvent({ commit, rootState, dispatch }, { event, stompClient }) {

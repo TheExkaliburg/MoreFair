@@ -5,6 +5,14 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("MINOR", "", {
+          balancing: [""],
+          features: [""],
+          improvements: [
+            "Throwing Vinegar and buying auto-promote doesn't get send over public channel anymore",
+          ],
+          fixes: [""],
+        }),
         new Version("PATCH", "", {
           balancing: [""],
           features: [""],
