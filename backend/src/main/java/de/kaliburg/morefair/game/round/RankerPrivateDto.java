@@ -1,7 +1,6 @@
-package de.kaliburg.morefair.dto;
+package de.kaliburg.morefair.game.round;
 
 import de.kaliburg.morefair.FairConfig;
-import de.kaliburg.morefair.game.round.RankerEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

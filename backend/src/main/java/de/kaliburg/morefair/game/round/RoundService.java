@@ -4,7 +4,6 @@ import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.api.GameController;
 import de.kaliburg.morefair.api.utils.WsUtils;
-import de.kaliburg.morefair.dto.LadderResultsDto;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.EventType;
 import java.util.List;

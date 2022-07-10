@@ -3,7 +3,7 @@ package de.kaliburg.morefair.api;
 import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WsMessage;
-import de.kaliburg.morefair.dto.InfoDto;
+import de.kaliburg.morefair.game.round.InfoDto;
 import de.kaliburg.morefair.game.round.RoundService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

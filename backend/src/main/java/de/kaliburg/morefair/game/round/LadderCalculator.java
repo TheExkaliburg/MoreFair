@@ -3,7 +3,6 @@ package de.kaliburg.morefair.game.round;
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.GameController;
 import de.kaliburg.morefair.api.utils.WsUtils;
-import de.kaliburg.morefair.dto.HeartbeatDto;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.EventType;
 import de.kaliburg.morefair.game.chat.MessageService;

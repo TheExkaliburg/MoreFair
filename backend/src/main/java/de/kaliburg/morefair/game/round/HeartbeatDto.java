@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.dto;
+package de.kaliburg.morefair.game.round;
 
 import lombok.Data;
 import lombok.NonNull;
