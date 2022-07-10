@@ -308,7 +308,8 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
     Event joinEvent = new Event(EventType.JOIN, account.getId());
     joinEvent.setData(new JoinData(account.getUsername(), account.getAssholeCount()));
-    eventMap.get(number).add(joinEvent);
+    wsUtils.convertAndSendToTopic(GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
+        ladder.getNumber().toString()), joinEvent);
 
     return result;
   }
@@ -423,6 +424,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
             account.getId());
         ranker.setGrowing(false);
         ranker = rankerService.save(ranker);
+
         RankerEntity newRanker = createRanker(account, ladder.getNumber() + 1);
         newRanker.setVinegar(ranker.getVinegar());
         newRanker.setGrapes(ranker.getGrapes());
@@ -432,7 +434,11 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
           newRanker.setAutoPromote(true);
         }
 
+        wsUtils.convertAndSendToTopic(GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
+            ladder.getNumber().toString()), event);
         account = accountService.save(accountService.find(account));
+
+        // Logic for the Asshole-Ladder
         if (newLadder.getNumber() > roundUtils.getAssholeLadderNumber(currentRound)) {
           chatService.sendGlobalMessage(account,
               account.getUsername() + " was welcomed by Chad. They are number "
@@ -457,9 +463,6 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
                 new Event(EventType.RESET, account.getId()));
           }
         }
-
-        wsUtils.convertAndSendToTopic(GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
-            ladder.getNumber().toString()), event);
         return true;
       }
     } catch (Exception e) {
@@ -508,8 +511,8 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
           targetVinegar = BigInteger.ZERO;
           data.setSuccess(true);
 
-          if (!buyMulti(new Event(EventType.BUY_MULTI, event.getAccountId()), ladder)) {
-            softResetPoints(new Event(EventType.SOFT_RESET_POINTS, event.getAccountId()), ladder);
+          if (!buyMulti(new Event(EventType.BUY_MULTI, targetAccount.getId()), ladder)) {
+            softResetPoints(new Event(EventType.SOFT_RESET_POINTS, targetAccount.getId()), ladder);
           }
         }
 

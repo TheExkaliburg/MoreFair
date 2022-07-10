@@ -81,15 +81,15 @@ export default {
       tag: event.data.tag,
     });
     if (
-      !this.rankers.find(
+      !state.rankers.find(
         (r) => r.accountId === newRanker.accountId && r.growing
       )
     ) {
-      this.rankers.push(newRanker);
+      state.rankers.push(newRanker);
     }
   },
   handlePromoteEvent(state, { event }) {
-    this.rankers.forEach((ranker) => {
+    state.rankers.forEach((ranker) => {
       if (event.accountId === ranker.accountId) {
         ranker.growing = false;
       }
