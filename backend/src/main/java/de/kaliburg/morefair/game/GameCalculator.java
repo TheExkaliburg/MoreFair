@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.game;
 
-import de.kaliburg.morefair.game.round.HeartbeatDto;
+import de.kaliburg.morefair.game.round.dto.HeartbeatDto;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;

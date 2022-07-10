@@ -6,6 +6,7 @@ import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.EventType;
 import de.kaliburg.morefair.game.chat.MessageService;
+import de.kaliburg.morefair.game.round.dto.HeartbeatDto;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;

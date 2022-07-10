@@ -1,6 +1,8 @@
-package de.kaliburg.morefair.game.round;
+package de.kaliburg.morefair.game.round.dto;
 
 import de.kaliburg.morefair.FairConfig;
+import de.kaliburg.morefair.game.round.RoundEntity;
+import de.kaliburg.morefair.game.round.RoundType;
 import lombok.Data;
 
 @Data

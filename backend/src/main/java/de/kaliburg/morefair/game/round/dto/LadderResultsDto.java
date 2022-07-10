@@ -1,6 +1,7 @@
-package de.kaliburg.morefair.game.round;
+package de.kaliburg.morefair.game.round.dto;
 
 import de.kaliburg.morefair.FairConfig;
+import de.kaliburg.morefair.game.round.LadderEntity;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
