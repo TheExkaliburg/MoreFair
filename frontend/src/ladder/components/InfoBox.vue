@@ -146,7 +146,7 @@ const yourPowerFormatted = computed(() =>
   numberFormatter.value.format(yourRanker.value.power)
 );
 const yourPointsFormatted = computed(() =>
-  numberFormatter.value.format(yourRanker.value.power)
+  numberFormatter.value.format(yourRanker.value.points)
 );
 const biasCostFormatted = computed(() =>
   numberFormatter.value.format(biasCost.value)

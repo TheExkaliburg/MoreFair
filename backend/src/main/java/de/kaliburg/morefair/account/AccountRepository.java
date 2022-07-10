@@ -18,4 +18,10 @@ public interface AccountRepository extends JpaRepository<AccountEntity, Long> {
   @Query("select a from AccountEntity a where lower( a.username) like concat('%', lower(:username), '%')")
   List<AccountEntity> findAccountsByUsernameIsContaining(
       @Param("username") @NonNull String username);
+
+  @Query("select a from AccountEntity a where a.accessRole = :accessRole order by a.id")
+  List<AccountEntity> findByAccessRoleOrderByIdAsc(
+      @Param("accessRole") AccountAccessRole accessRole);
+
+
 }

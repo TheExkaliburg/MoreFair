@@ -2,6 +2,7 @@ package de.kaliburg.morefair.game.chat;
 
 import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountEntity;
+import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.ChatController;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import java.util.HashMap;
@@ -25,14 +26,16 @@ public class ChatService {
   private final ChatRepository chatRepository;
   private final MessageService messageService;
   private final WsUtils wsUtils;
+  private final AccountService accountService;
   private final FairConfig config;
   private Map<Integer, ChatEntity> currentChatMap = new HashMap<>();
 
   public ChatService(ChatRepository chatRepository, MessageService messageService,
-      @Lazy WsUtils wsUtils, FairConfig config) {
+      @Lazy WsUtils wsUtils, AccountService accountService, FairConfig config) {
     this.chatRepository = chatRepository;
     this.messageService = messageService;
     this.wsUtils = wsUtils;
+    this.accountService = accountService;
     this.config = config;
   }
 
@@ -140,22 +143,23 @@ public class ChatService {
    * @param metadata the metadata of the message
    * @return the list of all the messages, sent to different chats
    */
-  public List<MessageEntity> sendGlobalMessage(AccountEntity account, String message,
+  public List<MessageEntity> sendGlobalMessage(String message,
       String metadata) {
+    AccountEntity broadcasterAccount = accountService.findBroadcaster();
     return currentChatMap.values().stream()
-        .map(chat -> sendMessageToChat(account, chat.getNumber(), message, metadata))
+        .map(chat -> sendMessageToChat(broadcasterAccount, chat.getNumber(), message, metadata))
         .collect(Collectors.toList());
   }
 
   /**
    * Sends a message (and the metadata) from a user to all chats.
    *
-   * @param account the account of the user
    * @param message the message
    * @return the list of all the messages, sent to different chats
    */
-  public List<MessageEntity> sendGlobalMessage(AccountEntity account, String message) {
-    return sendGlobalMessage(account, message, null);
+  public List<MessageEntity> sendGlobalMessage(String message) {
+
+    return sendGlobalMessage(message, null);
   }
 
 

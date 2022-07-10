@@ -77,4 +77,15 @@ public class AccountService {
   public List<AccountEntity> findByUsername(String username) {
     return accountRepository.findAccountsByUsernameIsContaining(username);
   }
+
+  public AccountEntity findBroadcaster() {
+    List<AccountEntity> result =
+        accountRepository.findByAccessRoleOrderByIdAsc(AccountAccessRole.BROADCASTER);
+
+    if (result.isEmpty()) {
+      return null;
+    }
+
+    return result.get(0);
+  }
 }

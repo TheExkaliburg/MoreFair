@@ -85,12 +85,15 @@ public class GameService implements ApplicationListener<GameResetEvent> {
   private GameEntity create() {
     GameEntity result = new GameEntity();
     result = gameRepository.save(result);
+
+    AccountEntity broadcaster = accountService.create(null);
+    broadcaster.setUsername("Chad");
+    broadcaster.setAccessRole(AccountAccessRole.BROADCASTER);
+    broadcaster.setAssholeCount(Integer.MAX_VALUE);
+    accountService.save(broadcaster);
+
     RoundEntity round = roundService.create(1);
     ChatEntity chat = chatService.create(1);
-    AccountEntity chadAccount = accountService.create(null);
-    chadAccount.setAccessRole(AccountAccessRole.OWNER);
-    chadAccount.setUsername("Chad");
-
     result.setCurrentRound(round);
 
     return gameRepository.save(result);

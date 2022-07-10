@@ -446,7 +446,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
         // Logic for the Asshole-Ladder
         if (ladder.getNumber() >= currentRound.getAssholeLadderNumber()) {
-          chatService.sendGlobalMessage(account,
+          chatService.sendGlobalMessage(
               account.getUsername() + " was welcomed by Chad. They are number "
                   + newLadder.getRankers().size()
                   + " of the lucky few initiates for the big ritual.");
