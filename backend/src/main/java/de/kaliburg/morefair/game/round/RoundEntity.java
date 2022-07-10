@@ -92,7 +92,7 @@ public class RoundEntity {
 
   public Integer getAssholeLadderNumber() {
     if (type == RoundType.FAST) {
-      return (baseAssholeLadder + highestAssholeCount) / 2;
+      return (baseAssholeLadder + highestAssholeCount + 1) / 2;
     }
     return baseAssholeLadder + highestAssholeCount;
   }
