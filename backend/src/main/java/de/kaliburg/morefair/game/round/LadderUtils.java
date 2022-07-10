@@ -66,7 +66,7 @@ public class LadderUtils {
   }
 
   public Integer getRequiredRankerCountToUnlock(LadderEntity ladder) {
-    return Math.max(config.getBasePeopleToPromote(), ladder.getNumber());
+    return Math.max(config.getBaseAssholeLadder(), ladder.getNumber());
   }
 
   /**

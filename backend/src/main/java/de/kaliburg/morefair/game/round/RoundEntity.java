@@ -25,7 +25,9 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @Entity
 @Table(name = "round", uniqueConstraints = {
     @UniqueConstraint(name = "uk_uuid", columnNames = "uuid"),
@@ -99,8 +101,8 @@ public class RoundEntity {
 
   public Integer getAssholesForReset() {
     int max = getAssholeLadderNumber();
-    int min = getBaseAssholeLadder() / 2;
+    int min = getBaseAssholeLadder();
 
-    return min + Math.round((max - min) * getPercentageOfAdditionalAssholes());
+    return min + Math.round((max - min) * getPercentageOfAdditionalAssholes() / 100);
   }
 }

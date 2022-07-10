@@ -17,7 +17,7 @@ public class InfoDto {
   private RoundType type;
 
   public InfoDto(RoundEntity currentRound, FairConfig config) {
-    minimumPeopleForPromote = config.getBasePeopleToPromote();
+    minimumPeopleForPromote = config.getBaseAssholeLadder();
     baseVinegarNeededToThrow = config.getBaseVinegarToThrow().toString();
     autoPromoteLadder = config.getAutoPromoteLadder();
     manualPromoteWaitTime = config.getManualPromoteWaitTime();

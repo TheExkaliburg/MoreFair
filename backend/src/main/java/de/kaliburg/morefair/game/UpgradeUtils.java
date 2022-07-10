@@ -36,7 +36,7 @@ public class UpgradeUtils {
   }
 
   public BigInteger buyAutoPromoteCost(Integer rank, Integer ladderNum) {
-    Integer minPeople = Math.max(config.getBasePeopleToPromote(), ladderNum);
+    Integer minPeople = Math.max(config.getBaseAssholeLadder(), ladderNum);
     Integer divisor = Math.max(rank - minPeople + 1, 1);
 
     BigDecimal decGrapes = new BigDecimal(config.getBaseGrapesToBuyAutoPromote());

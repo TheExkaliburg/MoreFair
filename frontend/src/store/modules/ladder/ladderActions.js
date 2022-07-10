@@ -8,6 +8,7 @@ export default {
       number: message.content.number,
       rankers: message.content.rankers,
       ladderType: message.content.type,
+      basePointsToPromote: message.content.basePointsToPromote,
     });
   },
   async handleLadderEvent({ dispatch }, { message, stompClient }) {

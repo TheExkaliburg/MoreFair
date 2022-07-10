@@ -1,8 +1,8 @@
 import Decimal from "break_infinity.js";
 
 export default {
-  getMinimumPointsForPromote(settings, ladder) {
-    return settings.pointsForPromote.mul(new Decimal(ladder.number));
+  getMinimumPointsForPromote(ladder) {
+    return ladder.basePointsToPromote;
   },
   getMinimumPeopleForPromote(settings, ladder) {
     return Math.max(settings.minimumPeopleForPromote, ladder.number);
@@ -18,18 +18,15 @@ export default {
     if (rankerCount < this.getMinimumPeopleForPromote(settings, ladder))
       return false;
     return (
-      ladder.rankers[0].points.cmp(
-        this.getMinimumPointsForPromote(settings, ladder)
-      ) >= 0
+      ladder.rankers[0].points.cmp(this.getMinimumPointsForPromote(ladder)) >= 0
     );
   },
   canThrowVinegar(settings, ladder) {
     return (
       ladder.rankers[0].growing &&
       !ladder.rankers[0].you &&
-      ladder.rankers[0].points.cmp(
-        this.getMinimumPointsForPromote(settings, ladder)
-      ) >= 0 &&
+      ladder.rankers[0].points.cmp(this.getMinimumPointsForPromote(ladder)) >=
+        0 &&
       ladder.rankers.length >=
         this.getMinimumPeopleForPromote(settings, ladder) &&
       ladder.yourRanker.vinegar.cmp(
@@ -76,24 +73,26 @@ export default {
       (leadingRanker.you ? pursuingRanker : leadingRanker).points.add(
         neededPointDiff
       ),
-      this.getMinimumPointsForPromote(settings, ladder)
+      this.getMinimumPointsForPromote(ladder)
     );
   },
   canPromote(settings, ladder) {
     // Don't have enough points
+    console.log("test");
     if (
-      ladder.yourRanker.points <
-      this.calculatePointsNeededForPromote(settings, ladder)
+      ladder.yourRanker.points.cmp(
+        this.calculatePointsNeededForPromote(settings, ladder)
+      ) < 0
     ) {
       return false;
     }
 
     if (
-      ladder.rankers.length < this.getMinimumPointsForPromote(settings, ladder)
+      ladder.rankers.length < this.getMinimumPeopleForPromote(settings, ladder)
     ) {
       return false;
     }
 
-    return ladder.yourRanker.rank >= 1;
+    return ladder.yourRanker.rank <= 1;
   },
 };

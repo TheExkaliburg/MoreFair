@@ -12,7 +12,6 @@ import de.kaliburg.morefair.events.data.VinegarData;
 import de.kaliburg.morefair.events.types.EventType;
 import de.kaliburg.morefair.game.GameResetEvent;
 import de.kaliburg.morefair.game.UpgradeUtils;
-import de.kaliburg.morefair.game.chat.ChatEntity;
 import de.kaliburg.morefair.game.chat.ChatService;
 import de.kaliburg.morefair.game.chat.MessageService;
 import java.math.BigInteger;
@@ -422,7 +421,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
       RankerEntity ranker = findActiveRankerOfAccountOnLadder(event.getAccountId(), ladder);
       if (ladderUtils.canPromote(ladder, ranker)) {
         AccountEntity account = accountService.find(ranker.getAccount());
-        log.info("[L{}] Promotion for {} (#{})", ladder.getRankers(), account.getUsername(),
+        log.info("[L{}] Promotion for {} (#{})", ladder.getNumber(), account.getUsername(),
             account.getId());
         ranker.setGrowing(false);
         ranker = rankerService.save(ranker);
@@ -437,7 +436,9 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         }
 
         // Create new Chat if it doesn't exist
-        ChatEntity newChat = chatService.create(ladder.getNumber() + 1);
+        if (chatService.find(ladder.getNumber() + 1) == null) {
+          chatService.create(ladder.getNumber() + 1);
+        }
 
         wsUtils.convertAndSendToTopic(GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
             ladder.getNumber().toString()), event);

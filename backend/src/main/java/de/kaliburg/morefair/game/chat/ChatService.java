@@ -161,7 +161,7 @@ public class ChatService {
 
   /**
    * gets the instance of a chat, if there is no cached chat, it will first look for a chat version
-   * from the database or create on if there is none.
+   * from the database or create one if there is none.
    *
    * @param number the number the chat has
    * @return the Chat Entity from the cache

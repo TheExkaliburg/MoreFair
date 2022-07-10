@@ -23,8 +23,8 @@ export default {
   activeRankers(state) {
     return state.rankers.filter((ranker) => ranker.growing);
   },
-  getMinimumPointsForPromote(state, _, rootState) {
-    return ladderUtils.getMinimumPointsForPromote(rootState.settings, state);
+  getMinimumPointsForPromote(state) {
+    return ladderUtils.getMinimumPointsForPromote(state);
   },
   getMinimumPeopleForPromote(state, _, rootState) {
     return ladderUtils.getMinimumPeopleForPromote(rootState.settings, state);
