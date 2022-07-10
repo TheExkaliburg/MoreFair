@@ -89,19 +89,25 @@ public class RoundEntity {
     if (randomPercentage < 40) {
       return RoundType.FAST;
     }
+    if (randomPercentage < 60) {
+      return RoundType.AUTO;
+    }
+
     return RoundType.DEFAULT;
   }
 
   public Integer getAssholeLadderNumber() {
+    int result = baseAssholeLadder + highestAssholeCount;
+    result = Math.min(20, result);
     if (type == RoundType.FAST) {
-      return (baseAssholeLadder + highestAssholeCount + 1) / 2;
+      result = (result + 1) / 2;
     }
-    return baseAssholeLadder + highestAssholeCount;
+    return result;
   }
 
   public Integer getAssholesForReset() {
     int max = getAssholeLadderNumber();
-    int min = getBaseAssholeLadder();
+    int min = getBaseAssholeLadder() / 2;
 
     return min + Math.round((max - min) * getPercentageOfAdditionalAssholes() / 100);
   }

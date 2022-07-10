@@ -78,7 +78,6 @@ export default {
   },
   canPromote(settings, ladder) {
     // Don't have enough points
-    console.log("test");
     if (
       ladder.yourRanker.points.cmp(
         this.calculatePointsNeededForPromote(settings, ladder)

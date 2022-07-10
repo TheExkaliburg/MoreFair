@@ -102,7 +102,7 @@ public final class LadderEntity {
 
     float randomPercentage = random.nextFloat(100);
 
-    if (randomPercentage < 20) {
+    if (randomPercentage < 20 || round.getType().equals(RoundType.FAST)) {
       return LadderType.SMALL;
     }
 
