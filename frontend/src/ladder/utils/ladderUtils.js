@@ -45,4 +45,55 @@ export default {
       Math.round(Math.pow(ladder.number + 1, currentUpgrade + 1))
     );
   },
+  calculatePointsNeededForPromote(settings, ladder) {
+    // If not enough Players -> Infinity
+    if (ladder.rankers.length < 2) {
+      return new Decimal(Infinity);
+    }
+
+    // If before autopromote unlocks -> 1st place
+    if (ladder.number < settings.autoPromoteLadder) {
+      return ladder.rankers[0].you
+        ? ladder.rankers[1].points.add(1)
+        : ladder.rankers[0].points.add(1);
+    }
+
+    let leadingRanker = ladder.rankers[0].you
+      ? ladder.yourRanker
+      : ladder.rankers[0];
+    let pursuingRanker = ladder.rankers[0].you
+      ? ladder.rankers[1]
+      : ladder.yourRanker;
+
+    // How many more points does the ranker gain against his pursuer, every Second
+    let powerDiff = (
+      leadingRanker.growing ? leadingRanker.power : new Decimal(0)
+    ).sub(pursuingRanker.growing ? pursuingRanker.power : 0);
+    // Calculate the needed Point difference, to have f.e. 30seconds of point generation with the difference in power
+    let neededPointDiff = powerDiff.mul(settings.manualPromoteWaitTime).abs();
+
+    return Decimal.max(
+      (leadingRanker.you ? pursuingRanker : leadingRanker).points.add(
+        neededPointDiff
+      ),
+      this.getMinimumPointsForPromote(settings, ladder)
+    );
+  },
+  canPromote(settings, ladder) {
+    // Don't have enough points
+    if (
+      ladder.yourRanker.points <
+      this.calculatePointsNeededForPromote(settings, ladder)
+    ) {
+      return false;
+    }
+
+    if (
+      ladder.rankers.length < this.getMinimumPointsForPromote(settings, ladder)
+    ) {
+      return false;
+    }
+
+    return ladder.yourRanker.rank >= 1;
+  },
 };

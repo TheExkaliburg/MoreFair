@@ -1,11 +1,16 @@
 package de.kaliburg.morefair.game.round;
 
+import de.kaliburg.morefair.FairConfig;
+import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -17,7 +22,6 @@ import javax.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -29,10 +33,10 @@ import lombok.experimental.Accessors;
 @Setter
 @Accessors(chain = true)
 @NoArgsConstructor
-@RequiredArgsConstructor
 @SequenceGenerator(name = "seq_round", sequenceName = "seq_round", allocationSize = 1)
 public class RoundEntity {
 
+  private static final Random random = new Random();
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_round")
   private Long id;
@@ -44,18 +48,50 @@ public class RoundEntity {
   private Integer number;
   @OneToMany(mappedBy = "round", fetch = FetchType.EAGER)
   private Set<LadderEntity> ladders = new HashSet<>();
-
-  /* The game doesn't need multiple game instances, so we don't need to differentiate between
-  rounds from a different game
-
   @NonNull
-  @ManyToOne
-  @JoinColumn(name = "game_id", nullable = false, foreignKey = @ForeignKey(name = "fk_round_game"))
-  private GameEntity game;
-  */
-
+  @Column(nullable = false)
+  @Enumerated(EnumType.STRING)
+  private RoundType type;
+  @Column(nullable = false)
   private ZonedDateTime createdOn = ZonedDateTime.now();
   @NonNull
   @Column(nullable = false)
   private Integer highestAssholeCount = 0;
+  @NonNull
+  @Column(nullable = false)
+  private Integer baseAssholeLadder;
+  @NonNull
+  @Column(nullable = false, precision = 1000)
+  private BigInteger basePointsRequirement;
+  @NonNull
+  @Column(nullable = false)
+  private Double percentageOfAdditionalAssholes;
+
+  public RoundEntity(@NonNull Integer number, FairConfig config) {
+    this.number = number;
+    this.type = determineRoundType();
+    this.baseAssholeLadder = config.getBaseAssholeLadder();
+    this.basePointsRequirement = config.getBasePointsToPromote();
+    this.percentageOfAdditionalAssholes = random.nextDouble(100);
+  }
+
+  private RoundType determineRoundType() {
+    float randomPercentage = random.nextFloat(100);
+
+    if (randomPercentage < 40) {
+      return RoundType.FAST;
+    }
+    return RoundType.DEFAULT;
+  }
+
+  public Integer getAssholeLadderNumber() {
+    if (type == RoundType.FAST) {
+      return (baseAssholeLadder + highestAssholeCount) / 2;
+    }
+    return baseAssholeLadder + highestAssholeCount;
+  }
+
+  public Integer getNumberOfAssholes() {
+    return (getAssholeLadderNumber() + 1) / 2;
+  }
 }

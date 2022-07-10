@@ -1,20 +1,24 @@
 package de.kaliburg.morefair.game.round;
 
-import de.kaliburg.morefair.api.FairController;
+import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.game.UpgradeUtils;
 import java.math.BigInteger;
+import java.util.Random;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 @Component
 public class LadderUtils {
 
+  private final Random random = new Random();
   private final UpgradeUtils upgradeUtils;
   private final RoundUtils roundUtils;
+  private final FairConfig config;
 
-  public LadderUtils(UpgradeUtils upgradeUtils, RoundUtils roundUtils) {
+  public LadderUtils(UpgradeUtils upgradeUtils, RoundUtils roundUtils, FairConfig config) {
     this.upgradeUtils = upgradeUtils;
     this.roundUtils = roundUtils;
+    this.config = config;
   }
 
   /**
@@ -41,7 +45,7 @@ public class LadderUtils {
         ladder.getRankers().get(0).getUuid().equals(ranker.getUuid());
 
     // If ladder is before AUTO_PROMOTE_LADDER -> 1st place + 1 points
-    if (ladder.getNumber() < FairController.AUTO_PROMOTE_LADDER || ranker.isAutoPromote()) {
+    if (ladder.getNumber() < config.getAutoPromoteLadder() || ranker.isAutoPromote()) {
       return isRankerEqualsToFirstRanker
           ? ladder.getRankers().get(1).getPoints().add(BigInteger.ONE)
           : ladder.getRankers().get(0).getPoints().add(BigInteger.ONE);
@@ -55,18 +59,18 @@ public class LadderUtils {
             .subtract(pursuingRanker.isGrowing() ? pursuingRanker.getPower() : BigInteger.ZERO);
 
     BigInteger neededPointDifference =
-        powerDifference.multiply(BigInteger.valueOf(FairController.MANUAL_PROMOTE_WAIT_TIME)).abs();
+        powerDifference.multiply(BigInteger.valueOf(config.getManualPromoteWaitTime())).abs();
 
     return (leadingRanker.getUuid().equals(ranker.getUuid()) ? pursuingRanker : leadingRanker)
         .getPoints().add(neededPointDifference).max(getBasePointsForPromote(ladder));
   }
 
   public BigInteger getBasePointsForPromote(@NonNull LadderEntity ladder) {
-    return FairController.POINTS_FOR_PROMOTE.multiply(BigInteger.valueOf(ladder.getNumber()));
+    return config.getBasePointsToPromote().multiply(BigInteger.valueOf(ladder.getNumber()));
   }
 
   public Integer getRequiredRankerCountToUnlock(LadderEntity ladder) {
-    return Math.max(FairController.MINIMUM_PEOPLE_FOR_PROMOTE, ladder.getNumber());
+    return Math.max(config.getBasePeopleToPromote(), ladder.getNumber());
   }
 
   /**
@@ -151,7 +155,7 @@ public class LadderUtils {
   public boolean canBuyAutoPromote(LadderEntity ladder, RankerEntity ranker, RoundEntity round) {
     return !ranker.isAutoPromote() && ranker.getGrapes()
         .compareTo(upgradeUtils.buyAutoPromoteCost(ranker.getRank(), ladder.getNumber())) >= 0
-        && ladder.getNumber() >= FairController.AUTO_PROMOTE_LADDER
+        && ladder.getNumber() >= config.getAutoPromoteLadder()
         && ladder.getNumber() < roundUtils.getAssholeLadderNumber(round);
 
   }

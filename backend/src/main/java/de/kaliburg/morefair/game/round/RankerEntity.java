@@ -1,8 +1,6 @@
 package de.kaliburg.morefair.game.round;
 
 import de.kaliburg.morefair.account.AccountEntity;
-import de.kaliburg.morefair.dto.RankerDto;
-import de.kaliburg.morefair.dto.RankerPrivateDto;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.UUID;
@@ -41,10 +39,10 @@ public class RankerEntity {
   @Column(nullable = false)
   private UUID uuid = UUID.randomUUID();
   @NonNull
-  @Column(nullable = false, precision = 1000, scale = 0)
+  @Column(nullable = false, precision = 1000)
   private BigInteger points = BigInteger.ZERO;
   @NonNull
-  @Column(nullable = false, precision = 1000, scale = 0)
+  @Column(nullable = false, precision = 1000)
   private BigInteger power = BigInteger.ONE;
   @NonNull
   @Column(nullable = false)
@@ -91,14 +89,6 @@ public class RankerEntity {
 
   public RankerEntity addPower(Integer power, double secondsPassed) {
     return addPower(BigInteger.valueOf(power), secondsPassed);
-  }
-
-  public RankerDto convertToDto() {
-    return new RankerDto(this);
-  }
-
-  public RankerPrivateDto convertToPrivateDto() {
-    return new RankerPrivateDto(this);
   }
 
   public RankerEntity addVinegar(Integer vinegar, double secondsPassed) {

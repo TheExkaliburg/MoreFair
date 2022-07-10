@@ -1,5 +1,6 @@
 package de.kaliburg.morefair.game.chat;
 
+import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.api.ChatController;
 import de.kaliburg.morefair.api.utils.WsUtils;
@@ -24,13 +25,15 @@ public class ChatService {
   private final ChatRepository chatRepository;
   private final MessageService messageService;
   private final WsUtils wsUtils;
+  private final FairConfig config;
   private Map<Integer, ChatEntity> currentChatMap = new HashMap<>();
 
   public ChatService(ChatRepository chatRepository, MessageService messageService,
-      @Lazy WsUtils wsUtils) {
+      @Lazy WsUtils wsUtils, FairConfig config) {
     this.chatRepository = chatRepository;
     this.messageService = messageService;
     this.wsUtils = wsUtils;
+    this.config = config;
   }
 
   @Transactional
@@ -113,7 +116,7 @@ public class ChatService {
     result = messageService.save(result);
     wsUtils.convertAndSendToTopic(
         ChatController.TOPIC_EVENTS_DESTINATION.replace("{number}", number.toString()),
-        new MessageDto(result));
+        new MessageDto(result, config));
     return result;
   }
 

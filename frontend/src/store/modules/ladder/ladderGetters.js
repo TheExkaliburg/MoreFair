@@ -48,4 +48,7 @@ export default {
   getVinegarThrowCost(state, _, rootState) {
     return ladderUtils.getVinegarThrowCost(rootState.settings, state);
   },
+  canPromote(state, _, rootState) {
+    return ladderUtils.canPromote(rootState.settings, state);
+  },
 };

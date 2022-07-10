@@ -1,5 +1,6 @@
 package de.kaliburg.morefair.game.round;
 
+import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.api.GameController;
 import de.kaliburg.morefair.api.utils.WsUtils;
@@ -26,14 +27,16 @@ public class RoundService {
   private final LadderService ladderService;
   private final WsUtils wsUtils;
   private final RoundUtils roundUtils;
+  private final FairConfig config;
   private LadderResultsDto lastRoundResults;
 
   public RoundService(RoundRepository roundRepository, LadderService ladderService,
-      @Lazy WsUtils wsUtils, RoundUtils roundUtils) {
+      @Lazy WsUtils wsUtils, RoundUtils roundUtils, FairConfig config) {
     this.roundRepository = roundRepository;
     this.ladderService = ladderService;
     this.wsUtils = wsUtils;
     this.roundUtils = roundUtils;
+    this.config = config;
   }
 
   @Transactional
@@ -50,7 +53,8 @@ public class RoundService {
    */
   @Transactional
   public RoundEntity create(Integer number) {
-    RoundEntity result = roundRepository.save(new RoundEntity(number));
+    RoundEntity result = new RoundEntity(number, config);
+    result = roundRepository.save(result);
     LadderEntity ladder = ladderService.createLadder(result, 1);
     result.getLadders().add(ladder);
     return result;
@@ -78,7 +82,7 @@ public class RoundService {
       Map<Integer, LadderEntity> lastRoundLadderMap = lastRound.getLadders().stream()
           .collect(Collectors.toMap(LadderEntity::getNumber,
               Function.identity()));
-      lastRoundResults = new LadderResultsDto(lastRoundLadderMap);
+      lastRoundResults = new LadderResultsDto(lastRoundLadderMap, config);
     }
   }
 
@@ -103,7 +107,8 @@ public class RoundService {
     RankerEntity result = ladderService.createRanker(account);
     Integer assholeCount = result.getAccount().getAssholeCount();
 
-    if (assholeCount > getCurrentRound().getHighestAssholeCount()) {
+    if (assholeCount > getCurrentRound().getHighestAssholeCount()
+        && ladderService.find(roundUtils.getAssholeLadderNumber(getCurrentRound())) == null) {
       getCurrentRound().setHighestAssholeCount(assholeCount);
       ladderService.setCurrentRound(save(getCurrentRound()));
       wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(

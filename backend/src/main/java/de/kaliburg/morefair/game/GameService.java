@@ -1,5 +1,8 @@
 package de.kaliburg.morefair.game;
 
+import de.kaliburg.morefair.account.AccountAccessRole;
+import de.kaliburg.morefair.account.AccountEntity;
+import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.game.chat.ChatEntity;
 import de.kaliburg.morefair.game.chat.ChatService;
 import de.kaliburg.morefair.game.round.LadderService;
@@ -37,16 +40,19 @@ public class GameService implements ApplicationListener<GameResetEvent> {
   private final LadderService ladderService;
   private final RankerService rankerService;
   private final ChatService chatService;
+  private final AccountService accountService;
   @Getter
   private GameEntity game;
 
   GameService(GameRepository gameRepository, RoundService roundService,
-      LadderService ladderService, RankerService rankerService, ChatService chatService) {
+      LadderService ladderService, RankerService rankerService, ChatService chatService,
+      AccountService accountService) {
     this.gameRepository = gameRepository;
     this.roundService = roundService;
     this.ladderService = ladderService;
     this.rankerService = rankerService;
     this.chatService = chatService;
+    this.accountService = accountService;
   }
 
   @PostConstruct
@@ -81,6 +87,9 @@ public class GameService implements ApplicationListener<GameResetEvent> {
     result = gameRepository.save(result);
     RoundEntity round = roundService.create(1);
     ChatEntity chat = chatService.create(1);
+    AccountEntity chadAccount = accountService.create(null);
+    chadAccount.setAccessRole(AccountAccessRole.OWNER);
+    chadAccount.setUsername("Chad");
 
     result.setCurrentRound(round);
 

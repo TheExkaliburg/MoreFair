@@ -1,5 +1,6 @@
 package de.kaliburg.morefair.api;
 
+import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.utils.RequestThrottler;
@@ -16,7 +17,6 @@ import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -41,22 +41,25 @@ public class ChatController {
   private final RequestThrottler throttler;
   private final RoundService roundService;
   private final ChatService chatService;
+  private final FairConfig config;
 
   public ChatController(AccountService accountService, RankerService rankerService, WsUtils wsUtils,
-      RequestThrottler throttler, RoundService roundService, ChatService chatService) {
+      RequestThrottler throttler, RoundService roundService, ChatService chatService,
+      FairConfig config) {
     this.accountService = accountService;
     this.rankerService = rankerService;
     this.wsUtils = wsUtils;
     this.throttler = throttler;
     this.roundService = roundService;
     this.chatService = chatService;
+    this.config = config;
   }
 
   @MessageMapping(APP_INIT_DESTINATION)
   public void initChat(SimpMessageHeaderAccessor sha, WsEmptyMessage wsMessage,
       @DestinationVariable("number") Integer number) {
     try {
-      String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
+      String uuid = wsMessage.getUuid();
       log.trace("/app/chat/init/{} from {}", number, uuid);
       AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null || account.isBanned()) {
@@ -73,7 +76,7 @@ public class ChatController {
       }
 
       if (account.isMod() || number <= ranker.getLadder().getNumber()) {
-        ChatDto c = new ChatDto(chatService.find(number));
+        ChatDto c = new ChatDto(chatService.find(number), config);
         wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION, c);
       } else {
         wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION, HttpStatus.FORBIDDEN);
@@ -97,9 +100,9 @@ public class ChatController {
       if (message.length() > 140) {
         message = message.substring(0, 140);
       }
-      message = StringEscapeUtils.escapeJava(message);
+      message = message;
 
-      String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
+      String uuid = wsMessage.getUuid();
       AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null || account.isMuted()) {
         return;
@@ -110,7 +113,8 @@ public class ChatController {
       if (account.isMod() || (number <= ranker.getLadder().getNumber() && throttler.canPostMessage(
           account))) {
         MessageEntity answer = chatService.sendMessageToChat(account, number, message, metadata);
-        wsUtils.convertAndSendToTopic(TOPIC_EVENTS_DESTINATION + number, new MessageDto(answer));
+        wsUtils.convertAndSendToTopic(TOPIC_EVENTS_DESTINATION + number, new MessageDto(answer,
+            config));
       }
     } catch (Exception e) {
       log.error(e.getMessage());

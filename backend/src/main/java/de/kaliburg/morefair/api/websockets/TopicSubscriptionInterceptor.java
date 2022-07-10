@@ -11,7 +11,6 @@ import java.security.Principal;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessagingException;
@@ -46,8 +45,8 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
       String uuid = Objects.requireNonNull(headerAccessor.getNativeHeader("uuid")).get(0);
       if (!validateSubscription(userPrincipal, headerAccessor.getDestination(), uuid)) {
         throw new MessagingException(
-            "No permission for this topic (" + StringEscapeUtils.escapeJava(
-                headerAccessor.getDestination()) + ") with principal: " + userPrincipal);
+            "No permission for this topic (" + headerAccessor.getDestination()
+                + ") with principal: " + userPrincipal);
       }
     }
     return message;
@@ -58,8 +57,6 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
     if (principal == null) {
       return false;
     }
-    topicDestination = StringEscapeUtils.escapeJava(topicDestination);
-    uuid = StringEscapeUtils.escapeJava(uuid);
 
     log.trace("Validate subscription for {} to {}", uuid, topicDestination);
     RoundEntity currentRound = roundService.getCurrentRound();

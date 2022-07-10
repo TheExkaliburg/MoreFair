@@ -14,7 +14,6 @@ import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -52,7 +51,7 @@ public class AccountController {
   public void login(SimpMessageHeaderAccessor sha, WsMessage wsMessage) {
     try {
       UserPrincipal principal = wsUtils.convertMessageHeaderAccessorToUserPrincipal(sha);
-      String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
+      String uuid = wsMessage.getUuid();
 
       log.trace("/app/{} {}", QUEUE_LOGIN_DESTINATION, uuid);
 
@@ -111,10 +110,10 @@ public class AccountController {
       if (username.length() > 32) {
         username = username.substring(0, 32);
       }
-      username = StringEscapeUtils.escapeJava(username);
+      username = username;
 
-      String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-      log.trace("/app/{} {} {}", APP_RENAME_DESTINATION, uuid, username);
+      String uuid = wsMessage.getUuid();
+      log.info("/app{} {} '{}'", APP_RENAME_DESTINATION, uuid, username);
 
       AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null || account.isMuted()) {
@@ -125,7 +124,7 @@ public class AccountController {
 
       wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION,
           new Event(EventType.NAME_CHANGE, account.getId(),
-              StringEscapeUtils.unescapeJava(account.getUsername())));
+              account.getUsername()));
 
     } catch (Exception e) {
       log.error(e.getMessage());

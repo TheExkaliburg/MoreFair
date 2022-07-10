@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.game;
 
-import de.kaliburg.morefair.api.FairController;
+import de.kaliburg.morefair.FairConfig;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -8,6 +8,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UpgradeUtils {
+
+  private final FairConfig config;
+
+  public UpgradeUtils(FairConfig config) {
+    this.config = config;
+  }
 
   /**
    * Calculates the cost of the next bias/multi upgrade.
@@ -26,14 +32,14 @@ public class UpgradeUtils {
   }
 
   public BigInteger throwVinegarCost(Integer ladderNum) {
-    return FairController.BASE_VINEGAR_NEEDED_TO_THROW.multiply(BigInteger.valueOf(ladderNum));
+    return config.getBaseVinegarToThrow().multiply(BigInteger.valueOf(ladderNum));
   }
 
   public BigInteger buyAutoPromoteCost(Integer rank, Integer ladderNum) {
-    Integer minPeople = Math.max(FairController.MINIMUM_PEOPLE_FOR_PROMOTE, ladderNum);
+    Integer minPeople = Math.max(config.getBasePeopleToPromote(), ladderNum);
     Integer divisor = Math.max(rank - minPeople + 1, 1);
 
-    BigDecimal decGrapes = new BigDecimal(FairController.BASE_GRAPES_NEEDED_TO_AUTO_PROMOTE);
+    BigDecimal decGrapes = new BigDecimal(config.getBaseGrapesToBuyAutoPromote());
     return decGrapes.divide(BigDecimal.valueOf(divisor), RoundingMode.FLOOR).toBigInteger();
   }
 }

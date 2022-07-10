@@ -48,9 +48,6 @@ public class AccountEntity {
   private List<RankerEntity> rankers = new ArrayList<>();
   @NonNull
   @Column(nullable = false)
-  private Boolean isAsshole = false;
-  @NonNull
-  @Column(nullable = false)
   private Integer assholeCount = 0;
   @Column
   private Integer lastIp;

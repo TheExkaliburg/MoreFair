@@ -39,10 +39,11 @@ export default {
   },
   actions: {
     async calculate({ state, rootState, commit }) {
-      let pointsNeededForManualPromote = calculatePointsNeededForPromote(
-        rootState.settings,
-        rootState.ladder
-      );
+      let pointsNeededForManualPromote =
+        ladderUtils.calculatePointsNeededForPromote(
+          rootState.settings,
+          rootState.ladder
+        );
 
       let growingRankerCount = rootState.ladder.rankers.filter(
         (ranker) => ranker.growing
@@ -74,47 +75,3 @@ export default {
   getters: {},
   modules: {},
 };
-
-function calculatePointsNeededForPromote(settings, ladder) {
-  // If not enough Players -> Infinity
-  if (ladder.rankers.length <= 1) {
-    return new Decimal(Infinity);
-  }
-
-  // If not enough points -> minimum required Points
-  if (
-    ladder.rankers[0].points.cmp(
-      ladderUtils.getMinimumPointsForPromote(settings, ladder)
-    ) < 0
-  ) {
-    return settings.pointsForPromote.mul(ladder.number);
-  }
-
-  // If before autopromote unlocks -> 1st place
-  if (ladder.number < settings.autoPromoteLadder) {
-    return ladder.rankers[0].you
-      ? ladder.rankers[1].points.add(1)
-      : ladder.rankers[0].points.add(1);
-  }
-
-  let leadingRanker = ladder.rankers[0].you
-    ? ladder.yourRanker
-    : ladder.rankers[0];
-  let pursuingRanker = ladder.rankers[0].you
-    ? ladder.rankers[1]
-    : ladder.yourRanker;
-
-  // How many more points does the ranker gain against his pursuer, every Second
-  let powerDiff = (
-    leadingRanker.growing ? leadingRanker.power : new Decimal(0)
-  ).sub(pursuingRanker.growing ? pursuingRanker.power : 0);
-  // Calculate the needed Point difference, to have f.e. 30seconds of point generation with the difference in power
-  let neededPointDiff = powerDiff.mul(settings.manualPromoteWaitTime).abs();
-
-  return Decimal.max(
-    (leadingRanker.you ? pursuingRanker : leadingRanker).points.add(
-      neededPointDiff
-    ),
-    ladderUtils.getMinimumPointsForPromote(settings, ladder)
-  );
-}

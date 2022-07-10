@@ -1,5 +1,6 @@
 package de.kaliburg.morefair.dto;
 
+import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.game.round.RankerEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,8 +13,8 @@ public class RankerPrivateDto extends RankerDto {
   private String vinegar;
   private boolean autoPromote = false;
 
-  public RankerPrivateDto(RankerEntity ranker) {
-    super(ranker);
+  public RankerPrivateDto(RankerEntity ranker, FairConfig config) {
+    super(ranker, config);
     this.grapes = ranker.getGrapes().toString();
     this.vinegar = ranker.getVinegar().toString();
     this.autoPromote = ranker.isAutoPromote();

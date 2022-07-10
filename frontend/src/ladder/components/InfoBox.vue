@@ -73,12 +73,7 @@
             </button>
             <button
               v-else-if="ladder.number === settings.assholeLadder"
-              :class="[
-                !promoteLastSecond &&
-                yourRanker.points.cmp(stats.pointsNeededForManualPromote) >= 0
-                  ? ''
-                  : 'disabled',
-              ]"
+              :class="[store.getters['ladder/canPromote'] ? '' : 'disabled']"
               class="btn btn-outline-primary shadow-none w-100"
               @click="promote"
             >
@@ -104,12 +99,7 @@
                 yourRanker.rank === 1 &&
                 ladder.number !== settings.assholeLadder
               "
-              :class="[
-                !promoteLastSecond &&
-                yourRanker.points.cmp(stats.pointsNeededForManualPromote) >= 0
-                  ? ''
-                  : 'disabled',
-              ]"
+              :class="[store.getters['ladder/canPromote'] ? '' : 'disabled']"
               class="btn btn-outline-primary shadow-none w-100"
               @click="promote"
             >

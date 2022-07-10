@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
 @SpringBootApplication
-@ConfigurationPropertiesScan("de.kaliburg.morefair.game")
+@ConfigurationPropertiesScan
 public class MoreFairApplication {
 
   public static void main(String[] args) {

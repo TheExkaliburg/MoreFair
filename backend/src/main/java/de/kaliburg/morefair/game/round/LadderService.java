@@ -1,9 +1,9 @@
 package de.kaliburg.morefair.game.round;
 
+import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.account.AccountServiceEvent;
-import de.kaliburg.morefair.api.FairController;
 import de.kaliburg.morefair.api.GameController;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.events.Event;
@@ -12,6 +12,7 @@ import de.kaliburg.morefair.events.data.VinegarData;
 import de.kaliburg.morefair.events.types.EventType;
 import de.kaliburg.morefair.game.GameResetEvent;
 import de.kaliburg.morefair.game.UpgradeUtils;
+import de.kaliburg.morefair.game.chat.ChatEntity;
 import de.kaliburg.morefair.game.chat.ChatService;
 import de.kaliburg.morefair.game.chat.MessageService;
 import java.math.BigInteger;
@@ -60,6 +61,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   @Getter(AccessLevel.PACKAGE)
   private final Map<Integer, List<Event>> eventMap = new HashMap<>();
   private final WsUtils wsUtils;
+  private final FairConfig fairConfig;
   @Getter(AccessLevel.PACKAGE)
   @Setter(AccessLevel.PACKAGE)
   private RoundEntity currentRound;
@@ -69,7 +71,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   public LadderService(RankerService rankerService, LadderRepository ladderRepository,
       LadderUtils ladderUtils, AccountService accountService, RoundUtils roundUtils,
       ChatService chatService, UpgradeUtils upgradeUtils, ApplicationEventPublisher eventPublisher,
-      @Lazy WsUtils wsUtils) {
+      @Lazy WsUtils wsUtils, FairConfig fairConfig) {
     this.rankerService = rankerService;
     this.ladderRepository = ladderRepository;
     this.ladderUtils = ladderUtils;
@@ -79,6 +81,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
     this.upgradeUtils = upgradeUtils;
     this.eventPublisher = eventPublisher;
     this.wsUtils = wsUtils;
+    this.fairConfig = fairConfig;
   }
 
   @Transactional
@@ -132,9 +135,11 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
    */
   public void loadIntoCache(RoundEntity round) {
     currentRound = round;
-    currentLadderMap = new HashMap<>();
     List<LadderEntity> ladders = ladderRepository.findByRoundOrderByNumberAsc(round);
-
+    if (ladders.isEmpty()) {
+      ladders.add(createLadder(round, 1));
+    }
+    currentLadderMap = new HashMap<>();
     ladders.forEach(ladder -> {
       currentLadderMap.put(ladder.getNumber(), ladder);
       eventMap.put(ladder.getNumber(), new ArrayList<>());
@@ -304,9 +309,8 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
     ladder.getRankers().add(result);
 
     Event joinEvent = new Event(EventType.JOIN, account.getId());
-    joinEvent.setData(new JoinData(account.getUsername(),
-        FairController.ASSHOLE_TAGS.get(Math.min(account.getAssholeCount(),
-            FairController.ASSHOLE_TAGS.size() - 1))));
+    joinEvent.setData(
+        new JoinData(account.getUsername(), fairConfig.getAssholeTag(account.getAssholeCount())));
     wsUtils.convertAndSendToTopic(GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
         ladder.getNumber().toString()), joinEvent);
 
@@ -432,20 +436,21 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
           newRanker.setAutoPromote(true);
         }
 
+        // Create new Chat if it doesn't exist
+        ChatEntity newChat = chatService.create(ladder.getNumber() + 1);
+
         wsUtils.convertAndSendToTopic(GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
             ladder.getNumber().toString()), event);
         account = accountService.save(accountService.find(account));
 
         // Logic for the Asshole-Ladder
-        if (ladder.getNumber() >= roundUtils.getAssholeLadderNumber(currentRound)) {
+        if (ladder.getNumber() >= currentRound.getAssholeLadderNumber()) {
           chatService.sendGlobalMessage(account,
               account.getUsername() + " was welcomed by Chad. They are number "
                   + newLadder.getRankers().size()
                   + " of the lucky few initiates for the big ritual.");
 
-          // TODO: Make it change based on People and a Random Value
-          int neededAssholesForReset = Math.max(FairController.ASSHOLES_FOR_RESET,
-              (newLadder.getNumber() + 1) >> 1);
+          int neededAssholesForReset = getCurrentRound().getNumberOfAssholes();
           int assholeCount = newLadder.getRankers().size();
 
           // Is it time to reset the game

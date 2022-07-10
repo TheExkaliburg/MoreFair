@@ -1,7 +1,9 @@
 package de.kaliburg.morefair.dto;
 
+import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.game.round.LadderEntity;
+import de.kaliburg.morefair.game.round.LadderType;
 import de.kaliburg.morefair.game.round.RankerEntity;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,13 +14,17 @@ public class LadderDto {
 
   private List<RankerDto> rankers = new ArrayList<>();
   private Integer number;
+  private LadderType type;
+  private String pointRequirement;
 
-  public LadderDto(LadderEntity ladder, AccountEntity account) {
+  public LadderDto(LadderEntity ladder, AccountEntity account, FairConfig config) {
+    pointRequirement = ladder.getPointRequirement().toString();
     number = ladder.getNumber();
+    type = ladder.getType();
     for (RankerEntity ranker : ladder.getRankers()) {
-      RankerDto rankerDto = new RankerDto(ranker);
+      RankerDto rankerDto = new RankerDto(ranker, config);
       if (ranker.getAccount().getUuid().equals(account.getUuid())) {
-        rankerDto = new RankerPrivateDto(ranker);
+        rankerDto = new RankerPrivateDto(ranker, config);
         rankerDto.setYou(true);
       }
       this.rankers.add(rankerDto);

@@ -1,5 +1,6 @@
 package de.kaliburg.morefair.api;
 
+import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.utils.WsUtils;
@@ -19,7 +20,6 @@ import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.game.round.RoundUtils;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -52,10 +52,11 @@ public class GameController {
   private final LadderService ladderService;
   private final GameService gameService;
   private final RoundUtils roundUtils;
+  private final FairConfig config;
 
   public GameController(RankerService rankerService, AccountService accountService,
       WsUtils wsUtils, RoundService roundService, LadderService ladderService,
-      GameService gameService, RoundUtils roundUtils) {
+      GameService gameService, RoundUtils roundUtils, FairConfig config) {
     this.rankerService = rankerService;
     this.accountService = accountService;
     this.wsUtils = wsUtils;
@@ -63,6 +64,7 @@ public class GameController {
     this.ladderService = ladderService;
     this.gameService = gameService;
     this.roundUtils = roundUtils;
+    this.config = config;
   }
 
   @GetMapping(value = "/lastRound", produces = "application/json")
@@ -84,7 +86,7 @@ public class GameController {
   public void initLadder(SimpMessageHeaderAccessor sha, WsMessage wsMessage,
       @DestinationVariable("number") Integer number) {
     try {
-      String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
+      String uuid = wsMessage.getUuid();
       log.debug("/app/game/init/{} from {}", number, uuid);
       AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null || account.isBanned()) {
@@ -103,7 +105,7 @@ public class GameController {
       if (account.isMod()
           || number.equals(roundUtils.getAssholeLadderNumber(roundService.getCurrentRound()))
           || number <= ranker.getLadder().getNumber()) {
-        LadderDto l = new LadderDto(ladderService.find(number), account);
+        LadderDto l = new LadderDto(ladderService.find(number), account, config);
         wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION, l);
       } else {
         wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION,
@@ -124,7 +126,7 @@ public class GameController {
   @MessageMapping(APP_BIAS_DESTINATION)
   public void buyBias(SimpMessageHeaderAccessor sha, WsObservedMessage wsMessage) {
     try {
-      String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
+      String uuid = wsMessage.getUuid();
       AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null || account.isBanned()) {
         return;
@@ -148,7 +150,7 @@ public class GameController {
   @MessageMapping(APP_MULTI_DESTINATION)
   public void buyMulti(SimpMessageHeaderAccessor sha, WsObservedMessage wsMessage) {
     try {
-      String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
+      String uuid = wsMessage.getUuid();
       AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null || account.isBanned()) {
         return;
@@ -172,7 +174,7 @@ public class GameController {
   @MessageMapping(APP_VINEGAR_DESTINATION)
   public void throwVinegar(SimpMessageHeaderAccessor sha, WsObservedMessage wsMessage) {
     try {
-      String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
+      String uuid = wsMessage.getUuid();
       AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null || account.isBanned()) {
         return;
@@ -196,7 +198,7 @@ public class GameController {
   @MessageMapping(APP_PROMOTE_DESTINATION)
   public void promote(SimpMessageHeaderAccessor sha, WsObservedMessage wsMessage) {
     try {
-      String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
+      String uuid = wsMessage.getUuid();
       AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null || account.isBanned()) {
         return;
@@ -220,7 +222,7 @@ public class GameController {
   @MessageMapping(APP_AUTOPROMOTE_DESTINATION)
   public void buyAutoPromote(SimpMessageHeaderAccessor sha, WsObservedMessage wsMessage) {
     try {
-      String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
+      String uuid = wsMessage.getUuid();
       AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null || account.isBanned()) {
         return;
