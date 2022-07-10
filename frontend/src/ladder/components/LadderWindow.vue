@@ -11,8 +11,13 @@
       <span
         >Ladder: {{ store.state.ladder.number }}/{{
           store.state.settings.assholeLadder
-        }}</span
-      >
+        }}
+      </span>
+    </div>
+    <div class="col">
+      Round: [{{ store.state.settings.roundType }}] Ladder: [{{
+        store.state.ladder.type
+      }}]
     </div>
     <PaginationGroup
       :current="ladder.number"

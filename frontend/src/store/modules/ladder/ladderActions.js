@@ -2,12 +2,12 @@ import Decimal from "break_infinity.js";
 import Ranker from "@/ladder/entities/ranker";
 
 export default {
-  async setup({ commit, rootState }, { message }) {
+  async setup({ commit }, { message }) {
     await commit({
       type: "setLadder",
       number: message.content.number,
       rankers: message.content.rankers,
-      settings: rootState.settings,
+      ladderType: message.content.type,
     });
   },
   async handleLadderEvent({ dispatch }, { message, stompClient }) {
@@ -37,10 +37,7 @@ export default {
       });
     }
   },
-  async calculate(
-    { state, rootState, commit, getters, dispatch },
-    { message }
-  ) {
+  async calculate({ state, commit, getters, dispatch }, { message }) {
     const delta = new Decimal(message.delta);
     let rankers = [...state.rankers];
     rankers.sort((a, b) => b.points.sub(a.points));
@@ -108,7 +105,7 @@ export default {
       type: "setLadder",
       rankers: rankers,
       number: state.number,
-      settings: rootState.settings,
+      ladderType: state.type,
     });
     dispatch({
       type: "stats/calculate",

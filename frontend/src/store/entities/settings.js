@@ -5,13 +5,13 @@ class Settings {
     this.pointsForPromote = new Decimal(data.pointsForPromote);
     this.minimumPeopleForPromote = data.minimumPeopleForPromote;
     this.assholeLadder = data.assholeLadder;
-    this.assholeTags = data.assholeTags;
     this.baseVinegarNeededToThrow = new Decimal(data.baseVinegarNeededToThrow);
     this.baseGrapesNeededToAutoPromote = new Decimal(
       data.baseGrapesNeededToAutoPromote
     );
     this.manualPromoteWaitTime = data.manualPromoteWaitTime;
     this.autoPromoteLadder = data.autoPromoteLadder;
+    this.roundType = data.type;
   }
 
   static placeholder() {
@@ -24,6 +24,7 @@ class Settings {
       baseGrapesNeededToAutoPromote: new Decimal(Infinity),
       manualPromoteWaitTime: Infinity,
       autoPromoteLadder: Infinity,
+      type: "DEFAULT",
     });
   }
 }

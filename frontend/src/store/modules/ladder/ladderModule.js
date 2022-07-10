@@ -11,6 +11,7 @@ export default {
       number: 1,
       rankers: [new Ranker()],
       yourRanker: new Ranker(),
+      type: "DEFAULT",
     };
   },
   mutations: ladderMutations,

@@ -18,7 +18,7 @@ public class LadderDto {
   private String pointRequirement;
 
   public LadderDto(LadderEntity ladder, AccountEntity account, FairConfig config) {
-    pointRequirement = ladder.getPointRequirement().toString();
+    pointRequirement = ladder.getBasePointsToPromote().toString();
     number = ladder.getNumber();
     type = ladder.getType();
     for (RankerEntity ranker : ladder.getRankers()) {

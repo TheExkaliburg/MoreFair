@@ -61,7 +61,7 @@ public final class LadderEntity {
   private LadderType type;
   @NonNull
   @Column(nullable = false, precision = 1000)
-  private BigInteger pointRequirement;
+  private BigInteger basePointsToPromote;
 
   public LadderEntity(@NonNull Integer number, @NonNull RoundEntity round) {
     this.number = number;
@@ -71,16 +71,16 @@ public final class LadderEntity {
     // getting the pointRequirement based on the type
     BigInteger base = round.getBasePointsRequirement().multiply(BigInteger.valueOf(number));
     if (type == LadderType.SMALL) {
-      base = base.divide(BigInteger.TWO);
+      base = base.divide(BigInteger.valueOf(5));
     } else if (type == LadderType.BIG) {
-      base = base.multiply(BigInteger.TWO);
+      base = base.multiply(BigInteger.valueOf(5));
     }
     Random random = new Random();
-    double percentage = random.nextDouble(0.75, 1.25);
+    double percentage = random.nextDouble(0.8, 1.2);
 
     BigDecimal baseDec = new BigDecimal(base);
     baseDec = baseDec.multiply(BigDecimal.valueOf(percentage));
-    this.pointRequirement = baseDec.toBigInteger();
+    this.basePointsToPromote = baseDec.toBigInteger();
   }
 
   private LadderType determineLadderType(Integer ladderNumber, RoundEntity round) {

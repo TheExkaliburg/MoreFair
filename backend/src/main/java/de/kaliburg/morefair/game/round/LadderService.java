@@ -450,7 +450,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
                   + newLadder.getRankers().size()
                   + " of the lucky few initiates for the big ritual.");
 
-          int neededAssholesForReset = getCurrentRound().getNumberOfAssholes();
+          int neededAssholesForReset = currentRound.getAssholesForReset();
           int assholeCount = newLadder.getRankers().size();
 
           // Is it time to reset the game
@@ -458,7 +458,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
             for (RankerEntity assholeRanker : newLadder.getRankers()) {
               AccountEntity assholeAccount = accountService.find(assholeRanker.getAccount());
               assholeAccount.setAssholeCount(assholeAccount.getAssholeCount() + 1);
-              assholeAccount = accountService.save(assholeAccount);
+              accountService.save(assholeAccount);
             }
 
             eventPublisher.publishEvent(new GameResetEvent(this));

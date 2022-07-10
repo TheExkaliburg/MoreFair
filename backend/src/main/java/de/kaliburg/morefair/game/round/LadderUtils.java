@@ -33,12 +33,12 @@ public class LadderUtils {
       @NonNull RankerEntity ranker) {
     if (ladder.getRankers().size() <= 1) {
       // Should always be above the points of the ranker
-      return ranker.getPoints().multiply(BigInteger.TWO).max(getBasePointsForPromote(ladder));
+      return ranker.getPoints().multiply(BigInteger.TWO).max(ladder.getBasePointsToPromote());
     }
 
     // If not enough points -> minimum required points
-    if (ladder.getRankers().get(0).getPoints().compareTo(getBasePointsForPromote(ladder)) < 0) {
-      return getBasePointsForPromote(ladder);
+    if (ladder.getRankers().get(0).getPoints().compareTo(ladder.getBasePointsToPromote()) < 0) {
+      return ladder.getBasePointsToPromote();
     }
 
     boolean isRankerEqualsToFirstRanker =
@@ -62,11 +62,7 @@ public class LadderUtils {
         powerDifference.multiply(BigInteger.valueOf(config.getManualPromoteWaitTime())).abs();
 
     return (leadingRanker.getUuid().equals(ranker.getUuid()) ? pursuingRanker : leadingRanker)
-        .getPoints().add(neededPointDifference).max(getBasePointsForPromote(ladder));
-  }
-
-  public BigInteger getBasePointsForPromote(@NonNull LadderEntity ladder) {
-    return config.getBasePointsToPromote().multiply(BigInteger.valueOf(ladder.getNumber()));
+        .getPoints().add(neededPointDifference).max(ladder.getBasePointsToPromote());
   }
 
   public Integer getRequiredRankerCountToUnlock(LadderEntity ladder) {
@@ -107,7 +103,7 @@ public class LadderUtils {
 
   public boolean isLadderPromotable(@NonNull LadderEntity ladder) {
     return isLadderUnlocked(ladder)
-        && ladder.getRankers().get(0).getPoints().compareTo(getBasePointsForPromote(ladder)) >= 0;
+        && ladder.getRankers().get(0).getPoints().compareTo(ladder.getBasePointsToPromote()) >= 0;
   }
 
   /**

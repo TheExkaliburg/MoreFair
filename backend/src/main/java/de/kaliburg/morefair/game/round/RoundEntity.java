@@ -1,6 +1,7 @@
 package de.kaliburg.morefair.game.round;
 
 import de.kaliburg.morefair.FairConfig;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
@@ -65,14 +66,19 @@ public class RoundEntity {
   private BigInteger basePointsRequirement;
   @NonNull
   @Column(nullable = false)
-  private Double percentageOfAdditionalAssholes;
+  private Float percentageOfAdditionalAssholes;
 
   public RoundEntity(@NonNull Integer number, FairConfig config) {
     this.number = number;
     this.type = determineRoundType();
     this.baseAssholeLadder = config.getBaseAssholeLadder();
-    this.basePointsRequirement = config.getBasePointsToPromote();
-    this.percentageOfAdditionalAssholes = random.nextDouble(100);
+
+    double percentage = random.nextDouble(0.5, 1.5);
+
+    BigDecimal baseDec = new BigDecimal(config.getBasePointsToPromote());
+    baseDec = baseDec.multiply(BigDecimal.valueOf(percentage));
+    this.basePointsRequirement = baseDec.toBigInteger();
+    this.percentageOfAdditionalAssholes = random.nextFloat(100);
   }
 
   private RoundType determineRoundType() {
@@ -91,7 +97,10 @@ public class RoundEntity {
     return baseAssholeLadder + highestAssholeCount;
   }
 
-  public Integer getNumberOfAssholes() {
-    return (getAssholeLadderNumber() + 1) / 2;
+  public Integer getAssholesForReset() {
+    int max = getAssholeLadderNumber();
+    int min = getBaseAssholeLadder() / 2;
+
+    return min + Math.round((max - min) * getPercentageOfAdditionalAssholes());
   }
 }

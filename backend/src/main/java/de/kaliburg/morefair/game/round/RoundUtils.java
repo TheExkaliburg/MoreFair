@@ -15,6 +15,13 @@ public class RoundUtils {
   }
 
   public Integer getAssholeLadderNumber(RoundEntity currentRound) {
-    return config.getBaseAssholeLadder() + currentRound.getHighestAssholeCount();
+    return currentRound.getAssholeLadderNumber();
+  }
+
+  public Integer getAssholesNeededForReset(RoundEntity currentRound) {
+    int max = currentRound.getAssholeLadderNumber();
+    int min = currentRound.getBaseAssholeLadder() / 2;
+
+    return min + Math.round((max - min) * currentRound.getPercentageOfAdditionalAssholes());
   }
 }

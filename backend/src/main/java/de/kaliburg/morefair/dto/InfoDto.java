@@ -15,7 +15,7 @@ public class InfoDto {
   private String baseGrapesNeededToAutoPromote;
   private Integer autoPromoteLadder;
   private Integer manualPromoteWaitTime;
-  private RoundType roundType;
+  private RoundType type;
 
   public InfoDto(RoundEntity currentRound, FairConfig config) {
     pointsForPromote = config.getBasePointsToPromote().toString();
@@ -25,6 +25,6 @@ public class InfoDto {
     manualPromoteWaitTime = config.getManualPromoteWaitTime();
     baseGrapesNeededToAutoPromote = config.getBaseGrapesToBuyAutoPromote().toString();
     assholeLadder = currentRound.getAssholeLadderNumber();
-    roundType = currentRound.getType();
+    type = currentRound.getType();
   }
 }
