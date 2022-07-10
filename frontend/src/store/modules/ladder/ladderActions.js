@@ -166,6 +166,13 @@ export default {
         );
         break;
       case "RESET":
+        setTimeout(
+          () =>
+            alert(
+              "Chad was successful in turning back the time, the only thing left from this future is a mark on the initiates that helped in the final ritual."
+            ),
+          0
+        );
         await stompClient.reconnect();
         break;
     }

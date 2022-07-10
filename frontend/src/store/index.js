@@ -187,7 +187,7 @@ let store = createStore({
         API.GAME.TOPIC_EVENTS_DESTINATION(newHighestLadder),
         (message) => {
           dispatch({
-            type: "ladder/update",
+            type: "ladder/handleLadderEvent",
             message: message,
             stompClient: stompClient,
           });

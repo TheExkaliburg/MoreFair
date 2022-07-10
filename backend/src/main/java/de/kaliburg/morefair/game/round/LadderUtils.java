@@ -98,7 +98,7 @@ public class LadderUtils {
   }
 
   public boolean isLadderUnlocked(@NonNull LadderEntity ladder) {
-    return ladder.getRankers().size() > getRequiredRankerCountToUnlock(ladder);
+    return ladder.getRankers().size() >= getRequiredRankerCountToUnlock(ladder);
   }
 
   public boolean isLadderPromotable(@NonNull LadderEntity ladder) {

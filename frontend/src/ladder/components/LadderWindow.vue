@@ -285,7 +285,7 @@ function changeLadder(event) {
       API.GAME.TOPIC_EVENTS_DESTINATION(targetLadder),
       (message) => {
         store.dispatch({
-          type: "ladder/update",
+          type: "ladder/handleLadderEvent",
           message: message,
         });
       }

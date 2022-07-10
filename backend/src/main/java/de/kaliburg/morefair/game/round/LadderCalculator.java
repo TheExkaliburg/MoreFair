@@ -146,7 +146,7 @@ public class LadderCalculator {
     }
   }
 
-  private void calculateLadder(LadderEntity ladder, double deltaSec) {
+  private void calculateLadder(LadderEntity ladder, double delta) {
     List<RankerEntity> rankers = ladder.getRankers();
     rankers.sort(Comparator.comparing(RankerEntity::getPoints).reversed());
 
@@ -158,16 +158,16 @@ public class LadderCalculator {
         // Calculating points & Power
         if (currentRanker.getRank() != 1) {
           currentRanker.addPower(
-              (i + currentRanker.getBias()) * currentRanker.getMultiplier(), deltaSec);
+              (i + currentRanker.getBias()) * currentRanker.getMultiplier(), delta);
         }
-        currentRanker.addPoints(currentRanker.getPower(), deltaSec);
+        currentRanker.addPoints(currentRanker.getPower(), delta);
 
         // Calculating Vinegar based on Grapes count
         if (currentRanker.getRank() != 1) {
-          currentRanker.addVinegar(currentRanker.getGrapes(), deltaSec);
+          currentRanker.addVinegar(currentRanker.getGrapes(), delta);
         }
         if (currentRanker.getRank() == 1 && ladderUtils.isLadderPromotable(ladder)) {
-          currentRanker.mulVinegar(0.9975, deltaSec);
+          currentRanker.mulVinegar(0.9975, delta);
         }
 
         for (int j = i - 1; j >= 0; j--) {
@@ -196,12 +196,11 @@ public class LadderCalculator {
     // Ranker on Last Place gains 1 Grape, only if he isn't in the top group
     if (rankers.size() >= ladder.getRequiredRankerCountToUnlock()) {
       RankerEntity lastRanker = rankers.get(rankers.size() - 1);
-      lastRanker.addGrapes(BigInteger.valueOf(3), deltaSec);
+      lastRanker.addGrapes(BigInteger.valueOf(3), delta);
     }
 
     if (rankers.size() >= 1 && rankers.get(0).isAutoPromote() && rankers.get(0).isGrowing()
-        && rankers.get(0).getPoints().compareTo(ladder.getRequiredPointsToUnlock()) >= 0
-        && rankers.size() >= ladder.getRequiredRankerCountToUnlock()) {
+        && ladderUtils.isLadderPromotable(ladder)) {
       log.info("[L{}] Trying to auto-promote {} (#{})", ladder.getNumber(),
           rankers.get(0).getAccount().getUsername(), rankers.get(0).getAccount().getId());
       ladderService.addEvent(ladder.getNumber(),

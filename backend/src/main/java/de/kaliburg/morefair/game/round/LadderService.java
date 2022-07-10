@@ -84,15 +84,11 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   @Transactional
   public void saveStateToDatabase() {
     try {
-      ladderSemaphore.acquire();
-      try {
-        for (LadderEntity ladder : currentLadderMap.values()) {
-          rankerService.save(ladder.getRankers());
-        }
-        ladderRepository.saveAll(currentLadderMap.values());
-      } finally {
-        ladderSemaphore.release();
+      for (LadderEntity ladder : currentLadderMap.values()) {
+        rankerService.save(ladder.getRankers());
       }
+      ladderRepository.saveAll(currentLadderMap.values());
+
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
@@ -308,7 +304,9 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
     ladder.getRankers().add(result);
 
     Event joinEvent = new Event(EventType.JOIN, account.getId());
-    joinEvent.setData(new JoinData(account.getUsername(), account.getAssholeCount()));
+    joinEvent.setData(new JoinData(account.getUsername(),
+        FairController.ASSHOLE_TAGS.get(Math.min(account.getAssholeCount(),
+            FairController.ASSHOLE_TAGS.size() - 1))));
     wsUtils.convertAndSendToTopic(GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
         ladder.getNumber().toString()), joinEvent);
 
@@ -320,7 +318,6 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         .filter(r -> r.getAccount().getId().equals(accountId) && r.isGrowing()).findFirst()
         .orElse(null);
   }
-
 
   public LadderEntity getHighestLadder() {
     return currentLadderMap.values().stream().max(Comparator.comparing(LadderEntity::getNumber))
@@ -440,7 +437,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         account = accountService.save(accountService.find(account));
 
         // Logic for the Asshole-Ladder
-        if (newLadder.getNumber() > roundUtils.getAssholeLadderNumber(currentRound)) {
+        if (ladder.getNumber() >= roundUtils.getAssholeLadderNumber(currentRound)) {
           chatService.sendGlobalMessage(account,
               account.getUsername() + " was welcomed by Chad. They are number "
                   + newLadder.getRankers().size()
@@ -473,7 +470,6 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
     return false;
   }
-
 
   /**
    * Throw vinegar as the active ranker of an account on a specific ladder.
@@ -513,7 +509,8 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
           data.setSuccess(true);
 
           if (!buyMulti(new Event(EventType.BUY_MULTI, targetAccount.getId()), ladder)) {
-            softResetPoints(new Event(EventType.SOFT_RESET_POINTS, targetAccount.getId()), ladder);
+            softResetPoints(new Event(EventType.SOFT_RESET_POINTS, targetAccount.getId()),
+                ladder);
           }
         }
 
@@ -556,10 +553,9 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
     return false;
   }
 
-
   @Override
   public void onApplicationEvent(AccountServiceEvent event) {
-    for (RankerEntity currentRanker : event.getAccount().getCurrentRankers()) {
+    for (RankerEntity currentRanker : event.getAccount().getCurrentRankers(currentRound)) {
       LadderEntity ladder = find(currentRanker.getLadder());
       for (RankerEntity ranker : ladder.getRankers()) {
         if (ranker.getAccount().getUuid().equals(event.getAccount().getUuid())) {

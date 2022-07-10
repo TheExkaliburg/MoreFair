@@ -42,7 +42,7 @@ public class RoundEntity {
   @NonNull
   @Column(nullable = false)
   private Integer number;
-  @OneToMany(mappedBy = "round", fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "round", fetch = FetchType.EAGER)
   private Set<LadderEntity> ladders = new HashSet<>();
 
   /* The game doesn't need multiple game instances, so we don't need to differentiate between

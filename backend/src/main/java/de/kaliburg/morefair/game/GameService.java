@@ -10,6 +10,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -88,8 +89,7 @@ public class GameService implements ApplicationListener<GameResetEvent> {
 
 
   @Override
-  public void onApplicationEvent(GameResetEvent event) {
-    saveStateToDatabase();
+  public void onApplicationEvent(@NonNull GameResetEvent event) {
     RoundEntity newRound = roundService.create(game.getCurrentRound().getNumber() + 1);
     game.setCurrentRound(newRound);
     saveStateToDatabase();

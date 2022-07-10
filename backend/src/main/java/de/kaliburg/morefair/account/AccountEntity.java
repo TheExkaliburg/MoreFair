@@ -1,11 +1,10 @@
 package de.kaliburg.morefair.account;
 
 import de.kaliburg.morefair.game.round.RankerEntity;
+import de.kaliburg.morefair.game.round.RoundEntity;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.Column;
@@ -83,28 +82,21 @@ public class AccountEntity {
     return rankers.stream().filter(RankerEntity::isGrowing).collect(Collectors.toList());
   }
 
-  public List<RankerEntity> getCurrentRankers() {
-    Entry<Integer, List<RankerEntity>> integerListEntry = rankers.stream()
-        .collect(Collectors.groupingBy(r -> r.getLadder().getRound().getNumber(),
-            TreeMap::new, Collectors.toList())).lastEntry();
-    if (integerListEntry == null) {
-      return new ArrayList<>();
-    }
-    return integerListEntry.getValue();
+  public List<RankerEntity> getCurrentRankers(RoundEntity currentRound) {
+    return rankers.stream()
+        .filter(r -> r.getLadder().getRound().getUuid().equals(currentRound.getUuid()))
+        .collect(Collectors.toList());
   }
 
-  public List<RankerEntity> getCurrentActiveRankers() {
-    Entry<Integer, List<RankerEntity>> integerListEntry = rankers.stream()
-        .filter(RankerEntity::isGrowing)
-        .collect(Collectors.groupingBy(r -> r.getLadder().getRound().getNumber(),
-            TreeMap::new, Collectors.toList())).lastEntry();
-    if (integerListEntry == null) {
-      return new ArrayList<>();
-    }
-    return integerListEntry.getValue();
+  public List<RankerEntity> getCurrentActiveRankers(RoundEntity currentRound) {
+    return rankers.stream()
+        .filter(
+            r -> r.isGrowing() && r.getLadder().getRound().getUuid().equals(currentRound.getUuid()))
+        .collect(Collectors.toList());
   }
 
-  public Integer getHighestCurrentLadder() {
-    return getCurrentRankers().stream().mapToInt(r -> r.getLadder().getNumber()).max().orElse(1);
+  public Integer getHighestCurrentLadder(RoundEntity currentRound) {
+    return getCurrentRankers(currentRound).stream().mapToInt(r -> r.getLadder().getNumber()).max()
+        .orElse(1);
   }
 }

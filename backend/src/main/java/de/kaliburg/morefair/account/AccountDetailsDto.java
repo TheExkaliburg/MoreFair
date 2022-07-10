@@ -1,7 +1,6 @@
-package de.kaliburg.morefair.dto;
+package de.kaliburg.morefair.account;
 
-import de.kaliburg.morefair.account.AccountAccessRole;
-import de.kaliburg.morefair.account.AccountEntity;
+import de.kaliburg.morefair.game.round.RoundEntity;
 import java.util.UUID;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,10 +14,10 @@ public class AccountDetailsDto {
   private Integer highestCurrentLadder;
   private AccountAccessRole accessRole;
 
-  public AccountDetailsDto(AccountEntity account) {
+  public AccountDetailsDto(AccountEntity account, RoundEntity currentRound) {
     this.uuid = account.getUuid();
     this.accountId = account.getId();
-    this.highestCurrentLadder = account.getHighestCurrentLadder();
+    this.highestCurrentLadder = account.getHighestCurrentLadder(currentRound);
     this.accessRole = account.getAccessRole();
   }
 }

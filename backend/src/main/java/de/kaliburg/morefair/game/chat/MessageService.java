@@ -37,7 +37,7 @@ public class MessageService {
    */
   public MessageEntity create(AccountEntity account, ChatEntity chat, String message,
       String metadata) {
-    if (metadata.isBlank()) {
+    if (metadata == null || metadata.isBlank()) {
       return create(account, chat, message);
     }
 

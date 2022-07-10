@@ -12,6 +12,7 @@ import de.kaliburg.morefair.game.chat.MessageDto;
 import de.kaliburg.morefair.game.chat.MessageEntity;
 import de.kaliburg.morefair.game.round.RankerEntity;
 import de.kaliburg.morefair.game.round.RankerService;
+import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
@@ -63,7 +64,10 @@ public class ChatController {
         return;
       }
 
-      RankerEntity ranker = rankerService.findHighestActiveRankerOfAccount(account);
+      RoundEntity currentRound = roundService.getCurrentRound();
+
+      RankerEntity ranker = rankerService.findHighestActiveRankerOfAccountAndRound(account,
+          currentRound);
       if (ranker == null) {
         ranker = roundService.createNewRanker(account);
       }
@@ -100,7 +104,9 @@ public class ChatController {
       if (account == null || account.isMuted()) {
         return;
       }
-      RankerEntity ranker = rankerService.findHighestActiveRankerOfAccount(account);
+      RoundEntity currentRound = roundService.getCurrentRound();
+      RankerEntity ranker = rankerService.findHighestActiveRankerOfAccountAndRound(account,
+          currentRound);
       if (account.isMod() || (number <= ranker.getLadder().getNumber() && throttler.canPostMessage(
           account))) {
         MessageEntity answer = chatService.sendMessageToChat(account, number, message, metadata);

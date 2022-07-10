@@ -22,9 +22,10 @@ public class RankerService {
     this.accountService = accountService;
   }
 
-  public RankerEntity findHighestActiveRankerOfAccount(AccountEntity account) {
-    return rankerRepository.findFirstByAccountAndGrowingIsTrueOrderByLadder_Round_NumberDescLadder_NumberDesc(
-        account).orElse(null);
+  public RankerEntity findHighestActiveRankerOfAccountAndRound(AccountEntity account,
+      RoundEntity currentRound) {
+    return rankerRepository.findFirstByAccountAndLadder_RoundAndGrowingIsTrueOrderByLadder_NumberDesc(
+        account, currentRound).orElse(null);
   }
 
   public RankerEntity create(AccountEntity account, LadderEntity ladder, Integer rank) {

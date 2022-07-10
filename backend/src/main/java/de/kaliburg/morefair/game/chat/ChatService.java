@@ -132,14 +132,27 @@ public class ChatService {
   /**
    * Sends a message (and the metadata) from a user to all chats.
    *
+   * @param account  the account of the user
+   * @param message  the message
+   * @param metadata the metadata of the message
+   * @return the list of all the messages, sent to different chats
+   */
+  public List<MessageEntity> sendGlobalMessage(AccountEntity account, String message,
+      String metadata) {
+    return currentChatMap.values().stream()
+        .map(chat -> sendMessageToChat(account, chat.getNumber(), message, metadata))
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Sends a message (and the metadata) from a user to all chats.
+   *
    * @param account the account of the user
    * @param message the message
    * @return the list of all the messages, sent to different chats
    */
   public List<MessageEntity> sendGlobalMessage(AccountEntity account, String message) {
-    return currentChatMap.values().stream()
-        .map(chat -> sendMessageToChat(account, chat.getNumber(), message))
-        .collect(Collectors.toList());
+    return sendGlobalMessage(account, message, null);
   }
 
 

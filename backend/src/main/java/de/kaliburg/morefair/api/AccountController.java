@@ -1,15 +1,16 @@
 package de.kaliburg.morefair.api;
 
 import de.kaliburg.morefair.account.AccountAccessRole;
+import de.kaliburg.morefair.account.AccountDetailsDto;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.utils.RequestThrottler;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.UserPrincipal;
 import de.kaliburg.morefair.api.websockets.messages.WsMessage;
-import de.kaliburg.morefair.dto.AccountDetailsDto;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.EventType;
+import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
@@ -55,11 +56,14 @@ public class AccountController {
 
       log.trace("/app/{} {}", QUEUE_LOGIN_DESTINATION, uuid);
 
+      RoundEntity currentRound = roundService.getCurrentRound();
+
       // Empty UUID
       if (uuid == null || uuid.isBlank()) {
         if (requestThrottler.canCreateAccount(principal)) {
           wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION,
-              new AccountDetailsDto(accountService.create(principal)), HttpStatus.CREATED);
+              new AccountDetailsDto(accountService.create(principal), currentRound),
+              HttpStatus.CREATED);
         } else {
           wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
         }
@@ -71,7 +75,7 @@ public class AccountController {
       if (account == null) {
         if (requestThrottler.canCreateAccount(principal)) {
           wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION,
-              new AccountDetailsDto(accountService.create(principal)),
+              new AccountDetailsDto(accountService.create(principal), currentRound),
               HttpStatus.CREATED);
         } else {
           wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
@@ -85,7 +89,8 @@ public class AccountController {
       }
 
       account = accountService.login(account, principal);
-      wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, new AccountDetailsDto(account));
+      wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, new AccountDetailsDto(account,
+          currentRound));
 
 
     } catch (IllegalArgumentException e) {

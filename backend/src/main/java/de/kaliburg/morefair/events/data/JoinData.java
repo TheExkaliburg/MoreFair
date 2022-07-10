@@ -9,5 +9,5 @@ public class JoinData {
   @NonNull
   private String username;
   @NonNull
-  private Integer timesAsshole;
+  private String tag;
 }
