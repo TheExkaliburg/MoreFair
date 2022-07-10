@@ -164,9 +164,11 @@ let store = createStore({
       stompClient.send(API.CHAT.APP_INIT_DESTINATION(highestLadderReached));
     },
     incrementHighestLadder({ state, commit, dispatch }, { stompClient }) {
-      stompClient.unsubscribe("/topic/ladder/" + state.ladder.number);
       stompClient.unsubscribe(
-        "/topic/chat/" + state.chat.chat.currentChatNumber
+        API.GAME.TOPIC_EVENTS_DESTINATION(state.ladder.number)
+      );
+      stompClient.unsubscribe(
+        API.CHAT.TOPIC_EVENTS_DESTINATION(state.chat.chat.currentChatNumber)
       );
 
       //now doing a jingle for boozle <3
@@ -179,8 +181,10 @@ let store = createStore({
         payload: state.user.highestCurrentLadder + 1,
       });
 
+      let newHighestLadder = state.user.highestCurrentLadder;
+
       stompClient.subscribe(
-        "/topic/ladder/" + state.user.highestCurrentLadder,
+        API.GAME.TOPIC_EVENTS_DESTINATION(newHighestLadder),
         (message) => {
           dispatch({
             type: "ladder/update",
@@ -190,13 +194,13 @@ let store = createStore({
         }
       );
       stompClient.subscribe(
-        "/topic/chat/" + state.user.highestCurrentLadder,
+        API.CHAT.TOPIC_EVENTS_DESTINATION(newHighestLadder),
         (message) => {
           commit({ type: "chat/addMessage", message: message });
         }
       );
-      stompClient.send("/app/ladder/init/" + state.user.highestCurrentLadder);
-      stompClient.send("/app/chat/init/" + state.user.highestCurrentLadder);
+      stompClient.send(API.GAME.APP_INIT_DESTINATION(newHighestLadder));
+      stompClient.send(API.CHAT.APP_INIT_DESTINATION(newHighestLadder));
     },
   },
   modules: {

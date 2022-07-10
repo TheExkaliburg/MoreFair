@@ -69,7 +69,7 @@ public class ChatController {
       }
 
       if (account.isMod() || number <= ranker.getLadder().getNumber()) {
-        ChatDto c = new ChatDto(chatService.getChat(number));
+        ChatDto c = new ChatDto(chatService.find(number));
         wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION, c);
       } else {
         wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION, HttpStatus.FORBIDDEN);

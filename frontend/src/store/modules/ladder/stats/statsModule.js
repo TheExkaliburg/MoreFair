@@ -77,14 +77,9 @@ export default {
 
 function calculatePointsNeededForPromote(settings, ladder) {
   // If not enough Players -> Infinity
-  /*
-  if (
-    ladder.rankers.length <
-    Math.max(settings.minimumPeopleForPromote, ladder.number)
-  ) {
-    this.pointsNeededForManualPromote = new Decimal(Infinity);
-    return;
-  }*/
+  if (ladder.rankers.length <= 1) {
+    return new Decimal(Infinity);
+  }
 
   // If not enough points -> minimum required Points
   if (

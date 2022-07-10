@@ -61,7 +61,7 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
     topicDestination = StringEscapeUtils.escapeJava(topicDestination);
     uuid = StringEscapeUtils.escapeJava(uuid);
 
-    log.debug("Validate subscription for {} to {}", uuid, topicDestination);
+    log.trace("Validate subscription for {} to {}", uuid, topicDestination);
 
     // Give free pass for all moderators and above
     if (topicDestination.contains("/topic/")) {

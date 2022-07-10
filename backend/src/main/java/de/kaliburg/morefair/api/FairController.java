@@ -88,7 +88,7 @@ public class FairController {
   public void login(SimpMessageHeaderAccessor sha, WsMessage wsMessage) throws Exception {
     try {
       String uuid = StringEscapeUtils.escapeJava(wsMessage.getUuid());
-      log.debug("/app/info {}", uuid);
+      log.trace("/app/info {}", uuid);
 
       Integer maxTimesAssholes = roundService.getCurrentRound().getHighestAssholeCount();
       InfoDto info = new InfoDto(maxTimesAssholes);

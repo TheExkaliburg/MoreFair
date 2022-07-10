@@ -114,6 +114,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
     result = ladderRepository.save(result);
     if (currentRound != null && currentRound.getUuid().equals(round.getUuid())) {
       currentLadderMap.put(ladderNumber, result);
+      eventMap.put(ladderNumber, new ArrayList<>());
     }
     return result;
   }
@@ -176,8 +177,8 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
     return currentLadderMap.values().stream()
         .filter(ladder -> ladder.getUuid().equals(uuid)).findFirst()
         .orElseGet(() -> {
-          LadderEntity result = ladderRepository.findByUuid(uuid).orElseThrow();
-          if (result.getRound().getUuid().equals(currentRound.getUuid())) {
+          LadderEntity result = ladderRepository.findByUuid(uuid).orElse(null);
+          if (result != null && result.getRound().getUuid().equals(currentRound.getUuid())) {
             currentLadderMap.put(result.getNumber(), result);
           }
           return result;
@@ -196,8 +197,8 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
     return currentLadderMap.values().stream()
         .filter(ladder -> ladder.getId().equals(id)).findFirst()
         .orElseGet(() -> {
-          LadderEntity result = ladderRepository.findById(id).orElseThrow();
-          if (result.getRound().getUuid().equals(currentRound.getUuid())) {
+          LadderEntity result = ladderRepository.findById(id).orElse(null);
+          if (result != null && result.getRound().getUuid().equals(currentRound.getUuid())) {
             currentLadderMap.put(result.getNumber(), result);
           }
           return result;
@@ -218,8 +219,8 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         .filter(ladder -> ladder.getRound().equals(round) && ladder.getNumber().equals(number))
         .findFirst()
         .orElseGet(() -> {
-          LadderEntity result = ladderRepository.findByRoundAndNumber(round, number).orElseThrow();
-          if (result.getRound().getUuid().equals(currentRound.getUuid())) {
+          LadderEntity result = ladderRepository.findByRoundAndNumber(round, number).orElse(null);
+          if (result != null && result.getRound().getUuid().equals(currentRound.getUuid())) {
             currentLadderMap.put(result.getNumber(), result);
           }
           return result;
@@ -317,7 +318,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   RankerEntity findActiveRankerOfAccountOnLadder(Long accountId, LadderEntity ladder) {
     return find(ladder).getRankers().stream()
         .filter(r -> r.getAccount().getId().equals(accountId) && r.isGrowing()).findFirst()
-        .orElseThrow();
+        .orElse(null);
   }
 
 

@@ -71,7 +71,6 @@ public class ChatService {
   public void loadIntoCache() {
     currentChatMap = new HashMap<>();
     chatRepository.findAll().forEach(chat -> currentChatMap.put(chat.getNumber(), chat));
-    log.info(currentChatMap);
   }
 
   @Transactional
@@ -102,7 +101,7 @@ public class ChatService {
    */
   public MessageEntity sendMessageToChat(AccountEntity account, Integer number,
       String message, String metadata) {
-    ChatEntity cachedChat = getChat(number);
+    ChatEntity cachedChat = find(number);
     MessageEntity result = messageService.create(account, cachedChat, message, metadata);
 
     cachedChat.getMessages().add(0, result);
@@ -151,12 +150,16 @@ public class ChatService {
    * @param number the number the chat has
    * @return the Chat Entity from the cache
    */
-  public ChatEntity getChat(Integer number) {
+  public ChatEntity find(Integer number) {
     if (currentChatMap.isEmpty()) {
       return null;
     }
+    ChatEntity result = currentChatMap.get(number);
+    if (result == null) {
+      result = create(number);
+    }
 
-    return currentChatMap.get(number);
+    return result;
   }
 
 
