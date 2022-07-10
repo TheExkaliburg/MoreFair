@@ -124,7 +124,8 @@ public class AccountController {
       accountService.save(account);
 
       wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION,
-          new Event(EventType.NAME_CHANGE, account.getId(), account.getUsername()));
+          new Event(EventType.NAME_CHANGE, account.getId(),
+              StringEscapeUtils.unescapeJava(account.getUsername())));
 
     } catch (Exception e) {
       log.error(e.getMessage());
