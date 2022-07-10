@@ -15,10 +15,10 @@ public class LadderDto {
   private List<RankerDto> rankers = new ArrayList<>();
   private Integer number;
   private LadderType type;
-  private String pointRequirement;
+  private String basePointToPromote;
 
   public LadderDto(LadderEntity ladder, AccountEntity account, FairConfig config) {
-    pointRequirement = ladder.getBasePointsToPromote().toString();
+    basePointToPromote = ladder.getBasePointsToPromote().toString();
     number = ladder.getNumber();
     type = ladder.getType();
     for (RankerEntity ranker : ladder.getRankers()) {
