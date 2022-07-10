@@ -3,6 +3,7 @@ import ladderActions from "@/store/modules/ladder/ladderActions";
 import statsModule from "@/store/modules/ladder/stats/statsModule";
 import ladderMutations from "@/store/modules/ladder/ladderMutations";
 import ladderGetters from "@/store/modules/ladder/ladderGetters";
+import Decimal from "break_infinity.js";
 
 export default {
   namespaced: true,
@@ -12,6 +13,7 @@ export default {
       rankers: [new Ranker()],
       yourRanker: new Ranker(),
       type: "DEFAULT",
+      basePointsToPromote: new Decimal(Infinity),
     };
   },
   mutations: ladderMutations,

@@ -8,6 +8,7 @@ import lombok.Data;
 @Data
 public class InfoDto {
 
+  private String pointsForPromote;
   private Integer minimumPeopleForPromote;
   private Integer assholeLadder;
   private String baseVinegarNeededToThrow;
@@ -17,6 +18,7 @@ public class InfoDto {
   private RoundType type;
 
   public InfoDto(RoundEntity currentRound, FairConfig config) {
+    pointsForPromote = currentRound.getBasePointsRequirement().toString();
     minimumPeopleForPromote = config.getBaseAssholeLadder();
     baseVinegarNeededToThrow = config.getBaseVinegarToThrow().toString();
     autoPromoteLadder = config.getAutoPromoteLadder();

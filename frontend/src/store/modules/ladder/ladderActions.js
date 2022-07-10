@@ -107,6 +107,7 @@ export default {
       rankers: rankers,
       number: state.number,
       ladderType: state.type,
+      basePointsToPromote: state.basePointsToPromote,
     });
     dispatch({
       type: "stats/calculate",

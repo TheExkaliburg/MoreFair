@@ -5,11 +5,12 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
-        new Version("MINOR", "", {
+        new Version("MINOR", "Round-Rework", {
           balancing: [""],
-          features: [""],
+          features: ["Rounds and ladders can have specific modifier."],
           improvements: [
             "Throwing Vinegar and buying auto-promote doesn't get send over public channel anymore",
+            "Only active rankers count toward the asshole ladder",
           ],
           fixes: [""],
         }),

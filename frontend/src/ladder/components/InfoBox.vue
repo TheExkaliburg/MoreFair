@@ -107,27 +107,37 @@
             </button>
           </div>
         </div>
-        <div class="row py-0 text-start">
-          {{
-            ladder.number >= settings.assholeLadder ? "Be Asshole" : "Promote"
-          }}
-          at
-          {{ numberFormatter.format(pointsForPromote) }}
-          Points ({{
-            numberFormatter.format(
-              yourRanker.points.mul(100).div(stats.pointsNeededForManualPromote)
-            )
-          }}%)
-          {{
-            yourRanker.points.cmp(stats.pointsNeededForManualPromote) >= 0
-              ? ""
-              : `(${secondsToHms(etaPromote)})`
-          }}
+        <div class="row py-0">
+          <div class="col px-0 text-start">
+            {{
+              ladder.number >= settings.assholeLadder ? "Be Asshole" : "Promote"
+            }}
+            at
+            {{ numberFormatter.format(pointsForPromote) }}
+            Points ({{
+              numberFormatter.format(
+                yourRanker.points
+                  .mul(100)
+                  .div(stats.pointsNeededForManualPromote)
+              )
+            }}%)
+            {{
+              yourRanker.points.cmp(stats.pointsNeededForManualPromote) >= 0
+                ? ""
+                : `(${secondsToHms(etaPromote)})`
+            }}
+          </div>
+          <div class="col px-0 text-end"></div>
         </div>
       </div>
     </div>
 
-    <div class="col-6"></div>
+    <div class="col-6">
+      Round Base Point Requirement:
+      {{ numberFormatter.format(store.state.settings.pointsForPromote) }}
+      <br />Ladder Base Point Requirement:
+      {{ numberFormatter.format(store.state.ladder.basePointsToPromote) }}
+    </div>
   </div>
 </template>
 

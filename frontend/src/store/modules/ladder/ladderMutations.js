@@ -6,7 +6,7 @@ export default {
   setLadder(state, { number, rankers, ladderType, basePointsToPromote }) {
     state.number = number;
     state.type = ladderType;
-    state.basePointsToPromote = basePointsToPromote;
+    state.basePointsToPromote = new Decimal(basePointsToPromote);
     state.rankers = [];
     rankers.forEach((ranker) => {
       const r = new Ranker(ranker);
