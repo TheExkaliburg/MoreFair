@@ -32,7 +32,6 @@ async function importCookie() {
       "Paste your ID into here (your old uuid will be copied into your clipboard):");
   try {
     if (newUUID) {
-      // TODO: Check if cookies are valid
       let oldUuid = getCookie("_uuid");
       setCookie("_uuid", newUUID, 365 * 5);
       setTimeout(async () => await navigator.clipboard.writeText(oldUuid),

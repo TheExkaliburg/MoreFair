@@ -31,7 +31,7 @@ public class FairController {
   public static final BigInteger BASE_GRAPES_NEEDED_TO_AUTO_PROMOTE = new BigInteger("5000");
   public static final Integer AUTO_PROMOTE_LADDER = 1;
   public static final Integer MANUAL_PROMOTE_WAIT_TIME = 30;
-  public static final Integer BASE_ASSHOLE_LADDER = 10;
+  public static final Integer BASE_ASSHOLE_LADDER = 3;
   public static final Integer ASSHOLES_FOR_RESET = 10;
   public static final List<String> ASSHOLE_TAGS = new ArrayList<>(
       Arrays.asList("", "♠",     // 01♠

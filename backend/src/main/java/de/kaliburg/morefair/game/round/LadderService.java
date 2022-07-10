@@ -3,12 +3,14 @@ package de.kaliburg.morefair.game.round;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.account.AccountServiceEvent;
+import de.kaliburg.morefair.api.FairController;
 import de.kaliburg.morefair.api.GameController;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.data.JoinData;
 import de.kaliburg.morefair.events.data.VinegarData;
 import de.kaliburg.morefair.events.types.EventType;
+import de.kaliburg.morefair.game.GameResetEvent;
 import de.kaliburg.morefair.game.UpgradeUtils;
 import de.kaliburg.morefair.game.chat.ChatService;
 import de.kaliburg.morefair.game.chat.MessageService;
@@ -25,6 +27,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -53,6 +56,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   private final RoundUtils roundUtils;
   private final ChatService chatService;
   private final UpgradeUtils upgradeUtils;
+  private final ApplicationEventPublisher eventPublisher;
   @Getter(AccessLevel.PACKAGE)
   private final Map<Integer, List<Event>> eventMap = new HashMap<>();
   private final WsUtils wsUtils;
@@ -64,7 +68,8 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
   public LadderService(RankerService rankerService, LadderRepository ladderRepository,
       LadderUtils ladderUtils, AccountService accountService, RoundUtils roundUtils,
-      ChatService chatService, UpgradeUtils upgradeUtils, @Lazy WsUtils wsUtils) {
+      ChatService chatService, UpgradeUtils upgradeUtils, ApplicationEventPublisher eventPublisher,
+      @Lazy WsUtils wsUtils) {
     this.rankerService = rankerService;
     this.ladderRepository = ladderRepository;
     this.ladderUtils = ladderUtils;
@@ -72,6 +77,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
     this.roundUtils = roundUtils;
     this.chatService = chatService;
     this.upgradeUtils = upgradeUtils;
+    this.eventPublisher = eventPublisher;
     this.wsUtils = wsUtils;
   }
 
@@ -432,6 +438,24 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
               account.getUsername() + " was welcomed by Chad. They are number "
                   + newLadder.getRankers().size()
                   + " of the lucky few initiates for the big ritual.");
+
+          // TODO: Make it change based on People and a Random Value
+          int neededAssholesForReset = Math.max(FairController.ASSHOLES_FOR_RESET,
+              (newLadder.getNumber() + 1) >> 1);
+          int assholeCount = newLadder.getRankers().size();
+
+          // Is it time to reset the game
+          if (assholeCount >= neededAssholesForReset) {
+            for (RankerEntity assholeRanker : newLadder.getRankers()) {
+              AccountEntity assholeAccount = accountService.find(assholeRanker.getAccount());
+              assholeAccount.setAssholeCount(assholeAccount.getAssholeCount() + 1);
+              assholeAccount = accountService.save(assholeAccount);
+            }
+
+            eventPublisher.publishEvent(new GameResetEvent(this));
+            wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION,
+                new Event(EventType.RESET, account.getId()));
+          }
         }
 
         wsUtils.convertAndSendToTopic(GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",

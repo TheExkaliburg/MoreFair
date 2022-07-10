@@ -66,13 +66,6 @@ public class LadderCalculator {
             1.0d);
         lastTimeMeasured = currentNanos;
 
-        // Send Broadcasts
-
-        // If someone was an Asshole and the reset worked, should notify all and end calculation
-        if (didPressAssholeButton) {
-          // TODO: Reset Game Logic
-        }
-
         // Otherwise, just send the default Heartbeat-Tick
         heartbeat.setDelta(deltaSec);
         wsUtils.convertAndSendToTopic(GameController.TOPIC_TICK_DESTINATION, heartbeat);
@@ -122,9 +115,6 @@ public class LadderCalculator {
               case PROMOTE -> {
                 if (!ladderService.promote(e, ladder)) {
                   eventsToBeRemoved.add(e);
-                } else if (roundUtils.getAssholeLadderNumber(roundService.getCurrentRound())
-                    .equals(ladder.getNumber())) {
-                  didPressAssholeButton = true;
                 }
               }
               case THROW_VINEGAR -> {

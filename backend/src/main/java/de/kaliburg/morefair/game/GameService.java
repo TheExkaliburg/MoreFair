@@ -11,6 +11,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Log4j2
-public class GameService {
+public class GameService implements ApplicationListener<GameResetEvent> {
 
   private final GameRepository gameRepository;
   private final RoundService roundService;
@@ -65,8 +66,8 @@ public class GameService {
   @PreDestroy
   void saveStateToDatabase() {
     try {
-      gameRepository.save(game);
-      ladderService.saveStateToDatabase();
+      game = gameRepository.save(game);
+      roundService.saveStateToDatabase();
       chatService.saveStateToDatabase();
     } catch (Exception e) {
       log.error(e.getMessage());
@@ -83,5 +84,15 @@ public class GameService {
     result.setCurrentRound(round);
 
     return gameRepository.save(result);
+  }
+
+
+  @Override
+  public void onApplicationEvent(GameResetEvent event) {
+    saveStateToDatabase();
+    RoundEntity newRound = roundService.create(game.getCurrentRound().getNumber() + 1);
+    game.setCurrentRound(newRound);
+    saveStateToDatabase();
+    initialGameSetup();
   }
 }

@@ -477,9 +477,6 @@ function calculateStats() {
   } else {
     ladderStats.pointsNeededForManualPromote = new Decimal(Infinity);
   }
-
-  // ETA
-  // TODO: ETA
 }
 
 function updateLadder() {
