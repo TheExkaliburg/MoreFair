@@ -196,7 +196,9 @@ public class LadderCalculator {
     // Ranker on Last Place gains 1 Grape, only if he isn't in the top group
     if (rankers.size() >= ladderUtils.getRequiredRankerCountToUnlock(ladder)) {
       RankerEntity lastRanker = rankers.get(rankers.size() - 1);
-      lastRanker.addGrapes(BigInteger.valueOf(3), delta);
+      if (lastRanker.isGrowing()) {
+        lastRanker.addGrapes(BigInteger.valueOf(3), delta);
+      }
     }
 
     if (rankers.size() >= 1 && rankers.get(0).isAutoPromote() && rankers.get(0).isGrowing()

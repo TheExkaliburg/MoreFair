@@ -292,6 +292,7 @@ function changeLadder(event) {
         store.dispatch({
           type: "ladder/handleLadderEvent",
           message: message,
+          stompClient: stompClient,
         });
       }
     );

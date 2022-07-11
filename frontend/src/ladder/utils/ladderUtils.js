@@ -10,7 +10,9 @@ export default {
   getAutoPromoteCost(settings, ladder, rank) {
     let minPeople = this.getMinimumPeopleForPromote(settings, ladder);
     let divisor = Math.max(rank - minPeople + 1, 1);
-    return settings.baseGrapesNeededToAutoPromote.div(divisor).floor();
+    return settings.baseGrapesNeededToAutoPromote
+      .div(new Decimal(divisor))
+      .floor();
   },
   isLadderUnlocked(settings, ladder) {
     if (ladder.rankers.length <= 0) return false;
