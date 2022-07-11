@@ -42,7 +42,7 @@
     "vue-final-modal": "^3.4.4",
     "vue-popperjs": "^2.3.0",
     "vue-router": "^4.0.3",
-    "vue-toastify": "^1.8.1",
+    "vue-toastification": "^2.0.0-rc.5",
     "vuex": "^4.0.0"
   },
   "devDependencies": {
