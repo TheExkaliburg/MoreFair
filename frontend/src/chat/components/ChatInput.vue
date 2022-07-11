@@ -301,8 +301,17 @@ function findGroupMentionsInString(str) {
   //Checking if any rankerName#id is in the text
   let possibleMentionLower = str.toLowerCase();
 
+  let subMentions =
+    store.getters["options/getOptionValue"]("subscribedMentions");
+  let possibleMentions = [];
+  for (let i = 0; i < subMentions.length; i++) {
+    if (subMentions[i].toLowerCase().startsWith(possibleMentionLower)) {
+      possibleMentions.push(subMentions[i]);
+    }
+  }
+  possibleMentions.push(str);
   return [
-    index > -1 && !str.includes(" ") ? str : "",
+    index > -1 && str.trim() != "" ? possibleMentions : [],
     possibleMentionLower.length + 1,
   ];
 }
@@ -407,29 +416,31 @@ function plainTextElementChanged(mutation) {
   if (possibleMentions.length === 0 && possibleGroupMentions.length > 0) {
     //Now we can create the dropdown
     dropdown.style.display = "block";
+    for (let index in possibleGroupMentions) {
+      let groupMention = possibleGroupMentions[index];
+      let option = document.createElement("option");
+      option.innerHTML = `$${groupMention}$`;
 
-    let option = document.createElement("option");
-    option.innerHTML = `$${possibleGroupMentions}$`;
+      option.style.border = "1px solid black";
 
-    option.style.border = "1px solid black";
+      option.style.paddingRight = "5px";
+      option.style.paddingLeft = "5px";
 
-    option.style.paddingRight = "5px";
-    option.style.paddingLeft = "5px";
+      option.addEventListener("click", function () {
+        let mention = getGroupMentionElement(groupMention);
+        //We need to insert the mention into the text
+        insertSpecialChatElement(
+          mention,
+          "CARET",
+          "END ELEMENT",
+          possibleGroupMentionLength
+        );
+        //We need to close the dropdown
+        dropdown.style.display = "none";
+      });
 
-    option.addEventListener("click", function () {
-      let mention = getGroupMentionElement(possibleGroupMentions);
-      //We need to insert the mention into the text
-      insertSpecialChatElement(
-        mention,
-        "CARET",
-        "END ELEMENT",
-        possibleGroupMentionLength
-      );
-      //We need to close the dropdown
-      dropdown.style.display = "none";
-    });
-
-    dropdown.appendChild(option);
+      dropdown.appendChild(option);
+    }
   }
 
   let navbar = document.getElementById("chatInput");
@@ -448,7 +459,7 @@ function plainTextElementChanged(mutation) {
   }
 
   //select the last element
-  window.dropdownElementSelected = 0;
+  window.dropdownElementSelected = possibleGroupMentions.length - 1;
   dropdown.children[window.dropdownElementSelected].style.backgroundColor =
     "var(--item-selected-color)";
   //make sure the dropdown always stays 5 pixels from the right window edge
