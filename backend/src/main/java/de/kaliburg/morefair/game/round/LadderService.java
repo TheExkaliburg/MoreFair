@@ -507,26 +507,29 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
             ladder.getNumber(), rankerAccount.getUsername(), rankerAccount.getId(), rankerVinegar,
             targetAccount.getUsername(), targetAccount.getId(), targetVinegar);
 
-        VinegarData data = new VinegarData(rankerVinegar.toString());
+        VinegarData data = new VinegarData(rankerVinegar.toString(), targetAccount.getId());
         if (targetVinegar.compareTo(rankerVinegar) > 0) {
           targetVinegar = targetVinegar.subtract(rankerVinegar);
         } else {
           targetVinegar = BigInteger.ZERO;
           data.setSuccess(true);
+        }
 
+        event.setData(data);
+        wsUtils.convertAndSendToUser(ranker.getAccount().getUuid(),
+            GameController.PRIVATE_EVENTS_DESTINATION, event);
+        wsUtils.convertAndSendToUser(target.getAccount().getUuid(),
+            GameController.PRIVATE_EVENTS_DESTINATION, event);
+
+        if (data.isSuccess()) {
           if (!buyMulti(new Event(EventType.BUY_MULTI, targetAccount.getId()), ladder)) {
             softResetPoints(new Event(EventType.SOFT_RESET_POINTS, targetAccount.getId()),
                 ladder);
           }
         }
 
-        event.setData(data);
         ranker.setVinegar(BigInteger.ZERO);
         target.setVinegar(targetVinegar);
-        wsUtils.convertAndSendToUser(ranker.getAccount().getUuid(),
-            GameController.PRIVATE_EVENTS_DESTINATION, event);
-        wsUtils.convertAndSendToUser(target.getAccount().getUuid(),
-            GameController.PRIVATE_EVENTS_DESTINATION, event);
         return true;
       }
     } catch (Exception e) {

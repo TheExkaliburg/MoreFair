@@ -10,4 +10,6 @@ public class VinegarData {
   private String amount;
   @NonNull
   private boolean success = false;
+  @NonNull
+  private Long targetId;
 }

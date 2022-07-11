@@ -85,6 +85,7 @@ public class RoundEntity {
 
   private RoundType determineRoundType() {
     float randomPercentage = random.nextFloat(100);
+    log.info("Determining Roundtype for Round {}: {}%", number, randomPercentage);
 
     if (randomPercentage < 40) {
       return RoundType.FAST;

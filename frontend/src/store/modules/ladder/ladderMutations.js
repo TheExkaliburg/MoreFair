@@ -42,23 +42,37 @@ export default {
       }
     });
   },
-  handleThrowVinegarEvent(state, { event }) {
-    // const vinegarThrown = new Decimal(event.data.amount);
+  handleThrowVinegarEvent(state, { event, numberFormatter }) {
+    const vinegarThrown = new Decimal(event.data.amount);
+    let throwingRanker;
     state.rankers.forEach((ranker) => {
       if (event.accountId === ranker.accountId) {
         if (ranker.you) ranker.vinegar = new Decimal(0);
+        throwingRanker = ranker;
       }
     });
-    // TODO: Show if you've been graped
-    const yourRanker = state.ladder.yourRanker;
-    if (yourRanker.rank === 1) {
+
+    const yourRanker = state.yourRanker;
+    console.log(yourRanker.accountId, event.data.targetId);
+    if (yourRanker.accountId === event.data.targetId) {
       //We are in the graped position
-      this.rankers.forEach((ranker) => {
-        if (event.accountId === ranker.accountId) {
-          if (ranker.you)
-            ranker.vinegar = ranker.vinegar.sub(event.data.amount);
-        }
-      });
+      yourRanker.vinegar = yourRanker.vinegar.sub(vinegarThrown);
+      if (event.data.success && throwingRanker) {
+        yourRanker.vinegar = new Decimal(0);
+        setTimeout(
+          () =>
+            alert(
+              "You slipped down the ladder because " +
+                throwingRanker.username +
+                " (#" +
+                throwingRanker.accountId +
+                ") threw their " +
+                numberFormatter.format(vinegarThrown) +
+                " Vinegar at you!"
+            ),
+          0
+        );
+      }
     }
   },
   handleSoftResetPointsEvent(state, { event }) {

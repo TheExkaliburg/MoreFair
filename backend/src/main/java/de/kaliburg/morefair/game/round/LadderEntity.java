@@ -27,7 +27,9 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @Entity
 @Table(name = "ladder", uniqueConstraints = {
     @UniqueConstraint(name = "uq_uuid", columnNames = "uuid"),
@@ -101,6 +103,7 @@ public final class LadderEntity {
     }
 
     float randomPercentage = random.nextFloat(100);
+    log.info("Determining LadderType for Ladder {}: {}%", number, randomPercentage);
 
     if (randomPercentage < 20 || round.getType().equals(RoundType.FAST)) {
       return LadderType.SMALL;

@@ -129,7 +129,11 @@ export default {
         });
         break;
       case "THROW_VINEGAR":
-        commit({ type: "handleThrowVinegarEvent", event: event });
+        commit({
+          type: "handleThrowVinegarEvent",
+          event: event,
+          numberFormatter: rootState.numberFormatter,
+        });
         break;
       case "SOFT_RESET_POINTS":
         commit({ type: "handleSoftResetPointsEvent", event: event });
