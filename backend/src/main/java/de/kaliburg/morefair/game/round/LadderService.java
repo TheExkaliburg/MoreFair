@@ -14,6 +14,7 @@ import de.kaliburg.morefair.game.GameResetEvent;
 import de.kaliburg.morefair.game.UpgradeUtils;
 import de.kaliburg.morefair.game.chat.ChatService;
 import de.kaliburg.morefair.game.chat.MessageService;
+import de.kaliburg.morefair.utils.FormattingUtils;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -449,7 +450,8 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
           chatService.sendGlobalMessage(
               account.getUsername() + " was welcomed by Chad. They are number "
                   + newLadder.getRankers().size()
-                  + " of the lucky few initiates for the big ritual.");
+                  + " of the lucky few initiates for the " + FormattingUtils.ordinal(
+                  currentRound.getNumber()) + " big ritual.");
 
           int neededAssholesForReset = currentRound.getAssholesForReset();
           int assholeCount = newLadder.getRankers().size();
