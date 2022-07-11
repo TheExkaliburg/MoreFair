@@ -73,9 +73,9 @@ public final class LadderEntity {
     // getting the pointRequirement based on the type
     BigInteger base = round.getBasePointsRequirement().multiply(BigInteger.valueOf(number));
     if (type == LadderType.SMALL) {
-      base = base.divide(BigInteger.valueOf(5));
+      base = base.divide(BigInteger.valueOf(10));
     } else if (type == LadderType.BIG) {
-      base = base.multiply(BigInteger.valueOf(5));
+      base = base.multiply(BigInteger.valueOf(3));
     }
     Random random = new Random();
     double percentage = random.nextDouble(0.8, 1.2);
