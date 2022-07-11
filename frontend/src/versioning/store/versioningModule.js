@@ -11,6 +11,7 @@ const versioningModule = {
           improvements: [
             "Throwing Vinegar and buying auto-promote doesn't get send over public channel anymore",
             "Only active rankers count toward the asshole ladder",
+            "Group mentions will now be suggested in the chat if you are subscribed to the group!",
           ],
           fixes: [""],
         }),
