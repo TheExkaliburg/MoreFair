@@ -53,7 +53,6 @@ export default {
     });
 
     const yourRanker = state.yourRanker;
-    console.log(yourRanker.accountId, event.data.targetId);
     if (yourRanker.accountId === event.data.targetId) {
       //We are in the graped position
       yourRanker.vinegar = yourRanker.vinegar.sub(vinegarThrown);
