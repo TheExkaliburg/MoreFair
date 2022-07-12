@@ -98,6 +98,10 @@ public final class LadderEntity {
         ladders.stream().filter(l -> l.getNumber().equals(ladderNumber - 1)).findFirst()
             .orElse(null);
 
+    if (round.getType().equals(RoundType.FAST)) {
+      return LadderType.SMALL;
+    }
+
     if (ladderNumber == 1) {
       return LadderType.DEFAULT;
     }
@@ -105,7 +109,7 @@ public final class LadderEntity {
     float randomPercentage = random.nextFloat(100);
     log.info("Determining LadderType for Ladder {}: {}%", number, randomPercentage);
 
-    if (randomPercentage < 20 || round.getType().equals(RoundType.FAST)) {
+    if (randomPercentage < 20) {
       return LadderType.SMALL;
     }
 
