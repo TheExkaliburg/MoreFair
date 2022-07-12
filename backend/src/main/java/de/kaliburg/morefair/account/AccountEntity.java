@@ -52,7 +52,7 @@ public class AccountEntity {
   @Column
   private Integer lastIp;
   @NonNull
-  @Column(nullable = false)
+  @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
   private ZonedDateTime lastLogin = ZonedDateTime.now();
   @NonNull
   @Column(nullable = false)

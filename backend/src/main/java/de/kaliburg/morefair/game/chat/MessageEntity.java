@@ -51,6 +51,6 @@ public class MessageEntity {
   @JoinColumn(name = "chat_id", nullable = false, foreignKey = @ForeignKey(name = "fk_message_chat"))
   private ChatEntity chat;
   @NonNull
-  @Column(nullable = false)
+  @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
   private ZonedDateTime createdOn = ZonedDateTime.now();
 }

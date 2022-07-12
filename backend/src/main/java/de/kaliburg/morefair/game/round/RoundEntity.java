@@ -55,7 +55,7 @@ public class RoundEntity {
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)
   private RoundType type;
-  @Column(nullable = false)
+  @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
   private ZonedDateTime createdOn = ZonedDateTime.now();
   @NonNull
   @Column(nullable = false)
