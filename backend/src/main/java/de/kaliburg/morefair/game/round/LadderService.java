@@ -398,8 +398,8 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
       if (ladderUtils.canBuyAutoPromote(ladder, ranker, currentRound)) {
         ranker.setGrapes(ranker.getGrapes().subtract(cost));
         ranker.setAutoPromote(true);
-        wsUtils.convertAndSendToTopic(GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
-            ladder.getNumber().toString()), event);
+        wsUtils.convertAndSendToUser(ranker.getAccount().getUuid(),
+            GameController.PRIVATE_EVENTS_DESTINATION, event);
         return true;
       }
     } catch (Exception e) {
