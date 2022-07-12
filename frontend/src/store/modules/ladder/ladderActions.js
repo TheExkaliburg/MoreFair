@@ -155,6 +155,10 @@ export default {
         break;
       case "NAME_CHANGE":
         commit({ type: "handleNameChangeEvent", event: event });
+        commit(
+          { type: "chat/handleNameChangeEvent", event: event },
+          { root: true }
+        );
         break;
       case "CONFIRM":
         // TODO: CONFIRM
