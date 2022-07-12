@@ -3,7 +3,8 @@ package de.kaliburg.morefair.game.round;
 import de.kaliburg.morefair.FairConfig;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.time.ZonedDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -56,7 +57,7 @@ public class RoundEntity {
   @Enumerated(EnumType.STRING)
   private RoundType type;
   @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
-  private ZonedDateTime createdOn = ZonedDateTime.now();
+  private OffsetDateTime createdOn = OffsetDateTime.now(ZoneOffset.UTC);
   @NonNull
   @Column(nullable = false)
   private Integer highestAssholeCount = 0;

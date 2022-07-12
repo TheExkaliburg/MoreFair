@@ -1,7 +1,8 @@
 package de.kaliburg.morefair.account;
 
 import de.kaliburg.morefair.api.websockets.UserPrincipal;
-import java.time.ZonedDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 import javax.transaction.Transactional;
@@ -57,7 +58,7 @@ public class AccountService {
    * @return the updated account
    */
   public AccountEntity login(AccountEntity account, UserPrincipal principal) {
-    account.setLastLogin(ZonedDateTime.now());
+    account.setLastLogin(OffsetDateTime.now(ZoneOffset.UTC));
     account.setLastIp(principal.getIpAddress());
     return save(account);
   }

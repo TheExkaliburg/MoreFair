@@ -2,7 +2,8 @@ package de.kaliburg.morefair.account;
 
 import de.kaliburg.morefair.game.round.RankerEntity;
 import de.kaliburg.morefair.game.round.RoundEntity;
-import java.time.ZonedDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -53,7 +54,7 @@ public class AccountEntity {
   private Integer lastIp;
   @NonNull
   @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
-  private ZonedDateTime lastLogin = ZonedDateTime.now();
+  private OffsetDateTime lastLogin = OffsetDateTime.now(ZoneOffset.UTC);
   @NonNull
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)
