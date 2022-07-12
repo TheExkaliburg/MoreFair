@@ -19,7 +19,7 @@ public class RequestThrottler {
   private final LoadingCache<UUID, Integer> hasPostedMessageRecently;
 
   public RequestThrottler() {
-    this.hasCreatedAccountRecently = Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.SECONDS)
+    this.hasCreatedAccountRecently = Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES)
         .build(integer -> false);
     this.hasPostedMessageRecently = Caffeine.newBuilder().expireAfterWrite(5, TimeUnit.SECONDS)
         .build(integer -> 0);
