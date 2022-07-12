@@ -344,9 +344,6 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         ranker.setBias(ranker.getBias() + 1);
         wsUtils.convertAndSendToTopic(GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
             ladder.getNumber().toString()), event);
-        wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
-            EventType.INCREASE_ASSHOLE_LADDER, ranker.getAccount().getId(),
-            roundUtils.getAssholeLadderNumber(getCurrentRound())));
         return true;
       }
     } catch (Exception e) {
