@@ -49,9 +49,9 @@
                 </li>
                 <li>Don't use any malicious and/or automating scripts.</li>
                 <li>
-                  Don't use alts past ladder 10 or to gain any advantage
-                  compared to playing solo. (f.e. syncing up actions to keep
-                  gaining grapes)
+                  Don't use alts past ladder 5 or to gain any advantage compared
+                  to playing solo. (f.e. syncing up actions to keep gaining
+                  grapes)
                 </li>
                 <li>No posting of uuids and/or sensitive data.</li>
               </ol>
@@ -417,7 +417,7 @@
                 efficiency. Trying to time your Multi and Bias purchases
                 optimally and deciding when it is the best time to stop buying
                 can be very challenging! While the guide is mainly focused on
-                the first Ladder, most of the concepts intruduced here are still
+                the first Ladder, most of the concepts introduced here are still
                 very valid when tackling the rest of the game. <br /><br />
               </p>
               <h2><strong>Where to go from here</strong></h2>

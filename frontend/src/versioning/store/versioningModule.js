@@ -6,10 +6,25 @@ const versioningModule = {
     return {
       versions: [
         new Version("MINOR", "Round-Rework", {
-          balancing: [""],
-          features: ["Rounds and ladders can have specific modifier."],
+          rules: ["Rule 8 now only allows for alts up to Ladder 5"],
+          features: [
+            "Rounds and ladders can have specific modifier.",
+            "DEFAULT Round and Ladders are the same as before.",
+            "SMALL Ladders only have around a tenth of the size of a DEFAULT one",
+            "BIG Ladders have around 3 times the size of a DEFAULT one",
+            "FAST Rounds only have SMALL Ladders and the asshole ladder is at half the original value",
+            "AUTO Rounds give people auto-promote automatically on entering a Ladder, for free (Does not work for Asshole-Ladder)",
+          ],
+          balancing: [
+            "The base points requirement of a round and a ladder are randomized now (before the new ladder and round types).",
+            "The base points requirement for a round is between 50K - 150K",
+            "The base points requirement for a ladder is based on the round requirement multiplied by the ladder number and a value between 1.2 - 0.8",
+            "The number of assholes that can pass the final ladder are now also randomized.",
+            "The minimum amount of people to become an asshole is 5 (base asshole ladder / 2)",
+            "The maximum amount of people to become an asshole is the ladder number of the asshole Ladder",
+          ],
           improvements: [
-            "Throwing Vinegar and buying auto-promote doesn't get send over public channel anymore",
+            "Throwing vinegar and buying auto-promote doesn't get send over public channel anymore",
             "Only active rankers count toward the asshole ladder",
             "Group mentions will now be suggested in the chat if you are subscribed to the group!",
           ],

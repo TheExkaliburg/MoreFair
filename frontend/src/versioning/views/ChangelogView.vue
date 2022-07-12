@@ -25,6 +25,17 @@
           </h5>
           <div :id="'collapse' + index" class="accordion-collapse collapse">
             <div class="accordion-body">
+              <div v-if="version.data.changes.rules.length > 0">
+                <h4>Rule-Changes:</h4>
+                <ul>
+                  <li
+                    v-for="change in version.data.changes.rules"
+                    :key="change"
+                  >
+                    <strong>{{ change }}</strong>
+                  </li>
+                </ul>
+              </div>
               <div v-if="version.data.changes.features.length > 0">
                 <h4>Features:</h4>
                 <ul>
