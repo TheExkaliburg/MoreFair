@@ -23,6 +23,7 @@ const versioningModule = {
             "The number of assholes that can pass the final ladder are now also randomized.",
             "The minimum amount of people to become an asshole is 5 (base asshole ladder / 2)",
             "The maximum amount of people to become an asshole is the ladder number of the asshole Ladder",
+            "The asshole ladder has been capped at ladder 25 and won't grow unless there is a reason to go above that",
             "The rewards for coming first (or up to tenth) have been overworked.",
             "If you are first you still gain autoPromote and your current vinegar gets multiplied by 1.2",
             "If you are in the Top 3 (1st, 2nd, 3rd), you the amount of grapes you would need to buy a full-cost autopromote (5000 Grapes)",
