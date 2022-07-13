@@ -448,7 +448,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
           newRanker.getUnlocks().setAutoPromote(true);
         }
         if (!newRanker.getUnlocks().getReachedBaseAssholeLadder()
-            && newLadder.getNumber() >= currentRound.getBaseAssholeLadder()) {
+            && newLadder.getNumber() >= currentRound.getModifiedBaseAssholeLadder()) {
           newRanker.getUnlocks().setReachedBaseAssholeLadder(true);
         }
         if (!newRanker.getUnlocks().getReachedPreAssholeLadder()

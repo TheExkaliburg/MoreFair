@@ -126,4 +126,8 @@ public class RoundEntity {
 
     return min + Math.round((max - min) * getPercentageOfAdditionalAssholes() / 100);
   }
+
+  public Integer getModifiedBaseAssholeLadder() {
+    return types.contains(RoundType.FAST) ? getBaseAssholeLadder() / 2 : getBaseAssholeLadder();
+  }
 }
