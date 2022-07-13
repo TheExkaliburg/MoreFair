@@ -88,16 +88,24 @@ public class RoundEntity {
   private void determineRoundTypes() {
     types.clear();
 
-    float randomPercentage = random.nextFloat(100);
-    log.info("Determining Roundtype for Round {}: {}%", number, randomPercentage);
+    float randomFastPercentage = random.nextFloat(100);
+    log.debug("Rolling randomFastPercentage for Round {}: {}%", number, randomFastPercentage);
 
-    if (randomPercentage < 40) {
+    float randomAutoPercentage = random.nextFloat(100);
+    log.debug("Rolling randomAutoPercentage for Round {}: {}%", number, randomFastPercentage);
+
+    if (randomFastPercentage < 40) {
       types.add(RoundType.FAST);
-    } else if (randomPercentage < 60) {
+    }
+
+    if (randomAutoPercentage < 20) {
       types.add(RoundType.AUTO);
-    } else {
+    }
+
+    if (types.isEmpty()) {
       types.add(RoundType.DEFAULT);
     }
+
   }
 
   public Integer getAssholeLadderNumber() {

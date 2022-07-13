@@ -104,7 +104,8 @@ public final class LadderEntity {
             .orElse(null);
 
     float randomSizePercentage = random.nextFloat(100);
-    log.info("Determining LadderType for Ladder {}: {}%", number, randomSizePercentage);
+    log.info("Rolling randomSizePercentage for Ladder {} in Round {}: {}%", number,
+        round.getNumber(), randomSizePercentage);
 
     if (round.getTypes().contains(RoundType.FAST)) {
       types.add(LadderType.SMALL);
@@ -114,7 +115,9 @@ public final class LadderEntity {
       types.add(LadderType.SMALL);
     } else if (randomSizePercentage > 80) {
       types.add(LadderType.BIG);
-    } else {
+    }
+
+    if (types.isEmpty()) {
       types.add(LadderType.DEFAULT);
     }
   }
