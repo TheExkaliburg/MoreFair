@@ -41,7 +41,7 @@ public class AccountService {
 
     result = save(result);
 
-    log.info("Created Mystery Guest (#{})", result.getId());
+    log.debug("Created Mystery Guest (#{})", result.getId());
     return result;
   }
 

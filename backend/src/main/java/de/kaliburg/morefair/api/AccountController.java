@@ -117,15 +117,16 @@ public class AccountController {
       if (username.length() > 32) {
         username = username.substring(0, 32);
       }
-      username = username;
 
       String uuid = wsMessage.getUuid();
-      log.info("/app{} {} '{}'", APP_RENAME_DESTINATION, uuid, username);
 
       AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null || account.isMuted()) {
         return;
       }
+
+      log.info("[G] RENAME: {} (#{}) -> {}", account.getUsername(), account.getId(), username);
+
       account.setUsername(username);
       accountService.save(account);
 
