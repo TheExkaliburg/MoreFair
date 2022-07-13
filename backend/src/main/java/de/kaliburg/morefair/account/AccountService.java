@@ -1,6 +1,7 @@
 package de.kaliburg.morefair.account;
 
 import de.kaliburg.morefair.api.websockets.UserPrincipal;
+import de.kaliburg.morefair.game.round.RoundEntity;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -19,11 +20,13 @@ public class AccountService {
 
   private final AccountRepository accountRepository;
   private final ApplicationEventPublisher eventPublisher;
+  private final UnlockService unlockService;
 
   public AccountService(AccountRepository accountRepository,
-      ApplicationEventPublisher eventPublisher) {
+      ApplicationEventPublisher eventPublisher, UnlockService unlockService) {
     this.accountRepository = accountRepository;
     this.eventPublisher = eventPublisher;
+    this.unlockService = unlockService;
   }
 
   /**
@@ -31,14 +34,17 @@ public class AccountService {
    *
    * @return the account
    */
-  @Transactional
-  public AccountEntity create(UserPrincipal principal) {
+  public AccountEntity create(UserPrincipal principal, RoundEntity currentRound) {
     AccountEntity result = new AccountEntity();
 
     if (principal != null) {
       result.setLastIp(principal.getIpAddress());
     }
+
     result = save(result);
+
+    UnlockEntity unlocks = unlockService.create(result, currentRound);
+
     log.info("Created Mystery Guest (#{})", result.getId());
     return result;
   }
@@ -64,7 +70,8 @@ public class AccountService {
   }
 
   public AccountEntity find(Long id) {
-    return accountRepository.findById(id).orElse(null);
+    AccountEntity result = accountRepository.findById(id).orElse(null);
+    return result;
   }
 
   public AccountEntity find(UUID uuid) {

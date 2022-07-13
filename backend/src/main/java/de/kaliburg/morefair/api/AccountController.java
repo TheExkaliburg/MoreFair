@@ -4,6 +4,7 @@ import de.kaliburg.morefair.account.AccountAccessRole;
 import de.kaliburg.morefair.account.AccountDetailsDto;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
+import de.kaliburg.morefair.account.AchievementEntity;
 import de.kaliburg.morefair.api.utils.RequestThrottler;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.UserPrincipal;
@@ -61,7 +62,7 @@ public class AccountController {
       if (uuid == null || uuid.isBlank()) {
         if (requestThrottler.canCreateAccount(principal)) {
           wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION,
-              new AccountDetailsDto(accountService.create(principal), currentRound),
+              new AccountDetailsDto(accountService.create(principal, currentRound), currentRound),
               HttpStatus.CREATED);
         } else {
           wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
@@ -74,7 +75,7 @@ public class AccountController {
       if (account == null) {
         if (requestThrottler.canCreateAccount(principal)) {
           wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION,
-              new AccountDetailsDto(accountService.create(principal), currentRound),
+              new AccountDetailsDto(accountService.create(principal, currentRound), currentRound),
               HttpStatus.CREATED);
         } else {
           wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
@@ -85,6 +86,12 @@ public class AccountController {
       // BANNED Players
       if (account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
         wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
+        return;
+      }
+
+      if (account.getAchievement() == null) {
+        account.setAchievement(new AchievementEntity(account));
+        accountService.save(account);
       }
 
       account = accountService.login(account, principal);

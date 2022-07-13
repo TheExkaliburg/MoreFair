@@ -2,6 +2,8 @@ package de.kaliburg.morefair.game.round;
 
 import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountEntity;
+import de.kaliburg.morefair.account.UnlockEntity;
+import de.kaliburg.morefair.account.UnlockService;
 import de.kaliburg.morefair.api.GameController;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.events.Event;
@@ -28,15 +30,18 @@ public class RoundService {
   private final WsUtils wsUtils;
   private final RoundUtils roundUtils;
   private final FairConfig config;
+  private final UnlockService unlockService;
   private LadderResultsDto lastRoundResults;
 
   public RoundService(RoundRepository roundRepository, LadderService ladderService,
-      @Lazy WsUtils wsUtils, RoundUtils roundUtils, FairConfig config) {
+      @Lazy WsUtils wsUtils, RoundUtils roundUtils, FairConfig config,
+      UnlockService unlockService) {
     this.roundRepository = roundRepository;
     this.ladderService = ladderService;
     this.wsUtils = wsUtils;
     this.roundUtils = roundUtils;
     this.config = config;
+    this.unlockService = unlockService;
   }
 
   @Transactional
@@ -105,6 +110,12 @@ public class RoundService {
    */
   public RankerEntity createNewRanker(AccountEntity account) {
     RankerEntity result = ladderService.createRanker(account);
+
+    UnlockEntity unlocks = unlockService.find(account, getCurrentRound());
+    if (unlocks == null) {
+      unlocks = unlockService.create(account, getCurrentRound());
+    }
+
     Integer assholeCount = result.getAccount().getAssholeCount();
     int baseAssholeLadderNumber = getCurrentRound().getTypes().contains(RoundType.FAST)
         ? getCurrentRound().getBaseAssholeLadder() / 2

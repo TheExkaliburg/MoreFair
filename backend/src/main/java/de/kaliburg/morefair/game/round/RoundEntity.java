@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -53,6 +54,7 @@ public class RoundEntity {
   private Integer number;
   @OneToMany(mappedBy = "round", fetch = FetchType.EAGER)
   private Set<LadderEntity> ladders = new HashSet<>();
+  @CollectionTable(name = "round_type")
   @ElementCollection(targetClass = RoundType.class, fetch = FetchType.EAGER)
   @Enumerated(EnumType.STRING)
   private Set<RoundType> types = new HashSet<>();

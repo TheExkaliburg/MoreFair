@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -59,6 +60,7 @@ public final class LadderEntity {
   private RoundEntity round;
   @OneToMany(mappedBy = "ladder", fetch = FetchType.EAGER)
   private List<RankerEntity> rankers = new ArrayList<>();
+  @CollectionTable(name = "ladder_type")
   @ElementCollection(targetClass = LadderType.class, fetch = FetchType.EAGER)
   @Enumerated(EnumType.STRING)
   private Set<LadderType> types = new HashSet<>();

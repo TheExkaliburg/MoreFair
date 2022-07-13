@@ -483,7 +483,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
           if (assholeCount >= neededAssholesForReset) {
             for (RankerEntity assholeRanker : newLadder.getRankers()) {
               AccountEntity assholeAccount = accountService.find(assholeRanker.getAccount());
-              assholeAccount.setAssholeCount(assholeAccount.getAssholeCount() + 1);
+              assholeAccount.setAssholePoints(assholeAccount.getAssholePoints() + 1);
               accountService.save(assholeAccount);
             }
 
