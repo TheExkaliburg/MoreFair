@@ -348,7 +348,7 @@ sub {
   background-color: var(--you-background-color);
   color: var(--you-color);
 
-  .account-id {
+  sub {
     color: var(--you-color);
   }
 }
