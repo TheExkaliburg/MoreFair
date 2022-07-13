@@ -114,7 +114,7 @@ public final class LadderEntity {
         round.getNumber(), randomSizePercentage);
     float randomNoAutoPercentage = random.nextFloat(100);
     log.debug("Rolling randomNoAutoPercentage for Ladder {} in Round {}: {}%", number,
-        round.getNumber(), randomSizePercentage);
+        round.getNumber(), randomNoAutoPercentage);
 
     if (round.getTypes().contains(RoundType.FAST)) {
       if (randomSizePercentage < 1) {

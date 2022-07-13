@@ -94,7 +94,7 @@ public class RoundEntity {
     log.debug("Rolling randomFastPercentage for Round {}: {}%", number, randomFastPercentage);
 
     float randomAutoPercentage = random.nextFloat(100);
-    log.debug("Rolling randomAutoPercentage for Round {}: {}%", number, randomFastPercentage);
+    log.debug("Rolling randomAutoPercentage for Round {}: {}%", number, randomAutoPercentage);
 
     if (randomFastPercentage < 40) {
       types.add(RoundType.FAST);
