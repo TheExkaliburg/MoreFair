@@ -61,7 +61,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   @Getter(AccessLevel.PACKAGE)
   private final Map<Integer, List<Event>> eventMap = new HashMap<>();
   private final WsUtils wsUtils;
-  private final FairConfig fairConfig;
+  private final FairConfig config;
   @Getter(AccessLevel.PACKAGE)
   @Setter(AccessLevel.PACKAGE)
   private RoundEntity currentRound;
@@ -71,7 +71,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   public LadderService(RankerService rankerService, LadderRepository ladderRepository,
       LadderUtils ladderUtils, AccountService accountService, RoundUtils roundUtils,
       ChatService chatService, UpgradeUtils upgradeUtils, ApplicationEventPublisher eventPublisher,
-      @Lazy WsUtils wsUtils, FairConfig fairConfig) {
+      @Lazy WsUtils wsUtils, FairConfig config) {
     this.rankerService = rankerService;
     this.ladderRepository = ladderRepository;
     this.ladderUtils = ladderUtils;
@@ -81,7 +81,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
     this.upgradeUtils = upgradeUtils;
     this.eventPublisher = eventPublisher;
     this.wsUtils = wsUtils;
-    this.fairConfig = fairConfig;
+    this.config = config;
   }
 
   @Transactional
@@ -310,7 +310,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
     Event joinEvent = new Event(EventType.JOIN, account.getId());
     joinEvent.setData(
-        new JoinData(account.getUsername(), fairConfig.getAssholeTag(account.getAssholeCount())));
+        new JoinData(account.getUsername(), config.getAssholeTag(account.getAssholeCount())));
     wsUtils.convertAndSendToTopic(GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
         ladder.getNumber().toString()), joinEvent);
 
@@ -429,8 +429,20 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         newRanker.setGrapes(ranker.getGrapes());
         LadderEntity newLadder = find(newRanker.getLadder());
 
-        if (newLadder.getRankers().size() == 1) {
+        if (newLadder.getRankers().size() <= 1) {
           newRanker.setAutoPromote(true);
+          newRanker.setVinegar(
+              newRanker.getVinegar().divide(BigInteger.TEN).multiply(BigInteger.valueOf(12)));
+        }
+
+        BigInteger autoPromoteCost = config.getBaseGrapesToBuyAutoPromote();
+
+        if (newLadder.getRankers().size() <= 3) {
+          newRanker.setGrapes(newRanker.getGrapes().add(autoPromoteCost));
+        } else if (newLadder.getRankers().size() <= 5) {
+          newRanker.setGrapes(newRanker.getGrapes().add(autoPromoteCost.divide(BigInteger.TWO)));
+        } else if (newLadder.getRankers().size() <= currentRound.getBaseAssholeLadder()) {
+          newRanker.setGrapes(newRanker.getGrapes().add(autoPromoteCost.divide(BigInteger.TEN)));
         }
 
         // Create new Chat if it doesn't exist
