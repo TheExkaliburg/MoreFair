@@ -104,7 +104,10 @@ public final class LadderEntity {
             .orElse(null);
 
     float randomSizePercentage = random.nextFloat(100);
-    log.info("Rolling randomSizePercentage for Ladder {} in Round {}: {}%", number,
+    log.debug("Rolling randomSizePercentage for Ladder {} in Round {}: {}%", number,
+        round.getNumber(), randomSizePercentage);
+    float randomNoAutoPercentage = random.nextFloat(100);
+    log.debug("Rolling randomNoAutoPercentage for Ladder {} in Round {}: {}%", number,
         round.getNumber(), randomSizePercentage);
 
     if (round.getTypes().contains(RoundType.FAST)) {
@@ -115,6 +118,15 @@ public final class LadderEntity {
       types.add(LadderType.SMALL);
     } else if (randomSizePercentage > 80) {
       types.add(LadderType.BIG);
+    }
+
+    if (round.getAssholeLadderNumber() <= number) {
+      types.add(LadderType.NO_AUTO);
+      types.add(LadderType.ASSHOLE);
+    }
+
+    if (randomNoAutoPercentage < 5) {
+      types.add(LadderType.NO_AUTO);
     }
 
     if (types.isEmpty()) {

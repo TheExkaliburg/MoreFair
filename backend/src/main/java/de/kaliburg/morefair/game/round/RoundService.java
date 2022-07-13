@@ -106,9 +106,12 @@ public class RoundService {
   public RankerEntity createNewRanker(AccountEntity account) {
     RankerEntity result = ladderService.createRanker(account);
     Integer assholeCount = result.getAccount().getAssholeCount();
+    int baseAssholeLadderNumber = getCurrentRound().getTypes().contains(RoundType.FAST)
+        ? getCurrentRound().getBaseAssholeLadder() / 2
+        : getCurrentRound().getBaseAssholeLadder();
 
     if (assholeCount > getCurrentRound().getHighestAssholeCount()
-        && ladderService.find(roundUtils.getAssholeLadderNumber(getCurrentRound())) == null) {
+        && ladderService.find(baseAssholeLadderNumber) == null) {
       getCurrentRound().setHighestAssholeCount(assholeCount);
       ladderService.setCurrentRound(save(getCurrentRound()));
       wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(

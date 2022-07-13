@@ -96,4 +96,14 @@ export default {
 
     return ladder.yourRanker.rank <= 1;
   },
+  canBuyAutoPromote(settings, ladder) {
+    return (
+      ladder.yourRanker.autoPromote &&
+      ladder.yourRanker.grapes.cmp(
+        this.getAutoPromoteCost(settings, ladder, ladder.yourRanker.rank)
+      ) >= 0 &&
+      ladder.number >= settings.autoPromoteLadder &&
+      !ladder.types.contains("NO_AUTO")
+    );
+  },
 };

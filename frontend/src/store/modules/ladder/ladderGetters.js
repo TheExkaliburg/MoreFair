@@ -54,4 +54,7 @@ export default {
   canPromote(state, _, rootState) {
     return ladderUtils.canPromote(rootState.settings, state);
   },
+  canBuyAutoPromote(state, _, rootState) {
+    return ladderUtils.canBuyAutoPromote(rootState.settings, state);
+  },
 };

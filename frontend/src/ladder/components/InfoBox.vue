@@ -59,12 +59,7 @@
             <button
               v-if="ladder.number < settings.assholeLadder"
               :class="[
-                !yourRanker.autoPromote &&
-                !autoPromoteLastSecond &&
-                yourRanker.grapes.cmp(autoPromoteCost) >= 0 &&
-                ladder.number < settings.assholeLadder
-                  ? ''
-                  : 'disabled',
+                isBuyAutoPromoteEnabled ? '' : 'disabled',
                 ladder.number >= settings.autoPromoteLadder ? '' : 'hide',
               ]"
               class="btn btn-outline-primary shadow-none w-100"
@@ -180,7 +175,7 @@ const yourVinegarFormatted = computed(() =>
 const biasLastSecond = ref(false);
 const multiLastSecond = ref(false);
 const vinegarLastSecond = ref(false);
-const autoPromoteLastSecond = ref(false);
+const buyAutoPromoteLastSecond = ref(false);
 const promoteLastSecond = ref(false);
 
 // computed
@@ -210,6 +205,11 @@ const isBiasEnabled = computed(
 const isMultiEnabled = computed(
   () =>
     yourRanker.value.power.cmp(multiCost.value) >= 0 && !multiLastSecond.value
+);
+
+const isBuyAutoPromoteEnabled = computed(
+  () =>
+    store.getters["ladder/canBuyAutoPromote"] && !buyAutoPromoteLastSecond.value
 );
 
 // ETA
@@ -247,9 +247,9 @@ function throwVinegar(event) {
 }
 
 function buyAutoPromote(event) {
-  if (autoPromoteLastSecond.value) return;
-  autoPromoteLastSecond.value = true;
-  setTimeout(() => (autoPromoteLastSecond.value = false), 1000);
+  if (buyAutoPromoteLastSecond.value) return;
+  buyAutoPromoteLastSecond.value = true;
+  setTimeout(() => (buyAutoPromoteLastSecond.value = false), 1000);
   stompClient.send(API.GAME.APP_AUTOPROMOTE_DESTINATION, { event: event });
 }
 
