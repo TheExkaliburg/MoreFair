@@ -48,7 +48,7 @@ public class AccountService {
   @Transactional
   public AccountEntity save(AccountEntity account) {
     AccountEntity result = accountRepository.save(account);
-    eventPublisher.publishEvent(new AccountServiceEvent(this, result));
+    eventPublisher.publishEvent(new AccountServiceEvent(this, List.of(result)));
     return result;
   }
 
@@ -91,5 +91,12 @@ public class AccountService {
     }
 
     return result.get(0);
+  }
+
+  @Transactional
+  public List<AccountEntity> save(List<AccountEntity> accounts) {
+    List<AccountEntity> result = accountRepository.saveAll(accounts);
+    eventPublisher.publishEvent(new AccountServiceEvent(this, result));
+    return result;
   }
 }

@@ -38,8 +38,40 @@ public class UnlocksEntity {
   @NonNull
   @Column(nullable = false)
   private Boolean autoPromote = false;
+  @NonNull
+  @Column(nullable = false)
+  private Boolean reachedBaseAssholeLadder = false;
+  @NonNull
+  @Column(nullable = false)
+  private Boolean reachedPreAssholeLadder = false;
+  @NonNull
+  @Column(nullable = false)
+  private Boolean reachedAssholeLadder = false;
+  @NonNull
+  @Column(nullable = false)
+  private Boolean pressedAssholeButton = false;
 
   public void copy(UnlocksEntity entity) {
     this.setAutoPromote(entity.getAutoPromote());
+  }
+
+  public Integer calculateAssholePoints() {
+    int result = 0;
+    if (getAutoPromote()) {
+      result += 1;
+    }
+    if (getReachedBaseAssholeLadder()) {
+      result += 1;
+    }
+    if (getReachedPreAssholeLadder()) {
+      result += 1;
+    }
+    if (getReachedAssholeLadder()) {
+      result += 2;
+    }
+    if (getPressedAssholeButton()) {
+      result += 10;
+    }
+    return result;
   }
 }

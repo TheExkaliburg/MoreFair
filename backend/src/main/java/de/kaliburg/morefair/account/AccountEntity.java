@@ -101,7 +101,21 @@ public class AccountEntity {
         .orElse(1);
   }
 
+  /**
+   * Maps the saved assholePoints to the asshole Count that determines the asshole tag. The function
+   * used is the inverse gauss sum formula.
+   *
+   * @return the asshole count
+   */
   public @NonNull Integer getAssholeCount() {
-    return assholePoints;
+    if (assholePoints <= 0) {
+      return 0;
+    }
+
+    double tenth = (double) assholePoints / 10;
+    double sqrt = Math.sqrt(1 + 8 * tenth);
+    double solution = (-1 + sqrt) / 2;
+
+    return (int) Math.round(Math.floor(solution));
   }
 }

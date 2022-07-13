@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Semaphore;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -440,6 +441,27 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         newRanker.getUnlocks().copy(ranker.getUnlocks());
         LadderEntity newLadder = find(newRanker.getLadder());
 
+        // Handling unlocks
+
+        if (!newRanker.getUnlocks().getAutoPromote()
+            && newLadder.getNumber() >= config.getAutoPromoteLadder()) {
+          newRanker.getUnlocks().setAutoPromote(true);
+        }
+        if (!newRanker.getUnlocks().getReachedBaseAssholeLadder()
+            && newLadder.getNumber() >= currentRound.getBaseAssholeLadder()) {
+          newRanker.getUnlocks().setReachedBaseAssholeLadder(true);
+        }
+        if (!newRanker.getUnlocks().getReachedPreAssholeLadder()
+            && newLadder.getNumber() >= currentRound.getAssholeLadderNumber() - 1) {
+          newRanker.getUnlocks().setReachedPreAssholeLadder(true);
+        }
+        if (!newRanker.getUnlocks().getReachedAssholeLadder()
+            && newLadder.getNumber() >= currentRound.getAssholeLadderNumber()) {
+          newRanker.getUnlocks().setReachedAssholeLadder(true);
+        }
+
+        // Rewards for finishing first / at the top
+
         if (newLadder.getRankers().size() <= 1) {
           newRanker.setAutoPromote(true);
           newRanker.setVinegar(
@@ -467,8 +489,9 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
         // Logic for the Asshole-Ladder
         if (ladder.getNumber() >= currentRound.getAssholeLadderNumber()) {
-          AccountEntity broadCaster = accountService.findBroadcaster();
+          newRanker.getUnlocks().setPressedAssholeButton(true);
 
+          AccountEntity broadCaster = accountService.findBroadcaster();
           chatService.sendGlobalMessage("{@} was welcomed by {@}. They are the "
                   + FormattingUtils.ordinal(newLadder.getRankers().size())
                   + " lucky initiate for the " + FormattingUtils.ordinal(
@@ -482,11 +505,18 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
           // Is it time to reset the game
           if (assholeCount >= neededAssholesForReset) {
-            for (RankerEntity assholeRanker : newLadder.getRankers()) {
-              AccountEntity assholeAccount = accountService.find(assholeRanker.getAccount());
-              assholeAccount.setAssholePoints(assholeAccount.getAssholePoints() + 1);
-              accountService.save(assholeAccount);
+            saveStateToDatabase();
+            LadderEntity firstLadder = find(1);
+            List<AccountEntity> accounts =
+                firstLadder.getRankers().stream().map(RankerEntity::getAccount).toList();
+            for (AccountEntity entity : accounts) {
+              RankerEntity highestRanker =
+                  rankerService.findHighestActiveRankerOfAccountAndRound(entity, getCurrentRound());
+              UnlocksEntity unlocks = highestRanker.getUnlocks();
+              entity.setAssholePoints(entity.getAssholePoints() + unlocks.calculateAssholePoints());
             }
+
+            accountService.save(accounts);
 
             eventPublisher.publishEvent(new GameResetEvent(this));
             wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION,
@@ -592,14 +622,17 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
   @Override
   public void onApplicationEvent(AccountServiceEvent event) {
-    for (RankerEntity currentRanker : event.getAccount().getCurrentRankers(currentRound)) {
-      LadderEntity ladder = find(currentRanker.getLadder());
+    Map<UUID, AccountEntity> accounts =
+        event.getAccounts().stream().collect(Collectors.toMap(AccountEntity::getUuid,
+            Function.identity()));
+
+    for (LadderEntity ladder : currentLadderMap.values()) {
       for (RankerEntity ranker : ladder.getRankers()) {
-        if (ranker.getAccount().getUuid().equals(event.getAccount().getUuid())) {
-          ranker.setAccount(event.getAccount());
+        AccountEntity newAccount = accounts.get(ranker.getAccount().getUuid());
+        if (newAccount != null) {
+          ranker.setAccount(newAccount);
         }
       }
     }
-
   }
 }

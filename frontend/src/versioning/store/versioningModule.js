@@ -32,6 +32,7 @@ const versioningModule = {
             "If you are in the 4th or 5th position you get half the amount of a full-cost autopromote (2500 Grapes)",
             "If you are in the remaining 5 (5th to 10th) of the base amount of people that is needed to unlock the ladder, you gain a tenth of the grapes needed to buy a full-cost autopromote (500 Grapes)",
             "If you can't afford a multi on getting graped, you don't only loose all your points, but also half of your power",
+            "You asshole points are now not mapped 1:1 to your asshole badge. Each Symbol requires 1 more point to reach it.",
           ],
           improvements: [
             "Throwing vinegar and buying auto-promote doesn't get send over public channel anymore",
@@ -41,6 +42,7 @@ const versioningModule = {
             "You get notified again, if you got graped down.",
             "Chat Messages can be 280 characters long again",
             "Number formatting now starts after 6 digits and not after 10",
+            "Now shows the asshole points next to your asshole tag",
           ],
           fixes: [
             "Removed an option that didn't have any functionality",
