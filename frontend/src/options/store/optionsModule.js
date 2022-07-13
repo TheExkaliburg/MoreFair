@@ -102,11 +102,6 @@ const optionsModule = {
                 "showAllRankers"
               );
             }),
-            new BoolOption({
-              displayName: "Follow own Ranker",
-              name: "followOwnRanker",
-              value: false,
-            }),
             new IntegerOption({
               displayName: "Rankers padding",
               name: "rankersPadding",
