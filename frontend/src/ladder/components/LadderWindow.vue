@@ -326,6 +326,14 @@ function changeLadder(event) {
   }
 }
 
+td {
+  overflow: hidden;
+}
+
+table {
+  table-layout: fixed;
+}
+
 .account-id {
   color: var(--text-dark-highlight-color);
 }

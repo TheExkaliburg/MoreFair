@@ -40,10 +40,12 @@ const versioningModule = {
             "Overhauled the Messages that Chad gives you for the asshole-promotions",
             "You get notified again, if you got graped down.",
             "Chat Messages can be 280 characters long again",
+            "Number formatting now starts after 6 digits and not after 10",
           ],
           fixes: [
             "Removed an option that didn't have any functionality",
             "Discord links now open in a new tab.",
+            "Overflow of the ranker table cells has been hidden, too long usernames no longer break the table format.",
           ],
         }),
         new Version("PATCH", "Group Mentions", {

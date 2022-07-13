@@ -13,6 +13,7 @@ import { computed } from "vue";
 import { Sounds } from "@/modules/sounds";
 import Cookies from "js-cookie";
 import API from "@/websocket/wsApi";
+import Decimal from "break_infinity.js";
 
 let promotionJingleVolume;
 let reachingFirstSound;
@@ -25,11 +26,14 @@ let store = createStore({
       settings: Settings.placeholder(),
       user: UserDetails.placeholder(),
       numberFormatter: new numberformat.Formatter({
+        backend: "decimal.js",
+        Decimal: Decimal,
         format: "hybrid",
-        sigfigs: 6,
+        sigfigs: 5,
         flavor: "short",
-        minSuffix: 1e10,
+        minSuffix: 1e6,
         maxSmall: 0,
+        default: 0,
       }),
     };
   },
