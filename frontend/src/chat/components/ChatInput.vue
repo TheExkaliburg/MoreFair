@@ -458,10 +458,12 @@ function plainTextElementChanged(mutation) {
     dropdown.scrollTop = dropdown.scrollHeight;
   }
 
-  //select the last element
   window.dropdownElementSelected = possibleGroupMentions.length - 1;
-  dropdown.children[window.dropdownElementSelected].style.backgroundColor =
-    "var(--item-selected-color)";
+  if (window.dropdownElementSelected >= 1) {
+    //select the last element
+    dropdown.children[window.dropdownElementSelected].style.backgroundColor =
+      "var(--item-selected-color)";
+  }
   //make sure the dropdown always stays 5 pixels from the right window edge
   caretX = Math.min(caretX, visualViewport.width - 5 - dropdown.offsetWidth);
   dropdown.style.left = caretX + "px";

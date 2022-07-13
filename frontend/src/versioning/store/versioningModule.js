@@ -17,6 +17,7 @@ const versioningModule = {
             "Legends have it that there are rare and elusive TINY and GIGANTIC Ladders out there. But no one has ever seen them.",
             "FAST Rounds only have SMALL Ladders and the asshole ladder is at half the original value",
             "AUTO Rounds give people auto-promote automatically on entering a Ladder, for free (Does not work for Asshole-Ladder)",
+            "You now gain asshole points on leaving the first ladder (1), reaching the base asshole ladder (1), reaching the pre-asshole ladder (1) and reaching the asshole ladder (2).",
           ],
           balancing: [
             "The base points requirement of a round and a ladder are randomized now (before the new ladder and round types).",
@@ -32,7 +33,8 @@ const versioningModule = {
             "If you are in the 4th or 5th position you get half the amount of a full-cost autopromote (2500 Grapes)",
             "If you are in the remaining 5 (5th to 10th) of the base amount of people that is needed to unlock the ladder, you gain a tenth of the grapes needed to buy a full-cost autopromote (500 Grapes)",
             "If you can't afford a multi on getting graped, you don't only loose all your points, but also half of your power",
-            "You asshole points are now not mapped 1:1 to your asshole badge. Each Symbol requires 1 more point to reach it.",
+            "You asshole points are now not mapped 1:1 to your asshole badge. Each Symbol requires 10 more points to reach it.",
+            "If you press the asshole button you now gain 10 asshole points",
           ],
           improvements: [
             "Throwing vinegar and buying auto-promote doesn't get send over public channel anymore",
@@ -42,7 +44,7 @@ const versioningModule = {
             "You get notified again, if you got graped down.",
             "Chat Messages can be 280 characters long again",
             "Number formatting now starts after 6 digits and not after 10",
-            "Now shows the asshole points next to your asshole tag",
+            "Now you can enable an option to show the asshole points next to the asshole tags",
           ],
           fixes: [
             "Removed an option that didn't have any functionality",

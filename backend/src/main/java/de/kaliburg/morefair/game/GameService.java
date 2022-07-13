@@ -97,7 +97,7 @@ public class GameService implements ApplicationListener<GameResetEvent> {
       AccountEntity broadcaster = accountService.create(null, round);
       broadcaster.setUsername("Chad");
       broadcaster.setAccessRole(AccountAccessRole.BROADCASTER);
-      broadcaster.setAssholePoints(config.getAssholeTags().size());
+      broadcaster.setAssholePoints(config.getMaxAssholePointsAsTag());
       accountService.save(broadcaster);
     }
 

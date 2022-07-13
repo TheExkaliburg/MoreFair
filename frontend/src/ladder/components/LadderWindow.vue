@@ -65,7 +65,12 @@
           <td class="text-start">
             {{ ranker.rank }}
             {{ ranker.tag
-            }}<sub>{{ ranker.tag === "" ? "" : ranker.ahPoints }}</sub>
+            }}<sub>{{
+              store.getters["options/getOptionValue"]("showAhPoints") &&
+              ranker.tag !== ""
+                ? ranker.ahPoints
+                : ""
+            }}</sub>
           </td>
           <td class="text-start">
             {{ ranker.username }}

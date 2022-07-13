@@ -36,40 +36,13 @@ const optionsModule = {
     return {
       options: [
         new OptionSection({
-          displayName: "Themes",
-          name: "themes",
+          displayName: "General",
+          name: "general",
           options: [
-            new DropdownOption({
-              displayName: "Theme",
-              name: "themeSelection",
-              options: (() => {
-                const themeNames = getThemeNames();
-                //insert the default theme
-                themeNames.unshift("Default");
-                //capitalize the first letter of each string
-                return themeNames.map((themeName) => {
-                  return themeName.charAt(0).toUpperCase() + themeName.slice(1);
-                });
-              })(),
-              callback: (ctx) => {
-                themeSelector.changeTheme(ctx.get());
-              },
-            }),
-            new StringInputOption({
-              displayName: "Custom theme",
-              name: "customTheme",
-              callback: (val) => {
-                loadTheme(val);
-              },
-              buttonText: "Load",
-            }),
-            new ButtonOption({
-              displayName: "Delete current theme",
-              name: "deleteCurrentTheme",
-              callback: () => {
-                deleteNamedTheme(themeSelector.getCurrentTheme());
-                location.reload();
-              },
+            new BoolOption({
+              displayName: "Show asshole-points subsections",
+              name: "showAhPoints",
+              value: false,
             }),
           ],
         }),
@@ -162,6 +135,44 @@ const optionsModule = {
                 "mentionSound"
               )
             ),
+          ],
+        }),
+        new OptionSection({
+          displayName: "Themes",
+          name: "themes",
+          options: [
+            new DropdownOption({
+              displayName: "Theme",
+              name: "themeSelection",
+              options: (() => {
+                const themeNames = getThemeNames();
+                //insert the default theme
+                themeNames.unshift("Default");
+                //capitalize the first letter of each string
+                return themeNames.map((themeName) => {
+                  return themeName.charAt(0).toUpperCase() + themeName.slice(1);
+                });
+              })(),
+              callback: (ctx) => {
+                themeSelector.changeTheme(ctx.get());
+              },
+            }),
+            new StringInputOption({
+              displayName: "Custom theme",
+              name: "customTheme",
+              callback: (val) => {
+                loadTheme(val);
+              },
+              buttonText: "Load",
+            }),
+            new ButtonOption({
+              displayName: "Delete current theme",
+              name: "deleteCurrentTheme",
+              callback: () => {
+                deleteNamedTheme(themeSelector.getCurrentTheme());
+                location.reload();
+              },
+            }),
           ],
         }),
         new OptionSection({
