@@ -13,6 +13,7 @@ const versioningModule = {
             "SMALL Ladders only have around a tenth of the size of a DEFAULT one",
             "BIG Ladders have around 3 times the size of a DEFAULT one",
             "NO_AUTO Ladders replace mostly the logic of the asshole ladder, because you can't buy auto promote there. Nevertheless, theres a small chance to have another ladder be a NO_AUTO ladder. This would overwrite the free autos from the AUTO rounds for this round.",
+            "ASSHOLE Ladder, I Believe you know this already, but the last ladder now has an exclusive type to make the identification of that ladder easier",
             "FAST Rounds only have SMALL Ladders and the asshole ladder is at half the original value",
             "AUTO Rounds give people auto-promote automatically on entering a Ladder, for free (Does not work for Asshole-Ladder)",
           ],
@@ -28,7 +29,8 @@ const versioningModule = {
             "If you are first you still gain autoPromote and your current vinegar gets multiplied by 1.2",
             "If you are in the Top 3 (1st, 2nd, 3rd), you the amount of grapes you would need to buy a full-cost autopromote (5000 Grapes)",
             "If you are in the 4th or 5th position you get half the amount of a full-cost autopromote (2500 Grapes)",
-            "If you are in the remaining 5 (5th to 10th) of the amount of people that is needed to unlock the ladder, you gain a tenth of the grapes needed to buy a full-cost autopromote (500 Grapes)",
+            "If you are in the remaining 5 (5th to 10th) of the base amount of people that is needed to unlock the ladder, you gain a tenth of the grapes needed to buy a full-cost autopromote (500 Grapes)",
+            "If you can't afford a multi on getting graped, you don't only loose all your points, but also half of your power",
           ],
           improvements: [
             "Throwing vinegar and buying auto-promote doesn't get send over public channel anymore",
@@ -36,14 +38,12 @@ const versioningModule = {
             "Group mentions will now be suggested in the chat if you are subscribed to the group!",
             "Overhauled the Messages that Chad gives you for the asshole-promotions",
             "You get notified again, if you got graped down.",
+            "Chat Messages can be 280 characters long again",
           ],
-          fixes: ["Removed an option that didn't have any functionality"],
-        }),
-        new Version("PATCH", "", {
-          balancing: [""],
-          features: [""],
-          improvements: [""],
-          fixes: [""],
+          fixes: [
+            "Removed an option that didn't have any functionality",
+            "Discord links now open in a new tab.",
+          ],
         }),
         new Version("PATCH", "Group Mentions", {
           features: [

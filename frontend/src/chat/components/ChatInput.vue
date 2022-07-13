@@ -14,8 +14,8 @@
       Send
     </button>
   </div>
-  <div :class="msgLength > 140 ? 'error' : ''" class="msgLength">
-    Message length: {{ msgLength }} / 140
+  <div :class="msgLength > 280 ? 'error' : ''" class="msgLength">
+    Message length: {{ msgLength }} / 280
   </div>
 </template>
 

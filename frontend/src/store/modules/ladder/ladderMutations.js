@@ -78,6 +78,7 @@ export default {
     state.rankers.forEach((ranker) => {
       if (event.accountId === ranker.accountId) {
         ranker.points = new Decimal(0);
+        ranker.power = ranker.power.div(new Decimal(2)).floor();
       }
     });
   },

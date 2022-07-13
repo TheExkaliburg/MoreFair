@@ -59,13 +59,14 @@
               If you have any questions, ideas, want to stay up to date to the
               latest updates or simply just want to chat with your fellow
               rankers, without having Chad listening, you can join us on our
-              <a href="https://discord.gg/ThKzCknfFr">Discord</a>.<br /><br />
+              <a href="https://discord.gg/ThKzCknfFr" target="_blank">Discord</a
+              >.<br /><br />
               I appreciate everyone that's part of this amazing community.
               <strong>Thank you!</strong> <br /><br />
               <div class="text-center">
                 <img
                   class="rounded mx-auto d-block"
-                  src="../assets/grapeDoodle.png"
+                  src="@/assets/grapeDoodle.png"
                 /><br />
                 ~ by doshMobile#0001
               </div>

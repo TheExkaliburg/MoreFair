@@ -442,7 +442,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         if (newLadder.getRankers().size() <= 1) {
           newRanker.setAutoPromote(true);
           newRanker.setVinegar(
-              newRanker.getVinegar().divide(BigInteger.TEN).multiply(BigInteger.valueOf(12)));
+              newRanker.getVinegar().multiply(BigInteger.valueOf(12).divide(BigInteger.TEN)));
         }
 
         BigInteger autoPromoteCost = config.getBaseGrapesToBuyAutoPromote();
@@ -566,7 +566,8 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   }
 
   /**
-   * Soft-reset the points of the active ranker of an account on a specific ladder.
+   * Soft-reset the points of the active ranker of an account on a specific ladder. This mainly
+   * happens after successfully thrown vinegar.
    *
    * @param event  the event that contains the information for the buy
    * @param ladder the ladder the ranker is on
@@ -576,6 +577,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
     try {
       RankerEntity ranker = findActiveRankerOfAccountOnLadder(event.getAccountId(), ladder);
       ranker.setPoints(BigInteger.ZERO);
+      ranker.setPower(ranker.getPower().divide(BigInteger.TWO));
       wsUtils.convertAndSendToTopic(GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
           ladder.getNumber().toString()), event);
       return true;

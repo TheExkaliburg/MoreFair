@@ -1,5 +1,6 @@
 package de.kaliburg.morefair.game;
 
+import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountAccessRole;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
@@ -41,18 +42,20 @@ public class GameService implements ApplicationListener<GameResetEvent> {
   private final RankerService rankerService;
   private final ChatService chatService;
   private final AccountService accountService;
+  private final FairConfig config;
   @Getter
   private GameEntity game;
 
   GameService(GameRepository gameRepository, RoundService roundService,
       LadderService ladderService, RankerService rankerService, ChatService chatService,
-      AccountService accountService) {
+      AccountService accountService, FairConfig config) {
     this.gameRepository = gameRepository;
     this.roundService = roundService;
     this.ladderService = ladderService;
     this.rankerService = rankerService;
     this.chatService = chatService;
     this.accountService = accountService;
+    this.config = config;
   }
 
   @PostConstruct
@@ -86,11 +89,13 @@ public class GameService implements ApplicationListener<GameResetEvent> {
     GameEntity result = new GameEntity();
     result = gameRepository.save(result);
 
-    AccountEntity broadcaster = accountService.create(null);
-    broadcaster.setUsername("Chad");
-    broadcaster.setAccessRole(AccountAccessRole.BROADCASTER);
-    broadcaster.setAssholeCount(Integer.MAX_VALUE);
-    accountService.save(broadcaster);
+    if (accountService.findBroadcaster() == null) {
+      AccountEntity broadcaster = accountService.create(null);
+      broadcaster.setUsername("Chad");
+      broadcaster.setAccessRole(AccountAccessRole.BROADCASTER);
+      broadcaster.setAssholeCount(config.getAssholeTags().size());
+      accountService.save(broadcaster);
+    }
 
     RoundEntity round = roundService.create(1);
     ChatEntity chat = chatService.create(1);
