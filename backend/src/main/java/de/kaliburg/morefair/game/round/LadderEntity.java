@@ -74,10 +74,14 @@ public final class LadderEntity {
 
     // getting the pointRequirement based on the type
     BigInteger base = round.getBasePointsRequirement().multiply(BigInteger.valueOf(number));
-    if (types.contains(LadderType.SMALL)) {
+    if (types.contains(LadderType.TINY)) {
+      base = BigInteger.ZERO;
+    } else if (types.contains(LadderType.SMALL)) {
       base = base.divide(BigInteger.valueOf(10));
     } else if (types.contains(LadderType.BIG)) {
       base = base.multiply(BigInteger.valueOf(3));
+    } else if (types.contains(LadderType.GIGANTIC)) {
+      base = base.multiply(BigInteger.valueOf(10));
     }
     Random random = new Random();
     double percentage = random.nextDouble(0.8, 1.2);
@@ -111,11 +115,19 @@ public final class LadderEntity {
         round.getNumber(), randomSizePercentage);
 
     if (round.getTypes().contains(RoundType.FAST)) {
-      types.add(LadderType.SMALL);
+      if (randomSizePercentage < 1) {
+        types.add(LadderType.TINY);
+      } else {
+        types.add(LadderType.SMALL);
+      }
     } else if (number == 1) {
       types.add(LadderType.DEFAULT);
+    } else if (randomSizePercentage < 1) {
+      types.add(LadderType.TINY);
     } else if (randomSizePercentage < 20) {
       types.add(LadderType.SMALL);
+    } else if (randomSizePercentage > 99) {
+      types.add(LadderType.GIGANTIC);
     } else if (randomSizePercentage > 80) {
       types.add(LadderType.BIG);
     }

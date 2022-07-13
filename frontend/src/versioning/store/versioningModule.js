@@ -14,6 +14,7 @@ const versioningModule = {
             "BIG Ladders have around 3 times the size of a DEFAULT one",
             "NO_AUTO Ladders replace mostly the logic of the asshole ladder, because you can't buy auto promote there. Nevertheless, theres a small chance to have another ladder be a NO_AUTO ladder. This would overwrite the free autos from the AUTO rounds for this round.",
             "ASSHOLE Ladder, I Believe you know this already, but the last ladder now has an exclusive type to make the identification of that ladder easier",
+            "Legends have it that there are rare and elusive TINY and GIGANTIC Ladders out there. But no one has ever seen them.",
             "FAST Rounds only have SMALL Ladders and the asshole ladder is at half the original value",
             "AUTO Rounds give people auto-promote automatically on entering a Ladder, for free (Does not work for Asshole-Ladder)",
           ],
