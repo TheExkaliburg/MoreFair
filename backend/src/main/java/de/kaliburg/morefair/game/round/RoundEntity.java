@@ -110,7 +110,7 @@ public class RoundEntity {
 
   public Integer getAssholeLadderNumber() {
     int result = baseAssholeLadder + highestAssholeCount;
-    result = Math.min(20, result);
+    result = Math.min(25, result);
     if (types.contains(RoundType.FAST)) {
       result = (result + 1) / 2;
     }
