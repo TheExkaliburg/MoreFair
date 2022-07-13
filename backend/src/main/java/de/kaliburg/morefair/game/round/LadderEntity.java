@@ -60,7 +60,7 @@ public final class LadderEntity {
   private RoundEntity round;
   @OneToMany(mappedBy = "ladder", fetch = FetchType.EAGER)
   private List<RankerEntity> rankers = new ArrayList<>();
-  @CollectionTable(name = "ladder_type")
+  @CollectionTable(name = "ladder_type", foreignKey = @ForeignKey(name = "fk_ladder_type_ladder"))
   @ElementCollection(targetClass = LadderType.class, fetch = FetchType.EAGER)
   @Enumerated(EnumType.STRING)
   private Set<LadderType> types = new HashSet<>();
