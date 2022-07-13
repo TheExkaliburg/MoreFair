@@ -20,6 +20,9 @@ export default {
   allRankers(state) {
     return state.rankers;
   },
+  ladderTypes(state) {
+    return state.types.join(",");
+  },
   activeRankers(state) {
     return state.rankers.filter((ranker) => ranker.growing);
   },

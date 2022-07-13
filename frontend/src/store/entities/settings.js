@@ -11,7 +11,7 @@ class Settings {
     );
     this.manualPromoteWaitTime = data.manualPromoteWaitTime;
     this.autoPromoteLadder = data.autoPromoteLadder;
-    this.roundType = data.type;
+    this.roundTypes = data.types;
   }
 
   static placeholder() {
@@ -24,7 +24,7 @@ class Settings {
       baseGrapesNeededToAutoPromote: new Decimal(Infinity),
       manualPromoteWaitTime: Infinity,
       autoPromoteLadder: Infinity,
-      type: "DEFAULT",
+      types: ["DEFAULT"],
     });
   }
 }

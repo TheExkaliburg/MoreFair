@@ -40,6 +40,9 @@ let store = createStore({
         state.user.accessRole === "MODERATOR"
       );
     },
+    roundTypes(state) {
+      return state.settings.roundTypes.join(",");
+    },
   },
   mutations: {
     initSettings(state, payload) {

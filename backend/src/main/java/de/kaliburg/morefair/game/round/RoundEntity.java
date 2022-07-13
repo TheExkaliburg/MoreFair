@@ -10,6 +10,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -52,10 +53,9 @@ public class RoundEntity {
   private Integer number;
   @OneToMany(mappedBy = "round", fetch = FetchType.EAGER)
   private Set<LadderEntity> ladders = new HashSet<>();
-  @NonNull
-  @Column(nullable = false)
+  @ElementCollection(targetClass = RoundType.class, fetch = FetchType.EAGER)
   @Enumerated(EnumType.STRING)
-  private RoundType type;
+  private Set<RoundType> types = new HashSet<>();
   @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
   private OffsetDateTime createdOn = OffsetDateTime.now(ZoneOffset.UTC);
   @NonNull
@@ -73,8 +73,9 @@ public class RoundEntity {
 
   public RoundEntity(@NonNull Integer number, FairConfig config) {
     this.number = number;
-    this.type = determineRoundType();
     this.baseAssholeLadder = config.getBaseAssholeLadder();
+
+    determineRoundTypes();
 
     double percentage = random.nextDouble(0.5, 1.5);
 
@@ -84,24 +85,25 @@ public class RoundEntity {
     this.percentageOfAdditionalAssholes = random.nextFloat(100);
   }
 
-  private RoundType determineRoundType() {
+  private void determineRoundTypes() {
+    types.clear();
+
     float randomPercentage = random.nextFloat(100);
     log.info("Determining Roundtype for Round {}: {}%", number, randomPercentage);
 
     if (randomPercentage < 40) {
-      return RoundType.FAST;
+      types.add(RoundType.FAST);
+    } else if (randomPercentage < 60) {
+      types.add(RoundType.AUTO);
+    } else {
+      types.add(RoundType.DEFAULT);
     }
-    if (randomPercentage < 60) {
-      return RoundType.AUTO;
-    }
-
-    return RoundType.DEFAULT;
   }
 
   public Integer getAssholeLadderNumber() {
     int result = baseAssholeLadder + highestAssholeCount;
     result = Math.min(20, result);
-    if (type == RoundType.FAST) {
+    if (types.contains(RoundType.FAST)) {
       result = (result + 1) / 2;
     }
     return result;

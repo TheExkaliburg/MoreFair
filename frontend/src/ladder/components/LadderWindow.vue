@@ -15,9 +15,10 @@
       </span>
     </div>
     <div class="col">
-      Round: [{{ store.state.settings.roundType }}] Ladder: [{{
-        store.state.ladder.type
-      }}]
+      <span>Round: [{{ store.getters.roundTypes }}]</span>
+    </div>
+    <div class="col">
+      <span>Ladder: [{{ store.getters["ladder/ladderTypes"] }}]</span>
     </div>
     <PaginationGroup
       :current="ladder.number"
@@ -27,7 +28,7 @@
           ? Math.max(settings.assholeLadder, user.highestCurrentLadder)
           : user.highestCurrentLadder
       "
-      :onChange="changeLadder"
+      :on-change="changeLadder"
     />
   </div>
   <div class="row py-1 ladder-row">
@@ -379,5 +380,11 @@ function changeLadder(event) {
   // The Animation moves through the keyframes but is paused,
   // so only the negative delay can change anything for it
   animation: 101s linear paused etaProgress;
+}
+
+div .col {
+  span {
+    font-size: 12px;
+  }
 }
 </style>

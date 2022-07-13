@@ -57,11 +57,12 @@
         <div class="row py-0">
           <div class="col px-0 btn-group d-flex">
             <button
-              v-if="ladder.number !== settings.assholeLadder"
+              v-if="ladder.number < settings.assholeLadder"
               :class="[
                 !yourRanker.autoPromote &&
                 !autoPromoteLastSecond &&
-                yourRanker.grapes.cmp(autoPromoteCost) >= 0
+                yourRanker.grapes.cmp(autoPromoteCost) >= 0 &&
+                ladder.number < settings.assholeLadder
                   ? ''
                   : 'disabled',
                 ladder.number >= settings.autoPromoteLadder ? '' : 'hide',
@@ -72,7 +73,7 @@
               Buy Autopromote
             </button>
             <button
-              v-else-if="ladder.number === settings.assholeLadder"
+              v-else-if="ladder.number >= settings.assholeLadder"
               :class="[store.getters['ladder/canPromote'] ? '' : 'disabled']"
               class="btn btn-outline-primary shadow-none w-100"
               @click="promote"

@@ -30,7 +30,7 @@ public class RankerService {
 
   public RankerEntity create(AccountEntity account, LadderEntity ladder, Integer rank) {
     RankerEntity result = new RankerEntity(ladder, account, rank);
-    if (ladder.getRound().getType().equals(RoundType.AUTO)
+    if (ladder.getRound().getTypes().contains(RoundType.AUTO)
         && ladder.getNumber() < ladder.getRound().getAssholeLadderNumber()) {
       result.setAutoPromote(true);
     }

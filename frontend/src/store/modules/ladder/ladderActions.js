@@ -7,7 +7,7 @@ export default {
       type: "setLadder",
       number: message.content.number,
       rankers: message.content.rankers,
-      ladderType: message.content.type,
+      ladderTypes: message.content.types,
       basePointsToPromote: message.content.basePointsToPromote,
     });
   },
@@ -106,7 +106,7 @@ export default {
       type: "setLadder",
       rankers: rankers,
       number: state.number,
-      ladderType: state.type,
+      ladderTypes: state.types,
       basePointsToPromote: state.basePointsToPromote,
     });
     dispatch({

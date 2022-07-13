@@ -3,9 +3,9 @@ import Decimal from "break_infinity.js";
 import ladderUtils from "@/ladder/utils/ladderUtils";
 
 export default {
-  setLadder(state, { number, rankers, ladderType, basePointsToPromote }) {
+  setLadder(state, { number, rankers, ladderTypes, basePointsToPromote }) {
     state.number = number;
-    state.type = ladderType;
+    state.types = ladderTypes;
     state.basePointsToPromote = new Decimal(basePointsToPromote);
     state.rankers = [];
     rankers.forEach((ranker) => {
