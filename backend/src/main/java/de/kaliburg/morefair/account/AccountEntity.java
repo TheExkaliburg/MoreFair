@@ -60,11 +60,8 @@ public class AccountEntity {
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)
   private AccountAccessRole accessRole = AccountAccessRole.PLAYER;
-  //@OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
-  //@MapKeyJoinColumn(name = "round_id")
-  //private Map<RoundEntity, UnlockEntity> roundUnlockMap = new HashMap<>();
   @OneToOne(mappedBy = "account", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-  private AchievementEntity achievement = new AchievementEntity(this);
+  private AchievementsEntity achievements = new AchievementsEntity(this);
 
   public boolean isOwner() {
     return accessRole.equals(AccountAccessRole.OWNER);

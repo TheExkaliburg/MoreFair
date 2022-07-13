@@ -4,14 +4,17 @@ import de.kaliburg.morefair.account.AccountEntity;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.UUID;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -70,6 +73,10 @@ public class RankerEntity {
   private BigInteger vinegar = BigInteger.ZERO;
   @Column
   private boolean autoPromote = false;
+  @NonNull
+  @OneToOne(mappedBy = "ranker", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  private UnlocksEntity unlocks = new UnlocksEntity(this);
+
 
   public RankerEntity addPoints(Integer points, double secondsPassed) {
     return addPoints(BigInteger.valueOf(points), secondsPassed);

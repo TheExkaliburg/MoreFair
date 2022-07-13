@@ -437,6 +437,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         RankerEntity newRanker = createRanker(account, ladder.getNumber() + 1);
         newRanker.setVinegar(ranker.getVinegar());
         newRanker.setGrapes(ranker.getGrapes());
+        newRanker.getUnlocks().copy(ranker.getUnlocks());
         LadderEntity newLadder = find(newRanker.getLadder());
 
         if (newLadder.getRankers().size() <= 1) {

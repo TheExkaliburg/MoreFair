@@ -20,13 +20,11 @@ public class AccountService {
 
   private final AccountRepository accountRepository;
   private final ApplicationEventPublisher eventPublisher;
-  private final UnlockService unlockService;
 
   public AccountService(AccountRepository accountRepository,
-      ApplicationEventPublisher eventPublisher, UnlockService unlockService) {
+      ApplicationEventPublisher eventPublisher) {
     this.accountRepository = accountRepository;
     this.eventPublisher = eventPublisher;
-    this.unlockService = unlockService;
   }
 
   /**
@@ -42,8 +40,6 @@ public class AccountService {
     }
 
     result = save(result);
-
-    UnlockEntity unlocks = unlockService.create(result, currentRound);
 
     log.info("Created Mystery Guest (#{})", result.getId());
     return result;

@@ -4,7 +4,7 @@ import de.kaliburg.morefair.account.AccountAccessRole;
 import de.kaliburg.morefair.account.AccountDetailsDto;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
-import de.kaliburg.morefair.account.AchievementEntity;
+import de.kaliburg.morefair.account.AchievementsEntity;
 import de.kaliburg.morefair.api.utils.RequestThrottler;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.UserPrincipal;
@@ -89,8 +89,8 @@ public class AccountController {
         return;
       }
 
-      if (account.getAchievement() == null) {
-        account.setAchievement(new AchievementEntity(account));
+      if (account.getAchievements() == null) {
+        account.setAchievements(new AchievementsEntity(account));
         accountService.save(account);
       }
 
