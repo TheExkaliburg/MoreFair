@@ -9,15 +9,13 @@
         >
           {{ msg.username }}
         </span>
-        <sub
-          class="message-user-id"
-          style="cursor: pointer"
-          @click="mentionUser"
+        <sub style="cursor: pointer" @click="mentionUser"
           >&nbsp;#{{ msg.accountId }}</sub
         >
       </div>
       <div class="col-4 message-status">
-        <strong>{{ msg.tag }}</strong>
+        <strong>{{ msg.tag }}</strong
+        ><sub>{{ msg.tag === "" ? "" : msg.ahPoints }}</sub>
       </div>
       <div class="col-3 message-date">{{ msg.timeCreated }}</div>
       <div
@@ -131,7 +129,7 @@ function free() {
   // border: white solid 0.5px;
 }
 
-.message-user-id {
+sub {
   color: var(--text-dark-highlight-color);
 }
 

@@ -13,6 +13,7 @@ class Ranker {
     growing = true,
     autoPromote = false,
     tag = "",
+    ahPoints = 0,
     grapes = new Decimal(0),
     vinegar = new Decimal(0),
   } = {}) {
@@ -27,6 +28,7 @@ class Ranker {
     this.growing = growing;
     this.autoPromote = autoPromote;
     this.tag = tag;
+    this.ahPoints = ahPoints;
 
     if (this.you) {
       this.grapes = new Decimal(grapes);

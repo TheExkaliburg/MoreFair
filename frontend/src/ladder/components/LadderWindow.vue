@@ -64,11 +64,12 @@
         >
           <td class="text-start">
             {{ ranker.rank }}
-            {{ ranker.tag }}
+            {{ ranker.tag
+            }}<sub>{{ ranker.tag === "" ? "" : ranker.ahPoints }}</sub>
           </td>
           <td class="text-start">
             {{ ranker.username }}
-            <sub class="account-id">#{{ ranker.accountId }}</sub>
+            <sub>#{{ ranker.accountId }}</sub>
           </td>
           <td
             v-if="showEtaSetting"
@@ -334,7 +335,7 @@ table {
   table-layout: fixed;
 }
 
-.account-id {
+sub {
   color: var(--text-dark-highlight-color);
 }
 
