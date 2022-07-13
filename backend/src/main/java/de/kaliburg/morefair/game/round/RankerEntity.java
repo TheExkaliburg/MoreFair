@@ -50,6 +50,7 @@ public class RankerEntity {
   @NonNull
   @Column(nullable = false)
   private Integer multiplier = 1;
+  @Column
   private boolean growing = true;
   @NonNull
   @ManyToOne
@@ -67,6 +68,7 @@ public class RankerEntity {
   @NonNull
   @Column(nullable = false, precision = 1000, scale = 0)
   private BigInteger vinegar = BigInteger.ZERO;
+  @Column
   private boolean autoPromote = false;
 
   public RankerEntity addPoints(Integer points, double secondsPassed) {

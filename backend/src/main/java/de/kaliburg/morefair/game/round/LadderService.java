@@ -21,8 +21,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Semaphore;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -135,15 +137,23 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
    */
   public void loadIntoCache(RoundEntity round) {
     currentRound = round;
-    List<LadderEntity> ladders = ladderRepository.findByRoundOrderByNumberAsc(round);
+    Set<LadderEntity> ladders = ladderRepository.findByRound(round);
     if (ladders.isEmpty()) {
       ladders.add(createLadder(round, 1));
     }
     currentLadderMap = new HashMap<>();
     ladders.forEach(ladder -> {
+      // TODO: This shouldn't need to be here, i don't know why it pulls multiple instances of
+      //  the same ranker sometimes ... my guess is with the way the ladders are handled, there
+      //  are 3 ladders for 3 modifier types, that get the rankers and then these get joined into
+      //  1 ladder with 3 of the same rankers
+      //  - Fix could be to remove the cascade since we only ever pull the rankers here and fetch
+      //    the rankers manually
+      ladder.setRankers(ladder.getRankers().stream().distinct().collect(Collectors.toList()));
       currentLadderMap.put(ladder.getNumber(), ladder);
       eventMap.put(ladder.getNumber(), new ArrayList<>());
     });
+    currentRound.setLadders(ladders);
   }
 
   /**
@@ -456,11 +466,15 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
         // Logic for the Asshole-Ladder
         if (ladder.getNumber() >= currentRound.getAssholeLadderNumber()) {
-          chatService.sendGlobalMessage(
-              account.getUsername() + " was welcomed by Chad. They are the "
+          AccountEntity broadCaster = accountService.findBroadcaster();
+
+          chatService.sendGlobalMessage("{@} was welcomed by {@}. They are the "
                   + FormattingUtils.ordinal(newLadder.getRankers().size())
                   + " lucky initiate for the " + FormattingUtils.ordinal(
-                  currentRound.getNumber()) + " big ritual.");
+                  currentRound.getNumber()) + " big ritual.",
+              "[{\"u\":\"" + account.getUsername() + "\",\"id\":\"" + account.getId()
+                  + "\",\"i\":0},{\"u\":\"" + broadCaster.getUsername() + "\",\"id\":\""
+                  + broadCaster.getId() + "\",\"i\":20}]");
 
           int neededAssholesForReset = currentRound.getAssholesForReset();
           int assholeCount = newLadder.getRankers().size();

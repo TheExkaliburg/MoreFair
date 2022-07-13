@@ -1,7 +1,7 @@
 package de.kaliburg.morefair.game.round;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,6 +18,6 @@ public interface LadderRepository extends JpaRepository<LadderEntity, Long> {
   Optional<LadderEntity> findByRoundAndNumber(
       @Param("round") RoundEntity round, @Param("number") Integer number);
 
-  @Query("select l from LadderEntity l where l.round = :round order by l.number")
-  List<LadderEntity> findByRoundOrderByNumberAsc(@Param("round") RoundEntity round);
+  @Query("select l from LadderEntity l where l.round = :round")
+  Set<LadderEntity> findByRound(@Param("round") RoundEntity round);
 }
