@@ -8,7 +8,7 @@ const versioningModule = {
         new Version("PATCH", "FREE_AUTO Ladders", {
           features: [
             "There is a FREE_AUTO LADDER and it automatically gives you autopromote",
-            "Every ladder, that is 5 ladders behind the top ladder is getting turned into a FREE_AUTO Ladder",
+            "Every ladder, that is 5 ladders behind the top ladder is getting turned into a FREE_AUTO Ladder (This doesn't work currently, will come back later)",
           ],
           balancing: [
             "Big Ladders are only half as likely to appear than before, should make streaks of them less likely",
