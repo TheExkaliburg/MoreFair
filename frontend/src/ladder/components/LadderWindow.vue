@@ -175,6 +175,8 @@ const shownRankers = computed(() => {
   }
 });
 
+const youEtaToFirst = computed(() => eta(yourRanker.value).toFirst());
+
 //---- Moderation ----
 
 function blur(event) {
@@ -255,13 +257,12 @@ function rankerEtaPercentage(ranker) {
   }
 
   const etaToRanker = eta(ranker).toRanker(yourRanker.value);
-  const youEtaToFirst = eta(yourRanker.value).toFirst();
 
   // we want to return a percentage for our animation interpolation
   // 0 is to overtake now
   // 50 is eta to overtake equals eta to first
   // 100 is eta to overtake equals eta to first * 2
-  let gradientPercent = (etaToRanker / youEtaToFirst) * 50;
+  let gradientPercent = (etaToRanker / youEtaToFirst.value) * 50;
   gradientPercent = Math.min(Math.max(gradientPercent, 0), 100);
 
   //check if the ranker is behind us
