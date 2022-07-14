@@ -452,6 +452,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         newRanker.getUnlocks().copy(ranker.getUnlocks());
         LadderEntity newLadder = find(newRanker.getLadder());
 
+        /*
         if (newLadder.getNumber() > 5 && newLadder.getRankers().size() <= 1) {
           LadderEntity autoLadder = find(newLadder.getNumber() - 5);
 
@@ -462,7 +463,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
                   autoLadderRanker.getAccount().getId()), autoLadder);
             }
           }
-        }
+        }*/
 
         // Unlocks
         if (!newRanker.getUnlocks().getAutoPromote()
