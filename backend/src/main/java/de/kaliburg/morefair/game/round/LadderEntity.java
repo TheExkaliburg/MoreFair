@@ -130,7 +130,7 @@ public final class LadderEntity {
       types.add(LadderType.SMALL);
     } else if (randomSizePercentage > 99) {
       types.add(LadderType.GIGANTIC);
-    } else if (randomSizePercentage > 80) {
+    } else if (randomSizePercentage > 90) {
       types.add(LadderType.BIG);
     }
 
