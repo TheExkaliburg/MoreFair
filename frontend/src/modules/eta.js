@@ -111,10 +111,7 @@ export function eta(ranker) {
       }
 
       // We need to reach the promotion limit and the first place, so we take the max.
-      return Math.max(
-        eta(ranker).toPromotionRequirement(),
-        eta(ranker).toFirst()
-      );
+      return Math.max(etaRequirement, eta(ranker).toFirst());
     },
   };
 }
