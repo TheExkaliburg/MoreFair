@@ -51,6 +51,9 @@ public class AccountEntity {
   @NonNull
   @Column(nullable = false)
   private Integer assholePoints = 0;
+  @NonNull
+  @Column(nullable = false)
+  private Integer legacyAssholePoints = 0;
   @Column
   private Integer lastIp;
   @NonNull

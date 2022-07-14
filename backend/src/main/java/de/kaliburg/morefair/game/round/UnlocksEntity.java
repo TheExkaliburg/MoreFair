@@ -43,9 +43,6 @@ public class UnlocksEntity {
   private Boolean reachedBaseAssholeLadder = false;
   @NonNull
   @Column(nullable = false)
-  private Boolean reachedPreAssholeLadder = false;
-  @NonNull
-  @Column(nullable = false)
   private Boolean reachedAssholeLadder = false;
   @NonNull
   @Column(nullable = false)
@@ -63,14 +60,11 @@ public class UnlocksEntity {
     if (getReachedBaseAssholeLadder()) {
       result += 1;
     }
-    if (getReachedPreAssholeLadder()) {
+    if (getReachedAssholeLadder()) {
       result += 1;
     }
-    if (getReachedAssholeLadder()) {
-      result += 2;
-    }
     if (getPressedAssholeButton()) {
-      result += 10;
+      result += 5;
     }
     return result;
   }

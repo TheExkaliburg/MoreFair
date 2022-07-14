@@ -26,7 +26,6 @@ public class AchievementsEntity {
 
   @Id
   private Long id;
-
   @NonNull
   @OneToOne(fetch = FetchType.EAGER, optional = false)
   @JoinColumn(name = "id", nullable = false, foreignKey = @ForeignKey(name =
