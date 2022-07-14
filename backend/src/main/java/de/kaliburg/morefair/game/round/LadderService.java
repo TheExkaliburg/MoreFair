@@ -403,6 +403,13 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
       RankerEntity ranker = findActiveRankerOfAccountOnLadder(event.getAccountId(), ladder);
       BigInteger cost = upgradeUtils.buyAutoPromoteCost(ranker.getRank(), ladder.getNumber());
 
+      if (ladder.getTypes().contains(LadderType.FREE_AUTO)) {
+        ranker.setAutoPromote(true);
+        wsUtils.convertAndSendToUser(ranker.getAccount().getUuid(),
+            GameController.PRIVATE_EVENTS_DESTINATION, event);
+        return true;
+      }
+
       if (ladderUtils.canBuyAutoPromote(ladder, ranker, currentRound)) {
         ranker.setGrapes(ranker.getGrapes().subtract(cost));
         ranker.setAutoPromote(true);
@@ -441,8 +448,19 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         newRanker.getUnlocks().copy(ranker.getUnlocks());
         LadderEntity newLadder = find(newRanker.getLadder());
 
-        // Handling unlocks
+        if (newLadder.getNumber() > 5) {
+          LadderEntity autoLadder = find(newLadder.getNumber() - 5);
 
+          if (autoLadder != null && !autoLadder.getTypes().contains(LadderType.FREE_AUTO)) {
+            autoLadder.getTypes().add(LadderType.FREE_AUTO);
+            for (RankerEntity autoLadderRanker : autoLadder.getRankers()) {
+              buyAutoPromote(new Event(EventType.BUY_AUTO_PROMOTE,
+                  autoLadderRanker.getAccount().getId()), autoLadder);
+            }
+          }
+        }
+
+        // Unlocks
         if (!newRanker.getUnlocks().getAutoPromote()
             && newLadder.getNumber() >= config.getAutoPromoteLadder()) {
           newRanker.getUnlocks().setAutoPromote(true);
@@ -457,7 +475,6 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         }
 
         // Rewards for finishing first / at the top
-
         if (newLadder.getRankers().size() <= 1) {
           newRanker.setAutoPromote(true);
           newRanker.setVinegar(
