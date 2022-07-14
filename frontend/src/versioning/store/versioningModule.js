@@ -5,6 +5,20 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "FREE_AUTO Ladders", {
+          features: [
+            "There is a FREE_AUTO LADDER and it automatically gives you autopromote",
+            "Every ladder, that is 5 ladders behind the top ladder is getting turned into a FREE_AUTO Ladder",
+          ],
+          balancing: [
+            "Big Ladders are only half as likely to appear than before, should make streaks of them less likely",
+          ],
+          improvements: [
+            "/lastRound Results now include the types and the basePointRequirements",
+            "Tiny Performance increases",
+          ],
+          fixes: ["Muting now works correctly"],
+        }),
         new Version("MAJOR", "Round-Rework and Big Reset", {
           rules: ["Rule 8 now only allows for alts up to Ladder 5"],
           features: [
