@@ -79,7 +79,7 @@ public class AccountEntity {
   }
 
   public boolean isMuted() {
-    return accessRole.equals(AccountAccessRole.MODERATOR) || isBanned();
+    return accessRole.equals(AccountAccessRole.MUTED_PLAYER) || isBanned();
   }
 
   public List<RankerEntity> getActiveRankers() {
