@@ -17,7 +17,7 @@ import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.game.round.RoundUtils;
 import de.kaliburg.morefair.game.round.dto.LadderDto;
-import de.kaliburg.morefair.game.round.dto.LadderResultsDto;
+import de.kaliburg.morefair.game.round.dto.RoundResultsDto;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -68,7 +68,7 @@ public class GameController {
   }
 
   @GetMapping(value = "/lastRound", produces = "application/json")
-  public ResponseEntity<LadderResultsDto> getStatistics() {
+  public ResponseEntity<RoundResultsDto> getStatistics() {
     try {
       if (roundService.getLastRoundResults() == null) {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
