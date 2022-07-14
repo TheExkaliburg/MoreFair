@@ -240,7 +240,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   }
 
   public LadderEntity find(LadderEntity ladder) {
-    return find(ladder.getId());
+    return find(ladder.getNumber());
   }
 
   /**
@@ -401,6 +401,10 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   boolean buyAutoPromote(Event event, LadderEntity ladder) {
     try {
       RankerEntity ranker = findActiveRankerOfAccountOnLadder(event.getAccountId(), ladder);
+      if (ranker == null) {
+        return false;
+      }
+
       BigInteger cost = upgradeUtils.buyAutoPromoteCost(ranker.getRank(), ladder.getNumber());
 
       if (ladder.getTypes().contains(LadderType.FREE_AUTO)) {
@@ -448,7 +452,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         newRanker.getUnlocks().copy(ranker.getUnlocks());
         LadderEntity newLadder = find(newRanker.getLadder());
 
-        if (newLadder.getNumber() > 5) {
+        if (newLadder.getNumber() > 5 && newLadder.getRankers().size() <= 1) {
           LadderEntity autoLadder = find(newLadder.getNumber() - 5);
 
           if (autoLadder != null && !autoLadder.getTypes().contains(LadderType.FREE_AUTO)) {
