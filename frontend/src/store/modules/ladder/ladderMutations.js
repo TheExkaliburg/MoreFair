@@ -13,6 +13,9 @@ export default {
       state.rankers.push(r);
     });
     state.yourRanker = state.rankers.find((r) => r.you);
+    if (!state.yourRanker) {
+      state.yourRanker = new Ranker();
+    }
   },
   handleMultiEvent(state, { event }) {
     state.rankers.forEach((ranker) => {
