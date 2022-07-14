@@ -156,8 +156,7 @@
               <ul>
                 <li>You need to be <strong>rank 1</strong>.</li>
                 <li>
-                  You need to have reached
-                  <strong>100 million points * current ladder</strong> or more.
+                  You need to have reached the base point requirement or more.
                 </li>
                 <li>
                   You need enough people at your ladder. The minimum amount to
@@ -170,7 +169,7 @@
                 </li>
                 <li>
                   You need to press the <strong>promote</strong> button, that
-                  will appear on the top of your screen.
+                  will appear instead of the throw vinegar button.
                 </li>
               </ul>
               Promotion leaves behind a body, that doesn't gain power or points,

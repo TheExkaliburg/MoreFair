@@ -34,7 +34,7 @@ const versioningModule = {
             "If you are in the remaining 5 (5th to 10th) of the base amount of people that is needed to unlock the ladder, you gain a tenth of the grapes needed to buy a full-cost autopromote (500 Grapes)",
             "If you can't afford a multi on getting graped, you don't only loose all your points, but also half of your power",
             "You asshole points are now not mapped 1:1 to your asshole badge. Each Symbol requires 10 more points to reach it.",
-            "If you press the asshole button you now gain 5 asshole points",
+            "If you press the asshole button you now gain 7 asshole points",
           ],
           improvements: [
             "Throwing vinegar and buying auto-promote doesn't get send over public channel anymore",

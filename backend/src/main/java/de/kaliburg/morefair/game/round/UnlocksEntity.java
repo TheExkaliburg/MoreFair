@@ -64,7 +64,7 @@ public class UnlocksEntity {
       result += 1;
     }
     if (getPressedAssholeButton()) {
-      result += 5;
+      result += 7;
     }
     return result;
   }
