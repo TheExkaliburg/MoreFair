@@ -457,13 +457,12 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         log.info("[L{}] Promotion for {} (#{})", ladder.getNumber(), account.getUsername(),
             account.getId());
         ranker.setGrowing(false);
-        ranker = rankerService.save(ranker);
 
         RankerEntity newRanker = createRanker(account, ladder.getNumber() + 1);
         newRanker.setVinegar(ranker.getVinegar());
         newRanker.setGrapes(ranker.getGrapes());
         newRanker.getUnlocks().copy(ranker.getUnlocks());
-        LadderEntity newLadder = find(newRanker.getLadder());
+        LadderEntity newLadder = find(newRanker.getLadder().getNumber());
 
         /*
         if (newLadder.getNumber() > 5 && newLadder.getRankers().size() <= 1) {
