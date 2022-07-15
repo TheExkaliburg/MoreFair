@@ -3,9 +3,9 @@ import Decimal from "break_infinity.js";
 import ladderUtils from "@/ladder/utils/ladderUtils";
 
 export default {
-  setLadder(state, { number, rankers, ladderType, basePointsToPromote }) {
+  setLadder(state, { number, rankers, ladderTypes, basePointsToPromote }) {
     state.number = number;
-    state.type = ladderType;
+    state.types = ladderTypes;
     state.basePointsToPromote = new Decimal(basePointsToPromote);
     state.rankers = [];
     rankers.forEach((ranker) => {
@@ -13,6 +13,9 @@ export default {
       state.rankers.push(r);
     });
     state.yourRanker = state.rankers.find((r) => r.you);
+    if (!state.yourRanker) {
+      state.yourRanker = new Ranker();
+    }
   },
   handleMultiEvent(state, { event }) {
     state.rankers.forEach((ranker) => {
@@ -53,7 +56,6 @@ export default {
     });
 
     const yourRanker = state.yourRanker;
-    console.log(yourRanker.accountId, event.data.targetId);
     if (yourRanker.accountId === event.data.targetId) {
       //We are in the graped position
       yourRanker.vinegar = yourRanker.vinegar.sub(vinegarThrown);
@@ -79,6 +81,7 @@ export default {
     state.rankers.forEach((ranker) => {
       if (event.accountId === ranker.accountId) {
         ranker.points = new Decimal(0);
+        ranker.power = ranker.power.div(new Decimal(2)).floor();
       }
     });
   },

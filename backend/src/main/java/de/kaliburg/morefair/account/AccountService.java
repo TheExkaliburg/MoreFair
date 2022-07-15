@@ -1,7 +1,9 @@
 package de.kaliburg.morefair.account;
 
 import de.kaliburg.morefair.api.websockets.UserPrincipal;
-import java.time.ZonedDateTime;
+import de.kaliburg.morefair.game.round.RoundEntity;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 import javax.transaction.Transactional;
@@ -30,22 +32,23 @@ public class AccountService {
    *
    * @return the account
    */
-  @Transactional
-  public AccountEntity create(UserPrincipal principal) {
+  public AccountEntity create(UserPrincipal principal, RoundEntity currentRound) {
     AccountEntity result = new AccountEntity();
 
     if (principal != null) {
       result.setLastIp(principal.getIpAddress());
     }
+
     result = save(result);
-    log.info("Created Mystery Guest (#{})", result.getId());
+
+    log.debug("Created Mystery Guest (#{})", result.getId());
     return result;
   }
 
   @Transactional
   public AccountEntity save(AccountEntity account) {
     AccountEntity result = accountRepository.save(account);
-    eventPublisher.publishEvent(new AccountServiceEvent(this, result));
+    eventPublisher.publishEvent(new AccountServiceEvent(this, List.of(result)));
     return result;
   }
 
@@ -57,13 +60,14 @@ public class AccountService {
    * @return the updated account
    */
   public AccountEntity login(AccountEntity account, UserPrincipal principal) {
-    account.setLastLogin(ZonedDateTime.now());
+    account.setLastLogin(OffsetDateTime.now(ZoneOffset.UTC));
     account.setLastIp(principal.getIpAddress());
     return save(account);
   }
 
   public AccountEntity find(Long id) {
-    return accountRepository.findById(id).orElse(null);
+    AccountEntity result = accountRepository.findById(id).orElse(null);
+    return result;
   }
 
   public AccountEntity find(UUID uuid) {
@@ -87,5 +91,12 @@ public class AccountService {
     }
 
     return result.get(0);
+  }
+
+  @Transactional
+  public List<AccountEntity> save(List<AccountEntity> accounts) {
+    List<AccountEntity> result = accountRepository.saveAll(accounts);
+    eventPublisher.publishEvent(new AccountServiceEvent(this, result));
+    return result;
   }
 }

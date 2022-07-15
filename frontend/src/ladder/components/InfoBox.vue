@@ -57,13 +57,9 @@
         <div class="row py-0">
           <div class="col px-0 btn-group d-flex">
             <button
-              v-if="ladder.number !== settings.assholeLadder"
+              v-if="ladder.number < settings.assholeLadder"
               :class="[
-                !yourRanker.autoPromote &&
-                !autoPromoteLastSecond &&
-                yourRanker.grapes.cmp(autoPromoteCost) >= 0
-                  ? ''
-                  : 'disabled',
+                isBuyAutoPromoteEnabled ? '' : 'disabled',
                 ladder.number >= settings.autoPromoteLadder ? '' : 'hide',
               ]"
               class="btn btn-outline-primary shadow-none w-100"
@@ -72,7 +68,7 @@
               Buy Autopromote
             </button>
             <button
-              v-else-if="ladder.number === settings.assholeLadder"
+              v-else-if="ladder.number >= settings.assholeLadder"
               :class="[store.getters['ladder/canPromote'] ? '' : 'disabled']"
               class="btn btn-outline-primary shadow-none w-100"
               @click="promote"
@@ -179,7 +175,7 @@ const yourVinegarFormatted = computed(() =>
 const biasLastSecond = ref(false);
 const multiLastSecond = ref(false);
 const vinegarLastSecond = ref(false);
-const autoPromoteLastSecond = ref(false);
+const buyAutoPromoteLastSecond = ref(false);
 const promoteLastSecond = ref(false);
 
 // computed
@@ -209,6 +205,11 @@ const isBiasEnabled = computed(
 const isMultiEnabled = computed(
   () =>
     yourRanker.value.power.cmp(multiCost.value) >= 0 && !multiLastSecond.value
+);
+
+const isBuyAutoPromoteEnabled = computed(
+  () =>
+    store.getters["ladder/canBuyAutoPromote"] && !buyAutoPromoteLastSecond.value
 );
 
 // ETA
@@ -246,9 +247,9 @@ function throwVinegar(event) {
 }
 
 function buyAutoPromote(event) {
-  if (autoPromoteLastSecond.value) return;
-  autoPromoteLastSecond.value = true;
-  setTimeout(() => (autoPromoteLastSecond.value = false), 1000);
+  if (buyAutoPromoteLastSecond.value) return;
+  buyAutoPromoteLastSecond.value = true;
+  setTimeout(() => (buyAutoPromoteLastSecond.value = false), 1000);
   stompClient.send(API.GAME.APP_AUTOPROMOTE_DESTINATION, { event: event });
 }
 

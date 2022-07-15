@@ -152,7 +152,8 @@ public class LadderUtils {
     return !ranker.isAutoPromote() && ranker.getGrapes()
         .compareTo(upgradeUtils.buyAutoPromoteCost(ranker.getRank(), ladder.getNumber())) >= 0
         && ladder.getNumber() >= config.getAutoPromoteLadder()
-        && ladder.getNumber() < round.getAssholeLadderNumber();
+        && ladder.getNumber() < round.getAssholeLadderNumber()
+        && !ladder.getTypes().contains(LadderType.NO_AUTO);
 
   }
 }

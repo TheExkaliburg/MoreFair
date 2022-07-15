@@ -203,8 +203,6 @@ public class LadderCalculator {
 
     if (rankers.size() >= 1 && rankers.get(0).isAutoPromote() && rankers.get(0).isGrowing()
         && ladderUtils.isLadderPromotable(ladder)) {
-      log.info("[L{}] Trying to auto-promote {} (#{})", ladder.getNumber(),
-          rankers.get(0).getAccount().getUsername(), rankers.get(0).getAccount().getId());
       ladderService.addEvent(ladder.getNumber(),
           new Event(EventType.PROMOTE, rankers.get(0).getAccount().getId()));
     }

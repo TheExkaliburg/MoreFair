@@ -3,6 +3,7 @@ class Message {
     this.username = data.username;
     this.message = data.message;
     this.tag = data.tag;
+    this.ahPoints = data.ahPoints;
     this.accountId = data.accountId;
     this.timeCreated = data.timeCreated;
     // TODO: Json parse should feed a constructor of type Metadata

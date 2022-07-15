@@ -2,11 +2,13 @@ package de.kaliburg.morefair.account;
 
 import de.kaliburg.morefair.game.round.RankerEntity;
 import de.kaliburg.morefair.game.round.RoundEntity;
-import java.time.ZonedDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -16,12 +18,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -30,8 +33,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-// @NoArgsConstructor
-@RequiredArgsConstructor
+@NoArgsConstructor
 @SequenceGenerator(name = "seq_account", sequenceName = "seq_account", allocationSize = 1)
 public class AccountEntity {
 
@@ -48,16 +50,21 @@ public class AccountEntity {
   private List<RankerEntity> rankers = new ArrayList<>();
   @NonNull
   @Column(nullable = false)
-  private Integer assholeCount = 0;
+  private Integer assholePoints = 0;
+  @NonNull
+  @Column(nullable = false)
+  private Integer legacyAssholePoints = 0;
   @Column
   private Integer lastIp;
   @NonNull
-  @Column(nullable = false)
-  private ZonedDateTime lastLogin = ZonedDateTime.now();
+  @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
+  private OffsetDateTime lastLogin = OffsetDateTime.now(ZoneOffset.UTC);
   @NonNull
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)
   private AccountAccessRole accessRole = AccountAccessRole.PLAYER;
+  @OneToOne(mappedBy = "account", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  private AchievementsEntity achievements = new AchievementsEntity(this);
 
   public boolean isOwner() {
     return accessRole.equals(AccountAccessRole.OWNER);
@@ -72,7 +79,7 @@ public class AccountEntity {
   }
 
   public boolean isMuted() {
-    return accessRole.equals(AccountAccessRole.MODERATOR) || isBanned();
+    return accessRole.equals(AccountAccessRole.MUTED_PLAYER) || isBanned();
   }
 
   public List<RankerEntity> getActiveRankers() {
@@ -95,5 +102,23 @@ public class AccountEntity {
   public Integer getHighestCurrentLadder(RoundEntity currentRound) {
     return getCurrentRankers(currentRound).stream().mapToInt(r -> r.getLadder().getNumber()).max()
         .orElse(1);
+  }
+
+  /**
+   * Maps the saved assholePoints to the asshole Count that determines the asshole tag. The function
+   * used is the inverse gauss sum formula.
+   *
+   * @return the asshole count
+   */
+  public @NonNull Integer getAssholeCount() {
+    if (assholePoints <= 0) {
+      return 0;
+    }
+
+    double tenth = (double) assholePoints / 10;
+    double sqrt = Math.sqrt(1 + 8 * tenth);
+    double solution = (-1 + sqrt) / 2;
+
+    return (int) Math.round(Math.floor(solution));
   }
 }

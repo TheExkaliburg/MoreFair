@@ -85,7 +85,7 @@
       </div>
       <div class="row">
         <div class="col-8">
-          <a href="https://discord.gg/ThKzCknfFr">Discord</a>
+          <a href="https://discord.gg/ThKzCknfFr" target="_blank">Discord</a>
         </div>
       </div>
     </div>

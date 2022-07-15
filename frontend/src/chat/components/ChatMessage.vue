@@ -9,15 +9,13 @@
         >
           {{ msg.username }}
         </span>
-        <sub
-          class="message-user-id"
-          style="cursor: pointer"
-          @click="mentionUser"
+        <sub style="cursor: pointer" @click="mentionUser"
           >&nbsp;#{{ msg.accountId }}</sub
         >
       </div>
       <div class="col-4 message-status">
-        <strong>{{ msg.tag }}</strong>
+        <strong>{{ msg.tag }}</strong
+        ><sub>{{ ahPoints }}</sub>
       </div>
       <div class="col-3 message-date">{{ msg.timeCreated }}</div>
       <div
@@ -58,7 +56,7 @@
 </template>
 
 <script setup>
-import { defineProps, inject } from "vue";
+import { computed, defineProps, inject } from "vue";
 import { useStore } from "vuex";
 import ChatMessageBody from "@/chat/components/ChatMessageBody";
 import API from "@/websocket/wsApi";
@@ -69,6 +67,17 @@ const stompClient = inject("$stompClient");
 
 const props = defineProps({
   msg: Object,
+});
+
+const numberFormatter = computed(() => store.state.numberFormatter);
+const ahPoints = computed(() => {
+  if (
+    store.getters["options/getOptionValue"]("showAhPoints") &&
+    props.msg.tag !== ""
+  ) {
+    return numberFormatter.value.format(props.msg.ahPoints);
+  }
+  return "";
 });
 
 function mentionUser() {
@@ -131,7 +140,7 @@ function free() {
   // border: white solid 0.5px;
 }
 
-.message-user-id {
+sub {
   color: var(--text-dark-highlight-color);
 }
 

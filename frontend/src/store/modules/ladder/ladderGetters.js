@@ -20,6 +20,9 @@ export default {
   allRankers(state) {
     return state.rankers;
   },
+  ladderTypes(state) {
+    return state.types.join(",");
+  },
   activeRankers(state) {
     return state.rankers.filter((ranker) => ranker.growing);
   },
@@ -50,5 +53,8 @@ export default {
   },
   canPromote(state, _, rootState) {
     return ladderUtils.canPromote(rootState.settings, state);
+  },
+  canBuyAutoPromote(state, _, rootState) {
+    return ladderUtils.canBuyAutoPromote(rootState.settings, state);
   },
 };

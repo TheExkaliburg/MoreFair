@@ -3,11 +3,14 @@ package de.kaliburg.morefair.game.round;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -32,7 +35,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @Entity
 @Table(name = "ladder", uniqueConstraints = {
-    @UniqueConstraint(name = "uq_uuid", columnNames = "uuid"),
+    @UniqueConstraint(name = "uk_uuid", columnNames = "uuid"),
     @UniqueConstraint(name = "uk_number_round", columnNames = {"number", "round_id"})})
 @Getter
 @Setter
@@ -57,10 +60,10 @@ public final class LadderEntity {
   private RoundEntity round;
   @OneToMany(mappedBy = "ladder", fetch = FetchType.EAGER)
   private List<RankerEntity> rankers = new ArrayList<>();
-  @NonNull
-  @Column(nullable = false)
+  @CollectionTable(name = "ladder_type", foreignKey = @ForeignKey(name = "fk_ladder_type_ladder"))
+  @ElementCollection(targetClass = LadderType.class, fetch = FetchType.EAGER)
   @Enumerated(EnumType.STRING)
-  private LadderType type;
+  private Set<LadderType> types = new HashSet<>();
   @NonNull
   @Column(nullable = false, precision = 1000)
   private BigInteger basePointsToPromote;
@@ -68,14 +71,19 @@ public final class LadderEntity {
   public LadderEntity(@NonNull Integer number, @NonNull RoundEntity round) {
     this.number = number;
     this.round = round;
-    this.type = determineLadderType(number, round);
+
+    determineLadderType(round);
 
     // getting the pointRequirement based on the type
     BigInteger base = round.getBasePointsRequirement().multiply(BigInteger.valueOf(number));
-    if (type == LadderType.SMALL) {
+    if (types.contains(LadderType.TINY)) {
+      base = BigInteger.ZERO;
+    } else if (types.contains(LadderType.SMALL)) {
       base = base.divide(BigInteger.valueOf(10));
-    } else if (type == LadderType.BIG) {
+    } else if (types.contains(LadderType.BIG)) {
       base = base.multiply(BigInteger.valueOf(3));
+    } else if (types.contains(LadderType.GIGANTIC)) {
+      base = base.multiply(BigInteger.valueOf(10));
     }
     Random random = new Random();
     double percentage = random.nextDouble(0.8, 1.2);
@@ -85,35 +93,65 @@ public final class LadderEntity {
     this.basePointsToPromote = baseDec.toBigInteger();
   }
 
-  private LadderType determineLadderType(Integer ladderNumber, RoundEntity round) {
+  private void determineLadderType(RoundEntity round) {
     Set<LadderEntity> ladders = round.getLadders();
     LadderEntity ladder =
-        ladders.stream().filter(l -> l.getNumber().equals(ladderNumber)).findFirst().orElse(null);
+        ladders.stream().filter(l -> l.getNumber().equals(number)).findFirst().orElse(null);
+
+    types.clear();
 
     if (ladder != null) {
-      return ladder.getType();
+      log.warn("Ladder already exists, copying LadderTypes.");
+      types = ladder.getTypes();
     }
 
     LadderEntity previousLadder =
-        ladders.stream().filter(l -> l.getNumber().equals(ladderNumber - 1)).findFirst()
+        ladders.stream().filter(l -> l.getNumber().equals(number - 1)).findFirst()
             .orElse(null);
 
-    if (ladderNumber == 1) {
-      return LadderType.DEFAULT;
+    float randomSizePercentage = random.nextFloat(100);
+    log.debug("Rolling randomSizePercentage for Ladder {} in Round {}: {}%", number,
+        round.getNumber(), randomSizePercentage);
+    float randomNoAutoPercentage = random.nextFloat(100);
+    log.debug("Rolling randomNoAutoPercentage for Ladder {} in Round {}: {}%", number,
+        round.getNumber(), randomNoAutoPercentage);
+
+    if (round.getTypes().contains(RoundType.FAST)) {
+      if (randomSizePercentage < 1) {
+        types.add(LadderType.TINY);
+      } else {
+        types.add(LadderType.SMALL);
+      }
+    } else if (number == 1) {
+      types.add(LadderType.DEFAULT);
+    } else if (randomSizePercentage < 1) {
+      types.add(LadderType.TINY);
+    } else if (randomSizePercentage < 20) {
+      types.add(LadderType.SMALL);
+    } else if (randomSizePercentage > 99) {
+      types.add(LadderType.GIGANTIC);
+    } else if (randomSizePercentage > 90) {
+      types.add(LadderType.BIG);
     }
 
-    float randomPercentage = random.nextFloat(100);
-    log.info("Determining LadderType for Ladder {}: {}%", number, randomPercentage);
-
-    if (randomPercentage < 20 || round.getType().equals(RoundType.FAST)) {
-      return LadderType.SMALL;
+    if (round.getAssholeLadderNumber() <= number) {
+      types.add(LadderType.NO_AUTO);
+      types.add(LadderType.ASSHOLE);
     }
 
-    if (randomPercentage > 80) {
-      return LadderType.BIG;
+    if (randomNoAutoPercentage < 5) {
+      types.add(LadderType.NO_AUTO);
+    } else if (randomNoAutoPercentage > 95) {
+      types.add(LadderType.FREE_AUTO);
     }
 
-    return LadderType.DEFAULT;
+    if (!types.contains(LadderType.NO_AUTO) && round.getTypes().contains(RoundType.AUTO)) {
+      types.add(LadderType.FREE_AUTO);
+    }
+
+    if (types.isEmpty()) {
+      types.add(LadderType.DEFAULT);
+    }
   }
 
 }

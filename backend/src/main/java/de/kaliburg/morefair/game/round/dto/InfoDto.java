@@ -3,6 +3,7 @@ package de.kaliburg.morefair.game.round.dto;
 import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundType;
+import java.util.Set;
 import lombok.Data;
 
 @Data
@@ -15,7 +16,7 @@ public class InfoDto {
   private String baseGrapesNeededToAutoPromote;
   private Integer autoPromoteLadder;
   private Integer manualPromoteWaitTime;
-  private RoundType type;
+  private Set<RoundType> types;
 
   public InfoDto(RoundEntity currentRound, FairConfig config) {
     pointsForPromote = currentRound.getBasePointsRequirement().toString();
@@ -25,6 +26,6 @@ public class InfoDto {
     manualPromoteWaitTime = config.getManualPromoteWaitTime();
     baseGrapesNeededToAutoPromote = config.getBaseGrapesToBuyAutoPromote().toString();
     assholeLadder = currentRound.getAssholeLadderNumber();
-    type = currentRound.getType();
+    types = currentRound.getTypes();
   }
 }

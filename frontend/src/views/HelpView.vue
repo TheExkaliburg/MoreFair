@@ -49,9 +49,9 @@
                 </li>
                 <li>Don't use any malicious and/or automating scripts.</li>
                 <li>
-                  Don't use alts past ladder 10 or to gain any advantage
-                  compared to playing solo. (f.e. syncing up actions to keep
-                  gaining grapes)
+                  Don't use alts past ladder 5 or to gain any advantage compared
+                  to playing solo. (f.e. syncing up actions to keep gaining
+                  grapes)
                 </li>
                 <li>No posting of uuids and/or sensitive data.</li>
               </ol>
@@ -59,13 +59,14 @@
               If you have any questions, ideas, want to stay up to date to the
               latest updates or simply just want to chat with your fellow
               rankers, without having Chad listening, you can join us on our
-              <a href="https://discord.gg/ThKzCknfFr">Discord</a>.<br /><br />
+              <a href="https://discord.gg/ThKzCknfFr" target="_blank">Discord</a
+              >.<br /><br />
               I appreciate everyone that's part of this amazing community.
               <strong>Thank you!</strong> <br /><br />
               <div class="text-center">
                 <img
                   class="rounded mx-auto d-block"
-                  src="../assets/grapeDoodle.png"
+                  src="@/assets/grapeDoodle.png"
                 /><br />
                 ~ by doshMobile#0001
               </div>
@@ -155,8 +156,7 @@
               <ul>
                 <li>You need to be <strong>rank 1</strong>.</li>
                 <li>
-                  You need to have reached
-                  <strong>100 million points * current ladder</strong> or more.
+                  You need to have reached the base point requirement or more.
                 </li>
                 <li>
                   You need enough people at your ladder. The minimum amount to
@@ -169,7 +169,7 @@
                 </li>
                 <li>
                   You need to press the <strong>promote</strong> button, that
-                  will appear on the top of your screen.
+                  will appear instead of the throw vinegar button.
                 </li>
               </ul>
               Promotion leaves behind a body, that doesn't gain power or points,
@@ -417,7 +417,7 @@
                 efficiency. Trying to time your Multi and Bias purchases
                 optimally and deciding when it is the best time to stop buying
                 can be very challenging! While the guide is mainly focused on
-                the first Ladder, most of the concepts intruduced here are still
+                the first Ladder, most of the concepts introduced here are still
                 very valid when tackling the rest of the game. <br /><br />
               </p>
               <h2><strong>Where to go from here</strong></h2>

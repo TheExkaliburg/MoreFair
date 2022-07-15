@@ -97,10 +97,9 @@ public class ChatController {
       String message = wsMessage.getContent();
       String metadata = wsMessage.getMetadata();
       message = message.trim();
-      if (message.length() > 140) {
-        message = message.substring(0, 140);
+      if (message.length() > 280) {
+        message = message.substring(0, 280);
       }
-      message = message;
 
       String uuid = wsMessage.getUuid();
       AccountEntity account = accountService.find(UUID.fromString(uuid));

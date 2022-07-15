@@ -14,6 +14,9 @@ const chatModule = {
     addMessage(state, payload) {
       state.chat.addNewMessage(payload.message);
     },
+    handleNameChangeEvent(state, { event }) {
+      state.chat.handleNameChange(event);
+    },
     update(state, payload) {
       state.chat.update(payload.message);
     },

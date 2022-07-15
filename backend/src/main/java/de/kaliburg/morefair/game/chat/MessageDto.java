@@ -12,10 +12,12 @@ public class MessageDto {
   private final Long accountId;
   private final String timeCreated;
   private final String tag;
+  private final Integer ahPoints;
   private final String metadata;
 
   public MessageDto(MessageEntity message, FairConfig config) {
     this.tag = config.getAssholeTag(message.getAccount().getAssholeCount());
+    this.ahPoints = message.getAccount().getAssholePoints();
     this.message = message.getMessage();
     this.username = message.getAccount().getUsername();
     this.accountId = message.getAccount().getId();

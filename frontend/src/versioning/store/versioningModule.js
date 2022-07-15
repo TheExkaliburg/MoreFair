@@ -5,21 +5,66 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
-        new Version("MINOR", "Round-Rework", {
-          balancing: [""],
-          features: ["Rounds and ladders can have specific modifier."],
+        new Version("PATCH", "FREE_AUTO Ladders", {
+          features: [
+            "There is a FREE_AUTO LADDER and it automatically gives you autopromote",
+            "Every ladder, that is 5 ladders behind the top ladder is getting turned into a FREE_AUTO Ladder (This doesn't work currently, will come back later)",
+          ],
+          balancing: [
+            "Big Ladders are only half as likely to appear than before, should make streaks of them less likely",
+          ],
           improvements: [
-            "Throwing Vinegar and buying auto-promote doesn't get send over public channel anymore",
+            "/lastRound Results now include the types and the basePointRequirements",
+            "Tiny Performance increases",
+          ],
+          fixes: ["Muting now works correctly"],
+        }),
+        new Version("MAJOR", "Round-Rework and Big Reset", {
+          rules: ["Rule 8 now only allows for alts up to Ladder 5"],
+          features: [
+            "Rounds and ladders can have specific modifier (some can even have multiple at once).",
+            "DEFAULT Round and Ladders are the same as before.",
+            "SMALL Ladders only have around a tenth of the size of a DEFAULT one",
+            "BIG Ladders have around 3 times the size of a DEFAULT one",
+            "NO_AUTO Ladders replace mostly the logic of the asshole ladder, because you can't buy auto promote there. Nevertheless, theres a small chance to have another ladder be a NO_AUTO ladder. This would overwrite the free autos from the AUTO rounds for this round.",
+            "ASSHOLE Ladder, I Believe you know this already, but the last ladder now has an exclusive type to make the identification of that ladder easier",
+            "Legends have it that there are rare and elusive TINY and GIGANTIC Ladders out there. But no one has ever seen them.",
+            "FAST Rounds only have SMALL Ladders and the asshole ladder is at half the original value",
+            "AUTO Rounds give people auto-promote automatically on entering a Ladder, for free (Does not work for Asshole-Ladder)",
+            "You now gain asshole points on leaving the first ladder (1), reaching the base asshole ladder (1) and reaching the asshole ladder (1).",
+          ],
+          balancing: [
+            "The base points requirement of a round and a ladder are randomized now (before the new ladder and round types).",
+            "The base points requirement for a round is between 50K - 150K",
+            "The base points requirement for a ladder is based on the round requirement multiplied by the ladder number and a value between 1.2 - 0.8",
+            "The number of assholes that can pass the final ladder are now also randomized.",
+            "The minimum amount of people to become an asshole is 5 (base asshole ladder / 2)",
+            "The maximum amount of people to become an asshole is the ladder number of the asshole Ladder",
+            "The asshole ladder has been capped at ladder 25 and won't grow unless there is a reason to go above that",
+            "The rewards for coming first (or up to tenth) have been overworked.",
+            "If you are first you still gain autoPromote and your current vinegar gets multiplied by 1.2",
+            "If you are in the Top 3 (1st, 2nd, 3rd), you the amount of grapes you would need to buy a full-cost autopromote (5000 Grapes)",
+            "If you are in the 4th or 5th position you get half the amount of a full-cost autopromote (2500 Grapes)",
+            "If you are in the remaining 5 (5th to 10th) of the base amount of people that is needed to unlock the ladder, you gain a tenth of the grapes needed to buy a full-cost autopromote (500 Grapes)",
+            "If you can't afford a multi on getting graped, you don't only loose all your points, but also half of your power",
+            "You asshole points are now not mapped 1:1 to your asshole badge. Each Symbol requires 10 more points to reach it.",
+            "If you press the asshole button you now gain 7 asshole points",
+          ],
+          improvements: [
+            "Throwing vinegar and buying auto-promote doesn't get send over public channel anymore",
             "Only active rankers count toward the asshole ladder",
             "Group mentions will now be suggested in the chat if you are subscribed to the group!",
+            "Overhauled the Messages that Chad gives you for the asshole-promotions",
+            "You get notified again, if you got graped down.",
+            "Chat Messages can be 280 characters long again",
+            "Number formatting now starts after 6 digits and not after 10",
+            "Now you can enable an option to show the asshole points next to the asshole tags",
           ],
-          fixes: [""],
-        }),
-        new Version("PATCH", "", {
-          balancing: [""],
-          features: [""],
-          improvements: [""],
-          fixes: [""],
+          fixes: [
+            "Removed an option that didn't have any functionality",
+            "Discord links now open in a new tab.",
+            "Overflow of the ranker table cells has been hidden, too long usernames no longer break the table format.",
+          ],
         }),
         new Version("PATCH", "Group Mentions", {
           features: [

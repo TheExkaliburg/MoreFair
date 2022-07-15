@@ -54,6 +54,11 @@ class Chat {
       if (event.accountId === message.accountId) {
         message.username = event.data;
       }
+      message.metadata.forEach((data) => {
+        if (event.accountId === parseInt(data.id)) {
+          data.u = event.data;
+        }
+      });
     });
   }
 }

@@ -26,4 +26,20 @@ public class FairConfig {
   public String getAssholeTag(Integer assholeCount) {
     return assholeTags.get(Math.min(assholeCount, assholeTags.size() - 1));
   }
+
+  /**
+   * Calculates the maximum assholePoints necessary to get the highest asshole tag.
+   *
+   * @return the maximum assholePoints
+   */
+  public Integer getMaxAssholePointsAsTag() {
+    // 1  10
+    // 2  30
+    // 3  60
+    // 4 100
+    // etc
+    int size = assholeTags.size() - 1;
+    int result = (size * (size + 1)) / 2;
+    return result * 10;
+  }
 }

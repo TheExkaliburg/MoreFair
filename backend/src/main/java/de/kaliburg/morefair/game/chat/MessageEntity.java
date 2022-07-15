@@ -1,7 +1,8 @@
 package de.kaliburg.morefair.game.chat;
 
 import de.kaliburg.morefair.account.AccountEntity;
-import java.time.ZonedDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -51,6 +52,6 @@ public class MessageEntity {
   @JoinColumn(name = "chat_id", nullable = false, foreignKey = @ForeignKey(name = "fk_message_chat"))
   private ChatEntity chat;
   @NonNull
-  @Column(nullable = false)
-  private ZonedDateTime createdOn = ZonedDateTime.now();
+  @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
+  private OffsetDateTime createdOn = OffsetDateTime.now(ZoneOffset.UTC);
 }

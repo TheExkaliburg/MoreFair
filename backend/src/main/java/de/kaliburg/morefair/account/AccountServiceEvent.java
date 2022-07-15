@@ -1,15 +1,16 @@
 package de.kaliburg.morefair.account;
 
+import java.util.List;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
 public class AccountServiceEvent extends ApplicationEvent {
 
   @Getter
-  private final AccountEntity account;
+  private final List<AccountEntity> accounts;
 
-  public AccountServiceEvent(Object source, AccountEntity account) {
+  public AccountServiceEvent(Object source, List<AccountEntity> accounts) {
     super(source);
-    this.account = account;
+    this.accounts = accounts;
   }
 }

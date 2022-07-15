@@ -3,16 +3,20 @@ package de.kaliburg.morefair.game.round;
 import de.kaliburg.morefair.FairConfig;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.time.ZonedDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -51,12 +55,12 @@ public class RoundEntity {
   private Integer number;
   @OneToMany(mappedBy = "round", fetch = FetchType.EAGER)
   private Set<LadderEntity> ladders = new HashSet<>();
-  @NonNull
-  @Column(nullable = false)
+  @CollectionTable(name = "round_type", foreignKey = @ForeignKey(name = "fk_round_type_round"))
+  @ElementCollection(targetClass = RoundType.class, fetch = FetchType.EAGER)
   @Enumerated(EnumType.STRING)
-  private RoundType type;
-  @Column(nullable = false)
-  private ZonedDateTime createdOn = ZonedDateTime.now();
+  private Set<RoundType> types = new HashSet<>();
+  @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
+  private OffsetDateTime createdOn = OffsetDateTime.now(ZoneOffset.UTC);
   @NonNull
   @Column(nullable = false)
   private Integer highestAssholeCount = 0;
@@ -72,8 +76,9 @@ public class RoundEntity {
 
   public RoundEntity(@NonNull Integer number, FairConfig config) {
     this.number = number;
-    this.type = determineRoundType();
     this.baseAssholeLadder = config.getBaseAssholeLadder();
+
+    determineRoundTypes();
 
     double percentage = random.nextDouble(0.5, 1.5);
 
@@ -83,24 +88,33 @@ public class RoundEntity {
     this.percentageOfAdditionalAssholes = random.nextFloat(100);
   }
 
-  private RoundType determineRoundType() {
-    float randomPercentage = random.nextFloat(100);
-    log.info("Determining Roundtype for Round {}: {}%", number, randomPercentage);
+  private void determineRoundTypes() {
+    types.clear();
 
-    if (randomPercentage < 40) {
-      return RoundType.FAST;
-    }
-    if (randomPercentage < 60) {
-      return RoundType.AUTO;
+    float randomFastPercentage = random.nextFloat(100);
+    log.debug("Rolling randomFastPercentage for Round {}: {}%", number, randomFastPercentage);
+
+    float randomAutoPercentage = random.nextFloat(100);
+    log.debug("Rolling randomAutoPercentage for Round {}: {}%", number, randomAutoPercentage);
+
+    if (randomFastPercentage < 40) {
+      types.add(RoundType.FAST);
     }
 
-    return RoundType.DEFAULT;
+    if (randomAutoPercentage < 20) {
+      types.add(RoundType.AUTO);
+    }
+
+    if (types.isEmpty()) {
+      types.add(RoundType.DEFAULT);
+    }
+
   }
 
   public Integer getAssholeLadderNumber() {
     int result = baseAssholeLadder + highestAssholeCount;
-    result = Math.min(20, result);
-    if (type == RoundType.FAST) {
+    result = Math.min(25, result);
+    if (types.contains(RoundType.FAST)) {
       result = (result + 1) / 2;
     }
     return result;
@@ -111,5 +125,9 @@ public class RoundEntity {
     int min = getBaseAssholeLadder() / 2;
 
     return min + Math.round((max - min) * getPercentageOfAdditionalAssholes() / 100);
+  }
+
+  public Integer getModifiedBaseAssholeLadder() {
+    return types.contains(RoundType.FAST) ? getBaseAssholeLadder() / 2 : getBaseAssholeLadder();
   }
 }

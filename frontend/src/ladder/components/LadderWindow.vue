@@ -15,9 +15,10 @@
       </span>
     </div>
     <div class="col">
-      Round: [{{ store.state.settings.roundType }}] Ladder: [{{
-        store.state.ladder.type
-      }}]
+      <span>Round: [{{ store.getters.roundTypes }}]</span>
+    </div>
+    <div class="col">
+      <span>Ladder: [{{ store.getters["ladder/ladderTypes"] }}]</span>
     </div>
     <PaginationGroup
       :current="ladder.number"
@@ -27,7 +28,7 @@
           ? Math.max(settings.assholeLadder, user.highestCurrentLadder)
           : user.highestCurrentLadder
       "
-      :onChange="changeLadder"
+      :on-change="changeLadder"
     />
   </div>
   <div class="row py-1 ladder-row">
@@ -63,11 +64,17 @@
         >
           <td class="text-start">
             {{ ranker.rank }}
-            {{ ranker.tag }}
+            {{ ranker.tag
+            }}<sub>{{
+              store.getters["options/getOptionValue"]("showAhPoints") &&
+              ranker.tag !== ""
+                ? ranker.ahPoints
+                : ""
+            }}</sub>
           </td>
           <td class="text-start">
             {{ ranker.username }}
-            <sub class="account-id">#{{ ranker.accountId }}</sub>
+            <sub>#{{ ranker.accountId }}</sub>
           </td>
           <td
             v-if="showEtaSetting"
@@ -168,6 +175,8 @@ const shownRankers = computed(() => {
   }
 });
 
+const youEtaToFirst = computed(() => eta(yourRanker.value).toFirst());
+
 //---- Moderation ----
 
 function blur(event) {
@@ -248,13 +257,12 @@ function rankerEtaPercentage(ranker) {
   }
 
   const etaToRanker = eta(ranker).toRanker(yourRanker.value);
-  const youEtaToFirst = eta(yourRanker.value).toFirst();
 
   // we want to return a percentage for our animation interpolation
   // 0 is to overtake now
   // 50 is eta to overtake equals eta to first
   // 100 is eta to overtake equals eta to first * 2
-  let gradientPercent = (etaToRanker / youEtaToFirst) * 50;
+  let gradientPercent = (etaToRanker / youEtaToFirst.value) * 50;
   gradientPercent = Math.min(Math.max(gradientPercent, 0), 100);
 
   //check if the ranker is behind us
@@ -325,7 +333,15 @@ function changeLadder(event) {
   }
 }
 
-.account-id {
+td {
+  overflow: hidden;
+}
+
+table {
+  table-layout: fixed;
+}
+
+sub {
   color: var(--text-dark-highlight-color);
 }
 
@@ -338,7 +354,7 @@ function changeLadder(event) {
   background-color: var(--you-background-color);
   color: var(--you-color);
 
-  .account-id {
+  sub {
     color: var(--you-color);
   }
 }
@@ -379,5 +395,11 @@ function changeLadder(event) {
   // The Animation moves through the keyframes but is paused,
   // so only the negative delay can change anything for it
   animation: 101s linear paused etaProgress;
+}
+
+div .col {
+  span {
+    font-size: 12px;
+  }
 }
 </style>
