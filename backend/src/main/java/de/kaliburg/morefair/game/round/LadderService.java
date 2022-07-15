@@ -334,6 +334,19 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         .orElse(null);
   }
 
+  public RankerEntity findFirstActiveRankerOfAccountThisRound(AccountEntity account) {
+    for (int i = currentRound.getAssholeLadderNumber() + 1; i > 0; i--) {
+      LadderEntity ladder = currentLadderMap.get(i);
+      if (ladder != null) {
+        RankerEntity ranker = findActiveRankerOfAccountOnLadder(account.getId(), ladder);
+        if (ranker != null) {
+          return ranker;
+        }
+      }
+    }
+    return null;
+  }
+
   public LadderEntity getHighestLadder() {
     return currentLadderMap.values().stream().max(Comparator.comparing(LadderEntity::getNumber))
         .orElseThrow();

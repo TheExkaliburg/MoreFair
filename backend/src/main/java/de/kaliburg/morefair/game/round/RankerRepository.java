@@ -11,10 +11,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RankerRepository extends JpaRepository<RankerEntity, Long> {
 
-
   Optional<RankerEntity> findFirstByAccountAndLadder_RoundAndGrowingIsTrueOrderByLadder_NumberDesc(
       AccountEntity account, RoundEntity round);
-
 
   @Query("select r from RankerEntity r where r.uuid = :uuid")
   Optional<RankerEntity> findByUuid(@Param("uuid") UUID uuid);
