@@ -53,7 +53,7 @@
                         </goals>
                         <phase>generate-resources</phase>
                         <configuration>
-                            <arguments>install</arguments>
+                            <arguments>clean-install</arguments>
                         </configuration>
                     </execution>
                     <execution>
