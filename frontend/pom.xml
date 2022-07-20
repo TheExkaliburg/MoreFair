@@ -14,8 +14,8 @@
     </parent>
 
     <properties>
-        <node.version>v14.17.5</node.version>
-        <npm.version>8.8.0</npm.version>
+        <node.version>v16.16.0</node.version>
+        <npm.version>8.14.0</npm.version>
     </properties>
 
     <build>
