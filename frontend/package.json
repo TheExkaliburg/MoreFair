@@ -9,7 +9,7 @@
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "cleanold": "rm -rf node_modules && rm -rf package-lock.json && npm cache clean -f",
-    "clean": ""
+    "clean": "rm -rf node_modules && rm -rf package-lock.json && npm cache clean -f"
   },
   "pre-commit": [
     "pre-commit"
