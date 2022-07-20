@@ -15,7 +15,7 @@
 
     <properties>
         <node.version>v16.16.0</node.version>
-        <npm.version>8.14.0</npm.version>
+        <npm.version>8.11.0</npm.version>
     </properties>
 
     <build>
@@ -36,7 +36,7 @@
                             <npmVersion>${npm.version}</npmVersion>
                         </configuration>
                     </execution>
-                    <execution>
+                    <!--execution>
                         <id>npm clean workspace</id>
                         <goals>
                             <goal>npm</goal>
@@ -45,7 +45,7 @@
                         <configuration>
                             <arguments>run clean</arguments>
                         </configuration>
-                    </execution>
+                    </execution-->
                     <execution>
                         <id>npm-install</id>
                         <goals>

@@ -7,9 +7,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
-    "lint": "vue-cli-service lint",
-    "cleanold": "rm -rf node_modules && rm -rf package-lock.json && npm cache clean -f",
-    "clean": "rm -rf node_modules && rm -rf package-lock.json && npm cache clean -f"
+    "lint": "vue-cli-service lint"
   },
   "pre-commit": [
     "pre-commit"
