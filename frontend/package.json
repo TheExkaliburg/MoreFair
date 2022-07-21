@@ -8,7 +8,7 @@
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
-    "clean": "rm -rf node_modules"
+    "clean": ""
   },
   "pre-commit": [
     "pre-commit"
