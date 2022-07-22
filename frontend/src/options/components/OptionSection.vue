@@ -31,7 +31,7 @@ import RangeSlider from "@/options/components/RangeSlider";
 import NumberInput from "@/options/components/NumberInput";
 import DropDown from "@/options/components/DropDown";
 import StringInput from "@/options/components/StringInput";
-import Button from "@/options/components/Button";
+import Button from "@/options/components/ClickButton";
 import EditableStringList from "./EditableStringList.vue";
 import { defineProps } from "vue";
 import {
