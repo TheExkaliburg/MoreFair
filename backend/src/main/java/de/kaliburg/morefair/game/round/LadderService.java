@@ -535,7 +535,6 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
           // Is it time to reset the game
           if (assholeCount >= neededAssholesForReset) {
-            saveStateToDatabase();
             LadderEntity firstLadder = find(1);
             List<AccountEntity> accounts =
                 firstLadder.getRankers().stream().map(RankerEntity::getAccount).toList();
