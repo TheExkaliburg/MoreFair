@@ -495,7 +495,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         if (newLadder.getRankers().size() <= 1) {
           newRanker.setAutoPromote(true);
           newRanker.setVinegar(
-              newRanker.getVinegar().multiply(BigInteger.valueOf(12).divide(BigInteger.TEN)));
+              newRanker.getVinegar().multiply(BigInteger.valueOf(12)).divide(BigInteger.TEN));
         }
 
         BigInteger autoPromoteCost = config.getBaseGrapesToBuyAutoPromote();
@@ -515,7 +515,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
         wsUtils.convertAndSendToTopic(GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
             ladder.getNumber().toString()), event);
-        account = accountService.save(accountService.find(account));
+        account = accountService.save(account);
 
         // Logic for the Asshole-Ladder
         if (ladder.getNumber() >= currentRound.getAssholeLadderNumber()) {
