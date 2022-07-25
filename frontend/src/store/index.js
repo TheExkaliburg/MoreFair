@@ -234,5 +234,5 @@ Sounds.register("promotionJingle", require("@/assets/promotionJingle.wav"));
 
 optionsModule.setStore(store);
 store.registerModule("options", optionsModule);
-window.store = store;
+window.store = { state: store.state };
 export default store;
