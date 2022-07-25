@@ -14,8 +14,8 @@
     </parent>
 
     <properties>
-        <node.version>v14.17.5</node.version>
-        <npm.version>8.8.0</npm.version>
+        <node.version>v16.16.0</node.version>
+        <npm.version>8.11.0</npm.version>
     </properties>
 
     <build>
@@ -37,13 +37,23 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>npm clean workspace</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <arguments>run clean</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>npm-install</id>
                         <goals>
                             <goal>npm</goal>
                         </goals>
                         <phase>generate-resources</phase>
                         <configuration>
-                            <arguments>install</arguments>
+                            <arguments>clean-install</arguments>
                         </configuration>
                     </execution>
                     <execution>
