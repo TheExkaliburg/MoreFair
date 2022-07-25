@@ -491,6 +491,11 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
             && newLadder.getNumber() >= currentRound.getAssholeLadderNumber()) {
           newRanker.getUnlocks().setReachedAssholeLadder(true);
         }
+        if (!newRanker.getUnlocks().getPressedAssholeButton()
+            && ladder.getTypes().contains(LadderType.ASSHOLE)) {
+          newRanker.getUnlocks().setPressedAssholeButton(true);
+          account.getAchievements().setPressedAssholeButton(true);
+        }
 
         // Rewards for finishing first / at the top
         if (newLadder.getRankers().size() <= 1) {
@@ -519,9 +524,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         account = accountService.save(account);
 
         // Logic for the Asshole-Ladder
-        if (ladder.getNumber() >= currentRound.getAssholeLadderNumber()) {
-          newRanker.getUnlocks().setPressedAssholeButton(true);
-
+        if (newRanker.getUnlocks().getPressedAssholeButton()) {
           AccountEntity broadCaster = accountService.findBroadcaster();
           chatService.sendGlobalMessage("{@} was welcomed by {@}. They are the "
                   + FormattingUtils.ordinal(newLadder.getRankers().size())

@@ -21,6 +21,8 @@ public class AccountService {
   private final AccountRepository accountRepository;
   private final ApplicationEventPublisher eventPublisher;
 
+  private AccountEntity broadcasterAccount;
+
   public AccountService(AccountRepository accountRepository,
       ApplicationEventPublisher eventPublisher) {
     this.accountRepository = accountRepository;
@@ -83,14 +85,17 @@ public class AccountService {
   }
 
   public AccountEntity findBroadcaster() {
-    List<AccountEntity> result =
-        accountRepository.findByAccessRoleOrderByIdAsc(AccountAccessRole.BROADCASTER);
+    if (broadcasterAccount == null) {
+      List<AccountEntity> result =
+          accountRepository.findByAccessRoleOrderByIdAsc(AccountAccessRole.BROADCASTER);
+      if (result.isEmpty()) {
+        return null;
+      }
 
-    if (result.isEmpty()) {
-      return null;
+      broadcasterAccount = result.get(0);
     }
 
-    return result.get(0);
+    return broadcasterAccount;
   }
 
   @Transactional
