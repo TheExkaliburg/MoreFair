@@ -5,9 +5,11 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
-        new Version("PATCH", "", {
+        new Version("PATCH", "Mostly Performance", {
           fixes: [
             "The winner of the round should now actually get 20% of their vinegar as reward",
+            "Rankers don't get pulled with the account, this should increase performance",
+            "Only exposing the store.state endpoint to the user now",
           ],
         }),
         new Version("PATCH", "FREE_AUTO Ladders", {
