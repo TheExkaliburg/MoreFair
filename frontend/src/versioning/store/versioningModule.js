@@ -5,6 +5,11 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "", {
+          fixes: [
+            "The winner of the round should now actually get 20% of their vinegar as reward",
+          ],
+        }),
         new Version("PATCH", "FREE_AUTO Ladders", {
           features: [
             "There is a FREE_AUTO LADDER and it automatically gives you autopromote",

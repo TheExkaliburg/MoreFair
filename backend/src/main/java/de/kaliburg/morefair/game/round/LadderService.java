@@ -307,7 +307,8 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
     // Final to be able to use it in a lambda
     final LadderEntity finalLadder = ladder;
-    List<RankerEntity> activeRankersInLadder = account.getActiveRankers().stream()
+    List<RankerEntity> activeRankersInLadder = rankerService.findCurrentActiveRankersOfAccount(
+            account, getCurrentRound()).stream()
         .filter(ranker -> ranker.getLadder().getUuid().equals(finalLadder.getUuid())).toList();
 
     // Only 1 active ranker per ladder

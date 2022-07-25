@@ -3,6 +3,7 @@ package de.kaliburg.morefair.api.websockets;
 import de.kaliburg.morefair.account.AccountAccessRole;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
+import de.kaliburg.morefair.game.round.RankerService;
 import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.game.round.RoundUtils;
@@ -24,12 +25,15 @@ import org.springframework.stereotype.Component;
 public class TopicSubscriptionInterceptor implements ChannelInterceptor {
 
   private final AccountService accountService;
+  private final RankerService rankerService;
   private final RoundService roundService;
   private final RoundUtils roundUtils;
 
-  public TopicSubscriptionInterceptor(AccountService accountService, RoundService roundService,
+  public TopicSubscriptionInterceptor(AccountService accountService, RankerService rankerService,
+      RoundService roundService,
       RoundUtils roundUtils) {
     this.accountService = accountService;
+    this.rankerService = rankerService;
     this.roundService = roundService;
     this.roundUtils = roundUtils;
   }
@@ -82,7 +86,7 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
       }
       int chatDestination = Integer.parseInt(
           topicDestination.substring("/topic/chat/events/".length()));
-      int highestLadder = account.getCurrentRankers(currentRound).stream()
+      int highestLadder = rankerService.findCurrentRankersOfAccount(account, currentRound).stream()
           .mapToInt(v -> v.getLadder().getNumber()).max().orElse(1);
       if (chatDestination > highestLadder) {
         return false;
@@ -99,7 +103,7 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
       if (ladderDestination == roundUtils.getAssholeLadderNumber(roundService.getCurrentRound())) {
         return true;
       }
-      int highestLadder = account.getCurrentRankers(currentRound).stream()
+      int highestLadder = rankerService.findCurrentRankersOfAccount(account, currentRound).stream()
           .mapToInt(v -> v.getLadder().getNumber())
           .max().orElse(1);
       if (ladderDestination > highestLadder) {

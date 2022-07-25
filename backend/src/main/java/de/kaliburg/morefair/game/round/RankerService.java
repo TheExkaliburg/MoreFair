@@ -51,6 +51,15 @@ public class RankerService {
     return rankerRepository.findById(id).orElseThrow();
   }
 
+  public List<RankerEntity> findCurrentRankersOfAccount(AccountEntity account, RoundEntity round) {
+    return rankerRepository.findByAccountAndLadder_Round(account, round);
+  }
+
+  public List<RankerEntity> findCurrentActiveRankersOfAccount(AccountEntity account,
+      RoundEntity round) {
+    return rankerRepository.findByAccountAndLadder_RoundAndGrowingIsTrue(account, round);
+  }
+
   @Transactional
   public List<RankerEntity> save(List<RankerEntity> rankers) {
     return rankerRepository.saveAll(rankers);

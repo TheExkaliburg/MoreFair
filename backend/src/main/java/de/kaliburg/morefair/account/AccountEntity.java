@@ -1,13 +1,8 @@
 package de.kaliburg.morefair.account;
 
-import de.kaliburg.morefair.game.round.RankerEntity;
-import de.kaliburg.morefair.game.round.RoundEntity;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,7 +12,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -46,8 +40,9 @@ public class AccountEntity {
   @NonNull
   @Column(nullable = false)
   private String username = "Mystery Guest";
-  @OneToMany(mappedBy = "account", fetch = FetchType.EAGER)
-  private List<RankerEntity> rankers = new ArrayList<>();
+  // Exists technically, but we don't want to call this in this direction
+  //@OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+  //private List<RankerEntity> rankers = new ArrayList<>();
   @NonNull
   @Column(nullable = false)
   private Integer assholePoints = 0;
@@ -80,28 +75,6 @@ public class AccountEntity {
 
   public boolean isMuted() {
     return accessRole.equals(AccountAccessRole.MUTED_PLAYER) || isBanned();
-  }
-
-  public List<RankerEntity> getActiveRankers() {
-    return rankers.stream().filter(RankerEntity::isGrowing).collect(Collectors.toList());
-  }
-
-  public List<RankerEntity> getCurrentRankers(RoundEntity currentRound) {
-    return rankers.stream()
-        .filter(r -> r.getLadder().getRound().getUuid().equals(currentRound.getUuid()))
-        .collect(Collectors.toList());
-  }
-
-  public List<RankerEntity> getCurrentActiveRankers(RoundEntity currentRound) {
-    return rankers.stream()
-        .filter(
-            r -> r.isGrowing() && r.getLadder().getRound().getUuid().equals(currentRound.getUuid()))
-        .collect(Collectors.toList());
-  }
-
-  public Integer getHighestCurrentLadder(RoundEntity currentRound) {
-    return getCurrentRankers(currentRound).stream().mapToInt(r -> r.getLadder().getNumber()).max()
-        .orElse(1);
   }
 
   /**
