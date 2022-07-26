@@ -8,13 +8,13 @@ import optionsModule from "@/options/store/optionsModule";
 import soundsModule from "@/sounds/store/soundsModule";
 import moderationModule from "@/moderation/store/moderationModule";
 import versioningModule from "@/versioning/store/versioningModule";
+import hookModule from "@/store/modules/hookModule";
 
 import { computed } from "vue";
 import { Sounds } from "@/modules/sounds";
 import Cookies from "js-cookie";
 import API from "@/websocket/wsApi";
 import Decimal from "break_infinity.js";
-import hookModule from "@/store/modules/hookModule";
 
 let promotionJingleVolume;
 let reachingFirstSound;
