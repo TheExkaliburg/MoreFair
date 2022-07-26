@@ -1,31 +1,20 @@
-import { reactive, readonly } from "vue";
 import store from "../store";
+import { readonly } from "vue";
 
-window.state = store.state;
-
-let user = {
-  accountId: store.state.user.accountId,
-  accessRole: store.state.user.accessRole,
-  highestCurrentLadder: store.state.user.highestCurrentLadder,
-};
-
-let state = readonly({
+let state = {
   ladder: store.state.ladder,
   chat: store.state.chat,
-  numberFormatter: store.state.numberFormatter,
-  settings: store.state.settings,
-  options: store.state.options,
-  user: reactive(user),
-});
+  hooks: store.state.hooks,
+};
 
-let api = {
+let api = readonly({
   state: state,
   addToHook: (id, fn) =>
     store.commit({ type: "hooks/addToHook", id: id, fn: fn }),
-};
+});
 
 function subscribe(link) {
-  console.log(link);
+  console.log("This is not implemented yet.", link);
 
   // TODO: Verify Link
 
@@ -34,10 +23,12 @@ function subscribe(link) {
   // TODO: Add Link into indexedDb
 
   // TODO: Execute Code
+  return -1;
 }
 
 function unsubscribe(link) {
-  console.log(link);
+  console.log("This is not implemented yet.", link);
+  return -1;
 }
 
 /**
@@ -45,7 +36,7 @@ function unsubscribe(link) {
  * @param func
  */
 function register(func) {
-  func(api);
+  return func(api);
 }
 
 const Fair = {
