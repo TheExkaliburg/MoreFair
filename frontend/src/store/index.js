@@ -14,11 +14,12 @@ import { Sounds } from "@/modules/sounds";
 import Cookies from "js-cookie";
 import API from "@/websocket/wsApi";
 import Decimal from "break_infinity.js";
+import hookModule from "@/store/modules/hookModule";
 
 let promotionJingleVolume;
 let reachingFirstSound;
 
-let store = createStore({
+const store = createStore({
   strict: process.env.NODE_ENV !== "production",
   namespaced: true,
   state: () => {
@@ -217,6 +218,7 @@ let store = createStore({
     sounds: soundsModule,
     mod: moderationModule,
     versioning: versioningModule,
+    hooks: hookModule,
   },
 });
 
@@ -229,10 +231,7 @@ reachingFirstSound = computed(() =>
 );
 
 Sounds.setStore(store);
-
 Sounds.register("promotionJingle", require("@/assets/promotionJingle.wav"));
-
 optionsModule.setStore(store);
 store.registerModule("options", optionsModule);
-window.store = { state: store.state };
 export default store;

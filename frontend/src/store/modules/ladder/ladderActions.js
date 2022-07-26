@@ -38,7 +38,10 @@ export default {
       });
     }
   },
-  async calculate({ state, commit, getters, dispatch }, { message }) {
+  async calculate(
+    { state, commit, getters, dispatch, rootState },
+    { message }
+  ) {
     const delta = new Decimal(message.delta);
     let rankers = [...state.rankers];
     rankers.sort((a, b) => b.points.sub(a.points));
@@ -102,6 +105,9 @@ export default {
           new Decimal(3).mul(delta).floor()
         );
     }
+
+    rootState.hooks.onTick.forEach((fn) => fn({ delta: delta }));
+
     commit({
       type: "setLadder",
       rankers: rankers,
