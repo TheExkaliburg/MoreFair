@@ -96,6 +96,7 @@ export default {
     let newRanker = new Ranker({
       accountId: event.accountId,
       username: event.data.username,
+      ahPoints: event.data.ahPoints,
       you: false,
       tag: event.data.tag,
     });

@@ -11,6 +11,8 @@ const versioningModule = {
             "Rankers don't get pulled with the account, this should increase performance",
             "Only exposing the store.state endpoint to the user now",
             "Not exposing the Sounds class anymore",
+            "Broadcaster Account (Chad) only gets pulled from database the first time and then cached",
+            "The join event now includes the asshole Points of that person",
           ],
         }),
         new Version("PATCH", "FREE_AUTO Ladders", {

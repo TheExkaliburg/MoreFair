@@ -10,4 +10,6 @@ public class JoinData {
   private String username;
   @NonNull
   private String tag;
+  @NonNull
+  private Integer ahPoints;
 }
