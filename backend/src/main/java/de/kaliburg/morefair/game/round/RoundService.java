@@ -85,7 +85,7 @@ public class RoundService {
   }
 
   public RoundEntity find(Integer number) {
-    if (getCurrentRound().getNumber() == number) {
+    if (getCurrentRound().getNumber().equals(number)) {
       return getCurrentRound();
     }
     return roundRepository.findByNumber(number).orElse(null);

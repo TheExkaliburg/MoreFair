@@ -558,8 +558,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
             List<AccountEntity> accounts =
                 firstLadder.getRankers().stream().map(RankerEntity::getAccount).distinct().toList();
             for (AccountEntity entity : accounts) {
-              RankerEntity highestRanker =
-                  rankerService.findHighestActiveRankerOfAccountAndRound(entity, getCurrentRound());
+              RankerEntity highestRanker = findFirstActiveRankerOfAccountThisRound(entity);
               UnlocksEntity unlocks = highestRanker.getUnlocks();
               entity.setAssholePoints(entity.getAssholePoints() + unlocks.calculateAssholePoints());
             }
