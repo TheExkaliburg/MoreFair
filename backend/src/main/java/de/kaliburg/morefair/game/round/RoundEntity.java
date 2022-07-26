@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -58,7 +59,7 @@ public class RoundEntity {
   @CollectionTable(name = "round_type", foreignKey = @ForeignKey(name = "fk_round_type_round"))
   @ElementCollection(targetClass = RoundType.class, fetch = FetchType.EAGER)
   @Enumerated(EnumType.STRING)
-  private Set<RoundType> types = new HashSet<>();
+  private Set<RoundType> types = EnumSet.noneOf(RoundType.class);
   @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
   private OffsetDateTime createdOn = OffsetDateTime.now(ZoneOffset.UTC);
   @NonNull

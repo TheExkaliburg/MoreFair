@@ -6,6 +6,9 @@ const versioningModule = {
     return {
       versions: [
         new Version("PATCH", "Mostly Performance", {
+          balancing: [
+            "BIG Ladders now can spawn with 20% again, but there can't be 2 BIG ladders back to back.",
+          ],
           fixes: [
             "The winner of the round should now actually get 20% of their vinegar as reward",
             "Rankers don't get pulled with the account, this should increase performance",
