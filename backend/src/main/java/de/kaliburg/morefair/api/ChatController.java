@@ -100,6 +100,10 @@ public class ChatController {
         message = message.substring(0, 280);
       }
 
+      if (message.isBlank()) {
+        return;
+      }
+
       String uuid = wsMessage.getUuid();
       AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null || account.isMuted()) {
