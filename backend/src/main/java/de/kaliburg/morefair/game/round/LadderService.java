@@ -195,7 +195,6 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
             log.warn("The ladder with the number {} of the current round wasn't found in the cache "
                     + "map but the database, adding it to the cache. (Searched for uuid)",
                 result.getNumber());
-            result.getId());
           }
           return result;
         });
