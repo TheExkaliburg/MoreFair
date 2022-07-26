@@ -192,6 +192,10 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
           LadderEntity result = ladderRepository.findByUuid(uuid).orElse(null);
           if (result != null && result.getRound().getUuid().equals(currentRound.getUuid())) {
             currentLadderMap.put(result.getNumber(), result);
+            log.warn("The ladder with the number {} of the current round wasn't found in the cache "
+                    + "map but the database, adding it to the cache. (Searched for uuid)",
+                result.getNumber());
+            result.getId());
           }
           return result;
         });
@@ -211,6 +215,9 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         .orElseGet(() -> {
           LadderEntity result = ladderRepository.findById(id).orElse(null);
           if (result != null && result.getRound().getUuid().equals(currentRound.getUuid())) {
+            log.warn("The ladder with the number {} of the current round wasn't found in the cache "
+                    + "map but the database, adding it to the cache. (Searched for id)",
+                result.getNumber());
             currentLadderMap.put(result.getNumber(), result);
           }
           return result;
@@ -227,16 +234,23 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
    * @return the ladder
    */
   public LadderEntity find(RoundEntity round, Integer number) {
-    return currentLadderMap.values().stream()
-        .filter(ladder -> ladder.getRound().equals(round) && ladder.getNumber().equals(number))
-        .findFirst()
-        .orElseGet(() -> {
-          LadderEntity result = ladderRepository.findByRoundAndNumber(round, number).orElse(null);
-          if (result != null && result.getRound().getUuid().equals(currentRound.getUuid())) {
-            currentLadderMap.put(result.getNumber(), result);
-          }
-          return result;
-        });
+    LadderEntity result = null;
+    boolean isCurrentRound = round.getUuid().equals(getCurrentRound().getUuid());
+
+    if (isCurrentRound) {
+      result = currentLadderMap.get(number);
+    }
+
+    if (result == null) {
+      result = ladderRepository.findByRoundAndNumber(round, number).orElse(null);
+      if (result != null && isCurrentRound) {
+        log.warn("The ladder with the number {} of the current round wasn't found in the cache "
+                + "map but the database, adding it to the cache. (Searched for round+number)",
+            result.getNumber());
+        currentLadderMap.put(result.getNumber(), result);
+      }
+    }
+    return result;
   }
 
   public LadderEntity find(LadderEntity ladder) {
@@ -253,6 +267,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   public LadderEntity find(Integer number) {
     LadderEntity ladder = currentLadderMap.get(number);
     if (ladder == null) {
+      log.warn("Couldn't find the ladder with the number {} in cache, checking database.", number);
       ladder = find(currentRound, number);
     }
 

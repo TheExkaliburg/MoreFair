@@ -20,4 +20,6 @@ public interface LadderRepository extends JpaRepository<LadderEntity, Long> {
 
   @Query("select l from LadderEntity l where l.round = :round")
   Set<LadderEntity> findByRound(@Param("round") RoundEntity round);
+
+
 }
