@@ -180,8 +180,6 @@ const etaPercentage = computed(() => shownRankers.map((ranker, index) => rankerE
 
 const youEtaToFirst = computed(() => eta(yourRanker.value).toFirst());
 
-const youEtaToFirst = computed(() => eta(yourRanker.value).toFirst());
-
 //---- Moderation ----
 
 function blur(event) {
