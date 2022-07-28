@@ -5,6 +5,34 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "Mostly Performance", {
+          balancing: [
+            "BIG Ladders now can spawn with 20% again, but there can't be 2 BIG ladders back to back.",
+          ],
+          fixes: [
+            "The winner of the round should now actually get 20% of their vinegar as reward",
+            "Rankers don't get pulled with the account, this should increase performance",
+            "Only exposing the store.state endpoint to the user now",
+            "Not exposing the Sounds class anymore",
+            "Broadcaster Account (Chad) only gets pulled from database the first time and then cached",
+            "The join event now includes the asshole Points of that person",
+            "Various other small performance fixes",
+          ],
+        }),
+        new Version("PATCH", "FREE_AUTO Ladders", {
+          features: [
+            "There is a FREE_AUTO LADDER and it automatically gives you autopromote",
+            "Every ladder, that is 5 ladders behind the top ladder is getting turned into a FREE_AUTO Ladder (This doesn't work currently, will come back later)",
+          ],
+          balancing: [
+            "Big Ladders are only half as likely to appear than before, should make streaks of them less likely",
+          ],
+          improvements: [
+            "/lastRound Results now include the types and the basePointRequirements",
+            "Tiny Performance increases",
+          ],
+          fixes: ["Muting now works correctly"],
+        }),
         new Version("MAJOR", "Round-Rework and Big Reset", {
           rules: ["Rule 8 now only allows for alts up to Ladder 5"],
           features: [

@@ -1,5 +1,6 @@
 package de.kaliburg.morefair.account;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
@@ -32,4 +33,7 @@ public class AchievementsEntity {
       "fk_achievements_account"))
   @MapsId
   private AccountEntity account;
+  @NonNull
+  @Column(nullable = false)
+  private Boolean pressedAssholeButton = false;
 }

@@ -192,6 +192,9 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
           LadderEntity result = ladderRepository.findByUuid(uuid).orElse(null);
           if (result != null && result.getRound().getUuid().equals(currentRound.getUuid())) {
             currentLadderMap.put(result.getNumber(), result);
+            log.warn("The ladder with the number {} of the current round wasn't found in the cache "
+                    + "map but the database, adding it to the cache. (Searched for uuid)",
+                result.getNumber());
           }
           return result;
         });
@@ -211,6 +214,9 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         .orElseGet(() -> {
           LadderEntity result = ladderRepository.findById(id).orElse(null);
           if (result != null && result.getRound().getUuid().equals(currentRound.getUuid())) {
+            log.warn("The ladder with the number {} of the current round wasn't found in the cache "
+                    + "map but the database, adding it to the cache. (Searched for id)",
+                result.getNumber());
             currentLadderMap.put(result.getNumber(), result);
           }
           return result;
@@ -227,20 +233,27 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
    * @return the ladder
    */
   public LadderEntity find(RoundEntity round, Integer number) {
-    return currentLadderMap.values().stream()
-        .filter(ladder -> ladder.getRound().equals(round) && ladder.getNumber().equals(number))
-        .findFirst()
-        .orElseGet(() -> {
-          LadderEntity result = ladderRepository.findByRoundAndNumber(round, number).orElse(null);
-          if (result != null && result.getRound().getUuid().equals(currentRound.getUuid())) {
-            currentLadderMap.put(result.getNumber(), result);
-          }
-          return result;
-        });
+    LadderEntity result = null;
+    boolean isCurrentRound = round.getUuid().equals(getCurrentRound().getUuid());
+
+    if (isCurrentRound) {
+      result = currentLadderMap.get(number);
+    }
+
+    if (result == null) {
+      result = ladderRepository.findByRoundAndNumber(round, number).orElse(null);
+      if (result != null && isCurrentRound) {
+        log.warn("The ladder with the number {} of the current round wasn't found in the cache "
+                + "map but the database, adding it to the cache. (Searched for round+number)",
+            result.getNumber());
+        currentLadderMap.put(result.getNumber(), result);
+      }
+    }
+    return result;
   }
 
   public LadderEntity find(LadderEntity ladder) {
-    return find(ladder.getId());
+    return find(ladder.getNumber());
   }
 
   /**
@@ -253,6 +266,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   public LadderEntity find(Integer number) {
     LadderEntity ladder = currentLadderMap.get(number);
     if (ladder == null) {
+      log.warn("Couldn't find the ladder with the number {} in cache, checking database.", number);
       ladder = find(currentRound, number);
     }
 
@@ -307,7 +321,8 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
     // Final to be able to use it in a lambda
     final LadderEntity finalLadder = ladder;
-    List<RankerEntity> activeRankersInLadder = account.getActiveRankers().stream()
+    List<RankerEntity> activeRankersInLadder = rankerService.findCurrentActiveRankersOfAccount(
+            account, getCurrentRound()).stream()
         .filter(ranker -> ranker.getLadder().getUuid().equals(finalLadder.getUuid())).toList();
 
     // Only 1 active ranker per ladder
@@ -321,7 +336,8 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
     Event joinEvent = new Event(EventType.JOIN, account.getId());
     joinEvent.setData(
-        new JoinData(account.getUsername(), config.getAssholeTag(account.getAssholeCount())));
+        new JoinData(account.getUsername(), config.getAssholeTag(account.getAssholeCount()),
+            account.getAssholePoints()));
     wsUtils.convertAndSendToTopic(GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
         ladder.getNumber().toString()), joinEvent);
 
@@ -332,6 +348,19 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
     return find(ladder).getRankers().stream()
         .filter(r -> r.getAccount().getId().equals(accountId) && r.isGrowing()).findFirst()
         .orElse(null);
+  }
+
+  public RankerEntity findFirstActiveRankerOfAccountThisRound(AccountEntity account) {
+    for (int i = currentRound.getAssholeLadderNumber() + 1; i > 0; i--) {
+      LadderEntity ladder = currentLadderMap.get(i);
+      if (ladder != null) {
+        RankerEntity ranker = findActiveRankerOfAccountOnLadder(account.getId(), ladder);
+        if (ranker != null) {
+          return ranker;
+        }
+      }
+    }
+    return null;
   }
 
   public LadderEntity getHighestLadder() {
@@ -401,7 +430,18 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   boolean buyAutoPromote(Event event, LadderEntity ladder) {
     try {
       RankerEntity ranker = findActiveRankerOfAccountOnLadder(event.getAccountId(), ladder);
+      if (ranker == null) {
+        return false;
+      }
+
       BigInteger cost = upgradeUtils.buyAutoPromoteCost(ranker.getRank(), ladder.getNumber());
+
+      if (ladder.getTypes().contains(LadderType.FREE_AUTO)) {
+        ranker.setAutoPromote(true);
+        wsUtils.convertAndSendToUser(ranker.getAccount().getUuid(),
+            GameController.PRIVATE_EVENTS_DESTINATION, event);
+        return true;
+      }
 
       if (ladderUtils.canBuyAutoPromote(ladder, ranker, currentRound)) {
         ranker.setGrapes(ranker.getGrapes().subtract(cost));
@@ -433,16 +473,27 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         log.info("[L{}] Promotion for {} (#{})", ladder.getNumber(), account.getUsername(),
             account.getId());
         ranker.setGrowing(false);
-        ranker = rankerService.save(ranker);
 
         RankerEntity newRanker = createRanker(account, ladder.getNumber() + 1);
         newRanker.setVinegar(ranker.getVinegar());
         newRanker.setGrapes(ranker.getGrapes());
         newRanker.getUnlocks().copy(ranker.getUnlocks());
-        LadderEntity newLadder = find(newRanker.getLadder());
+        LadderEntity newLadder = find(newRanker.getLadder().getNumber());
 
-        // Handling unlocks
+        /*
+        if (newLadder.getNumber() > 5 && newLadder.getRankers().size() <= 1) {
+          LadderEntity autoLadder = find(newLadder.getNumber() - 5);
 
+          if (autoLadder != null && !autoLadder.getTypes().contains(LadderType.FREE_AUTO)) {
+            autoLadder.getTypes().add(LadderType.FREE_AUTO);
+            for (RankerEntity autoLadderRanker : autoLadder.getRankers()) {
+              buyAutoPromote(new Event(EventType.BUY_AUTO_PROMOTE,
+                  autoLadderRanker.getAccount().getId()), autoLadder);
+            }
+          }
+        }*/
+
+        // Unlocks
         if (!newRanker.getUnlocks().getAutoPromote()
             && newLadder.getNumber() >= config.getAutoPromoteLadder()) {
           newRanker.getUnlocks().setAutoPromote(true);
@@ -455,13 +506,17 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
             && newLadder.getNumber() >= currentRound.getAssholeLadderNumber()) {
           newRanker.getUnlocks().setReachedAssholeLadder(true);
         }
+        if (!newRanker.getUnlocks().getPressedAssholeButton()
+            && ladder.getTypes().contains(LadderType.ASSHOLE)) {
+          newRanker.getUnlocks().setPressedAssholeButton(true);
+          account.getAchievements().setPressedAssholeButton(true);
+        }
 
         // Rewards for finishing first / at the top
-
         if (newLadder.getRankers().size() <= 1) {
           newRanker.setAutoPromote(true);
           newRanker.setVinegar(
-              newRanker.getVinegar().multiply(BigInteger.valueOf(12).divide(BigInteger.TEN)));
+              newRanker.getVinegar().multiply(BigInteger.valueOf(12)).divide(BigInteger.TEN));
         }
 
         BigInteger autoPromoteCost = config.getBaseGrapesToBuyAutoPromote();
@@ -481,12 +536,10 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
         wsUtils.convertAndSendToTopic(GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
             ladder.getNumber().toString()), event);
-        account = accountService.save(accountService.find(account));
+        account = accountService.save(account);
 
         // Logic for the Asshole-Ladder
-        if (ladder.getNumber() >= currentRound.getAssholeLadderNumber()) {
-          newRanker.getUnlocks().setPressedAssholeButton(true);
-
+        if (newRanker.getUnlocks().getPressedAssholeButton()) {
           AccountEntity broadCaster = accountService.findBroadcaster();
           chatService.sendGlobalMessage("{@} was welcomed by {@}. They are the "
                   + FormattingUtils.ordinal(newLadder.getRankers().size())
@@ -501,13 +554,11 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
           // Is it time to reset the game
           if (assholeCount >= neededAssholesForReset) {
-            saveStateToDatabase();
             LadderEntity firstLadder = find(1);
             List<AccountEntity> accounts =
-                firstLadder.getRankers().stream().map(RankerEntity::getAccount).toList();
+                firstLadder.getRankers().stream().map(RankerEntity::getAccount).distinct().toList();
             for (AccountEntity entity : accounts) {
-              RankerEntity highestRanker =
-                  rankerService.findHighestActiveRankerOfAccountAndRound(entity, getCurrentRound());
+              RankerEntity highestRanker = findFirstActiveRankerOfAccountThisRound(entity);
               UnlocksEntity unlocks = highestRanker.getUnlocks();
               entity.setAssholePoints(entity.getAssholePoints() + unlocks.calculateAssholePoints());
             }

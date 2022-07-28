@@ -31,8 +31,7 @@ public class RankerService {
   public RankerEntity create(AccountEntity account, LadderEntity ladder, Integer rank) {
     RankerEntity result = new RankerEntity(ladder, account, rank);
 
-    if (ladder.getRound().getTypes().contains(RoundType.AUTO)
-        && !ladder.getTypes().contains(LadderType.NO_AUTO)) {
+    if (ladder.getTypes().contains(LadderType.FREE_AUTO)) {
       result.setAutoPromote(true);
     }
 
@@ -50,6 +49,15 @@ public class RankerService {
 
   public RankerEntity find(Long id) {
     return rankerRepository.findById(id).orElseThrow();
+  }
+
+  public List<RankerEntity> findCurrentRankersOfAccount(AccountEntity account, RoundEntity round) {
+    return rankerRepository.findByAccountAndLadder_Round(account, round);
+  }
+
+  public List<RankerEntity> findCurrentActiveRankersOfAccount(AccountEntity account,
+      RoundEntity round) {
+    return rankerRepository.findByAccountAndLadder_RoundAndGrowingIsTrue(account, round);
   }
 
   @Transactional

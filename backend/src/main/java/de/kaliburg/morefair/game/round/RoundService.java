@@ -6,11 +6,8 @@ import de.kaliburg.morefair.api.GameController;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.EventType;
-import de.kaliburg.morefair.game.round.dto.LadderResultsDto;
+import de.kaliburg.morefair.game.round.dto.RoundResultsDto;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -28,7 +25,7 @@ public class RoundService {
   private final WsUtils wsUtils;
   private final RoundUtils roundUtils;
   private final FairConfig config;
-  private LadderResultsDto lastRoundResults;
+  private RoundResultsDto lastRoundResults;
 
   public RoundService(RoundRepository roundRepository, LadderService ladderService,
       @Lazy WsUtils wsUtils, RoundUtils roundUtils, FairConfig config) {
@@ -79,10 +76,7 @@ public class RoundService {
     ladderService.loadIntoCache(round);
     if (getCurrentRound().getNumber() > 1) {
       RoundEntity lastRound = find(getCurrentRound().getNumber() - 1);
-      Map<Integer, LadderEntity> lastRoundLadderMap = lastRound.getLadders().stream()
-          .collect(Collectors.toMap(LadderEntity::getNumber,
-              Function.identity()));
-      lastRoundResults = new LadderResultsDto(lastRoundLadderMap, config);
+      lastRoundResults = new RoundResultsDto(lastRound, config);
     }
   }
 
@@ -91,7 +85,7 @@ public class RoundService {
   }
 
   public RoundEntity find(Integer number) {
-    if (getCurrentRound().getNumber() == number) {
+    if (getCurrentRound().getNumber().equals(number)) {
       return getCurrentRound();
     }
     return roundRepository.findByNumber(number).orElse(null);
@@ -124,7 +118,7 @@ public class RoundService {
   }
 
 
-  public LadderResultsDto getLastRoundResults() {
+  public RoundResultsDto getLastRoundResults() {
     return lastRoundResults;
   }
 

@@ -17,7 +17,7 @@ import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.game.round.RoundUtils;
 import de.kaliburg.morefair.game.round.dto.LadderDto;
-import de.kaliburg.morefair.game.round.dto.LadderResultsDto;
+import de.kaliburg.morefair.game.round.dto.RoundResultsDto;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -68,7 +68,7 @@ public class GameController {
   }
 
   @GetMapping(value = "/lastRound", produces = "application/json")
-  public ResponseEntity<LadderResultsDto> getStatistics() {
+  public ResponseEntity<RoundResultsDto> getStatistics() {
     try {
       if (roundService.getLastRoundResults() == null) {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -93,11 +93,7 @@ public class GameController {
         wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION, HttpStatus.FORBIDDEN);
         return;
       }
-
-      RoundEntity currentRound = roundService.getCurrentRound();
-      RankerEntity ranker = rankerService.findHighestActiveRankerOfAccountAndRound(account,
-          currentRound);
-
+      RankerEntity ranker = ladderService.findFirstActiveRankerOfAccountThisRound(account);
       if (ranker == null) {
         ranker = roundService.createNewRanker(account);
       }
@@ -131,9 +127,8 @@ public class GameController {
       if (account == null || account.isBanned()) {
         return;
       }
-      RoundEntity currentRound = roundService.getCurrentRound();
-      Integer num = rankerService.findHighestActiveRankerOfAccountAndRound(account, currentRound)
-          .getLadder().getNumber();
+      Integer num = ladderService.findFirstActiveRankerOfAccountThisRound(account).getLadder()
+          .getNumber();
       log.info("[L{}] BIAS: {} (#{}) {}", num, account.getUsername(), account.getId(),
           wsMessage.getEvent());
       ModServerMessageData data = new ModServerMessageData(account.getId(),
@@ -156,8 +151,8 @@ public class GameController {
         return;
       }
       RoundEntity currentRound = roundService.getCurrentRound();
-      Integer num = rankerService.findHighestActiveRankerOfAccountAndRound(account, currentRound)
-          .getLadder().getNumber();
+      Integer num = ladderService.findFirstActiveRankerOfAccountThisRound(account).getLadder()
+          .getNumber();
       log.info("[L{}] MULTI: {} (#{}) {}", num, account.getUsername(), account.getId(),
           wsMessage.getEvent());
       ModServerMessageData data = new ModServerMessageData(account.getId(),
@@ -180,8 +175,8 @@ public class GameController {
         return;
       }
       RoundEntity currentRound = roundService.getCurrentRound();
-      Integer num = rankerService.findHighestActiveRankerOfAccountAndRound(account, currentRound)
-          .getLadder().getNumber();
+      Integer num = ladderService.findFirstActiveRankerOfAccountThisRound(account).getLadder()
+          .getNumber();
       log.info("[L{}] VINEGAR: {} (#{}) {}", num, account.getUsername(), account.getId(),
           wsMessage.getEvent());
       ModServerMessageData data = new ModServerMessageData(account.getId(),
@@ -204,8 +199,8 @@ public class GameController {
         return;
       }
       RoundEntity currentRound = roundService.getCurrentRound();
-      Integer num = rankerService.findHighestActiveRankerOfAccountAndRound(account, currentRound)
-          .getLadder().getNumber();
+      Integer num = ladderService.findFirstActiveRankerOfAccountThisRound(account).getLadder()
+          .getNumber();
       log.info("[L{}] PROMOTE: {} (#{}) {}", num, account.getUsername(), account.getId(),
           wsMessage.getEvent());
       ModServerMessageData data = new ModServerMessageData(account.getId(),
@@ -228,8 +223,8 @@ public class GameController {
         return;
       }
       RoundEntity currentRound = roundService.getCurrentRound();
-      Integer num = rankerService.findHighestActiveRankerOfAccountAndRound(account, currentRound)
-          .getLadder().getNumber();
+      Integer num = ladderService.findFirstActiveRankerOfAccountThisRound(account).getLadder()
+          .getNumber();
       log.info("[L{}] AUTOPROMOTE: {} (#{}) {}", num, account.getUsername(), account.getId(),
           wsMessage.getEvent());
       ModServerMessageData data = new ModServerMessageData(account.getId(),

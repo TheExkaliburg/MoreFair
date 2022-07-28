@@ -59,7 +59,7 @@ const optionsModule = {
               displayName: "ETA Colors",
               name: "etaColors",
               options: ["Off", "3-Color", "Gradient"],
-              selectedIndex: 2,
+              selectedIndex: 0,
             }),
             new BoolOption({
               displayName: "Show all rankers",

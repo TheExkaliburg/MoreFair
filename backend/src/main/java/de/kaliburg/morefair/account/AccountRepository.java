@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AccountRepository extends JpaRepository<AccountEntity, Long> {
 
-  @Query("SELECT a FROM AccountEntity a LEFT JOIN FETCH a.rankers WHERE a.uuid = :uuid")
+  @Query("SELECT a FROM AccountEntity a WHERE a.uuid = :uuid")
   Optional<AccountEntity> findByUuid(@Param("uuid") UUID uuid);
 
   @Query("select a from AccountEntity a where lower( a.username) like concat('%', lower(:username), '%')")

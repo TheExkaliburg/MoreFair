@@ -11,9 +11,9 @@ import de.kaliburg.morefair.game.chat.ChatDto;
 import de.kaliburg.morefair.game.chat.ChatService;
 import de.kaliburg.morefair.game.chat.MessageDto;
 import de.kaliburg.morefair.game.chat.MessageEntity;
+import de.kaliburg.morefair.game.round.LadderService;
 import de.kaliburg.morefair.game.round.RankerEntity;
 import de.kaliburg.morefair.game.round.RankerService;
-import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
@@ -42,10 +42,11 @@ public class ChatController {
   private final RoundService roundService;
   private final ChatService chatService;
   private final FairConfig config;
+  private final LadderService ladderService;
 
   public ChatController(AccountService accountService, RankerService rankerService, WsUtils wsUtils,
       RequestThrottler throttler, RoundService roundService, ChatService chatService,
-      FairConfig config) {
+      FairConfig config, LadderService ladderService) {
     this.accountService = accountService;
     this.rankerService = rankerService;
     this.wsUtils = wsUtils;
@@ -53,6 +54,7 @@ public class ChatController {
     this.roundService = roundService;
     this.chatService = chatService;
     this.config = config;
+    this.ladderService = ladderService;
   }
 
   @MessageMapping(APP_INIT_DESTINATION)
@@ -67,10 +69,7 @@ public class ChatController {
         return;
       }
 
-      RoundEntity currentRound = roundService.getCurrentRound();
-
-      RankerEntity ranker = rankerService.findHighestActiveRankerOfAccountAndRound(account,
-          currentRound);
+      RankerEntity ranker = ladderService.findFirstActiveRankerOfAccountThisRound(account);
       if (ranker == null) {
         ranker = roundService.createNewRanker(account);
       }
@@ -101,14 +100,16 @@ public class ChatController {
         message = message.substring(0, 280);
       }
 
+      if (message.isBlank()) {
+        return;
+      }
+
       String uuid = wsMessage.getUuid();
       AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null || account.isMuted()) {
         return;
       }
-      RoundEntity currentRound = roundService.getCurrentRound();
-      RankerEntity ranker = rankerService.findHighestActiveRankerOfAccountAndRound(account,
-          currentRound);
+      RankerEntity ranker = ladderService.findFirstActiveRankerOfAccountThisRound(account);
       if (account.isMod() || (number <= ranker.getLadder().getNumber() && throttler.canPostMessage(
           account))) {
         MessageEntity answer = chatService.sendMessageToChat(account, number, message, metadata);

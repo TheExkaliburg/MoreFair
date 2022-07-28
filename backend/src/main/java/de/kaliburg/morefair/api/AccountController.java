@@ -11,6 +11,7 @@ import de.kaliburg.morefair.api.websockets.UserPrincipal;
 import de.kaliburg.morefair.api.websockets.messages.WsMessage;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.EventType;
+import de.kaliburg.morefair.game.round.RankerService;
 import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
 import java.util.UUID;
@@ -32,14 +33,16 @@ public class AccountController {
   private final RequestThrottler requestThrottler;
   private final WsUtils wsUtils;
   private final RoundService roundService;
+  private final RankerService rankerService;
 
   public AccountController(AccountService accountService,
       RequestThrottler requestThrottler, WsUtils wsUtils,
-      RoundService roundService) {
+      RoundService roundService, RankerService rankerService) {
     this.accountService = accountService;
     this.requestThrottler = requestThrottler;
     this.wsUtils = wsUtils;
     this.roundService = roundService;
+    this.rankerService = rankerService;
   }
 
   /**
@@ -62,7 +65,7 @@ public class AccountController {
       if (uuid == null || uuid.isBlank()) {
         if (requestThrottler.canCreateAccount(principal)) {
           wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION,
-              new AccountDetailsDto(accountService.create(principal, currentRound), currentRound),
+              new AccountDetailsDto(accountService.create(principal, currentRound), 1),
               HttpStatus.CREATED);
         } else {
           wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
@@ -75,7 +78,7 @@ public class AccountController {
       if (account == null) {
         if (requestThrottler.canCreateAccount(principal)) {
           wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION,
-              new AccountDetailsDto(accountService.create(principal, currentRound), currentRound),
+              new AccountDetailsDto(accountService.create(principal, currentRound), 1),
               HttpStatus.CREATED);
         } else {
           wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
@@ -95,8 +98,11 @@ public class AccountController {
       }
 
       account = accountService.login(account, principal);
+      int highestLadder = rankerService.findCurrentRankersOfAccount(account, currentRound).stream()
+          .mapToInt(r -> r.getLadder().getNumber()).max().orElse(1);
+
       wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, new AccountDetailsDto(account,
-          currentRound));
+          highestLadder));
 
 
     } catch (IllegalArgumentException e) {

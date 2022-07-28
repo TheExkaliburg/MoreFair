@@ -3,8 +3,9 @@ package de.kaliburg.morefair.game.round;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
@@ -63,7 +64,7 @@ public final class LadderEntity {
   @CollectionTable(name = "ladder_type", foreignKey = @ForeignKey(name = "fk_ladder_type_ladder"))
   @ElementCollection(targetClass = LadderType.class, fetch = FetchType.EAGER)
   @Enumerated(EnumType.STRING)
-  private Set<LadderType> types = new HashSet<>();
+  private Set<LadderType> types = EnumSet.noneOf(LadderType.class);
   @NonNull
   @Column(nullable = false, precision = 1000)
   private BigInteger basePointsToPromote;
@@ -105,9 +106,10 @@ public final class LadderEntity {
       types = ladder.getTypes();
     }
 
-    LadderEntity previousLadder =
-        ladders.stream().filter(l -> l.getNumber().equals(number - 1)).findFirst()
-            .orElse(null);
+    Optional<LadderEntity> ladderOptional = ladders.stream()
+        .filter(l -> l.getNumber().equals(number - 1)).findFirst();
+    Set<LadderType> previousLadderTypes = ladderOptional.map(LadderEntity::getTypes)
+        .orElse(EnumSet.noneOf(LadderType.class));
 
     float randomSizePercentage = random.nextFloat(100);
     log.debug("Rolling randomSizePercentage for Ladder {} in Round {}: {}%", number,
@@ -130,7 +132,8 @@ public final class LadderEntity {
       types.add(LadderType.SMALL);
     } else if (randomSizePercentage > 99) {
       types.add(LadderType.GIGANTIC);
-    } else if (randomSizePercentage > 80) {
+    } else if (randomSizePercentage > 80 && !previousLadderTypes.contains(LadderType.BIG)
+        && !previousLadderTypes.contains(LadderType.GIGANTIC)) {
       types.add(LadderType.BIG);
     }
 
@@ -141,6 +144,12 @@ public final class LadderEntity {
 
     if (randomNoAutoPercentage < 5) {
       types.add(LadderType.NO_AUTO);
+    } else if (randomNoAutoPercentage > 95) {
+      types.add(LadderType.FREE_AUTO);
+    }
+
+    if (!types.contains(LadderType.NO_AUTO) && round.getTypes().contains(RoundType.AUTO)) {
+      types.add(LadderType.FREE_AUTO);
     }
 
     if (types.isEmpty()) {

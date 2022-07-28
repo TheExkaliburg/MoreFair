@@ -22,6 +22,6 @@ let Sounds = {
   },
 };
 
-window.Sounds = Sounds;
+//window.Sounds = Sounds;
 
 export { Sounds };
