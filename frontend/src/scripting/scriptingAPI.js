@@ -1,24 +1,17 @@
 import store from "../store";
 import { computed, readonly } from "vue";
 
-let user = {
-  accountId: computed(() => store.state.user.accountId),
-  highestCurrentLadder: computed(() => store.state.user.highestCurrentLadder),
-  accessRole: computed(() => store.state.user.accessRole),
-};
+// let user = {
+//   accountId: computed(() => store.state.user.accountId),
+//   highestCurrentLadder: computed(() => store.state.user.highestCurrentLadder),
+//   accessRole: computed(() => store.state.user.accessRole),
+// };
+//
 
-let state = {
-  ladder: store.state.ladder,
-  chat: store.state.chat,
-  hooks: store.state.hooks,
-  numberFormatter: computed(() => store.state.numberFormatter),
-  settings: computed(() => store.state.settings),
-  user: user,
-  options: store.state.options,
-};
+let state = readonly(store.state);
 
 let api = readonly({
-  state: state,
+  state: computed(() => state),
   addToHook: (id, fn) =>
     store.commit({ type: "hooks/addToHook", id: id, fn: fn }),
 });
