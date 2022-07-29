@@ -103,7 +103,7 @@ export default {
         this.getAutoPromoteCost(settings, ladder, ladder.yourRanker.rank)
       ) >= 0 &&
       ladder.number >= settings.autoPromoteLadder &&
-      !ladder.types.includes("NO_AUTO")
+      !ladder.types.has("NO_AUTO")
     );
   },
 };
