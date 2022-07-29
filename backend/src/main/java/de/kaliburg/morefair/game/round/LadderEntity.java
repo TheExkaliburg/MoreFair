@@ -144,7 +144,7 @@ public final class LadderEntity {
 
     if (randomNoAutoPercentage < 5) {
       types.add(LadderType.NO_AUTO);
-    } else if (randomNoAutoPercentage > 95) {
+    } else if (randomNoAutoPercentage > 95 && !types.contains(LadderType.NO_AUTO)) {
       types.add(LadderType.FREE_AUTO);
     }
 
