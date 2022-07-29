@@ -137,7 +137,7 @@ public final class LadderEntity {
       types.add(LadderType.BIG);
     }
 
-    if (round.getAssholeLadderNumber() <= number) {
+    if (number >= round.getAssholeLadderNumber()) {
       types.add(LadderType.NO_AUTO);
       types.add(LadderType.ASSHOLE);
     }

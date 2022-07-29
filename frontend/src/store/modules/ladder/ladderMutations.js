@@ -5,7 +5,7 @@ import ladderUtils from "@/ladder/utils/ladderUtils";
 export default {
   setLadder(state, { number, rankers, ladderTypes, basePointsToPromote }) {
     state.number = number;
-    state.types = ladderTypes;
+    state.types = new Set(ladderTypes);
     state.basePointsToPromote = new Decimal(basePointsToPromote);
     state.rankers = [];
     rankers.forEach((ranker) => {

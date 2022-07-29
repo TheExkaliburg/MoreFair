@@ -12,6 +12,7 @@ class Chat {
   }
 
   addNewMessage(message) {
+    console.log("test");
     if (!(message instanceof Message)) message = new Message(message);
     this.messages.push(message);
     if (this.messages.length > 50) {

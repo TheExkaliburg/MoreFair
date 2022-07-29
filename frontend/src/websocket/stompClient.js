@@ -1,6 +1,7 @@
 import SockJs from "sockjs-client";
 import Stomp from "stomp-websocket";
 import Cookies from "js-cookie";
+import store from "../store";
 
 export class StompClient {
   constructor() {
@@ -23,6 +24,7 @@ export class StompClient {
         });
       },
       async () => {
+        store.commit("chat/addRestartMessage");
         await this.reconnect();
       }
     );

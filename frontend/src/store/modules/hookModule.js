@@ -6,7 +6,7 @@ export default {
     };
   },
   mutations: {
-    addToHook(state, { id, fn }) {
+    subscribeToHook(state, { id, fn }) {
       let hooks = Reflect.get(state, id);
       hooks.push(fn);
     },

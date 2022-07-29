@@ -6,17 +6,26 @@ const versioningModule = {
     return {
       versions: [
         new Version("PATCH", "Mostly Performance", {
+          improvements: [
+            "Chad will announce temporarily that the server is restarting",
+          ],
           balancing: [
             "BIG Ladders now can spawn with 20% again, but there can't be 2 BIG ladders back to back.",
+            "Free Auto Ladders, 5 behind the top are back for testing now",
           ],
           fixes: [
             "The winner of the round should now actually get 20% of their vinegar as reward",
-            "Rankers don't get pulled with the account, this should increase performance",
-            "Only exposing the store.state endpoint to the user now",
-            "Not exposing the Sounds class anymore",
+            "Rankers don't get pulled with the account, this should increase server-performance a lot",
             "Broadcaster Account (Chad) only gets pulled from database the first time and then cached",
             "The join event now includes the asshole Points of that person",
             "Various other small performance fixes",
+          ],
+          api: [
+            "The API is now exposed via the Fair.register((api) => ...) endpoint",
+            "Only exposing the api.state and api.getters endpoint to the user now",
+            "Also exposing a function to subscribe to a hook",
+            "The first hook you can subscribe too is 'onTick' and gets called after every tick",
+            "The API is readonly, so that 2 scripts can share the same api without 1 messing with the api and breaking it for the other",
           ],
         }),
         new Version("PATCH", "FREE_AUTO Ladders", {

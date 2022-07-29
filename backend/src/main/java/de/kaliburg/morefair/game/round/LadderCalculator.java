@@ -201,7 +201,8 @@ public class LadderCalculator {
       }
     }
 
-    if (rankers.size() >= 1 && rankers.get(0).isAutoPromote() && rankers.get(0).isGrowing()
+    if (rankers.size() >= 1 && (rankers.get(0).isAutoPromote() || ladder.getTypes()
+        .contains(LadderType.FREE_AUTO)) && rankers.get(0).isGrowing()
         && ladderUtils.isLadderPromotable(ladder)) {
       ladderService.addEvent(ladder.getNumber(),
           new Event(EventType.PROMOTE, rankers.get(0).getAccount().getId()));

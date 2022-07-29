@@ -12,7 +12,7 @@ export default {
       number: 1,
       rankers: [new Ranker()],
       yourRanker: new Ranker(),
-      types: ["DEFAULT"],
+      types: new Set(["DEFAULT"]),
       basePointsToPromote: new Decimal(Infinity),
     };
   },

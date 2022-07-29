@@ -23,6 +23,18 @@ const chatModule = {
     msgFlag(state, payload) {
       state.chat.msgFlag(payload);
     },
+    addRestartMessage(state) {
+      state.chat.addNewMessage({
+        username: "Chad",
+        message:
+          "The server is restarting, please stay patient and try again in a few minutes.",
+        tag: "🂮",
+        ahPoints: 5950,
+        accountId: 1,
+        timeCreated: "Now",
+        metadata: "[]",
+      });
+    },
   },
   actions: {},
   getters: {},

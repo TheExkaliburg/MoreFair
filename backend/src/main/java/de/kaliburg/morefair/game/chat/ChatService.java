@@ -132,7 +132,7 @@ public class ChatService {
    * @return the message entity
    */
   public MessageEntity sendMessageToChat(AccountEntity account, Integer number, String message) {
-    return sendMessageToChat(account, number, message, null);
+    return sendMessageToChat(account, number, message, "[]");
   }
 
   /**
@@ -158,8 +158,7 @@ public class ChatService {
    * @return the list of all the messages, sent to different chats
    */
   public List<MessageEntity> sendGlobalMessage(String message) {
-
-    return sendGlobalMessage(message, null);
+    return sendGlobalMessage(message, "[]");
   }
 
 

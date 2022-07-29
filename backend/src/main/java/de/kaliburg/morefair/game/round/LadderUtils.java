@@ -93,7 +93,7 @@ public class LadderUtils {
 
     return ranker.getRank() == 1 && ladder.getRankers().get(0).getUuid().equals(ranker.getUuid())
         && ranker.isGrowing()
-        && (ranker.isAutoPromote()
+        && (ranker.isAutoPromote() || ladder.getTypes().contains(LadderType.FREE_AUTO)
         || ranker.getPoints().compareTo(getPointsForPromoteWithLead(ladder, ranker)) >= 0);
   }
 

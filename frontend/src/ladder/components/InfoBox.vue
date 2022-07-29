@@ -45,7 +45,14 @@
                 numberFormatter.format(autoPromoteCost)
               }}</span></span
             >
-            Grapes <span v-if="yourRanker.autoPromote">(Active)</span>
+            Grapes
+            <span
+              v-if="
+                yourRanker.autoPromote ||
+                store.state.ladder.types.has('FREE_AUTO')
+              "
+              >(Active)</span
+            >
           </div>
           <div class="col px-0 text-end">
             {{ yourVinegarFormatted }}/<span class="text-highlight">{{

@@ -98,7 +98,7 @@ export default {
   },
   canBuyAutoPromote(settings, ladder) {
     return (
-      !ladder.yourRanker.autoPromote &&
+      !(ladder.yourRanker.autoPromote || ladder.types.has("FREE_AUTO")) &&
       ladder.yourRanker.grapes.cmp(
         this.getAutoPromoteCost(settings, ladder, ladder.yourRanker.rank)
       ) >= 0 &&

@@ -480,18 +480,18 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         newRanker.getUnlocks().copy(ranker.getUnlocks());
         LadderEntity newLadder = find(newRanker.getLadder().getNumber());
 
-        /*
         if (newLadder.getNumber() > 5 && newLadder.getRankers().size() <= 1) {
           LadderEntity autoLadder = find(newLadder.getNumber() - 5);
 
           if (autoLadder != null && !autoLadder.getTypes().contains(LadderType.FREE_AUTO)) {
+            log.info("Giving everyone in L{} free auto-promotes", autoLadder.getNumber());
             autoLadder.getTypes().add(LadderType.FREE_AUTO);
-            for (RankerEntity autoLadderRanker : autoLadder.getRankers()) {
+            /*for (RankerEntity autoLadderRanker : autoLadder.getRankers()) {
               buyAutoPromote(new Event(EventType.BUY_AUTO_PROMOTE,
                   autoLadderRanker.getAccount().getId()), autoLadder);
-            }
+            }*/
           }
-        }*/
+        }
 
         // Unlocks
         if (!newRanker.getUnlocks().getAutoPromote()

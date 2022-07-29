@@ -12,8 +12,9 @@ let state = readonly(store.state);
 
 let api = readonly({
   state: computed(() => state),
-  addToHook: (id, fn) =>
-    store.commit({ type: "hooks/addToHook", id: id, fn: fn }),
+  getters: store.getters,
+  subscribeToHook: (id, fn) =>
+    store.commit({ type: "hooks/subscribeToHook", id: id, fn: fn }),
 });
 
 function subscribe(link) {

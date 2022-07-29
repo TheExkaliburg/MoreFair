@@ -80,6 +80,14 @@
                   </li>
                 </ul>
               </div>
+              <div v-if="version.data.changes.api.length > 0">
+                <h4>API-Changes:</h4>
+                <ul>
+                  <li v-for="change in version.data.changes.api" :key="change">
+                    {{ change }}
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
