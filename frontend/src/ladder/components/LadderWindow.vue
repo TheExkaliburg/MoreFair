@@ -178,7 +178,7 @@ const etaToPromote = computed(() =>
   shownRankers.value.map((ranker) => eta(ranker).toPromote())
 );
 const etaToYou = computed(() =>
-  shownRankers.value.map((ranker) => eta(ranker).toRanker(yourRanker))
+  shownRankers.value.map((ranker) => eta(ranker).toRanker(yourRanker.value))
 );
 const etaPercentage = computed(() =>
   shownRankers.value.map((ranker, index) =>
