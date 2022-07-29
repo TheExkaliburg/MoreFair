@@ -174,9 +174,17 @@ const shownRankers = computed(() => {
     return rankers.value;
   }
 });
-const etaToPromote = computed(() => shownRankers.map(ranker => eta(ranker).toPromote()));
-const etaToYou = computed(() => shownRankers.map(ranker => eta(ranker).toRanker(yourRanker)));
-const etaPercentage = computed(() => shownRankers.map((ranker, index) => rankerEtaPercentage(ranker, etaToYou[index])));
+const etaToPromote = computed(() =>
+  shownRankers.value.map((ranker) => eta(ranker).toPromote())
+);
+const etaToYou = computed(() =>
+  shownRankers.value.map((ranker) => eta(ranker).toRanker(yourRanker))
+);
+const etaPercentage = computed(() =>
+  shownRankers.value.map((ranker, index) =>
+    rankerEtaPercentage(ranker, etaToYou[index])
+  )
+);
 
 const youEtaToFirst = computed(() => eta(yourRanker.value).toFirst());
 
@@ -248,7 +256,7 @@ function free(event) {
 
 // should return the value from fastest (0%) to as long as it takes for the top (50%) to double as long (100%)
 // as a negative, because the animation-delay only sets the start value if the delay is negative, otherwise it's an actual delay
-function rankerEtaPercentage(ranker,etaToYou) {
+function rankerEtaPercentage(ranker, etaToYou) {
   if (etaColorSetting.value === "Off") {
     return 1;
   }
@@ -259,7 +267,9 @@ function rankerEtaPercentage(ranker,etaToYou) {
     return 1;
   }
 
-  const etaToRanker = etaToYou ? etaToYou : eta(ranker).toRanker(yourRanker.value);
+  const etaToRanker = etaToYou
+    ? etaToYou
+    : eta(ranker).toRanker(yourRanker.value);
 
   // we want to return a percentage for our animation interpolation
   // 0 is to overtake now
