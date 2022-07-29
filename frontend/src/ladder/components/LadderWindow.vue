@@ -54,7 +54,7 @@
       </thead>
       <tbody id="ladderBody" class="">
         <tr
-          v-for="ranker in shownRankers"
+          v-for="(ranker, index) in shownRankers"
           :key="ranker"
           :class="[
             ranker.you ? 'you' : '',
@@ -78,17 +78,17 @@
           </td>
           <td
             v-if="showEtaSetting"
-            :style="'animation-delay: ' + rankerEtaPercentage(ranker) + 's'"
+            :style="'animation-delay: ' + etaPercentage[index] + 's'"
             class="text-end etaProgressAnim"
           >
-            {{ secondsToHms(eta(ranker).toPromote()) }}
+            {{ secondsToHms(etaToPromote[index]) }}
           </td>
           <td
             v-if="showEtaSetting"
-            :style="'animation-delay: ' + rankerEtaPercentage(ranker) + 's'"
+            :style="'animation-delay: ' + etaPercentage[index] + 's'"
             class="text-end etaProgressAnim"
           >
-            {{ secondsToHms(eta(ranker).toRanker(yourRanker)) }}
+            {{ secondsToHms(etaToYou[index]) }}
           </td>
           <td class="text-end">
             {{ numberFormatter.format(ranker.power) }} [+{{
@@ -97,7 +97,7 @@
             x{{ ("" + ranker.multi).padStart(2, "0") }}]
           </td>
           <td
-            :style="'animation-delay: ' + rankerEtaPercentage(ranker) + 's'"
+            :style="'animation-delay: ' + etaPercentage[index] + 's'"
             class="text-end etaProgressAnim"
           >
             {{ numberFormatter.format(ranker.points) }}
@@ -174,6 +174,9 @@ const shownRankers = computed(() => {
     return rankers.value;
   }
 });
+const etaToPromote = computed(() => shownRankers.map(ranker => eta(ranker).toPromote()));
+const etaToYou = computed(() => shownRankers.map(ranker => eta(ranker).toRanker(yourRanker)));
+const etaPercentage = computed(() => shownRankers.map((ranker, index) => rankerEtaPercentage(ranker, etaToYou[index])));
 
 const youEtaToFirst = computed(() => eta(yourRanker.value).toFirst());
 
@@ -245,7 +248,7 @@ function free(event) {
 
 // should return the value from fastest (0%) to as long as it takes for the top (50%) to double as long (100%)
 // as a negative, because the animation-delay only sets the start value if the delay is negative, otherwise it's an actual delay
-function rankerEtaPercentage(ranker) {
+function rankerEtaPercentage(ranker,etaToYou) {
   if (etaColorSetting.value === "Off") {
     return 1;
   }
@@ -256,7 +259,7 @@ function rankerEtaPercentage(ranker) {
     return 1;
   }
 
-  const etaToRanker = eta(ranker).toRanker(yourRanker.value);
+  const etaToRanker = etaToYou ? etaToYou : eta(ranker).toRanker(yourRanker.value);
 
   // we want to return a percentage for our animation interpolation
   // 0 is to overtake now
