@@ -5,13 +5,13 @@
       class="row py-0"
       style="height: 100%; max-height: 100%"
     >
-      <div class="col-7">
+      <div class="col-12 col-md-7">
         <div class="container py-1 px-3">
           <LadderWindow />
           <InfoBox />
         </div>
       </div>
-      <div class="col-5">
+      <div class="col-12 col-md-5">
         <ChatWindow />
       </div>
     </div>
@@ -48,7 +48,16 @@ const hideChat = computed(() =>
 
 .game-view {
   max-width: 100vw;
-  height: calc(100vh - 56px);
+
+  @media (max-width: 768px) and (min-width: 400px) {
+    height: calc(200vh - 56px);
+  }
+  @media (max-width: 400px) {
+    height: calc(300vh - 56px);
+  }
+  @media (min-width: 768px) {
+    height: calc(100vh - 56px);
+  }
 
   div {
     max-height: 100%;

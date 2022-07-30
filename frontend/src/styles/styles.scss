@@ -4,7 +4,12 @@ body {
   background-color: var(--background-color);
   color: var(--main-color);
   overflow-x: hidden;
-  overflow-y: hidden;
+  @media(max-width: 768px) {
+    overflow-y: auto;
+  }
+  @media(min-width: 768px) {
+    overflow-y: hidden;
+  }
   font-size: var(--text-font-size);
 }
 
