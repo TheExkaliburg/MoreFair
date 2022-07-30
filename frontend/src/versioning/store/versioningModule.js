@@ -9,6 +9,8 @@ const versioningModule = {
           improvements: [
             "Added an option to choose whether to show power-gain and multi/bias",
             "Showing bias/multi above bias/multi - button now",
+            "Showing if someone can bias/multi now",
+            "A little bit something to put the chat underneath the ladder for mobile users",
           ],
         }),
         new Version("PATCH", "Hotfix for Help", {
