@@ -31,7 +31,7 @@
       :on-change="changeLadder"
     />
   </div>
-  <div class="row py-1 ladder-row">
+  <div class="row py-1 ladder-row" @scroll="fillMissingETAs">
     <table
       class="table table-sm caption-top table-borderless"
       style="border: 0px solid yellow"
@@ -72,6 +72,7 @@
             ranker.you ? 'you' : '',
             ranker.growing || ranker.you ? '' : 'promoted',
           ]"
+          :id="'ranker-' + ranker.accountId"
           @contextmenu="openModMenu"
         >
           <td class="text-start">
@@ -88,22 +89,29 @@
             <sub>#{{ ranker.accountId }}</sub>
           </td>
           <td
-            v-if="showEtaSetting"
             :style="'animation-delay: ' + etaPercentage[index] + 's'"
+            v-if="showEtaSetting && rankerIsVisible(ranker)"
             class="text-end etaProgressAnim"
           >
             {{ secondsToHms(etaToPromote[index]) }}
           </td>
+          <td v-else-if="showEtaSetting" class="text-end etaProgressAnim">
+            ??:??:??
+          </td>
           <td
-            v-if="showEtaSetting"
             :style="'animation-delay: ' + etaPercentage[index] + 's'"
+            v-if="showEtaSetting && rankerIsVisible(ranker)"
             class="text-end etaProgressAnim"
           >
             {{ secondsToHms(etaToYou[index]) }}
           </td>
+
+          <td v-else-if="showEtaSetting" class="text-end etaProgressAnim">
+            ??:??:??
+          </td>
           <td
-            v-if="showPowerGainSettings || showBiasMultiSettings"
             class="text-end"
+            v-if="showPowerGainSettings || showBiasMultiSettings"
           >
             {{
               showPowerGainSettings && ranker.growing
@@ -227,6 +235,44 @@ const etaPercentage = computed(() =>
 );
 
 const youEtaToFirst = computed(() => eta(yourRanker.value).toFirst());
+
+const rankerIsVisible = (ranker) => {
+  const rankerRow = document.getElementById("ranker-" + ranker.accountId);
+  if (!rankerRow) return false;
+  //check if the row is scrolled into view in the containing table
+  const tableMinY =
+    rankerRow.parentElement.parentElement.parentElement.getBoundingClientRect()
+      .top;
+  const tableMaxY =
+    rankerRow.parentElement.parentElement.parentElement.getBoundingClientRect()
+      .bottom;
+  const rowMinY = rankerRow.getBoundingClientRect().top;
+  const rowMaxY = rankerRow.getBoundingClientRect().bottom;
+  return rowMaxY >= tableMinY && rowMinY <= tableMaxY;
+};
+const fillMissingETAs = () => {
+  const needsFilling = rankers.value.filter(
+    (ranker) =>
+      rankerIsVisible(ranker) &&
+      document.getElementById("ranker-" + ranker.accountId).childNodes[3]
+        .innerHTML === " ??:??:?? "
+  );
+  needsFilling.forEach((ranker) => {
+    document.getElementById(
+      "ranker-" + ranker.accountId
+    ).childNodes[2].innerHTML = secondsToHms(eta(ranker).toPromote());
+    document.getElementById(
+      "ranker-" + ranker.accountId
+    ).childNodes[3].innerHTML = secondsToHms(
+      eta(ranker).toRanker(yourRanker.value)
+    );
+    //color the row
+    document.getElementById("ranker-" + ranker.accountId).childNodes[2].style =
+      "animation-delay: " + rankerEtaPercentage(ranker) + "s";
+    document.getElementById("ranker-" + ranker.accountId).childNodes[3].style =
+      "animation-delay: " + rankerEtaPercentage(ranker) + "s";
+  });
+};
 
 //---- Moderation ----
 
