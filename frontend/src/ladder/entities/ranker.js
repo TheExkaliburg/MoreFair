@@ -17,6 +17,9 @@ class Ranker {
     grapes = new Decimal(0),
     vinegar = new Decimal(0),
   } = {}) {
+    // TODO: LOOK AT THIS @Tobi
+    // Object.assign(this, arguments[0]);
+
     this.accountId = accountId;
     this.username = username;
     this.rank = rank;

@@ -91,10 +91,11 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   public void saveStateToDatabase() {
     try {
       for (LadderEntity ladder : currentLadderMap.values()) {
-        rankerService.save(ladder.getRankers());
+        List<RankerEntity> rankerEntities = rankerService.save(ladder.getRankers());
+        LadderEntity ladderEntity = ladderRepository.save(ladder);
+        ladderEntity.setRankers(rankerEntities);
+        currentLadderMap.put(ladder.getNumber(), ladder);
       }
-      ladderRepository.saveAll(currentLadderMap.values());
-
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
@@ -484,6 +485,8 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
           LadderEntity autoLadder = find(newLadder.getNumber() - 5);
 
           if (autoLadder != null && !autoLadder.getTypes().contains(LadderType.FREE_AUTO)) {
+            // TODO: Find out why this saves like 400 variations of ladder_id, FREE_AUTO over the
+            //  course of 1 round in the database
             log.info("Giving everyone in L{} free auto-promotes", autoLadder.getNumber());
             autoLadder.getTypes().add(LadderType.FREE_AUTO);
             /*for (RankerEntity autoLadderRanker : autoLadder.getRankers()) {

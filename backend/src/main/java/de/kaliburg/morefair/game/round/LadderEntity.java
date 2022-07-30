@@ -104,6 +104,7 @@ public final class LadderEntity {
     if (ladder != null) {
       log.warn("Ladder already exists, copying LadderTypes.");
       types = ladder.getTypes();
+      return;
     }
 
     Optional<LadderEntity> ladderOptional = ladders.stream()

@@ -73,7 +73,6 @@ public class GameController {
       if (roundService.getLastRoundResults() == null) {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
       }
-      // TODO: Logic in Service
       return new ResponseEntity<>(roundService.getLastRoundResults(), HttpStatus.OK);
     } catch (Exception e) {
       log.error(e.getMessage());
