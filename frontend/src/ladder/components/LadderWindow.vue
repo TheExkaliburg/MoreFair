@@ -116,15 +116,28 @@
                   "/s)"
                 : ""
             }}
-            {{
-              showBiasMultiSettings
-                ? "[+" +
-                  ("" + ranker.bias).padStart(2, "0") +
-                  " x" +
-                  ("" + ranker.multi).padStart(2, "0") +
-                  "]"
-                : ""
-            }}
+            <span v-if="showBiasMultiSettings">
+              [<span
+                :style="[
+                  rankerCanBuyBias(ranker)
+                    ? 'color: var(--eta-best)'
+                    : etaBias(ranker) < 300
+                    ? 'color: var(--eta-mid);'
+                    : 'color: var(--eta-worst)',
+                ]"
+                >+{{ ("" + ranker.bias).padStart(2, "0") }}</span
+              ><span
+                :style="[
+                  rankerCanBuyMulti(ranker)
+                    ? 'color: var(--eta-best)'
+                    : etaMulti(ranker) < 300
+                    ? 'color: var(--eta-mid)'
+                    : 'color: var(--eta-worst)',
+                ]"
+              >
+                x{{ ("" + ranker.multi).padStart(2, "0") }}</span
+              >]
+            </span>
           </td>
           <td class="text-end">
             {{ numberFormatter.format(ranker.power) }}
@@ -227,6 +240,29 @@ const etaPercentage = computed(() =>
 );
 
 const youEtaToFirst = computed(() => eta(yourRanker.value).toFirst());
+const biasCost = (ranker) =>
+  store.getters["ladder/getNextUpgradeCost"](ranker.bias);
+const multiCost = (ranker) =>
+  store.getters["ladder/getNextUpgradeCost"](ranker.multi);
+
+const rankerCanBuyBias = (ranker) => {
+  return ranker.points.cmp(biasCost(ranker)) >= 0;
+};
+const rankerCanBuyMulti = (ranker) => {
+  return ranker.power.cmp(multiCost(ranker)) >= 0;
+};
+const etaBias = (ranker) => {
+  if (rankerCanBuyBias(ranker)) {
+    return 0;
+  }
+  return eta(ranker).toPoints(biasCost(ranker));
+};
+const etaMulti = (ranker) => {
+  if (rankerCanBuyMulti(ranker)) {
+    return 0;
+  }
+  return ranker.rank === 1 ? Infinity : eta(ranker).toPower(multiCost(ranker));
+};
 
 //---- Moderation ----
 
