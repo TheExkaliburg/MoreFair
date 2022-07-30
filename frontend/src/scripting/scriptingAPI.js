@@ -19,7 +19,6 @@ let api = readonly({
 
 function subscribe(link) {
   console.log("This is not implemented yet.", link);
-
   // TODO: Verify Link
 
   // TODO: Load Link

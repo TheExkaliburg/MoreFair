@@ -66,8 +66,7 @@
             {{ ranker.rank }}
             {{ ranker.tag
             }}<sub>{{
-              store.getters["options/getOptionValue"]("showAhPoints") &&
-              ranker.tag !== ""
+              store.getters["options/getOptionValue"]("showAhPoints")
                 ? ranker.ahPoints
                 : ""
             }}</sub>
@@ -90,11 +89,20 @@
           >
             {{ secondsToHms(etaToYou[index]) }}
           </td>
-          <td class="text-end">
+          <td v-if="showStatsSetting" class="text-end">
             {{ numberFormatter.format(ranker.power) }} [+{{
               ("" + ranker.bias).padStart(2, "0")
             }}
             x{{ ("" + ranker.multi).padStart(2, "0") }}]
+          </td>
+          <td v-else class="text-end">
+            (+{{
+              ranker.rank === 1
+                ? "00"
+                : numberFormatter.format(
+                    (ranker.rank + ranker.bias - 1) * ranker.multi
+                  )
+            }}) {{ numberFormatter.format(ranker.power) }}
           </td>
           <td
             :style="'animation-delay: ' + etaPercentage[index] + 's'"
@@ -164,6 +172,9 @@ const etaColorSetting = computed(() =>
 const showEtaSetting = computed(() =>
   store.getters["options/getOptionValue"]("showETA")
 );
+const showStatsSetting = computed(() =>
+  store.getters["options/getOptionValue"]("showStats")
+);
 const hidePromotedPlayers = computed(() =>
   store.getters["options/getOptionValue"]("hidePromotedPlayers")
 );
@@ -174,6 +185,7 @@ const shownRankers = computed(() => {
     return rankers.value;
   }
 });
+
 const etaToPromote = computed(() =>
   shownRankers.value.map((ranker) => eta(ranker).toPromote())
 );

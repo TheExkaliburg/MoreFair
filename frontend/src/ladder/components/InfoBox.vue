@@ -7,9 +7,10 @@
             {{ yourPowerFormatted }}/<span class="text-highlight"
               >{{ multiCostFormatted }}
             </span>
-            Power
+            Power [M: x{{ ("" + yourRanker.multi).padStart(2, "0") }}]
           </div>
           <div class="col px-0 text-end">
+            [B: +{{ ("" + yourRanker.bias).padStart(2, "0") }}]
             {{ yourPointsFormatted }}/<span class="text-highlight"
               >{{ biasCostFormatted }}
             </span>

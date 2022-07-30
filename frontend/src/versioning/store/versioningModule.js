@@ -5,6 +5,12 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "Option for power-gain vs multi/bias", {
+          improvements: [
+            "Added an option to choose whether to show power-gain or multi/bias",
+            "Showing bias/multi above bias/multi - button now",
+          ],
+        }),
         new Version("PATCH", "Hotfix for Help", {
           fixes: [
             "It should not show DEFAULT in L1 if it isn't a DEFAULT Ladder",

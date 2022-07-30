@@ -109,4 +109,8 @@ const versions = computed(() => store.getters["versioning/getVersions"]);
   max-height: calc(100vh - 56px);
   overflow: auto !important;
 }
+
+.accordion-item {
+  color: var(--text-color);
+}
 </style>
