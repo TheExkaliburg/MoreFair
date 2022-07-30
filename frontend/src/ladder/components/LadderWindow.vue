@@ -106,7 +106,7 @@
             class="text-end"
           >
             {{
-              showPowerGainSettings
+              showPowerGainSettings && ranker.growing
                 ? "(+" +
                   (ranker.rank === 1
                     ? "0"
