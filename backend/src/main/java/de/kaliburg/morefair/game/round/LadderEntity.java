@@ -124,17 +124,19 @@ public final class LadderEntity {
       } else {
         types.add(LadderType.SMALL);
       }
-    } else if (number == 1) {
-      types.add(LadderType.DEFAULT);
-    } else if (randomSizePercentage < 1) {
-      types.add(LadderType.TINY);
-    } else if (randomSizePercentage < 20) {
-      types.add(LadderType.SMALL);
-    } else if (randomSizePercentage > 99) {
-      types.add(LadderType.GIGANTIC);
-    } else if (randomSizePercentage > 80 && !previousLadderTypes.contains(LadderType.BIG)
-        && !previousLadderTypes.contains(LadderType.GIGANTIC)) {
-      types.add(LadderType.BIG);
+    } else {
+      if (number != 1) {
+        if (randomSizePercentage < 1) {
+          types.add(LadderType.TINY);
+        } else if (randomSizePercentage < 20) {
+          types.add(LadderType.SMALL);
+        } else if (randomSizePercentage > 99) {
+          types.add(LadderType.GIGANTIC);
+        } else if (randomSizePercentage > 80 && !previousLadderTypes.contains(LadderType.BIG)
+            && !previousLadderTypes.contains(LadderType.GIGANTIC)) {
+          types.add(LadderType.BIG);
+        }
+      }
     }
 
     if (number >= round.getAssholeLadderNumber()) {
