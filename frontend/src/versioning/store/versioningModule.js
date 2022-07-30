@@ -5,7 +5,7 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
-        new Version("PATCH", "Mostly Performance", {
+        new Version("PATCH", "Hotfix for Help", {
           fixes: [
             "It should not show DEFAULT in L1 if it isn't a DEFAULT Ladder",
             "HelpView text should be fixed",
