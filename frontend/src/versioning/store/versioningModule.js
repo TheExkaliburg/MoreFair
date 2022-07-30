@@ -6,6 +6,12 @@ const versioningModule = {
     return {
       versions: [
         new Version("PATCH", "Mostly Performance", {
+          fixes: [
+            "It should not show DEFAULT in L1 if it isn't a DEFAULT Ladder",
+            "HelpView text should be fixed",
+          ],
+        }),
+        new Version("PATCH", "Mostly Performance", {
           improvements: [
             "Chad will announce temporarily that the server is restarting",
           ],
