@@ -7,7 +7,7 @@ const versioningModule = {
       versions: [
         new Version("PATCH", "Option for power-gain vs multi/bias", {
           improvements: [
-            "Added an option to choose whether to show power-gain or multi/bias",
+            "Added an option to choose whether to show power-gain and multi/bias",
             "Showing bias/multi above bias/multi - button now",
           ],
         }),

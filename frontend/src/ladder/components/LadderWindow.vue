@@ -39,17 +39,29 @@
       <thead>
         <tr v-if="showEtaSetting" class="thead-light">
           <th class="col-1 text-start">#</th>
-          <th class="col-3 text-start">Username</th>
+          <th class="col-2 text-start">Username</th>
           <th class="col-1 text-end">ETA -> L{{ ladder.number + 1 }}</th>
           <th class="col-1 text-end">ETA -> You</th>
-          <th class="col-3 text-end">Power</th>
-          <th class="col-3 text-end">Points</th>
+          <th
+            v-if="showPowerGainSettings || showBiasMultiSettings"
+            class="col-2 text-end"
+          >
+            Power-Gain
+          </th>
+          <th class="col-1 text-end">Power</th>
+          <th class="col-1 text-end">Points</th>
         </tr>
         <tr v-else class="thead-light">
           <th class="col-1 text-start">#</th>
-          <th class="col-5 text-start">Username</th>
-          <th class="col-3 text-end">Power</th>
-          <th class="col-3 text-end">Points</th>
+          <th class="col-2 text-start">Username</th>
+          <th
+            v-if="showPowerGainSettings || showBiasMultiSettings"
+            class="col-2 text-end"
+          >
+            Power-Gain
+          </th>
+          <th class="col-1 text-end">Power</th>
+          <th class="col-1 text-end">Points</th>
         </tr>
       </thead>
       <tbody id="ladderBody" class="">
@@ -89,20 +101,33 @@
           >
             {{ secondsToHms(etaToYou[index]) }}
           </td>
-          <td v-if="showStatsSetting" class="text-end">
-            {{ numberFormatter.format(ranker.power) }} [+{{
-              ("" + ranker.bias).padStart(2, "0")
+          <td
+            v-if="showPowerGainSettings || showBiasMultiSettings"
+            class="text-end"
+          >
+            {{
+              showPowerGainSettings
+                ? "(+" +
+                  (ranker.rank === 1
+                    ? "0"
+                    : numberFormatter.format(
+                        (ranker.rank + ranker.bias - 1) * ranker.multi
+                      )) +
+                  "/s)"
+                : ""
             }}
-            x{{ ("" + ranker.multi).padStart(2, "0") }}]
+            {{
+              showBiasMultiSettings
+                ? "[+" +
+                  ("" + ranker.bias).padStart(2, "0") +
+                  " x" +
+                  ("" + ranker.multi).padStart(2, "0") +
+                  "]"
+                : ""
+            }}
           </td>
-          <td v-else class="text-end">
-            (+{{
-              ranker.rank === 1
-                ? "00"
-                : numberFormatter.format(
-                    (ranker.rank + ranker.bias - 1) * ranker.multi
-                  )
-            }}) {{ numberFormatter.format(ranker.power) }}
+          <td class="text-end">
+            {{ numberFormatter.format(ranker.power) }}
           </td>
           <td
             :style="'animation-delay: ' + etaPercentage[index] + 's'"
@@ -172,8 +197,11 @@ const etaColorSetting = computed(() =>
 const showEtaSetting = computed(() =>
   store.getters["options/getOptionValue"]("showETA")
 );
-const showStatsSetting = computed(() =>
-  store.getters["options/getOptionValue"]("showStats")
+const showBiasMultiSettings = computed(() =>
+  store.getters["options/getOptionValue"]("showBiasMulti")
+);
+const showPowerGainSettings = computed(() =>
+  store.getters["options/getOptionValue"]("showPowerGain")
 );
 const hidePromotedPlayers = computed(() =>
   store.getters["options/getOptionValue"]("hidePromotedPlayers")

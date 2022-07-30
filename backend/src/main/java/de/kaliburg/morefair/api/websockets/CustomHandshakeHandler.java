@@ -21,7 +21,7 @@ import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 @Log4j2
 public class CustomHandshakeHandler extends DefaultHandshakeHandler {
 
-  private final static Integer MAX_CONNECTIONS_PER_MINUTE = 50;
+  private final static Integer MAX_CONNECTIONS_PER_MINUTE = 10;
   private final LoadingCache<Integer, Integer> connectionsPerIpAddress;
 
   public CustomHandshakeHandler() {

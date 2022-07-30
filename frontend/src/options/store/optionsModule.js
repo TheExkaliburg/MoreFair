@@ -85,9 +85,14 @@ const optionsModule = {
               );
             }),
             new BoolOption({
-              displayName: "Show Bias/Multi instead of power-gain",
-              name: "showStats",
-              value: false,
+              displayName: "Show Bias/Multi for Rankers",
+              name: "showBiasMulti",
+              value: true,
+            }),
+            new BoolOption({
+              displayName: "Show Power-Gain for Rankers",
+              name: "showPowerGain",
+              value: true,
             }),
             new BoolOption({
               displayName: "Hide promoted players",
