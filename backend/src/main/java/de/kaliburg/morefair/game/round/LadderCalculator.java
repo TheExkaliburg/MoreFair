@@ -197,7 +197,7 @@ public class LadderCalculator {
     if (rankers.size() >= 1) {
       RankerEntity lastRanker = rankers.get(rankers.size() - 1);
       if (lastRanker.isGrowing()) {
-        lastRanker.addGrapes(BigInteger.valueOf(3), delta);
+        lastRanker.addGrapes(BigInteger.valueOf(2), delta);
       }
     }
 

@@ -137,11 +137,13 @@
     </div>
 
     <div class="col-6 tempInfo">
-      In case you are lost or need information, look at the
-      <router-link to="/help">Help-Page</router-link>
-      under the menu at the top right. If that's not enough you can always ask
-      away at Chad or join the Discord.
-      <br /><br />
+      <span v-if="!hideHelpText">
+        In case you are lost or need information, look at the
+        <router-link to="/help">Help-Page</router-link>
+        under the menu at the top right. If that's not enough you can always ask
+        away at Chad or join the Discord.
+        <br /><br
+      /></span>
       Round Base Point Requirement:
       {{ numberFormatter.format(store.state.settings.pointsForPromote) }}
       <br />Ladder Base Point Requirement:
@@ -199,6 +201,9 @@ const numberFormatter = computed(() => store.state.numberFormatter);
 const yourRanker = computed(() => store.state.ladder.yourRanker);
 const hideVinegarAndGrapes = computed(() =>
   store.getters["options/getOptionValue"]("hideVinAndGrapeCount")
+);
+const hideHelpText = computed(() =>
+  store.getters["options/getOptionValue"]("hideHelpText")
 );
 const biasCost = computed(() =>
   store.getters["ladder/getNextUpgradeCost"](yourRanker.value.bias)

@@ -4,7 +4,7 @@ const chatModule = {
   namespaced: true,
   state: () => {
     return {
-      chat: {},
+      chat: new Chat({ currentChatNumber: 1, messages: [] }),
     };
   },
   mutations: {

@@ -102,7 +102,7 @@ export default {
       let index = rankers.length - 1;
       if (rankers[index].growing && rankers[index].you)
         rankers[index].grapes = rankers[index].grapes.add(
-          new Decimal(3).mul(delta).floor()
+          new Decimal(2).mul(delta).floor()
         );
     }
 

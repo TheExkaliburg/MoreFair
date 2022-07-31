@@ -5,11 +5,16 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
-        new Version("PATCH", "Mobile Change and bias/multi info", {
+        new Version("PATCH", "Grape reward changes", {
+          balancing: [
+            "Floor grapes are down to 2 from 3",
+            "The cost for autopromote is down to 2000 from 5000",
+            "This turns down all grape-rewards for promoting early by a factor of 3/5",
+          ],
           improvements: [
             "Showing if someone can bias/multi now",
             "A little bit something to put the chat underneath the ladder for mobile users",
-            "Temporary Help page link on the front page",
+            "Temporary Help page link on the front page (you can turn it off in options/ladder)",
           ],
           fixes: [
             "Hopefully fixed a bug which saves the ladder-types multiple times in the database",

@@ -104,6 +104,11 @@ const optionsModule = {
               name: "hideVinAndGrapeCount",
               value: false,
             }),
+            new BoolOption({
+              displayName: "Hide help text",
+              name: "hideHelpText",
+              value: false,
+            }),
           ],
         }),
         new OptionSection({
