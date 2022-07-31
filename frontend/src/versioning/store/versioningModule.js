@@ -5,6 +5,12 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "Itty bitty QOL changes", {
+          improvements: [
+            "Added a [Don't show this again] button to the help text.",
+            "Changed the throw vinegar button text to clarify that all vinegar is thrown.",
+          ],
+        }),
         new Version("PATCH", "Grape reward changes", {
           balancing: [
             "Floor grapes are down to 2 from 3",
