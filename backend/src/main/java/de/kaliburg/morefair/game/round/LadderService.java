@@ -90,17 +90,25 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   @Transactional
   public void saveStateToDatabase() {
     try {
-      for (LadderEntity ladder : currentLadderMap.values()) {
-        List<RankerEntity> rankerEntities = rankerService.save(ladder.getRankers());
-        LadderEntity ladderEntity = ladderRepository.save(ladder);
-        ladderEntity.setRankers(rankerEntities);
-        currentLadderMap.put(ladder.getNumber(), ladder);
+      int maxNumber = currentLadderMap.values().stream()
+          .max(Comparator.comparing(LadderEntity::getNumber)).map(LadderEntity::getNumber)
+          .orElse(0);
+      for (int i = 1; i <= maxNumber; i++) {
+        LadderEntity ladder = currentLadderMap.get(i);
+        if (ladder != null) {
+          List<RankerEntity> rankerEntities = rankerService.save(ladder.getRankers());
+          LadderEntity ladderEntity = ladderRepository.save(ladder);
+          ladderEntity.setRankers(rankerEntities);
+          currentLadderMap.put(ladder.getNumber(), ladderEntity);
+        }
       }
+      ;
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
     }
   }
+
 
   /**
    * Creates a new Ladder for the round of its round with the specific ladderNumber and saves it.
