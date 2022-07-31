@@ -38,8 +38,17 @@ public class RoundService {
 
   @Transactional
   public void saveStateToDatabase() {
-    save(getCurrentRound());
-    ladderService.saveStateToDatabase();
+    try {
+      ladderService.getLadderSemaphore().acquire();
+      try {
+        RoundEntity roundEntity = save(getCurrentRound());
+        ladderService.saveStateToDatabase(roundEntity);
+      } finally {
+        ladderService.getLadderSemaphore().release();
+      }
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**

@@ -88,8 +88,9 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   }
 
   @Transactional
-  public void saveStateToDatabase() {
+  public void saveStateToDatabase(RoundEntity currentRound) {
     try {
+      this.currentRound = currentRound;
       int maxNumber = currentLadderMap.values().stream()
           .max(Comparator.comparing(LadderEntity::getNumber)).map(LadderEntity::getNumber)
           .orElse(0);
@@ -102,7 +103,6 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
           currentLadderMap.put(ladder.getNumber(), ladderEntity);
         }
       }
-      ;
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
