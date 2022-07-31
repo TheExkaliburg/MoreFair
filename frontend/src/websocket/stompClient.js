@@ -66,9 +66,18 @@ export class StompClient {
     if (!data.uuid) data.uuid = "";
     if (payload) {
       if (payload.content) data.content = payload.content;
-      if (payload.event) data.event = JSON.stringify(payload.event);
+      if (payload.event)
+        data.event = JSON.stringify(serializeClickEvent(payload.event));
       if (payload.metadata) data.metadata = JSON.stringify(payload.metadata);
     }
     this.stompClient.send(destination, {}, JSON.stringify(data));
   }
+}
+
+function serializeClickEvent(event) {
+  let serializableEvent = {
+    isTrusted: event.isTrusted,
+    target: event.target.outerHTML,
+  };
+  return serializableEvent;
 }
