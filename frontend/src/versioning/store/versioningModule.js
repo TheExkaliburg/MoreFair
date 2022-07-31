@@ -5,12 +5,20 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "Mobile Change and bias/multi info", {
+          improvements: [
+            "Showing if someone can bias/multi now",
+            "A little bit something to put the chat underneath the ladder for mobile users",
+            "Temporary Help page link on the front page",
+          ],
+          fixes: [
+            "Hopefully fixed a bug which saves the ladder-types multiple times in the database",
+          ],
+        }),
         new Version("PATCH", "Option for power-gain vs multi/bias", {
           improvements: [
             "Added an option to choose whether to show power-gain and multi/bias",
             "Showing bias/multi above bias/multi - button now",
-            "Showing if someone can bias/multi now",
-            "A little bit something to put the chat underneath the ladder for mobile users",
           ],
         }),
         new Version("PATCH", "Hotfix for Help", {

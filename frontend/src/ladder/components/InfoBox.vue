@@ -136,7 +136,12 @@
       </div>
     </div>
 
-    <div class="col-6">
+    <div class="col-6 tempInfo">
+      In case you are lost or need information, look at the
+      <router-link to="/help">Help-Page</router-link>
+      under the menu at the top right. If that's not enough you can always ask
+      away at Chad or join the Discord.
+      <br /><br />
       Round Base Point Requirement:
       {{ numberFormatter.format(store.state.settings.pointsForPromote) }}
       <br />Ladder Base Point Requirement:
@@ -298,6 +303,9 @@ div .col-6 {
   text-align: start;
   height: 50%;
   // border: white solid 1px;
+  &.tempInfo {
+    font-size: 13px;
+  }
 }
 
 .hide {
