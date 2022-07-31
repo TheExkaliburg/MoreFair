@@ -576,6 +576,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
             accountService.save(accounts);
 
+            saveStateToDatabase(currentRound);
             eventPublisher.publishEvent(new GameResetEvent(this));
             wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION,
                 new Event(EventType.RESET, account.getId()));

@@ -109,7 +109,6 @@ public class GameService implements ApplicationListener<GameResetEvent> {
   public void onApplicationEvent(@NonNull GameResetEvent event) {
     RoundEntity newRound = roundService.create(game.getCurrentRound().getNumber() + 1);
     game.setCurrentRound(newRound);
-    saveStateToDatabase();
     initialGameSetup();
   }
 }
