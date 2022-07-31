@@ -89,7 +89,7 @@
               class="btn btn-outline-primary shadow-none w-100"
               @click="throwVinegar"
             >
-              Throw Vinegar
+              Throw All Vinegar
               {{
                 yourRanker.vinegar.cmp(vinegarCost) >= 0
                   ? ""
@@ -142,7 +142,9 @@
         <router-link to="/help">here</router-link> in the hamburger menu at the
         top right of the page. If you want more help, ask in Chad or join the
         <a href="https://discord.gg/ThKzCknfFr" target="_blank">Discord</a>,
-        we're always willing to give you any assistance you need! <br /><br
+        we're always willing to give you any assistance you need! <br />
+        <a href="#" @click="hideTempInfo">[[Don't show this again]]</a
+        ><br /><br
       /></span>
       Round Base Point Requirement:
       {{ numberFormatter.format(store.state.settings.pointsForPromote) }}
@@ -256,6 +258,15 @@ const pointsForPromoteIsInfinity = computed(
 );
 
 // Functions
+
+function hideTempInfo() {
+  let option = store.getters["options/getOption"]("hideHelpText");
+  store.commit({
+    type: "options/updateOption",
+    option: option,
+    payload: { value: true },
+  });
+}
 
 function throwVinegar(event) {
   if (vinegarLastSecond.value) return;
