@@ -207,7 +207,7 @@
               <ul>
                 <li>
                   <strong>Being last</strong> in a ladder that has already
-                  filled up, gains you 3 sour grape every second.
+                  filled up, gains you 2 sour grape every second.
                 </li>
                 <li>
                   <strong>Getting passed</strong> by someone else, while having

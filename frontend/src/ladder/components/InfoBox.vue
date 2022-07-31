@@ -138,11 +138,11 @@
 
     <div class="col-6 tempInfo">
       <span v-if="!hideHelpText">
-        In case you are lost or need information, look at the
-        <router-link to="/help">Help-Page</router-link>
-        under the menu at the top right. If that's not enough you can always ask
-        away at Chad or join the Discord.
-        <br /><br
+        How to play - check the info
+        <router-link to="/help">here</router-link> in the hamburger menu at the
+        top right of the page. If you want more help, ask in Chad or join the
+        <a href="https://discord.gg/ThKzCknfFr" target="_blank">Discord</a>,
+        we're always willing to give you any assistance you need! <br /><br
       /></span>
       Round Base Point Requirement:
       {{ numberFormatter.format(store.state.settings.pointsForPromote) }}
