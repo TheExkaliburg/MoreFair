@@ -105,10 +105,13 @@ public class GameService implements ApplicationListener<GameResetEvent> {
   }
 
 
+  @Transactional
   @Override
   public void onApplicationEvent(@NonNull GameResetEvent event) {
     RoundEntity newRound = roundService.create(game.getCurrentRound().getNumber() + 1);
     game.setCurrentRound(newRound);
+    game = gameRepository.save(game);
+    chatService.saveStateToDatabase();
     initialGameSetup();
   }
 }
