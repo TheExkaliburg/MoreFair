@@ -492,15 +492,9 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         if (newLadder.getNumber() > 5 && newLadder.getRankers().size() <= 1) {
           LadderEntity autoLadder = find(newLadder.getNumber() - 5);
 
-          if (autoLadder != null && !autoLadder.getTypes().contains(LadderType.FREE_AUTO)) {
-            // TODO: Find out why this saves like 400 variations of ladder_id, FREE_AUTO over the
-            //  course of 1 round in the database
-            log.info("Giving everyone in L{} free auto-promotes", autoLadder.getNumber());
+          if (autoLadder != null && !autoLadder.getTypes().contains(LadderType.FREE_AUTO)
+              && !autoLadder.getTypes().contains(LadderType.NO_AUTO)) {
             autoLadder.getTypes().add(LadderType.FREE_AUTO);
-            /*for (RankerEntity autoLadderRanker : autoLadder.getRankers()) {
-              buyAutoPromote(new Event(EventType.BUY_AUTO_PROMOTE,
-                  autoLadderRanker.getAccount().getId()), autoLadder);
-            }*/
           }
         }
 
