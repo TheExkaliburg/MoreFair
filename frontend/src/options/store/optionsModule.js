@@ -267,7 +267,7 @@ const optionsModule = {
             value: option.value,
           };
         })
-        .filter((o) => o.value);
+        .filter((o) => o.value || o.value === false);
       localStorage.setItem("options", JSON.stringify(optionNamesAndValues));
 
       //Now updating the option's display properties
