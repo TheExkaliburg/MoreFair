@@ -5,10 +5,13 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
-        new Version("PATCH", "Itty bitty QOL changes", {
+        new Version("PATCH", "QoL and Options-Save-Fix", {
           improvements: [
             "Added a [Don't show this again] button to the help text.",
             "Changed the throw vinegar button text to clarify that all vinegar is thrown.",
+          ],
+          balancing: [
+            "Doesn't Replace No-Auto Ladders with Free-Auto anymore.",
           ],
           fixes: ["Now saving all options (hopefully) correctly."],
         }),
