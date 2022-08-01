@@ -10,9 +10,7 @@ const versioningModule = {
             "Added a [Don't show this again] button to the help text.",
             "Changed the throw vinegar button text to clarify that all vinegar is thrown.",
           ],
-          fixes: [
-            "Now saving all options (hopefully) correctly.",
-          ],
+          fixes: ["Now saving all options (hopefully) correctly."],
         }),
         new Version("PATCH", "Grape reward changes", {
           balancing: [
