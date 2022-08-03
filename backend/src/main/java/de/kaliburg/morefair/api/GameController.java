@@ -17,16 +17,13 @@ import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.game.round.RoundUtils;
 import de.kaliburg.morefair.game.round.dto.LadderDto;
-import de.kaliburg.morefair.game.round.dto.RoundResultsDto;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 @Log4j2
@@ -42,9 +39,7 @@ public class GameController {
   public static final String TOPIC_EVENTS_DESTINATION = "/game/events/{number}";
   public static final String TOPIC_GLOBAL_EVENTS_DESTINATION = "/game/events";
   public static final String QUEUE_INIT_DESTINATION = "/game/init";
-
   public static final String PRIVATE_EVENTS_DESTINATION = "/game/events";
-
   private final RankerService rankerService;
   private final AccountService accountService;
   private final WsUtils wsUtils;
@@ -67,19 +62,6 @@ public class GameController {
     this.config = config;
   }
 
-  @GetMapping(value = "/lastRound", produces = "application/json")
-  public ResponseEntity<RoundResultsDto> getStatistics() {
-    try {
-      if (roundService.getLastRoundResults() == null) {
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-      }
-      return new ResponseEntity<>(roundService.getLastRoundResults(), HttpStatus.OK);
-    } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
 
   @MessageMapping(APP_INIT_DESTINATION)
   public void initLadder(SimpMessageHeaderAccessor sha, WsMessage wsMessage,

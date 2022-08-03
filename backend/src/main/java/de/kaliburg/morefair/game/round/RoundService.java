@@ -1,5 +1,7 @@
 package de.kaliburg.morefair.game.round;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.api.GameController;
@@ -8,6 +10,7 @@ import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.EventType;
 import de.kaliburg.morefair.game.round.dto.RoundResultsDto;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -25,7 +28,10 @@ public class RoundService {
   private final WsUtils wsUtils;
   private final RoundUtils roundUtils;
   private final FairConfig config;
-  private RoundResultsDto lastRoundResults;
+  private final Cache<Integer, RoundResultsDto> roundResultsCache =
+      Caffeine.newBuilder().expireAfterAccess(1,
+          TimeUnit.HOURS).maximumSize(10).build();
+
 
   public RoundService(RoundRepository roundRepository, LadderService ladderService,
       @Lazy WsUtils wsUtils, RoundUtils roundUtils, FairConfig config) {
@@ -83,10 +89,6 @@ public class RoundService {
    */
   public void loadIntoCache(RoundEntity round) {
     ladderService.loadIntoCache(round);
-    if (getCurrentRound().getNumber() > 1) {
-      RoundEntity lastRound = find(getCurrentRound().getNumber() - 1);
-      lastRoundResults = new RoundResultsDto(lastRound, config);
-    }
   }
 
   public RoundEntity getCurrentRound() {
@@ -127,9 +129,16 @@ public class RoundService {
   }
 
 
-  public RoundResultsDto getLastRoundResults() {
-    return lastRoundResults;
+  public RoundResultsDto getRoundResults(Integer number) {
+    RoundResultsDto result = roundResultsCache.getIfPresent(number);
+    if (result == null) {
+      RoundEntity round = find(number);
+      if (round == null) {
+        return null;
+      }
+      result = new RoundResultsDto(round, config);
+      roundResultsCache.put(number, result);
+    }
+    return result;
   }
-
-
 }

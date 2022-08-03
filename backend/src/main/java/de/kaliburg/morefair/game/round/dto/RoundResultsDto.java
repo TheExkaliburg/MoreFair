@@ -21,6 +21,7 @@ public class RoundResultsDto {
   private String basePointsToPromote;
   private String createdOn;
   private String closedOn = "stillOpen";
+  private Integer number;
 
   public RoundResultsDto(RoundEntity round, FairConfig config) {
     roundTypes = round.getTypes();
@@ -40,5 +41,6 @@ public class RoundResultsDto {
       closedOn = round.getClosedOn().atZoneSameInstant(ZoneOffset.UTC).format(
           DateTimeFormatter.ISO_DATE_TIME);
     }
+    number = round.getNumber();
   }
 }
