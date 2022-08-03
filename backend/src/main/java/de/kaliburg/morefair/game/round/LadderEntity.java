@@ -2,6 +2,8 @@ package de.kaliburg.morefair.game.round;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -65,6 +67,8 @@ public final class LadderEntity {
   @ElementCollection(targetClass = LadderType.class, fetch = FetchType.EAGER)
   @Enumerated(EnumType.STRING)
   private Set<LadderType> types = EnumSet.noneOf(LadderType.class);
+  @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
+  private OffsetDateTime createdOn = OffsetDateTime.now(ZoneOffset.UTC);
   @NonNull
   @Column(nullable = false, precision = 1000)
   private BigInteger basePointsToPromote;
@@ -119,6 +123,17 @@ public final class LadderEntity {
     log.debug("Rolling randomNoAutoPercentage for Ladder {} in Round {}: {}%", number,
         round.getNumber(), randomNoAutoPercentage);
 
+    if (number == 1) {
+      if (round.getTypes().contains(RoundType.AUTO)) {
+        types.add(LadderType.FREE_AUTO);
+      } else if (round.getTypes().contains(RoundType.FAST)) {
+        types.add(LadderType.SMALL);
+      } else {
+        types.add(LadderType.DEFAULT);
+      }
+      return;
+    }
+
     if (round.getTypes().contains(RoundType.FAST)) {
       if (randomSizePercentage < 1) {
         types.add(LadderType.TINY);
@@ -126,33 +141,39 @@ public final class LadderEntity {
         types.add(LadderType.SMALL);
       }
     } else {
-      if (number != 1) {
-        if (randomSizePercentage < 1) {
-          types.add(LadderType.TINY);
-        } else if (randomSizePercentage < 20) {
-          types.add(LadderType.SMALL);
-        } else if (randomSizePercentage > 99) {
-          types.add(LadderType.GIGANTIC);
-        } else if (randomSizePercentage > 80 && !previousLadderTypes.contains(LadderType.BIG)
-            && !previousLadderTypes.contains(LadderType.GIGANTIC)) {
-          types.add(LadderType.BIG);
-        }
+      if (randomSizePercentage < 1) {
+        types.add(LadderType.TINY);
+      } else if (randomSizePercentage < 20) {
+        types.add(LadderType.SMALL);
+      } else if (randomSizePercentage > 99) {
+        types.add(LadderType.GIGANTIC);
+      } else if (randomSizePercentage > 80 && !previousLadderTypes.contains(LadderType.BIG)
+          && !previousLadderTypes.contains(LadderType.GIGANTIC)) {
+        types.add(LadderType.BIG);
       }
     }
 
     if (number >= round.getAssholeLadderNumber()) {
       types.add(LadderType.NO_AUTO);
       types.add(LadderType.ASSHOLE);
+      return;
     }
 
-    if (randomNoAutoPercentage < 5) {
-      types.add(LadderType.NO_AUTO);
-    } else if (randomNoAutoPercentage > 95 && !types.contains(LadderType.NO_AUTO)) {
-      types.add(LadderType.FREE_AUTO);
-    }
-
-    if (!types.contains(LadderType.NO_AUTO) && round.getTypes().contains(RoundType.AUTO)) {
-      types.add(LadderType.FREE_AUTO);
+    // In Auto Rounds
+    if (round.getTypes().contains(RoundType.AUTO)) {
+      // Higher Chance to get NO_AUTO but all other rounds are FREE_AUTO
+      if (randomNoAutoPercentage < 5) {
+        types.add(LadderType.NO_AUTO);
+      } else if (!types.contains(LadderType.NO_AUTO)) {
+        types.add(LadderType.FREE_AUTO);
+      }
+    } else {
+      // 2% Chance to get NO_AUTO and 5% for FREE_AUTO if it isn't NO_AUTO already
+      if (randomNoAutoPercentage < 2) {
+        types.add(LadderType.NO_AUTO);
+      } else if (randomNoAutoPercentage > 95 && !types.contains(LadderType.NO_AUTO)) {
+        types.add(LadderType.FREE_AUTO);
+      }
     }
 
     if (types.isEmpty()) {

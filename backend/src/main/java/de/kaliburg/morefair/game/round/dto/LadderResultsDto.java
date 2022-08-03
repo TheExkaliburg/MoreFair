@@ -3,6 +3,8 @@ package de.kaliburg.morefair.game.round.dto;
 import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.game.round.LadderEntity;
 import de.kaliburg.morefair.game.round.LadderType;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -15,6 +17,7 @@ public class LadderResultsDto {
   private Set<LadderType> ladderTypes;
   private String basePointsToPromote;
 
+  private String createdOn;
 
   public LadderResultsDto(LadderEntity ladder, FairConfig config) {
     basePointsToPromote = ladder.getBasePointsToPromote().toString();
@@ -23,5 +26,7 @@ public class LadderResultsDto {
       RankerPrivateDto dto = new RankerPrivateDto(ranker, config);
       rankers.add(dto);
     });
+    createdOn = ladder.getCreatedOn().atZoneSameInstant(ZoneOffset.UTC).format(
+        DateTimeFormatter.ISO_DATE_TIME);
   }
 }

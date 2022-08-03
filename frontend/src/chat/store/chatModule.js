@@ -27,7 +27,7 @@ const chatModule = {
       state.chat.addNewMessage({
         username: "Chad",
         message:
-          "The server is restarting, please stay patient and try again in a few minutes.",
+          "You have been disconnected from the server, this could be because of a restart or an update. Please try reconnecting in a few minutes or try Discord if you cannot connect at all anymore.",
         tag: "🂮",
         ahPoints: 5950,
         accountId: 1,

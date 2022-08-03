@@ -62,6 +62,8 @@ public class RoundEntity {
   private Set<RoundType> types = EnumSet.noneOf(RoundType.class);
   @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
   private OffsetDateTime createdOn = OffsetDateTime.now(ZoneOffset.UTC);
+  @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
+  private OffsetDateTime closedOn;
   @NonNull
   @Column(nullable = false)
   private Integer highestAssholeCount = 0;
@@ -98,11 +100,11 @@ public class RoundEntity {
     float randomAutoPercentage = random.nextFloat(100);
     log.debug("Rolling randomAutoPercentage for Round {}: {}%", number, randomAutoPercentage);
 
-    if (randomFastPercentage < 40) {
+    if (randomFastPercentage < 20) {
       types.add(RoundType.FAST);
     }
 
-    if (randomAutoPercentage < 20) {
+    if (randomAutoPercentage < 10) {
       types.add(RoundType.AUTO);
     }
 
@@ -130,5 +132,12 @@ public class RoundEntity {
 
   public Integer getModifiedBaseAssholeLadder() {
     return types.contains(RoundType.FAST) ? getBaseAssholeLadder() / 2 : getBaseAssholeLadder();
+  }
+
+  public boolean isClosed() {
+    if (closedOn == null) {
+      return false;
+    }
+    return true;
   }
 }

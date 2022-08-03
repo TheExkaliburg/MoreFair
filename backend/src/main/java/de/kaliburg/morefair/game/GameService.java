@@ -10,6 +10,8 @@ import de.kaliburg.morefair.game.round.LadderService;
 import de.kaliburg.morefair.game.round.RankerService;
 import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -108,6 +110,9 @@ public class GameService implements ApplicationListener<GameResetEvent> {
   @Transactional
   @Override
   public void onApplicationEvent(@NonNull GameResetEvent event) {
+    roundService.getCurrentRound().setClosedOn(OffsetDateTime.now(ZoneOffset.UTC));
+    roundService.save(roundService.getCurrentRound());
+
     RoundEntity newRound = roundService.create(game.getCurrentRound().getNumber() + 1);
     game.setCurrentRound(newRound);
     game = gameRepository.save(game);
