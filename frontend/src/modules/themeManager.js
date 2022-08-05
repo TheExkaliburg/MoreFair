@@ -176,16 +176,16 @@ export function requestAllThemes(callback = () => {}) {
     return;
   }
   const themeDatabaseObject = JSON.parse(themeDatabase);
-  let mutex = 1;
+  let awaitingLoadedCount = 1;
   Object.values(themeDatabaseObject).forEach((theme) => {
-    mutex++;
+    awaitingLoadedCount++;
     loadTheme(theme, true, () => {
-      mutex--;
-      if (mutex === 0) callback();
+      awaitingLoadedCount--;
+      if (awaitingLoadedCount === 0) callback();
     });
   });
-  mutex--;
-  if (mutex === 0) {
+  awaitingLoadedCount--;
+  if (awaitingLoadedCount === 0) {
     callback();
   }
 }

@@ -231,7 +231,6 @@ const optionsModule = {
         const savedOptions = JSON.parse(localStorage.getItem("options"));
         const themes = JSON.parse(localStorage.getItem("themeDatabase"));
         requestAllThemes(() => {
-          console.log("all themes loaded");
           try {
             if (savedOptions) {
               //get all options
@@ -243,7 +242,6 @@ const optionsModule = {
                 const option = allOptions.find((o) => o.name === name);
                 if (option) {
                   option.value = value;
-                  console.log(`loaded ${name} with value ${value}`);
                   if (option.name === "themeSelection") {
                     requestTheme(value);
                   }
