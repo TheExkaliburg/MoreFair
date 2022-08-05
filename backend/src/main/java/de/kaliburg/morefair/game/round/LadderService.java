@@ -600,7 +600,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
       AccountEntity rankerAccount = accountService.find(ranker.getAccount());
       AccountEntity targetAccount = accountService.find(target.getAccount());
 
-      if (target.isAutoPromote()) {
+      if (target.isAutoPromote() || ladder.getTypes().contains(LadderType.FREE_AUTO)) {
         log.info("[L{}] {} (#{}) tried to throw Vinegar at {} (#{}), but they had Auto-Promote!",
             ladder.getNumber(), rankerAccount.getUsername(), rankerAccount.getId(),
             targetAccount.getUsername(), targetAccount.getId());
