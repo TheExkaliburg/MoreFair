@@ -14,9 +14,7 @@ const reachingFirstSound = computed(() =>
 export default {
   namespaced: true,
   state: () => {
-    setTimeout(() => {
-      Sounds.register("gotFirstJingle", require("@/assets/gotFirstJingle.wav"));
-    }, 0);
+    setTimeout(() => {}, 0);
     return {
       growingRankerCount: 1,
       pointsNeededForManualPromote: new Decimal(Infinity),
