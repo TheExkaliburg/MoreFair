@@ -1,20 +1,19 @@
-import { createStore } from "vuex";
-import ladderModule from "@/store/modules/ladder/ladderModule";
-import chatModule from "@/chat/store/chatModule";
+import API from "@/websocket/wsApi";
+import Cookies from "js-cookie";
+import Decimal from "break_infinity.js";
 import Settings from "@/store/entities/settings";
+import { Sounds } from "@/modules/sounds";
 import UserDetails from "@/store/entities/userDetails";
+import chatModule from "@/chat/store/chatModule";
+import { computed } from "vue";
+import { createStore } from "vuex";
+import hookModule from "@/store/modules/hookModule";
+import ladderModule from "@/store/modules/ladder/ladderModule";
+import moderationModule from "@/moderation/store/moderationModule";
 import { numberformat } from "swarm-numberformat";
 import optionsModule from "@/options/store/optionsModule";
 import soundsModule from "@/sounds/store/soundsModule";
-import moderationModule from "@/moderation/store/moderationModule";
 import versioningModule from "@/versioning/store/versioningModule";
-import hookModule from "@/store/modules/hookModule";
-
-import { computed } from "vue";
-import { Sounds } from "@/modules/sounds";
-import Cookies from "js-cookie";
-import API from "@/websocket/wsApi";
-import Decimal from "break_infinity.js";
 
 let promotionJingleVolume;
 let reachingFirstSound;
@@ -231,7 +230,6 @@ reachingFirstSound = computed(() =>
 );
 
 Sounds.setStore(store);
-Sounds.register("promotionJingle", require("@/assets/promotionJingle.wav"));
 optionsModule.setStore(store);
 store.registerModule("options", optionsModule);
 export default store;
