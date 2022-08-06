@@ -31,7 +31,7 @@
       :on-change="changeLadder"
     />
   </div>
-  <div class="row py-1 ladder-row">
+  <div class="row py-1 ladder-row" id="table-scroll-container">
     <table
       class="table table-sm caption-top table-borderless"
       style="border: 0px solid yellow"
@@ -68,6 +68,7 @@
         <tr
           v-for="(ranker, index) in shownRankers"
           :key="ranker"
+          :id="'ranker-' + ranker.accountId"
           :class="[
             ranker.you ? 'you' : '',
             ranker.growing || ranker.you ? '' : 'promoted',
@@ -189,7 +190,7 @@
 
 <script setup>
 import { useStore } from "vuex";
-import { computed, inject } from "vue";
+import { computed, inject, onUpdated } from "vue";
 import PaginationGroup from "@/components/PaginationGroup";
 import { eta } from "@/modules/eta";
 import { secondsToHms } from "@/modules/formatting";
@@ -219,6 +220,9 @@ const showPowerGainSettings = computed(() =>
 const hidePromotedPlayers = computed(() =>
   store.getters["options/getOptionValue"]("hidePromotedPlayers")
 );
+const followOwnRanker = computed(() =>
+  store.getters["options/getOptionValue"]("followOwnRanker")
+);
 const shownRankers = computed(() => {
   if (hidePromotedPlayers.value) {
     return rankers.value.filter((ranker) => ranker.growing || ranker.you);
@@ -238,6 +242,23 @@ const etaPercentage = computed(() =>
     rankerEtaPercentage(ranker, etaToYou[index])
   )
 );
+
+onUpdated(() => {
+  if (!followOwnRanker.value) return; //respect the user's setting
+  const yourRankerRow = document.getElementById(
+    "ranker-" + yourRanker.value.accountId
+  );
+  if (!yourRankerRow) return;
+  const yourRankerRowRect = yourRankerRow.getBoundingClientRect();
+  const ladderTableRect = document
+    .getElementById("table-scroll-container")
+    .getBoundingClientRect();
+  //scoll your ranker in the middle of the table
+  document.getElementById("table-scroll-container").scrollTop =
+    yourRankerRow.offsetTop -
+    ladderTableRect.height / 2 +
+    yourRankerRowRect.height / 2;
+});
 
 const youEtaToFirst = computed(() => eta(yourRanker.value).toFirst());
 const biasCost = (ranker) =>
