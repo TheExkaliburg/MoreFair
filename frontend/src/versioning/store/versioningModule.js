@@ -6,9 +6,7 @@ const versioningModule = {
     return {
       versions: [
         new Version("PATCH", "", {
-          fixes: [
-            "Fixed theme loading issues.",
-          ],
+          fixes: ["Fixed theme loading issues."],
         }),
         new Version("PATCH", "Balancing Round-Types", {
           balancing: [
@@ -29,9 +27,7 @@ const versioningModule = {
           balancing: [
             "Doesn't Replace No-Auto Ladders with Free-Auto anymore.",
           ],
-          fixes: [
-            "Now saving all options (hopefully) correctly.",
-          ],
+          fixes: ["Now saving all options (hopefully) correctly."],
         }),
         new Version("PATCH", "Grape reward changes", {
           balancing: [
