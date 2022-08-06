@@ -13,10 +13,11 @@ const versioningModule = {
             "FAST  rounds are only half as likely to appear now. (40% -> 20%)",
             "AUTO rounds are only half as likely to appear now. (20% -> 10%)",
             "NO_AUTO ladders were tuned down from 5% to 2% (unless its an auto round, where its still 5%)",
-            "Fixed theme loading issues.",
           ],
           api: [
-            "The /lastRound provides the time, when the round was created and closed (also the time it was created for each ladder)",
+            "Changed /lastRound to /roundStats",
+            "Added an option to specify which round you want to pull the stats from with /roundStats?round=#",
+            "The /roundStats provides the time, when the round was created and closed (also the time it was created for each ladder)",
           ],
         }),
         new Version("PATCH", "QoL and Options-Save-Fix", {
