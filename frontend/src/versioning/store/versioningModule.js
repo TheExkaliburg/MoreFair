@@ -5,11 +5,17 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "", {
+          fixes: [
+            "Fixed theme loading issues.",
+          ],
+        }),
         new Version("PATCH", "Balancing Round-Types", {
           balancing: [
             "FAST  rounds are only half as likely to appear now. (40% -> 20%)",
             "AUTO rounds are only half as likely to appear now. (20% -> 10%)",
             "NO_AUTO ladders were tuned down from 5% to 2% (unless its an auto round, where its still 5%)",
+            "Fixed theme loading issues.",
           ],
           api: [
             "The /lastRound provides the time, when the round was created and closed (also the time it was created for each ladder)",
@@ -25,7 +31,6 @@ const versioningModule = {
           ],
           fixes: [
             "Now saving all options (hopefully) correctly.",
-            "Fixed theme loading issues.",
           ],
         }),
         new Version("PATCH", "Grape reward changes", {
