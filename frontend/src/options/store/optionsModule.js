@@ -228,24 +228,32 @@ const optionsModule = {
     loadOptions(state) {
       //TODO: load locally
       try {
-        requestAllThemes();
         const savedOptions = JSON.parse(localStorage.getItem("options"));
-        if (savedOptions) {
-          //get all options
-          let allOptions = state.options.map(
-            (section) => section.options || [section]
-          );
-          allOptions = [].concat(...allOptions);
-          savedOptions.forEach(({ name, value }) => {
-            const option = allOptions.find((o) => o.name === name);
-            if (option) {
-              option.value = value;
-              if (option.name === "themeSelection") {
-                requestTheme(value);
-              }
+        const themes = JSON.parse(localStorage.getItem("themeDatabase"));
+        requestAllThemes(() => {
+          try {
+            if (savedOptions) {
+              //get all options
+              let allOptions = state.options.map(
+                (section) => section.options || [section]
+              );
+              allOptions = [].concat(...allOptions);
+              savedOptions.forEach(({ name, value }) => {
+                const option = allOptions.find((o) => o.name === name);
+                if (option) {
+                  option.value = value;
+                  if (option.name === "themeSelection") {
+                    requestTheme(value);
+                  }
+                }
+              });
+              localStorage.setItem("options", JSON.stringify(savedOptions));
+              localStorage.setItem("themeDatabase", JSON.stringify(themes));
             }
-          });
-        }
+          } catch (e) {
+            console.log(state.value);
+          }
+        });
       } catch (e) {
         console.error(state.value);
       }
