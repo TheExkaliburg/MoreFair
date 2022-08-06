@@ -1,6 +1,10 @@
 let Sounds = {
   setStore: (store) => {
     Sounds.store = store;
+    //Initialize the sounds
+    Sounds.register("gotFirstJingle", require("@/assets/gotFirstJingle.wav"));
+    Sounds.register("promotionJingle", require("@/assets/promotionJingle.wav"));
+    Sounds.register("mention", require("@/assets/gotFirstJingle.wav"));
   },
   register: (name, url) => {
     Sounds.store.commit({

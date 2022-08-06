@@ -33,14 +33,7 @@ import { computed, inject, onUpdated, ref } from "vue";
 import ChatMessage from "@/chat/components/ChatMessage";
 import ChatInput from "@/chat/components/ChatInput";
 import PaginationGroup from "@/components/PaginationGroup";
-
-import { Sounds } from "@/modules/sounds";
 import API from "@/websocket/wsApi";
-
-Sounds.register(
-  "mention",
-  "https://assets.mixkit.co/sfx/download/mixkit-software-interface-start-2574.wav"
-);
 
 const store = useStore();
 const stompClient = inject("$stompClient");
