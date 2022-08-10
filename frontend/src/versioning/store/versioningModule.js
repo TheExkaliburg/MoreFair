@@ -6,7 +6,7 @@ const versioningModule = {
     return {
       versions: [
         new Version("PATCH", "", {
-          fixes: ["Fixed theme loading issues."],
+          fixes: ["Fixed theme loading issues.", "Fixed some sound settings."],
         }),
         new Version("PATCH", "Balancing Round-Types", {
           balancing: [
