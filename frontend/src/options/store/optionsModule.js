@@ -26,6 +26,14 @@ import {
 //  }
 //);
 
+const anyOptionEquals = function (value, ...optionIdentifier) {
+  return optionIdentifier.some((option) => {
+    return (
+      optionsModule.store.getters["options/getOption"](option).value === value
+    );
+  });
+};
+
 const optionsModule = {
   namespaced: true,
   store: {},
@@ -146,8 +154,11 @@ const optionsModule = {
               min: 0,
               max: 100,
             }).setActiveFn(() =>
-              optionsModule.store.getters["options/getOptionValue"](
-                "mentionSound"
+              anyOptionEquals(
+                true,
+                "mentionSound",
+                "reachingFirstSound",
+                "promoteSound"
               )
             ),
           ],
