@@ -36,6 +36,7 @@
     "sass-loader": "^13.0.2",
     "sockjs-client": "^1.6.1",
     "stomp-websocket": "2.3.4-next",
+    "tailwindcss": "^3.1.8",
     "typescript": "^4.8.2",
     "vite": "^2.3.0",
     "vue": "^3.2.0",

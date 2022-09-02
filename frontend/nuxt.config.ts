@@ -13,4 +13,14 @@ export default defineNuxtConfig({
     analyze: true,
   },
   srcDir: "src/",
+  build: {
+    postcss: {
+      postcssOptions: {
+        plugins: {
+          tailwindcss: {},
+          autoprefixer: {},
+        },
+      },
+    },
+  },
 });
