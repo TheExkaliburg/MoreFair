@@ -320,19 +320,19 @@ function findEmojisInString(str) {
   let possibleMentions = [];
 
   emojiData.forEach(function (emoji) {
-    if (emoji.description.includes(str)) {
+    if (emoji.description.replaceAll(" ", "_").toLowerCase().includes(str)) {
       let newEmoji = {
         emoji: emoji.emoji,
-        description: emoji.description.replaceAll(" ", "_"),
+        description: emoji.description.replaceAll(" ", "_").toLowerCase(),
       };
       possibleMentions.push(newEmoji);
     }
     //also check the array "aliases" for the emoji
     emoji.aliases.forEach(function (alias) {
-      if (alias.includes(str)) {
+      if (alias.replaceAll(" ", "_").toLowerCase().includes(str)) {
         let newEmoji = {
           emoji: emoji.emoji,
-          description: alias.replaceAll(" ", "_"),
+          description: alias.replaceAll(" ", "_").toLowerCase(),
         };
         possibleMentions.push(newEmoji);
       }
