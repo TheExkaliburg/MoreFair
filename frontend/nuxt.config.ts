@@ -2,7 +2,11 @@ import { defineNuxtConfig } from "nuxt";
 
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
 export default defineNuxtConfig({
-  css: ["virtual:windi.css", "virtual:windi-devtools"],
+  css: [
+    "virtual:windi.css",
+    "virtual:windi-devtools",
+    "~/assets/scss/styles.scss",
+  ],
   modules: [
     "@pinia/nuxt",
     "@nuxtjs/partytown",
@@ -24,6 +28,15 @@ export default defineNuxtConfig({
         },
       },
     },
+    transpile: [
+      "@fortawesome/fontawesome-svg-core",
+      "@fortawesome/free-brands-svg-icons",
+      "@fortawesome/free-regular-svg-icons",
+      "@fortawesome/free-solid-svg-icons",
+      "@fortawesome/vue-fontawesome",
+      "@headlessui/vue",
+      "@heroicons/vue",
+    ],
   },
   intlify: {
     localeDir: "locales",

@@ -12,7 +12,13 @@
   "devDependencies": {
     "@commitlint/cli": "^17.1.2",
     "@commitlint/config-conventional": "^17.1.0",
+    "@fortawesome/fontawesome-svg-core": "^6.2.0",
+    "@fortawesome/free-brands-svg-icons": "^6.2.0",
+    "@fortawesome/free-regular-svg-icons": "^6.2.0",
+    "@fortawesome/free-solid-svg-icons": "^6.2.0",
+    "@fortawesome/vue-fontawesome": "^3.0.1",
     "@headlessui/vue": "^1.6.7",
+    "@heroicons/vue": "^2.0.10",
     "@intlify/nuxt3": "^0.2.4",
     "@nuxt/content": "^2.0.1",
     "@nuxtjs/eslint-config-typescript": "^10.0.0",
