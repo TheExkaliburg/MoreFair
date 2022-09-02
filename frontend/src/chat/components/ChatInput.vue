@@ -321,13 +321,19 @@ function findEmojisInString(str) {
 
   emojiData.forEach(function (emoji) {
     if (emoji.description.includes(str)) {
-      let newEmoji = { emoji: emoji.emoji, description: emoji.description };
+      let newEmoji = {
+        emoji: emoji.emoji,
+        description: emoji.description.replace(" ", "_"),
+      };
       possibleMentions.push(newEmoji);
     }
     //also check the array "aliases" for the emoji
     emoji.aliases.forEach(function (alias) {
       if (alias.includes(str)) {
-        let newEmoji = { emoji: emoji.emoji, description: alias };
+        let newEmoji = {
+          emoji: emoji.emoji,
+          description: alias.replace(" ", "_"),
+        };
         possibleMentions.push(newEmoji);
       }
     });
