@@ -323,7 +323,7 @@ function findEmojisInString(str) {
     if (emoji.description.includes(str)) {
       let newEmoji = {
         emoji: emoji.emoji,
-        description: emoji.description.replace(" ", "_"),
+        description: emoji.description.replaceAll(" ", "_"),
       };
       possibleMentions.push(newEmoji);
     }
@@ -332,7 +332,7 @@ function findEmojisInString(str) {
       if (alias.includes(str)) {
         let newEmoji = {
           emoji: emoji.emoji,
-          description: alias.replace(" ", "_"),
+          description: alias.replaceAll(" ", "_"),
         };
         possibleMentions.push(newEmoji);
       }
