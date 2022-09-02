@@ -8,6 +8,8 @@ export default defineNuxtConfig({
     "@nuxtjs/partytown",
     "nuxt-windicss",
     "@vueuse/nuxt",
+    "@intlify/nuxt3",
+    "@nuxt/content",
   ],
   windicss: {
     analyze: true,
@@ -21,6 +23,14 @@ export default defineNuxtConfig({
           autoprefixer: {},
         },
       },
+    },
+  },
+  intlify: {
+    localeDir: "locales",
+    vueI18n: {
+      locale: "en",
+      fallbackLocale: "en",
+      availableLocales: ["en"],
     },
   },
 });

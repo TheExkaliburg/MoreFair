@@ -13,6 +13,8 @@
     "@commitlint/cli": "^17.1.2",
     "@commitlint/config-conventional": "^17.1.0",
     "@headlessui/vue": "^1.6.7",
+    "@intlify/nuxt3": "^0.2.4",
+    "@nuxt/content": "^2.0.1",
     "@nuxtjs/eslint-config-typescript": "^10.0.0",
     "@nuxtjs/partytown": "^1.2.1",
     "@pinia/nuxt": "^0.4.1",
