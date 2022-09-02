@@ -6,9 +6,7 @@ const versioningModule = {
     return {
       versions: [
         new Version("PATCH", "Emojis", {
-          features: [
-            "You can now use emojis in your messages :eyes:",
-          ],
+          features: ["You can now use emojis in your messages :eyes:"],
           fixes: ["Fixed theme loading issues."],
         }),
         new Version("PATCH", "Balancing Round-Types", {
