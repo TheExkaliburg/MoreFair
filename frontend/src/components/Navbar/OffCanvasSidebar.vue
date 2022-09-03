@@ -1,22 +1,20 @@
 <template>
   <div
     ref="canvas"
-    class="bg-navbar-bg fixed inset-y-0 right-0 w-4/12 min-w-min max-w-prose z-10 text-navbar-text p-4 transform transition-transform"
+    class="flex flex-col bg-navbar-bg fixed inset-y-0 right-0 w-4/12 min-w-min max-w-prose z-10 text-navbar-text p-4 transform transition-transform justify-between"
     :class="
       uiStore.sidebarExpanded ? 'md:translate-x-full' : 'translate-x-full'
     "
     tabindex="-1"
   >
+    <!--Top of the Canvas-->
     <div class="min-w-min flex flex-col justify-items-start content-around">
-      <OffCanvasButton
-        label="Back123456"
-        @click="uiStore.sidebarExpanded = false"
-      >
+      <OffCanvasButton label="Back" @click="uiStore.sidebarExpanded = false">
         <template #icon>
           <BackspaceIcon />
         </template>
       </OffCanvasButton>
-      <OffCanvasButton label="Back1">
+      <OffCanvasButton label="Back1" @click="uiStore.sidebarExpanded = false">
         <template #icon>
           <BackspaceIcon />
         </template>
@@ -27,6 +25,21 @@
         </template>
       </OffCanvasButton>
       <OffCanvasButton label="Back123" @click="uiStore.sidebarExpanded = false">
+        <template #icon>
+          <BackspaceIcon />
+        </template>
+      </OffCanvasButton>
+    </div>
+    <!--Bottom of the Canvas-->
+    <div
+      class="min-w-min flex flex-col-reverse justify-items-start content-around"
+    >
+      <OffCanvasButton label="Back9" @click="uiStore.sidebarExpanded = false">
+        <template #icon>
+          <BackspaceIcon />
+        </template>
+      </OffCanvasButton>
+      <OffCanvasButton label="Back98" @click="uiStore.sidebarExpanded = false">
         <template #icon>
           <BackspaceIcon />
         </template>
