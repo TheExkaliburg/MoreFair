@@ -72,9 +72,10 @@ $color-saltpan: #ebede9;
   --text-error-color: var(--placeholder-color);
 
   // Buttons
-  --button-color: var(--main-secondary-color);
-  --button-hover-color: var(--background-color);
-  --button-hover-background-color: var(--button-color);
+  --button-bg-color: var(--background-color);
+  --button-bg-hover-color: var(--main-color);
+  --button-text-color: var(--main-color);
+  --button-text-hover-color: var(--background-color);
 
   // Ladder
   --you-color: var(--background-dark-color);
@@ -92,7 +93,8 @@ $color-saltpan: #ebede9;
   --header-font-size: 14px;
 
   // Navbar
-  --navbar-color: var(--background-dark-color);
+  --navbar-bg-color: var(--background-dark-color);
+  --navbar-text-color: var(--main-color);
   --offcanvas-background-color: var(--background-light-color);
 
   // Link

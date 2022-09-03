@@ -1,6 +1,7 @@
 <template>
   <div>
-    <NuxtWelcome />
+    <span class="text-test">123</span>
+    <!--NuxtWelcome /-->
   </div>
 </template>
 
