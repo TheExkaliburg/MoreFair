@@ -1,7 +1,7 @@
 <template>
   <div
     ref="canvas"
-    class="flex flex-col bg-navbar-bg fixed inset-y-0 right-0 w-4/12 min-w-min max-w-prose z-10 text-navbar-text p-4 transform transition-transform justify-between"
+    class="flex flex-col bg-navbar-bg fixed inset-y-0 right-0 w-4/12 min-w-min max-w-prose z-10 text-navbar-text px-4 py-1 transform transition-transform justify-between"
     :class="
       uiStore.sidebarExpanded ? 'md:translate-x-full' : 'translate-x-full'
     "
@@ -14,32 +14,36 @@
           <BackspaceIcon />
         </template>
       </OffCanvasButton>
-      <OffCanvasButton label="Back1" @click="uiStore.sidebarExpanded = false">
+      <!--Leaving this spot free-->
+      <OffCanvasButton class="cursor-auto" />
+      <OffCanvasButton
+        label="Ladder"
+        :toggle="uiStore.ladderEnabled"
+        @onToggle="(value) => (uiStore.ladderEnabled = value)"
+      >
         <template #icon>
-          <BackspaceIcon />
+          <TableCellsIcon />
         </template>
       </OffCanvasButton>
-      <OffCanvasButton label="Back12" @click="uiStore.sidebarExpanded = false">
+      <OffCanvasButton label="Chat">
         <template #icon>
-          <BackspaceIcon />
-        </template>
-      </OffCanvasButton>
-      <OffCanvasButton label="Back123" @click="uiStore.sidebarExpanded = false">
-        <template #icon>
-          <BackspaceIcon />
+          <ChatBubbleLeftEllipsisIcon />
         </template>
       </OffCanvasButton>
     </div>
     <!--Bottom of the Canvas-->
-    <div
-      class="min-w-min flex flex-col-reverse justify-items-start content-around"
-    >
-      <OffCanvasButton label="Back9" @click="uiStore.sidebarExpanded = false">
+    <div class="min-w-min flex flex-col justify-items-start content-around">
+      <OffCanvasButton label="Options">
         <template #icon>
-          <BackspaceIcon />
+          <Cog8ToothIcon />
         </template>
       </OffCanvasButton>
-      <OffCanvasButton label="Back98" @click="uiStore.sidebarExpanded = false">
+      <OffCanvasButton label="Help">
+        <template #icon>
+          <QuestionMarkCircleIcon />
+        </template>
+      </OffCanvasButton>
+      <OffCanvasButton label="Discord">
         <template #icon>
           <BackspaceIcon />
         </template>
@@ -49,7 +53,13 @@
 </template>
 
 <script setup lang="ts">
-import { BackspaceIcon } from "@heroicons/vue/24/outline";
+import {
+  BackspaceIcon,
+  ChatBubbleLeftEllipsisIcon,
+  Cog8ToothIcon,
+  QuestionMarkCircleIcon,
+  TableCellsIcon,
+} from "@heroicons/vue/24/outline";
 import { useUiStore } from "~/store/ui";
 import OffCanvasButton from "~/components/Navbar/OffCanvasButton.vue";
 import { onClickOutside } from "#imports";
