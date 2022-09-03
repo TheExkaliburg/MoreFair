@@ -6,6 +6,7 @@ export default defineNuxtConfig({
     "virtual:windi.css",
     "virtual:windi-devtools",
     "~/assets/scss/styles.scss",
+    "@fortawesome/fontawesome-svg-core/styles.css",
   ],
   modules: [
     "@pinia/nuxt",

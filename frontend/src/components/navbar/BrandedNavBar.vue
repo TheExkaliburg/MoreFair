@@ -5,13 +5,13 @@
         <div class="flex items-center">
           <div class="flex-shrink-0">
             <!--FairGame Logo and Branding with a link to the main page-->
-            <NuxtLink to="/" class="flex" @click="console.log(1)">
+            <NuxtLink to="/" class="flex">
               <img src="/favicon.ico" alt="FairGame" class="w-7 h-7" />
               <span class="text-xl text-navbar-text">FairGame</span>
             </NuxtLink>
           </div>
         </div>
-        <div class="-mr-2 flex md:hidden">
+        <div class="-mr-2 flex lg:hidden">
           <button
             type="button"
             class="inline-flex items-center justify-center rounded-md py-0.5 px-1 text-button-text hover:bg-button-bg_hover hover:text-button-text_hover"
@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
 import { Bars3Icon } from "@heroicons/vue/24/outline";
-import OffCanvasBrandedSidebar from "~/components/Navbar/OffCanvasSidebar.vue";
+import OffCanvasBrandedSidebar from "~/components/navbar/OffCanvasSidebar.vue";
 import { useUiStore } from "~/store/ui";
 
 const uiStore = useUiStore();

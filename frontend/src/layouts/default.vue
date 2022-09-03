@@ -8,7 +8,7 @@
 <script setup lang="ts"></script>
 
 <script>
-import CBrandedNavbarWithNarrowExpandableSidebar from "../components/Navbar/CBrandedNavbarWithNarrowExpandableSidebar";
+import CBrandedNavbarWithNarrowExpandableSidebar from "../components/navbar/CBrandedNavbarWithNarrowExpandableSidebar";
 export default {
   components: { CBrandedNavbarWithNarrowExpandableSidebar },
 };
