@@ -77,6 +77,15 @@ $color-saltpan: #ebede9;
   --button-text-color: var(--main-color);
   --button-text-hover-color: var(--background-color);
 
+  // Toggle Buttons
+  --toggle-bg-on-color: var(--main-color);
+  --toggle-bg-off-color: var(--background-dark-color);
+  --toggle-border-color: var(--main-color);
+  // Toggle Buttons - Inner Circle
+  --toggle-circle-bg-on-color: var(--background-color);
+  --toggle-circle-bg-on-color: var(--background-color);
+  --toggle-circle-border-color: var(--background-color);
+
   // Ladder
   --you-color: var(--background-dark-color);
   --you-background-color: var(--text-dark-highlight-color);

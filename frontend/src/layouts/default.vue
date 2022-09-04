@@ -1,7 +1,9 @@
 <template>
   <div>
-    <CBrandedNavbarWithNarrowExpandableSidebar />
-    <slot />
+    <CBrandedNavbarWithNarrowExpandableSidebar>
+      <slot />
+      Test123
+    </CBrandedNavbarWithNarrowExpandableSidebar>
   </div>
 </template>
 

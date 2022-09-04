@@ -19,41 +19,33 @@
       </OffCanvasButton>
       <!--Leaving this spot free-->
       <OffCanvasButton class="cursor-auto" />
-      <OffCanvasButton
-        :label="ladderLabel"
-        :toggle="uiStore.ladderEnabled"
-        @onToggle="(value) => (uiStore.ladderEnabled = value)"
-      >
-        <template #icon>
-          <TableCellsIcon />
+      <OffCanvasButton v-model="uiStore.ladderEnabled" :label="ladderLabel">
+        <template #icon="{ _class }">
+          <TableCellsIcon :class="_class" />
         </template>
       </OffCanvasButton>
-      <OffCanvasButton
-        :label="chatLabel"
-        :toggle="uiStore.chatEnabled"
-        @onToggle="(value) => (uiStore.chatEnabled = value)"
-      >
-        <template #icon>
-          <ChatBubbleLeftEllipsisIcon />
+      <OffCanvasButton v-model="uiStore.chatEnabled" :label="chatLabel">
+        <template #icon="{ _class }">
+          <ChatBubbleLeftEllipsisIcon :class="_class" />
         </template>
       </OffCanvasButton>
     </div>
     <!--Bottom of the Canvas-->
     <div class="min-w-min flex flex-col justify-items-start content-around">
-      <NuxtLinx to="/options">
+      <NuxtLink to="/">
         <OffCanvasButton :label="optionsLabel">
           <template #icon>
             <Cog8ToothIcon />
           </template>
         </OffCanvasButton>
-      </NuxtLinx>
-      <NuxtLinx to="/help">
+      </NuxtLink>
+      <NuxtLink to="/">
         <OffCanvasButton :label="helpLabel">
           <template #icon>
             <QuestionMarkCircleIcon />
           </template>
         </OffCanvasButton>
-      </NuxtLinx>
+      </NuxtLink>
       <OffCanvasButton :label="discordLabel">
         <template #icon>
           <font-awesome-icon icon="fa-brands fa-discord" />

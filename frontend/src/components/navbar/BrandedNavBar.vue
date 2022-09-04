@@ -14,7 +14,7 @@
         <div class="-mr-2 flex lg:hidden">
           <button
             type="button"
-            class="inline-flex items-center justify-center rounded-md py-0.5 px-1 text-button-text hover:bg-button-bg_hover hover:text-button-text_hover"
+            class="inline-flex items-center justify-center rounded-md py-0.5 px-1 text-button-text hover:bg-button-bg-hover hover:text-button-text-hover"
             data-drawer-target="mobile-menu"
             aria-controls="mobile-menu"
             aria-expanded="false"

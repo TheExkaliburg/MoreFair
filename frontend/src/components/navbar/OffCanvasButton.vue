@@ -1,29 +1,36 @@
 <template>
   <button
     type="button"
-    class="flex flex-row justify-start min-w-min py-1"
-    @click="onClick()"
+    class="flex flex-row justify-start min-w-min py-1 bg-toggle"
+    @click="emit('update:modelValue', !modelValue)"
   >
-    <div class="w-7 h-7 text-button-text"><slot name="icon" /></div>
-    <span class="h-7 px-3 w-min text-left">{{ label }}</span>
+    <div class="w-7 h-7 text-button-text">
+      <slot name="icon" :_class="'h-6 w-6'" />
+    </div>
+    <VerticalToggleSwitch
+      v-if="isToggleSwitch"
+      :model-value="modelValue"
+      @update:modelValue="(value) => emit('update:modelValue', value)"
+    />
+    <div v-else class="w-7 h-5"></div>
+    <span class="h-7 px-1 w-min text-left">{{ label }}</span>
   </button>
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
+import VerticalToggleSwitch from "~/components/navbar/VerticalToggleSwitch.vue";
+
 const props = defineProps({
   label: { type: String, required: false, default: "" },
-  toggle: { type: Boolean, required: false, default: null },
+  modelValue: { type: Boolean, required: false, default: null },
 });
 
 const emit = defineEmits<{
-  (e: "onToggle", value: Boolean): void;
+  (e: "update:modelValue", value: Boolean): void;
 }>();
 
-function onClick() {
-  if (props.toggle !== null) {
-    emit("onToggle", !props.toggle);
-  }
-}
+const isToggleSwitch = computed<Boolean>(() => props.modelValue !== null);
 </script>
 
 <style scoped lang="scss"></style>
