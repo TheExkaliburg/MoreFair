@@ -20,13 +20,13 @@
       <!--Leaving this spot free-->
       <OffCanvasButton class="cursor-auto" />
       <OffCanvasButton v-model="uiStore.ladderEnabled" :label="ladderLabel">
-        <template #icon="{ _class }">
-          <TableCellsIcon :class="_class" />
+        <template #icon>
+          <TableCellsIcon />
         </template>
       </OffCanvasButton>
       <OffCanvasButton v-model="uiStore.chatEnabled" :label="chatLabel">
-        <template #icon="{ _class }">
-          <ChatBubbleLeftEllipsisIcon :class="_class" />
+        <template #icon>
+          <ChatBubbleLeftEllipsisIcon />
         </template>
       </OffCanvasButton>
     </div>
@@ -46,11 +46,13 @@
           </template>
         </OffCanvasButton>
       </NuxtLink>
-      <OffCanvasButton :label="discordLabel">
-        <template #icon>
-          <font-awesome-icon icon="fa-brands fa-discord" />
-        </template>
-      </OffCanvasButton>
+      <NuxtLink to="/">
+        <OffCanvasButton :label="discordLabel">
+          <template #icon>
+            <font-awesome-icon icon="fa-brands fa-discord" />
+          </template>
+        </OffCanvasButton>
+      </NuxtLink>
     </div>
   </div>
 </template>

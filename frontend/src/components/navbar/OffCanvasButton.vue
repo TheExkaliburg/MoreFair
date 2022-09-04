@@ -5,7 +5,7 @@
     @click="emit('update:modelValue', !modelValue)"
   >
     <div class="w-7 h-7 text-button-text">
-      <slot name="icon" :_class="'h-6 w-6'" />
+      <slot name="icon" />
     </div>
     <VerticalToggleSwitch
       v-if="isToggleSwitch"
@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import VerticalToggleSwitch from "~/components/navbar/VerticalToggleSwitch.vue";
+import VerticalToggleSwitch from "~/components/VerticalToggleSwitch.vue";
 
 const props = defineProps({
   label: { type: String, required: false, default: "" },
