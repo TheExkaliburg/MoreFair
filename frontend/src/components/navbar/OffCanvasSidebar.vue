@@ -9,49 +9,52 @@
   >
     <!--Top of the Canvas-->
     <div class="min-w-min flex flex-col justify-items-start content-around">
-      <OffCanvasButton
+      <OffCanvasSidebarButton
         :label="backLabel"
         @click="uiStore.sidebarExpanded = false"
       >
         <template #icon>
           <BackspaceIcon />
         </template>
-      </OffCanvasButton>
+      </OffCanvasSidebarButton>
       <!--Leaving this spot free-->
-      <OffCanvasButton class="cursor-auto" />
-      <OffCanvasButton v-model="uiStore.ladderEnabled" :label="ladderLabel">
+      <OffCanvasSidebarButton class="cursor-auto" />
+      <OffCanvasSidebarButton
+        v-model="uiStore.ladderEnabled"
+        :label="ladderLabel"
+      >
         <template #icon>
           <TableCellsIcon />
         </template>
-      </OffCanvasButton>
-      <OffCanvasButton v-model="uiStore.chatEnabled" :label="chatLabel">
+      </OffCanvasSidebarButton>
+      <OffCanvasSidebarButton v-model="uiStore.chatEnabled" :label="chatLabel">
         <template #icon>
           <ChatBubbleLeftEllipsisIcon />
         </template>
-      </OffCanvasButton>
+      </OffCanvasSidebarButton>
     </div>
     <!--Bottom of the Canvas-->
     <div class="min-w-min flex flex-col justify-items-start content-around">
       <NuxtLink to="/">
-        <OffCanvasButton :label="optionsLabel">
+        <OffCanvasSidebarButton :label="optionsLabel">
           <template #icon>
             <Cog8ToothIcon />
           </template>
-        </OffCanvasButton>
+        </OffCanvasSidebarButton>
       </NuxtLink>
       <NuxtLink to="/">
-        <OffCanvasButton :label="helpLabel">
+        <OffCanvasSidebarButton :label="helpLabel">
           <template #icon>
             <QuestionMarkCircleIcon />
           </template>
-        </OffCanvasButton>
+        </OffCanvasSidebarButton>
       </NuxtLink>
       <NuxtLink to="/">
-        <OffCanvasButton :label="discordLabel">
+        <OffCanvasSidebarButton :label="discordLabel">
           <template #icon>
             <font-awesome-icon icon="fa-brands fa-discord" />
           </template>
-        </OffCanvasButton>
+        </OffCanvasSidebarButton>
       </NuxtLink>
     </div>
   </div>
@@ -68,7 +71,7 @@ import {
 
 import { computed, ref } from "vue";
 import { useUiStore } from "~/store/ui";
-import OffCanvasButton from "~/components/navbar/OffCanvasButton.vue";
+import OffCanvasSidebarButton from "~/components/navbar/OffCanvasSidebarButton.vue";
 import { onClickOutside, useLang } from "#imports";
 
 const uiStore = useUiStore();

@@ -39,7 +39,7 @@ import {
   TableCellsIcon,
 } from "@heroicons/vue/24/outline";
 import { useUiStore } from "~/store/ui";
-import OffCanvasButton from "~/components/navbar/OffCanvasButton.vue";
+import OffCanvasButton from "~/components/navbar/OffCanvasSidebarButton.vue";
 
 const uiStore = useUiStore();
 </script>

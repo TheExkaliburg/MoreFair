@@ -1,17 +1,11 @@
 <template>
   <div>
-    <CBrandedNavbarWithNarrowExpandableSidebar>
-      <slot />
-    </CBrandedNavbarWithNarrowExpandableSidebar>
+    <TheBrandedNavBarWithOffCanvas class="xl:hidden" />
+    <TheBrandedExpandableSidebar><slot /></TheBrandedExpandableSidebar>
   </div>
 </template>
 
-<script setup lang="ts"></script>
-
-<script>
-import CBrandedNavbarWithNarrowExpandableSidebar from "../components/navbar/CBrandedNavbarWithNarrowExpandableSidebar";
-export default {
-  components: { CBrandedNavbarWithNarrowExpandableSidebar },
-};
+<script setup lang="ts">
+import TheBrandedExpandableSidebar from "~/components/navbar/TheBrandedExpandableSidebar.vue";
+import TheBrandedNavBarWithOffCanvas from "~/components/navbar/TheBrandedNavBarWithOffCanvas.vue";
 </script>
-<style scoped></style>
