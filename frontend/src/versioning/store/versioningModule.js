@@ -7,7 +7,10 @@ const versioningModule = {
       versions: [
         new Version("PATCH", "Emojis", {
           features: ["You can now use emojis in your messages :eyes:"],
-          fixes: ["Fixed theme loading issues."],
+          fixes: [
+            "Fixed theme loading issues.",
+            "Made the chet input system more maintainable."
+          ],
         }),
         new Version("PATCH", "Balancing Round-Types", {
           balancing: [

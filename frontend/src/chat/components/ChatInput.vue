@@ -248,6 +248,35 @@ onMounted(() => {
   observer.observe(document.getElementById("chatInput"), config);
 });
 
+let inputSpecialSequenceHandlers = [];
+
+function registerNewInputSpecialSequenceHandler({
+  checker,
+  optionTextGenerator,
+  optionInsertionElementGenerator,
+  sorter,
+  priority,
+}) {
+  if (!checker) {
+    throw new Error("checker is required");
+  }
+  if (!optionTextGenerator) {
+    throw new Error("optionTextGenerator is required");
+  }
+  if (!priority) {
+    throw new Error("priority is required");
+  }
+  if (!inputSpecialSequenceHandlers[priority]) {
+    inputSpecialSequenceHandlers[priority] = [];
+  }
+  inputSpecialSequenceHandlers[priority].push({
+    checker,
+    optionTextGenerator,
+    optionInsertionElementGenerator,
+    sorter,
+  });
+}
+
 function onElementChange(mutation) {
   //on any mutation, check if the dropdown is open and if so, close it
   let oldDropdown = document.getElementById("mentionDropdown");
@@ -312,13 +341,10 @@ async function loadEmojiData() {
   return emojiData;
 }
 loadEmojiData();
-
 function findEmojisInString(str) {
   let index = str.lastIndexOf(":");
   str = str.substring(str.lastIndexOf(":") + 1);
-
   let possibleMentions = [];
-
   emojiData.forEach(function (emoji) {
     if (emoji.description.replaceAll(" ", "_").toLowerCase().includes(str)) {
       let newEmoji = {
@@ -338,7 +364,6 @@ function findEmojisInString(str) {
       }
     });
   });
-
   //ensure that all emojis are unique
   let uniqueEmojis = [];
   possibleMentions.forEach(function (emoji) {
@@ -352,7 +377,6 @@ function findEmojisInString(str) {
       uniqueEmojis.push(emoji);
     }
   });
-
   return [index > -1 && str.trim() != "" ? uniqueEmojis : [], str.length + 1];
 }
 
@@ -380,54 +404,17 @@ function findGroupMentionsInString(str) {
   ];
 }
 
-function plainTextElementChanged(mutation) {
-  let textElement = mutation.target;
-  let text = textElement.textContent;
-
-  //If we have no text, all is good.
-  if (text.length === 0) {
-    return;
-  }
-  if (!textElement.parentNode) {
-    return; //Unconnected node
-  }
-
-  //now we are getting the caret position and the text before and after the caret
-  let caretPosition = document.getSelection().anchorOffset;
-  let textBeforeCaret = text.substring(0, caretPosition);
-
-  //Here, we find out where to put the popup later so it follows the caret.
-  let dummySpan = document.createElement("span");
-  dummySpan.innerText = textBeforeCaret;
-  textElement.parentNode.insertBefore(dummySpan, textElement);
-  let caretX = dummySpan.getBoundingClientRect().right;
-  dummySpan.parentNode.removeChild(dummySpan);
-
-  //Now that we know where the caret is, we can check if we have a mention in the text before the caret
-  let [possibleMentions, possibleMentionLength] =
-    findMentionsInString(textBeforeCaret);
-  let [possibleGroupMentions, possibleGroupMentionLength] =
-    findGroupMentionsInString(textBeforeCaret);
-  let [possibleEmojis, possibleEmojiLength] =
-    findEmojisInString(textBeforeCaret);
-
-  if (
-    possibleMentions.length === 0 &&
-    possibleGroupMentions.length === 0 &&
-    possibleEmojis.length === 0
-  ) {
-    return; //no possible mentions
-  }
-  //We have possible mentions, so now we should display our dropdown
-
-  let dropdown = document.getElementById("mentionDropdown");
-  dropdown.innerHTML = "";
-
-  if (possibleMentions.length > 0) {
+/** Mentions */
+registerNewInputSpecialSequenceHandler({
+  checker: findMentionsInString,
+  optionTextGenerator: function (mention) {
+    return mention.name + "#" + mention.id;
+  },
+  optionInsertionElementGenerator: getMentionElement,
+  sorter: function (textBeforeCaret, mentions) {
     let numberMention = textBeforeCaret.toLowerCase().startsWith("#");
-
     //First, sorting the mentions by their name and accountId
-    possibleMentions.sort((a, b) => {
+    mentions.sort((a, b) => {
       if (numberMention) {
         //If we are looking for a number, we want a different order to put the numbers lower than the names (and select them easier)
         if (("#" + a.id).startsWith(textBeforeCaret.toLowerCase())) {
@@ -454,96 +441,105 @@ function plainTextElementChanged(mutation) {
       }
       return 0;
     });
+    return mentions;
+  },
+  priority: 1,
+});
 
-    //Now we can create the dropdown
-    dropdown.style.display = "block";
-    for (let i = 0; i < possibleMentions.length; i++) {
-      let option = document.createElement("option");
-      option.innerHTML = `${possibleMentions[i].name}#${possibleMentions[i].id}`;
+/** Group mentions */
+registerNewInputSpecialSequenceHandler({
+  checker: findGroupMentionsInString,
+  optionTextGenerator: function (mention) {
+    return `$${mention}$`;
+  },
+  optionInsertionElementGenerator: getGroupMentionElement,
+  priority: 1,
+});
 
-      option.style.border = "1px solid black";
+/** Emojis */
+registerNewInputSpecialSequenceHandler({
+  checker: findEmojisInString,
+  optionTextGenerator: function (emoji) {
+    return `${emoji.emoji}: ${emoji.description}`;
+  },
+  optionInsertionElementGenerator: (emoji) => {
+    return getPlaintextElement(emoji.emoji);
+  },
+  priority: 1,
+});
 
-      option.style.paddingRight = "5px";
-      option.style.paddingLeft = "5px";
+function plainTextElementChanged(mutation) {
+  let textElement = mutation.target;
+  let text = textElement.textContent;
 
-      option.addEventListener("click", function () {
-        let mention = getMentionElement(possibleMentions[i]);
-        //We need to insert the mention into the text
-        insertSpecialChatElement(
-          mention,
-          "CARET",
-          "END ELEMENT",
-          possibleMentionLength
-        );
-        //We need to close the dropdown
-        dropdown.style.display = "none";
-      });
-
-      dropdown.appendChild(option);
-    }
+  //If we have no text, all is good.
+  if (text.length === 0) {
+    return;
+  }
+  if (!textElement.parentNode) {
+    return; //Unconnected node
   }
 
-  if (possibleMentions.length === 0 && possibleGroupMentions.length > 0) {
-    //Now we can create the dropdown
-    dropdown.style.display = "block";
-    for (let index in possibleGroupMentions) {
-      let groupMention = possibleGroupMentions[index];
-      let option = document.createElement("option");
-      option.innerHTML = `$${groupMention}$`;
+  //now we are getting the caret position and the text before and after the caret
+  let caretPosition = document.getSelection().anchorOffset;
+  let textBeforeCaret = text.substring(0, caretPosition);
 
-      option.style.border = "1px solid black";
+  //Here, we find out where to put the popup later so it follows the caret.
+  let dummySpan = document.createElement("span");
+  dummySpan.innerText = textBeforeCaret;
+  textElement.parentNode.insertBefore(dummySpan, textElement);
+  let caretX = dummySpan.getBoundingClientRect().right;
+  dummySpan.parentNode.removeChild(dummySpan);
 
-      option.style.paddingRight = "5px";
-      option.style.paddingLeft = "5px";
+  let dropdown = document.getElementById("mentionDropdown");
+  dropdown.innerHTML = "";
 
-      option.addEventListener("click", function () {
-        let mention = getGroupMentionElement(groupMention);
-        //We need to insert the mention into the text
-        insertSpecialChatElement(
-          mention,
-          "CARET",
-          "END ELEMENT",
-          possibleGroupMentionLength
-        );
-        //We need to close the dropdown
-        dropdown.style.display = "none";
-      });
+  for (let prio in inputSpecialSequenceHandlers) {
+    let handlers = inputSpecialSequenceHandlers[prio];
+    for (let handler in handlers) {
+      let {
+        checker,
+        optionTextGenerator,
+        optionInsertionElementGenerator,
+        sorter,
+      } = handlers[handler];
+      let [possibleOptions, possibleOptionLength] = checker(textBeforeCaret);
+      if (possibleOptions.length === 0) {
+        continue;
+      }
+      if (sorter) {
+        possibleOptions = sorter(textBeforeCaret, possibleOptions);
+      }
 
-      dropdown.appendChild(option);
-    }
-  }
+      //Now we can create the dropdown
+      dropdown.style.display = "block";
+      for (let index in possibleOptions) {
+        let optionRaw = possibleOptions[index];
+        let option = document.createElement("option");
 
-  if (
-    possibleMentions.length === 0 &&
-    possibleGroupMentions.length == 0 &&
-    possibleEmojis.length > 0
-  ) {
-    //Now we can create the dropdown
-    dropdown.style.display = "block";
-    for (let index in possibleEmojis) {
-      let emoji = possibleEmojis[index];
-      let option = document.createElement("option");
-      option.innerHTML = `${emoji.emoji}: ${emoji.description}`;
+        option.style.border = "1px solid black";
 
-      option.style.border = "1px solid black";
+        option.style.paddingRight = "5px";
+        option.style.paddingLeft = "5px";
 
-      option.style.paddingRight = "5px";
-      option.style.paddingLeft = "5px";
+        option.innerText = optionTextGenerator(optionRaw);
+        option.addEventListener("click", function () {
+          let optionElement = optionInsertionElementGenerator(optionRaw);
+          //We need to insert the emojiElement into the text
+          insertSpecialChatElement(
+            optionElement,
+            "CARET",
+            "END ELEMENT",
+            possibleOptionLength
+          );
+          //We need to close the dropdown
+          dropdown.style.display = "none";
+        });
 
-      option.addEventListener("click", function () {
-        let emojiElement = getPlaintextElement(emoji.emoji);
-        //We need to insert the emojiElement into the text
-        insertSpecialChatElement(
-          emojiElement,
-          "CARET",
-          "END ELEMENT",
-          possibleEmojiLength
-        );
-        //We need to close the dropdown
-        dropdown.style.display = "none";
-      });
-
-      dropdown.appendChild(option);
+        dropdown.appendChild(option);
+      }
+      window.dropdownElementSelected = possibleOptions.length - 1;
+      break;
     }
   }
 
@@ -562,8 +558,10 @@ function plainTextElementChanged(mutation) {
     dropdown.scrollTop = dropdown.scrollHeight;
   }
 
-  window.dropdownElementSelected = possibleGroupMentions.length - 1;
-  if (window.dropdownElementSelected >= 1) {
+  if (
+    window.dropdownElementSelected >= 0 &&
+    dropdown.children[window.dropdownElementSelected]
+  ) {
     //select the last element
     dropdown.children[window.dropdownElementSelected].style.backgroundColor =
       "var(--item-selected-color)";
