@@ -2,7 +2,6 @@
   <div>
     <CBrandedNavbarWithNarrowExpandableSidebar>
       <slot />
-      Test123
     </CBrandedNavbarWithNarrowExpandableSidebar>
   </div>
 </template>

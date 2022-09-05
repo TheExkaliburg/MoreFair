@@ -3,7 +3,7 @@
     ref="offCanvas"
     class="flex flex-col bg-navbar-bg fixed inset-y-0 right-0 w-1/4 min-w-min max-w-full z-10 text-navbar-text px-4 py-1 transform transition-transform justify-between"
     :class="
-      uiStore.sidebarExpanded ? 'lg:translate-x-full' : 'translate-x-full'
+      uiStore.sidebarExpanded ? 'xl:translate-x-full' : 'translate-x-full'
     "
     tabindex="-1"
   >

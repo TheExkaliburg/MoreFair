@@ -11,7 +11,7 @@
             </NuxtLink>
           </div>
         </div>
-        <div class="-mr-2 flex lg:hidden">
+        <div class="-mr-2 flex">
           <button
             type="button"
             class="inline-flex items-center justify-center rounded-md py-0.5 px-1 text-button-text hover:bg-button-bg-hover hover:text-button-text-hover"
