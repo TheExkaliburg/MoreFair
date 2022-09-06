@@ -2,3 +2,6 @@ components.d.ts
 imports.d.ts
 nuxt.d.ts
 dist
+node_modules
+.output
+.nuxt
