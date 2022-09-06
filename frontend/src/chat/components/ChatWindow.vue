@@ -10,7 +10,7 @@
             ? Math.max(settings.assholeLadder, user.highestCurrentLadder)
             : user.highestCurrentLadder
         "
-        :onChange="changeChat"
+        :on-change="changeChat"
       />
     </div>
     <div ref="chatContent" class="chat-content row py-0">

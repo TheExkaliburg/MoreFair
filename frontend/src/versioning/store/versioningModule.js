@@ -5,9 +5,10 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
-        new Version("PATCH", "Follow Ranker", {
+        new Version("PATCH", "Emojis and Follow Ranker", {
           features: [
             "You can now enable following your own ranker in the options :^)",
+            "You can now use emojis in your messages :eyes:",
           ],
           fixes: [
             "Fixed theme loading issues.",

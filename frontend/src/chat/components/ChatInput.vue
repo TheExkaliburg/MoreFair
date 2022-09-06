@@ -41,6 +41,11 @@ export function getGroupMentionElement(groupName) {
   return mention;
 }
 
+export function getPlaintextElement(plainText) {
+  let mention = document.createTextNode(plainText);
+  return mention;
+}
+
 /**
  *
  * @param {"START"|"END"|"START ELEMENT"|"END ELEMENT"} [caretEndPosition] - Where to put the caret after the element is inserted.
@@ -294,6 +299,63 @@ function findMentionsInString(str) {
   return [possibleMentions, possibleMentionLength];
 }
 
+//load https://raw.githubusercontent.com/github/gemoji/master/db/emoji.json from the server
+let emojiData = null;
+async function loadEmojiData() {
+  if (emojiData) {
+    return emojiData;
+  }
+  const response = await fetch(
+    "https://raw.githubusercontent.com/github/gemoji/master/db/emoji.json"
+  );
+  emojiData = await response.json();
+  return emojiData;
+}
+loadEmojiData();
+
+function findEmojisInString(str) {
+  let index = str.lastIndexOf(":");
+  str = str.substring(str.lastIndexOf(":") + 1);
+
+  let possibleMentions = [];
+
+  emojiData.forEach(function (emoji) {
+    if (emoji.description.replaceAll(" ", "_").toLowerCase().includes(str)) {
+      let newEmoji = {
+        emoji: emoji.emoji,
+        description: emoji.description.replaceAll(" ", "_").toLowerCase(),
+      };
+      possibleMentions.push(newEmoji);
+    }
+    //also check the array "aliases" for the emoji
+    emoji.aliases.forEach(function (alias) {
+      if (alias.replaceAll(" ", "_").toLowerCase().includes(str)) {
+        let newEmoji = {
+          emoji: emoji.emoji,
+          description: alias.replaceAll(" ", "_").toLowerCase(),
+        };
+        possibleMentions.push(newEmoji);
+      }
+    });
+  });
+
+  //ensure that all emojis are unique
+  let uniqueEmojis = [];
+  possibleMentions.forEach(function (emoji) {
+    if (
+      !uniqueEmojis.some(
+        (emoji_) =>
+          emoji_.emoji === emoji.emoji &&
+          emoji_.description === emoji.description
+      )
+    ) {
+      uniqueEmojis.push(emoji);
+    }
+  });
+
+  return [index > -1 && str.trim() != "" ? uniqueEmojis : [], str.length + 1];
+}
+
 function findGroupMentionsInString(str) {
   let index = str.lastIndexOf("$");
   str = str.substring(str.lastIndexOf("$") + 1);
@@ -309,7 +371,9 @@ function findGroupMentionsInString(str) {
       possibleMentions.push(subMentions[i]);
     }
   }
-  possibleMentions.push(str);
+  if (str.indexOf(" ") == -1) {
+    possibleMentions.push(str);
+  }
   return [
     index > -1 && str.trim() != "" ? possibleMentions : [],
     possibleMentionLower.length + 1,
@@ -344,8 +408,14 @@ function plainTextElementChanged(mutation) {
     findMentionsInString(textBeforeCaret);
   let [possibleGroupMentions, possibleGroupMentionLength] =
     findGroupMentionsInString(textBeforeCaret);
+  let [possibleEmojis, possibleEmojiLength] =
+    findEmojisInString(textBeforeCaret);
 
-  if (possibleMentions.length === 0 && possibleGroupMentions.length === 0) {
+  if (
+    possibleMentions.length === 0 &&
+    possibleGroupMentions.length === 0 &&
+    possibleEmojis.length === 0
+  ) {
     return; //no possible mentions
   }
   //We have possible mentions, so now we should display our dropdown
@@ -434,6 +504,40 @@ function plainTextElementChanged(mutation) {
           "CARET",
           "END ELEMENT",
           possibleGroupMentionLength
+        );
+        //We need to close the dropdown
+        dropdown.style.display = "none";
+      });
+
+      dropdown.appendChild(option);
+    }
+  }
+
+  if (
+    possibleMentions.length === 0 &&
+    possibleGroupMentions.length == 0 &&
+    possibleEmojis.length > 0
+  ) {
+    //Now we can create the dropdown
+    dropdown.style.display = "block";
+    for (let index in possibleEmojis) {
+      let emoji = possibleEmojis[index];
+      let option = document.createElement("option");
+      option.innerHTML = `${emoji.emoji}: ${emoji.description}`;
+
+      option.style.border = "1px solid black";
+
+      option.style.paddingRight = "5px";
+      option.style.paddingLeft = "5px";
+
+      option.addEventListener("click", function () {
+        let emojiElement = getPlaintextElement(emoji.emoji);
+        //We need to insert the emojiElement into the text
+        insertSpecialChatElement(
+          emojiElement,
+          "CARET",
+          "END ELEMENT",
+          possibleEmojiLength
         );
         //We need to close the dropdown
         dropdown.style.display = "none";
