@@ -9,7 +9,10 @@ const versioningModule = {
           features: [
             "You can now enable following your own ranker in the options :^)",
           ],
-          fixes: ["Fixed theme loading issues."],
+          fixes: [
+            "Fixed theme loading issues.",
+            'Fixed a bug with the "got first jingle" sound.',
+          ],
         }),
         new Version("PATCH", "Balancing Round-Types", {
           balancing: [
@@ -33,7 +36,6 @@ const versioningModule = {
           ],
           fixes: [
             "Now saving all options (hopefully) correctly.",
-            'Fixed a bug with the "got first jingle" sound.',
           ],
         }),
         new Version("PATCH", "Grape reward changes", {
