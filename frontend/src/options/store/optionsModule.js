@@ -26,6 +26,14 @@ import {
 //  }
 //);
 
+const anyOptionEquals = function (value, ...optionIdentifier) {
+  return optionIdentifier.some((option) => {
+    return (
+      optionsModule.store.getters["options/getOption"](option).value === value
+    );
+  });
+};
+
 const optionsModule = {
   namespaced: true,
   store: {},
@@ -53,6 +61,11 @@ const optionsModule = {
             new BoolOption({
               displayName: "Show ETA to Top/Ranker",
               name: "showETA",
+              value: false,
+            }),
+            new BoolOption({
+              displayName: "Folow own Ranker",
+              name: "followOwnRanker",
               value: false,
             }),
             new DropdownOption({
@@ -146,8 +159,11 @@ const optionsModule = {
               min: 0,
               max: 100,
             }).setActiveFn(() =>
-              optionsModule.store.getters["options/getOptionValue"](
-                "mentionSound"
+              anyOptionEquals(
+                true,
+                "mentionSound",
+                "reachingFirstSound",
+                "promoteSound"
               )
             ),
           ],
@@ -227,9 +243,19 @@ const optionsModule = {
     },
     loadOptions(state) {
       //TODO: load locally
+      let savedOptions;
+      let themes;
       try {
-        const savedOptions = JSON.parse(localStorage.getItem("options"));
-        const themes = JSON.parse(localStorage.getItem("themeDatabase"));
+        savedOptions = JSON.parse(localStorage.getItem("options"));
+      } catch (e) {
+        localStorage.setItem("options", JSON.stringify({}));
+      }
+      try {
+        themes = JSON.parse(localStorage.getItem("themeDatabase"));
+      } catch (e) {
+        localStorage.setItem("themeDatabase", JSON.stringify({}));
+      }
+      try {
         requestAllThemes(() => {
           try {
             if (savedOptions) {
@@ -251,11 +277,11 @@ const optionsModule = {
               localStorage.setItem("themeDatabase", JSON.stringify(themes));
             }
           } catch (e) {
-            console.log(state.value);
+            console.log(e, state);
           }
         });
       } catch (e) {
-        console.error(state.value);
+        console.error(e, state);
       }
     },
     updateOption(state, { option, payload }) {
