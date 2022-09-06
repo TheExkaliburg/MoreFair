@@ -1,5 +1,6 @@
 <template>
   <div class="flex flex-row">
+    <slot />
     <div
       class="hidden xl:block w-18 bg-navbar-bg flex flex-col justify-between px-2 py-2"
     >
@@ -29,7 +30,6 @@
         class="min-w-min flex flex-col justify-items-start content-around"
       ></div>
     </div>
-    <slot />
   </div>
 </template>
 

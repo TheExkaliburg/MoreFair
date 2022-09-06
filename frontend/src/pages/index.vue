@@ -10,11 +10,13 @@
       class="w-full p-1 lg:h-full"
       :class="uiStore.ladderEnabled ? 'h-1/3 lg:w-2/5' : 'h-full lg:w-full'"
     />
+    <TheLoginDialog></TheLoginDialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useUiStore } from "~/store/ui";
+import TheLoginDialog from "~/components/auth/TheAuthenticationDialog.vue";
 
 const uiStore = useUiStore();
 </script>
