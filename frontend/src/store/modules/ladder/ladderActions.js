@@ -1,5 +1,6 @@
 import Decimal from "break_infinity.js";
 import Ranker from "@/ladder/entities/ranker";
+import { Sounds } from "@/modules/sounds";
 
 export default {
   async setup({ commit }, { message }) {
@@ -39,13 +40,17 @@ export default {
     }
   },
   async calculate(
-    { state, commit, getters, dispatch, rootState },
+    { state, commit, getters, dispatch, rootState, rootGetters },
     { message }
   ) {
     const delta = new Decimal(message.delta);
     let rankers = [...state.rankers];
     rankers.sort((a, b) => b.points.sub(a.points));
     let yourRanker = new Ranker(state.yourRanker);
+
+    //cache the old isFirst value of yourRanker
+    const wasFirst = yourRanker.rank === 1;
+
     for (let i = 0; i < rankers.length; i++) {
       let ranker = new Ranker(rankers[i]);
       rankers[i] = ranker;
@@ -97,6 +102,19 @@ export default {
         }
       }
     }
+
+    //if youRanker was not first but is now, we need to play the jingle
+    if (
+      !wasFirst &&
+      yourRanker.rank === 1 &&
+      rootGetters["options/getOptionValue"]("reachingFirstSound")
+    ) {
+      Sounds.play(
+        "gotFirstJingle",
+        rootGetters["options/getOptionValue"]("notificationVolume")
+      );
+    }
+
     // Ranker on Last Place gains 1 Grape, only if he isn't the only one
     if (rankers.length >= 1) {
       let index = rankers.length - 1;
