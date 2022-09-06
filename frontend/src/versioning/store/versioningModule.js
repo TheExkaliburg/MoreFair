@@ -5,7 +5,10 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
-        new Version("PATCH", "", {
+        new Version("PATCH", "Follow Ranker", {
+          features: [
+            "You can now enable following your own ranker in the options :^)",
+          ],
           fixes: ["Fixed theme loading issues."],
         }),
         new Version("PATCH", "Balancing Round-Types", {

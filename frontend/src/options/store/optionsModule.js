@@ -55,6 +55,11 @@ const optionsModule = {
               name: "showETA",
               value: false,
             }),
+            new BoolOption({
+              displayName: "Folow own Ranker",
+              name: "followOwnRanker",
+              value: false,
+            }),
             new DropdownOption({
               displayName: "ETA Colors",
               name: "etaColors",
