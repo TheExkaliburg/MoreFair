@@ -5,9 +5,15 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
-        new Version("PATCH", "Emojis", {
-          features: ["You can now use emojis in your messages :eyes:"],
-          fixes: ["Fixed theme loading issues."],
+        new Version("PATCH", "Emojis and Follow Ranker", {
+          features: [
+            "You can now enable following your own ranker in the options :^)",
+            "You can now use emojis in your messages :eyes:",
+          ],
+          fixes: [
+            "Fixed theme loading issues.",
+            'Fixed a bug with the "got first jingle" sound.',
+          ],
         }),
         new Version("PATCH", "Balancing Round-Types", {
           balancing: [
@@ -29,7 +35,9 @@ const versioningModule = {
           balancing: [
             "Doesn't Replace No-Auto Ladders with Free-Auto anymore.",
           ],
-          fixes: ["Now saving all options (hopefully) correctly."],
+          fixes: [
+            "Now saving all options (hopefully) correctly.",
+          ],
         }),
         new Version("PATCH", "Grape reward changes", {
           balancing: [
