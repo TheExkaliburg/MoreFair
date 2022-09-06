@@ -227,9 +227,19 @@ const optionsModule = {
     },
     loadOptions(state) {
       //TODO: load locally
+      let savedOptions;
+      let themes;
       try {
-        const savedOptions = JSON.parse(localStorage.getItem("options"));
-        const themes = JSON.parse(localStorage.getItem("themeDatabase"));
+        savedOptions = JSON.parse(localStorage.getItem("options"));
+      } catch (e) {
+        localStorage.setItem("options", JSON.stringify({}));
+      }
+      try {
+        themes = JSON.parse(localStorage.getItem("themeDatabase"));
+      } catch (e) {
+        localStorage.setItem("themeDatabase", JSON.stringify({}));
+      }
+      try {
         requestAllThemes(() => {
           try {
             if (savedOptions) {
@@ -251,11 +261,11 @@ const optionsModule = {
               localStorage.setItem("themeDatabase", JSON.stringify(themes));
             }
           } catch (e) {
-            console.log(state.value);
+            console.log(e, state);
           }
         });
       } catch (e) {
-        console.error(state.value);
+        console.error(e, state);
       }
     },
     updateOption(state, { option, payload }) {

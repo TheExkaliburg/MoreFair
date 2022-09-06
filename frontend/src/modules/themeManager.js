@@ -171,22 +171,29 @@ export function requestTheme(themeName) {
 }
 
 export function requestAllThemes(callback = () => {}) {
-  const themeDatabase = localStorage.getItem("themeDatabase");
-  if (!themeDatabase) {
-    return;
-  }
-  const themeDatabaseObject = JSON.parse(themeDatabase);
-  let awaitingLoadedCount = 1;
-  Object.values(themeDatabaseObject).forEach((theme) => {
-    awaitingLoadedCount++;
-    loadTheme(theme, true, () => {
-      awaitingLoadedCount--;
-      if (awaitingLoadedCount === 0) callback();
+  try {
+    const themeDatabase = localStorage.getItem("themeDatabase");
+    if (!themeDatabase) {
+      callback();
+      return;
+    }
+    const themeDatabaseObject = JSON.parse(themeDatabase);
+    let awaitingLoadedCount = 1;
+    Object.values(themeDatabaseObject).forEach((theme) => {
+      awaitingLoadedCount++;
+      loadTheme(theme, true, () => {
+        awaitingLoadedCount--;
+        if (awaitingLoadedCount === 0) callback();
+      });
     });
-  });
-  awaitingLoadedCount--;
-  if (awaitingLoadedCount === 0) {
+    awaitingLoadedCount--;
+    if (awaitingLoadedCount === 0) {
+      callback();
+    }
+  } catch (e) {
+    console.err(e);
     callback();
+    localStorage.setItem("themeDatabase", JSON.stringify({}));
   }
 }
 
