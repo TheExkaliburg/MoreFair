@@ -14,6 +14,7 @@ const versioningModule = {
             "Fixed theme loading issues.",
             "Fixed some sound settings.",
             'Fixed a bug with the "got first jingle" sound.',
+            "Made the chet input system more maintainable.",
           ],
         }),
         new Version("PATCH", "Balancing Round-Types", {
