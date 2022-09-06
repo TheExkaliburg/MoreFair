@@ -16,7 +16,7 @@ import soundsModule from "@/sounds/store/soundsModule";
 import versioningModule from "@/versioning/store/versioningModule";
 
 let promotionJingleVolume;
-let reachingFirstSound;
+let promotionSound;
 
 const store = createStore({
   strict: process.env.NODE_ENV !== "production",
@@ -179,7 +179,7 @@ const store = createStore({
       );
 
       //now doing a jingle for boozle <3
-      if (reachingFirstSound.value) {
+      if (promotionSound.value) {
         Sounds.play("promotionJingle", promotionJingleVolume.value);
       }
 
@@ -225,8 +225,8 @@ promotionJingleVolume = computed(() =>
   store.getters["options/getOptionValue"]("notificationVolume")
 );
 
-reachingFirstSound = computed(() =>
-  store.getters["options/getOptionValue"]("reachingFirstSound")
+promotionSound = computed(() =>
+  store.getters["options/getOptionValue"]("promoteSound")
 );
 
 Sounds.setStore(store);

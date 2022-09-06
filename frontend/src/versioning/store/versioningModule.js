@@ -12,6 +12,7 @@ const versioningModule = {
           ],
           fixes: [
             "Fixed theme loading issues.",
+            "Fixed some sound settings.",
             'Fixed a bug with the "got first jingle" sound.',
           ],
         }),
