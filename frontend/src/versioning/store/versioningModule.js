@@ -31,7 +31,10 @@ const versioningModule = {
           balancing: [
             "Doesn't Replace No-Auto Ladders with Free-Auto anymore.",
           ],
-          fixes: ["Now saving all options (hopefully) correctly."],
+          fixes: [
+            "Now saving all options (hopefully) correctly.",
+            'Fixed a bug with the "got first jingle" sound.',
+          ],
         }),
         new Version("PATCH", "Grape reward changes", {
           balancing: [
