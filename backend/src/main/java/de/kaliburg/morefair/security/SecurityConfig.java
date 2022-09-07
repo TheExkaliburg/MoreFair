@@ -21,6 +21,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   private final UserDetailsService userDetailsService;
   private final Argon2PasswordEncoder argon2PasswordEncoder;
+  private final SecurityUtils securityUtils;
 
   @Bean
   public AuthenticationManager authenticationManager() throws Exception {
@@ -30,7 +31,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(
-        authenticationManager());
+        authenticationManager(), securityUtils);
     customAuthenticationFilter.setFilterProcessesUrl("/api/auth/login");
 
     http.csrf().disable();
@@ -41,7 +42,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/**").authenticated();
     http.authorizeRequests().antMatchers(HttpMethod.PUT, "/api/**").authenticated();
     http.authorizeRequests().antMatchers(HttpMethod.DELETE, "/api/**").authenticated();
-    http.authorizeRequests().anyRequest().authenticated();
+    http.authorizeRequests().anyRequest().permitAll();
     http.addFilterBefore(new CustomAuthorizationFilter(),
         UsernamePasswordAuthenticationFilter.class);
     http.addFilter(customAuthenticationFilter);

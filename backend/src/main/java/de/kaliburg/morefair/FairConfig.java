@@ -13,7 +13,6 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 @Data
 public class FairConfig {
 
-  private String jwtSecret = "";
   private BigInteger basePointsToPromote = new BigInteger("100000000");
   private BigInteger baseVinegarToThrow = new BigInteger("500000");
   private BigInteger baseGrapesToBuyAutoPromote = new BigInteger("5000");
@@ -44,3 +43,4 @@ public class FairConfig {
     return result * 10;
   }
 }
+

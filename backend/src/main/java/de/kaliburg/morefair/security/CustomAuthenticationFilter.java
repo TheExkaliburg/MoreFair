@@ -23,6 +23,8 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
   private final AuthenticationManager authenticationManager;
 
+  private final SecurityUtils securityUtils;
+
   @Override
   public Authentication attemptAuthentication(HttpServletRequest request,
       HttpServletResponse response) throws AuthenticationException {
@@ -40,7 +42,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
       FilterChain chain, Authentication authResult) throws IOException {
     User user = (User) authResult.getPrincipal();
 
-    HashMap<String, String> tokens = SecurityUtils.generateTokens(request, user);
+    HashMap<String, String> tokens = securityUtils.generateTokens(request, user);
     response.setContentType(APPLICATION_JSON_VALUE);
     new ObjectMapper().writeValue(response.getOutputStream(), tokens);
   }

@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,11 +20,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class SecurityUtils {
 
-  private static final SecureRandom secureRandom = new SecureRandom();
+  private final SecureRandom secureRandom = new SecureRandom();
+  private final JwtConfig jwtConfig;
 
-  public static String generatePassword() {
+
+  public String generatePassword() {
     String passwordCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~`!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?";
     String pwd = RandomStringUtils.random(20, 0, passwordCharacters.length() - 1, false, false,
         passwordCharacters.toCharArray(), secureRandom);
@@ -32,7 +36,7 @@ public class SecurityUtils {
   }
 
   // generate access and refresh jwt tokens
-  public static HashMap<String, String> generateTokens(HttpServletRequest request, User user) {
+  public HashMap<String, String> generateTokens(HttpServletRequest request, User user) {
     String accessToken = JWT.create()
         .withSubject(user.getUsername())
         .withExpiresAt(new Date(System.currentTimeMillis() + 60 * 60 * 1000))
@@ -53,18 +57,18 @@ public class SecurityUtils {
     return tokens;
   }
 
-  public static User convertAccountToUser(AccountEntity account) {
+  public User convertAccountToUser(AccountEntity account) {
     Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
     authorities.add(new SimpleGrantedAuthority(account.getAccessRole().name()));
     return new User(account.getUsername(), account.getPassword(), authorities);
   }
 
-  public static HashMap<String, String> generateTokens(HttpServletRequest request,
+  public HashMap<String, String> generateTokens(HttpServletRequest request,
       AccountEntity account) {
     return generateTokens(request, convertAccountToUser(account));
   }
 
-  public static Algorithm getAlgorithm() {
-    return Algorithm.HMAC256("secret".getBytes());
+  public Algorithm getAlgorithm() {
+    return Algorithm.HMAC256(jwtConfig.getSecret().getBytes());
   }
 }

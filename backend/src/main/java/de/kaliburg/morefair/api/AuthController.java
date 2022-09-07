@@ -37,6 +37,7 @@ public class AuthController {
 
   private final AccountService accountService;
   private final PasswordEncoder passwordEncoder;
+  private final SecurityUtils securityUtils;
 
   private final Pattern emailRegexPattern = Pattern.compile(
       "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,15}$");
@@ -104,13 +105,13 @@ public class AuthController {
     if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
       try {
         String token = authorizationHeader.substring("Bearer ".length());
-        Algorithm algorithm = SecurityUtils.getAlgorithm();
+        Algorithm algorithm = securityUtils.getAlgorithm();
         JWTVerifier verifier = JWT.require(algorithm).build();
         DecodedJWT decodedJwt = verifier.verify(token);
         String username = decodedJwt.getSubject();
 
         AccountEntity account = accountService.findByUsername(username);
-        HashMap<String, String> tokens = SecurityUtils.generateTokens(request, account);
+        HashMap<String, String> tokens = securityUtils.generateTokens(request, account);
 
         return ResponseEntity.created(HttpUtils.createCreatedUri("/api/auth/refresh"))
             .body(tokens);
