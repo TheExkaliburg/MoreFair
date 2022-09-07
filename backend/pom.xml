@@ -187,6 +187,24 @@
       <artifactId>gson</artifactId>
       <groupId>com.google.code.gson</groupId>
     </dependency>
+
+    <!--Auth-->
+    <dependency>
+      <artifactId>spring-boot-starter-security</artifactId>
+      <groupId>org.springframework.boot</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>spring-security-test</artifactId>
+      <groupId>org.springframework.security</groupId>
+      <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/com.auth0/java-jwt -->
+    <dependency>
+      <artifactId>java-jwt</artifactId>
+      <groupId>com.auth0</groupId>
+      <version>4.0.0</version>
+    </dependency>
+
     <!-- Caching -->
     <dependency>
       <artifactId>caffeine</artifactId>

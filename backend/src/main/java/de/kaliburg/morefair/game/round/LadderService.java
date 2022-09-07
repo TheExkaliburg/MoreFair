@@ -345,7 +345,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
     Event joinEvent = new Event(EventType.JOIN, account.getId());
     joinEvent.setData(
-        new JoinData(account.getUsername(), config.getAssholeTag(account.getAssholeCount()),
+        new JoinData(account.getDisplayName(), config.getAssholeTag(account.getAssholeCount()),
             account.getAssholePoints()));
     wsUtils.convertAndSendToTopic(GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
         ladder.getNumber().toString()), joinEvent);
@@ -479,7 +479,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
       RankerEntity ranker = findActiveRankerOfAccountOnLadder(event.getAccountId(), ladder);
       if (ladderUtils.canPromote(ladder, ranker)) {
         AccountEntity account = accountService.find(ranker.getAccount());
-        log.info("[L{}] Promotion for {} (#{})", ladder.getNumber(), account.getUsername(),
+        log.info("[L{}] Promotion for {} (#{})", ladder.getNumber(), account.getDisplayName(),
             account.getId());
         ranker.setGrowing(false);
 
@@ -550,8 +550,8 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
                   + FormattingUtils.ordinal(newLadder.getRankers().size())
                   + " lucky initiate for the " + FormattingUtils.ordinal(
                   currentRound.getNumber()) + " big ritual.",
-              "[{\"u\":\"" + account.getUsername() + "\",\"id\":\"" + account.getId()
-                  + "\",\"i\":0},{\"u\":\"" + broadCaster.getUsername() + "\",\"id\":\""
+              "[{\"u\":\"" + account.getDisplayName() + "\",\"id\":\"" + account.getId()
+                  + "\",\"i\":0},{\"u\":\"" + broadCaster.getDisplayName() + "\",\"id\":\""
                   + broadCaster.getId() + "\",\"i\":20}]");
 
           int neededAssholesForReset = currentRound.getAssholesForReset();
@@ -602,8 +602,8 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
       if (target.isAutoPromote() || ladder.getTypes().contains(LadderType.FREE_AUTO)) {
         log.info("[L{}] {} (#{}) tried to throw Vinegar at {} (#{}), but they had Auto-Promote!",
-            ladder.getNumber(), rankerAccount.getUsername(), rankerAccount.getId(),
-            targetAccount.getUsername(), targetAccount.getId());
+            ladder.getNumber(), rankerAccount.getDisplayName(), rankerAccount.getId(),
+            targetAccount.getDisplayName(), targetAccount.getId());
         return false;
       }
 
@@ -612,8 +612,9 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         BigInteger targetVinegar = target.getVinegar();
 
         log.info("[L{}] {} (#{}) is using their {} Vinegar on {} (#{}) with {} Vinegar",
-            ladder.getNumber(), rankerAccount.getUsername(), rankerAccount.getId(), rankerVinegar,
-            targetAccount.getUsername(), targetAccount.getId(), targetVinegar);
+            ladder.getNumber(), rankerAccount.getDisplayName(), rankerAccount.getId(),
+            rankerVinegar,
+            targetAccount.getDisplayName(), targetAccount.getId(), targetVinegar);
 
         VinegarData data = new VinegarData(rankerVinegar.toString(), targetAccount.getId());
         if (targetVinegar.compareTo(rankerVinegar) > 0) {

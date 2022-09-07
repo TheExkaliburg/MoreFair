@@ -12,12 +12,15 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AccountRepository extends JpaRepository<AccountEntity, Long> {
 
+  @Query("select a from AccountEntity a where a.username = :username")
+  Optional<AccountEntity> findByUsername(@Param("username") String username);
+
   @Query("SELECT a FROM AccountEntity a WHERE a.uuid = :uuid")
   Optional<AccountEntity> findByUuid(@Param("uuid") UUID uuid);
 
-  @Query("select a from AccountEntity a where lower( a.username) like concat('%', lower(:username), '%')")
-  List<AccountEntity> findAccountsByUsernameIsContaining(
-      @Param("username") @NonNull String username);
+  @Query("select a from AccountEntity a where lower( a.displayName) like concat('%', lower(:displayName), '%')")
+  List<AccountEntity> findAccountsByDisplayNameIsContaining(
+      @Param("displayName") @NonNull String displayName);
 
   @Query("select a from AccountEntity a where a.accessRole = :accessRole order by a.id")
   List<AccountEntity> findByAccessRoleOrderByIdAsc(

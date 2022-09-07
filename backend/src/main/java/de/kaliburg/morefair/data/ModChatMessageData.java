@@ -17,7 +17,7 @@ public class ModChatMessageData {
 
   public ModChatMessageData(MessageEntity message, FairConfig config) {
     this.message = message.getMessage();
-    this.username = message.getAccount().getUsername();
+    this.username = message.getAccount().getDisplayName();
     this.assholeTag = config.getAssholeTag(message.getAccount().getAssholeCount());
     this.accountId = message.getAccount().getId();
     this.timeCreated = message.getCreatedOn().format(DateTimeFormatter.ofPattern("EE HH:mm"));

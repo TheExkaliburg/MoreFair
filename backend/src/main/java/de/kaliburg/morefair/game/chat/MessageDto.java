@@ -20,7 +20,7 @@ public class MessageDto {
     this.tag = config.getAssholeTag(message.getAccount().getAssholeCount());
     this.ahPoints = message.getAccount().getAssholePoints();
     this.message = message.getMessage();
-    this.username = message.getAccount().getUsername();
+    this.username = message.getAccount().getDisplayName();
     this.accountId = message.getAccount().getId();
     this.timeCreated =
         message.getCreatedOn().atZoneSameInstant(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern(

@@ -39,10 +39,16 @@ public class AccountEntity {
   private UUID uuid = UUID.randomUUID();
   @NonNull
   @Column(nullable = false)
-  private String username = "Mystery Guest";
+  private String displayName = "Mystery Guest";
   // Exists technically, but we don't want to call this in this direction
   //@OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
   //private List<RankerEntity> rankers = new ArrayList<>();
+
+  @Column
+  private String username;
+  @Column
+  private String password;
+
   @NonNull
   @Column(nullable = false)
   private Integer assholePoints = 0;

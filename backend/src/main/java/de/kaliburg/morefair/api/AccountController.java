@@ -65,7 +65,8 @@ public class AccountController {
       if (uuid == null || uuid.isBlank()) {
         if (requestThrottler.canCreateAccount(principal)) {
           wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION,
-              new AccountDetailsDto(accountService.create(principal, currentRound), 1),
+              // TOOD: Create Account
+              new AccountDetailsDto(accountService.create(principal, "", "", currentRound), 1),
               HttpStatus.CREATED);
         } else {
           wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
@@ -78,7 +79,8 @@ public class AccountController {
       if (account == null) {
         if (requestThrottler.canCreateAccount(principal)) {
           wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION,
-              new AccountDetailsDto(accountService.create(principal, currentRound), 1),
+              // TOOD: Create Account
+              new AccountDetailsDto(accountService.create(principal, "", "", currentRound), 1),
               HttpStatus.CREATED);
         } else {
           wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
@@ -131,14 +133,14 @@ public class AccountController {
         return;
       }
 
-      log.info("[G] RENAME: {} (#{}) -> {}", account.getUsername(), account.getId(), username);
+      log.info("[G] RENAME: {} (#{}) -> {}", account.getDisplayName(), account.getId(), username);
 
-      account.setUsername(username);
+      account.setDisplayName(username);
       accountService.save(account);
 
       wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION,
           new Event(EventType.NAME_CHANGE, account.getId(),
-              account.getUsername()));
+              account.getDisplayName()));
 
     } catch (Exception e) {
       log.error(e.getMessage());

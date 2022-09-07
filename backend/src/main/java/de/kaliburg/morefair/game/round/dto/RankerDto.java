@@ -21,7 +21,7 @@ public class RankerDto {
 
   public RankerDto(RankerEntity ranker, FairConfig config) {
     this.accountId = ranker.getAccount().getId();
-    this.username = ranker.getAccount().getUsername();
+    this.username = ranker.getAccount().getDisplayName();
     this.rank = ranker.getRank();
     this.points = ranker.getPoints().toString();
     this.power = ranker.getPower().toString();
