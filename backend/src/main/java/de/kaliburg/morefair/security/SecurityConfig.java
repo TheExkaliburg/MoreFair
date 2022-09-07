@@ -11,7 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -20,7 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   private final UserDetailsService userDetailsService;
-  private final BCryptPasswordEncoder bcryptPasswordEncoder;
+  private final Argon2PasswordEncoder argon2PasswordEncoder;
 
   @Bean
   public AuthenticationManager authenticationManager() throws Exception {
@@ -36,6 +36,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     http.csrf().disable();
     http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/auth/**").permitAll();
+    http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/auth/**").permitAll();
     http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/**").authenticated();
     http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/**").authenticated();
     http.authorizeRequests().antMatchers(HttpMethod.PUT, "/api/**").authenticated();
@@ -48,6 +49,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    auth.userDetailsService(userDetailsService).passwordEncoder(bcryptPasswordEncoder);
+    auth.userDetailsService(userDetailsService).passwordEncoder(argon2PasswordEncoder);
   }
 }

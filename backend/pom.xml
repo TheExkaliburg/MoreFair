@@ -193,7 +193,7 @@
       <groupId>com.google.code.gson</groupId>
     </dependency>
 
-    <!--Auth-->
+    <!--Security-->
     <dependency>
       <artifactId>spring-boot-starter-security</artifactId>
       <groupId>org.springframework.boot</groupId>
@@ -203,11 +203,15 @@
       <groupId>org.springframework.security</groupId>
       <scope>test</scope>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/com.auth0/java-jwt -->
     <dependency>
       <artifactId>java-jwt</artifactId>
       <groupId>com.auth0</groupId>
       <version>4.0.0</version>
+    </dependency>
+    <dependency>
+      <artifactId>bcpkix-jdk15on</artifactId>
+      <groupId>org.bouncycastle</groupId>
+      <version>1.70</version>
     </dependency>
 
     <!-- Caching -->

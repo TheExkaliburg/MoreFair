@@ -18,6 +18,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -28,8 +29,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
   @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-      FilterChain filterChain) throws IOException, ServletException {
+  protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response,
+      @NonNull FilterChain filterChain) throws IOException, ServletException {
 
     if (request.getServletPath().equals("/api/auth/login") || request.getServletPath()
         .equals("/api/auth/register") || request.getServletPath().equals("/api/auth/refresh")) {
@@ -41,9 +42,9 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
           String token = authorizationHeader.substring("Bearer ".length());
           Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
           JWTVerifier verifier = JWT.require(algorithm).build();
-          DecodedJWT decodedJWT = verifier.verify(token);
-          String username = decodedJWT.getSubject();
-          String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
+          DecodedJWT decodedJwt = verifier.verify(token);
+          String username = decodedJwt.getSubject();
+          String[] roles = decodedJwt.getClaim("roles").asArray(String.class);
           Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
           Arrays.stream(roles).forEach(role -> authorities.add(new SimpleGrantedAuthority(role)));
           UsernamePasswordAuthenticationToken authenticationToken =
@@ -51,14 +52,11 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
           SecurityContextHolder.getContext().setAuthentication(authenticationToken);
           filterChain.doFilter(request, response);
         } catch (Exception e) {
-          log.error("Error logging in: {}", e.getMessage());
-          response.setHeader("error", e.getMessage());
-          response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-          Map<String, String> error = new HashMap<>();
-          error.put("error_message", e.getMessage());
+          log.error("Failed Authorization: {}", e.getMessage());
+          Map<String, String> errors = new HashMap<>();
+          errors.put("error", e.getMessage());
           response.setContentType(APPLICATION_JSON_VALUE);
-          new ObjectMapper().writeValue(response.getOutputStream(), error);
-          return;
+          new ObjectMapper().writeValue(response.getOutputStream(), errors);
         }
       } else {
         filterChain.doFilter(request, response);

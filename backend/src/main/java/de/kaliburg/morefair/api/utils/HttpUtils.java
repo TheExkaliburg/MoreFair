@@ -4,8 +4,12 @@ import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -50,5 +54,11 @@ public class HttpUtils {
   public static URI createCreatedUri(String apiPath) {
     return URI.create(
         ServletUriComponentsBuilder.fromCurrentContextPath().path(apiPath).toUriString());
+  }
+
+  public static void buildErrorMessage(HttpServletResponse response, String message, int status) {
+    Map<String, String> errors = new HashMap<>();
+    errors.put("error", message);
+    ResponseEntity.status(status).body(errors);
   }
 }
