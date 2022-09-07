@@ -1,7 +1,6 @@
 package de.kaliburg.morefair.account;
 
 import de.kaliburg.morefair.api.websockets.UserPrincipal;
-import de.kaliburg.morefair.game.round.RoundEntity;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -44,15 +43,11 @@ public class AccountService implements UserDetailsService {
    *
    * @return the account
    */
-  public AccountEntity create(UserPrincipal principal, String email, String password,
-      RoundEntity currentRound) {
+  public AccountEntity create(String email, String password, Integer ipAddress, boolean isGuest) {
     AccountEntity result = new AccountEntity();
     result.setUsername(email);
     result.setPassword(passwordEncoder.encode(password));
-
-    if (principal != null) {
-      result.setLastIp(principal.getIpAddress());
-    }
+    result.setLastIp(ipAddress);
 
     result = save(result);
 

@@ -134,6 +134,11 @@
       <version>1.18.24</version>
     </dependency>
     <dependency>
+      <artifactId>commons-validator</artifactId>
+      <groupId>commons-validator</groupId>
+      <version>1.7</version>
+    </dependency>
+    <dependency>
       <artifactId>spring-boot-starter-test</artifactId>
       <groupId>org.springframework.boot</groupId>
       <scope>test</scope>

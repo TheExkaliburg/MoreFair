@@ -14,6 +14,7 @@ import de.kaliburg.morefair.security.SecurityUtils;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.UUID;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import lombok.Getter;
@@ -99,9 +100,9 @@ public class GameService implements ApplicationListener<GameResetEvent> {
     result.setCurrentRound(round);
 
     if (accountService.findBroadcaster() == null) {
-      String email = "text@gmail.com";
-      String password = securityUtils.generatePassword();
-      AccountEntity broadcaster = accountService.create(null, email, password, round);
+      String broadcasterUuid = UUID.randomUUID().toString();
+      AccountEntity broadcaster = accountService.create(broadcasterUuid, broadcasterUuid, null,
+          true);
       broadcaster.setDisplayName("Chad");
       broadcaster.setAccessRole(AccountAccessRole.BROADCASTER);
       broadcaster.setAssholePoints(config.getMaxAssholePointsAsTag());

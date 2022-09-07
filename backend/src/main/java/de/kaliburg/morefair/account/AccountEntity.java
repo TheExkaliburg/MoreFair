@@ -1,7 +1,6 @@
 package de.kaliburg.morefair.account;
 
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -23,7 +22,9 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Entity
-@Table(name = "account", uniqueConstraints = @UniqueConstraint(name = "uk_uuid", columnNames = "uuid"))
+@Table(name = "account", uniqueConstraints = {
+    @UniqueConstraint(name = "uk_uuid", columnNames = "uuid"),
+    @UniqueConstraint(name = "uk_username", columnNames = "username")})
 @Getter
 @Setter
 @Accessors(chain = true)
@@ -40,15 +41,14 @@ public class AccountEntity {
   @NonNull
   @Column(nullable = false)
   private String displayName = "Mystery Guest";
-  // Exists technically, but we don't want to call this in this direction
-  //@OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
-  //private List<RankerEntity> rankers = new ArrayList<>();
-
-  @Column
+  @Column(nullable = false)
+  @NonNull
   private String username;
-  @Column
+  @NonNull
+  @Column(nullable = false)
   private String password;
-
+  @Column(nullable = false)
+  private boolean guest = true;
   @NonNull
   @Column(nullable = false)
   private Integer assholePoints = 0;
@@ -59,7 +59,10 @@ public class AccountEntity {
   private Integer lastIp;
   @NonNull
   @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
-  private OffsetDateTime lastLogin = OffsetDateTime.now(ZoneOffset.UTC);
+  private OffsetDateTime lastLogin = OffsetDateTime.now();
+  @NonNull
+  @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
+  private OffsetDateTime createdOn = OffsetDateTime.now();
   @NonNull
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)

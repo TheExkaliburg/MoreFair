@@ -59,34 +59,7 @@ public class AccountController {
 
       log.trace("/app/{} {}", QUEUE_LOGIN_DESTINATION, uuid);
 
-      RoundEntity currentRound = roundService.getCurrentRound();
-
-      // Empty UUID
-      if (uuid == null || uuid.isBlank()) {
-        if (requestThrottler.canCreateAccount(principal)) {
-          wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION,
-              // TOOD: Create Account
-              new AccountDetailsDto(accountService.create(principal, "", "", currentRound), 1),
-              HttpStatus.CREATED);
-        } else {
-          wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
-        }
-        return;
-      }
-
       AccountEntity account = accountService.find(UUID.fromString(uuid));
-      // Can't find account with valid UUID
-      if (account == null) {
-        if (requestThrottler.canCreateAccount(principal)) {
-          wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION,
-              // TOOD: Create Account
-              new AccountDetailsDto(accountService.create(principal, "", "", currentRound), 1),
-              HttpStatus.CREATED);
-        } else {
-          wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
-        }
-        return;
-      }
 
       // BANNED Players
       if (account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
@@ -99,6 +72,7 @@ public class AccountController {
         accountService.save(account);
       }
 
+      RoundEntity currentRound = roundService.getCurrentRound();
       account = accountService.login(account, principal);
       int highestLadder = rankerService.findCurrentRankersOfAccount(account, currentRound).stream()
           .mapToInt(r -> r.getLadder().getNumber()).max().orElse(1);

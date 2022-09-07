@@ -3,11 +3,8 @@ package de.kaliburg.morefair.api.websockets;
 import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import java.math.BigInteger;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import de.kaliburg.morefair.api.utils.HttpUtils;
 import java.security.Principal;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -39,15 +36,13 @@ public class CustomHandshakeHandler extends DefaultHandshakeHandler {
   @Override
   protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler,
       Map<String, Object> attributes) {
-    String ipString = request.getHeaders()
-        .getOrDefault("x-forwarded-for", List.of(request.getRemoteAddress().getHostName()))
-        .get(0);
+
     Integer ip = 0;
     try {
-      ip = new BigInteger(InetAddress.getByName(ipString).getAddress()).intValue();
-    } catch (UnknownHostException e) {
-      log.error(e);
-      e.printStackTrace();
+      ip = HttpUtils.getIp(request);
+    } catch (Exception e) {
+      log.error("Could not determine IP address of client", e);
+      return null;
     }
 
     if (isMaximumConnectionsPerMinuteExceeded(ip)) {
