@@ -328,19 +328,8 @@ function findMentionsInString(str) {
   return [possibleMentions, possibleMentionLength];
 }
 
-//load https://raw.githubusercontent.com/github/gemoji/master/db/emoji.json from the server
-let emojiData = null;
-async function loadEmojiData() {
-  if (emojiData) {
-    return emojiData;
-  }
-  const response = await fetch(
-    "https://raw.githubusercontent.com/github/gemoji/master/db/emoji.json"
-  );
-  emojiData = await response.json();
-  return emojiData;
-}
-loadEmojiData();
+let emojiData = require("@/assets/emoji.json");
+
 function findEmojisInString(str) {
   let index = str.lastIndexOf(":");
   str = str.substring(str.lastIndexOf(":") + 1);
@@ -700,10 +689,21 @@ function chatBoxKeyDown(e) {
 
   const mentionDropdown = document.getElementById("mentionDropdown");
 
-  //if the key is key up or down or tab
-  if (e.keyCode === 38 || e.keyCode === 40 || e.keyCode === 9) {
+  //if the key is key up or down or tab or escape
+  if (
+    e.keyCode === 38 ||
+    e.keyCode === 40 ||
+    e.keyCode === 9 ||
+    e.keyCode === 27
+  ) {
     e.preventDefault();
     if (!mentionDropdown || mentionDropdown.style.display == "none") {
+      return;
+    }
+
+    //if it is escape, hide the dropdown
+    if (e.keyCode === 27) {
+      mentionDropdown.style.display = "none";
       return;
     }
 
