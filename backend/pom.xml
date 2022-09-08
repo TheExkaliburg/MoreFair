@@ -162,7 +162,6 @@
       <artifactId>spring-boot-starter-websocket</artifactId>
       <groupId>org.springframework.boot</groupId>
     </dependency>
-
     <dependency>
       <artifactId>reactor-core</artifactId>
       <groupId>io.projectreactor</groupId>
@@ -171,7 +170,12 @@
       <artifactId>gson</artifactId>
       <groupId>com.google.code.gson</groupId>
     </dependency>
-
+    <!-- Emails -->
+    <dependency>
+      <artifactId>spring-boot-starter-mail</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <version>2.7.3</version>
+    </dependency>
     <!--Security-->
     <dependency>
       <artifactId>spring-boot-starter-security</artifactId>

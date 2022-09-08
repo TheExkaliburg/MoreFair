@@ -6,17 +6,23 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.utils.HttpUtils;
 import de.kaliburg.morefair.security.SecurityUtils;
+import de.kaliburg.morefair.serivces.EmailService;
 import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -38,16 +44,25 @@ public class AuthController {
   private final AccountService accountService;
   private final PasswordEncoder passwordEncoder;
   private final SecurityUtils securityUtils;
+  private final EmailService emailService;
 
   private final Pattern emailRegexPattern = Pattern.compile(
       "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,15}$");
+
+  private final LoadingCache<String, UserRegistrationDetails> userThatRequestedConfirmation = Caffeine.newBuilder()
+      .expireAfterWrite(1, TimeUnit.HOURS)
+      .build(uuid -> null);
+
+  // TODO: changePassword
+  // TODO: forgotPassword + sendToken via Mail
+  // TODO: resetPassword with the previously sent token
+  // TODO: revokeJwtTokens for a specific user
+  // TODO: config for server-paths to put into mails
 
   @PostMapping(value = "/register", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   public ResponseEntity<?> signup(@RequestParam String username, @RequestParam String password,
       HttpServletRequest request, @RequestParam(required = false) String uuid)
       throws Exception {
-    Integer ip = HttpUtils.getIp(request);
-
     if (password.length() < 8) {
       return ResponseEntity.badRequest().body("Password must be at least 8 characters long");
     }
@@ -66,7 +81,32 @@ public class AuthController {
       return ResponseEntity.badRequest().body("Email address already in use");
     }
 
-    // TODO: Send email to make sure that the email is accurate
+    String confirmToken = UUID.randomUUID().toString();
+    userThatRequestedConfirmation.put(confirmToken,
+        new UserRegistrationDetails(username, password, uuid, false));
+    emailService.sendRegistrationMail(username, confirmToken);
+
+    URI uri = HttpUtils.createCreatedUri("/api/auth/register");
+    return ResponseEntity.created(uri).body("Please look into your inbox for a confirmation link");
+  }
+
+  @GetMapping(value = "/register/confirm")
+  public ResponseEntity<?> signup(@RequestParam String token, HttpServletRequest request)
+      throws Exception {
+    UserRegistrationDetails details = userThatRequestedConfirmation.get(token);
+    if (details == null) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND)
+          .body("Invalid or expired confirmation token");
+    }
+    if (details.isUsed()) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND)
+          .body("Confirmation token already used");
+    }
+
+    Integer ip = HttpUtils.getIp(request);
+    String uuid = details.getUuid();
+    String username = details.getUsername();
+    String password = details.getPassword();
 
     if (uuid != null && !uuid.isEmpty()) {
       AccountEntity account = accountService.findByUsername(uuid);
@@ -80,12 +120,17 @@ public class AuthController {
       }
     } else {
       AccountEntity account = accountService.create(username, password, ip, false);
-      account.setLastLogin(OffsetDateTime.now());
       account.setLastIp(ip);
+      account.setLastLogin(OffsetDateTime.now());
+      accountService.save(account);
     }
 
-    URI uri = HttpUtils.createCreatedUri("/api/auth/signup");
-    return ResponseEntity.created(uri).build();
+    userThatRequestedConfirmation.put(token,
+        new UserRegistrationDetails(username, securityUtils.generatePassword(), uuid, true));
+
+    URI uri = HttpUtils.createCreatedUri("/api/auth/register/confirm");
+    return ResponseEntity.created(uri)
+        .body("Registration successful; Please log into your account");
   }
 
   @PostMapping("/register/guest")
@@ -126,4 +171,15 @@ public class AuthController {
       throw new RuntimeException("Refresh token is missing");
     }
   }
+}
+
+@Data
+@RequiredArgsConstructor
+@AllArgsConstructor
+class UserRegistrationDetails {
+
+  private String username = "";
+  private String password = "";
+  private String uuid = "";
+  private boolean used = true;
 }
