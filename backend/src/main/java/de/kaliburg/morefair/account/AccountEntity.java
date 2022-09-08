@@ -51,6 +51,9 @@ public class AccountEntity {
   private boolean guest = true;
   @NonNull
   @Column(nullable = false)
+  private OffsetDateTime lastRevoke = OffsetDateTime.now();
+  @NonNull
+  @Column(nullable = false)
   private Integer assholePoints = 0;
   @NonNull
   @Column(nullable = false)

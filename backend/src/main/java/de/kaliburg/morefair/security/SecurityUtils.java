@@ -2,6 +2,7 @@ package de.kaliburg.morefair.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import de.kaliburg.morefair.account.AccountEntity;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ public class SecurityUtils {
     String accessToken = JWT.create()
         .withSubject(user.getUsername())
         .withExpiresAt(new Date(System.currentTimeMillis() + 60 * 60 * 1000))
+        .withIssuedAt(new Date())
         .withIssuer(request.getRequestURL().toString())
         .withClaim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority)
             .collect(Collectors.toList()))
@@ -48,6 +50,7 @@ public class SecurityUtils {
     String refreshToken = JWT.create()
         .withSubject(user.getUsername())
         .withExpiresAt(new Date(System.currentTimeMillis() + 365L * 24 * 60 * 60 * 1000))
+        .withIssuedAt(new Date())
         .withIssuer(request.getRequestURL().toString())
         .sign(getAlgorithm());
 
@@ -66,6 +69,10 @@ public class SecurityUtils {
   public HashMap<String, String> generateTokens(HttpServletRequest request,
       AccountEntity account) {
     return generateTokens(request, convertAccountToUser(account));
+  }
+
+  public DecodedJWT verifyToken(String token) {
+    return JWT.require(getAlgorithm()).build().verify(token);
   }
 
   public Algorithm getAlgorithm() {

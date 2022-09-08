@@ -2,9 +2,6 @@ package de.kaliburg.morefair.api;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
@@ -14,6 +11,7 @@ import de.kaliburg.morefair.api.utils.HttpUtils;
 import de.kaliburg.morefair.security.SecurityUtils;
 import de.kaliburg.morefair.serivces.EmailService;
 import java.net.URI;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -150,12 +148,18 @@ public class AuthController {
     if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
       try {
         String token = authorizationHeader.substring("Bearer ".length());
-        Algorithm algorithm = securityUtils.getAlgorithm();
-        JWTVerifier verifier = JWT.require(algorithm).build();
-        DecodedJWT decodedJwt = verifier.verify(token);
+        DecodedJWT decodedJwt = securityUtils.verifyToken(token);
         String username = decodedJwt.getSubject();
+        Instant instant = decodedJwt.getIssuedAt().toInstant();
 
         AccountEntity account = accountService.findByUsername(username);
+        if (account == null) {
+          return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+        if (account.getLastRevoke().toInstant().isAfter(instant)) {
+          return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token revoked");
+        }
+
         HashMap<String, String> tokens = securityUtils.generateTokens(request, account);
 
         return ResponseEntity.created(HttpUtils.createCreatedUri("/api/auth/refresh"))
