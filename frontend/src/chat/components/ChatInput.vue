@@ -328,19 +328,8 @@ function findMentionsInString(str) {
   return [possibleMentions, possibleMentionLength];
 }
 
-//load https://raw.githubusercontent.com/github/gemoji/master/db/emoji.json from the server
-let emojiData = null;
-async function loadEmojiData() {
-  if (emojiData) {
-    return emojiData;
-  }
-  const response = await fetch(
-    "https://raw.githubusercontent.com/github/gemoji/master/db/emoji.json"
-  );
-  emojiData = await response.json();
-  return emojiData;
-}
-loadEmojiData();
+let emojiData = require("@/assets/emoji.json");
+
 function findEmojisInString(str) {
   let index = str.lastIndexOf(":");
   str = str.substring(str.lastIndexOf(":") + 1);
