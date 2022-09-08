@@ -689,10 +689,21 @@ function chatBoxKeyDown(e) {
 
   const mentionDropdown = document.getElementById("mentionDropdown");
 
-  //if the key is key up or down or tab
-  if (e.keyCode === 38 || e.keyCode === 40 || e.keyCode === 9) {
+  //if the key is key up or down or tab or escape
+  if (
+    e.keyCode === 38 ||
+    e.keyCode === 40 ||
+    e.keyCode === 9 ||
+    e.keyCode === 27
+  ) {
     e.preventDefault();
     if (!mentionDropdown || mentionDropdown.style.display == "none") {
+      return;
+    }
+
+    //if it is escape, hide the dropdown
+    if (e.keyCode === 27) {
+      mentionDropdown.style.display = "none";
       return;
     }
 
