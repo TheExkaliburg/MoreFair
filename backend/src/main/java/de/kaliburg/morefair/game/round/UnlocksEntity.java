@@ -54,14 +54,11 @@ public class UnlocksEntity {
 
   public Integer calculateAssholePoints() {
     int result = 0;
-    if (getAutoPromote()) {
-      result += 1;
-    }
     if (getReachedBaseAssholeLadder()) {
       result += 1;
     }
     if (getReachedAssholeLadder()) {
-      result += 1;
+      result += 2;
     }
     if (getPressedAssholeButton()) {
       result += 7;

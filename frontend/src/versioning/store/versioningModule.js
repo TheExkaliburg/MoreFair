@@ -10,6 +10,10 @@ const versioningModule = {
             "You can now enable following your own ranker in the options :^)",
             "You can now use emojis in your messages :eyes:",
           ],
+          balancing: [
+            "A Ladder only gains FREE_AUTO dependent on the base Asshole-Ladder. So in DEFAULT rounds it's now 10 behind and in FAST rounds it's 5 behind.",
+            "You don't gain any asshole-points by leaving L1 anymore. The lost point is now distributed to you reaching asshole-ladder.",
+          ],
           fixes: [
             "Fixed theme loading issues.",
             "Fixed some sound settings.",
