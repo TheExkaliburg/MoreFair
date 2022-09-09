@@ -50,7 +50,7 @@ public class AccountEntity {
   @Column(nullable = false)
   private boolean guest = true;
   @NonNull
-  @Column(nullable = false)
+  @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
   private OffsetDateTime lastRevoke = OffsetDateTime.now();
   @NonNull
   @Column(nullable = false)

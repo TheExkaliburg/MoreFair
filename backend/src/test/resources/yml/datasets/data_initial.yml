@@ -1,0 +1,47 @@
+account:
+  - id: 1
+    uuid: ecc70b72-5d20-4199-b600-af82eaa78765
+    display_name: Chad
+    username: da0104ac-e971-48aa-8903-269a4d21eeab
+    password: $argon2id$v=19$m=4096,t=3,p=1$vNHsRTeYNLE3paTgxp5aKA$026UVRPtPdnWNR4wW4/EiKrwqNePOG5EjKJ5tZNcJvg
+    guest: true
+    access_role: BROADCASTER
+    asshole_points: 5950
+
+account_achievements:
+  - id: 1
+    pressed_asshole_button: false
+
+chat:
+  - id: 1
+    number: 1
+    uuid: 414cbb38-c77e-48c9-9104-be80bb0c8181
+
+game:
+  - id: 1
+    uuid: 75ccdb57-7ba2-4626-941d-b460486dd247
+    current_round: 1
+
+ladder:
+  - id: 1
+    uuid: b09777c8-d0a8-4277-a0f0-a5886bc43d38
+    base_points_to_promote: 506
+    number: 1
+    round: 1
+
+ladder_type:
+  - ladder_entity_id: 1
+    type: DEFAULT
+
+round:
+  - id: 1
+    uuid: 9d7819c4-e6bb-4f3f-b5e0-a7311db34fc7
+    base_asshole_ladder: 2
+    base_points_requirement: 620
+    highest_asshole_count: 0
+    number: 1
+    percentage_of_additional_assholes: 50.0
+
+round_type:
+  - round_entity_id: 1
+    type: DEFAULT

@@ -134,11 +134,7 @@
       <groupId>commons-validator</groupId>
       <version>1.7</version>
     </dependency>
-    <dependency>
-      <artifactId>spring-boot-starter-test</artifactId>
-      <groupId>org.springframework.boot</groupId>
-      <scope>test</scope>
-    </dependency>
+
     <dependency>
       <artifactId>commons-text</artifactId>
       <groupId>org.apache.commons</groupId>
@@ -182,11 +178,6 @@
       <groupId>org.springframework.boot</groupId>
     </dependency>
     <dependency>
-      <artifactId>spring-security-test</artifactId>
-      <groupId>org.springframework.security</groupId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <artifactId>java-jwt</artifactId>
       <groupId>com.auth0</groupId>
       <version>4.0.0</version>
@@ -214,10 +205,38 @@
     </dependency>
     <!-- Testing-->
     <dependency>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <artifactId>rider-core</artifactId>
       <groupId>com.github.database-rider</groupId>
       <scope>test</scope>
-      <version>1.24.0</version>
+      <version>1.34.0</version>
+    </dependency>
+    <dependency>
+      <artifactId>rider-junit5</artifactId>
+      <groupId>com.github.database-rider</groupId>
+      <scope>test</scope>
+      <version>1.34.0</version>
+    </dependency>
+    <dependency>
+      <artifactId>rider-spring</artifactId>
+      <groupId>com.github.database-rider</groupId>
+      <scope>test</scope>
+      <version>1.34.0</version>
+    </dependency>
+    <dependency>
+      <artifactId>spring-security-test</artifactId>
+      <groupId>org.springframework.security</groupId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.github.database-rider</groupId>
+      <artifactId>rider-core</artifactId>
+      <version>1.34.0</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 

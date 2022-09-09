@@ -8,6 +8,7 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.utils.HttpUtils;
+import de.kaliburg.morefair.api.utils.RequestThrottler;
 import de.kaliburg.morefair.security.SecurityUtils;
 import de.kaliburg.morefair.serivces.EmailService;
 import java.net.URI;
@@ -44,6 +45,7 @@ public class AuthController {
   private final SecurityUtils securityUtils;
   private final EmailService emailService;
 
+  private final RequestThrottler requestThrottler;
   private final Pattern emailRegexPattern = Pattern.compile(
       "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,15}$");
 
@@ -131,10 +133,16 @@ public class AuthController {
         .body("Registration successful; Please log into your account");
   }
 
-  @PostMapping("/register/guest")
-  public ResponseEntity<?> guestSignup(HttpServletRequest request)
+  @PostMapping(value = "/register/guest", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> registerGuest(HttpServletRequest request)
       throws Exception {
     Integer ip = HttpUtils.getIp(request);
+
+    if (!requestThrottler.canCreateAccount(ip)) {
+      return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+          .body("Too many requests");
+    }
+
     UUID uuid = UUID.randomUUID();
     AccountEntity account = accountService.create(uuid.toString(), uuid.toString(), ip, true);
 

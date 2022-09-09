@@ -3,7 +3,6 @@ package de.kaliburg.morefair.api.utils;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import de.kaliburg.morefair.account.AccountEntity;
-import de.kaliburg.morefair.api.websockets.UserPrincipal;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.log4j.Log4j2;
@@ -25,9 +24,8 @@ public class RequestThrottler {
         .build(integer -> 0);
   }
 
-  public boolean canCreateAccount(UserPrincipal principal) {
+  public boolean canCreateAccount(Integer ipAddress) {
     Boolean request;
-    Integer ipAddress = principal.getIpAddress();
     request = hasCreatedAccountRecently.get(ipAddress);
     if (request != null) {
       if (request) {
