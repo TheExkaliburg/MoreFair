@@ -191,7 +191,7 @@ export function requestAllThemes(callback = () => {}) {
       callback();
     }
   } catch (e) {
-    console.err(e);
+    console.error(e);
     callback();
     localStorage.setItem("themeDatabase", JSON.stringify({}));
   }
