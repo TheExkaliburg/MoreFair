@@ -18,7 +18,7 @@ const versioningModule = {
             "Fixed theme loading issues.",
             "Fixed some sound settings.",
             'Fixed a bug with the "got first jingle" sound.',
-            "Made the chat input system more maintainable.",
+            "Made the chad input system more maintainable.",
             "Fixed spelling of `chat` in the patch notes.",
             "Fixed a bug with the theme loader.",
           ],
