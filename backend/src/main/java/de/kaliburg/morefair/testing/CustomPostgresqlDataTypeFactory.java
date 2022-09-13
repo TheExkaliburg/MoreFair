@@ -17,14 +17,19 @@ public class CustomPostgresqlDataTypeFactory extends PostgresqlDataTypeFactory {
     return DATABASE_PRODUCTS;
   }
 
+  // TODO: (Low Prio) Bad Base64 input character at 8: 45(decimal) is getting written as Error
+  //  Message if i use Timestamp for Timestamp with time zone
+
   @Override
   public DataType createDataType(int sqlType, String sqlTypeName) throws DataTypeException {
-    DataType dataType = super.createDataType(sqlType, sqlTypeName);
+    DataType dataType;
 
-    if (dataType == DataType.UNKNOWN) {
-      if (sqlType == 2014 && sqlTypeName.equals("TIMESTAMP WITH TIME ZONE")) {
-        dataType = DataType.TIMESTAMP;
-      }
+    if (sqlTypeName.equals("BOOLEAN")) {
+      dataType = DataType.BOOLEAN;
+    } else if (sqlTypeName.equals("TIMESTAMP WITH TIME ZONE")) {
+      dataType = DataType.TIMESTAMP;
+    } else {
+      dataType = super.createDataType(sqlType, sqlTypeName);
     }
 
     return dataType;
