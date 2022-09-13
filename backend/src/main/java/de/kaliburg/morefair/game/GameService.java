@@ -81,14 +81,9 @@ public class GameService implements ApplicationListener<GameResetEvent> {
   @Scheduled(initialDelay = 60000, fixedRate = 60000)
   @PreDestroy
   void saveStateToDatabase() {
-    try {
-      game = gameRepository.save(game);
-      roundService.saveStateToDatabase();
-      chatService.saveStateToDatabase();
-    } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
-    }
+    game = gameRepository.save(game);
+    roundService.saveStateToDatabase();
+    chatService.saveStateToDatabase();
   }
 
   private GameEntity create() {

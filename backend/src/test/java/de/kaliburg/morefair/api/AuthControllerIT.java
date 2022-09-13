@@ -1,5 +1,6 @@
 package de.kaliburg.morefair.api;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -10,6 +11,7 @@ import de.kaliburg.morefair.MoreFairApplication;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountRepository;
 import de.kaliburg.morefair.utils.ITUtils;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -19,14 +21,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = MoreFairApplication.class)
 @AutoConfigureMockMvc
 //@TestPropertySource(locations = "classpath:application.properties")
 @DBRider
 @Slf4j
-public class AuthController_IT {
+public class AuthControllerIT {
 
   @Autowired
   private MockMvc mockMvc;
@@ -35,50 +36,46 @@ public class AuthController_IT {
   private AccountRepository accountRepository;
 
   @Test
-  //@DataSet(cleanAfter = true, cleanBefore = true, value = "yml/datasets/data.yml")
   public void registerGuest_default_registered() throws Exception {
-    MvcResult mvcResult = mockMvc.perform(post("/api/auth/register/guest").with(request -> {
+    String result = mockMvc.perform(post("/api/auth/register/guest").with(request -> {
           request.setRemoteAddr(ITUtils.randomIp());
           return request;
         }))
         .andExpect(status().isCreated())
         .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-        .andReturn();
+        .andReturn().getResponse().getContentAsString();
 
-    String content = mvcResult.getResponse().getContentAsString();
-    accountRepository.findByUsername(UUID.fromString(content).toString())
+    accountRepository.findByUsername(UUID.fromString(result).toString())
         .orElseThrow();
-
-    List<AccountEntity> allAccounts = accountRepository.findAll();
-    for (AccountEntity acc : allAccounts) {
-      log.info("Account: {}", acc.getUsername());
-    }
   }
 
   @Test
-  @DataSet(cleanAfter = true, cleanBefore = true, value = {"yml/datasets/data_initial.yml"})
+  @DataSet(cleanBefore = true, value = "yml/datasets/data_initial.yml")
   public void registerGuest_multipleRequestsWithSameIp_statusForbidden() throws Exception {
     String ipAddress = ITUtils.randomIp();
 
-    mockMvc.perform(post("/api/auth/register/guest").with(request -> {
+    final String result = mockMvc
+        .perform(post("/api/auth/register/guest").with(request -> {
           request.setRemoteAddr(ipAddress);
           return request;
         }))
         .andExpect(status().isCreated())
         .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-        .andReturn();
-    mockMvc.perform(post("/api/auth/register/guest").with(request -> {
+        .andReturn().getResponse().getContentAsString();
+
+    mockMvc
+        .perform(post("/api/auth/register/guest").with(request -> {
           request.setRemoteAddr(ipAddress);
           return request;
         }))
         .andExpect(status().isTooManyRequests())
         .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-        .andReturn();
+        .andReturn().getResponse().getContentAsString();
 
     List<AccountEntity> allAccounts = accountRepository.findAll();
-    for (AccountEntity acc : allAccounts) {
-      log.info("Account: {}", acc.getUsername());
-    }
+    allAccounts.sort(Comparator.comparing(AccountEntity::getId));
+    assertEquals(2, allAccounts.size());
+    assertEquals(allAccounts.get(1).getUsername(), result);
   }
 
 }

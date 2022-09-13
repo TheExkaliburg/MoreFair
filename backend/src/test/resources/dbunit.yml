@@ -1,0 +1,2 @@
+properties:
+  datatypeFactory: !!de.kaliburg.morefair.testing.CustomPostgresqlDataTypeFactory { }

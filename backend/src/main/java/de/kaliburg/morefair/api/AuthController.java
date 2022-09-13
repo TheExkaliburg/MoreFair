@@ -49,9 +49,10 @@ public class AuthController {
   private final Pattern emailRegexPattern = Pattern.compile(
       "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,15}$");
 
-  private final LoadingCache<String, UserRegistrationDetails> userThatRequestedConfirmation = Caffeine.newBuilder()
-      .expireAfterWrite(1, TimeUnit.HOURS)
-      .build(uuid -> null);
+  private final LoadingCache<String, UserRegistrationDetails> userThatRequestedConfirmation =
+      Caffeine.newBuilder()
+          .expireAfterWrite(1, TimeUnit.HOURS)
+          .build(uuid -> null);
 
   // TODO: changePassword
   // TODO: forgotPassword + sendToken via Mail
