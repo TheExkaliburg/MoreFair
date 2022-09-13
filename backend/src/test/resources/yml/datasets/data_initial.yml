@@ -4,6 +4,7 @@ account:
     display_name: Chad
     username: da0104ac-e971-48aa-8903-269a4d21eeab
     password: $argon2id$v=19$m=4096,t=3,p=1$vNHsRTeYNLE3paTgxp5aKA$026UVRPtPdnWNR4wW4/EiKrwqNePOG5EjKJ5tZNcJvg
+    created_on: 2020-05-01 00:00:00.000000
     guest: true
     access_role: BROADCASTER
     asshole_points: 5950

@@ -4,6 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.github.database.rider.core.api.dataset.DataSet;
 import com.github.database.rider.junit5.api.DBRider;
 import de.kaliburg.morefair.MoreFairApplication;
 import de.kaliburg.morefair.account.AccountEntity;
@@ -17,13 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = MoreFairApplication.class)
 @AutoConfigureMockMvc
-@TestPropertySource(locations = "classpath:application-it.properties")
+//@TestPropertySource(locations = "classpath:application.properties")
 @DBRider
 @Slf4j
 public class AuthController_IT {
@@ -56,7 +56,7 @@ public class AuthController_IT {
   }
 
   @Test
-  // @DataSet(cleanAfter = true, cleanBefore = true, value = {"yml/datasets/data_initial.yml"})
+  @DataSet(cleanAfter = true, cleanBefore = true, value = {"yml/datasets/data_initial.yml"})
   public void registerGuest_multipleRequestsWithSameIp_statusForbidden() throws Exception {
     String ipAddress = ITUtils.randomIp();
 
