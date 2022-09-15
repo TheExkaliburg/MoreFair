@@ -22,16 +22,21 @@ public class EmailServiceImpl implements EmailService {
     message.setTo(to);
     message.setSubject(subject);
     message.setText(text);
-    emailSender.send(message);
+    try {
+      emailSender.send(message);
+    } catch (Exception e) {
+      log.error("Failed to send email from \"noreply@kaliburg.de\" with the subject \"{}\"",
+          subject, e);
+    }
   }
 
   @Override
   public void sendRegistrationMail(String to, String token) {
-    log.info("Sending registration mail to {}", to);
     String fullToken = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath()
         .path("/api/auth/register/confirm").queryParam("token", token).toUriString()).toString();
     sendEmail(to, "Registration at FairGame",
-        "Hello, thanks for registering at FairGame. Please click on the following link to activate your account: "
+        "Hello, thanks for registering at FairGame. Please click on the following link to "
+            + "activate your account:\n"
             + fullToken);
   }
 }

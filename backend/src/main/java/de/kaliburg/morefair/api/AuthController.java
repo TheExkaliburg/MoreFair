@@ -14,6 +14,7 @@ import de.kaliburg.morefair.serivces.EmailService;
 import java.net.URI;
 import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -49,7 +50,7 @@ public class AuthController {
   private final Pattern emailRegexPattern = Pattern.compile(
       "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,15}$");
 
-  private final LoadingCache<String, UserRegistrationDetails> userThatRequestedConfirmation =
+  private final LoadingCache<String, UserRegistrationDetails> registrationTokens =
       Caffeine.newBuilder()
           .expireAfterWrite(1, TimeUnit.HOURS)
           .build(uuid -> null);
@@ -61,9 +62,10 @@ public class AuthController {
   // TODO: config for server-paths to put into mails
 
   @PostMapping(value = "/register", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-  public ResponseEntity<?> signup(@RequestParam String username, @RequestParam String password,
+  public ResponseEntity<?> register(@RequestParam String username, @RequestParam String password,
       HttpServletRequest request, @RequestParam(required = false) String uuid)
       throws Exception {
+
     if (password.length() < 8) {
       return ResponseEntity.badRequest().body("Password must be at least 8 characters long");
     }
@@ -78,12 +80,19 @@ public class AuthController {
       return ResponseEntity.badRequest().body("Invalid email address");
     }
 
+    Integer ip = HttpUtils.getIp(request);
+
+    if (!requestThrottler.canCreateAccount(ip)) {
+      return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+          .body("Too many requests");
+    }
+
     if (accountService.findByUsername(username) != null) {
       return ResponseEntity.badRequest().body("Email address already in use");
     }
 
     String confirmToken = UUID.randomUUID().toString();
-    userThatRequestedConfirmation.put(confirmToken,
+    registrationTokens.put(confirmToken,
         new UserRegistrationDetails(username, password, uuid, false));
     emailService.sendRegistrationMail(username, confirmToken);
 
@@ -91,10 +100,11 @@ public class AuthController {
     return ResponseEntity.created(uri).body("Please look into your inbox for a confirmation link");
   }
 
-  @GetMapping(value = "/register/confirm")
-  public ResponseEntity<?> signup(@RequestParam String token, HttpServletRequest request)
+  @GetMapping(value = "/register/confirm", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> confirmRegistration(@RequestParam String token,
+      HttpServletRequest request)
       throws Exception {
-    UserRegistrationDetails details = userThatRequestedConfirmation.get(token);
+    UserRegistrationDetails details = registrationTokens.get(token);
     if (details == null) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND)
           .body("Invalid or expired confirmation token");
@@ -126,7 +136,7 @@ public class AuthController {
       accountService.save(account);
     }
 
-    userThatRequestedConfirmation.put(token,
+    registrationTokens.put(token,
         new UserRegistrationDetails(username, securityUtils.generatePassword(), uuid, true));
 
     URI uri = HttpUtils.createCreatedUri("/api/auth/register/confirm");
@@ -153,35 +163,39 @@ public class AuthController {
 
   @GetMapping(value = "/refresh", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> refreshToken(HttpServletRequest request) {
-    String authorizationHeader = request.getHeader(AUTHORIZATION);
-    if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-      try {
-        String token = authorizationHeader.substring("Bearer ".length());
-        DecodedJWT decodedJwt = securityUtils.verifyToken(token);
-        String username = decodedJwt.getSubject();
-        Instant instant = decodedJwt.getIssuedAt().toInstant();
+    try {
+      String authorizationHeader = request.getHeader(AUTHORIZATION);
+      if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+        try {
+          String token = authorizationHeader.substring("Bearer ".length());
+          DecodedJWT decodedJwt = securityUtils.verifyToken(token);
+          String username = decodedJwt.getSubject();
+          Instant instant = decodedJwt.getIssuedAt().toInstant();
 
-        AccountEntity account = accountService.findByUsername(username);
-        if (account == null) {
-          return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+          AccountEntity account = accountService.findByUsername(username);
+          if (account == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+          }
+          if (account.getLastRevoke().toInstant().isAfter(instant.plus(1, ChronoUnit.SECONDS))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token revoked");
+          }
+
+          HashMap<String, String> tokens = securityUtils.generateTokens(request, account);
+
+          return ResponseEntity.created(HttpUtils.createCreatedUri("/api/auth/refresh"))
+              .body(tokens);
+
+        } catch (Exception e) {
+          log.error("Error refreshing jwt-tokens: {}", e.getMessage());
+          Map<String, String> errors = new HashMap<>();
+          errors.put("error", e.getMessage());
+          return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errors);
         }
-        if (account.getLastRevoke().toInstant().isAfter(instant)) {
-          return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token revoked");
-        }
-
-        HashMap<String, String> tokens = securityUtils.generateTokens(request, account);
-
-        return ResponseEntity.created(HttpUtils.createCreatedUri("/api/auth/refresh"))
-            .body(tokens);
-
-      } catch (Exception e) {
-        log.error("Error refreshing jwt-tokens: {}", e.getMessage());
-        Map<String, String> errors = new HashMap<>();
-        errors.put("error", e.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errors);
+      } else {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Refresh token is missing");
       }
-    } else {
-      throw new RuntimeException("Refresh token is missing");
+    } catch (Exception e) {
+      return ResponseEntity.internalServerError().body(e.getMessage());
     }
   }
 }

@@ -165,12 +165,12 @@
     <dependency>
       <artifactId>gson</artifactId>
       <groupId>com.google.code.gson</groupId>
+      <version>2.9.1</version>
     </dependency>
     <!-- Emails -->
     <dependency>
       <artifactId>spring-boot-starter-mail</artifactId>
       <groupId>org.springframework.boot</groupId>
-      <version>2.7.3</version>
     </dependency>
     <!--Security-->
     <dependency>
@@ -233,10 +233,16 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.github.database-rider</groupId>
       <artifactId>rider-core</artifactId>
-      <version>1.34.0</version>
+      <groupId>com.github.database-rider</groupId>
       <scope>compile</scope>
+      <version>1.34.0</version>
+    </dependency>
+    <dependency>
+      <artifactId>greenmail-spring</artifactId>
+      <groupId>com.icegreen</groupId>
+      <scope>test</scope>
+      <version>1.6.10</version>
     </dependency>
   </dependencies>
 

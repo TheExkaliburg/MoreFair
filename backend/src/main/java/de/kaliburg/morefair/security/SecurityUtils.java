@@ -24,11 +24,11 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SecurityUtils {
 
-  private final SecureRandom secureRandom = new SecureRandom();
+  private static final SecureRandom secureRandom = new SecureRandom();
   private final JwtConfig jwtConfig;
 
 
-  public String generatePassword() {
+  public static String generatePassword() {
     String passwordCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~`!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?";
     String pwd = RandomStringUtils.random(20, 0, passwordCharacters.length() - 1, false, false,
         passwordCharacters.toCharArray(), secureRandom);
@@ -55,8 +55,8 @@ public class SecurityUtils {
         .sign(getAlgorithm());
 
     HashMap<String, String> tokens = new HashMap<>();
-    tokens.put("access_token", accessToken);
-    tokens.put("refresh_token", refreshToken);
+    tokens.put("accessToken", accessToken);
+    tokens.put("refreshToken", refreshToken);
     return tokens;
   }
 

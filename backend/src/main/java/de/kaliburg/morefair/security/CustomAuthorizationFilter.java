@@ -9,6 +9,7 @@ import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
 import java.io.IOException;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,10 +40,15 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response,
       @NonNull FilterChain filterChain) throws IOException, ServletException {
 
-    if (request.getServletPath().equals("/api/auth/login")
-        || request.getServletPath().equals("/api/auth/register")
-        || request.getServletPath().equals("/api/auth/register/guest")
-        || request.getServletPath().equals("/api/auth/refresh")) {
+    String servletPath = request.getServletPath();
+    // If servlet path is empty get from request url
+    if (servletPath.isEmpty()) {
+      servletPath = request.getRequestURI();
+    }
+    if (servletPath.equals("/api/auth/login")
+        || servletPath.equals("/api/auth/register")
+        || servletPath.equals("/api/auth/register/guest")
+        || servletPath.equals("/api/auth/refresh")) {
       filterChain.doFilter(request, response);
     } else {
       String authorizationHeader = request.getHeader(AUTHORIZATION);
@@ -57,7 +63,8 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
           if (account == null) {
             throw new Exception("User not found");
           }
-          if (account.getLastRevoke().toInstant().isAfter(issueInstant)) {
+          if (account.getLastRevoke().toInstant()
+              .isAfter(issueInstant.plus(1, ChronoUnit.SECONDS))) {
             throw new Exception("Token revoked");
           }
 
