@@ -48,11 +48,7 @@
                   explicitly permitted.
                 </li>
                 <li>Don't use any malicious and/or automating scripts.</li>
-                <li>
-                  Don't use alts past ladder 5 or to gain any advantage compared
-                  to playing solo. (f.e. syncing up actions to keep gaining
-                  grapes)
-                </li>
+                <li>Don't use multiple accounts during the same round.</li>
                 <li>No posting of uuids and/or sensitive data.</li>
               </ol>
 
