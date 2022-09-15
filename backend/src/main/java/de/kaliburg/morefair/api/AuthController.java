@@ -100,6 +100,41 @@ public class AuthController {
     return ResponseEntity.created(uri).body("Please look into your inbox for a confirmation link");
   }
 
+  // API endpoint for changing password in combination with the old password
+  @PostMapping(value = "/password/change", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+  public ResponseEntity<?> changePassword(@RequestParam String oldPassword,
+      @RequestParam String newPassword, HttpServletRequest request) throws Exception {
+
+    if (newPassword.length() < 8) {
+      return ResponseEntity.badRequest().body("Password must be at least 8 characters long");
+    }
+    if (newPassword.length() > 64) {
+      return ResponseEntity.badRequest().body("Password must be at most 64 characters long");
+    }
+
+    DecodedJWT jwt = securityUtils.getJwtFromRequest(request);
+    if (jwt == null) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in");
+    }
+    String username = jwt.getSubject();
+
+    AccountEntity account = accountService.findByUsername(username);
+    if (account == null) {
+      return ResponseEntity.badRequest().body("Account not found");
+    }
+
+    if (!passwordEncoder.matches(oldPassword, account.getPassword())) {
+      return ResponseEntity.badRequest().body("Wrong password");
+    }
+
+    account.setPassword(passwordEncoder.encode(newPassword));
+    account.setLastRevoke(OffsetDateTime.now());
+    accountService.save(account);
+
+    return ResponseEntity.ok("Password changed");
+  }
+
+
   @GetMapping(value = "/register/confirm", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> confirmRegistration(@RequestParam String token,
       HttpServletRequest request)

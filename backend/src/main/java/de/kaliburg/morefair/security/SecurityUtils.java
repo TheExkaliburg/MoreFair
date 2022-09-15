@@ -78,4 +78,13 @@ public class SecurityUtils {
   public Algorithm getAlgorithm() {
     return Algorithm.HMAC256(jwtConfig.getSecret().getBytes());
   }
+
+  public DecodedJWT getJwtFromRequest(HttpServletRequest request) {
+    String authorizationHeader = request.getHeader("Authorization");
+    if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+      String token = authorizationHeader.substring("Bearer ".length());
+      return verifyToken(token);
+    }
+    return null;
+  }
 }

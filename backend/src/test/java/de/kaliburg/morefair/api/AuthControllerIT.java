@@ -2,9 +2,9 @@ package de.kaliburg.morefair.api;
 
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -90,6 +90,35 @@ public class AuthControllerIT {
   }
 
   @Test
+  public void registerLoginChangePassword_default_authenticated() throws Exception {
+    String email = "registerLoginChangePassword_default_authenticated@mail.de";
+    String password = SecurityUtils.generatePassword();
+    String ip = ITUtils.randomIp();
+    String registrationToken = registerUser(email, password, ip);
+    confirmRegistrationToken(UUID.fromString(registrationToken).toString(), ip);
+
+    HashMap<String, String> jwtTokens = login(email, password, ip);
+    DecodedJWT accessToken = securityUtils.verifyToken(jwtTokens.get("accessToken"));
+
+    String newPassword = SecurityUtils.generatePassword();
+    mockMvc.perform(post("/api/auth/password/change")
+            .with(request -> {
+              request.setRemoteAddr(ip);
+              return request;
+            })
+            .header(AUTHORIZATION, "Bearer " + accessToken.getToken())
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+            .param("oldPassword", password)
+            .param("newPassword", newPassword))
+        .andExpect(status().isOk())
+        .andExpect(content().string("Password changed"));
+
+    jwtTokens = login(email, newPassword, ip);
+    accessToken = securityUtils.verifyToken(jwtTokens.get("accessToken"));
+    assertEquals(email, accessToken.getSubject());
+  }
+
+  @Test
   public void register_tooShortPassword_badRequest() throws Exception {
     String email = "registerTooShortPassword@mail.de";
     String password = SecurityUtils.generatePassword().substring(0, 4);
@@ -128,8 +157,6 @@ public class AuthControllerIT {
         .andExpect(status().isBadRequest())
         .andExpect(content().string("Password must be at most 64 characters long"))
         .andReturn().getResponse().getContentAsString();
-
-    assertFalse(greenMailBean.getGreenMail().waitForIncomingEmail(1000, 1));
   }
 
   @Test
