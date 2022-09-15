@@ -48,6 +48,7 @@ public class AccountService implements UserDetailsService {
     result.setUsername(email);
     result.setPassword(passwordEncoder.encode(password));
     result.setLastIp(ipAddress);
+    result.setGuest(isGuest);
 
     result = save(result);
 
