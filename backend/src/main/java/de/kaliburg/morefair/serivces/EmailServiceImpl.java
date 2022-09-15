@@ -15,6 +15,7 @@ public class EmailServiceImpl implements EmailService {
 
   private final JavaMailSender emailSender;
 
+
   @Override
   public void sendEmail(String to, String subject, String text) {
     SimpleMailMessage message = new SimpleMailMessage();
@@ -38,5 +39,13 @@ public class EmailServiceImpl implements EmailService {
         "Hello, thanks for registering at FairGame. Please click on the following link to "
             + "activate your account:\n"
             + fullToken);
+  }
+
+  @Override
+  public void sendPasswordResetMail(String username, String confirmToken) {
+    String text = "The token for resetting your password is:\n" + confirmToken;
+    text += "\n\nIf you did not request a password reset, please ignore this email.";
+
+    sendEmail(username, "Reset your password", text);
   }
 }

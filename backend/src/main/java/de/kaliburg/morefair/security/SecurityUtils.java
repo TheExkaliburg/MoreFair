@@ -5,9 +5,10 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import de.kaliburg.morefair.account.AccountEntity;
 import java.security.SecureRandom;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
@@ -40,18 +41,20 @@ public class SecurityUtils {
   public HashMap<String, String> generateTokens(HttpServletRequest request, User user) {
     String accessToken = JWT.create()
         .withSubject(user.getUsername())
-        .withExpiresAt(new Date(System.currentTimeMillis() + 60 * 60 * 1000))
-        .withIssuedAt(new Date())
+        .withExpiresAt(Instant.now().plus(1, ChronoUnit.HOURS))
+        .withIssuedAt(Instant.now())
         .withIssuer(request.getRequestURL().toString())
+        .withClaim("issuedAt", Instant.now().toEpochMilli())
         .withClaim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority)
             .collect(Collectors.toList()))
         .sign(getAlgorithm());
 
     String refreshToken = JWT.create()
         .withSubject(user.getUsername())
-        .withExpiresAt(new Date(System.currentTimeMillis() + 365L * 24 * 60 * 60 * 1000))
-        .withIssuedAt(new Date())
+        .withExpiresAt(Instant.now().plus(30, ChronoUnit.DAYS))
+        .withIssuedAt(Instant.now())
         .withIssuer(request.getRequestURL().toString())
+        .withClaim("issuedAt", Instant.now().toEpochMilli())
         .sign(getAlgorithm());
 
     HashMap<String, String> tokens = new HashMap<>();

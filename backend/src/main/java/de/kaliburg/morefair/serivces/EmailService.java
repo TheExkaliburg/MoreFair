@@ -6,4 +6,5 @@ public interface EmailService {
 
   void sendRegistrationMail(String to, String token);
 
+  void sendPasswordResetMail(String username, String confirmToken);
 }

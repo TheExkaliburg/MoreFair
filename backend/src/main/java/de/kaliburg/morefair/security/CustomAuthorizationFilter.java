@@ -9,7 +9,6 @@ import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
 import java.io.IOException;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -48,7 +47,9 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
     if (servletPath.equals("/api/auth/login")
         || servletPath.equals("/api/auth/register")
         || servletPath.equals("/api/auth/register/guest")
-        || servletPath.equals("/api/auth/refresh")) {
+        || servletPath.equals("/api/auth/refresh")
+        || servletPath.equals("/api/auth/password/forgot")
+        || servletPath.equals("/api/auth/password/reset")) {
       filterChain.doFilter(request, response);
     } else {
       String authorizationHeader = request.getHeader(AUTHORIZATION);
@@ -57,14 +58,19 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
           String token = authorizationHeader.substring("Bearer ".length());
           DecodedJWT decodedJwt = securityUtils.verifyToken(token);
           String username = decodedJwt.getSubject();
-          Instant issueInstant = decodedJwt.getIssuedAt().toInstant();
+
+          if (Instant.now().isBefore(decodedJwt.getIssuedAtAsInstant())) {
+            throw new RuntimeException("Token is not valid yet");
+          }
+          if (Instant.now().isAfter(decodedJwt.getExpiresAtAsInstant())) {
+            throw new Exception("Token is not valid anymore");
+          }
 
           AccountEntity account = accountService.findByUsername(username);
           if (account == null) {
             throw new Exception("User not found");
           }
-          if (account.getLastRevoke().toInstant()
-              .isAfter(issueInstant.plus(1, ChronoUnit.SECONDS))) {
+          if (account.getLastRevokeAsInstant().isAfter(decodedJwt.getIssuedAtAsInstant())) {
             throw new Exception("Token revoked");
           }
 

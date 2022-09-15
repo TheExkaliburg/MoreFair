@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.UUID;
 import javax.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -61,6 +62,11 @@ public class AuthControllerIT {
   @Autowired
   private SecurityUtils securityUtils;
 
+  @BeforeEach
+  public void beforeEach() throws Exception {
+    greenMailBean.getGreenMail().purgeEmailFromAllMailboxes();
+  }
+
   @Test
   public void registerLoginRefresh_default_authenticated() throws Exception {
     String email = "test1@mail.de";
@@ -90,7 +96,7 @@ public class AuthControllerIT {
   }
 
   @Test
-  public void registerLoginChangePassword_default_authenticated() throws Exception {
+  public void registerLoginChangePasswordLogin_default_authenticated() throws Exception {
     String email = "registerLoginChangePassword_default_authenticated@mail.de";
     String password = SecurityUtils.generatePassword();
     String ip = ITUtils.randomIp();
@@ -117,6 +123,50 @@ public class AuthControllerIT {
     accessToken = securityUtils.verifyToken(jwtTokens.get("accessToken"));
     assertEquals(email, accessToken.getSubject());
   }
+
+  @Test
+  public void registerForgotPasswordResetLogin_default_authenticated() throws Exception {
+    String email = "registerForgotPasswordResetLogin_default_authenticated@mail.de";
+    String password = SecurityUtils.generatePassword();
+    String ip = ITUtils.randomIp();
+    String registrationToken = registerUser(email, password, ip);
+    confirmRegistrationToken(UUID.fromString(registrationToken).toString(), ip);
+
+    HashMap<String, String> jwtTokens = login(email, password, ip);
+    securityUtils.verifyToken(jwtTokens.get("accessToken"));
+
+    mockMvc.perform(post("/api/auth/password/forgot")
+            .with(request -> {
+              request.setRemoteAddr(ip);
+              return request;
+            })
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+            .param("username", email))
+        .andExpect(status().isCreated())
+        .andExpect(content().string("Please look into your inbox for the reset token"))
+        .andReturn().getResponse().getContentAsString();
+
+    assertTrue(greenMailBean.getGreenMail().waitForIncomingEmail(2));
+    MimeMessage message = ITUtils.getLastGreenMailMessage(greenMailBean);
+    String resetToken = message.getContent().toString().split("\n")[1].split("\r")[0];
+
+    String newPassword = SecurityUtils.generatePassword();
+    mockMvc.perform(post("/api/auth/password/reset")
+            .with(request -> {
+              request.setRemoteAddr(ip);
+              return request;
+            })
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+            .param("resetToken", resetToken)
+            .param("newPassword", newPassword))
+        .andExpect(status().isOk())
+        .andExpect(content().string("Password changed"))
+        .andReturn().getResponse().getContentAsString();
+
+    jwtTokens = login(email, newPassword, ip);
+    securityUtils.verifyToken(jwtTokens.get("accessToken"));
+  }
+
 
   @Test
   public void register_tooShortPassword_badRequest() throws Exception {
@@ -298,6 +348,44 @@ public class AuthControllerIT {
   }
 
   @Test
+  public void registerLoginAndRevoke_default_unauthorized() throws Exception {
+    String email = "registerLoginAndRevoke_default_unauthorized@mail.de";
+    String password = SecurityUtils.generatePassword();
+    String ip = ITUtils.randomIp();
+    String registrationToken = registerUser(email, password, ip);
+    confirmRegistrationToken(registrationToken, ip);
+    HashMap<String, String> jwtTokens = login(email, password, ip);
+    refreshTokens(jwtTokens.get("refreshToken"), ip);
+
+    mockMvc
+        .perform(post("/api/auth/revoke")
+            .with(request -> {
+              request.setRemoteAddr(ip);
+              return request;
+            })
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .header(AUTHORIZATION, "Bearer " + jwtTokens.get("accessToken")))
+        .andExpect(status().isOk())
+        .andExpect(content().string("All tokens revoked"))
+        .andReturn().getResponse().getContentAsString();
+
+    Thread.sleep(1000);
+    mockMvc.perform(get("/api/auth/refresh")
+            .with(request -> {
+              request.setRemoteAddr(ip);
+              return request;
+            })
+            .header(AUTHORIZATION, "Bearer " + jwtTokens.get("refreshToken")))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isUnauthorized())
+        .andExpect(content().string("Token revoked"))
+        .andReturn().getResponse().getContentAsString();
+
+    jwtTokens = login(email, password, ip);
+    refreshTokens(jwtTokens.get("refreshToken"), ip);
+  }
+
+  @Test
   public void registerGuestUpgradeLoginRefresh_default_authenticated() throws Exception {
     String ip = ITUtils.randomIp();
     final String email = "test4@mail.de";
@@ -356,6 +444,7 @@ public class AuthControllerIT {
   }
 
   private String registerUser(String email, String password, String ip) throws Exception {
+    int emailCount = greenMailBean.getGreenMail().getReceivedMessages().length;
     mockMvc
         .perform(post("/api/auth/register")
             .with(request -> {
@@ -369,7 +458,7 @@ public class AuthControllerIT {
         .andExpect(content().string("Please look into your inbox for a confirmation link"))
         .andReturn().getResponse().getContentAsString();
 
-    assertTrue(greenMailBean.getGreenMail().waitForIncomingEmail(1000, 1));
+    assertTrue(greenMailBean.getGreenMail().waitForIncomingEmail(emailCount + 1));
     MimeMessage message = ITUtils.getLastGreenMailMessage(greenMailBean);
 
     return message.getContent().toString().split("token=")[1].split("\"")[0];
@@ -377,6 +466,7 @@ public class AuthControllerIT {
 
   private String upgradeGuestToUser(String email, String password, String uuid, String ip)
       throws Exception {
+    int emailCount = greenMailBean.getGreenMail().getReceivedMessages().length;
     mockMvc
         .perform(post("/api/auth/register")
             .with(request -> {
@@ -391,7 +481,7 @@ public class AuthControllerIT {
         .andExpect(content().string("Please look into your inbox for a confirmation link"))
         .andReturn().getResponse().getContentAsString();
 
-    assertTrue(greenMailBean.getGreenMail().waitForIncomingEmail(1000, 1));
+    assertTrue(greenMailBean.getGreenMail().waitForIncomingEmail(1000, emailCount + 1));
     MimeMessage message = ITUtils.getLastGreenMailMessage(greenMailBean);
 
     return message.getContent().toString().split("token=")[1].split("\"")[0];
@@ -438,7 +528,7 @@ public class AuthControllerIT {
               request.setRemoteAddr(ip);
               return request;
             })
-            .header("authorization", "Bearer " + token))
+            .header(AUTHORIZATION, "Bearer " + token))
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$", aMapWithSize(2)))

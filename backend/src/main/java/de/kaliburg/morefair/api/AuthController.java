@@ -14,7 +14,6 @@ import de.kaliburg.morefair.serivces.EmailService;
 import java.net.URI;
 import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -55,7 +54,11 @@ public class AuthController {
           .expireAfterWrite(1, TimeUnit.HOURS)
           .build(uuid -> null);
 
-  // TODO: changePassword
+  private final LoadingCache<String, String> passwordResetTokens =
+      Caffeine.newBuilder()
+          .expireAfterWrite(1, TimeUnit.HOURS)
+          .build(uuid -> "");
+
   // TODO: forgotPassword + sendToken via Mail
   // TODO: resetPassword with the previously sent token
   // TODO: revokeJwtTokens for a specific user
@@ -134,12 +137,91 @@ public class AuthController {
     return ResponseEntity.ok("Password changed");
   }
 
+  // API endpoint for revoking all jwt tokens for a specific account
+  @PostMapping(value = "/revoke", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+  public ResponseEntity<?> revokeJwtTokens(HttpServletRequest request) throws Exception {
+    DecodedJWT jwt = securityUtils.getJwtFromRequest(request);
+    if (jwt == null) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in");
+    }
+
+    String username = jwt.getSubject();
+    AccountEntity account = accountService.findByUsername(username);
+    if (account == null) {
+      return ResponseEntity.internalServerError().body("Account not found");
+    }
+
+    // if jwt got issued before lastRevoke, it is not valid anymore
+
+    if (Instant.now().isBefore(jwt.getIssuedAtAsInstant())) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Token is not valid yet");
+    }
+    if (Instant.now().isAfter(jwt.getExpiresAtAsInstant())) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is not valid anymore");
+    }
+
+    if (account.getLastRevokeAsInstant().isAfter(jwt.getIssuedAtAsInstant())) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token revoked");
+    }
+
+    account.setLastRevoke(OffsetDateTime.now());
+    accountService.save(account);
+
+    return ResponseEntity.ok("All tokens revoked");
+  }
+
+  // API for Creating, saving and sending a new token via mail for resetting the password
+  @PostMapping(value = "/password/forgot", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+  public ResponseEntity<?> forgotPassword(@RequestParam String username, HttpServletRequest request)
+      throws Exception {
+    URI uri = HttpUtils.createCreatedUri("/api/auth/password/forgot");
+    AccountEntity account = accountService.findByUsername(username);
+    if (account == null || account.isGuest()) {
+      return ResponseEntity.created(uri).body("Please look into your inbox for the reset token");
+    }
+
+    String confirmToken = UUID.randomUUID().toString();
+    passwordResetTokens.put(confirmToken, username);
+    emailService.sendPasswordResetMail(username, confirmToken);
+
+    return ResponseEntity.created(uri).body("Please look into your inbox for the reset token");
+  }
+
+  // API endpoint for changing password in combination with a passwordResetToken
+  @PostMapping(value = "/password/reset", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+  public ResponseEntity<?> resetPassword(@RequestParam String resetToken,
+      @RequestParam String newPassword, HttpServletRequest request) throws Exception {
+
+    if (newPassword.length() < 8) {
+      return ResponseEntity.badRequest().body("Password must be at least 8 characters long");
+    }
+    if (newPassword.length() > 64) {
+      return ResponseEntity.badRequest().body("Password must be at most 64 characters long");
+    }
+
+    String username = passwordResetTokens.getIfPresent(resetToken);
+    if (username == null) {
+      return ResponseEntity.badRequest().body("Invalid token");
+    }
+
+    AccountEntity account = accountService.findByUsername(username);
+    if (account == null) {
+      return ResponseEntity.internalServerError().body("Account not found");
+    }
+
+    account.setPassword(passwordEncoder.encode(newPassword));
+    account.setLastRevoke(OffsetDateTime.now());
+    accountService.save(account);
+
+    return ResponseEntity.ok("Password changed");
+  }
+
 
   @GetMapping(value = "/register/confirm", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> confirmRegistration(@RequestParam String token,
       HttpServletRequest request)
       throws Exception {
-    UserRegistrationDetails details = registrationTokens.get(token);
+    UserRegistrationDetails details = registrationTokens.getIfPresent(token);
     if (details == null) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND)
           .body("Invalid or expired confirmation token");
@@ -172,7 +254,7 @@ public class AuthController {
     }
 
     registrationTokens.put(token,
-        new UserRegistrationDetails(username, securityUtils.generatePassword(), uuid, true));
+        new UserRegistrationDetails(username, SecurityUtils.generatePassword(), uuid, true));
 
     URI uri = HttpUtils.createCreatedUri("/api/auth/register/confirm");
     return ResponseEntity.created(uri)
@@ -205,17 +287,26 @@ public class AuthController {
           String token = authorizationHeader.substring("Bearer ".length());
           DecodedJWT decodedJwt = securityUtils.verifyToken(token);
           String username = decodedJwt.getSubject();
-          Instant instant = decodedJwt.getIssuedAt().toInstant();
+
+          if (Instant.now().isBefore(decodedJwt.getIssuedAtAsInstant())) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Token is not valid yet");
+          }
+          if (Instant.now().isAfter(decodedJwt.getExpiresAtAsInstant())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
+          }
 
           AccountEntity account = accountService.findByUsername(username);
           if (account == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
           }
-          if (account.getLastRevoke().toInstant().isAfter(instant.plus(1, ChronoUnit.SECONDS))) {
+          if (account.getLastRevokeAsInstant().isAfter(decodedJwt.getIssuedAtAsInstant())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token revoked");
           }
 
           HashMap<String, String> tokens = securityUtils.generateTokens(request, account);
+          account.setLastLogin(OffsetDateTime.now());
+          accountService.save(account);
 
           return ResponseEntity.created(HttpUtils.createCreatedUri("/api/auth/refresh"))
               .body(tokens);
