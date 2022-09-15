@@ -80,15 +80,15 @@ public class AuthController {
       return ResponseEntity.badRequest().body("Invalid email address");
     }
 
+    if (accountService.findByUsername(username) != null) {
+      return ResponseEntity.badRequest().body("Email address already in use");
+    }
+
     Integer ip = HttpUtils.getIp(request);
 
     if (!requestThrottler.canCreateAccount(ip)) {
       return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
           .body("Too many requests");
-    }
-
-    if (accountService.findByUsername(username) != null) {
-      return ResponseEntity.badRequest().body("Email address already in use");
     }
 
     String confirmToken = UUID.randomUUID().toString();

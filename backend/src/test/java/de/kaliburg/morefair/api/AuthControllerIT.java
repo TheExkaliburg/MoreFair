@@ -2,7 +2,8 @@ package de.kaliburg.morefair.api;
 
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -89,6 +90,90 @@ public class AuthControllerIT {
   }
 
   @Test
+  public void register_tooShortPassword_badRequest() throws Exception {
+    String email = "registerTooShortPassword@mail.de";
+    String password = SecurityUtils.generatePassword().substring(0, 4);
+    String ip = ITUtils.randomIp();
+
+    mockMvc
+        .perform(post("/api/auth/register")
+            .with(request -> {
+              request.setRemoteAddr(ip);
+              return request;
+            })
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("username", email)
+            .param("password", password))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string("Password must be at least 8 characters long"))
+        .andReturn().getResponse().getContentAsString();
+  }
+
+  @Test
+  public void register_tooLongPassword_badRequest() throws Exception {
+    String email = "registerTooShortPassword@mail.de";
+    String password = SecurityUtils.generatePassword();
+    password = password + password + password + password + password + password + password;
+    String ip = ITUtils.randomIp();
+
+    mockMvc
+        .perform(post("/api/auth/register")
+            .with(request -> {
+              request.setRemoteAddr(ip);
+              return request;
+            })
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("username", email)
+            .param("password", password))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string("Password must be at most 64 characters long"))
+        .andReturn().getResponse().getContentAsString();
+
+    assertFalse(greenMailBean.getGreenMail().waitForIncomingEmail(1000, 1));
+  }
+
+  @Test
+  public void register_tooLongEmailPassword_badRequest() throws Exception {
+    String email = "2wRooaIYpZDfq53aGZqL50Ev4JOKeMxzQTGci03acsam40MK53XFNkPYpIJIofOrFbFpTofgRbgZLWEPZt9BDOgXgBEbLJknnmv0VQIquxY1THTipig1cBfqkPVGduaqZ9C4RPHey5QDHztVdhKql1YpWD62FYBiU9memAjE4nrAGITmm6fcJy23xa9cevCumDi8nEb1OwCXviWuLCSdznwllrhpO6qDPcf6OME8WYzaBJOhSs6rj1GZKqBcd4l@mail.de";
+    String password = SecurityUtils.generatePassword();
+    String ip = ITUtils.randomIp();
+
+    mockMvc
+        .perform(post("/api/auth/register")
+            .with(request -> {
+              request.setRemoteAddr(ip);
+              return request;
+            })
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("username", email)
+            .param("password", password))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string("Email must be at most 254 characters long"))
+        .andReturn().getResponse().getContentAsString();
+  }
+
+  @Test
+  @DataSet(cleanBefore = true, value = "yml/datasets/data_initial.yml")
+  public void register_invalidEmail_badRequest() throws Exception {
+    String email = "jbneßfq7ß09234";
+    String password = SecurityUtils.generatePassword();
+    String ip = ITUtils.randomIp();
+
+    mockMvc
+        .perform(post("/api/auth/register")
+            .with(request -> {
+              request.setRemoteAddr(ip);
+              return request;
+            })
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("username", email)
+            .param("password", password))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string("Invalid email address"))
+        .andReturn().getResponse().getContentAsString();
+  }
+
+  @Test
   @DataSet(cleanBefore = true, value = "yml/datasets/data_initial.yml")
   public void register_multipleRequestsWithSameIp_statusForbidden() throws Exception {
     String email1 = "test2@mail.de";
@@ -113,13 +198,52 @@ public class AuthControllerIT {
   }
 
   @Test
+  @DataSet(cleanBefore = true, value = "yml/datasets/data_initial.yml")
+  public void register_multipleRequestsWithSameEmail_badRequest() throws Exception {
+    String email = "registerMultipleRequestsWithSameEmail@mail.de";
+    String password = SecurityUtils.generatePassword();
+    String ip = ITUtils.randomIp();
+
+    String token = registerUser(email, password, ip);
+    confirmRegistrationToken(token, ip);
+
+    mockMvc
+        .perform(post("/api/auth/register")
+            .with(request -> {
+              request.setRemoteAddr(ITUtils.randomIp());
+              return request;
+            })
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("username", email)
+            .param("password", password))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string("Email address already in use"))
+        .andReturn().getResponse().getContentAsString();
+  }
+
+  @Test
   public void registerGuestLoginRefresh_default_authenticated() throws Exception {
     String ip = ITUtils.randomIp();
-    String result = registerGuest(ip);
+    String uuid = registerGuest(ip);
 
-    AccountEntity account = accountRepository.findByUsername(UUID.fromString(result).toString())
+    HashMap<String, String> jwtTokens1 = login(uuid, uuid, ip);
+    DecodedJWT accessToken1 = securityUtils.verifyToken(jwtTokens1.get("accessToken"));
+
+    AccountEntity account1 = accountRepository.findByUsername(accessToken1.getSubject())
         .orElseThrow();
-    assertNotNull(account);
+    assertTrue(passwordEncoder.matches(uuid, account1.getPassword()));
+
+    HashMap<String, String> jwtTokens2 = refreshTokens(jwtTokens1.get("refreshToken"), ip);
+    DecodedJWT accessToken2 = securityUtils.verifyToken(jwtTokens2.get("accessToken"));
+
+    AccountEntity account2 = accountRepository.findByUsername(accessToken2.getSubject())
+        .orElseThrow();
+    assertTrue(passwordEncoder.matches(uuid, account2.getPassword()));
+    assertEquals(accessToken1.getSubject(), accessToken2.getSubject());
+    assertEquals(accessToken1.getClaim("roles").toString(),
+        accessToken2.getClaim("roles").toString());
+    assertEquals(accessToken1.getHeader(), accessToken2.getHeader());
+    assertEquals(accessToken1.getAlgorithm(), accessToken2.getAlgorithm());
   }
 
   @Test
@@ -146,6 +270,52 @@ public class AuthControllerIT {
     assertEquals(allAccounts.get(1).getUsername(), result);
   }
 
+  @Test
+  public void registerGuestUpgradeLoginRefresh_default_authenticated() throws Exception {
+    String ip = ITUtils.randomIp();
+    final String email = "test4@mail.de";
+    final String password = SecurityUtils.generatePassword();
+    final String uuid = registerGuest(ip);
+
+    HashMap<String, String> jwtTokens0 = login(uuid, uuid, ip);
+    DecodedJWT accessToken0 = securityUtils.verifyToken(jwtTokens0.get("accessToken"));
+
+    AccountEntity account0 = accountRepository.findByUsername(accessToken0.getSubject())
+        .orElseThrow();
+    assertTrue(passwordEncoder.matches(uuid, account0.getPassword()));
+
+    // Upgrade
+    ip = ITUtils.randomIp();
+    String registrationToken = upgradeGuestToUser(email, password, uuid, ip);
+    confirmRegistrationToken(UUID.fromString(registrationToken).toString(), ip);
+
+    HashMap<String, String> jwtTokens1 = login(email, password, ip);
+    DecodedJWT accessToken1 = securityUtils.verifyToken(jwtTokens1.get("accessToken"));
+
+    AccountEntity account1 = accountRepository.findByUsername(accessToken1.getSubject())
+        .orElseThrow();
+    assertTrue(passwordEncoder.matches(password, account1.getPassword()));
+
+    assertNotEquals(accessToken0.getSubject(), accessToken1.getSubject());
+    assertEquals(accessToken0.getClaim("roles").toString(),
+        accessToken1.getClaim("roles").toString());
+    assertEquals(accessToken0.getHeader(), accessToken1.getHeader());
+    assertEquals(accessToken0.getAlgorithm(), accessToken1.getAlgorithm());
+
+    // Refresh
+    HashMap<String, String> jwtTokens2 = refreshTokens(jwtTokens1.get("refreshToken"), ip);
+    DecodedJWT accessToken2 = securityUtils.verifyToken(jwtTokens2.get("accessToken"));
+
+    AccountEntity account2 = accountRepository.findByUsername(accessToken2.getSubject())
+        .orElseThrow();
+    assertTrue(passwordEncoder.matches(password, account2.getPassword()));
+    assertEquals(accessToken1.getSubject(), accessToken2.getSubject());
+    assertEquals(accessToken1.getClaim("roles").toString(),
+        accessToken2.getClaim("roles").toString());
+    assertEquals(accessToken1.getHeader(), accessToken2.getHeader());
+    assertEquals(accessToken1.getAlgorithm(), accessToken2.getAlgorithm());
+  }
+
   private String registerGuest(String ip) throws Exception {
     return mockMvc
         .perform(post("/api/auth/register/guest")
@@ -168,6 +338,28 @@ public class AuthControllerIT {
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .param("username", email)
             .param("password", password))
+        .andExpect(status().isCreated())
+        .andExpect(content().string("Please look into your inbox for a confirmation link"))
+        .andReturn().getResponse().getContentAsString();
+
+    assertTrue(greenMailBean.getGreenMail().waitForIncomingEmail(1000, 1));
+    MimeMessage message = ITUtils.getLastGreenMailMessage(greenMailBean);
+
+    return message.getContent().toString().split("token=")[1].split("\"")[0];
+  }
+
+  private String upgradeGuestToUser(String email, String password, String uuid, String ip)
+      throws Exception {
+    mockMvc
+        .perform(post("/api/auth/register")
+            .with(request -> {
+              request.setRemoteAddr(ip);
+              return request;
+            })
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("username", email)
+            .param("password", password)
+            .param("uuid", uuid))
         .andExpect(status().isCreated())
         .andExpect(content().string("Please look into your inbox for a confirmation link"))
         .andReturn().getResponse().getContentAsString();
