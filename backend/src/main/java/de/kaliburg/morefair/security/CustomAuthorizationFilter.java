@@ -5,7 +5,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
 import java.io.IOException;
 import java.time.Instant;
@@ -57,7 +56,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         try {
           String token = authorizationHeader.substring("Bearer ".length());
           DecodedJWT decodedJwt = securityUtils.verifyToken(token);
-          String username = decodedJwt.getSubject();
 
           if (Instant.now().isBefore(decodedJwt.getIssuedAtAsInstant())) {
             throw new RuntimeException("Token is not valid yet");
@@ -66,18 +64,11 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             throw new Exception("Token is not valid anymore");
           }
 
-          AccountEntity account = accountService.findByUsername(username);
-          if (account == null) {
-            throw new Exception("User not found");
-          }
-          if (account.getLastRevokeAsInstant().isAfter(decodedJwt.getIssuedAtAsInstant())) {
-            throw new Exception("Token revoked");
-          }
-
           String[] roles = decodedJwt.getClaim("roles").asArray(String.class);
           Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
           Arrays.stream(roles).forEach(role -> authorities.add(new SimpleGrantedAuthority(role)));
 
+          String username = decodedJwt.getSubject();
           UsernamePasswordAuthenticationToken authenticationToken =
               new UsernamePasswordAuthenticationToken(username, null, authorities);
           SecurityContextHolder.getContext().setAuthentication(authenticationToken);

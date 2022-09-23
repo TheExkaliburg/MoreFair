@@ -160,7 +160,7 @@ public class AuthController {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is not valid anymore");
     }
 
-    if (account.getLastRevokeAsInstant().isAfter(jwt.getIssuedAtAsInstant())) {
+    if (account.getLastRevoke().toInstant().isAfter(jwt.getIssuedAtAsInstant())) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token revoked");
     }
 
@@ -300,7 +300,7 @@ public class AuthController {
           if (account == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
           }
-          if (account.getLastRevokeAsInstant().isAfter(decodedJwt.getIssuedAtAsInstant())) {
+          if (account.getLastRevoke().toInstant().isAfter(decodedJwt.getIssuedAtAsInstant())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token revoked");
           }
 

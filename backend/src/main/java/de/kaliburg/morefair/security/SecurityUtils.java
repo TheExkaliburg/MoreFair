@@ -41,10 +41,9 @@ public class SecurityUtils {
   public HashMap<String, String> generateTokens(HttpServletRequest request, User user) {
     String accessToken = JWT.create()
         .withSubject(user.getUsername())
-        .withExpiresAt(Instant.now().plus(1, ChronoUnit.HOURS))
+        .withExpiresAt(Instant.now().plus(10, ChronoUnit.MINUTES))
         .withIssuedAt(Instant.now())
         .withIssuer(request.getRequestURL().toString())
-        .withClaim("issuedAt", Instant.now().toEpochMilli())
         .withClaim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority)
             .collect(Collectors.toList()))
         .sign(getAlgorithm());
@@ -54,7 +53,6 @@ public class SecurityUtils {
         .withExpiresAt(Instant.now().plus(30, ChronoUnit.DAYS))
         .withIssuedAt(Instant.now())
         .withIssuer(request.getRequestURL().toString())
-        .withClaim("issuedAt", Instant.now().toEpochMilli())
         .sign(getAlgorithm());
 
     HashMap<String, String> tokens = new HashMap<>();

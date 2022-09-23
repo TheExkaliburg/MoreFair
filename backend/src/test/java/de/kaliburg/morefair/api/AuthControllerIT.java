@@ -369,7 +369,6 @@ public class AuthControllerIT {
         .andExpect(content().string("All tokens revoked"))
         .andReturn().getResponse().getContentAsString();
 
-    Thread.sleep(1000);
     mockMvc.perform(get("/api/auth/refresh")
             .with(request -> {
               request.setRemoteAddr(ip);
@@ -381,6 +380,7 @@ public class AuthControllerIT {
         .andExpect(content().string("Token revoked"))
         .andReturn().getResponse().getContentAsString();
 
+    Thread.sleep(1000);
     jwtTokens = login(email, password, ip);
     refreshTokens(jwtTokens.get("refreshToken"), ip);
   }

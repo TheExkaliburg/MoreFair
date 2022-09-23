@@ -1,6 +1,5 @@
 package de.kaliburg.morefair.account;
 
-import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
@@ -107,14 +106,5 @@ public class AccountEntity {
     double solution = (-1 + sqrt) / 2;
 
     return (int) Math.round(Math.floor(solution));
-  }
-
-  /**
-   * Truncates the milliseconds and nanoseconds of the last-revoke date-time.
-   *
-   * @return the truncated last-revoke date-time as instant
-   */
-  public Instant getLastRevokeAsInstant() {
-    return lastRevoke.toInstant().truncatedTo(ChronoUnit.SECONDS);
   }
 }
