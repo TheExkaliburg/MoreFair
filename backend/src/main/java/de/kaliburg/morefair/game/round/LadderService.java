@@ -123,6 +123,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   public LadderEntity createLadder(RoundEntity round, Integer ladderNumber) {
     LadderEntity result = new LadderEntity(ladderNumber, round);
     result = ladderRepository.save(result);
+    round.getLadders().add(result);
     if (currentRound != null && currentRound.getUuid().equals(round.getUuid())) {
       currentLadderMap.put(ladderNumber, result);
       eventMap.put(ladderNumber, new ArrayList<>());
