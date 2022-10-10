@@ -15,6 +15,9 @@ module.exports = {
             DEFAULT: "var(--button-text-color)",
             hover: "var(--button-text-hover-color)",
           },
+          border: {
+            DEFAULT: "var(--button-border-color)",
+          },
         },
         toggle: {
           bg: {

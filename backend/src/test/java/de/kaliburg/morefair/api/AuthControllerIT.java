@@ -374,7 +374,7 @@ public class AuthControllerIT {
               request.setRemoteAddr(ip);
               return request;
             })
-            .header(AUTHORIZATION, "Bearer " + jwtTokens.get("refreshToken")))
+            .param("refreshToken", jwtTokens.get("refreshToken")))
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isUnauthorized())
         .andExpect(content().string("Token revoked"))
@@ -528,7 +528,7 @@ public class AuthControllerIT {
               request.setRemoteAddr(ip);
               return request;
             })
-            .header(AUTHORIZATION, "Bearer " + token))
+            .param("refreshToken", token))
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$", aMapWithSize(2)))

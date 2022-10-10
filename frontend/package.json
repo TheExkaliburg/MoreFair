@@ -24,6 +24,7 @@
     "@nuxtjs/eslint-config-typescript": "^10.0.0",
     "@nuxtjs/partytown": "^1.2.1",
     "@pinia/nuxt": "^0.4.1",
+    "@types/js-cookie": "^3.0.2",
     "@vueuse/nuxt": "^9.1.1",
     "@zxcvbn-ts/core": "^2.0.4",
     "@zxcvbn-ts/language-common": "^2.0.1",

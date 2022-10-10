@@ -1,22 +1,26 @@
 <template>
-  <div class="w-full h-screen flex flex-col lg:flex-row">
-    <LadderWindow
-      v-if="uiStore.ladderEnabled"
-      class="w-full p-1 lg:h-full"
-      :class="uiStore.chatEnabled ? 'h-2/3 lg:w-3/5' : 'h-full lg:w-full'"
-    />
-    <ChatWindow
-      v-if="uiStore.chatEnabled"
-      class="w-full p-1 lg:h-full"
-      :class="uiStore.ladderEnabled ? 'h-1/3 lg:w-2/5' : 'h-full lg:w-full'"
-    />
-    <TheLoginDialog></TheLoginDialog>
+  <div
+    class="flex flex-col justify-center items-center w-screen h-screen bg-navbar-bg"
+  >
+    <div class="text-5xl color-text-color">FairGame</div>
+    <div class="flex flex-row justify-center content-center">
+      <FairButton>Play as Guest</FairButton>
+      <FairButton>Login</FairButton>
+    </div>
   </div>
 </template>
 
-<script setup lang="ts">
-import { useUiStore } from "~/store/ui";
-import TheLoginDialog from "~/components/auth/TheAuthenticationDialog.vue";
+<script lang="ts" setup>
+import { useAccountStore } from "~/store/account";
+import FairButton from "~/components/interactables/FairButton.vue";
 
-const uiStore = useUiStore();
+const accountStore = useAccountStore();
+definePageMeta({ layout: false });
+
+onBeforeMount(() => {
+  accountStore.login();
+  if (accountStore.isLoggedIn()) {
+    // await navigateTo("/game");
+  }
+});
 </script>

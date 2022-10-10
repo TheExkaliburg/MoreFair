@@ -1,10 +1,10 @@
 <template>
   <div
     ref="offCanvas"
-    class="flex flex-col bg-navbar-bg fixed inset-y-0 right-0 w-1/4 min-w-min max-w-full z-10 text-navbar-text px-4 py-1 transform transition-transform justify-between"
     :class="
       uiStore.sidebarExpanded ? 'xl:translate-x-full' : 'translate-x-full'
     "
+    class="flex flex-col bg-navbar-bg fixed inset-y-0 right-0 w-1/4 min-w-min max-w-full z-10 text-navbar-text px-4 py-1 transform transition-transform justify-between"
     tabindex="-1"
   >
     <!--Top of the Canvas-->
@@ -60,7 +60,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {
   BackspaceIcon,
   ChatBubbleLeftEllipsisIcon,
@@ -85,6 +85,8 @@ const optionsLabel = computed<string>(() => lang("options"));
 const helpLabel = computed<string>(() => lang("help"));
 const discordLabel = computed<string>(() => lang("discord"));
 
+uiStore.sidebarExpanded = false;
+
 onClickOutside(offCanvas, () => {
   if (uiStore.sidebarExpanded) {
     uiStore.sidebarExpanded = false;
@@ -92,4 +94,4 @@ onClickOutside(offCanvas, () => {
 });
 </script>
 
-<style scoped lang="scss"></style>
+<style lang="scss" scoped></style>

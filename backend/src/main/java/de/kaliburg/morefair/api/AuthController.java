@@ -1,7 +1,5 @@
 package de.kaliburg.morefair.api;
 
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
@@ -279,49 +277,40 @@ public class AuthController {
   }
 
   @GetMapping(value = "/refresh", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> refreshToken(HttpServletRequest request) {
+  public ResponseEntity<?> refreshToken(HttpServletRequest request,
+      @RequestParam(name = "refreshToken") String refreshToken) {
     try {
-      String authorizationHeader = request.getHeader(AUTHORIZATION);
-      if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-        try {
-          String token = authorizationHeader.substring("Bearer ".length());
-          DecodedJWT decodedJwt = securityUtils.verifyToken(token);
-          String username = decodedJwt.getSubject();
+      DecodedJWT decodedJwt = securityUtils.verifyToken(refreshToken);
+      String username = decodedJwt.getSubject();
 
-          if (Instant.now().isBefore(decodedJwt.getIssuedAtAsInstant())) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Token is not valid yet");
-          }
-          if (Instant.now().isAfter(decodedJwt.getExpiresAtAsInstant())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
-          }
-
-          AccountEntity account = accountService.findByUsername(username);
-          if (account == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-          }
-          if (account.getLastRevoke().toInstant().isAfter(decodedJwt.getIssuedAtAsInstant())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token revoked");
-          }
-
-          HashMap<String, String> tokens = securityUtils.generateTokens(request, account);
-          account.setLastLogin(OffsetDateTime.now());
-          accountService.save(account);
-
-          return ResponseEntity.created(HttpUtils.createCreatedUri("/api/auth/refresh"))
-              .body(tokens);
-
-        } catch (Exception e) {
-          log.error("Error refreshing jwt-tokens: {}", e.getMessage());
-          Map<String, String> errors = new HashMap<>();
-          errors.put("error", e.getMessage());
-          return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errors);
-        }
-      } else {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Refresh token is missing");
+      if (Instant.now().isBefore(decodedJwt.getIssuedAtAsInstant())) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body("Token is not valid yet");
       }
+      if (Instant.now().isAfter(decodedJwt.getExpiresAtAsInstant())) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
+      }
+
+      AccountEntity account = accountService.findByUsername(username);
+      if (account == null) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+      }
+      if (account.getLastRevoke().toInstant().isAfter(decodedJwt.getIssuedAtAsInstant())) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token revoked");
+      }
+
+      HashMap<String, String> tokens = securityUtils.generateTokens(request, account);
+      account.setLastLogin(OffsetDateTime.now());
+      accountService.save(account);
+
+      return ResponseEntity.created(HttpUtils.createCreatedUri("/api/auth/refresh"))
+          .body(tokens);
+
     } catch (Exception e) {
-      return ResponseEntity.internalServerError().body(e.getMessage());
+      log.error("Error refreshing jwt-tokens: {}", e.getMessage());
+      Map<String, String> errors = new HashMap<>();
+      errors.put("error", e.getMessage());
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errors);
     }
   }
 }

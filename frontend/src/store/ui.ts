@@ -3,17 +3,17 @@ import { watch } from "vue";
 
 export const useUiStore = defineStore("ui", () => {
   // variables
-  const sidebarExpanded = ref<Boolean>(false);
-  const ladderEnabled = ref<Boolean>(true);
-  const chatEnabled = ref<Boolean>(true);
+  const sidebarExpanded = ref<boolean>(false);
+  const ladderEnabled = ref<boolean>(true);
+  const chatEnabled = ref<boolean>(true);
 
   // side-effects
-  watch(ladderEnabled, (value: Boolean) => {
+  watch(ladderEnabled, (value: boolean) => {
     if (!value && !chatEnabled.value) {
       chatEnabled.value = true;
     }
   });
-  watch(chatEnabled, (value: Boolean) => {
+  watch(chatEnabled, (value: boolean) => {
     if (!value && !ladderEnabled.value) {
       ladderEnabled.value = true;
     }
