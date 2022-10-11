@@ -124,7 +124,6 @@ function findMentions() {
     let isOk = false;
     try {
       isOk = "g" in m && "i" in m;
-      isOk &= m.g.length <= 20; //We dont want to parse too long groups...
     } catch (e) {
       //This is a check for the case that the m is not an object
       //We get really weird errors when we dont catch this but we dont care about the error here.

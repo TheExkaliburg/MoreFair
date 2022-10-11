@@ -637,7 +637,12 @@ function parseSendMessage() {
   let metadata = [];
   for (let i = 0; i < children.length; i++) {
     if (children[i].nodeType === 3) {
+      let first = msg === "";
       msg += children[i].nodeValue;
+      //remove leading whitespace to match the server implementation
+      if (first) {
+        msg = msg.trimStart();
+      }
     } else if (children[i].classList.contains("mention")) {
       let dict = {
         user: "u",
