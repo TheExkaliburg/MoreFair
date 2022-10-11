@@ -19,6 +19,7 @@ const versioningModule = {
             "Fixed some sound settings.",
             'Fixed a bug with the "got first jingle" sound.',
             "Made the chad input system more maintainable.",
+            "Fixed 2 bugs with rendering / sending mentions. Group mentions and user mentions should now be more stable.",
           ],
         }),
         new Version("PATCH", "Balancing Round-Types", {
