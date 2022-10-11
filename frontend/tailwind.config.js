@@ -33,6 +33,9 @@ module.exports = {
             border: "var(--toggle-inner-border-color)",
           },
         },
+        text: {
+          DEFAULT: "var(--text-color)",
+        },
       },
     },
   },

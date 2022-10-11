@@ -2,11 +2,12 @@
   <div
     class="flex flex-col justify-center items-center w-screen h-screen bg-navbar-bg"
   >
-    <div class="text-5xl color-text-color">FairGame</div>
+    <div class="text-5xl text-text">FairGame</div>
     <div class="flex flex-row justify-center content-center">
       <FairButton>Play as Guest</FairButton>
       <FairButton>Login</FairButton>
     </div>
+    <div class="text-text">{{ accountStore.uuid }}</div>
   </div>
 </template>
 
@@ -18,9 +19,6 @@ const accountStore = useAccountStore();
 definePageMeta({ layout: false });
 
 onBeforeMount(() => {
-  accountStore.login();
-  if (accountStore.isLoggedIn()) {
-    // await navigateTo("/game");
-  }
+  accountStore.registerGuest();
 });
 </script>
