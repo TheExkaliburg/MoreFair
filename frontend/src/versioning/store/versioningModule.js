@@ -20,6 +20,7 @@ const versioningModule = {
             'Fixed a bug with the "got first jingle" sound.',
             "Made the chad input system more maintainable.",
             "Fixed 2 bugs with rendering / sending mentions. Group mentions and user mentions should now be more stable.",
+            "Increasing the min length of emoji strings to 3. You can now send `:)` and `:^)` without it being interpreted as an emoji.",
           ],
         }),
         new Version("PATCH", "Balancing Round-Types", {
