@@ -5,8 +5,11 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
-        new Version("PATCH", "Emojis and Follow Ranker", {
-          fixes: ["Fixed a bug where the gotFirstJingle played on mentions"],
+        new Version("PATCH", "Fixing Mention-Sound and Emoji-QoL", {
+          fixes: [
+            "Fixed a bug where the gotFirstJingle played on mentions",
+            "Increasing the min length of emoji strings to 3. You can now send `:)` and `:^)` without it being interpreted as an emoji.",
+          ],
         }),
         new Version("PATCH", "Emojis and Follow Ranker", {
           features: [
