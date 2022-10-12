@@ -10,7 +10,6 @@ export default defineNuxtConfig({
   ],
   modules: [
     "@pinia/nuxt",
-    "@nuxtjs/partytown",
     "nuxt-windicss",
     "@vueuse/nuxt",
     "@intlify/nuxt3",

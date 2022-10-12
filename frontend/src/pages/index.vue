@@ -8,6 +8,8 @@
       <FairButton>Login</FairButton>
     </div>
     <div class="text-text">{{ accountStore.uuid }}</div>
+    <div class="text-text">{{ accountStore.accessToken }}</div>
+    <div class="text-text">{{ accountStore.refreshToken }}</div>
   </div>
 </template>
 
@@ -19,6 +21,12 @@ const accountStore = useAccountStore();
 definePageMeta({ layout: false });
 
 onBeforeMount(() => {
-  accountStore.registerGuest();
+  // If guest-uuid exists try logging in
+  // If not try to refresh existing tokens as pseudo-login
+  if (accountStore.uuid !== "") {
+    accountStore.login(accountStore.uuid, accountStore.uuid);
+  } else if (accountStore.refreshToken !== "") {
+    accountStore.refresh();
+  }
 });
 </script>
