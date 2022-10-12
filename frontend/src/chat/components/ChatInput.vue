@@ -366,7 +366,12 @@ function findEmojisInString(str) {
       uniqueEmojis.push(emoji);
     }
   });
-  return [index > -1 && str.trim() != "" ? uniqueEmojis : [], str.length + 1];
+  return [
+    index > -1 && str.trim() != "" && str.trim().length >= 3
+      ? uniqueEmojis
+      : [],
+    str.length + 1,
+  ];
 }
 
 function findGroupMentionsInString(str) {
