@@ -6,6 +6,9 @@ const versioningModule = {
     return {
       versions: [
         new Version("PATCH", "Emojis and Follow Ranker", {
+          fixes: ["Fixed a bug where the gotFirstJingle played on mentions"],
+        }),
+        new Version("PATCH", "Emojis and Follow Ranker", {
           features: [
             "You can now enable following your own ranker in the options :^)",
             "You can now use emojis in your messages :eyes:",
