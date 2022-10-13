@@ -107,6 +107,9 @@ public class RoundEntity {
     if (randomAutoPercentage < 10) {
       types.add(RoundType.AUTO);
     }
+    else if (randomAutoPercentage > 90) {
+      types.add(RoundType.CHAOS);
+    }
 
     if (types.isEmpty()) {
       types.add(RoundType.DEFAULT);

@@ -5,6 +5,15 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "CHAOS Round Modifier", {
+          features: [
+            "The CHAOS round modifier has been added, with a 10% chance to appear.",
+            "Each ladder in a CHAOS round has a 50% chance to be one of TINY, SMALL, BIG or GIGANTIC, all equally likely.",
+            "Each ladder in a CHAOS round also has a 50% chance to be either NO_AUTO or FREE_AUTO, with both equally likely.",
+            "When CHAOS is rolled with FAST, the ladder modifiers above replace the normal FAST ones.",
+            "CHAOS cannot be rolled with AUTO."
+          ],
+        }),
         new Version("PATCH", "Fixing Mention-Sound and Emoji-QoL", {
           fixes: [
             "Fixed a bug where the gotFirstJingle played on mentions",

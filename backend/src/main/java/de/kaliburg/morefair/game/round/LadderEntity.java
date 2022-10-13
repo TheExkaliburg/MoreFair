@@ -116,12 +116,19 @@ public final class LadderEntity {
     Set<LadderType> previousLadderTypes = ladderOptional.map(LadderEntity::getTypes)
         .orElse(EnumSet.noneOf(LadderType.class));
 
+    // group the random rolls together
     float randomSizePercentage = random.nextFloat(100);
     log.debug("Rolling randomSizePercentage for Ladder {} in Round {}: {}%", number,
         round.getNumber(), randomSizePercentage);
     float randomNoAutoPercentage = random.nextFloat(100);
     log.debug("Rolling randomNoAutoPercentage for Ladder {} in Round {}: {}%", number,
         round.getNumber(), randomNoAutoPercentage);
+    float modifySizeChance = random.nextFloat(100);
+    log.debug("Rolling modifySizeChance for Ladder {} in Round {}: {}%", number,
+        round.getNumber(), modifySizeChance);
+    float autoApplyChance = random.nextFloat(100);
+    log.debug("Rolling autoApplyChance for Ladder {} in Round {}: {}%", number,
+        round.getNumber(), autoApplyChance);
 
     // First ladder must be DEFAULT (or SMALL on fast rounds)
     if (number == 1) {
@@ -135,8 +142,32 @@ public final class LadderEntity {
       return;
     }
 
-    // FAST rounds have a 1% chance to generate TINY ladders instead of SMALL
-    if (round.getTypes().contains(RoundType.FAST)) {
+    if (round.getTypes().contains(RoundType.CHAOS)) {
+      // CHAOS ladder size distribution:
+      // 50% DEFAULT
+      // 12.5% TINY
+      // 12.5% SMALL
+      // 12.5% BIG
+      // 12.5% GIGANTIC
+      // No back to back protection
+
+      if (modifySizeChance > 50) {
+        if (randomSizePercentage < 25) {
+          types.add(LadderType.TINY);
+        }
+        else if (randomSizePercentage < 50) {
+          types.add(LadderType.SMALL);
+        }
+        else if (randomSizePercentage < 75) {
+          types.add(LadderType.BIG);
+        }
+        else {
+          types.add(LadderType.GIGANTIC);
+        }
+      }
+    }
+    else if (round.getTypes().contains(RoundType.FAST)) {
+      // FAST rounds have a 1% chance to generate TINY ladders instead of SMALL
       if (randomSizePercentage < 1) {
         types.add(LadderType.TINY);
       } else {
@@ -150,7 +181,7 @@ public final class LadderEntity {
         19% BIG
         60% DEFAULT
         
-        If previous ladder was BIG/GIGANTIC, DEFAULT chance is 80% and BIG is blocked
+        If previous ladder was BIG/GIGANTIC, DEFAULT chance is 79% and BIG is blocked
         */
       boolean canGenerateBig = !(previousLadderTypes.contains(LadderType.BIG)
           || previousLadderTypes.contains(LadderType.GIGANTIC));
@@ -179,6 +210,19 @@ public final class LadderEntity {
       } else if (!types.contains(LadderType.NO_AUTO)) {
         types.add(LadderType.FREE_AUTO);
       }
+    } else if (round.getTypes().contains(RoundType.CHAOS)) {
+      // CHAOS ladder auto distribution:
+      // 50% no change
+      // 25% FREE_AUTO
+      // 25% NO_AUTO
+      if (autoApplyChance > 50) {
+        if (randomNoAutoPercentage < 50) {
+          types.add(LadderType.NO_AUTO);
+        }
+        else {
+          types.add(LadderType.FREE_AUTO);
+        }
+      }
     } else {
       // 2% Chance to get NO_AUTO and 5% for FREE_AUTO if it isn't NO_AUTO already
       if (randomNoAutoPercentage < 2) {
@@ -192,5 +236,4 @@ public final class LadderEntity {
       types.add(LadderType.DEFAULT);
     }
   }
-
 }
