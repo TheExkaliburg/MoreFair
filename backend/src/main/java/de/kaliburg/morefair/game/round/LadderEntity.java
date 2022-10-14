@@ -116,54 +116,42 @@ public final class LadderEntity {
     Set<LadderType> previousLadderTypes = ladderOptional.map(LadderEntity::getTypes)
         .orElse(EnumSet.noneOf(LadderType.class));
 
-    // group the random rolls together
     float randomSizePercentage = random.nextFloat(100);
     log.debug("Rolling randomSizePercentage for Ladder {} in Round {}: {}%", number,
         round.getNumber(), randomSizePercentage);
     float randomNoAutoPercentage = random.nextFloat(100);
     log.debug("Rolling randomNoAutoPercentage for Ladder {} in Round {}: {}%", number,
         round.getNumber(), randomNoAutoPercentage);
-    float modifySizeChance = random.nextFloat(100);
-    log.debug("Rolling modifySizeChance for Ladder {} in Round {}: {}%", number,
-        round.getNumber(), modifySizeChance);
-    float autoApplyChance = random.nextFloat(100);
-    log.debug("Rolling autoApplyChance for Ladder {} in Round {}: {}%", number,
-        round.getNumber(), autoApplyChance);
 
     // First ladder must be DEFAULT (or SMALL on fast rounds)
     if (number == 1) {
       if (round.getTypes().contains(RoundType.AUTO)) {
         types.add(LadderType.FREE_AUTO);
-      } else if (round.getTypes().contains(RoundType.FAST)) {
+      }
+      if (round.getTypes().contains(RoundType.FAST)) {
         types.add(LadderType.SMALL);
-      } else {
+      }
+      if (types.isEmpty()) {
         types.add(LadderType.DEFAULT);
       }
       return;
     }
 
     if (round.getTypes().contains(RoundType.CHAOS)) {
-      // CHAOS ladder size distribution:
-      // 50% DEFAULT
-      // 12.5% TINY
-      // 12.5% SMALL
-      // 12.5% BIG
-      // 12.5% GIGANTIC
+      // CHAOS ladders have an equal chance to roll all sizes
       // No back to back protection
 
-      if (modifySizeChance > 50) {
-        if (randomSizePercentage < 25) {
-          types.add(LadderType.TINY);
-        }
-        else if (randomSizePercentage < 50) {
-          types.add(LadderType.SMALL);
-        }
-        else if (randomSizePercentage < 75) {
-          types.add(LadderType.BIG);
-        }
-        else {
-          types.add(LadderType.GIGANTIC);
-        }
+      if (randomSizePercentage < 20) {
+        types.add(LadderType.TINY);
+      }
+      else if (randomSizePercentage < 40) {
+        types.add(LadderType.SMALL);
+      }
+      else if (randomSizePercentage > 80) {
+        types.add(LadderType.GIGANTIC);
+      }
+      else if (randomSizePercentage > 60) {
+        types.add(LadderType.BIG);
       }
     }
     else if (round.getTypes().contains(RoundType.FAST)) {
@@ -209,19 +197,6 @@ public final class LadderEntity {
         types.add(LadderType.NO_AUTO);
       } else if (!types.contains(LadderType.NO_AUTO)) {
         types.add(LadderType.FREE_AUTO);
-      }
-    } else if (round.getTypes().contains(RoundType.CHAOS)) {
-      // CHAOS ladder auto distribution:
-      // 50% no change
-      // 25% FREE_AUTO
-      // 25% NO_AUTO
-      if (autoApplyChance > 50) {
-        if (randomNoAutoPercentage < 50) {
-          types.add(LadderType.NO_AUTO);
-        }
-        else {
-          types.add(LadderType.FREE_AUTO);
-        }
       }
     } else {
       // 2% Chance to get NO_AUTO and 5% for FREE_AUTO if it isn't NO_AUTO already

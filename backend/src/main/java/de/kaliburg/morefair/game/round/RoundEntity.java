@@ -83,6 +83,11 @@ public class RoundEntity {
 
     determineRoundTypes();
 
+    if (types.contains(RoundType.CHAOS)) {
+      // CHAOS rounds add a random number of additional ladders (up to 15)
+      this.highestAssholeCount = random.nextInt(16);
+    }
+
     double percentage = random.nextDouble(0.5, 1.5);
 
     BigDecimal baseDec = new BigDecimal(config.getBasePointsToPromote());
@@ -100,6 +105,9 @@ public class RoundEntity {
     float randomAutoPercentage = random.nextFloat(100);
     log.debug("Rolling randomAutoPercentage for Round {}: {}%", number, randomAutoPercentage);
 
+    float randomChaosPercentage = random.nextFloat(100);
+    log.debug("Rolling randomChaosPercentage for Round {}: {}%", number, randomChaosPercentage);
+
     if (randomFastPercentage < 20) {
       types.add(RoundType.FAST);
     }
@@ -107,7 +115,8 @@ public class RoundEntity {
     if (randomAutoPercentage < 10) {
       types.add(RoundType.AUTO);
     }
-    else if (randomAutoPercentage > 90) {
+
+    if (randomChaosPercentage < 10) {
       types.add(RoundType.CHAOS);
     }
 

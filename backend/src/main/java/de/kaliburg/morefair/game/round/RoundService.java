@@ -117,6 +117,7 @@ public class RoundService {
         : getCurrentRound().getBaseAssholeLadder();
 
     if (assholeCount > getCurrentRound().getHighestAssholeCount()
+        && !getCurrentRound().getTypes().contains(RoundType.CHAOS)
         && ladderService.find(baseAssholeLadderNumber) == null) {
       getCurrentRound().setHighestAssholeCount(assholeCount);
       ladderService.setCurrentRound(save(getCurrentRound()));
