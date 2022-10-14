@@ -24,6 +24,22 @@ client.onStompError = (frame) => {
   console.log("Additional details: " + frame.body);
 };
 
+export interface IStompCallbacks {
+  onTick: (() => void)[];
+  onLoadLadder: (() => void)[];
+  onLoadChat: (() => void)[];
+  onNewMessage: (() => void)[];
+  onGameEvent: (() => void)[];
+}
+
+const callbacks: IStompCallbacks = {
+  onTick: [],
+  onLoadLadder: [],
+  onLoadChat: [],
+  onNewMessage: [],
+  onGameEvent: [],
+};
+
 const api = (client: Client) => {
   return {
     info: () => {
@@ -45,5 +61,6 @@ export const useStomp = () => {
 
   return {
     api: api(client),
+    callbacks,
   };
 };
