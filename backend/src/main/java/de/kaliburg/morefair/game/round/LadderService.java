@@ -123,6 +123,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   public LadderEntity createLadder(RoundEntity round, Integer ladderNumber) {
     LadderEntity result = new LadderEntity(ladderNumber, round);
     result = ladderRepository.save(result);
+    round.getLadders().add(result);
     if (currentRound != null && currentRound.getUuid().equals(round.getUuid())) {
       currentLadderMap.put(ladderNumber, result);
       eventMap.put(ladderNumber, new ArrayList<>());
@@ -489,8 +490,10 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         newRanker.getUnlocks().copy(ranker.getUnlocks());
         LadderEntity newLadder = find(newRanker.getLadder().getNumber());
 
-        if (newLadder.getNumber() > 5 && newLadder.getRankers().size() <= 1) {
-          LadderEntity autoLadder = find(newLadder.getNumber() - 5);
+        if (newLadder.getNumber() > currentRound.getModifiedBaseAssholeLadder()
+            && newLadder.getRankers().size() <= 1) {
+          LadderEntity autoLadder = find(
+              newLadder.getNumber() - currentRound.getModifiedBaseAssholeLadder());
 
           if (autoLadder != null && !autoLadder.getTypes().contains(LadderType.FREE_AUTO)
               && !autoLadder.getTypes().contains(LadderType.NO_AUTO)) {

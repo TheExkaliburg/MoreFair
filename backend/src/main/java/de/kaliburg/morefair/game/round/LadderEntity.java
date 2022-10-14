@@ -123,6 +123,7 @@ public final class LadderEntity {
     log.debug("Rolling randomNoAutoPercentage for Ladder {} in Round {}: {}%", number,
         round.getNumber(), randomNoAutoPercentage);
 
+    // First ladder must be DEFAULT (or SMALL on fast rounds)
     if (number == 1) {
       if (round.getTypes().contains(RoundType.AUTO)) {
         types.add(LadderType.FREE_AUTO);
@@ -134,6 +135,7 @@ public final class LadderEntity {
       return;
     }
 
+    // FAST rounds have a 1% chance to generate TINY ladders instead of SMALL
     if (round.getTypes().contains(RoundType.FAST)) {
       if (randomSizePercentage < 1) {
         types.add(LadderType.TINY);
@@ -141,14 +143,24 @@ public final class LadderEntity {
         types.add(LadderType.SMALL);
       }
     } else {
+      /* Breakdown:
+        1% TINY
+        19% SMALL
+        1% GIGANTIC
+        19% BIG
+        60% DEFAULT
+        
+        If previous ladder was BIG/GIGANTIC, DEFAULT chance is 80% and BIG is blocked
+        */
+      boolean canGenerateBig = !(previousLadderTypes.contains(LadderType.BIG)
+          || previousLadderTypes.contains(LadderType.GIGANTIC));
       if (randomSizePercentage < 1) {
         types.add(LadderType.TINY);
       } else if (randomSizePercentage < 20) {
         types.add(LadderType.SMALL);
       } else if (randomSizePercentage > 99) {
         types.add(LadderType.GIGANTIC);
-      } else if (randomSizePercentage > 80 && !previousLadderTypes.contains(LadderType.BIG)
-          && !previousLadderTypes.contains(LadderType.GIGANTIC)) {
+      } else if (randomSizePercentage > 80 && canGenerateBig) {
         types.add(LadderType.BIG);
       }
     }
