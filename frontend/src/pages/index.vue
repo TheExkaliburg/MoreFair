@@ -21,6 +21,7 @@ import { useStomp } from "~/composables/useStomp";
 useStomp();
 const accountStore = useAccountStore();
 definePageMeta({ layout: false });
+await accountStore.registerGuest();
 
 onBeforeMount(() => {
   // If guest-uuid exists try logging in
