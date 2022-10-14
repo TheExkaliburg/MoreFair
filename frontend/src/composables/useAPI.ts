@@ -35,6 +35,7 @@ axios.interceptors.response.use(
       useAccountStore().refreshToken = response.data.refreshToken;
       return axios(config);
     }
+    return Promise.reject(error);
   }
 );
 

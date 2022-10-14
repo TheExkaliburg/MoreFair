@@ -37,7 +37,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response,
       @NonNull FilterChain filterChain) throws IOException, ServletException {
-
     String servletPath = request.getServletPath();
     // If servlet path is empty get from request url
     if (servletPath.isEmpty()) {
@@ -48,7 +47,8 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         || servletPath.equals("/api/auth/register/guest")
         || servletPath.equals("/api/auth/refresh")
         || servletPath.equals("/api/auth/password/forgot")
-        || servletPath.equals("/api/auth/password/reset")) {
+        || servletPath.equals("/api/auth/password/reset")
+        || servletPath.equals("/api/fairsocket")) {
       filterChain.doFilter(request, response);
     } else {
       String authorizationHeader = request.getHeader(AUTHORIZATION);

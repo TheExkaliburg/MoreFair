@@ -14,7 +14,9 @@ specifiers:
   '@nuxt/content': ^2.0.1
   '@nuxtjs/eslint-config-typescript': ^10.0.0
   '@pinia/nuxt': ^0.4.1
+  '@stomp/stompjs': ^6.1.2
   '@types/js-cookie': ^3.0.2
+  '@types/sockjs-client': ^1.5.1
   '@vueuse/nuxt': ^9.1.1
   '@zxcvbn-ts/core': ^2.0.4
   '@zxcvbn-ts/language-common': ^2.0.1
@@ -58,7 +60,9 @@ devDependencies:
   '@nuxt/content': 2.0.1_vite@2.9.15+webpack@5.74.0
   '@nuxtjs/eslint-config-typescript': 10.0.0_shit3uhl6a7megkzgoz6xssnfa
   '@pinia/nuxt': 0.4.1_ji7makela53bf45bggjsqi5emm
+  '@stomp/stompjs': 6.1.2
   '@types/js-cookie': 3.0.2
+  '@types/sockjs-client': 1.5.1
   '@vueuse/nuxt': 9.1.1_bfvl2qmknf3s6ebqod7ummjp2u
   '@zxcvbn-ts/core': 2.0.4
   '@zxcvbn-ts/language-common': 2.0.1
@@ -1488,6 +1492,10 @@ packages:
       picomatch: 2.3.1
     dev: true
 
+  /@stomp/stompjs/6.1.2:
+    resolution: {integrity: sha512-FHDTrIFM5Ospi4L3Xhj6v2+NzCVAeNDcBe95YjUWhWiRMrBF6uN3I7AUOlRgT6jU/2WQvvYK8ZaIxFfxFp+uHQ==}
+    dev: true
+
   /@trysound/sax/0.2.0:
     resolution: {integrity: sha512-L7z9BgrNEcYyUYtF+HaEfiS5ebkh9jXqbszz7pC0hRBPaatV0XjSD3+eHrpqFemQfgwiFF0QPIarnIihIDn7OA==}
     engines: {node: '>=10.13.0'}
@@ -1609,6 +1617,10 @@ packages:
     resolution: {integrity: sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==}
     dependencies:
       '@types/node': 18.7.14
+    dev: true
+
+  /@types/sockjs-client/1.5.1:
+    resolution: {integrity: sha512-bmZM6A1GPdjF0bcuIUC+50hZEMGkzMsiG9by6X9U+7IZFOiPtz7MJ9h05FSpPVxlj4i+TzzoG3ESo1FJlbLb6A==}
     dev: true
 
   /@types/tough-cookie/4.0.2:

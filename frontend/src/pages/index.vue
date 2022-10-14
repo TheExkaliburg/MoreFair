@@ -16,7 +16,9 @@
 <script lang="ts" setup>
 import { useAccountStore } from "~/store/account";
 import FairButton from "~/components/interactables/FairButton.vue";
+import { useStomp } from "~/composables/useStomp";
 
+useStomp();
 const accountStore = useAccountStore();
 definePageMeta({ layout: false });
 
