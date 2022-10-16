@@ -53,7 +53,11 @@ export const useAccountStore = defineStore("account", () => {
       if (response.status === 200) {
         accessToken.value = response.data.accessToken;
         refreshToken.value = response.data.refreshToken;
-        Cookies.set("_uuid", uuid.value, { expires: 365 });
+        Cookies.set("_uuid", uuid.value, {
+          expires: 365,
+          secure: true,
+          sameSite: "strict",
+        });
       }
     });
   }
@@ -70,17 +74,32 @@ export const useAccountStore = defineStore("account", () => {
   }
 
   watch(uuid, (value: string) => {
-    if (value !== "") Cookies.set("_uuid", value, { expires: 365 });
+    if (value !== "")
+      Cookies.set("_uuid", value, {
+        expires: 365,
+        secure: true,
+        sameSite: "strict",
+      });
     else Cookies.remove("_uuid");
   });
 
   watch(accessToken, (value: string) => {
-    if (value !== "") Cookies.set("accessToken", value, { expires: 1 });
+    if (value !== "")
+      Cookies.set("accessToken", value, {
+        expires: 1,
+        secure: true,
+        sameSite: "strict",
+      });
     else Cookies.remove("accessToken");
   });
 
   watch(refreshToken, (value: string) => {
-    if (value !== "") Cookies.set("refreshToken", value, { expires: 30 });
+    if (value !== "")
+      Cookies.set("refreshToken", value, {
+        expires: 30,
+        secure: true,
+        sameSite: "strict",
+      });
     else Cookies.remove("refreshToken");
   });
 

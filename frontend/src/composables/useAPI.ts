@@ -1,13 +1,13 @@
-import axios from "axios";
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import Cookies from "js-cookie";
 import { useAccountStore } from "~/store/account";
 
 const isDevMode = process.env.NODE_ENV !== "production";
 
 axios.interceptors.request.use(
-  function (config) {
+  function (config: AxiosRequestConfig) {
     if (isDevMode) {
-      config.url = "http://localhost:8080" + config.url;
+      config.baseURL = "http://localhost:8080";
     }
 
     const accessToken = Cookies.get("accessToken");
@@ -18,23 +18,28 @@ axios.interceptors.request.use(
       Authorization: `Bearer ${accessToken}`,
     };
 
+    console.log(config);
     return config;
   },
-  (error) => Promise.reject(error)
+  (error: AxiosError) => Promise.reject(error)
 );
 
 axios.interceptors.response.use(
-  (response) => response,
-  async (error) => {
+  (response: AxiosResponse) => response,
+  async (error: AxiosError) => {
     const config = error?.config;
+    const url = config?.url;
 
-    if (error?.response?.status === 403 && !config?.sent) {
-      config.sent = true;
+    if (error?.response?.status === 403 && !url.endsWith("/api/auth/refresh")) {
       const response = await API.auth.refresh(Cookies.get("refreshToken"));
-      useAccountStore().accessToken = response.data.accessToken;
-      useAccountStore().refreshToken = response.data.refreshToken;
-      return axios(config);
+
+      if (response.status < 300) {
+        useAccountStore().accessToken = response.data.accessToken;
+        useAccountStore().refreshToken = response.data.refreshToken;
+        return axios(config);
+      }
     }
+    console.log(error);
     return Promise.reject(error);
   }
 );
@@ -61,6 +66,16 @@ const API = {
       const params = new URLSearchParams();
       params.append("refreshToken", refreshToken);
       return axios.get("/api/auth/refresh", { params });
+    },
+  },
+  account: {
+    changeDisplayName: (displayName: string) => {
+      const params = new URLSearchParams();
+      params.append("displayName", displayName);
+      return axios.patch("/api/account/name", params);
+    },
+    getAccountDetails: () => {
+      return axios.get("/api/account");
     },
   },
 };

@@ -4,7 +4,7 @@
   >
     <div class="text-5xl text-text">FairGame</div>
     <div class="flex flex-row justify-center content-center">
-      <FairButton>Play as Guest</FairButton>
+      <FairButton @click="test">Play as Guest</FairButton>
       <FairButton>Login</FairButton>
     </div>
     <div class="text-text">{{ accountStore.uuid }}</div>
@@ -16,20 +16,28 @@
 <script lang="ts" setup>
 import { useAccountStore } from "~/store/account";
 import FairButton from "~/components/interactables/FairButton.vue";
-import { useStomp } from "~/composables/useStomp";
+import { useAPI } from "~/composables/useAPI";
 
-useStomp();
+// useStomp();
+const api = useAPI();
 const accountStore = useAccountStore();
 definePageMeta({ layout: false });
-await accountStore.registerGuest();
+// await accountStore.registerGuest();
 
 onBeforeMount(() => {
   // If guest-uuid exists try logging in
   // If not try to refresh existing tokens as pseudo-login
   if (accountStore.uuid !== "") {
-    accountStore.login(accountStore.uuid, accountStore.uuid);
+    // accountStore.login(accountStore.uuid, accountStore.uuid);
   } else if (accountStore.refreshToken !== "") {
-    accountStore.refresh();
+    // accountStore.refresh();
   }
 });
+
+function test() {
+  api.account
+    .getAccountDetails()
+    .then((res) => console.log(res))
+    .catch((error) => console.log(error));
+}
 </script>
