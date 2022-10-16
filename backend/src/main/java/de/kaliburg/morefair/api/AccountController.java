@@ -10,6 +10,8 @@ import de.kaliburg.morefair.events.types.EventType;
 import de.kaliburg.morefair.game.round.RankerService;
 import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +21,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @Controller
 @Log4j2
 @RequestMapping("/api/account")
+@RestController
 @RequiredArgsConstructor
 public class AccountController {
 
@@ -37,7 +41,8 @@ public class AccountController {
 
 
   @GetMapping
-  public ResponseEntity<?> getAccount(Authentication authentication) {
+  public ResponseEntity<?> getAccount(HttpServletRequest request, Authentication authentication,
+      HttpServletResponse response) {
     try {
       AccountEntity account = accountService.findByUsername(authentication.getName());
 

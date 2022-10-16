@@ -18,6 +18,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -31,11 +32,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @Controller
 @Slf4j
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@RestController
 public class AuthController {
 
   private final AccountService accountService;
@@ -277,8 +280,8 @@ public class AuthController {
   }
 
   @GetMapping(value = "/refresh", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> refreshToken(HttpServletRequest request,
-      @RequestParam(name = "refreshToken") String refreshToken) {
+  public ResponseEntity<?> refreshToken(HttpServletRequest request, @RequestParam(name =
+      "refreshToken") String refreshToken, HttpServletResponse response) {
     try {
       DecodedJWT decodedJwt = securityUtils.verifyToken(refreshToken);
       String username = decodedJwt.getSubject();
@@ -299,7 +302,10 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token revoked");
       }
 
-      HashMap<String, String> tokens = securityUtils.generateTokens(request, account);
+      String userContext = SecurityUtils.generatePassword();
+      response.addHeader("Set-Cookie", "__Host-userContext=" + userContext + "; Secure; Path=/; "
+          + "HttpOnly; SameSite=Strict");
+      HashMap<String, String> tokens = securityUtils.generateTokens(request, account, userContext);
       account.setLastLogin(OffsetDateTime.now());
       accountService.save(account);
 

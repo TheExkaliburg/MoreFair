@@ -28,7 +28,7 @@ onBeforeMount(() => {
   // If guest-uuid exists try logging in
   // If not try to refresh existing tokens as pseudo-login
   if (accountStore.uuid !== "") {
-    // accountStore.login(accountStore.uuid, accountStore.uuid);
+    accountStore.login(accountStore.uuid, accountStore.uuid);
   } else if (accountStore.refreshToken !== "") {
     // accountStore.refresh();
   }

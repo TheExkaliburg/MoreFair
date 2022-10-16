@@ -18,7 +18,6 @@ axios.interceptors.request.use(
       Authorization: `Bearer ${accessToken}`,
     };
 
-    console.log(config);
     return config;
   },
   (error: AxiosError) => Promise.reject(error)
@@ -50,7 +49,7 @@ const API = {
       const params = new URLSearchParams();
       params.append("username", username);
       params.append("password", password);
-      return axios.post("/api/auth/login", params);
+      return axios.post("/api/auth/login", params, { withCredentials: true });
     },
     registerGuest: () => {
       return axios.post("/api/auth/register/guest");
@@ -65,7 +64,7 @@ const API = {
     refresh: (refreshToken: string) => {
       const params = new URLSearchParams();
       params.append("refreshToken", refreshToken);
-      return axios.get("/api/auth/refresh", { params });
+      return axios.get("/api/auth/refresh", { params, withCredentials: true });
     },
   },
   account: {

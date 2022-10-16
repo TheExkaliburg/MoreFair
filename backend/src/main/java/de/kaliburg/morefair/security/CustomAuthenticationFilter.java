@@ -42,7 +42,11 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
       FilterChain chain, Authentication authResult) throws IOException {
     User user = (User) authResult.getPrincipal();
 
-    HashMap<String, String> tokens = securityUtils.generateTokens(request, user);
+    String userContext = SecurityUtils.generatePassword();
+    response.addHeader("Set-Cookie", "__Host-userContext=" + userContext + "; Secure; Path=/; "
+        + "HttpOnly; SameSite=Strict");
+
+    HashMap<String, String> tokens = securityUtils.generateTokens(request, user, userContext);
     response.setContentType(APPLICATION_JSON_VALUE);
     new ObjectMapper().writeValue(response.getOutputStream(), tokens);
   }

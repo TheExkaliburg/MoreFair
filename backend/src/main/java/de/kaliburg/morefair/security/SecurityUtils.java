@@ -18,6 +18,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -27,10 +28,11 @@ public class SecurityUtils {
 
   private static final SecureRandom secureRandom = new SecureRandom();
   private final JwtConfig jwtConfig;
+  private final Argon2PasswordEncoder argon2PasswordEncoder;
 
 
   public static String generatePassword() {
-    String passwordCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~`!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?";
+    String passwordCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#$%^&*()-_=+[{]}|:',<.>/?";
     String pwd = RandomStringUtils.random(20, 0, passwordCharacters.length() - 1, false, false,
         passwordCharacters.toCharArray(), secureRandom);
     log.debug("Generated random password: {}", pwd);
@@ -38,7 +40,10 @@ public class SecurityUtils {
   }
 
   // generate access and refresh jwt tokens
-  public HashMap<String, String> generateTokens(HttpServletRequest request, User user) {
+  public HashMap<String, String> generateTokens(HttpServletRequest request, User user,
+      String userContext) {
+    String userContextHash = argon2PasswordEncoder.encode(userContext);
+
     String accessToken = JWT.create()
         .withSubject(user.getUsername())
         .withExpiresAt(Instant.now().plus(10, ChronoUnit.MINUTES))
@@ -46,6 +51,7 @@ public class SecurityUtils {
         .withIssuer(request.getRequestURL().toString())
         .withClaim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority)
             .collect(Collectors.toList()))
+        .withClaim("userContextHash", userContextHash)
         .sign(getAlgorithm());
 
     String refreshToken = JWT.create()
@@ -53,6 +59,7 @@ public class SecurityUtils {
         .withExpiresAt(Instant.now().plus(30, ChronoUnit.DAYS))
         .withIssuedAt(Instant.now())
         .withIssuer(request.getRequestURL().toString())
+        .withClaim("userContextHash", userContextHash)
         .sign(getAlgorithm());
 
     HashMap<String, String> tokens = new HashMap<>();
@@ -68,8 +75,8 @@ public class SecurityUtils {
   }
 
   public HashMap<String, String> generateTokens(HttpServletRequest request,
-      AccountEntity account) {
-    return generateTokens(request, convertAccountToUser(account));
+      AccountEntity account, String userContext) {
+    return generateTokens(request, convertAccountToUser(account), userContext);
   }
 
   public DecodedJWT verifyToken(String token) {
