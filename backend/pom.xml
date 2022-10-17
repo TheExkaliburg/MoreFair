@@ -242,7 +242,20 @@
       <artifactId>greenmail-spring</artifactId>
       <groupId>com.icegreen</groupId>
       <scope>test</scope>
-      <version>1.6.10</version>
+      <version>1.6.11</version>
+    </dependency>
+    <dependency>
+      <artifactId>spring-session-data-redis</artifactId>
+      <groupId>org.springframework.session</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>spring-boot-starter-data-redis</artifactId>
+      <groupId>org.springframework.boot</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>spring-session-core</artifactId>
+      <groupId>org.springframework.session</groupId>
+      <version>2.6.0</version>
     </dependency>
   </dependencies>
 

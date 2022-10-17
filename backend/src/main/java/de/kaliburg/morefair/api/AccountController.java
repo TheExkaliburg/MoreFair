@@ -44,7 +44,7 @@ public class AccountController {
   public ResponseEntity<?> getAccount(HttpServletRequest request, Authentication authentication,
       HttpServletResponse response) {
     try {
-      AccountEntity account = accountService.findByUsername(authentication.getName());
+      AccountEntity account = accountService.findByUsername("da539786-83f1-4ff2-92b9-aea2634a27d8");
 
       if (account.getAchievements() == null) {
         account.setAchievements(new AchievementsEntity(account));

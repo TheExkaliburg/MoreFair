@@ -15,7 +15,7 @@ public class MoreFairApplication {
   }
 
   @Bean
-  public Argon2PasswordEncoder bcryptPasswordEncoder() {
+  public Argon2PasswordEncoder passwordEncoder() {
     return new Argon2PasswordEncoder();
   }
 }
