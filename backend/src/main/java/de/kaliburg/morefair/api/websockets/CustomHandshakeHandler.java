@@ -23,7 +23,6 @@ public class CustomHandshakeHandler extends DefaultHandshakeHandler {
 
   public CustomHandshakeHandler() {
     super();
-
     connectionsPerIpAddress = Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES)
         .build(new CacheLoader<>() {
           @Override

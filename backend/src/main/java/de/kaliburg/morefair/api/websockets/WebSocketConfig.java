@@ -1,22 +1,15 @@
 package de.kaliburg.morefair.api.websockets;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.session.Session;
+import org.springframework.session.web.socket.config.annotation.AbstractSessionWebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 @Configuration
 @EnableWebSocketMessageBroker
-public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-
-  private final ChannelInterceptor interceptor;
-
-  public WebSocketConfig(ChannelInterceptor interceptor) {
-    this.interceptor = interceptor;
-  }
+public class WebSocketConfig extends AbstractSessionWebSocketMessageBrokerConfigurer<Session> {
 
   @Override
   public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -25,13 +18,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
   }
 
   @Override
-  public void registerStompEndpoints(StompEndpointRegistry registry) {
+  protected void configureStompEndpoints(StompEndpointRegistry registry) {
     registry.addEndpoint("/api/fairsocket").setHandshakeHandler(new CustomHandshakeHandler())
         .setAllowedOriginPatterns("*");
-  }
-
-  @Override
-  public void configureClientInboundChannel(ChannelRegistration registration) {
-    registration.interceptors(interceptor);
   }
 }

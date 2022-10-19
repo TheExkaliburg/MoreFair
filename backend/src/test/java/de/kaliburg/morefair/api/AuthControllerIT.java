@@ -1,6 +1,7 @@
 package de.kaliburg.morefair.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -300,7 +301,6 @@ public class AuthControllerIT {
     String ip = ITUtils.randomIp();
     String xsrfToken = getXsrfToken();
     String uuid = registerGuest(ip, xsrfToken);
-
     String session = login(uuid, uuid, ip, xsrfToken);
 
     AccountEntity account1 = accountRepository.findByUsername(uuid).orElseThrow();
@@ -335,7 +335,7 @@ public class AuthControllerIT {
   }
 
   @Test
-  public void registerLoginAndRevoke_default_unauthorized() throws Exception {
+  public void registerLoginAndLogout_default_unauthorized() throws Exception {
     String email = "registerLoginAndRevoke_default_unauthorized@mail.de";
     String password = SecurityUtils.generatePassword();
     String ip = ITUtils.randomIp();
@@ -343,6 +343,8 @@ public class AuthControllerIT {
     String registrationToken = registerUser(email, password, ip, xsrfToken);
     confirmRegistrationToken(registrationToken, ip);
     String session = login(email, password, ip, xsrfToken);
+
+    logout(xsrfToken, session);
   }
 
   @Test
@@ -353,7 +355,7 @@ public class AuthControllerIT {
     String xsrfToken = getXsrfToken();
     final String uuid = registerGuest(ip, xsrfToken);
 
-    String session = login(uuid, uuid, ip, xsrfToken);
+    String session0 = login(uuid, uuid, ip, xsrfToken);
 
     AccountEntity account0 = accountRepository.findByUsername(uuid)
         .orElseThrow();
@@ -361,10 +363,11 @@ public class AuthControllerIT {
 
     // Upgrade
     ip = ITUtils.randomIp();
-    String registrationToken = upgradeGuestToUser(email, password, uuid, ip, xsrfToken, session);
+    String registrationToken = upgradeGuestToUser(email, password, uuid, ip, xsrfToken, session0);
     confirmRegistrationToken(UUID.fromString(registrationToken).toString(), ip);
 
-    session = login(email, password, ip, xsrfToken);
+    String session1 = login(email, password, ip, xsrfToken);
+    assertNotEquals(session0, session1);
 
     AccountEntity account1 = accountRepository.findByUsername(email)
         .orElseThrow();
@@ -470,5 +473,14 @@ public class AuthControllerIT {
         .andReturn().getResponse();
 
     return Objects.requireNonNull(response.getCookie("SESSION")).getValue();
+  }
+
+  private void logout(String xsrfToken, String session) throws Exception {
+    mockMvc.perform(post("/api/auth/logout")
+            .header("X-XSRF-TOKEN", xsrfToken)
+            .cookie(new Cookie("XSRF-TOKEN", xsrfToken))
+            .cookie(new Cookie("SESSION", session)))
+        .andExpect(status().isOk())
+        .andReturn().getResponse();
   }
 }

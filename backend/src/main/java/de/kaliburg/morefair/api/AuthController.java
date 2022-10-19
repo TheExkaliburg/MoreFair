@@ -16,6 +16,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -208,6 +209,11 @@ public class AuthController {
       return ResponseEntity.internalServerError().body("Account not found");
     }
 
+    HttpSession session = request.getSession(false);
+    if (session != null) {
+      session.invalidate();
+    }
+
     account.setPassword(passwordEncoder.encode(newPassword));
     account.setLastRevoke(OffsetDateTime.now());
     accountService.save(account);
@@ -275,6 +281,15 @@ public class AuthController {
 
     URI uri = HttpUtils.createCreatedUri("/api/auth/signup/guest");
     return ResponseEntity.created(uri).body(account.getUsername());
+  }
+
+  @PostMapping(value = "/logout")
+  public ResponseEntity<?> logout(HttpServletRequest request) {
+    HttpSession session = request.getSession(false);
+    if (session != null) {
+      session.invalidate();
+    }
+    return ResponseEntity.ok("Logged out");
   }
 }
 
