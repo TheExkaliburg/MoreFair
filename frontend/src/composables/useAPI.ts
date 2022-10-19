@@ -61,10 +61,22 @@ const API = {
       if (uuid) params.append("uuid", uuid);
       return axios.post("/api/auth/register", params);
     },
-    refresh: (refreshToken: string) => {
+    changePassword: (oldPassword: string, newPassword: string) => {
       const params = new URLSearchParams();
-      params.append("refreshToken", refreshToken);
-      return axios.get("/api/auth/refresh", { params, withCredentials: true });
+      params.append("oldPassword", oldPassword);
+      params.append("newPassword", newPassword);
+      return axios.post("/api/auth/password/change", params);
+    },
+    forgotPassword: (username: string) => {
+      const params = new URLSearchParams();
+      params.append("username", username);
+      return axios.post("/api/auth/password/forgot", params);
+    },
+    resetPassword: (token: string, password: string) => {
+      const params = new URLSearchParams();
+      params.append("token", token);
+      params.append("password", password);
+      return axios.post("/api/auth/password/reset", params);
     },
   },
   account: {

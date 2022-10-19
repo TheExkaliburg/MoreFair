@@ -12,13 +12,10 @@ import de.kaliburg.morefair.serivces.EmailService;
 import java.net.URI;
 import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -26,19 +23,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 @Controller
 @Slf4j
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-@RestController
 public class AuthController {
 
   private final AccountService accountService;
@@ -64,6 +60,11 @@ public class AuthController {
   // TODO: resetPassword with the previously sent token
   // TODO: revokeJwtTokens for a specific user
   // TODO: config for server-paths to put into mails
+
+  @GetMapping
+  public ResponseEntity<?> getXsrfToken() {
+    return ResponseEntity.ok(null);
+  }
 
   @PostMapping(value = "/register", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   public ResponseEntity<?> register(@RequestParam String username, @RequestParam String password,
@@ -107,7 +108,8 @@ public class AuthController {
   // API endpoint for changing password in combination with the old password
   @PostMapping(value = "/password/change", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   public ResponseEntity<?> changePassword(@RequestParam String oldPassword,
-      @RequestParam String newPassword, HttpServletRequest request) throws Exception {
+      @RequestParam String newPassword, HttpServletRequest request, Authentication authentication)
+      throws Exception {
 
     if (newPassword.length() < 8) {
       return ResponseEntity.badRequest().body("Password must be at least 8 characters long");
@@ -116,11 +118,7 @@ public class AuthController {
       return ResponseEntity.badRequest().body("Password must be at most 64 characters long");
     }
 
-    DecodedJWT jwt = securityUtils.getJwtFromRequest(request);
-    if (jwt == null) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in");
-    }
-    String username = jwt.getSubject();
+    String username = authentication.getName();
 
     AccountEntity account = accountService.findByUsername(username);
     if (account == null) {
@@ -277,47 +275,6 @@ public class AuthController {
 
     URI uri = HttpUtils.createCreatedUri("/api/auth/signup/guest");
     return ResponseEntity.created(uri).body(account.getUsername());
-  }
-
-  @GetMapping(value = "/refresh", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> refreshToken(HttpServletRequest request, @RequestParam(name =
-      "refreshToken") String refreshToken, HttpServletResponse response) {
-    try {
-      DecodedJWT decodedJwt = securityUtils.verifyToken(refreshToken);
-      String username = decodedJwt.getSubject();
-
-      if (Instant.now().isBefore(decodedJwt.getIssuedAtAsInstant())) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body("Token is not valid yet");
-      }
-      if (Instant.now().isAfter(decodedJwt.getExpiresAtAsInstant())) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token expired");
-      }
-
-      AccountEntity account = accountService.findByUsername(username);
-      if (account == null) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-      }
-      if (account.getLastRevoke().toInstant().isAfter(decodedJwt.getIssuedAtAsInstant())) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token revoked");
-      }
-
-      String userContext = SecurityUtils.generatePassword();
-      response.addHeader("Set-Cookie", "__Host-userContext=" + userContext + "; Secure; Path=/; "
-          + "HttpOnly; SameSite=Strict");
-      HashMap<String, String> tokens = securityUtils.generateTokens(request, account, userContext);
-      account.setLastLogin(OffsetDateTime.now());
-      accountService.save(account);
-
-      return ResponseEntity.created(HttpUtils.createCreatedUri("/api/auth/refresh"))
-          .body(tokens);
-
-    } catch (Exception e) {
-      log.error("Error refreshing jwt-tokens: {}", e.getMessage());
-      Map<String, String> errors = new HashMap<>();
-      errors.put("error", e.getMessage());
-      return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errors);
-    }
   }
 }
 
