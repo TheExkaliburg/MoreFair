@@ -12,7 +12,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 @Configuration
@@ -37,17 +36,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         authenticationManager(), securityUtils);
     customAuthenticationFilter.setFilterProcessesUrl("/api/auth/login");
 
-    CookieCsrfTokenRepository cookieCsrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
-    cookieCsrfTokenRepository.setCookieHttpOnly(true);
-    http.csrf()
-        .csrfTokenRepository(cookieCsrfTokenRepository);
+    http.csrf().csrfTokenRepository(new CustomCookieCsrfTokenRepository());
     http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
     http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/auth/**").permitAll();
     http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/auth/**").permitAll();
     http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/fairsocket").permitAll();
-    http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/**").authenticated();
+    http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/**").permitAll();
     http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/**").authenticated();
     http.authorizeRequests().antMatchers(HttpMethod.PUT, "/api/**").authenticated();
+    http.authorizeRequests().antMatchers(HttpMethod.PATCH, "/api/**").authenticated();
     http.authorizeRequests().antMatchers(HttpMethod.DELETE, "/api/**").authenticated();
     http.authorizeRequests().anyRequest().permitAll();
     http.addFilter(customAuthenticationFilter);
