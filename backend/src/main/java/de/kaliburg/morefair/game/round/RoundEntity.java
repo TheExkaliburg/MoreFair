@@ -123,7 +123,13 @@ public class RoundEntity {
   }
 
   public Integer getModifiedBaseAssholeLadder() {
-    return types.contains(RoundType.FAST) ? getBaseAssholeLadder() / 2 : getBaseAssholeLadder();
+    int result = getBaseAssholeLadder();
+    if (types.contains(RoundType.FAST)) {
+      result = getBaseAssholeLadder() / 2;
+    } else if (types.contains(RoundType.SLOW)) {
+      result = getBaseAssholeLadder() + 5;
+    }
+    return result;
   }
 
   public boolean isClosed() {
