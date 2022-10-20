@@ -127,16 +127,35 @@ public final class LadderEntity {
     if (number == 1) {
       if (round.getTypes().contains(RoundType.AUTO)) {
         types.add(LadderType.FREE_AUTO);
-      } else if (round.getTypes().contains(RoundType.FAST)) {
+      }
+      if (round.getTypes().contains(RoundType.FAST)) {
         types.add(LadderType.SMALL);
-      } else {
+      }
+      if (types.isEmpty()) {
         types.add(LadderType.DEFAULT);
       }
       return;
     }
 
-    // FAST rounds have a 1% chance to generate TINY ladders instead of SMALL
-    if (round.getTypes().contains(RoundType.FAST)) {
+    if (round.getTypes().contains(RoundType.CHAOS)) {
+      // CHAOS ladders have an equal chance to roll all sizes
+      // No back to back protection
+
+      if (randomSizePercentage < 20) {
+        types.add(LadderType.TINY);
+      }
+      else if (randomSizePercentage < 40) {
+        types.add(LadderType.SMALL);
+      }
+      else if (randomSizePercentage > 80) {
+        types.add(LadderType.GIGANTIC);
+      }
+      else if (randomSizePercentage > 60) {
+        types.add(LadderType.BIG);
+      }
+    }
+    else if (round.getTypes().contains(RoundType.FAST)) {
+      // FAST rounds have a 1% chance to generate TINY ladders instead of SMALL
       if (randomSizePercentage < 1) {
         types.add(LadderType.TINY);
       } else {
@@ -150,7 +169,7 @@ public final class LadderEntity {
         19% BIG
         60% DEFAULT
         
-        If previous ladder was BIG/GIGANTIC, DEFAULT chance is 80% and BIG is blocked
+        If previous ladder was BIG/GIGANTIC, DEFAULT chance is 79% and BIG is blocked
         */
       boolean canGenerateBig = !(previousLadderTypes.contains(LadderType.BIG)
           || previousLadderTypes.contains(LadderType.GIGANTIC));
@@ -192,5 +211,4 @@ public final class LadderEntity {
       types.add(LadderType.DEFAULT);
     }
   }
-
 }
