@@ -81,7 +81,7 @@ public class AccountService {
   }
 
   public List<AccountEntity> findByUsername(String username) {
-    return accountRepository.findAccountsByUsernameIsContaining(username);
+    return accountRepository.findTop100ByUsernameContainsIgnoreCaseOrderByLastLoginDesc(username);
   }
 
   public AccountEntity findBroadcaster() {

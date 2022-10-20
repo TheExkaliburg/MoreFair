@@ -297,10 +297,6 @@ public class ModerationController {
       }
       List<AccountEntity> accountsWithName = accountService.findByUsername(name);
 
-      if (accountsWithName.size() >= 100) {
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-      }
-
       Map<Long, String> result = accountsWithName.stream()
           .collect(Collectors.toMap(AccountEntity::getId, AccountEntity::getUsername));
       return new ResponseEntity<>(result, HttpStatus.OK);
