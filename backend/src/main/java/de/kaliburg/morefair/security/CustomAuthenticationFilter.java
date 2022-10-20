@@ -1,5 +1,6 @@
 package de.kaliburg.morefair.security;
 
+import de.kaliburg.morefair.account.AccountService;
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,17 +20,23 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
   private final AuthenticationManager authenticationManager;
-
-  private final SecurityUtils securityUtils;
+  private final AccountService accountService;
 
   @Override
   public Authentication attemptAuthentication(HttpServletRequest request,
       HttpServletResponse response) throws AuthenticationException {
     String username = super.obtainUsername(request);
+    username = username != null ? username : "";
+    username = username.trim();
     String password = super.obtainPassword(request);
+    password = password != null ? password : "";
+
+    String uuid = accountService.findByUsername(username).getUuid().toString();
 
     UsernamePasswordAuthenticationToken authenticationToken =
-        new UsernamePasswordAuthenticationToken(username, password);
+        new UsernamePasswordAuthenticationToken(uuid, password);
+
+    super.setDetails(request, authenticationToken);
 
     return authenticationManager.authenticate(authenticationToken);
   }

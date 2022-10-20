@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 public class SecurityUtils {
 
   private static final SecureRandom secureRandom = new SecureRandom();
-  private final JwtConfig jwtConfig;
+  private final Secrets secrets;
   private final Argon2PasswordEncoder argon2PasswordEncoder;
 
 
@@ -84,7 +84,7 @@ public class SecurityUtils {
   }
 
   public Algorithm getAlgorithm() {
-    return Algorithm.HMAC256(jwtConfig.getSecret().getBytes());
+    return Algorithm.HMAC256(secrets.getRememberMeKey().getBytes());
   }
 
   public DecodedJWT getJwtFromRequest(HttpServletRequest request) {

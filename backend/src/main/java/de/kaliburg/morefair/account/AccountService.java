@@ -116,13 +116,13 @@ public class AccountService implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    AccountEntity account = accountRepository.findByUsername(username)
+    AccountEntity account = accountRepository.findByUuid(UUID.fromString(username))
         .orElseThrow(() -> new UsernameNotFoundException("Account not found"));
 
     Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
     authorities.add(new SimpleGrantedAuthority(account.getAccessRole().name()));
 
-    return new User(account.getUsername(), account.getPassword(), authorities);
+    return new User(account.getUuid().toString(), account.getPassword(), authorities);
   }
 
   public AccountEntity findByUsername(String username) {

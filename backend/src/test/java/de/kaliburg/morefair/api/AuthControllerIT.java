@@ -480,7 +480,7 @@ public class AuthControllerIT {
             .header("X-XSRF-TOKEN", xsrfToken)
             .cookie(new Cookie("XSRF-TOKEN", xsrfToken))
             .cookie(new Cookie("SESSION", session)))
-        .andExpect(status().isOk())
+        .andExpect(status().isFound())
         .andReturn().getResponse();
   }
 }

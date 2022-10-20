@@ -63,8 +63,9 @@ public class AuthController {
   // TODO: config for server-paths to put into mails
 
   @GetMapping
-  public ResponseEntity<?> getXsrfToken() {
-    return ResponseEntity.ok(null);
+  public ResponseEntity<?> getSessionStatus(HttpServletRequest request) {
+    HttpSession session = request.getSession(false);
+    return ResponseEntity.ok(session != null);
   }
 
   @PostMapping(value = "/register", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
@@ -119,9 +120,9 @@ public class AuthController {
       return ResponseEntity.badRequest().body("Password must be at most 64 characters long");
     }
 
-    String username = authentication.getName();
+    String uuid = authentication.getName();
 
-    AccountEntity account = accountService.findByUsername(username);
+    AccountEntity account = accountService.find(UUID.fromString(uuid));
     if (account == null) {
       return ResponseEntity.badRequest().body("Account not found");
     }
@@ -283,6 +284,7 @@ public class AuthController {
     return ResponseEntity.created(uri).body(account.getUsername());
   }
 
+  /*
   @PostMapping(value = "/logout")
   public ResponseEntity<?> logout(HttpServletRequest request) {
     HttpSession session = request.getSession(false);
@@ -290,7 +292,7 @@ public class AuthController {
       session.invalidate();
     }
     return ResponseEntity.ok("Logged out");
-  }
+  }*/
 }
 
 @Data
