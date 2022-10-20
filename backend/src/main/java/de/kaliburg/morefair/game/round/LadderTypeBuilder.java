@@ -169,10 +169,10 @@ public class LadderTypeBuilder {
     List<Entry<Float, LadderType>> inverseLookupEntries = createInverseLookupTable(
         weights).entrySet().stream().sorted(Entry.comparingByKey()).toList();
 
-    log.debug("Random {} percentage for L{}: {}/{}", categoryName, ladderNumber, randomNumber,
+    log.info("Random {} percentage for L{}: {}/{}", categoryName, ladderNumber, randomNumber,
         totalWeight);
     for (Map.Entry<Float, LadderType> entry : inverseLookupEntries) {
-      log.trace("Checking {} percentage: {}/{}", entry.getValue(), entry.getKey(), totalWeight);
+      log.info("Checking {} percentage: {}/{}", entry.getValue(), entry.getKey(), totalWeight);
       if (randomNumber < entry.getKey()) {
         return entry.getValue();
       }

@@ -81,10 +81,10 @@ public class RoundTypeBuilder {
     List<Entry<Float, RoundType>> sortedInverseLookupEntries = createInverseLookupTable(
         weights).entrySet().stream().sorted(Entry.comparingByKey()).toList();
 
-    log.debug("Random {} percentage for R{}: {}/{}", categoryName, roundNumber, randomNumber,
+    log.info("Random {} percentage for R{}: {}/{}", categoryName, roundNumber, randomNumber,
         totalWeight);
     for (Map.Entry<Float, RoundType> entry : sortedInverseLookupEntries) {
-      log.trace("Checking {} percentage: {}/{}", entry.getValue(), entry.getKey(), totalWeight);
+      log.info("Checking {} percentage: {}/{}", entry.getValue(), entry.getKey(), totalWeight);
       if (randomNumber < entry.getKey()) {
         return entry.getValue();
       }
