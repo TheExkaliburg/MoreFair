@@ -90,7 +90,8 @@ public class AccountService implements UserDetailsService {
   }
 
   public List<AccountEntity> findByDisplayName(String displayName) {
-    return accountRepository.findAccountsByDisplayNameIsContaining(displayName);
+    return accountRepository.findTop100ByDisplayNameContainsIgnoreCaseOrderByLastLoginDesc(
+        displayName);
   }
 
   public AccountEntity findBroadcaster() {
