@@ -1,7 +1,5 @@
-package de.kaliburg.morefair.game.round.ladder;
+package de.kaliburg.morefair.game.round;
 
-import de.kaliburg.morefair.game.round.LadderType;
-import de.kaliburg.morefair.game.round.RoundType;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +42,7 @@ public class LadderTypeBuilder {
     ladderAutoTypeWeights.put(LadderType.DEFAULT, 100.f);
   }
 
-  private void handleLadderType(LadderType ladderType) {
+  private void handlePreviousLadderType(LadderType ladderType) {
     if (previousLadderType.contains(ladderType)) {
       return;
     }
@@ -125,7 +123,7 @@ public class LadderTypeBuilder {
     }
 
     this.roundTypes.forEach(this::handleRoundTypes);
-    this.previousLadderType.forEach(this::handleLadderType);
+    this.previousLadderType.forEach(this::handlePreviousLadderType);
 
     if (ladderNumber >= assholeLadderNumber) {
       ladderAutoTypeWeights.put(LadderType.NO_AUTO,
@@ -162,7 +160,8 @@ public class LadderTypeBuilder {
     List<Entry<Float, LadderType>> inverseLookupEntries = createInverseLookupTable(
         weights).entrySet().stream().sorted(Entry.comparingByKey()).toList();
 
-    log.debug("Random {} percentage: {}/{}", categoryName, randomNumber, totalWeight);
+    log.debug("Random {} percentage for L{}: {}/{}", categoryName, ladderNumber, randomNumber,
+        totalWeight);
     for (Map.Entry<Float, LadderType> entry : inverseLookupEntries) {
       log.trace("Checking {} percentage: {}/{}", entry.getValue(), entry.getKey(), totalWeight);
       if (randomNumber < entry.getKey()) {

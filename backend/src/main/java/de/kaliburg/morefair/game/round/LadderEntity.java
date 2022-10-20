@@ -1,6 +1,5 @@
 package de.kaliburg.morefair.game.round;
 
-import de.kaliburg.morefair.game.round.ladder.LadderTypeBuilder;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.OffsetDateTime;
