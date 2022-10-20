@@ -29,7 +29,8 @@ public class RoundTypeBuilder {
 
   public RoundTypeBuilder() {
     roundSpeedTypeWeights.put(RoundType.FAST, 20.f);
-    roundSpeedTypeWeights.put(RoundType.DEFAULT, 80.f);
+    roundSpeedTypeWeights.put(RoundType.SLOW, 10.f);
+    roundSpeedTypeWeights.put(RoundType.DEFAULT, 70.f);
 
     roundAutoTypeWeights.put(RoundType.AUTO, 10.f);
     roundAutoTypeWeights.put(RoundType.DEFAULT, 90.f);

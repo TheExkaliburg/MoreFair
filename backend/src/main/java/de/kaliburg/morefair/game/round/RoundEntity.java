@@ -109,6 +109,8 @@ public class RoundEntity {
     result = Math.min(25, result);
     if (types.contains(RoundType.FAST)) {
       result = (result + 1) / 2;
+    } else if (types.contains(RoundType.SLOW)) {
+      result += 5;
     }
     return result;
   }
