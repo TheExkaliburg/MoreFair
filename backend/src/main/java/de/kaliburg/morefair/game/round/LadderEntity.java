@@ -47,6 +47,7 @@ import lombok.extern.log4j.Log4j2;
 @SequenceGenerator(name = "seq_ladder", sequenceName = "seq_ladder", allocationSize = 1)
 public final class LadderEntity {
 
+
   private static final Random random = new Random();
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_ladder")
@@ -116,99 +117,11 @@ public final class LadderEntity {
     Set<LadderType> previousLadderTypes = ladderOptional.map(LadderEntity::getTypes)
         .orElse(EnumSet.noneOf(LadderType.class));
 
-    float randomSizePercentage = random.nextFloat(100);
-    log.debug("Rolling randomSizePercentage for Ladder {} in Round {}: {}%", number,
-        round.getNumber(), randomSizePercentage);
-    float randomNoAutoPercentage = random.nextFloat(100);
-    log.debug("Rolling randomNoAutoPercentage for Ladder {} in Round {}: {}%", number,
-        round.getNumber(), randomNoAutoPercentage);
-
-    // First ladder must be DEFAULT (or SMALL on fast rounds)
-    if (number == 1) {
-      if (round.getTypes().contains(RoundType.AUTO)) {
-        types.add(LadderType.FREE_AUTO);
-      }
-      if (round.getTypes().contains(RoundType.FAST)) {
-        types.add(LadderType.SMALL);
-      }
-      if (types.isEmpty()) {
-        types.add(LadderType.DEFAULT);
-      }
-      return;
-    }
-
-    if (round.getTypes().contains(RoundType.CHAOS)) {
-      // CHAOS ladders have an equal chance to roll all sizes
-      // No back to back protection
-
-      if (randomSizePercentage < 20) {
-        types.add(LadderType.TINY);
-      }
-      else if (randomSizePercentage < 40) {
-        types.add(LadderType.SMALL);
-      }
-      else if (randomSizePercentage > 80) {
-        types.add(LadderType.GIGANTIC);
-      }
-      else if (randomSizePercentage > 60) {
-        types.add(LadderType.BIG);
-      }
-    }
-    else if (round.getTypes().contains(RoundType.FAST)) {
-      // FAST rounds have a 1% chance to generate TINY ladders instead of SMALL
-      if (randomSizePercentage < 1) {
-        types.add(LadderType.TINY);
-      } else {
-        types.add(LadderType.SMALL);
-      }
-    } else {
-      /* Breakdown:
-        1% TINY
-        19% SMALL
-        1% GIGANTIC
-        19% BIG
-        60% DEFAULT
-        
-        If previous ladder was BIG/GIGANTIC, DEFAULT chance is 79% and BIG is blocked
-        */
-      boolean canGenerateBig = !(previousLadderTypes.contains(LadderType.BIG)
-          || previousLadderTypes.contains(LadderType.GIGANTIC));
-      if (randomSizePercentage < 1) {
-        types.add(LadderType.TINY);
-      } else if (randomSizePercentage < 20) {
-        types.add(LadderType.SMALL);
-      } else if (randomSizePercentage > 99) {
-        types.add(LadderType.GIGANTIC);
-      } else if (randomSizePercentage > 80 && canGenerateBig) {
-        types.add(LadderType.BIG);
-      }
-    }
-
-    if (number >= round.getAssholeLadderNumber()) {
-      types.add(LadderType.NO_AUTO);
-      types.add(LadderType.ASSHOLE);
-      return;
-    }
-
-    // In Auto Rounds
-    if (round.getTypes().contains(RoundType.AUTO)) {
-      // Higher Chance to get NO_AUTO but all other rounds are FREE_AUTO
-      if (randomNoAutoPercentage < 5) {
-        types.add(LadderType.NO_AUTO);
-      } else if (!types.contains(LadderType.NO_AUTO)) {
-        types.add(LadderType.FREE_AUTO);
-      }
-    } else {
-      // 2% Chance to get NO_AUTO and 5% for FREE_AUTO if it isn't NO_AUTO already
-      if (randomNoAutoPercentage < 2) {
-        types.add(LadderType.NO_AUTO);
-      } else if (randomNoAutoPercentage > 95 && !types.contains(LadderType.NO_AUTO)) {
-        types.add(LadderType.FREE_AUTO);
-      }
-    }
-
-    if (types.isEmpty()) {
-      types.add(LadderType.DEFAULT);
-    }
+    LadderTypeBuilder builder = new LadderTypeBuilder();
+    builder.setLadderNumber(number);
+    builder.setAssholeLadderNumber(round.getAssholeLadderNumber());
+    builder.setRoundTypes(round.getTypes());
+    builder.setPreviousLadderType(previousLadderTypes);
+    types = builder.build();
   }
 }

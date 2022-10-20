@@ -99,31 +99,9 @@ public class RoundEntity {
   private void determineRoundTypes() {
     types.clear();
 
-    float randomFastPercentage = random.nextFloat(100);
-    log.debug("Rolling randomFastPercentage for Round {}: {}%", number, randomFastPercentage);
-
-    float randomAutoPercentage = random.nextFloat(100);
-    log.debug("Rolling randomAutoPercentage for Round {}: {}%", number, randomAutoPercentage);
-
-    float randomChaosPercentage = random.nextFloat(100);
-    log.debug("Rolling randomChaosPercentage for Round {}: {}%", number, randomChaosPercentage);
-
-    if (randomFastPercentage < 20) {
-      types.add(RoundType.FAST);
-    }
-
-    if (randomAutoPercentage < 10) {
-      types.add(RoundType.AUTO);
-    }
-
-    if (randomChaosPercentage < 10) {
-      types.add(RoundType.CHAOS);
-    }
-
-    if (types.isEmpty()) {
-      types.add(RoundType.DEFAULT);
-    }
-
+    RoundTypeBuilder builder = new RoundTypeBuilder();
+    builder.setRoundNumber(number);
+    types = builder.build();
   }
 
   public Integer getAssholeLadderNumber() {
@@ -131,6 +109,8 @@ public class RoundEntity {
     result = Math.min(25, result);
     if (types.contains(RoundType.FAST)) {
       result = (result + 1) / 2;
+    } else if (types.contains(RoundType.SLOW)) {
+      result += 5;
     }
     return result;
   }
@@ -143,7 +123,13 @@ public class RoundEntity {
   }
 
   public Integer getModifiedBaseAssholeLadder() {
-    return types.contains(RoundType.FAST) ? getBaseAssholeLadder() / 2 : getBaseAssholeLadder();
+    int result = getBaseAssholeLadder();
+    if (types.contains(RoundType.FAST)) {
+      result = getBaseAssholeLadder() / 2;
+    } else if (types.contains(RoundType.SLOW)) {
+      result = getBaseAssholeLadder() + 5;
+    }
+    return result;
   }
 
   public boolean isClosed() {
