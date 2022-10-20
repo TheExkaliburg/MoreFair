@@ -1,6 +1,6 @@
 <template>
-  <Dialog :open="true" class="relative z-50">
-    <div class="fixed inset-0 bg-black/30" aria-hidden="true" />
+  <Dialog :open="props.open" class="relative z-50">
+    <div aria-hidden="true" class="fixed inset-0 bg-black/30" />
     <div class="fixed inset-0 flex items-center justify-center p-4">
       <DialogPanel
         v-if="isLogin"
@@ -9,26 +9,26 @@
         <DialogTitle>Log in</DialogTitle>
         <DialogDescription>
           Don't have an account?
-          <a href="#" class="text-blue-600" @click="isLogin = false">Sign up</a>
+          <a class="text-blue-600" href="#" @click="isLogin = false">Sign up</a>
         </DialogDescription>
         <form class="flex flex-col h-full" @submit="login">
           <div class="h-10 py-3">E-Mail:</div>
-          <input v-model="email" type="text" name="email" class="" />
+          <input v-model="email" class="" name="email" type="text" />
           <div class="h-10 py-3">Password:</div>
-          <input v-model="password" type="password" name="password" />
+          <input v-model="password" name="password" type="password" />
           <div class="h-10 py-3"></div>
-          <button type="submit" name="submit" value="submit">Submit</button>
+          <button name="submit" type="submit" value="submit">Submit</button>
         </form>
       </DialogPanel>
       <DialogPanel v-else class="w-full max-w-sm rounded-3xl bg-pink-400 p-4">
         <DialogTitle>Sign up</DialogTitle>
         <DialogDescription>
           Already have an account?
-          <a href="#" class="text-blue-600" @click="isLogin = true">Log in</a>
+          <a class="text-blue-600" href="#" @click="isLogin = true">Log in</a>
         </DialogDescription>
         <form class="flex flex-col h-full" @submit="signup">
           <div class="h-10 py-3">E-Mail:</div>
-          <input v-model="email" type="text" name="email" class="" />
+          <input v-model="email" class="" name="email" type="text" />
           <div class="h-10 py-3">Password:</div>
           <input
             v-model="password"
@@ -39,39 +39,28 @@
           <input
             v-if="!showPassword"
             v-model="repeatedPassword"
-            type="password"
             name="repeatedPassword"
+            type="password"
           />
           <div class="flex flex-row">
             <div class="flex flex-row justify-center">
-              <div class="h-10 py-3">Show Password:</div>
+              <div class="h-16 py-3 align-middle">Show Password:</div>
               <input
                 v-model="showPassword"
-                type="checkbox"
                 name="showPassword"
+                type="checkbox"
               />
             </div>
-            <div class="h-10 p-1">{{ strength.toString }}</div>
+            <div class="h-16 p-1">{{ strength.toString }}</div>
           </div>
-          <button type="submit" name="submit" value="submit">Submit</button>
+          <button name="submit" type="submit" value="submit">Submit</button>
         </form>
       </DialogPanel>
     </div>
   </Dialog>
-
-  <!--div class="bg-yellow-500 flex justify-center items-center">
-    <form class="flex flex-col h-10" @submit="submit">
-      <div class="h-10 p-1">Username:</div>
-      <input v-model="username" type="text" name="email" class="" />
-      <div class="h-10 p-1">Password:</div>
-      <input v-model="password" type="password" name="password" />
-      <div class="h-10 p-1">{{ strength.toString }}</div>
-      <button type="submit" name="submit" value="submit">Submit</button>
-    </form>
-  </div-->
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { computed, ref } from "vue";
 import {
   Dialog,
@@ -80,12 +69,17 @@ import {
   DialogTitle,
 } from "@headlessui/vue";
 import { FeedbackType } from "@zxcvbn-ts/core/dist/types";
-import axios from "axios";
 import { useZxcvbn } from "~/composables/useZxcvbn";
+import { useAPI } from "~/composables/useAPI";
 
 const isLogin = ref<boolean>(true);
 
+const props = defineProps({
+  open: { type: Boolean, required: false, default: false },
+});
+
 const zxcvbn = useZxcvbn();
+const api = useAPI();
 
 const email = ref<string>("");
 const password = ref<string>("");
@@ -135,32 +129,23 @@ function signup(event) {
     return;
   }
 
-  axios
-    .post("http://localhost:8080/api/auth/signup", {
-      params: {
-        email: email.value,
-        password: password.value,
-      },
-    })
-    .then((response) => {
-      console.log(response);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+  api.auth.register(email.value, password.value).then((response) => {
+    if (response.status === 201) {
+      alert(response.data);
+    } else {
+      alert("Error while registering");
+    }
+  });
 }
+
 function login(event) {
   event.preventDefault();
-  axios
-    .post("http://localhost:8080/api/auth/login", {
-      email: email.value,
-      password: password.value,
-    })
-    .then((response) => {
-      console.log(response);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+  api.auth.login(email.value, password.value).then((response) => {
+    if (response.status === 200) {
+      alert("Successfully logged in");
+    } else {
+      alert("Error while logging in");
+    }
+  });
 }
 </script>

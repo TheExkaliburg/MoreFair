@@ -1,5 +1,6 @@
 package de.kaliburg.morefair.security;
 
+import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
@@ -13,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Slf4j
@@ -31,10 +33,13 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     String password = super.obtainPassword(request);
     password = password != null ? password : "";
 
-    String uuid = accountService.findByUsername(username).getUuid().toString();
+    AccountEntity account = accountService.findByUsername(username);
+    if (account == null) {
+      throw new UsernameNotFoundException("User not found");
+    }
 
     UsernamePasswordAuthenticationToken authenticationToken =
-        new UsernamePasswordAuthenticationToken(uuid, password);
+        new UsernamePasswordAuthenticationToken(account.getUuid().toString(), password);
 
     super.setDetails(request, authenticationToken);
 

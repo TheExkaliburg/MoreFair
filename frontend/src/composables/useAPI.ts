@@ -1,8 +1,9 @@
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import Cookies from "js-cookie";
-import { useAccountStore } from "~/store/account";
 
 const isDevMode = process.env.NODE_ENV !== "production";
+
+axios.defaults.withCredentials = true;
 
 axios.interceptors.request.use(
   function (config: AxiosRequestConfig) {
@@ -10,37 +11,17 @@ axios.interceptors.request.use(
       config.baseURL = "http://localhost:8080";
     }
 
-    const accessToken = Cookies.get("accessToken");
-    if (!accessToken) return config;
+    const xsrfToken = Cookies.get("XSRF-TOKEN");
+    if (!xsrfToken) return config;
 
     config.headers = {
       ...config.headers,
-      Authorization: `Bearer ${accessToken}`,
+      "X-XSRF-TOKEN": xsrfToken,
     };
 
     return config;
   },
   (error: AxiosError) => Promise.reject(error)
-);
-
-axios.interceptors.response.use(
-  (response: AxiosResponse) => response,
-  async (error: AxiosError) => {
-    const config = error?.config;
-    const url = config?.url;
-
-    if (error?.response?.status === 403 && !url.endsWith("/api/auth/refresh")) {
-      const response = await API.auth.refresh(Cookies.get("refreshToken"));
-
-      if (response.status < 300) {
-        useAccountStore().accessToken = response.data.accessToken;
-        useAccountStore().refreshToken = response.data.refreshToken;
-        return axios(config);
-      }
-    }
-    console.log(error);
-    return Promise.reject(error);
-  }
 );
 
 const API = {
@@ -78,6 +59,12 @@ const API = {
       params.append("password", password);
       return axios.post("/api/auth/password/reset", params);
     },
+    logout: () => {
+      return axios.post("/api/auth/logout");
+    },
+    authenticationStatus: () => {
+      return axios.get("/api/auth");
+    },
   },
   account: {
     changeDisplayName: (displayName: string) => {
@@ -92,5 +79,9 @@ const API = {
 };
 
 export const useAPI = () => {
+  const xsrfToken = Cookies.get("XSRF-TOKEN");
+  if (!xsrfToken) {
+    API.auth.authenticationStatus().then((_) => {});
+  }
   return API;
 };

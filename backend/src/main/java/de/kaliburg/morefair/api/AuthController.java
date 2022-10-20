@@ -57,15 +57,15 @@ public class AuthController {
           .expireAfterWrite(1, TimeUnit.HOURS)
           .build(uuid -> "");
 
-  // TODO: forgotPassword + sendToken via Mail
-  // TODO: resetPassword with the previously sent token
-  // TODO: revokeJwtTokens for a specific user
-  // TODO: config for server-paths to put into mails
+  // TODO: _uuid cookie automatisch setzen (registerGuest), lesen (upgradeAccount) und löschen
+  //  (upgradeAccount)
+  // TODO: auto reroute to /game on successful login
+  // TODO: auto reroute to / if not authenticated
+  // TODO: Websockets via HttpSession
 
   @GetMapping
-  public ResponseEntity<?> getSessionStatus(HttpServletRequest request) {
-    HttpSession session = request.getSession(false);
-    return ResponseEntity.ok(session != null);
+  public ResponseEntity<?> getAuthenticationStatus(Authentication authentication) {
+    return ResponseEntity.ok(authentication != null && authentication.isAuthenticated());
   }
 
   @PostMapping(value = "/register", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
@@ -283,16 +283,6 @@ public class AuthController {
     URI uri = HttpUtils.createCreatedUri("/api/auth/signup/guest");
     return ResponseEntity.created(uri).body(account.getUsername());
   }
-
-  /*
-  @PostMapping(value = "/logout")
-  public ResponseEntity<?> logout(HttpServletRequest request) {
-    HttpSession session = request.getSession(false);
-    if (session != null) {
-      session.invalidate();
-    }
-    return ResponseEntity.ok("Logged out");
-  }*/
 }
 
 @Data
