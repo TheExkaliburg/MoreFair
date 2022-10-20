@@ -26,5 +26,8 @@ public interface AccountRepository extends JpaRepository<AccountEntity, Long> {
   List<AccountEntity> findByAccessRoleOrderByIdAsc(
       @Param("accessRole") AccountAccessRole accessRole);
 
+  List<AccountEntity> findTop100ByUsernameContainsIgnoreCaseOrderByLastLoginDesc(
+      @Param("username") @NonNull String username);
+
 
 }
