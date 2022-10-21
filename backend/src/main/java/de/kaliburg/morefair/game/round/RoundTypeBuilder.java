@@ -52,6 +52,12 @@ public class RoundTypeBuilder {
 
   public Set<RoundType> build() {
     Set<RoundType> roundTypes = EnumSet.noneOf(RoundType.class);
+    if (roundNumber == 100) {
+      roundSpeedTypeWeights.put(RoundType.DEFAULT, 0.f);
+      roundSpeedTypeWeights.put(RoundType.FAST, 0.f);
+      roundAutoTypeWeights.put(RoundType.DEFAULT, 0.f);
+      roundChaosTypeWeights.put(RoundType.DEFAULT, 0.f);
+    }
 
     roundTypes.add(getRandomLadderType(roundSpeedTypeWeights, "Speed"));
     roundTypes.add(getRandomLadderType(roundAutoTypeWeights, "Auto"));
