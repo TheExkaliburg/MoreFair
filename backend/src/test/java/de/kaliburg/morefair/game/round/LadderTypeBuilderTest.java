@@ -61,7 +61,7 @@ class LadderTypeBuilderTest {
   }
 
   @Test
-  void buildLadderTypes_allRoundAndLadderTypes_DefaultOnlyAlone() {
+  void build_allRoundAndLadderTypes_DefaultOnlyAlone() {
     ladderTypesListMap.forEach((key, value) -> value.forEach(ladderTypes -> {
       if (ladderTypes.size() > 1) {
         assertThat(ladderTypes).doesNotContain(LadderType.DEFAULT);
@@ -77,6 +77,7 @@ class LadderTypeBuilderTest {
         assertThat(ladderTypes).doesNotContain(LadderType.DEFAULT);
       }
     });
+    log.info("FAST: {}", countMapMap.get(EnumSet.of(RoundType.FAST)));
   }
 
 }

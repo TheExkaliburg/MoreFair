@@ -1,6 +1,8 @@
 package de.kaliburg.morefair.game.round;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,9 +31,11 @@ class RoundTypeBuilderTest {
   }
 
   @Test
-  void buildRoundTypes_allRoundTypes_DefaultOnlyAlone() {
+  void build_allRoundTypes_DefaultOnlyAlone() {
     roundTypesList.forEach(roundTypes -> {
-      countMap.merge(roundTypes, 1, Integer::sum);
+      if (roundTypes.size() > 1) {
+        assertThat(roundTypes).doesNotContain(RoundType.DEFAULT);
+      }
     });
 
     log.info("{}", countMap);
