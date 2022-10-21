@@ -5,7 +5,7 @@
     <div class="text-5xl text-text">FairGame</div>
     <div class="flex flex-row justify-center content-center">
       <FairButton @click="registerGuest">Play as Guest</FairButton>
-      <FairButton @click="isLoginModalOpen.value = true">Login</FairButton>
+      <FairButton @click="openLoginModal">Login</FairButton>
     </div>
     <div class="text-text">Guest-UUID: {{ accountStore.uuid }}</div>
     <div class="text-text">
@@ -39,7 +39,19 @@ onBeforeMount(() => {
   }
 });
 
-function registerGuest() {
+async function openLoginModal() {
+  if (accountStore.authenticationStatus) {
+    return await navigateTo("/game");
+  }
+
+  isLoginModalOpen.value = true;
+}
+
+async function registerGuest() {
+  if (accountStore.authenticationStatus) {
+    await navigateTo("/game");
+  }
+
   if (
     accountStore.isGuest ||
     confirm(

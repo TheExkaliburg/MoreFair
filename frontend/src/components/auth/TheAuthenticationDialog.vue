@@ -44,14 +44,16 @@
           />
           <div class="flex flex-row">
             <div class="flex flex-row justify-center">
-              <div class="h-16 py-3 align-middle">Show Password:</div>
+              <div class="h-10 p-2 align-middle">Show Password:</div>
               <input
                 v-model="showPassword"
+                class="p-2"
                 name="showPassword"
                 type="checkbox"
               />
+
+              <div class="h-10 p-2">{{ strength.toString }}</div>
             </div>
-            <div class="h-16 p-1">{{ strength.toString }}</div>
           </div>
           <button name="submit" type="submit" value="submit">Submit</button>
         </form>
