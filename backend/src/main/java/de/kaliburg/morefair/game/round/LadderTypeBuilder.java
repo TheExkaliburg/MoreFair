@@ -43,10 +43,6 @@ public class LadderTypeBuilder {
   }
 
   private void handlePreviousLadderType(LadderType ladderType) {
-    if (previousLadderType.contains(ladderType)) {
-      return;
-    }
-
     // CHAOS disables back to back protection but promotes a different ladder Type each time
     if (roundTypes.contains(RoundType.CHAOS)) {
       if (ladderSizeTypeWeights.containsKey(ladderType)) {
@@ -72,14 +68,9 @@ public class LadderTypeBuilder {
         // do nothing
       }
     }
-    previousLadderType.add(ladderType);
   }
 
   private void handleRoundTypes(RoundType roundType) {
-    if (roundTypes.contains(roundType)) {
-      return;
-    }
-
     switch (roundType) {
       case FAST -> {
         ladderSizeTypeWeights.put(LadderType.SMALL, ladderSizeTypeWeights.get(LadderType.DEFAULT));
@@ -115,8 +106,6 @@ public class LadderTypeBuilder {
         // do nothing
       }
     }
-
-    roundTypes.add(roundType);
   }
 
   public Set<LadderType> build() {
