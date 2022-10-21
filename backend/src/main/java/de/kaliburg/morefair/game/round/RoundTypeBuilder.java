@@ -25,7 +25,7 @@ public class RoundTypeBuilder {
 
   @Setter
   @Accessors(chain = true)
-  private Integer roundNumber;
+  private Integer roundNumber = 1;
 
   public RoundTypeBuilder() {
     roundSpeedTypeWeights.put(RoundType.FAST, 20.f);
@@ -41,13 +41,8 @@ public class RoundTypeBuilder {
 
   // TODO: add reference to last Round into this method
   private void handlePreviousRoundType(RoundType roundType) {
-    if (previousRoundType.contains(roundType)) {
-      return;
-    }
-
     // Logic goes here
 
-    previousRoundType.add(roundType);
   }
 
   public Set<RoundType> build() {
@@ -58,6 +53,8 @@ public class RoundTypeBuilder {
       roundAutoTypeWeights.put(RoundType.DEFAULT, 0.f);
       roundChaosTypeWeights.put(RoundType.DEFAULT, 0.f);
     }
+
+    roundTypes.forEach(this::handlePreviousRoundType);
 
     roundTypes.add(getRandomLadderType(roundSpeedTypeWeights, "Speed"));
     roundTypes.add(getRandomLadderType(roundAutoTypeWeights, "Auto"));
