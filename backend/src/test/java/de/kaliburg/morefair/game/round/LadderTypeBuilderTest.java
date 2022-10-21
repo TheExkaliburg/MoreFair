@@ -8,16 +8,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 @Slf4j
 class LadderTypeBuilderTest {
 
-  
-  @Test
-  void buildLadderTypes_multipleTimesAllCategories_noDoubleCategories() {
+  static List<Set<RoundType>> roundTypesList = new ArrayList<>();
+  static HashMap<Set<RoundType>, List<Set<LadderType>>> ladderTypesListMap = new HashMap<>();
+  static HashMap<Set<RoundType>, HashMap<Set<LadderType>, Integer>> countMapMap = new HashMap<>();
 
-    List<Set<RoundType>> roundTypesList = new ArrayList<>();
+  @BeforeAll
+  static void init() {
     roundTypesList.add(EnumSet.of(RoundType.DEFAULT));
     roundTypesList.add(EnumSet.of(RoundType.FAST));
     roundTypesList.add(EnumSet.of(RoundType.SLOW));
@@ -30,8 +32,6 @@ class LadderTypeBuilderTest {
     roundTypesList.add(EnumSet.of(RoundType.AUTO, RoundType.CHAOS));
     roundTypesList.add(EnumSet.of(RoundType.SLOW, RoundType.AUTO, RoundType.CHAOS));
     roundTypesList.add(EnumSet.of(RoundType.FAST, RoundType.AUTO, RoundType.CHAOS));
-
-    StringBuilder sb = new StringBuilder();
 
     roundTypesList.forEach(roundTypes -> {
       List<Set<LadderType>> ladderTypesList = new ArrayList<>();
@@ -46,6 +46,7 @@ class LadderTypeBuilderTest {
         ladderTypesList.add(result);
         lastRoundTypes = result;
       }
+      ladderTypesListMap.put(roundTypes, ladderTypesList);
 
       HashMap<Set<LadderType>, Integer> countMap = new HashMap<>();
       ladderTypesList.forEach(ladderTypes -> {
@@ -55,38 +56,27 @@ class LadderTypeBuilderTest {
 
         countMap.merge(ladderTypes, 1, Integer::sum);
       });
-
-      sb.append(roundTypes.toString()).append(countMap).append("\n\n");
+      countMapMap.put(roundTypes, countMap);
     });
-
-    log.info("\n{}", sb);
   }
 
   @Test
-  void build_multipleTimesFastRound_noBigGigantic() {
-    List<Set<LadderType>> ladderTypesList = new ArrayList<>();
-    Set<LadderType> lastRoundTypes = EnumSet.noneOf(LadderType.class);
-    for (int i = 0; i < 10000; i++) {
-      LadderTypeBuilder builder = new LadderTypeBuilder();
-      builder.setLadderNumber(2);
-      builder.setAssholeLadderNumber(25);
-      builder.setRoundTypes(EnumSet.of(RoundType.FAST));
-      builder.setPreviousLadderType(lastRoundTypes);
-      Set<LadderType> result = builder.build();
-      ladderTypesList.add(result);
-      lastRoundTypes = result;
-    }
-
-    HashMap<Set<LadderType>, Integer> countMap = new HashMap<>();
-    ladderTypesList.forEach(ladderTypes -> {
+  void buildLadderTypes_allRoundAndLadderTypes_DefaultOnlyAlone() {
+    ladderTypesListMap.forEach((key, value) -> value.forEach(ladderTypes -> {
       if (ladderTypes.size() > 1) {
         assertThat(ladderTypes).doesNotContain(LadderType.DEFAULT);
       }
+    }));
+    log.info("{}", countMapMap);
+  }
 
-      countMap.merge(ladderTypes, 1, Integer::sum);
+  @Test
+  void build_FastRoundsAndAllLadderTypes_noBigGigantic() {
+    ladderTypesListMap.get(EnumSet.of(RoundType.FAST)).forEach(ladderTypes -> {
+      if (ladderTypes.size() > 1) {
+        assertThat(ladderTypes).doesNotContain(LadderType.DEFAULT);
+      }
     });
-
-    log.info("{}", countMap);
   }
 
 }
