@@ -54,6 +54,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
       session.invalidate();
     }
 
+    request.getSession();
     SecurityContext context = SecurityContextHolder.createEmptyContext();
     context.setAuthentication(authResult);
     SecurityContextHolder.setContext(context);
