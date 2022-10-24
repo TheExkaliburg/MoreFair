@@ -1,5 +1,25 @@
 import { Client } from "@stomp/stompjs";
 
+export type IOnTickBody = {
+  delta: number;
+};
+
+export type IStompCallbacks = {
+  onTick: ((body: IOnTickBody) => void)[];
+  onLoadLadder: (() => void)[];
+  onLoadChat: (() => void)[];
+  onNewMessage: (() => void)[];
+  onGameEvent: (() => void)[];
+};
+
+const callbacks: IStompCallbacks = {
+  onTick: [],
+  onLoadLadder: [],
+  onLoadChat: [],
+  onNewMessage: [],
+  onGameEvent: [],
+};
+
 const isDevMode = process.env.NODE_ENV !== "production";
 const connection = isDevMode
   ? "ws://localhost:8080/api/fairsocket"
@@ -15,29 +35,16 @@ const client = new Client({
   heartbeatOutgoing: 4000,
 });
 
-client.onConnect = (frame) => {
-  console.log("Connected: " + frame);
+client.onConnect = (_) => {
+  client.subscribe("/topic/game/tick", (message) => {
+    const body: IOnTickBody = JSON.parse(message.body);
+    callbacks.onTick.forEach((callback) => callback(body));
+  });
 };
 
 client.onStompError = (frame) => {
   console.log("Broker reported error: " + frame.headers.message);
   console.log("Additional details: " + frame.body);
-};
-
-export interface IStompCallbacks {
-  onTick: (() => void)[];
-  onLoadLadder: (() => void)[];
-  onLoadChat: (() => void)[];
-  onNewMessage: (() => void)[];
-  onGameEvent: (() => void)[];
-}
-
-const callbacks: IStompCallbacks = {
-  onTick: [],
-  onLoadLadder: [],
-  onLoadChat: [],
-  onNewMessage: [],
-  onGameEvent: [],
 };
 
 const api = (client: Client) => {

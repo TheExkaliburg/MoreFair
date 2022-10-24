@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-green-500 flex justify-center items-center">Gemüse</div>
+  <div class="bg-green-500 flex justify-center items-center">Ladder</div>
 </template>
 
-<script setup lang="ts"></script>
+<script lang="ts" setup></script>

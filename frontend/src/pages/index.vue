@@ -20,6 +20,7 @@
 </template>
 
 <script lang="ts" setup>
+import { onMounted } from "vue";
 import { useAccountStore } from "~/store/account";
 import FairButton from "~/components/interactables/FairButton.vue";
 import TheAuthenticationDialog from "~/components/auth/TheAuthenticationDialog.vue";
@@ -29,13 +30,13 @@ definePageMeta({ layout: false });
 
 const isLoginModalOpen = ref<boolean>(false);
 
-onBeforeMount(() => {
+onMounted(() => {
   // If guest-uuid exists try logging in
   if (accountStore.isGuest) {
     accountStore.login(accountStore.uuid, accountStore.uuid);
   }
   if (accountStore.authenticationStatus) {
-    console.log("Logged in");
+    return navigateTo("/game");
   }
 });
 

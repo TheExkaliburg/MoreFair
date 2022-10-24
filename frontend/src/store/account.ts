@@ -45,7 +45,6 @@ export const useAccountStore = defineStore("account", () => {
   }
 
   function login(username: string, password: string) {
-    console.debug("Logging in...");
     API.auth.login(username, password).then((response) => {
       // 200 - OK
       if (response.status === 200) {
