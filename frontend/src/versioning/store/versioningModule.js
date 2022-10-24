@@ -5,7 +5,7 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
-        new Version("PATCH", "CHAOS and SLOW Round Modifier", {
+        new Version("MINOR", "CHAOS and SLOW Round Modifier", {
           features: [
             "CHAOS rounds have an equal chance to be TINY, SMALL, BIG or GIGANTIC.",
             "CHAOS rounds have a random length between base Asshole-Ladder and 25, ignoring the scaling from AH points.",
