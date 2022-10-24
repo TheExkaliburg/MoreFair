@@ -52,6 +52,16 @@ public class RoundTypeBuilder {
       roundSpeedTypeWeights.put(RoundType.FAST, 0.f);
       roundAutoTypeWeights.put(RoundType.DEFAULT, 0.f);
       roundChaosTypeWeights.put(RoundType.DEFAULT, 0.f);
+    } else if (roundNumber % 10 == 0) {
+      roundSpeedTypeWeights.put(RoundType.FAST, 1.f);
+      roundSpeedTypeWeights.put(RoundType.SLOW, 1.f);
+      roundSpeedTypeWeights.put(RoundType.DEFAULT, 1.f);
+
+      roundAutoTypeWeights.put(RoundType.AUTO, 1.f);
+      roundAutoTypeWeights.put(RoundType.DEFAULT, 1.f);
+
+      roundChaosTypeWeights.put(RoundType.CHAOS, 1.f);
+      roundChaosTypeWeights.put(RoundType.DEFAULT, 1.f);
     }
 
     roundTypes.forEach(this::handlePreviousRoundType);

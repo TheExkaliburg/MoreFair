@@ -5,13 +5,12 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
-        new Version("PATCH", "CHAOS Round Modifier", {
+        new Version("PATCH", "CHAOS and SLOW Round Modifier", {
           features: [
-            "The CHAOS round modifier has been added, with a 10% chance to appear.",
-            "Each ladder in a CHAOS round has an equal chance to be TINY, SMALL, DEFAULT, BIG or GIGANTIC.",
-            "The same ladder size can be rolled back-to-back.",
+            "CHAOS rounds have an equal chance to be TINY, SMALL, BIG or GIGANTIC.",
             "CHAOS rounds have a random length between base Asshole-Ladder and 25, ignoring the scaling from AH points.",
-            "When CHAOS is rolled alongside FAST, the equal ladder size chance still applies.",
+            "SLOW rounds have an higher Chance to roll BIG and GIGANTIC but less chance for SMALL and TINY",
+            "SLOW rounds have a flat +5 modifier to their length and their base Asshole Ladder.",
           ],
           fixes: [
             "The first ladder of a [FAST,AUTO] round should now be correctly marked as [SMALL].",
