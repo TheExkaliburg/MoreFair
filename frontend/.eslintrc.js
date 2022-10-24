@@ -19,5 +19,12 @@ module.exports = {
         "vue/multi-word-component-names": "off",
       },
     },
+    {
+      files: ["src/**/*.vue"],
+      rules: {
+        "vue/no-v-for-template-key-on-child": "error",
+        "vue/no-v-for-template-key": "off",
+      },
+    },
   ],
 };
