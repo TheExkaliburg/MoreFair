@@ -6,7 +6,7 @@ const versioningModule = {
     return {
       versions: [
         new Version("PATCH", "Round- and LadderType Bugfixes", {
-          fix: [
+          fixes: [
             "Fixed a bug where SLOW would have 2/3 of their ladders FREE_AUTO",
             "CHAOS now gets applied before SLOW/FAST and should create even more interesting behaviour",
           ],

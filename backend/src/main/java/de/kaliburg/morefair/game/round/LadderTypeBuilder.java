@@ -52,7 +52,6 @@ public class LadderTypeBuilder {
         ladderAutoTypeWeights.put(ladderType, ladderAutoTypeWeights.get(ladderType) / 2);
       }
 
-      previousLadderType.add(ladderType);
       return;
     }
 
