@@ -64,7 +64,7 @@ public class RoundTypeBuilder {
       roundChaosTypeWeights.put(RoundType.DEFAULT, 1.f);
     }
 
-    roundTypes.forEach(this::handlePreviousRoundType);
+    roundTypes.stream().sorted(new RoundTypeComparator()).forEach(this::handlePreviousRoundType);
 
     roundTypes.add(getRandomLadderType(roundSpeedTypeWeights, "Speed"));
     roundTypes.add(getRandomLadderType(roundAutoTypeWeights, "Auto"));

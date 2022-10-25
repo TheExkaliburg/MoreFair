@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
@@ -78,6 +79,24 @@ class LadderTypeBuilderTest {
       }
     });
     log.info("FAST: {}", countMapMap.get(EnumSet.of(RoundType.FAST)));
+  }
+
+  @Test
+  void test() {
+
+    for (int i = 0; i < 10; i++) {
+      Set<LadderType> set = new HashSet<>();
+      set.add(LadderType.DEFAULT);
+      set.add(LadderType.SMALL);
+      set.add(LadderType.TINY);
+      set.add(LadderType.NO_AUTO);
+      set.add(LadderType.FREE_AUTO);
+      set.add(LadderType.BIG);
+      System.out.println("");
+      set.stream().sorted(new LadderTypeComparator()).forEach(ladderType -> {
+        System.out.print(ladderType + " " + ladderType.ordinal() + ", ");
+      });
+    }
   }
 
 }

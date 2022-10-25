@@ -102,7 +102,7 @@ public class LadderTypeBuilder {
         ladderSizeTypeWeights.put(LadderType.TINY, ladderSizeTypeWeights.get(LadderType.TINY) / 2);
         ladderAutoTypeWeights.put(LadderType.NO_AUTO, 0.f);
         ladderAutoTypeWeights.put(LadderType.FREE_AUTO,
-            ladderAutoTypeWeights.get(LadderType.DEFAULT) * 2);
+            ladderAutoTypeWeights.get(LadderType.FREE_AUTO) * 2);
       }
       default -> {
         // do nothing
@@ -126,8 +126,9 @@ public class LadderTypeBuilder {
       ladderSizeTypeWeights.put(LadderType.GIGANTIC, 0.f);
     }
 
-    this.roundTypes.forEach(this::handleRoundTypes);
-    this.previousLadderType.forEach(this::handlePreviousLadderType);
+    this.roundTypes.stream().sorted(new RoundTypeComparator()).forEach(this::handleRoundTypes);
+    this.previousLadderType.stream().sorted(new LadderTypeComparator())
+        .forEach(this::handlePreviousLadderType);
 
     if (ladderNumber >= assholeLadderNumber) {
       ladderAutoTypeWeights.put(LadderType.NO_AUTO,
