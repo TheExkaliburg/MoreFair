@@ -5,6 +5,12 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "Round- and LadderType Bugfixes", {
+          fix: [
+            "Fixed a bug where SLOW would have 2/3 of their ladders FREE_AUTO",
+            "CHAOS now gets applied before SLOW/FAST and should create even more interesting behaviour",
+          ],
+        }),
         new Version("MINOR", "CHAOS and SLOW Round Modifier", {
           features: [
             "CHAOS rounds have an equal chance to be TINY, SMALL, BIG or GIGANTIC.",
