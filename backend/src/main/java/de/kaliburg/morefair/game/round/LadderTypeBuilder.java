@@ -52,7 +52,6 @@ public class LadderTypeBuilder {
         ladderAutoTypeWeights.put(ladderType, ladderAutoTypeWeights.get(ladderType) / 2);
       }
 
-      previousLadderType.add(ladderType);
       return;
     }
 
@@ -84,7 +83,7 @@ public class LadderTypeBuilder {
             ladderAutoTypeWeights.get(LadderType.DEFAULT));
         ladderAutoTypeWeights.put(LadderType.DEFAULT, 0.f);
         ladderAutoTypeWeights.put(LadderType.NO_AUTO,
-            ladderAutoTypeWeights.get(LadderType.NO_AUTO) * 2.5f);
+            ladderAutoTypeWeights.get(LadderType.NO_AUTO) * 2f);
       }
       case CHAOS -> {
         ladderSizeTypeWeights.put(LadderType.TINY, 1.f);
@@ -101,6 +100,8 @@ public class LadderTypeBuilder {
             ladderSizeTypeWeights.get(LadderType.SMALL) / 2);
         ladderSizeTypeWeights.put(LadderType.TINY, ladderSizeTypeWeights.get(LadderType.TINY) / 2);
         ladderAutoTypeWeights.put(LadderType.NO_AUTO, 0.f);
+        ladderAutoTypeWeights.put(LadderType.FREE_AUTO,
+            ladderAutoTypeWeights.get(LadderType.FREE_AUTO) * 2);
       }
       default -> {
         // do nothing
@@ -120,8 +121,13 @@ public class LadderTypeBuilder {
       ladderAutoTypeWeights.put(LadderType.NO_AUTO, 0.f);
     }
 
-    this.roundTypes.forEach(this::handleRoundTypes);
-    this.previousLadderType.forEach(this::handlePreviousLadderType);
+    if (ladderNumber > 25) {
+      ladderSizeTypeWeights.put(LadderType.GIGANTIC, 0.f);
+    }
+
+    this.roundTypes.stream().sorted(new RoundTypeComparator()).forEach(this::handleRoundTypes);
+    this.previousLadderType.stream().sorted(new LadderTypeComparator())
+        .forEach(this::handlePreviousLadderType);
 
     if (ladderNumber >= assholeLadderNumber) {
       ladderAutoTypeWeights.put(LadderType.NO_AUTO,
