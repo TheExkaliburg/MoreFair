@@ -1,82 +1,32 @@
 <template>
-  <div
-    class="absolute inset-x-2 bottom-1 flex flex-col"
-    @keydown.down.prevent=""
-    @keydown.up.prevent=""
-  >
-    <div v-if="input.includes('@') && filteredMentions.length > 0">
-      <ul
-        v-for="(s, index) in filteredMentions"
-        :key="index"
-        class="bg-gray-300"
-      >
-        <li>{{ s.name }}#{{ s.id }}</li>
-      </ul>
-    </div>
-    <div class="flex flex-row">
-      <input
-        ref="inputField"
-        v-model="input"
-        class="basis-4/5 w-full px-2 text-black rounded-l-md"
+  <div class="flex flex-col justify-around text-md lg:text-xl">
+    <div class="flex flex-row justify-center items-center relative w-full">
+      <div
+        class="w-full rounded-l-md border-1 border-button-border p-1 outline-0 overflow-x-hidden text-text"
+        contenteditable
+        role="textbox"
+        spellcheck="false"
         type="text"
-      />
-      <button class="h-8 basis-1/5 px-2 bg-blue-500 rounded-r-md">Send</button>
+      ></div>
+      <div
+        class="absolute left-1 pointer-events-none p-1 text-text-placeholder"
+      >
+        Chat is listening...
+      </div>
+      <button
+        class="w-1/4 rounded-r-md border-l-0 border-1 border-button-border py-1 text-button-text hover:text-button-text-hover hover:bg-button-bg-hover"
+      >
+        Send
+      </button>
+    </div>
+    <div class="text-xs lg:text-xs text-left w-full px-2 text-text-light">
+      Message length: 0 / 280
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-export type Ranker = { name: string; id: number };
+import { useDomUtils } from "~/composables/useDomUtils";
 
-const mentions: Ranker[] = [
-  { name: "Kali", id: 11235 },
-  { name: "Lynn", id: 6969 },
-  { name: "Grapes", id: 1913 },
-];
-
-const input = ref<string>("");
-const inputField = ref<HTMLInputElement | null>(null);
-
-const filteredMentions = computed<Ranker[]>(() => {
-  // filter the mentions and sort them based of the index where the mentionSearch is found
-  if (!isNaN(mentionIdSearch.value)) {
-    return mentions
-      .filter((m) => String(m.id).includes(String(mentionIdSearch.value)))
-      .sort((a, b) => {
-        const aIndex = String(a.id).indexOf(String(mentionIdSearch.value));
-        const bIndex = String(b.id).indexOf(String(mentionIdSearch.value));
-        return aIndex !== bIndex ? aIndex - bIndex : a.id - b.id;
-      });
-  }
-
-  return mentions
-    .filter((s) => s.name.toLowerCase().includes(mentionSearch.value))
-    .sort((a, b) => {
-      const aIndex = a.name.toLowerCase().indexOf(mentionSearch.value);
-      const bIndex = b.name.toLowerCase().indexOf(mentionSearch.value);
-      return aIndex !== bIndex ? aIndex - bIndex : a.id - b.id;
-    });
-});
-
-const mentionIdSearch = computed<number>(() => {
-  if (!mentionSearch.value.startsWith("#")) {
-    return NaN;
-  }
-  return parseInt(mentionSearch.value.split("#")[1]);
-});
-
-const mentionSearch = computed<string>(() => {
-  const mentionParts = lastPreString.value.split("@");
-  const lastMentionParts = mentionParts[mentionParts.length - 1];
-
-  return lastMentionParts.toLowerCase();
-});
-
-const lastPreString = computed<string>(() => {
-  if (!inputField.value) return "";
-
-  const preString = input.value.substring(0, inputField.value.selectionStart);
-  const preStringParts = preString.split(" ");
-  return preStringParts[preStringParts.length - 1];
-});
+useDomUtils();
 </script>

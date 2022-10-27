@@ -17,6 +17,7 @@ module.exports = {
           },
           border: {
             DEFAULT: "var(--button-border-color)",
+            hover: "var(--button-border-hover-color)",
           },
         },
         toggle: {
@@ -35,7 +36,19 @@ module.exports = {
         },
         text: {
           DEFAULT: "var(--text-color)",
+          light: "var(--text-light-highlight-color)",
+          dark: "var(--text-dark-highlight-color)",
+          placeholder: "var(--text-placeholder-color)",
         },
+        background: {
+          DEFAULT: "var(--background-color)",
+        },
+      },
+      fontSize: {
+        "2xs": "0.64rem",
+        "3xs": "0.512rem",
+        "4xs": "0.41rem",
+        "5xs": "0.328rem",
       },
     },
   },

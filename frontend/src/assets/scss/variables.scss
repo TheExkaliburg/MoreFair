@@ -61,7 +61,6 @@ $color-saltpan: #ebede9;
   --background-color: #{$color-black-russian-1};
   --background-dark-color: #{$color-black-russian-2};
   --background-light-color: #{$color-black-pearl};
-  --placeholder-color: #{$color-claret};
   --item-selected-color: #{$color-tangaroa};
 
   // Text
@@ -69,6 +68,7 @@ $color-saltpan: #ebede9;
   --text-color: #{$color-givry};
   --text-light-highlight-color: var(--main-secondary-color);
   --text-dark-highlight-color: #{$color-dark-coral};
+  --text-placeholder-color: #{$color-claret};
   --text-error-color: var(--placeholder-color);
 
   // Buttons
@@ -76,7 +76,8 @@ $color-saltpan: #ebede9;
   --button-bg-hover-color: var(--main-color);
   --button-text-color: var(--main-color);
   --button-text-hover-color: var(--background-color);
-  --button-border-color: var(--background-color);
+  --button-border-color: var(--main-color);
+  --button-border-hover-color: var(--background-color);
 
   // Toggle Buttons
   --toggle-bg-on-color: var(--main-color);
