@@ -1,9 +1,7 @@
 <template>
-  <span>
-    <span v-for="part in messageParts" :key="part">
-      <!-- Plain Message -->
+  <div>
+    <template v-for="part in messageParts" :key="part">
       <span v-if="part.is(MessagePartType.plain)">{{ part.text }}</span>
-      <!-- UserMentions -->
       <span
         v-else-if="part.is(MessagePartType.mentionUser)"
         class="text-text-light"
@@ -14,17 +12,15 @@
         class="text-text-dark"
         >#{{ part.text }}
       </sub>
-      <!-- GroupMentions -->
       <span v-else-if="part.is(MessagePartType.mentionGroup)"
         ><span class="text-text-dark">$</span>{{ part.text
         }}<span class="text-text-dark">$</span>
       </span>
-      <!-- Unimplemented -->
-      <span v-else>
+      <span v-else class="text-red-500">
         {{ part.text }}
       </span>
-    </span>
-  </span>
+    </template>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -59,7 +55,7 @@ class MessagePart {
 }
 
 const messageParts = computed<MessagePart[]>(() => {
-  let message = props.message.message;
+  const message = props.message.message;
   const metadata = props.message.metadata;
   const result: MessagePart[] = [];
 
@@ -80,14 +76,13 @@ const messageParts = computed<MessagePart[]>(() => {
     if (isGroup) {
       let name = m.g;
       name = name.trim();
-      if (message.slice(index, index + 3) !== "{§}") return;
+      if (message.slice(index, index + 3) !== "{$}") return;
 
       result.push(
         new MessagePart(MessagePartType.plain, message.slice(lastIndex, index))
       );
       result.push(new MessagePart(MessagePartType.mentionGroup, name));
       lastIndex = index + 3;
-      message = message.slice(lastIndex);
     } else {
       const name = m.u.trim();
       const id = m.id;
@@ -99,10 +94,10 @@ const messageParts = computed<MessagePart[]>(() => {
       result.push(new MessagePart(MessagePartType.mentionUser, name));
       result.push(new MessagePart(MessagePartType.mentionUserId, id));
       lastIndex = index + 3;
-      message = message.slice(lastIndex);
     }
   });
 
+  result.push(new MessagePart(MessagePartType.plain, message.slice(lastIndex)));
   return result;
 });
 </script>

@@ -5,9 +5,3 @@
     <slot />
   </button>
 </template>
-
-<style scoped>
-.c {
-  aspect-ratio: 1 / 1;
-}
-</style>
