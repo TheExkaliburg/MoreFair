@@ -2,9 +2,8 @@ import { defineStore } from "pinia";
 import Cookies from "js-cookie";
 import { watch } from "vue";
 
-export const useAccountStore = defineStore("account", () => {
+export const useAuthStore = defineStore("auth", () => {
   const API = useAPI();
-
   // vars
   const uuid = ref<string>(Cookies.get("_uuid") || "");
   const authenticationStatus = ref<boolean>(false);
@@ -13,39 +12,42 @@ export const useAccountStore = defineStore("account", () => {
     authenticationStatus.value = Boolean(response.data);
   });
 
+  // getters
   const isGuest = computed<boolean>(() => {
     return uuid.value !== "";
   });
+  const homeLocation = computed<string>(() => {
+    return authenticationStatus.value ? "/game" : "/";
+  });
 
   // actions
-  function registerGuest() {
+  async function registerGuest() {
     if (uuid.value !== "") {
-      login(uuid.value, uuid.value);
+      await login(uuid.value, uuid.value);
       return;
     }
 
-    API.auth.registerGuest().then((response) => {
+    await API.auth.registerGuest().then(async (response) => {
       // 201 - Created
       if (response.status === 201) {
         uuid.value = response.data;
-        login(uuid.value, uuid.value);
+        await login(uuid.value, uuid.value);
       }
     });
   }
 
-  function registerAccount(username: string, password: string) {
+  async function registerAccount(username: string, password: string) {
     // TODO
-    API.auth.register(username, password, uuid.value).then((response) => {
+    await API.auth.register(username, password, uuid.value).then((response) => {
       // 201 - Created
-      console.log(response);
       if (response.status === 201) {
         alert(response.data);
       }
     });
   }
 
-  function login(username: string, password: string) {
-    API.auth.login(username, password).then((response) => {
+  async function login(username: string, password: string) {
+    await API.auth.login(username, password).then((response) => {
       // 200 - OK
       if (response.status === 200) {
         authenticationStatus.value = true;
@@ -60,6 +62,7 @@ export const useAccountStore = defineStore("account", () => {
     });
   }
 
+  // Side effects
   watch(uuid, (value: string) => {
     if (value !== "")
       Cookies.set("_uuid", value, {
@@ -76,6 +79,7 @@ export const useAccountStore = defineStore("account", () => {
     authenticationStatus,
     // getters
     isGuest,
+    homeLocation,
     // actions
     login,
     registerGuest,

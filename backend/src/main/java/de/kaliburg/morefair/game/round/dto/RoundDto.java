@@ -7,9 +7,9 @@ import java.util.Set;
 import lombok.Data;
 
 @Data
-public class InfoDto {
+public class RoundDto {
 
-  private String pointsForPromote;
+  private String basePointsForPromote;
   private Integer minimumPeopleForPromote;
   private Integer assholeLadder;
   private String baseVinegarNeededToThrow;
@@ -18,8 +18,8 @@ public class InfoDto {
   private Integer manualPromoteWaitTime;
   private Set<RoundType> types;
 
-  public InfoDto(RoundEntity currentRound, FairConfig config) {
-    pointsForPromote = currentRound.getBasePointsRequirement().toString();
+  public RoundDto(RoundEntity currentRound, FairConfig config) {
+    basePointsForPromote = currentRound.getBasePointsRequirement().toString();
     minimumPeopleForPromote = config.getBaseAssholeLadder();
     baseVinegarNeededToThrow = config.getBaseVinegarToThrow().toString();
     autoPromoteLadder = config.getAutoPromoteLadder();

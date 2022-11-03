@@ -4,7 +4,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountEntity;
-import de.kaliburg.morefair.api.GameController;
+import de.kaliburg.morefair.api.LadderController;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.EventType;
@@ -121,7 +121,7 @@ public class RoundService {
         && ladderService.find(baseAssholeLadderNumber) == null) {
       getCurrentRound().setHighestAssholeCount(assholeCount);
       ladderService.setCurrentRound(save(getCurrentRound()));
-      wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
+      wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
           EventType.INCREASE_ASSHOLE_LADDER, account.getId(),
           roundUtils.getAssholeLadderNumber(getCurrentRound())));
     }

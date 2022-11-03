@@ -1,7 +1,7 @@
 package de.kaliburg.morefair.game.round;
 
 import de.kaliburg.morefair.account.AccountService;
-import de.kaliburg.morefair.api.GameController;
+import de.kaliburg.morefair.api.FairController;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.EventType;
@@ -68,7 +68,7 @@ public class LadderCalculator {
 
         // Otherwise, just send the default Heartbeat-Tick
         heartbeat.setDelta(deltaSec);
-        wsUtils.convertAndSendToTopic(GameController.TOPIC_TICK_DESTINATION, heartbeat);
+        wsUtils.convertAndSendToTopic(FairController.TOPIC_TICK_DESTINATION, heartbeat);
 
         // Calculate Ladder yourself
         Collection<LadderEntity> ladders = ladderService.getCurrentLadderMap().values();

@@ -7,8 +7,8 @@
       <div class="min-w-min flex flex-col justify-items-start content-around">
         <OffCanvasButton @click="uiStore.sidebarExpanded = false">
           <template #icon>
-            <NuxtLink to="/" class="flex">
-              <img src="/favicon.ico" alt="FairGame" class="w-7 h-7" />
+            <NuxtLink :to="authStore.homeLocation" class="flex">
+              <img alt="FairGame" class="w-7 h-7" src="/favicon.ico" />
               <span class="text-xl text-navbar-text"></span>
             </NuxtLink>
           </template>
@@ -33,15 +33,17 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {
   ChatBubbleLeftEllipsisIcon,
   TableCellsIcon,
 } from "@heroicons/vue/24/outline";
 import { useUiStore } from "~/store/ui";
 import OffCanvasButton from "~/components/navbar/OffCanvasSidebarButton.vue";
+import { useAuthStore } from "~/store/authentication";
 
 const uiStore = useUiStore();
+const authStore = useAuthStore();
 </script>
 
-<style scoped lang="scss"></style>
+<style lang="scss" scoped></style>

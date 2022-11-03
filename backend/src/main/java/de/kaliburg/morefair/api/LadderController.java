@@ -4,75 +4,60 @@ import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.utils.WsUtils;
-import de.kaliburg.morefair.api.websockets.messages.WsMessage;
 import de.kaliburg.morefair.api.websockets.messages.WsObservedMessage;
 import de.kaliburg.morefair.data.ModServerMessageData;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.EventType;
-import de.kaliburg.morefair.game.GameService;
 import de.kaliburg.morefair.game.round.LadderService;
 import de.kaliburg.morefair.game.round.RankerEntity;
-import de.kaliburg.morefair.game.round.RankerService;
 import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.game.round.RoundUtils;
 import de.kaliburg.morefair.game.round.dto.LadderDto;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @Log4j2
-public class GameController {
+@RequestMapping("/api/ladder")
+@RequiredArgsConstructor
+public class LadderController {
 
-  public static final String APP_INIT_DESTINATION = "/game/init/{number}";
-  public static final String APP_BIAS_DESTINATION = "/game/bias";
-  public static final String APP_MULTI_DESTINATION = "/game/multi";
-  public static final String APP_VINEGAR_DESTINATION = "/game/vinegar";
-  public static final String APP_PROMOTE_DESTINATION = "/game/promote";
-  public static final String APP_AUTOPROMOTE_DESTINATION = "/game/autopromote";
-  public static final String TOPIC_TICK_DESTINATION = "/game/tick";
-  public static final String TOPIC_EVENTS_DESTINATION = "/game/events/{number}";
-  public static final String TOPIC_GLOBAL_EVENTS_DESTINATION = "/game/events";
-  public static final String QUEUE_INIT_DESTINATION = "/game/init";
-  public static final String PRIVATE_EVENTS_DESTINATION = "/game/events";
-  private final RankerService rankerService;
+  public static final String APP_BIAS_DESTINATION = "/ladder/bias";
+  public static final String APP_MULTI_DESTINATION = "/ladder/multi";
+  public static final String APP_VINEGAR_DESTINATION = "/ladder/vinegar";
+  public static final String APP_PROMOTE_DESTINATION = "/ladder/promote";
+  public static final String APP_AUTOPROMOTE_DESTINATION = "/ladder/autopromote";
+  public static final String TOPIC_EVENTS_DESTINATION = "/ladder/events/{number}";
+  public static final String TOPIC_GLOBAL_EVENTS_DESTINATION = "/ladder/events";
+  public static final String PRIVATE_EVENTS_DESTINATION = "/ladder/events";
   private final AccountService accountService;
   private final WsUtils wsUtils;
   private final RoundService roundService;
   private final LadderService ladderService;
-  private final GameService gameService;
   private final RoundUtils roundUtils;
   private final FairConfig config;
 
-  public GameController(RankerService rankerService, AccountService accountService,
-      WsUtils wsUtils, RoundService roundService, LadderService ladderService,
-      GameService gameService, RoundUtils roundUtils, FairConfig config) {
-    this.rankerService = rankerService;
-    this.accountService = accountService;
-    this.wsUtils = wsUtils;
-    this.roundService = roundService;
-    this.ladderService = ladderService;
-    this.gameService = gameService;
-    this.roundUtils = roundUtils;
-    this.config = config;
-  }
 
-
-  @MessageMapping(APP_INIT_DESTINATION)
-  public void initLadder(SimpMessageHeaderAccessor sha, WsMessage wsMessage,
-      @DestinationVariable("number") Integer number) {
+  @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> initLadder(@RequestParam(value = "number") Integer number,
+      Authentication authentication) {
     try {
-      String uuid = wsMessage.getUuid();
-      log.debug("/app/game/init/{} from {}", number, uuid);
-      AccountEntity account = accountService.find(UUID.fromString(uuid));
+      log.debug("/app/game/init/{} from {}", number, authentication.getName());
+      AccountEntity account = accountService.findByUsername(authentication.getName());
       if (account == null || account.isBanned()) {
-        wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION, HttpStatus.FORBIDDEN);
-        return;
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       }
       RankerEntity ranker = ladderService.findFirstActiveRankerOfAccountThisRound(account);
       if (ranker == null) {
@@ -83,20 +68,17 @@ public class GameController {
           || number.equals(roundUtils.getAssholeLadderNumber(roundService.getCurrentRound()))
           || number <= ranker.getLadder().getNumber()) {
         LadderDto l = new LadderDto(ladderService.find(number), account, config);
-        wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION, l);
+        return ResponseEntity.ok(l);
       } else {
-        wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION,
-            "Can't get permission to view the ladder.",
-            HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       }
 
     } catch (IllegalArgumentException e) {
-      wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION, HttpStatus.BAD_REQUEST);
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     } catch (Exception e) {
-      wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION, e.getMessage(),
-          HttpStatus.INTERNAL_SERVER_ERROR);
       log.error(e.getMessage());
       e.printStackTrace();
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 

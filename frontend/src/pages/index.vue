@@ -7,10 +7,8 @@
       <FairButton @click="registerGuest">Play as Guest</FairButton>
       <FairButton @click="openLoginModal">Login</FairButton>
     </div>
-    <div class="text-text">Guest-UUID: {{ accountStore.uuid }}</div>
-    <div class="text-text">
-      Logged in: {{ accountStore.authenticationStatus }}
-    </div>
+    <div class="text-text">Guest-UUID: {{ authStore.uuid }}</div>
+    <div class="text-text">Logged in: {{ authStore.authenticationStatus }}</div>
     <div class="text-text"></div>
     <TheAuthenticationDialog
       :open="isLoginModalOpen"
@@ -20,48 +18,48 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted } from "vue";
-import { useAccountStore } from "~/store/account";
+import { onBeforeMount } from "vue";
+import { useAuthStore } from "~/store/authentication";
 import FairButton from "~/components/interactables/FairButton.vue";
 import TheAuthenticationDialog from "~/components/auth/TheAuthenticationDialog.vue";
 
-const accountStore = useAccountStore();
-definePageMeta({ layout: false });
+const authStore = useAuthStore();
+definePageMeta({ layout: "empty" });
 
 const isLoginModalOpen = ref<boolean>(false);
 
-onMounted(() => {
+onBeforeMount(async () => {
   // If guest-uuid exists try logging in
-  if (accountStore.isGuest) {
-    accountStore.login(accountStore.uuid, accountStore.uuid);
+  if (authStore.isGuest) {
+    await authStore.login(authStore.uuid, authStore.uuid);
   }
-  if (accountStore.authenticationStatus) {
-    return navigateTo("/game");
+  if (authStore.authenticationStatus) {
+    return await navigateTo("/game");
   }
 });
 
-async function openLoginModal() {
-  if (accountStore.authenticationStatus) {
-    return await navigateTo("/game");
+function openLoginModal() {
+  if (authStore.authenticationStatus) {
+    return navigateTo("/game");
   }
 
   isLoginModalOpen.value = true;
 }
 
 async function registerGuest() {
-  if (accountStore.authenticationStatus) {
-    await navigateTo("/game");
+  if (authStore.authenticationStatus) {
+    return await navigateTo("/game");
   }
 
   if (
-    accountStore.isGuest ||
+    authStore.isGuest ||
     confirm(
       "As guest your account cannot access all features a normal account could. " +
         "You are also more susceptible to malicious scripts.\n\n " +
         "Are you sure you want to continue? (You can also upgrade to a full account for free later on)"
     )
   ) {
-    accountStore.registerGuest();
+    await authStore.registerGuest();
   }
 }
 </script>

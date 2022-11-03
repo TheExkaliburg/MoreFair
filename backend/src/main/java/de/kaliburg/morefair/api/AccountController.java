@@ -10,13 +10,15 @@ import de.kaliburg.morefair.events.types.EventType;
 import de.kaliburg.morefair.game.round.RankerService;
 import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,9 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AccountController {
 
-  private static final String APP_LOGIN_DESTINATION = "/account/login";
   private static final String APP_RENAME_DESTINATION = "/account/name";
-  private static final String QUEUE_LOGIN_DESTINATION = "/account/login";
 
   private final AccountService accountService;
   private final WsUtils wsUtils;
@@ -38,10 +38,10 @@ public class AccountController {
   private final RankerService rankerService;
 
 
-  @GetMapping
+  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> getAccount(Authentication authentication) {
     try {
-      AccountEntity account = accountService.findByUsername(authentication.getName());
+      AccountEntity account = accountService.find(UUID.fromString(authentication.getName()));
 
       if (account.getAchievements() == null) {
         account.setAchievements(new AchievementsEntity(account));
@@ -61,7 +61,7 @@ public class AccountController {
   }
 
 
-  @PatchMapping("/name")
+  @MessageMapping(APP_RENAME_DESTINATION)
   public ResponseEntity<?> updateDisplayName(Authentication authentication,
       @RequestParam("displayName") String displayName) {
     try {
@@ -78,7 +78,7 @@ public class AccountController {
       account.setDisplayName(displayName);
       accountService.save(account);
 
-      wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION,
+      wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION,
           new Event(EventType.NAME_CHANGE, account.getId(),
               account.getDisplayName()));
 

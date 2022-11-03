@@ -133,7 +133,7 @@ public class ModerationController {
       log.info("{} (#{}) is banning the account {} (#{})", account.getDisplayName(),
           account.getId(),
           target.getDisplayName(), target.getId());
-      wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
+      wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
           EventType.BAN, target.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
@@ -162,7 +162,7 @@ public class ModerationController {
       target = accountService.save(target);
       log.info("{} (#{}) is muting the account {} (#{})", account.getDisplayName(), account.getId(),
           target.getDisplayName(), target.getId());
-      wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
+      wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
           EventType.MUTE, target.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
@@ -190,7 +190,7 @@ public class ModerationController {
       log.info("{} (#{}) is freeing the account {} (#{})", account.getDisplayName(),
           account.getId(),
           target.getDisplayName(), target.getId());
-      wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
+      wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
           EventType.FREE, target.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
@@ -225,7 +225,7 @@ public class ModerationController {
       target = accountService.save(target);
       log.info("{} (#{}) is renaming the account {} (#{}) to {}", account.getDisplayName(),
           account.getId(), target.getDisplayName(), target.getId(), username);
-      wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
+      wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
           EventType.NAME_CHANGE, target.getId(), username));
     } catch (Exception e) {
       log.error(e.getMessage());
@@ -246,7 +246,7 @@ public class ModerationController {
       }
 
       AccountEntity target = accountService.find(id);
-      wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
+      wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
           EventType.MOD, target.getId(), text));
       log.info("{} (#{}) is prompting the account {} (#{}) with {}", account.getDisplayName(),
           account.getId(), target.getDisplayName(), target.getId(), text);
@@ -276,7 +276,7 @@ public class ModerationController {
       target = accountService.save(target);
       log.info("{} (#{}) is modding the account {} (#{})", account.getDisplayName(),
           account.getId(), target.getDisplayName(), target.getId());
-      wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
+      wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
           EventType.MOD, target.getId(), account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());

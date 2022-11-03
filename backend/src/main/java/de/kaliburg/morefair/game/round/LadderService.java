@@ -4,7 +4,7 @@ import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.account.AccountServiceEvent;
-import de.kaliburg.morefair.api.GameController;
+import de.kaliburg.morefair.api.LadderController;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.data.JoinData;
@@ -348,7 +348,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
     joinEvent.setData(
         new JoinData(account.getDisplayName(), config.getAssholeTag(account.getAssholeCount()),
             account.getAssholePoints()));
-    wsUtils.convertAndSendToTopic(GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
+    wsUtils.convertAndSendToTopic(LadderController.TOPIC_EVENTS_DESTINATION.replace("{number}",
         ladder.getNumber().toString()), joinEvent);
 
     return result;
@@ -392,7 +392,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
       if (ranker.getPoints().compareTo(cost) >= 0) {
         ranker.setPoints(BigInteger.ZERO);
         ranker.setBias(ranker.getBias() + 1);
-        wsUtils.convertAndSendToTopic(GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
+        wsUtils.convertAndSendToTopic(LadderController.TOPIC_EVENTS_DESTINATION.replace("{number}",
             ladder.getNumber().toString()), event);
         return true;
       }
@@ -419,7 +419,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         ranker.setPower(BigInteger.ZERO);
         ranker.setBias(0);
         ranker.setMultiplier(ranker.getMultiplier() + 1);
-        wsUtils.convertAndSendToTopic(GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
+        wsUtils.convertAndSendToTopic(LadderController.TOPIC_EVENTS_DESTINATION.replace("{number}",
             ladder.getNumber().toString()), event);
         return true;
       }
@@ -449,7 +449,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
       if (ladder.getTypes().contains(LadderType.FREE_AUTO)) {
         ranker.setAutoPromote(true);
         wsUtils.convertAndSendToUser(ranker.getAccount().getUuid(),
-            GameController.PRIVATE_EVENTS_DESTINATION, event);
+            LadderController.PRIVATE_EVENTS_DESTINATION, event);
         return true;
       }
 
@@ -457,7 +457,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         ranker.setGrapes(ranker.getGrapes().subtract(cost));
         ranker.setAutoPromote(true);
         wsUtils.convertAndSendToUser(ranker.getAccount().getUuid(),
-            GameController.PRIVATE_EVENTS_DESTINATION, event);
+            LadderController.PRIVATE_EVENTS_DESTINATION, event);
         return true;
       }
     } catch (Exception e) {
@@ -542,7 +542,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
           chatService.create(ladder.getNumber() + 1);
         }
 
-        wsUtils.convertAndSendToTopic(GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
+        wsUtils.convertAndSendToTopic(LadderController.TOPIC_EVENTS_DESTINATION.replace("{number}",
             ladder.getNumber().toString()), event);
         account = accountService.save(account);
 
@@ -574,7 +574,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
             accountService.save(accounts);
             saveStateToDatabase(currentRound);
             eventPublisher.publishEvent(new GameResetEvent(this));
-            wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION,
+            wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION,
                 new Event(EventType.RESET, account.getId()));
           }
         }
@@ -629,9 +629,9 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
         event.setData(data);
         wsUtils.convertAndSendToUser(ranker.getAccount().getUuid(),
-            GameController.PRIVATE_EVENTS_DESTINATION, event);
+            LadderController.PRIVATE_EVENTS_DESTINATION, event);
         wsUtils.convertAndSendToUser(target.getAccount().getUuid(),
-            GameController.PRIVATE_EVENTS_DESTINATION, event);
+            LadderController.PRIVATE_EVENTS_DESTINATION, event);
 
         if (data.isSuccess()) {
           if (!buyMulti(new Event(EventType.BUY_MULTI, targetAccount.getId()), ladder)) {
@@ -665,7 +665,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
       RankerEntity ranker = findActiveRankerOfAccountOnLadder(event.getAccountId(), ladder);
       ranker.setPoints(BigInteger.ZERO);
       ranker.setPower(ranker.getPower().divide(BigInteger.TWO));
-      wsUtils.convertAndSendToTopic(GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
+      wsUtils.convertAndSendToTopic(LadderController.TOPIC_EVENTS_DESTINATION.replace("{number}",
           ladder.getNumber().toString()), event);
       return true;
     } catch (Exception e) {

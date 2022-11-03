@@ -7,7 +7,7 @@
       </span>
       <span class="text-text-light basis-1/4 grow flex-auto"
         ><strong>{{ message.tag }}</strong
-        ><sub class="text-text-dark">{{ message.ahPoints }}</sub></span
+        ><sub class="text-text-dark">{{ message.assholePoints }}</sub></span
       >
       <span class="basis-1/4 grow flex-auto">
         {{ message.timestamp }}
@@ -20,10 +20,11 @@
 
 <script lang="ts" setup>
 import ChatWindowContentMessageBody from "~/components/chat/ChatWindowContentMessageBody.vue";
+import { Message } from "~/store/entities/message";
 
 defineProps({
   message: {
-    type: Object,
+    type: Message,
     required: true,
   },
 });

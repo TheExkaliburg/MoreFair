@@ -76,6 +76,25 @@ const API = {
       return axios.get("/api/account");
     },
   },
+  ladder: {
+    getLadder: (number: number) => {
+      const params = new URLSearchParams();
+      params.append("number", number.toString());
+      return axios.get("/api/ladder", { params });
+    },
+  },
+  chat: {
+    getChat: (number: number) => {
+      const params = new URLSearchParams();
+      params.append("number", number.toString());
+      return axios.get("/api/chat", { params });
+    },
+  },
+  round: {
+    getCurrentRound: () => {
+      return axios.get("/api/round");
+    },
+  },
 };
 
 export const useAPI = () => {

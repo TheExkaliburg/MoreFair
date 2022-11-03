@@ -1,24 +1,39 @@
 import { Client } from "@stomp/stompjs";
+import { MentionMeta } from "~/store/entities/message";
 
-export type IOnTickBody = {
+export type OnTickBody = {
   delta: number;
 };
+export type OnChatEventBody = {};
+export type OnLadderEventBody = {};
+export type OnRoundEventBody = {};
+export type OnAccountEventBody = {};
 
-export type IStompCallbacks = {
-  onTick: ((body: IOnTickBody) => void)[];
-  onLoadLadder: (() => void)[];
-  onLoadChat: (() => void)[];
-  onNewMessage: (() => void)[];
-  onGameEvent: (() => void)[];
+export type StompCallback<T> = {
+  callback: (body: T) => void;
+  identifier: string;
 };
 
-const callbacks: IStompCallbacks = {
+export type StompCallbacks = {
+  onTick: StompCallback<OnTickBody>[];
+  onChatEvent: StompCallback<OnChatEventBody>[];
+  onLadderEvent: StompCallback<OnLadderEventBody>[];
+  onRoundEvent: StompCallback<OnRoundEventBody>[];
+  onAccountEvent: StompCallback<OnAccountEventBody>[];
+};
+
+const callbacks: StompCallbacks = {
   onTick: [],
-  onLoadLadder: [],
-  onLoadChat: [],
-  onNewMessage: [],
-  onGameEvent: [],
+  onChatEvent: [],
+  onLadderEvent: [],
+  onRoundEvent: [],
+  onAccountEvent: [],
 };
+
+callbacks.onTick.push({
+  callback: (body) => console.log(body),
+  identifier: "test",
+});
 
 const isDevMode = process.env.NODE_ENV !== "production";
 const connection = isDevMode
@@ -37,8 +52,44 @@ const client = new Client({
 
 client.onConnect = (_) => {
   client.subscribe("/topic/game/tick", (message) => {
-    const body: IOnTickBody = JSON.parse(message.body);
-    callbacks.onTick.forEach((callback) => callback(body));
+    const body: OnTickBody = JSON.parse(message.body);
+    callbacks.onTick.forEach(({ callback }) => callback(body));
+  });
+
+  client.subscribe("/topic/account/event", (message) => {
+    const body: OnAccountEventBody = JSON.parse(message.body);
+    callbacks.onAccountEvent.forEach(({ callback }) => callback(body));
+  });
+  client.subscribe("/user/queue/account/event", (message) => {
+    const body: OnAccountEventBody = JSON.parse(message.body);
+    callbacks.onAccountEvent.forEach(({ callback }) => callback(body));
+  });
+
+  client.subscribe("/topic/round/event", (message) => {
+    const body: OnRoundEventBody = JSON.parse(message.body);
+    callbacks.onRoundEvent.forEach(({ callback }) => callback(body));
+  });
+  client.subscribe("/user/queue/round/event", (message) => {
+    const body: OnRoundEventBody = JSON.parse(message.body);
+    callbacks.onRoundEvent.forEach(({ callback }) => callback(body));
+  });
+
+  client.subscribe("/topic/ladder/event/1", (message) => {
+    const body: OnLadderEventBody = JSON.parse(message.body);
+    callbacks.onLadderEvent.forEach(({ callback }) => callback(body));
+  });
+  client.subscribe("/user/queue/ladder/event", (message) => {
+    const body: OnLadderEventBody = JSON.parse(message.body);
+    callbacks.onLadderEvent.forEach(({ callback }) => callback(body));
+  });
+
+  client.subscribe("/topic/chat/event/1", (message) => {
+    const body: OnChatEventBody = JSON.parse(message.body);
+    callbacks.onChatEvent.forEach(({ callback }) => callback(body));
+  });
+  client.subscribe("/user/queue/chat/event", (message) => {
+    const body: OnChatEventBody = JSON.parse(message.body);
+    callbacks.onChatEvent.forEach(({ callback }) => callback(body));
   });
 };
 
@@ -47,16 +98,79 @@ client.onStompError = (frame) => {
   console.log("Additional details: " + frame.body);
 };
 
-const api = (client: Client) => {
+const wsApi = (client: Client) => {
   return {
-    info: () => {
-      client.publish({
-        destination: "/app/info",
-      });
-    },
     account: {
-      login: () => {
-        console.log("login");
+      rename: () => {
+        client.publish({
+          destination: "/app/account/rename",
+          body: JSON.stringify({ name: "test" }),
+        });
+      },
+    },
+    chat: {
+      changeChat: (
+        currentNumber: number,
+        newNumber: number,
+        unsubscribe?: boolean
+      ) => {
+        if (unsubscribe) {
+          client.unsubscribe(`/topic/chat/event/${currentNumber}`);
+        }
+        client.subscribe(`/topic/chat/event/${newNumber}`, (message) => {
+          const body: OnChatEventBody = JSON.parse(message.body);
+          callbacks.onChatEvent.forEach(({ callback }) => callback(body));
+        });
+      },
+      sendMessage: (
+        message: string,
+        metadata: MentionMeta[],
+        chatNumber: number
+      ) => {
+        client.publish({
+          destination: `/app/chat/${chatNumber}`,
+          body: JSON.stringify({ content: message, metadata }),
+        });
+      },
+    },
+    ladder: {
+      changeLadder: (
+        currentNumber: number,
+        newNumber: number,
+        unsubscribe?: boolean
+      ) => {
+        if (unsubscribe) {
+          client.unsubscribe(`/topic/ladder/event/${currentNumber}`);
+        }
+        client.subscribe(`/topic/ladder/event/${newNumber}`, (message) => {
+          const body: OnLadderEventBody = JSON.parse(message.body);
+          callbacks.onLadderEvent.forEach(({ callback }) => callback(body));
+        });
+      },
+      buyBias: () => {
+        client.publish({
+          destination: "/app/ladder/buyBias",
+        });
+      },
+      buyMulti: () => {
+        client.publish({
+          destination: "/app/ladder/buyMulti",
+        });
+      },
+      throwVinegar: () => {
+        client.publish({
+          destination: "/app/ladder/throwVinegar",
+        });
+      },
+      buyAutoPromote: () => {
+        client.publish({
+          destination: "/app/ladder/autoPromote",
+        });
+      },
+      promote: () => {
+        client.publish({
+          destination: "/app/ladder/promote",
+        });
       },
     },
   };
@@ -64,10 +178,12 @@ const api = (client: Client) => {
 
 export const useStomp = () => {
   // only activate the client if it is not already active
-  if (!client.active) client.activate();
+  while (!client.active) {
+    client.activate();
+  }
 
   return {
-    api: api(client),
+    wsApi: wsApi(client),
     callbacks,
   };
 };

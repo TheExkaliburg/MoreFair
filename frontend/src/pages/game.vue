@@ -17,4 +17,6 @@
 import { useUiStore } from "~/store/ui";
 
 const uiStore = useUiStore();
+definePageMeta({ layout: "default" });
+useStomp();
 </script>
