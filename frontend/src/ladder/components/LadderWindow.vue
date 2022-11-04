@@ -2,14 +2,14 @@
   <div class="row py-1">
     <div class="col">
       <span
-        >Active Rankers: {{ store.getters["ladder/activeRankers"].length }}/{{
+      >Active Rankers: {{ store.getters["ladder/activeRankers"].length }}/{{
           store.state.ladder.rankers.length
         }}</span
       >
     </div>
     <div class="col">
       <span
-        >Ladder: {{ store.state.ladder.number }}/{{
+      >Ladder: {{ store.state.ladder.number }}/{{
           store.state.settings.assholeLadder
         }}
       </span>
@@ -22,6 +22,7 @@
     </div>
     <PaginationGroup
       :current="ladder.number"
+      :last="store.state.settings.assholeLadder"
       :max="
         store.getters['options/getOptionValue']('enableUnrestrictedAccess') &&
         store.getters.isMod
@@ -29,139 +30,140 @@
           : user.highestCurrentLadder
       "
       :on-change="changeLadder"
+      :show-last="true"
     />
   </div>
-  <div class="row py-1 ladder-row" id="table-scroll-container">
+  <div id="table-scroll-container" class="row py-1 ladder-row">
     <table
       class="table table-sm caption-top table-borderless"
       style="border: 0px solid yellow"
     >
       <thead>
-        <tr v-if="showEtaSetting" class="thead-light">
-          <th class="col-1 text-start">#</th>
-          <th class="col-2 text-start">Username</th>
-          <th class="col-1 text-end">ETA -> L{{ ladder.number + 1 }}</th>
-          <th class="col-1 text-end">ETA -> You</th>
-          <th
-            v-if="showPowerGainSettings || showBiasMultiSettings"
-            class="col-2 text-end"
-          >
-            Power-Gain
-          </th>
-          <th class="col-1 text-end">Power</th>
-          <th class="col-1 text-end">Points</th>
-        </tr>
-        <tr v-else class="thead-light">
-          <th class="col-1 text-start">#</th>
-          <th class="col-2 text-start">Username</th>
-          <th
-            v-if="showPowerGainSettings || showBiasMultiSettings"
-            class="col-2 text-end"
-          >
-            Power-Gain
-          </th>
-          <th class="col-1 text-end">Power</th>
-          <th class="col-1 text-end">Points</th>
-        </tr>
+      <tr v-if="showEtaSetting" class="thead-light">
+        <th class="col-1 text-start">#</th>
+        <th class="col-2 text-start">Username</th>
+        <th class="col-1 text-end">ETA -> L{{ ladder.number + 1 }}</th>
+        <th class="col-1 text-end">ETA -> You</th>
+        <th
+          v-if="showPowerGainSettings || showBiasMultiSettings"
+          class="col-2 text-end"
+        >
+          Power-Gain
+        </th>
+        <th class="col-1 text-end">Power</th>
+        <th class="col-1 text-end">Points</th>
+      </tr>
+      <tr v-else class="thead-light">
+        <th class="col-1 text-start">#</th>
+        <th class="col-2 text-start">Username</th>
+        <th
+          v-if="showPowerGainSettings || showBiasMultiSettings"
+          class="col-2 text-end"
+        >
+          Power-Gain
+        </th>
+        <th class="col-1 text-end">Power</th>
+        <th class="col-1 text-end">Points</th>
+      </tr>
       </thead>
       <tbody id="ladderBody" class="">
-        <tr
-          v-for="(ranker, index) in shownRankers"
-          :key="ranker"
-          :id="'ranker-' + ranker.accountId"
-          :class="[
+      <tr
+        v-for="(ranker, index) in shownRankers"
+        :id="'ranker-' + ranker.accountId"
+        :key="ranker"
+        :class="[
             ranker.you ? 'you' : '',
             ranker.growing || ranker.you ? '' : 'promoted',
           ]"
-          @contextmenu="openModMenu"
+        @contextmenu="openModMenu"
+      >
+        <td class="text-start">
+          {{ ranker.rank }}
+          {{ ranker.tag
+          }}<sub>{{
+            store.getters["options/getOptionValue"]("showAhPoints")
+              ? ranker.ahPoints
+              : ""
+          }}</sub>
+        </td>
+        <td class="text-start">
+          {{ ranker.username }}
+          <sub>#{{ ranker.accountId }}</sub>
+        </td>
+        <td
+          v-if="showEtaSetting"
+          :style="'animation-delay: ' + etaPercentage[index] + 's'"
+          class="text-end etaProgressAnim"
         >
-          <td class="text-start">
-            {{ ranker.rank }}
-            {{ ranker.tag
-            }}<sub>{{
-              store.getters["options/getOptionValue"]("showAhPoints")
-                ? ranker.ahPoints
-                : ""
-            }}</sub>
-          </td>
-          <td class="text-start">
-            {{ ranker.username }}
-            <sub>#{{ ranker.accountId }}</sub>
-          </td>
-          <td
-            v-if="showEtaSetting"
-            :style="'animation-delay: ' + etaPercentage[index] + 's'"
-            class="text-end etaProgressAnim"
-          >
-            {{ secondsToHms(etaToPromote[index]) }}
-          </td>
-          <td
-            v-if="showEtaSetting"
-            :style="'animation-delay: ' + etaPercentage[index] + 's'"
-            class="text-end etaProgressAnim"
-          >
-            {{ secondsToHms(etaToYou[index]) }}
-          </td>
-          <td
-            v-if="showPowerGainSettings || showBiasMultiSettings"
-            class="text-end"
-          >
-            {{
-              showPowerGainSettings && ranker.growing
-                ? "(+" +
-                  (ranker.rank === 1
-                    ? "0"
-                    : numberFormatter.format(
-                        (ranker.rank + ranker.bias - 1) * ranker.multi
-                      )) +
-                  "/s)"
-                : ""
-            }}
-            <span v-if="showBiasMultiSettings">
+          {{ secondsToHms(etaToPromote[index]) }}
+        </td>
+        <td
+          v-if="showEtaSetting"
+          :style="'animation-delay: ' + etaPercentage[index] + 's'"
+          class="text-end etaProgressAnim"
+        >
+          {{ secondsToHms(etaToYou[index]) }}
+        </td>
+        <td
+          v-if="showPowerGainSettings || showBiasMultiSettings"
+          class="text-end"
+        >
+          {{
+            showPowerGainSettings && ranker.growing
+              ? "(+" +
+              (ranker.rank === 1
+                ? "0"
+                : numberFormatter.format(
+                  (ranker.rank + ranker.bias - 1) * ranker.multi
+                )) +
+              "/s)"
+              : ""
+          }}
+          <span v-if="showBiasMultiSettings">
               [<span
-                :style="[
+            :style="[
                   rankerCanBuyBias(ranker)
                     ? 'color: var(--eta-best)'
                     : etaBias(ranker) < 300
                     ? 'color: var(--eta-mid);'
                     : 'color: var(--eta-worst)',
                 ]"
-                >+{{ ("" + ranker.bias).padStart(2, "0") }}</span
-              ><span
-                :style="[
+          >+{{ ("" + ranker.bias).padStart(2, "0") }}</span
+          ><span
+            :style="[
                   rankerCanBuyMulti(ranker)
                     ? 'color: var(--eta-best)'
                     : etaMulti(ranker) < 300
                     ? 'color: var(--eta-mid)'
                     : 'color: var(--eta-worst)',
                 ]"
-              >
-                x{{ ("" + ranker.multi).padStart(2, "0") }}</span
-              >]
-            </span>
-          </td>
-          <td class="text-end">
-            {{ numberFormatter.format(ranker.power) }}
-          </td>
-          <td
-            :style="'animation-delay: ' + etaPercentage[index] + 's'"
-            class="text-end etaProgressAnim"
           >
-            {{ numberFormatter.format(ranker.points) }}
-          </td>
-          <ul
-            v-if="
+                x{{ ("" + ranker.multi).padStart(2, "0") }}</span
+          >]
+            </span>
+        </td>
+        <td class="text-end">
+          {{ numberFormatter.format(ranker.power) }}
+        </td>
+        <td
+          :style="'animation-delay: ' + etaPercentage[index] + 's'"
+          class="text-end etaProgressAnim"
+        >
+          {{ numberFormatter.format(ranker.points) }}
+        </td>
+        <ul
+          v-if="
               store.getters['options/getOptionValue'](
                 'enableLadderModFeatures'
               ) && store.getters.isMod
             "
-            :data-id="ranker.accountId"
-            :data-name="ranker.username"
-            class="dropdown-menu"
-            tabindex="-1"
-            @blur="blur"
-            @focus="focus"
-          >
+          :data-id="ranker.accountId"
+          :data-name="ranker.username"
+          class="dropdown-menu"
+          tabindex="-1"
+          @blur="blur"
+          @focus="focus"
+        >
             <span
               style="
                 color: var(--text-color);
@@ -170,19 +172,19 @@
                 width: 100%;
                 display: inline-block;
               "
-              >{{ ranker.username
+            >{{ ranker.username
               }}<sub style="color: var(--text-dark-highlight-color)"
-                >#{{ ranker.accountId }}</sub
+              >#{{ ranker.accountId }}</sub
               ></span
             >
-            <li>
-              <a class="dropdown-item" href="#" @click="ban">Ban</a>
-              <a class="dropdown-item" href="#" @click="mute">Mute</a>
-              <a class="dropdown-item" href="#" @click="rename">Rename</a>
-              <a class="dropdown-item" href="#" @click="free">Free</a>
-            </li>
-          </ul>
-        </tr>
+          <li>
+            <a class="dropdown-item" href="#" @click="ban">Ban</a>
+            <a class="dropdown-item" href="#" @click="mute">Mute</a>
+            <a class="dropdown-item" href="#" @click="rename">Rename</a>
+            <a class="dropdown-item" href="#" @click="free">Free</a>
+          </li>
+        </ul>
+      </tr>
       </tbody>
     </table>
   </div>
@@ -337,7 +339,7 @@ function rename(event) {
   const newName = prompt(`What would you like to name "${name}" (#${id})`);
   if (newName) {
     stompClient.send("/app/mod/name/" + id, {
-      content: newName,
+      content: newName
     });
   }
 }
@@ -410,7 +412,7 @@ function changeLadder(event) {
         store.dispatch({
           type: "ladder/handleLadderEvent",
           message: message,
-          stompClient: stompClient,
+          stompClient: stompClient
         });
       }
     );
