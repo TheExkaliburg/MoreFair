@@ -118,6 +118,11 @@ const optionsModule = {
               value: false,
             }),
             new BoolOption({
+              displayName: "Enable Spectating Asshole Ladder ",
+              name: "showSpectateAssholeLadder",
+              value: false,
+            }),
+            new BoolOption({
               displayName: "Hide help text",
               name: "hideHelpText",
               value: false,

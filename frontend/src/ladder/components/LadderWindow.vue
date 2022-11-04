@@ -30,7 +30,9 @@
           : user.highestCurrentLadder
       "
       :on-change="changeLadder"
-      :show-last="true"
+      :show-last="
+        store.getters['options/getOptionValue']('showSpectateAssholeLadder')
+      "
     />
   </div>
   <div id="table-scroll-container" class="row py-1 ladder-row">

@@ -5,6 +5,11 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "Spectate Asshole Ladder", {
+          features: [
+            "Adding an option to being able to spectate the asshole ladder (experimental)",
+          ],
+        }),
         new Version("PATCH", "SLOW fixes", {
           balancing: [
             "Slightly boosting the chance for GIGANTIC ladders in SLOW rounds to an avg. of 1-2 per rounds",
