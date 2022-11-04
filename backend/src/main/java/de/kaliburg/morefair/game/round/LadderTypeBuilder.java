@@ -55,6 +55,10 @@ public class LadderTypeBuilder {
       return;
     }
 
+    if (roundTypes.contains(RoundType.SLOW)) {
+      return;
+    }
+
     switch (ladderType) {
       case BIG, GIGANTIC -> {
         ladderSizeTypeWeights.put(LadderType.BIG, 0.f);
@@ -95,7 +99,7 @@ public class LadderTypeBuilder {
       case SLOW -> {
         ladderSizeTypeWeights.put(LadderType.BIG, ladderSizeTypeWeights.get(LadderType.BIG) * 2);
         ladderSizeTypeWeights.put(LadderType.GIGANTIC,
-            ladderSizeTypeWeights.get(LadderType.GIGANTIC) * 2);
+            ladderSizeTypeWeights.get(LadderType.GIGANTIC) * 5);
         ladderSizeTypeWeights.put(LadderType.SMALL,
             ladderSizeTypeWeights.get(LadderType.SMALL) / 2);
         ladderSizeTypeWeights.put(LadderType.TINY, ladderSizeTypeWeights.get(LadderType.TINY) / 2);
