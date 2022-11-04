@@ -52,7 +52,7 @@
             class="dropdown-item"
             href="#"
             @click="onChange"
-          >{{ i }}</a
+            >{{ i }}</a
           >
         </li>
         <li v-if="showLast && last > max">
@@ -61,7 +61,7 @@
             class="dropdown-item"
             href="#"
             @click="onChange"
-          >{{ last }}</a
+            >{{ last }}</a
           >
         </li>
       </ul>
@@ -79,7 +79,7 @@ defineProps({
   size: { type: Number, default: 3 },
   onChange: Function,
   last: { type: Number, required: false, default: 1 },
-  showLast: { type: Boolean, default: false }
+  showLast: { type: Boolean, default: false },
 });
 </script>
 
