@@ -5,6 +5,14 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "SLOW fixes", {
+          balancing: [
+            "Slightly boosting the chance for GIGANTIC ladders in SLOW rounds to an avg. of 1-2 per rounds",
+          ],
+          fixes: [
+            "Fixed a bug where SLOW still has back to back protection from repeating BIG ladders",
+          ],
+        }),
         new Version("PATCH", "Round- and LadderType Bugfixes", {
           fixes: [
             "Fixed a bug where SLOW would have 2/3 of their ladders FREE_AUTO",
