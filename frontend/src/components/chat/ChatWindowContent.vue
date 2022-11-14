@@ -12,13 +12,8 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted } from "vue";
 import ChatWindowContentMessage from "~/components/chat/ChatWindowContentMessage.vue";
 import { useChatStore } from "~/store/chat";
 
-const chatStore = useChatStore();
-
-onMounted(() => {
-  chatStore.sendMessage("Hello World", []);
-});
+const chatStore = await useChatStore();
 </script>

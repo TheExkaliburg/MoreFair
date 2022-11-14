@@ -1,7 +1,7 @@
 <template>
   <div class="flex justify-end items-center text-button-text">
     <PaginationButtonGroup
-      :current="current"
+      :current="chatStore.number"
       :max="10"
       :prefix="'Chad'"
       class="h-8 w-42 self-end"
@@ -12,10 +12,11 @@
 
 <script lang="ts" setup>
 import PaginationButtonGroup from "~/components/interactables/PaginationButtonGroup.vue";
+import { useChatStore } from "~/store/chat";
 
-const current = ref<number>(1);
+const chatStore = useChatStore();
 
 function changeChat(e: number) {
-  current.value = e;
+  chatStore.changeChat(e);
 }
 </script>

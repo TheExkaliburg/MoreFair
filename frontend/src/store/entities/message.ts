@@ -40,7 +40,7 @@ export type MessageData = {
   id: number;
   username: string;
   message: string;
-  metadata: MentionMeta[];
+  metadata: string;
   timestamp: number;
   tag: string;
   assholePoints: number;
@@ -50,13 +50,13 @@ export class Message implements MessageData {
   id: number = 0;
   username: string = "";
   message: string = "";
-  metadata: MentionMeta[] = [];
+  metadata: string = "[]";
   timestamp: number = 0;
   tag: string = "";
   assholePoints: number = 0;
   private flags: string[] = [];
 
-  constructor(data: MessageData) {
+  constructor(data: any) {
     Object.assign(this, data);
   }
 
@@ -76,9 +76,24 @@ export class Message implements MessageData {
     return this.flags.includes(flag);
   }
 
+  getMetadata(): MentionMeta[] {
+    return JSON.parse(this.metadata);
+  }
+
+  getTimestampString() {
+    const date = new Date(0);
+    date.setUTCSeconds(this.timestamp);
+    // format to weekday. hours:minutes
+    return date.toLocaleString("en-UK", {
+      weekday: "short",
+      hour: "numeric",
+      minute: "numeric",
+    });
+  }
+
   getMessageParts(): MessagePart[] {
     const message = this.message;
-    const metadata = this.metadata;
+    const metadata = this.getMetadata();
     const result: MessagePart[] = [];
 
     if (metadata.length === 0) {

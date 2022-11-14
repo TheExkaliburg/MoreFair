@@ -38,7 +38,7 @@ const props = defineProps({
   },
 });
 
-const messageParts = computed<MessagePart[]>(() =>
-  props.message.getMessageParts()
-);
+const messageParts = computed<MessagePart[]>(() => {
+  return props.message.getMessageParts();
+});
 </script>

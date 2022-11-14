@@ -15,6 +15,7 @@
       </div>
       <button
         class="w-1/4 max-w-xs rounded-r-md border-l-0 border-1 border-button-border py-1 text-button-text hover:text-button-text-hover hover:bg-button-bg-hover"
+        @click="sendMessage"
       >
         Send
       </button>
@@ -27,6 +28,13 @@
 
 <script lang="ts" setup>
 import { useDomUtils } from "~/composables/useDomUtils";
+import { useChatStore } from "~/store/chat";
 
 useDomUtils();
+
+const chatStore = useChatStore();
+
+function sendMessage() {
+  chatStore.sendMessage("Test123", []);
+}
 </script>

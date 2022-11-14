@@ -4,10 +4,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
+@RequiredArgsConstructor
 public class WsMetaMessage extends WsMessage {
 
   @NonNull

@@ -3,14 +3,14 @@
     <div class="flex flex-row text-sm justify-between pr-3">
       <span class="text-text-light truncate basis-1/4 flex-auto">
         {{ message.username }}
-        <sub class="text-text-dark">&nbsp;#{{ message.accountId }} </sub>
+        <sub class="text-text-dark">&nbsp;#{{ message.id }} </sub>
       </span>
       <span class="text-text-light basis-1/4 grow flex-auto"
         ><strong>{{ message.tag }}</strong
         ><sub class="text-text-dark">{{ message.assholePoints }}</sub></span
       >
       <span class="basis-1/4 grow flex-auto">
-        {{ message.timestamp }}
+        {{ message.getTimestampString() }}
       </span>
       <span v-if="true" class="text-end flex-none">...</span>
     </div>

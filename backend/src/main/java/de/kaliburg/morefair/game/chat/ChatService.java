@@ -136,8 +136,7 @@ public class ChatService implements ApplicationListener<AccountServiceEvent> {
     }
 
     result = messageService.save(result);
-    wsUtils.convertAndSendToTopic(
-        ChatController.TOPIC_EVENTS_DESTINATION.replace("{number}", number.toString()),
+    wsUtils.convertAndSendToTopic(ChatController.TOPIC_EVENTS_DESTINATION(number),
         new MessageDto(result, config));
     return result;
   }
@@ -157,7 +156,6 @@ public class ChatService implements ApplicationListener<AccountServiceEvent> {
   /**
    * Sends a message (and the metadata) from a user to all chats.
    *
-   * @param account  the account of the user
    * @param message  the message
    * @param metadata the metadata of the message
    * @return the list of all the messages, sent to different chats

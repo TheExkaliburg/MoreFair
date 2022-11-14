@@ -1,10 +1,10 @@
 import { Client } from "@stomp/stompjs";
-import { MentionMeta } from "~/store/entities/message";
+import { MentionMeta, MessageData } from "~/store/entities/message";
 
 export type OnTickBody = {
   delta: number;
 };
-export type OnChatEventBody = {};
+export type OnChatEventBody = MessageData;
 export type OnLadderEventBody = {};
 export type OnRoundEventBody = {};
 export type OnAccountEventBody = {};
@@ -29,11 +29,6 @@ const callbacks: StompCallbacks = {
   onRoundEvent: [],
   onAccountEvent: [],
 };
-
-callbacks.onTick.push({
-  callback: (body) => console.log(body),
-  identifier: "test",
-});
 
 const isDevMode = process.env.NODE_ENV !== "production";
 const connection = isDevMode
@@ -129,7 +124,10 @@ const wsApi = (client: Client) => {
       ) => {
         client.publish({
           destination: `/app/chat/${chatNumber}`,
-          body: JSON.stringify({ content: message, metadata }),
+          body: JSON.stringify({
+            content: message,
+            metadata: JSON.stringify(metadata),
+          }),
         });
       },
     },
