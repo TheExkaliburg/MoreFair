@@ -5,6 +5,16 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "Balancing SLOW + CHAOS", {
+          balancing: [
+            "CHAOS also has a chance to contain DEFAULT Ladders",
+            "SLOW doesn't contain SMALL and TINY anymore",
+            "SLOW contains less DEFAULT Ladders",
+          ],
+          fixes: [
+            "FAST + CHAOS can now generate something else besides SMALL ladders",
+          ],
+        }),
         new Version("PATCH", "Spectate Asshole Ladder", {
           features: [
             "Adding an option to being able to spectate the asshole ladder (experimental)",

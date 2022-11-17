@@ -91,15 +91,15 @@ public class LadderTypeBuilder {
         ladderSizeTypeWeights.put(LadderType.SMALL, 1.f);
         ladderSizeTypeWeights.put(LadderType.BIG, 1.f);
         ladderSizeTypeWeights.put(LadderType.GIGANTIC, 1.f);
-        ladderSizeTypeWeights.put(LadderType.DEFAULT, 0.f);
+        ladderSizeTypeWeights.put(LadderType.DEFAULT, 1.f);
       }
       case SLOW -> {
-        ladderSizeTypeWeights.put(LadderType.TINY, ladderSizeTypeWeights.get(LadderType.TINY) / 2);
-        ladderSizeTypeWeights.put(LadderType.SMALL,
-            ladderSizeTypeWeights.get(LadderType.SMALL) / 2);
-        ladderSizeTypeWeights.put(LadderType.BIG, ladderSizeTypeWeights.get(LadderType.BIG) * 2);
+        ladderSizeTypeWeights.put(LadderType.TINY, 0.f);
+        ladderSizeTypeWeights.put(LadderType.SMALL, 0.f);
+        ladderSizeTypeWeights.put(LadderType.DEFAULT,
+            ladderSizeTypeWeights.get(LadderType.DEFAULT) / 5);
         ladderSizeTypeWeights.put(LadderType.GIGANTIC,
-            ladderSizeTypeWeights.get(LadderType.GIGANTIC) * 5);
+            ladderSizeTypeWeights.get(LadderType.GIGANTIC) * 2);
         ladderAutoTypeWeights.put(LadderType.NO_AUTO, 0.f);
         ladderAutoTypeWeights.put(LadderType.FREE_AUTO,
             ladderAutoTypeWeights.get(LadderType.FREE_AUTO) * 2);
