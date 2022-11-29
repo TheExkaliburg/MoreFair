@@ -130,6 +130,7 @@ public class ModerationController {
       target.setAccessRole(AccountAccessRole.BANNED_PLAYER);
       target.setUsername("BANNED");
       target = accountService.save(target);
+      chatService.deleteMessagesOfAccount(target);
       log.info("{} (#{}) is banning the account {} (#{})", account.getUsername(), account.getId(),
           target.getUsername(), target.getId());
       wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
@@ -159,6 +160,7 @@ public class ModerationController {
       target.setAccessRole(AccountAccessRole.MUTED_PLAYER);
       target.setUsername(target.getUsername() + "(MUTED)");
       target = accountService.save(target);
+      chatService.deleteMessagesOfAccount(target);
       log.info("{} (#{}) is muting the account {} (#{})", account.getUsername(), account.getId(),
           target.getUsername(), target.getId());
       wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
