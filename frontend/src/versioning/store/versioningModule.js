@@ -5,6 +5,11 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "Deleting messages of muted/banned players", {
+          fixes: [
+            "Should now properly delete messages of muted/banned players",
+          ],
+        }),
         new Version("PATCH", "Balancing SLOW + CHAOS", {
           balancing: [
             "CHAOS also has a chance to contain DEFAULT Ladders",
