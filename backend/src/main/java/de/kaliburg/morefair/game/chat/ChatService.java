@@ -176,19 +176,10 @@ public class ChatService {
    * @return the list of all the messages, sent to different chats
    */
   public List<MessageEntity> sendGlobalMessage(String message, String metadata) {
-    try {
-      chatSemaphore.acquire();
-      try {
-        AccountEntity broadcasterAccount = accountService.findBroadcaster();
-        return currentChatMap.values().stream()
-            .map(chat -> sendMessageToChat(broadcasterAccount, chat.getNumber(), message, metadata))
-            .collect(Collectors.toList());
-      } finally {
-        chatSemaphore.release();
-      }
-    } catch (InterruptedException e) {
-      throw new RuntimeException(e);
-    }
+    AccountEntity broadcasterAccount = accountService.findBroadcaster();
+    return currentChatMap.values().stream()
+        .map(chat -> sendMessageToChat(broadcasterAccount, chat.getNumber(), message, metadata))
+        .collect(Collectors.toList());
   }
 
   /**
