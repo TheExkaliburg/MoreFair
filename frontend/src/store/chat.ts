@@ -23,7 +23,9 @@ export const useChatStore = defineStore("chat", () => {
       const data: ChatData = response.data;
       Object.assign(messages, []);
       data.messages.forEach((message: Message) => {
-        messages.unshift(new Message(message));
+        const msg = new Message(message);
+        msg.setFlag("old");
+        messages.unshift(msg);
       });
       number.value = data.number;
 
@@ -33,7 +35,9 @@ export const useChatStore = defineStore("chat", () => {
         stomp.callbacks.onChatEvent.push({
           identifier: "default",
           callback: (body) => {
-            console.log(body);
+            if (messages.length > 50) {
+              messages.shift();
+            }
             messages.push(new Message(body));
           },
         });
