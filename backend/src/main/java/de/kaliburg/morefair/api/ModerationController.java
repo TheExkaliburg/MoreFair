@@ -130,9 +130,9 @@ public class ModerationController {
       target.setAccessRole(AccountAccessRole.BANNED_PLAYER);
       target.setDisplayName("BANNED");
       target = accountService.save(target);
-      log.info("{} (#{}) is banning the account {} (#{})", account.getDisplayName(),
-          account.getId(),
-          target.getDisplayName(), target.getId());
+      chatService.deleteMessagesOfAccount(target);
+      log.info("{} (#{}) is banning the account {} (#{})", account.getUsername(), account.getId(),
+          target.getUsername(), target.getId());
       wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
           EventType.BAN, target.getId()));
     } catch (Exception e) {
@@ -160,8 +160,9 @@ public class ModerationController {
       target.setAccessRole(AccountAccessRole.MUTED_PLAYER);
       target.setDisplayName(target.getDisplayName() + "(MUTED)");
       target = accountService.save(target);
-      log.info("{} (#{}) is muting the account {} (#{})", account.getDisplayName(), account.getId(),
-          target.getDisplayName(), target.getId());
+      chatService.deleteMessagesOfAccount(target);
+      log.info("{} (#{}) is muting the account {} (#{})", account.getUsername(), account.getId(),
+          target.getUsername(), target.getId());
       wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
           EventType.MUTE, target.getId()));
     } catch (Exception e) {

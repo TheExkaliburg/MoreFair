@@ -3,6 +3,7 @@ package de.kaliburg.morefair.game.chat;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.game.round.LadderRepository;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -19,6 +20,7 @@ public class MessageService {
 
   private final MessageRepository messageRepository;
   private final AccountService accountService;
+
 
   public MessageService(MessageRepository messageRepository, LadderRepository ladderRepository,
       AccountService accountService) {
@@ -70,13 +72,31 @@ public class MessageService {
     return messageRepository.findByUuid(uuid).orElseThrow();
   }
 
-
   public ArrayList<MessageEntity> getAllMessages() {
     return new ArrayList<>();
+  }
+
+  public List<MessageEntity> loadMessages(ChatEntity chat) {
+    return messageRepository.findTop30ByChatAndDeletedOnNullOrderByCreatedOnDesc(chat);
   }
 
   @Transactional
   public List<MessageEntity> save(List<MessageEntity> messages) {
     return messageRepository.saveAll(messages);
+  }
+
+  /**
+   * Sets all messages of a specific account as deleted.
+   *
+   * @param account the account that needs their messages deleted
+   */
+  public void deleteMessagesOfAccount(AccountEntity account) {
+    List<MessageEntity> messages = messageRepository.findByAccount(account);
+
+    messages.forEach(message -> {
+      message.setDeletedOn(OffsetDateTime.now());
+    });
+
+    messageRepository.saveAll(messages);
   }
 }

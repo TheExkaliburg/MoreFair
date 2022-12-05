@@ -76,7 +76,6 @@ public class LadderTypeBuilder {
   private void handleRoundTypes(RoundType roundType) {
     switch (roundType) {
       case FAST -> {
-        ladderSizeTypeWeights.put(LadderType.SMALL, ladderSizeTypeWeights.get(LadderType.DEFAULT));
         ladderSizeTypeWeights.put(LadderType.TINY, ladderSizeTypeWeights.get(LadderType.TINY) * 2);
         ladderSizeTypeWeights.put(LadderType.BIG, 0.f);
         ladderSizeTypeWeights.put(LadderType.GIGANTIC, 0.f);
@@ -84,25 +83,23 @@ public class LadderTypeBuilder {
       }
       case AUTO -> {
         ladderAutoTypeWeights.put(LadderType.FREE_AUTO,
-            ladderAutoTypeWeights.get(LadderType.DEFAULT));
+            ladderAutoTypeWeights.get(LadderType.FREE_AUTO) * 10);
         ladderAutoTypeWeights.put(LadderType.DEFAULT, 0.f);
-        ladderAutoTypeWeights.put(LadderType.NO_AUTO,
-            ladderAutoTypeWeights.get(LadderType.NO_AUTO) * 2f);
       }
       case CHAOS -> {
         ladderSizeTypeWeights.put(LadderType.TINY, 1.f);
         ladderSizeTypeWeights.put(LadderType.SMALL, 1.f);
         ladderSizeTypeWeights.put(LadderType.BIG, 1.f);
         ladderSizeTypeWeights.put(LadderType.GIGANTIC, 1.f);
-        ladderSizeTypeWeights.put(LadderType.DEFAULT, 0.f);
+        ladderSizeTypeWeights.put(LadderType.DEFAULT, 1.f);
       }
       case SLOW -> {
-        ladderSizeTypeWeights.put(LadderType.BIG, ladderSizeTypeWeights.get(LadderType.BIG) * 2);
+        ladderSizeTypeWeights.put(LadderType.TINY, 0.f);
+        ladderSizeTypeWeights.put(LadderType.SMALL, 0.f);
+        ladderSizeTypeWeights.put(LadderType.DEFAULT,
+            ladderSizeTypeWeights.get(LadderType.DEFAULT) / 5);
         ladderSizeTypeWeights.put(LadderType.GIGANTIC,
-            ladderSizeTypeWeights.get(LadderType.GIGANTIC) * 5);
-        ladderSizeTypeWeights.put(LadderType.SMALL,
-            ladderSizeTypeWeights.get(LadderType.SMALL) / 2);
-        ladderSizeTypeWeights.put(LadderType.TINY, ladderSizeTypeWeights.get(LadderType.TINY) / 2);
+            ladderSizeTypeWeights.get(LadderType.GIGANTIC) * 2);
         ladderAutoTypeWeights.put(LadderType.NO_AUTO, 0.f);
         ladderAutoTypeWeights.put(LadderType.FREE_AUTO,
             ladderAutoTypeWeights.get(LadderType.FREE_AUTO) * 2);

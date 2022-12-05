@@ -54,4 +54,10 @@ public class MessageEntity {
   @NonNull
   @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
   private OffsetDateTime createdOn = OffsetDateTime.now(ZoneOffset.UTC);
+  @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
+  private OffsetDateTime deletedOn;
+
+  public boolean isDeleted() {
+    return deletedOn != null;
+  }
 }
