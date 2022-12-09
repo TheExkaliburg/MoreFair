@@ -1,18 +1,12 @@
 <template>
   <div class="flex flex-col justify-around">
     <div class="flex flex-row justify-center items-center relative w-full">
-      <div
+      <EditorContent
+        :editor="editor"
         class="w-full rounded-l-md border-1 border-button-border p-1 outline-0 overflow-x-hidden text-text"
-        contenteditable
-        role="textbox"
         spellcheck="false"
-        type="text"
-      ></div>
-      <div
-        class="absolute left-1 pointer-events-none p-1 text-text-placeholder"
-      >
-        Chat is listening...
-      </div>
+        @keydown.enter.prevent="sendMessage"
+      ></EditorContent>
       <button
         class="w-1/4 max-w-xs rounded-r-md border-l-0 border-1 border-button-border py-1 text-button-text hover:text-button-text-hover hover:bg-button-bg-hover"
         @click="sendMessage"
@@ -21,20 +15,65 @@
       </button>
     </div>
     <div class="text-xs lg:text-sm text-left w-full px-2 text-text-light">
-      Message length: <span class="text-text">0</span> / 280
+      Message length:
+      <span class="text-text">{{
+        editor?.storage.characterCount.characters()
+      }}</span>
+      /
+      {{ characterLimit }} ->
+      <span class="text-text">{{ input }}</span>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
+import { EditorContent, Node, useEditor } from "@tiptap/vue-3";
+import { Text } from "@tiptap/extension-text";
+import { Paragraph } from "@tiptap/extension-paragraph";
+import { CharacterCount } from "@tiptap/extension-character-count";
+import { Mention } from "@tiptap/extension-mention";
+import { onBeforeUnmount } from "vue";
 import { useDomUtils } from "~/composables/useDomUtils";
 import { useChatStore } from "~/store/chat";
+import { useSuggestion } from "~/composables/useSuggestion";
 
 useDomUtils();
 
 const chatStore = useChatStore();
 
+const input = ref(undefined);
+const characterLimit = 280;
+
+const editor = useEditor({
+  content: "<p></p>",
+  extensions: [
+    Node.create({
+      name: "doc",
+      topNode: true,
+      content: "block",
+    }),
+    Text,
+    Paragraph,
+    CharacterCount.configure({ limit: characterLimit }),
+    Mention.configure({
+      HTMLAttributes: {
+        class: "mention",
+      },
+      suggestion: useSuggestion(),
+    }),
+  ],
+  onUpdate: ({ editor }) => {
+    input.value = editor.getText();
+    console.log(editor.getJSON());
+  },
+});
+
 function sendMessage() {
-  chatStore.sendMessage("Test123", []);
+  chatStore.sendMessage(input.value, []);
+  editor.value.commands.clearContent(true);
 }
+
+onBeforeUnmount(() => {
+  editor.value.destroy();
+});
 </script>

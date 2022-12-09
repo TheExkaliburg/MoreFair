@@ -40,7 +40,6 @@
       <ListboxButton :disabled="max === 1" as="template">
         <PaginationButtonGroupButton
           class="w-1/6 border-l-0 rounded-r-md w-full flex justify-center items-center"
-          @click="emit('change', max)"
         >
           <ChevronDownIcon class="h-4 w-4 text-button-text" />
         </PaginationButtonGroupButton>
@@ -51,7 +50,7 @@
         leave-to-class="opacity-0"
       >
         <ListboxOptions
-          class="absolute top-8 bg-background max-h-32 w-full overflow-auto z-1 border-1 border-button-border rounded-md"
+          class="absolute top-5 bg-background max-h-32 w-full overflow-auto z-1 border-1 border-button-border rounded-md pl-0"
         >
           <ListboxOption v-for="number in max" :key="number" as="template">
             <li class="w-full flex flex-row">

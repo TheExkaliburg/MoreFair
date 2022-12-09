@@ -4,15 +4,20 @@
   </NuxtLayout>
 </template>
 
-<script setup lang="ts">
-// HIGHEST PRIO
-// TODO: Sidebar for large Screens
-// TODO: Toggle UI for Sidebar Buttons
+<script lang="ts" setup>
+// CHAD
+// TODO: Mentions, GroupMentions
+// TODO: Emoji
 
-// MEDIUM PRIO
-// TODO: Ladder and Chat Placeholder
-// TODO:
+// LADDER
 
-// LOWEST PRIO
-// TODO: Lower opacity of the page when the sidebar is open
+// OPTIONS
+
+// RULES
+
+// HELP
+
+// ABOUT
+
+// MOD
 </script>

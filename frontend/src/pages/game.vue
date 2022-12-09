@@ -2,12 +2,12 @@
   <div class="w-full h-screen flex flex-col lg:flex-row bg-background">
     <LadderWindow
       v-if="uiStore.ladderEnabled"
-      :class="uiStore.chatEnabled ? 'h-2/3 lg:w-3/5' : 'h-full lg:w-full'"
+      :class="uiStore.chatEnabled ? 'h-2/3 lg:w-7/10' : 'h-full lg:w-full'"
       class="w-full lg:h-full"
     />
     <ChatWindow
       v-if="uiStore.chatEnabled"
-      :class="uiStore.ladderEnabled ? 'h-1/3 lg:w-2/5' : 'h-full lg:w-full'"
+      :class="uiStore.ladderEnabled ? 'h-1/3 lg:w-3/10' : 'h-full lg:w-full'"
       class="w-full lg:h-full"
     />
   </div>

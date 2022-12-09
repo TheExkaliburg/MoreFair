@@ -36,6 +36,11 @@ export default defineNuxtConfig({
       "@fortawesome/vue-fontawesome",
       "@headlessui/vue",
       "@heroicons/vue",
+      "@tiptap/core",
+      "@tiptap/suggestion",
+      "@tiptap/vue-3",
+      "@tiptap/extension-character-count",
+      "@tiptap/extension-mention",
     ],
   },
   intlify: {
