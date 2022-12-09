@@ -20,8 +20,7 @@
         editor?.storage.characterCount?.characters()
       }}</span>
       /
-      {{ characterLimit }} ->
-      <span class="text-text">{{ editor?.getHTML() }}</span>
+      {{ characterLimit }}
     </div>
   </div>
 </template>
@@ -35,7 +34,11 @@ import { Mention } from "@tiptap/extension-mention";
 import { CharacterCount } from "@tiptap/extension-character-count";
 import { useDomUtils } from "~/composables/useDomUtils";
 import { useChatStore } from "~/store/chat";
-import { useUserSuggestion } from "~/composables/useSuggestion";
+import {
+  useEmojiSuggestion,
+  useGroupSuggestion,
+  useUserSuggestion,
+} from "~/composables/useSuggestion";
 
 useDomUtils();
 
@@ -67,7 +70,7 @@ const editor = useEditor({
       },
       suggestion: useEmojiSuggestion(),
       renderLabel: ({ node }) => {
-        return `${node.attrs.label ?? node.attrs.id.emoji}`;
+        return `${node.attrs.id.emoji}`;
       },
     }),
     Mention.extend({ name: "groupMention" }).configure({
@@ -82,15 +85,39 @@ const editor = useEditor({
   ],
   onUpdate: ({ editor }) => {
     input.value = editor.getText();
-    console.log(editor.getJSON());
   },
 });
 
 function sendMessage() {
   const messageJson = editor.value.getJSON();
-  console.log(messageJson);
+  const textNodes = messageJson.content[0]?.content;
 
-  chatStore.sendMessage(input.value, []);
+  let result = "";
+  const metadata = [];
+
+  for (const node of textNodes) {
+    if (node.type === "text") {
+      result += node.text;
+    } else if (node.type === "userMention") {
+      result += "{@}";
+      metadata.push({
+        u: node.attrs.id,
+        i: result.length - 3,
+        id: 0,
+      });
+    } else if (node.type === "emojiMention") {
+      result += node.attrs.id.emoji;
+    } else if (node.type === "groupMention") {
+      result += "{$}";
+      metadata.push({
+        g: node.attrs.id,
+        i: result.length - 3,
+      });
+    }
+  }
+
+  console.log(result, metadata);
+  chatStore.sendMessage(result, metadata);
   editor.value.commands.clearContent(true);
 }
 
