@@ -86,6 +86,9 @@ public class RoundEntity {
     if (types.contains(RoundType.CHAOS)) {
       // CHAOS rounds add a random number of additional ladders (up to 15)
       this.highestAssholeCount = random.nextInt(16);
+      if (number == 100) {
+        this.highestAssholeCount = 15;
+      }
     }
 
     double percentage = random.nextDouble(0.5, 1.5);
