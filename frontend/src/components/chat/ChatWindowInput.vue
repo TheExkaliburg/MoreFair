@@ -17,35 +17,31 @@
     <div class="text-xs lg:text-sm text-left w-full px-2 text-text-light">
       Message length:
       <span class="text-text">{{
-        editor?.storage.characterCount.characters()
+        editor?.storage.characterCount?.characters()
       }}</span>
       /
       {{ characterLimit }} ->
-      <span class="text-text">{{ input }}</span>
+      <span class="text-text">{{ editor?.getHTML() }}</span>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { EditorContent, Node, useEditor } from "@tiptap/vue-3";
-import { Text } from "@tiptap/extension-text";
-import { Paragraph } from "@tiptap/extension-paragraph";
-import { CharacterCount } from "@tiptap/extension-character-count";
-import { Mention } from "@tiptap/extension-mention";
 import { onBeforeUnmount } from "vue";
+import { Paragraph } from "@tiptap/extension-paragraph";
+import { Text } from "@tiptap/extension-text";
+import { Mention } from "@tiptap/extension-mention";
+import { CharacterCount } from "@tiptap/extension-character-count";
 import { useDomUtils } from "~/composables/useDomUtils";
 import { useChatStore } from "~/store/chat";
-import {
-  useEmojiSuggestion,
-  useGroupSuggestion,
-  useUserSuggestion,
-} from "~/composables/useSuggestion";
+import { useUserSuggestion } from "~/composables/useSuggestion";
 
 useDomUtils();
 
 const chatStore = useChatStore();
 
-const input = ref(undefined);
+const input = ref<string>("");
 const characterLimit = 280;
 
 const editor = useEditor({
@@ -61,13 +57,13 @@ const editor = useEditor({
     CharacterCount.configure({ limit: characterLimit }),
     Mention.extend({ name: "userMention" }).configure({
       HTMLAttributes: {
-        class: "user",
+        class: "mention",
       },
       suggestion: useUserSuggestion(["Grapes", "Banana", "Apple"]),
     }),
     Mention.extend({ name: "emojiMention" }).configure({
       HTMLAttributes: {
-        class: "emoji",
+        class: "mention",
       },
       suggestion: useEmojiSuggestion(),
       renderLabel: ({ node }) => {
@@ -76,7 +72,7 @@ const editor = useEditor({
     }),
     Mention.extend({ name: "groupMention" }).configure({
       HTMLAttributes: {
-        class: "group",
+        class: "mention",
       },
       suggestion: useGroupSuggestion(["mod", "here", "train"]),
       renderLabel: ({ node }) => {
@@ -91,6 +87,9 @@ const editor = useEditor({
 });
 
 function sendMessage() {
+  const messageJson = editor.value.getJSON();
+  console.log(messageJson);
+
   chatStore.sendMessage(input.value, []);
   editor.value.commands.clearContent(true);
 }
