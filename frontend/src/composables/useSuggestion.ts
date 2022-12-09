@@ -46,8 +46,7 @@ export const useSuggestion = () => {
             return true;
           }
 
-          console.log(component.ref);
-          return component.ref?.onKeyDown(props);
+          return component.ref?.onKeyDown(props.event);
         },
         onExit() {
           popup[0].destroy();

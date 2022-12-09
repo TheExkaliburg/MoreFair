@@ -43,7 +43,7 @@
     <div v-else>No result</div>
   </div>
 </template-->
-<!--script lang="ts" setup>
+<script lang="ts" setup>
 import { Listbox, ListboxOption, ListboxOptions } from "@headlessui/vue";
 import { watch } from "vue";
 
@@ -61,7 +61,8 @@ watch(props.items, () => {
   selectedIndex.value = 0;
 });
 
- function onKeyDown(event: KeyboardEvent) {
+function onKeyDown(event: KeyboardEvent) {
+  console.log(event);
   if (event.key === "Escape") {
     event.preventDefault();
     return false;
@@ -95,9 +96,11 @@ function selectItem(index: number) {
     props.command({ id: item });
   }
 }
-</script-->
 
-<script lang="ts">
+defineExpose({ onKeyDown });
+</script>
+
+<!--script lang="ts">
 import { Listbox, ListboxOption, ListboxOptions } from "@headlessui/vue";
 
 export default {
@@ -128,6 +131,7 @@ export default {
   },
   methods: {
     onKeyDown(event: KeyboardEvent) {
+      console.log(event, this.props.items);
       if (event.key === "Escape") {
         event.preventDefault();
         return false;
@@ -162,4 +166,4 @@ export default {
     },
   },
 };
-</script>
+</script-->
