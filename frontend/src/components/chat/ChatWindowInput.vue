@@ -35,7 +35,11 @@ import { Mention } from "@tiptap/extension-mention";
 import { onBeforeUnmount } from "vue";
 import { useDomUtils } from "~/composables/useDomUtils";
 import { useChatStore } from "~/store/chat";
-import { useSuggestion } from "~/composables/useSuggestion";
+import {
+  useEmojiSuggestion,
+  useGroupSuggestion,
+  useUserSuggestion,
+} from "~/composables/useSuggestion";
 
 useDomUtils();
 
@@ -55,11 +59,29 @@ const editor = useEditor({
     Text,
     Paragraph,
     CharacterCount.configure({ limit: characterLimit }),
-    Mention.configure({
+    Mention.extend({ name: "userMention" }).configure({
       HTMLAttributes: {
-        class: "mention",
+        class: "user",
       },
-      suggestion: useSuggestion(),
+      suggestion: useUserSuggestion(["Grapes", "Banana", "Apple"]),
+    }),
+    Mention.extend({ name: "emojiMention" }).configure({
+      HTMLAttributes: {
+        class: "emoji",
+      },
+      suggestion: useEmojiSuggestion(),
+      renderLabel: ({ node }) => {
+        return `${node.attrs.label ?? node.attrs.id.emoji}`;
+      },
+    }),
+    Mention.extend({ name: "groupMention" }).configure({
+      HTMLAttributes: {
+        class: "group",
+      },
+      suggestion: useGroupSuggestion(["mod", "here", "train"]),
+      renderLabel: ({ node }) => {
+        return `$${node.attrs.label ?? node.attrs.id}$`;
+      },
     }),
   ],
   onUpdate: ({ editor }) => {
