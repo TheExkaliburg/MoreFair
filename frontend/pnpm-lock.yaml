@@ -25,6 +25,7 @@ specifiers:
   '@tiptap/extension-document': 2.0.0-beta.207
   '@tiptap/extension-mention': 2.0.0-beta.207
   '@tiptap/extension-paragraph': 2.0.0-beta.207
+  '@tiptap/extension-placeholder': 2.0.0-beta.207
   '@tiptap/extension-text': 2.0.0-beta.207
   '@tiptap/suggestion': 2.0.0-beta.207
   '@tiptap/vue-3': 2.0.0-beta.207
@@ -78,6 +79,7 @@ devDependencies:
   '@tiptap/extension-document': 2.0.0-beta.207_xzobyxekojg7s63egj2c4mbq34
   '@tiptap/extension-mention': 2.0.0-beta.207_gsipuqtqkxbcabskenwasm3r4q
   '@tiptap/extension-paragraph': 2.0.0-beta.207_xzobyxekojg7s63egj2c4mbq34
+  '@tiptap/extension-placeholder': 2.0.0-beta.207_nkfksf3ehgnl37drbbsnihlqhe
   '@tiptap/extension-text': 2.0.0-beta.207_xzobyxekojg7s63egj2c4mbq34
   '@tiptap/suggestion': 2.0.0-beta.207_nkfksf3ehgnl37drbbsnihlqhe
   '@tiptap/vue-3': 2.0.0-beta.207_cmn4xz4ovgnyrhld2aoz7esuhi
@@ -1617,6 +1619,20 @@ packages:
       '@tiptap/core': ^2.0.0-beta.193
     dependencies:
       '@tiptap/core': 2.0.0-beta.207_rd5pjtxohzfgv2zee3iufpqkay
+    dev: true
+
+  /@tiptap/extension-placeholder/2.0.0-beta.207_nkfksf3ehgnl37drbbsnihlqhe:
+    resolution: {integrity: sha512-ZlmW4yYwgVH7yRfp0ZA/ntcd+OQRM0HCuGKWug+bV3H5S14cTrFmQ3OY3r5tmDGKhMp6MpJ0jgXtP0CghM6Tqg==}
+    peerDependencies:
+      '@tiptap/core': ^2.0.0-beta.193
+      prosemirror-model: ^1.18.1
+      prosemirror-state: ^1.4.1
+      prosemirror-view: ^1.28.2
+    dependencies:
+      '@tiptap/core': 2.0.0-beta.207_rd5pjtxohzfgv2zee3iufpqkay
+      prosemirror-model: 1.18.3
+      prosemirror-state: 1.4.2
+      prosemirror-view: 1.29.1
     dev: true
 
   /@tiptap/extension-text/2.0.0-beta.207_xzobyxekojg7s63egj2c4mbq34:

@@ -17,7 +17,7 @@
             <a
               :ref="index === selectedIndex ? 'selected' : ''"
               :class="{ 'bg-white': index === selectedIndex }"
-              class="w-full px-2 text-right text-text-light hover:text-button-text-hover hover:bg-button-bg-hover whitespace-nowrap"
+              class="w-full px-2 text-left text-text-light hover:text-button-text-hover hover:bg-button-bg-hover whitespace-nowrap"
               href="#"
               @click="selectItem(index)"
               @keydown="onKeyDown"
