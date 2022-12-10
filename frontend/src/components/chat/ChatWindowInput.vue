@@ -3,7 +3,7 @@
     <div class="flex flex-row justify-center items-center relative w-full">
       <EditorContent
         :editor="editor"
-        class="w-full rounded-l-md border-1 border-button-border p-1 outline-0 overflow-x-hidden text-text"
+        class="w-full rounded-l-md border-1 border-button-border p-1 outline-0 overflow-x-hidden text-text caret-text"
         spellcheck="false"
         @keydown.enter.prevent="sendMessage"
       ></EditorContent>
@@ -119,7 +119,6 @@ function sendMessage() {
     }
   }
 
-  console.log(result, metadata);
   chatStore.sendMessage(result, metadata);
   editor.value.commands.clearContent(true);
 }
@@ -134,6 +133,6 @@ onBeforeUnmount(() => {
   float: left;
   color: var(--text-placeholder-color);
   pointer-events: none;
-  //height: 0;
+  height: 0;
 }
 </style>

@@ -3,9 +3,13 @@ import Cookies from "js-cookie";
 
 const isDevMode = process.env.NODE_ENV !== "production";
 
-axios.defaults.withCredentials = true;
+const axiosInstance = axios.create({
+  baseURL: isDevMode ? "http://localhost:8080" : "",
+});
 
-axios.interceptors.request.use(
+axiosInstance.defaults.withCredentials = true;
+
+axiosInstance.interceptors.request.use(
   function (config: AxiosRequestConfig) {
     if (isDevMode) {
       config.baseURL = "http://localhost:8080";
@@ -24,75 +28,87 @@ axios.interceptors.request.use(
   (error: AxiosError) => Promise.reject(error)
 );
 
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError) => {
+    if (error.response?.status === 403) {
+      window.location.href = "/";
+    }
+    return Promise.reject(error);
+  }
+);
+
 const API = {
   auth: {
     login: (username: string, password: string) => {
       const params = new URLSearchParams();
       params.append("username", username);
       params.append("password", password);
-      return axios.post("/api/auth/login", params, { withCredentials: true });
+      return axiosInstance.post("/api/auth/login", params, {
+        withCredentials: true,
+      });
     },
     registerGuest: () => {
-      return axios.post("/api/auth/register/guest");
+      return axiosInstance.post("/api/auth/register/guest");
     },
     register: (username: string, password: string, uuid?: string) => {
       const params = new URLSearchParams();
       params.append("username", username);
       params.append("password", password);
       if (uuid) params.append("uuid", uuid);
-      return axios.post("/api/auth/register", params);
+      return axiosInstance.post("/api/auth/register", params);
     },
     changePassword: (oldPassword: string, newPassword: string) => {
       const params = new URLSearchParams();
       params.append("oldPassword", oldPassword);
       params.append("newPassword", newPassword);
-      return axios.post("/api/auth/password/change", params);
+      return axiosInstance.post("/api/auth/password/change", params);
     },
     forgotPassword: (username: string) => {
       const params = new URLSearchParams();
       params.append("username", username);
-      return axios.post("/api/auth/password/forgot", params);
+      return axiosInstance.post("/api/auth/password/forgot", params);
     },
     resetPassword: (token: string, password: string) => {
       const params = new URLSearchParams();
       params.append("token", token);
       params.append("password", password);
-      return axios.post("/api/auth/password/reset", params);
+      return axiosInstance.post("/api/auth/password/reset", params);
     },
     logout: () => {
-      return axios.post("/api/auth/logout");
+      return axiosInstance.post("/api/auth/logout");
     },
     authenticationStatus: () => {
-      return axios.get("/api/auth");
+      return axiosInstance.get("/api/auth");
     },
   },
   account: {
     changeDisplayName: (displayName: string) => {
       const params = new URLSearchParams();
       params.append("displayName", displayName);
-      return axios.patch("/api/account/name", params);
+      return axiosInstance.patch("/api/account/name", params);
     },
     getAccountDetails: () => {
-      return axios.get("/api/account");
+      return axiosInstance.get("/api/account");
     },
   },
   ladder: {
     getLadder: (number: number) => {
       const params = new URLSearchParams();
       params.append("number", number.toString());
-      return axios.get("/api/ladder", { params });
+      return axiosInstance.get("/api/ladder", { params });
     },
   },
   chat: {
     getChat: (number: number) => {
       const params = new URLSearchParams();
       params.append("number", number.toString());
-      return axios.get("/api/chat", { params });
+      return axiosInstance.get("/api/chat", { params });
     },
   },
   round: {
     getCurrentRound: () => {
-      return axios.get("/api/round");
+      return axiosInstance.get("/api/round");
     },
   },
 };
