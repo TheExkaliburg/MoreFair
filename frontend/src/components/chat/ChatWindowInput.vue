@@ -20,7 +20,7 @@
         editor?.storage.characterCount?.characters()
       }}</span>
       /
-      {{ characterLimit }}
+      {{ characterLimit }} {{ editor?.getHTML() }}
     </div>
   </div>
 </template>
@@ -32,6 +32,7 @@ import { Paragraph } from "@tiptap/extension-paragraph";
 import { Text } from "@tiptap/extension-text";
 import { Mention } from "@tiptap/extension-mention";
 import { CharacterCount } from "@tiptap/extension-character-count";
+import { Placeholder } from "@tiptap/extension-placeholder";
 import { useDomUtils } from "~/composables/useDomUtils";
 import { useChatStore } from "~/store/chat";
 import {
@@ -48,7 +49,6 @@ const input = ref<string>("");
 const characterLimit = 280;
 
 const editor = useEditor({
-  content: "<p></p>",
   extensions: [
     Node.create({
       name: "doc",
@@ -58,6 +58,9 @@ const editor = useEditor({
     Text,
     Paragraph,
     CharacterCount.configure({ limit: characterLimit }),
+    Placeholder.configure({
+      placeholder: "Chad is listening...",
+    }),
     Mention.extend({ name: "userMention" }).configure({
       HTMLAttributes: {
         class: "mention",
@@ -125,3 +128,12 @@ onBeforeUnmount(() => {
   editor.value.destroy();
 });
 </script>
+<style lang="scss">
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--text-placeholder-color);
+  pointer-events: none;
+  //height: 0;
+}
+</style>
