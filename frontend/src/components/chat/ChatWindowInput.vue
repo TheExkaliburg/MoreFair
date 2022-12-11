@@ -1,6 +1,8 @@
 <template>
   <div class="flex flex-col justify-around">
-    <div class="flex flex-row justify-center items-center relative w-full">
+    <div
+      class="flex flex-row justify-center items-center relative w-full bg-background"
+    >
       <EditorContent
         :editor="editor"
         class="w-full rounded-l-md border-1 border-button-border p-1 outline-0 overflow-x-hidden text-text caret-text"
@@ -56,7 +58,11 @@ const editor = useEditor({
       content: "block",
     }),
     Text,
-    Paragraph,
+    Paragraph.configure({
+      HTMLAttributes: {
+        class: "my-0",
+      },
+    }),
     CharacterCount.configure({ limit: characterLimit }),
     Placeholder.configure({
       placeholder: "Chad is listening...",
@@ -127,8 +133,8 @@ onBeforeUnmount(() => {
   editor.value.destroy();
 });
 </script>
-<style lang="scss">
-.ProseMirror p.is-editor-empty:first-child::before {
+<style lang="scss" scoped>
+:deep(.ProseMirror p.is-editor-empty:first-child::before) {
   content: attr(data-placeholder);
   float: left;
   color: var(--text-placeholder-color);
