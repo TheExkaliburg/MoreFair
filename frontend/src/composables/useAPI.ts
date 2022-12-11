@@ -1,9 +1,10 @@
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import Cookies from "js-cookie";
+import { navigateTo } from "#app";
 
 const isDevMode = process.env.NODE_ENV !== "production";
 
-const axiosInstance = axios.create({
+export const axiosInstance = axios.create({
   baseURL: isDevMode ? "http://localhost:8080" : "",
 });
 
@@ -32,7 +33,7 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     if (error.response?.status === 403) {
-      window.location.href = "/";
+      navigateTo("/");
     }
     return Promise.reject(error);
   }

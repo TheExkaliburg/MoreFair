@@ -5,19 +5,28 @@
 </template>
 
 <script lang="ts" setup>
-// CHAD
-// TODO: Mentions, GroupMentions
-// TODO: Emoji
-
-// LADDER
-
-// OPTIONS
-
-// RULES
-
-// HELP
-
-// ABOUT
-
-// MOD
+/*
+- AUTHENTICATION
+- CHAD
+  - TODO: input bar should not grow in y-size
+- LADDER
+  - TODO: LadderView
+  - TODO: Infinity Scrolling
+  - TODO: Controls
+  - TODO: ETA & Colors
+  - TODO: Accounts need to be featured in the mention suggestions
+- OPTIONS
+  - TODO: Options Page
+  - TODO: Groups need to be featured in the groups suggestions
+  - TODO: Shortcuts
+- RULES
+  - TODO: Rules Page
+  - TODO: Agree on Login
+- HELP
+  - TODO: content with .md
+- ABOUT
+  - TODO: Impressum
+- MOD
+  - TODO: Mod Page & options
+*/
 </script>
