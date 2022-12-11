@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 import { MentionMeta, Message } from "~/store/entities/message";
 import { useStomp } from "~/composables/useStomp";
 import { useAPI } from "~/composables/useAPI";

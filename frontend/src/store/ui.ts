@@ -1,10 +1,10 @@
 import { defineStore } from "pinia";
-import { watch } from "vue";
+import { ref, watch } from "vue";
 
 export const useUiStore = defineStore("ui", () => {
   // variables
   const sidebarExpanded = ref<boolean>(false);
-  const ladderEnabled = ref<boolean>(false);
+  const ladderEnabled = ref<boolean>(true);
   const chatEnabled = ref<boolean>(true);
 
   // side-effects

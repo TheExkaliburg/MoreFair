@@ -8,7 +8,6 @@
 /*
 - AUTHENTICATION
 - CHAD
-  - TODO: input bar should not grow in y-size
 - LADDER
   - TODO: LadderView
   - TODO: Infinity Scrolling
