@@ -4,7 +4,7 @@
       :current="chatStore.number"
       :max="10"
       :prefix="'Chad'"
-      class="h-8 w-42 self-end"
+      class="h-8 w-42 self-end bg-background z-2"
       @change="changeChat"
     />
   </div>
