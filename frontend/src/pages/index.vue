@@ -4,8 +4,10 @@
   >
     <div class="text-5xl text-text">FairGame</div>
     <div class="flex flex-row justify-center content-center">
-      <FairButton @click="registerGuest">Play as Guest</FairButton>
-      <FairButton @click="openLoginModal">Login</FairButton>
+      <FairButton class="mx-1 my-3" @click="registerGuest"
+        >Play as Guest</FairButton
+      >
+      <FairButton class="mx-1 my-3" @click="openLoginModal">Login</FairButton>
     </div>
     <div class="text-text">Guest-UUID: {{ authStore.uuid }}</div>
     <div class="text-text">Logged in: {{ authStore.authenticationStatus }}</div>

@@ -50,12 +50,12 @@ public class LadderController {
   private final FairConfig config;
 
 
-  @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> initLadder(@RequestParam(value = "number") Integer number,
       Authentication authentication) {
     try {
       log.debug("/app/game/init/{} from {}", number, authentication.getName());
-      AccountEntity account = accountService.findByUsername(authentication.getName());
+      AccountEntity account = accountService.find(UUID.fromString(authentication.getName()));
       if (account == null || account.isBanned()) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       }
@@ -72,7 +72,6 @@ public class LadderController {
       } else {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       }
-
     } catch (IllegalArgumentException e) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     } catch (Exception e) {

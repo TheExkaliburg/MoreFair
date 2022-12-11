@@ -2,9 +2,9 @@
   <div
     class="flex flex-col justify-center items-center relative p-1 overflow-hidden text-text"
   >
-    <LadderWindowHeader class="h-8 w-full" />
-    <LadderWindowTable class="h-full w-full" />
-    <LadderWindowBody class="h-1/4 w-full" />
+    <LadderWindowHeader class="h-8 w-full shrink-0" />
+    <LadderWindowTable class="h-full w-full flex-auto items-center" />
+    <LadderWindowBody class="h-min w-full shrink-0" />
   </div>
 </template>
 
@@ -16,6 +16,6 @@ import LadderWindowBody from "./LadderWindowBody.vue";
 
 <style lang="scss" scoped>
 div {
-  border: 1px solid white;
+  //border: 1px solid white;
 }
 </style>

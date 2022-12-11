@@ -7,8 +7,11 @@
     />
     <ChatWindow
       v-if="uiStore.chatEnabled"
-      :class="uiStore.ladderEnabled ? 'h-1/3 lg:w-3/10' : 'h-full lg:w-full'"
-      class="w-full lg:h-full border-t-1 border-button-border lg:border-t-0"
+      :class="[
+        uiStore.ladderEnabled ? 'h-1/3 lg:w-3/10' : 'h-full lg:w-full',
+        { 'border-t-1': uiStore.ladderEnabled && uiStore.chatEnabled },
+      ]"
+      class="w-full lg:h-full border-button-border lg:border-t-0"
     />
   </div>
 </template>
@@ -18,6 +21,7 @@ import { onMounted } from "vue";
 import { useUiStore } from "~/store/ui";
 import { useStomp } from "~/composables/useStomp";
 import { useChatStore } from "~/store/chat";
+import { useLadderStore } from "~/store/ladder";
 
 const uiStore = useUiStore();
 
@@ -27,5 +31,6 @@ useStomp();
 
 onMounted(() => {
   useChatStore().init();
+  useLadderStore().init();
 });
 </script>

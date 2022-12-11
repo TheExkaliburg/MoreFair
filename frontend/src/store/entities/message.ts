@@ -135,6 +135,25 @@ export class Message implements MessageData {
       }
     });
 
+    // Take the last part and add it as Plain text
+    result.push(
+      new MessagePart(MessagePartType.plain, message.slice(lastIndex))
+    );
+
     return result;
   }
 }
+
+/*
+const m = new Message({
+  id: 1,
+  username: "test",
+  message: "test {$} {@} test",
+  metadata: '[{"g":"group","i":5},{"u":"user","i":9,"id":1}]',
+  timestamp: 0,
+  tag: "",
+  assholePoints: 0,
+});
+
+console.log(m.getMessageParts());
+*/

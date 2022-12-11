@@ -1,11 +1,11 @@
 import { defineStore } from "pinia";
 import { reactive, ref } from "vue";
-import { MentionMeta, Message } from "~/store/entities/message";
+import { MentionMeta, Message, MessageData } from "~/store/entities/message";
 import { useStomp } from "~/composables/useStomp";
 import { useAPI } from "~/composables/useAPI";
 
 export type ChatData = {
-  messages: object[];
+  messages: MessageData[];
   number: number;
 };
 
@@ -29,7 +29,7 @@ export const useChatStore = defineStore("chat", () => {
       .then((response) => {
         const data: ChatData = response.data;
         Object.assign(messages, []);
-        data.messages.forEach((message: Message) => {
+        data.messages.forEach((message) => {
           const msg = new Message(message);
           msg.setFlag("old");
           messages.unshift(msg);
@@ -65,7 +65,7 @@ export const useChatStore = defineStore("chat", () => {
   }
 
   return {
-    // vars
+    // state
     messages,
     number,
     // actions

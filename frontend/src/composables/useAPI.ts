@@ -32,7 +32,7 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    if (error.response?.status === 403) {
+    if (error.response?.status === 401) {
       navigateTo("/");
     }
     return Promise.reject(error);
