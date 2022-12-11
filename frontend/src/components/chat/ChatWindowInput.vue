@@ -1,11 +1,11 @@
 <template>
   <div class="flex flex-col justify-around">
     <div
-      class="flex flex-row justify-center items-center relative w-full bg-background"
+      class="flex flex-row justify-center items-center relative w-full bg-background z-10"
     >
       <EditorContent
         :editor="editor"
-        class="w-full rounded-l-md border-1 border-button-border p-1 outline-0 overflow-x-hidden text-text caret-text"
+        class="w-full rounded-l-md border-1 border-button-border p-1 outline-0 overflow-x-hidden text-text caret-text whitespace-nowrap overflow-x-auto"
         spellcheck="false"
         @keydown.enter.prevent="sendMessage"
       ></EditorContent>
@@ -22,7 +22,7 @@
         editor?.storage.characterCount?.characters()
       }}</span>
       /
-      {{ characterLimit }} {{ editor?.getHTML() }}
+      {{ characterLimit }}
     </div>
   </div>
 </template>
@@ -60,7 +60,7 @@ const editor = useEditor({
     Text,
     Paragraph.configure({
       HTMLAttributes: {
-        class: "my-0",
+        class: "my-0 whitespace-pre",
       },
     }),
     CharacterCount.configure({ limit: characterLimit }),
@@ -101,6 +101,8 @@ function sendMessage() {
   const messageJson = editor.value.getJSON();
   const textNodes = messageJson.content[0]?.content;
 
+  if (!textNodes) return;
+
   let result = "";
   const metadata = [];
 
@@ -123,8 +125,9 @@ function sendMessage() {
         i: result.length - 3,
       });
     }
-  }
 
+    if (result.startsWith(" ")) result = result.trimStart();
+  }
   chatStore.sendMessage(result, metadata);
   editor.value.commands.clearContent(true);
 }
