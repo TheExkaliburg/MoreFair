@@ -5,6 +5,12 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "Client Side Performance", {
+          improvements: [
+            "Excluded the insides of the Decimals from the reactive state since they never change, only get overwritten.",
+            "This was back when i tested it (August) a ~50% decrease in time it takes for a tick to process",
+          ],
+        }),
         new Version("PATCH", "Deleting messages of muted/banned players", {
           fixes: [
             "Should now properly delete messages of muted/banned players",

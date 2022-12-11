@@ -23,8 +23,8 @@ class Ranker {
     this.accountId = accountId;
     this.username = username;
     this.rank = rank;
-    this.points = new Decimal(points);
-    this.power = new Decimal(power);
+    this.points = Object.freeze(new Decimal(points));
+    this.power = Object.freeze(new Decimal(power));
     this.bias = bias;
     this.multi = multi;
     this.you = you;
@@ -34,11 +34,11 @@ class Ranker {
     this.ahPoints = ahPoints;
 
     if (this.you) {
-      this.grapes = new Decimal(grapes);
-      this.vinegar = new Decimal(vinegar);
+      this.grapes = Object.freeze(new Decimal(grapes));
+      this.vinegar = Object.freeze(new Decimal(vinegar));
     } else {
-      this.grapes = new Decimal(0);
-      this.vinegar = new Decimal(0);
+      this.grapes = Object.freeze(new Decimal(0));
+      this.vinegar = Object.freeze(new Decimal(0));
     }
   }
 }
