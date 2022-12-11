@@ -67,7 +67,16 @@ export const useUserSuggestion = (list: Array<string>) => {
     items: ({ query }) => {
       const queryLower = query.toLowerCase();
       if (queryLower.length < 1) return [];
-      return list.filter((item) => item.toLowerCase().startsWith(queryLower));
+
+      if (queryLower.startsWith("#")) {
+        if (queryLower.length < 2) return [];
+        return list.filter((_, index) =>
+          String(index + 1).includes(queryLower.substring(1))
+        );
+      } else {
+        if (queryLower.length < 1) return [];
+        return list.filter((item) => item.toLowerCase().startsWith(queryLower));
+      }
     },
     pluginKey: new PluginKey("userSuggestion"),
     render: render((item) => item),
@@ -98,8 +107,8 @@ export const useGroupSuggestion = (list: Array<string>) => {
     items: ({ query }) => {
       const queryLower = query.toLowerCase();
       return [
-        queryLower,
         ...list.filter((item) => item.toLowerCase().startsWith(queryLower)),
+        queryLower,
       ];
     },
     pluginKey: new PluginKey("groupSuggestion"),
