@@ -7,6 +7,7 @@ export default defineNuxtConfig({
     "virtual:windi-devtools",
     "~/assets/scss/styles.scss",
     "@fortawesome/fontawesome-svg-core/styles.css",
+    "vue-virtual-scroller/dist/vue-virtual-scroller.css",
   ],
   modules: [
     "@pinia/nuxt",
@@ -36,6 +37,7 @@ export default defineNuxtConfig({
       "@fortawesome/vue-fontawesome",
       "@headlessui/vue",
       "@heroicons/vue",
+      "vue-virtual-scroller",
     ],
   },
   intlify: {

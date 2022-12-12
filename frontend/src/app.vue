@@ -10,7 +10,7 @@
 - CHAD
 - LADDER
   - TODO: LadderView
-  - TODO: Infinity Scrolling
+  - TODO: Virtual Scrolling
   - TODO: Controls
   - TODO: ETA & Colors
   - TODO: Accounts need to be featured in the mention suggestions

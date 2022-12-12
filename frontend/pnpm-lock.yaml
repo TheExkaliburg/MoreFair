@@ -52,11 +52,13 @@ specifiers:
   prettier-plugin-tailwindcss: ^0.1.13
   sass: ^1.54.8
   sass-loader: ^13.0.2
+  swarm-numberformat: ^0.4.0
   tailwindcss: ^3.1.8
   tippy.js: ^6.3.7
   typescript: ^4.8.2
   vite: ^2.3.0
   vue: ^3.2.0
+  vue-virtual-scroller: 2.0.0-beta.5
   webpack: ^5.0.0
 
 devDependencies:
@@ -106,11 +108,13 @@ devDependencies:
   prettier-plugin-tailwindcss: 0.1.13_prettier@2.7.1
   sass: 1.54.8
   sass-loader: 13.0.2_sass@1.54.8+webpack@5.74.0
+  swarm-numberformat: 0.4.0_decimal.js@7.5.1
   tailwindcss: 3.1.8_57znarxsqwmnneadci5z5fd5gu
   tippy.js: 6.3.7
   typescript: 4.8.2
   vite: 2.9.15_sass@1.54.8
   vue: 3.2.38
+  vue-virtual-scroller: 2.0.0-beta.5_vue@3.2.38
   webpack: 5.74.0
 
 packages:
@@ -3373,6 +3377,10 @@ packages:
   /decamelize/1.2.0:
     resolution: {integrity: sha512-z2S+W9X73hAUUki+N+9Za2lBlun89zigOyGrsax+KUQ6wKW4ZoWpEYBkGhQjwAjjDCkWxhY0VKEhk8wzY7F5cA==}
     engines: {node: '>=0.10.0'}
+    dev: true
+
+  /decimal.js/7.5.1:
+    resolution: {integrity: sha512-1K5Y6MykxQYfHBcFfAj2uBaLmwreq4MsjsvrlgcEOvg+X82IeeXlIVIVkBMiypksu+yo9vcYP6lfU3qTedofSQ==}
     dev: true
 
   /declass/0.0.1:
@@ -6655,6 +6663,10 @@ packages:
       yallist: 4.0.0
     dev: true
 
+  /mitt/2.1.0:
+    resolution: {integrity: sha512-ILj2TpLiysu2wkBbWjAmww7TkZb65aiQO+DkVdUTBpBXq+MHYiETENkKFMtsJZX1Lf4pe4QOrTSjIfUwN5lRdg==}
+    dev: true
+
   /mkdirp/0.5.6:
     resolution: {integrity: sha512-FP+p8RB8OWpF3YZBCrP5gtADmtXApB5AMLn+vdyA+PyxCjrCs00mjyUozssO33cwDeT3wNGdLxJ5M//YqtHAJw==}
     hasBin: true
@@ -8786,6 +8798,14 @@ packages:
       stable: 0.1.8
     dev: true
 
+  /swarm-numberformat/0.4.0_decimal.js@7.5.1:
+    resolution: {integrity: sha512-Fs00WiW2G1505GXXawEAvHsFrznjyDCqyTySE1aFO5MdaheX1CUt7XhAauYq6xowGIpUom15o2pFN4cyljaVXg==}
+    peerDependencies:
+      decimal.js: ^7.1.0
+    dependencies:
+      decimal.js: 7.5.1
+    dev: true
+
   /tailwindcss/3.1.8_57znarxsqwmnneadci5z5fd5gu:
     resolution: {integrity: sha512-YSneUCZSFDYMwk+TGq8qYFdCA3yfBRdBlS7txSq0LUmzyeqRe3a8fBQzbz9M3WS/iFT4BNf/nmw9mEzrnSaC0g==}
     engines: {node: '>=12.13.0'}
@@ -9834,6 +9854,22 @@ packages:
       vue: 3.2.38
     dev: true
 
+  /vue-observe-visibility/2.0.0-alpha.1_vue@3.2.38:
+    resolution: {integrity: sha512-flFbp/gs9pZniXR6fans8smv1kDScJ8RS7rEpMjhVabiKeq7Qz3D9+eGsypncjfIyyU84saU88XZ0zjbD6Gq/g==}
+    peerDependencies:
+      vue: ^3.0.0
+    dependencies:
+      vue: 3.2.38
+    dev: true
+
+  /vue-resize/2.0.0-alpha.1_vue@3.2.38:
+    resolution: {integrity: sha512-7+iqOueLU7uc9NrMfrzbG8hwMqchfVfSzpVlCMeJQe4pyibqyoifDNbKTZvwxZKDvGkB+PdFeKvnGZMoEb8esg==}
+    peerDependencies:
+      vue: ^3.0.0
+    dependencies:
+      vue: 3.2.38
+    dev: true
+
   /vue-router/4.1.5_vue@3.2.38:
     resolution: {integrity: sha512-IsvoF5D2GQ/EGTs/Th4NQms9gd2NSqV+yylxIyp/OYp8xOwxmU8Kj/74E9DTSYAyH5LX7idVUngN3JSj1X4xcQ==}
     peerDependencies:
@@ -9841,6 +9877,17 @@ packages:
     dependencies:
       '@vue/devtools-api': 6.2.1
       vue: 3.2.38
+    dev: true
+
+  /vue-virtual-scroller/2.0.0-beta.5_vue@3.2.38:
+    resolution: {integrity: sha512-P7m/8D/7bzu45gWqCflQxyZomWL4cy75AZXz73Ri43VYRiSx1hW8QNIGr6PoAR1kZAcEqHZwYlvM76gUDA3wdA==}
+    peerDependencies:
+      vue: ^3.2.0
+    dependencies:
+      mitt: 2.1.0
+      vue: 3.2.38
+      vue-observe-visibility: 2.0.0-alpha.1_vue@3.2.38
+      vue-resize: 2.0.0-alpha.1_vue@3.2.38
     dev: true
 
   /vue/3.2.38:

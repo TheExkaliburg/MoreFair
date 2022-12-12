@@ -26,7 +26,7 @@ export const useLadderStore = defineStore("ladder", () => {
   const stomp = useStomp();
 
   const isInitialized = ref<boolean>(false);
-  const ladder = reactive<Ranker[]>([]);
+  const rankers = reactive<Ranker[]>([]);
   const number = ref<number>(1);
   const types = reactive<Set<LadderType>>(new Set());
   const basePointsToPromote = ref<Decimal>(new Decimal(0));
@@ -42,9 +42,9 @@ export const useLadderStore = defineStore("ladder", () => {
       .getLadder(ladderNumber)
       .then((res) => {
         const data: LadderData = res.data;
-        Object.assign(ladder, []);
+        Object.assign(rankers, []);
         data.rankers.forEach((ranker) => {
-          ladder.push(new Ranker(ranker));
+          rankers.push(new Ranker(ranker));
         });
         Object.assign(types, new Set());
         data.types.forEach((s) => {
@@ -57,6 +57,13 @@ export const useLadderStore = defineStore("ladder", () => {
           !stomp.callbacks.onLadderEvent.some((x) => x.identifier === "default")
         ) {
           stomp.callbacks.onLadderEvent.push({
+            identifier: "default",
+            callback: (_) => {},
+          });
+        }
+
+        if (!stomp.callbacks.onTick.some((x) => x.identifier === "default")) {
+          stomp.callbacks.onTick.push({
             identifier: "default",
             callback: (_) => {},
           });
@@ -74,7 +81,7 @@ export const useLadderStore = defineStore("ladder", () => {
 
   return {
     // state
-    ladder,
+    rankers,
     number,
     types,
     basePointsToPromote,
