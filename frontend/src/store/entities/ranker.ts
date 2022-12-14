@@ -3,6 +3,7 @@ import Decimal from "break_infinity.js";
 export type RankerData = {
   id: number;
   username: string;
+  you: boolean;
   rank: number;
   points: Decimal;
   power: Decimal;
@@ -11,6 +12,7 @@ export type RankerData = {
   growing: boolean;
   autoPromote: boolean;
   assholeTag: string;
+  assholePoints: number;
   grapes: Decimal;
   vinegar: Decimal;
 };
@@ -18,6 +20,7 @@ export type RankerData = {
 export class Ranker implements RankerData {
   id: number = 0;
   username: string = "";
+  you: boolean = false;
   rank: number = 0;
   points: Decimal = new Decimal(0);
   power: Decimal = new Decimal(1);
@@ -26,14 +29,15 @@ export class Ranker implements RankerData {
   growing: boolean = true;
   autoPromote: boolean = false;
   assholeTag: string = "";
+  assholePoints: number = 0;
   grapes: Decimal = new Decimal(0);
   vinegar: Decimal = new Decimal(0);
 
   constructor(data: any) {
     Object.assign(this, data);
-    Object.freeze(this.points);
-    Object.freeze(this.power);
-    Object.freeze(this.grapes);
-    Object.freeze(this.vinegar);
+    this.points = Object.freeze(new Decimal(this.points));
+    this.power = Object.freeze(new Decimal(this.power));
+    this.grapes = Object.freeze(new Decimal(this.grapes));
+    this.vinegar = Object.freeze(new Decimal(this.vinegar));
   }
 }

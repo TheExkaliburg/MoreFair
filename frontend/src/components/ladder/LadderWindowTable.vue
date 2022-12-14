@@ -1,6 +1,6 @@
 <template>
   <div>
-    <DynamicScroller
+    <!--DynamicScroller
       :buffer="1000"
       :items="shownRanker"
       :min-item-size="23"
@@ -23,18 +23,25 @@
           :item="item"
           :size-dependencies="item"
         >
-          <LadderWindowTableRow :ranker="item" />
+          <LadderWindowTableRow
+            :active="active"
+            :index="index"
+            :ranker="item"
+          />
         </DynamicScrollerItem>
       </template>
-    </DynamicScroller>
+    </DynamicScroller-->
+    <LadderWindowTableRow
+      v-for="(ranker, index) in shownRanker"
+      :key="index"
+      :active="true"
+      :index="index"
+      :ranker="ranker"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
-import {
-  DynamicScroller,
-  DynamicScrollerItem,
-} from "vue-virtual-scroller/dist/vue-virtual-scroller.esm";
 import { computed } from "vue";
 import { useLadderStore } from "~/store/ladder";
 import LadderWindowTableRow from "~/components/ladder/LadderWindowTableRow.vue";
