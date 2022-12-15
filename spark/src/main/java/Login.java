@@ -26,6 +26,6 @@ public class Login {
 
         result.show();
 
-        result.write().format("mongo").mode("append").save();
+        result.write().format("mongodb").mode("append").save();
     }
 }
