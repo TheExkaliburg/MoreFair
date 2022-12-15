@@ -2,6 +2,9 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 
+import java.util.Calendar;
+import java.util.Date;
+
 public class Login {
     public static void main(String[] args) {
         SparkSession spark = SparkSession.builder()
@@ -13,8 +16,16 @@ public class Login {
 
         Dataset<Row> df = spark.read().format("mongodb").load();
 
-        Dataset<Row> result = df.groupBy("account._id").count();
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -1);
+        Date yesterday = calendar.getTime();
+
+        Dataset<Row> entriesFromLastHour = df.where("createdOn >= yesterday");
+
+        Dataset<Row> result = entriesFromLastHour.groupBy("account._id").count();
 
         result.show();
+
+        result.write().format("mongo").mode("append").save();
     }
 }
