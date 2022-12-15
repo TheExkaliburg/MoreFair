@@ -20,9 +20,9 @@ public class Login {
         calendar.add(Calendar.DATE, -1);
         Date yesterday = calendar.getTime();
 
-        Dataset<Row> entriesFromLastHour = df.where("createdOn >= '" + yesterday + "'");
+        // Dataset<Row> entriesFromLastHour = df.where("createdOn >= '" + yesterday + "'");
 
-        Dataset<Row> result = entriesFromLastHour.groupBy("account._id").count();
+        Dataset<Row> result = df.groupBy("account._id").count();
 
         result.show();
 
