@@ -14,6 +14,7 @@ import de.kaliburg.morefair.events.types.EventType;
 import de.kaliburg.morefair.game.round.RankerService;
 import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
+import de.kaliburg.morefair.statistics.StatisticsService;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -34,15 +35,17 @@ public class AccountController {
   private final WsUtils wsUtils;
   private final RoundService roundService;
   private final RankerService rankerService;
+  private final StatisticsService statisticsService;
 
   public AccountController(AccountService accountService,
       RequestThrottler requestThrottler, WsUtils wsUtils,
-      RoundService roundService, RankerService rankerService) {
+      RoundService roundService, RankerService rankerService, StatisticsService statisticsService) {
     this.accountService = accountService;
     this.requestThrottler = requestThrottler;
     this.wsUtils = wsUtils;
     this.roundService = roundService;
     this.rankerService = rankerService;
+    this.statisticsService = statisticsService;
   }
 
   /**
@@ -98,6 +101,7 @@ public class AccountController {
       }
 
       account = accountService.login(account, principal);
+      statisticsService.login(account);
       int highestLadder = rankerService.findCurrentRankersOfAccount(account, currentRound).stream()
           .mapToInt(r -> r.getLadder().getNumber()).max().orElse(1);
 
