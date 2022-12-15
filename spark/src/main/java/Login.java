@@ -22,7 +22,7 @@ public class Login {
 
         // Dataset<Row> entriesFromLastHour = df.where("createdOn >= '" + yesterday + "'");
 
-        Dataset<Row> result = df.groupBy("account._id").count();
+        Dataset<Row> result = df.groupBy("account._id").count().sort("count");
 
         result.show();
 
