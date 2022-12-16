@@ -1,5 +1,6 @@
 dependency
 /backend/src/main/resources/public/
+/frontend/node/
 
 # Created by https://www.toptal.com/developers/gitignore/api/git,java,maven,intellij+all,node
 # Edit at https://www.toptal.com/developers/gitignore?templates=git,java,maven,intellij+all,node
