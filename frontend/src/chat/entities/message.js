@@ -7,7 +7,11 @@ class Message {
     this.accountId = data.accountId;
     this.timeCreated = data.timeCreated;
     // TODO: Json parse should feed a constructor of type Metadata
-    this.metadata = JSON.parse(data.metadata);
+    try {
+      this.metadata = JSON.parse(data.metadata);
+    } catch (e) {
+      this.metadata = [];
+    }
     this.flags = [];
   }
 
