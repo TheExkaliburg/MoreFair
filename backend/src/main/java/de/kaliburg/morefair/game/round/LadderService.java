@@ -1,5 +1,7 @@
 package de.kaliburg.morefair.game.round;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
@@ -31,6 +33,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Lazy;
@@ -65,6 +68,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   private final Map<Integer, List<Event>> eventMap = new HashMap<>();
   private final WsUtils wsUtils;
   private final FairConfig config;
+  private final Gson gson;
   @Getter(AccessLevel.PACKAGE)
   @Setter(AccessLevel.PACKAGE)
   private RoundEntity currentRound;
@@ -74,7 +78,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   public LadderService(RankerService rankerService, LadderRepository ladderRepository,
       LadderUtils ladderUtils, AccountService accountService, RoundUtils roundUtils,
       ChatService chatService, UpgradeUtils upgradeUtils, ApplicationEventPublisher eventPublisher,
-      @Lazy WsUtils wsUtils, FairConfig config) {
+      @Lazy WsUtils wsUtils, FairConfig config, Gson gson) {
     this.rankerService = rankerService;
     this.ladderRepository = ladderRepository;
     this.ladderUtils = ladderUtils;
@@ -85,6 +89,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
     this.eventPublisher = eventPublisher;
     this.wsUtils = wsUtils;
     this.config = config;
+    this.gson = gson;
   }
 
   @Transactional
@@ -548,14 +553,23 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
         // Logic for the Asshole-Ladder
         if (newRanker.getUnlocks().getPressedAssholeButton()) {
+          JsonObject object1 = new JsonObject();
+          object1.addProperty("u", StringEscapeUtils.escapeJson(account.getUsername()));
+          object1.addProperty("id", account.getId());
+          object1.addProperty("i", 0);
+
           AccountEntity broadCaster = accountService.findBroadcaster();
+          JsonObject object2 = new JsonObject();
+          object2.addProperty("u", StringEscapeUtils.escapeJson(broadCaster.getUsername()));
+          object2.addProperty("id", broadCaster.getId());
+          object2.addProperty("i", 20);
+
+          String metadataString = gson.toJson(new JsonObject[]{object1, object2});
+
           chatService.sendGlobalMessage("{@} was welcomed by {@}. They are the "
-                  + FormattingUtils.ordinal(newLadder.getRankers().size())
-                  + " lucky initiate for the " + FormattingUtils.ordinal(
-                  currentRound.getNumber()) + " big ritual.",
-              "[{\"u\":\"" + account.getUsername() + "\",\"id\":\"" + account.getId()
-                  + "\",\"i\":0},{\"u\":\"" + broadCaster.getUsername() + "\",\"id\":\""
-                  + broadCaster.getId() + "\",\"i\":20}]");
+              + FormattingUtils.ordinal(newLadder.getRankers().size())
+              + " lucky initiate for the " + FormattingUtils.ordinal(
+              currentRound.getNumber()) + " big ritual.", metadataString);
 
           int neededAssholesForReset = currentRound.getAssholesForReset();
           int assholeCount = newLadder.getRankers().size();
