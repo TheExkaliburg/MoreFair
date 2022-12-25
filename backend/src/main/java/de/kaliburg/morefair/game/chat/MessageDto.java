@@ -1,6 +1,7 @@
 package de.kaliburg.morefair.game.chat;
 
 import de.kaliburg.morefair.FairConfig;
+import java.time.ZoneOffset;
 import lombok.Data;
 
 @Data
@@ -20,7 +21,7 @@ public class MessageDto {
     this.message = message.getMessage();
     this.username = message.getAccount().getUsername();
     this.accountId = message.getAccount().getId();
-    this.timestamp = message.getCreatedOn().toEpochSecond();
+    this.timestamp = message.getCreatedOn().withOffsetSameInstant(ZoneOffset.UTC).toEpochSecond();
     this.metadata = message.getMetadata();
   }
 }
