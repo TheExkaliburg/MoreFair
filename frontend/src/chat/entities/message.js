@@ -34,12 +34,15 @@ class Message {
   getTimestampString() {
     const date = new Date(0);
     date.setUTCSeconds(this.timestamp);
-    // format to weekday. hours:minutes
-    return date.toLocaleString("en-GB", {
+
+    const options = {
       weekday: "short",
       hour: "numeric",
       minute: "numeric",
-    });
+    };
+
+    const formatter = new Intl.DateTimeFormat(undefined, options);
+    return formatter.format(date);
   }
 }
 
