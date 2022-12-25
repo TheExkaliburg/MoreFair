@@ -17,7 +17,7 @@
         <strong>{{ msg.tag }}</strong
         ><sub>{{ ahPoints }}</sub>
       </div>
-      <div class="col-3 message-date">{{ msg.timeCreated }}</div>
+      <div class="col-3 message-date">{{ timestamp }}</div>
       <div
         v-if="
           store.getters['options/getOptionValue']('enableChatModFeatures') &&
@@ -79,6 +79,8 @@ const ahPoints = computed(() => {
   }
   return "";
 });
+
+const timestamp = computed(() => props.msg.getTimestampString());
 
 function mentionUser() {
   let mention = getMentionElement({

@@ -5,6 +5,11 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "Timestamp for messages", {
+          fixes: [
+            "Should now show the timestamp of the message correctly",
+          ],
+        }),
         new Version("PATCH", "Backslash breaking Chad - Fix v2", {
           fixes: [
             "Should escape the usernames properly on sending a message from Chad.",
