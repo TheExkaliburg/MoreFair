@@ -5,6 +5,11 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "Backslash breaking Chad - Fix v2", {
+          fixes: [
+            "Should escape the usernames properly on sending a message from Chad.",
+          ],
+        }),
         new Version("PATCH", "Backslash breaking Chad - Fix", {
           fixes: [
             "Should escape the usernames properly on sending a message from Chad.",
