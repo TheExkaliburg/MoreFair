@@ -2,7 +2,6 @@ package de.kaliburg.morefair.game.chat;
 
 import de.kaliburg.morefair.FairConfig;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import lombok.Data;
 
 @Data
@@ -11,7 +10,7 @@ public class MessageDto {
   private final String message;
   private final String username;
   private final Long accountId;
-  private final String timeCreated;
+  private final Long timestamp;
   private final String tag;
   private final Integer ahPoints;
   private final String metadata;
@@ -22,10 +21,7 @@ public class MessageDto {
     this.message = message.getMessage();
     this.username = message.getAccount().getUsername();
     this.accountId = message.getAccount().getId();
-    this.timeCreated =
-        message.getCreatedOn().atZoneSameInstant(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern(
-            "EE "
-                + "HH:mm"));
+    this.timestamp = message.getCreatedOn().withOffsetSameInstant(ZoneOffset.UTC).toEpochSecond();
     this.metadata = message.getMetadata();
   }
 }

@@ -5,6 +5,21 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "Timestamp for messages", {
+          fixes: [
+            "Should now show the timestamp of the message correctly, regarding timezone and locale",
+          ],
+        }),
+        new Version("PATCH", "Backslash breaking Chad - Fix v2", {
+          fixes: [
+            "Should escape the usernames properly on sending a message from Chad.",
+          ],
+        }),
+        new Version("PATCH", "Backslash breaking Chad - Fix", {
+          fixes: [
+            "Should escape the usernames properly on sending a message from Chad.",
+          ],
+        }),
         new Version("PATCH", "Client Side Performance", {
           improvements: [
             "Excluded the insides of the Decimals from the reactive state since they never change, only get overwritten.",
