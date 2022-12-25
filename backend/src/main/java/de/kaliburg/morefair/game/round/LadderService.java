@@ -33,7 +33,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Lazy;
@@ -554,13 +553,13 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         // Logic for the Asshole-Ladder
         if (newRanker.getUnlocks().getPressedAssholeButton()) {
           JsonObject object1 = new JsonObject();
-          object1.addProperty("u", StringEscapeUtils.escapeJson(account.getUsername()));
+          object1.addProperty("u", account.getUsername());
           object1.addProperty("id", account.getId());
           object1.addProperty("i", 0);
 
           AccountEntity broadCaster = accountService.findBroadcaster();
           JsonObject object2 = new JsonObject();
-          object2.addProperty("u", StringEscapeUtils.escapeJson(broadCaster.getUsername()));
+          object2.addProperty("u", broadCaster.getUsername());
           object2.addProperty("id", broadCaster.getId());
           object2.addProperty("i", 20);
 
