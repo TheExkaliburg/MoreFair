@@ -31,7 +31,7 @@ class Message {
     return this.flags.includes(flag);
   }
 
-  getTimestampString(){
+  getTimestampString() {
     const date = new Date(0);
     date.setUTCSeconds(this.timestamp);
     // format to weekday. hours:minutes
