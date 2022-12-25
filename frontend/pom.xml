@@ -36,7 +36,7 @@
                             <npmVersion>${npm.version}</npmVersion>
                         </configuration>
                     </execution>
-                    <execution>
+                    <!--execution>
                         <id>npm clean workspace</id>
                         <goals>
                             <goal>npm</goal>
@@ -45,7 +45,7 @@
                         <configuration>
                             <arguments>run clean</arguments>
                         </configuration>
-                    </execution>
+                    </execution-->
                     <execution>
                         <id>npm-install</id>
                         <goals>
