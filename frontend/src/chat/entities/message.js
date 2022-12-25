@@ -32,8 +32,15 @@ class Message {
   }
 
   getTimestampString() {
+    // Create a date object with the timestamp
     const date = new Date(0);
     date.setUTCSeconds(this.timestamp);
+
+    // Get the timezone offset of the client's timezone in minutes
+    const timezoneOffset = date.getTimezoneOffset();
+
+    // Adjust the timestamp by the timezone offset
+    date.setUTCMinutes(date.getUTCMinutes() + timezoneOffset);
 
     const options = {
       weekday: "short",
