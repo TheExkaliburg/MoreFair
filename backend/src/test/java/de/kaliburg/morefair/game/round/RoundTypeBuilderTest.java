@@ -20,7 +20,7 @@ class RoundTypeBuilderTest {
 
   @BeforeAll
   static void init() {
-    for (int i = 0; i < 10000; i++) {
+    for (int i = 0; i < 100; i++) {
       RoundTypeBuilder builder = new RoundTypeBuilder();
       roundTypesList.add(builder.build());
     }

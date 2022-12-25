@@ -20,7 +20,7 @@ public class MessageDto {
     this.message = message.getMessage();
     this.username = message.getAccount().getDisplayName();
     this.id = message.getAccount().getId();
-    this.timestamp = message.getCreatedOn().toEpochSecond();
+    this.timestamp = message.getCreatedOn().withOffsetSameInstant(ZoneOffset.UTC).toEpochSecond();
     this.metadata = message.getMetadata();
   }
 }
