@@ -4,11 +4,14 @@
   "private": true,
   "scripts": {
     "pre-commit": "lint-staged",
-    "serve": "vue-cli-service serve",
+    "dev": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
-    "clean": ""
+    "clean": "rm -rf node_modules && rm -rf .nuxt",
+    "clean-install": "npm run clean || npm install",
+    "clean-install::win": "npm run clean::win || npm install",
+    "clean::win": "rd /s /q node_modules && rd /s /q .nuxt"
   },
   "pre-commit": [
     "pre-commit"
