@@ -36,19 +36,14 @@ class Message {
     const date = new Date(0);
     date.setUTCSeconds(this.timestamp);
 
-    // Get the timezone offset of the client's timezone in minutes
-    const timezoneOffset = date.getTimezoneOffset();
-
-    // Adjust the timestamp by the timezone offset
-    date.setUTCMinutes(date.getUTCMinutes() + timezoneOffset);
-
     const options = {
       weekday: "short",
       hour: "numeric",
       minute: "numeric",
+      hour12: false,
     };
 
-    const formatter = new Intl.DateTimeFormat(undefined, options);
+    const formatter = new Intl.DateTimeFormat(navigator.language, options);
     return formatter.format(date);
   }
 }
