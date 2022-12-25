@@ -6,7 +6,9 @@ const versioningModule = {
     return {
       versions: [
         new Version("PATCH", "Timestamp for messages", {
-          fixes: ["Should now show the timestamp of the message correctly"],
+          fixes: [
+            "Should now show the timestamp of the message correctly, regarding timezone and locale",
+          ],
         }),
         new Version("PATCH", "Backslash breaking Chad - Fix v2", {
           fixes: [
