@@ -10,6 +10,7 @@ import de.kaliburg.morefair.events.types.EventType;
 import de.kaliburg.morefair.game.round.RankerService;
 import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
+import de.kaliburg.morefair.statistics.StatisticsService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -36,6 +37,7 @@ public class AccountController {
   private final WsUtils wsUtils;
   private final RoundService roundService;
   private final RankerService rankerService;
+  private final StatisticsService statisticsService;
 
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -48,6 +50,7 @@ public class AccountController {
         accountService.save(account);
       }
 
+      statisticsService.login(account);
       RoundEntity currentRound = roundService.getCurrentRound();
       int highestLadder = rankerService.findCurrentRankersOfAccount(account, currentRound).stream()
           .mapToInt(r -> r.getLadder().getNumber()).max().orElse(1);
