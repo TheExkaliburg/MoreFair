@@ -40,4 +40,20 @@ class RoundTypeBuilderTest {
 
     log.info("{}", countMap);
   }
+
+  @Test
+  void build_round100_ChaosSlowAuto() {
+    RoundTypeBuilder builder = new RoundTypeBuilder();
+    builder.setRoundNumber(100);
+    Set<RoundType> build = builder.build();
+    log.info("{}", build);
+
+    LadderTypeBuilder ladderTypeBuilder = new LadderTypeBuilder();
+    ladderTypeBuilder.setRoundTypes(build);
+    ladderTypeBuilder.setLadderNumber(1);
+    ladderTypeBuilder.setAssholeLadderNumber(30);
+    ladderTypeBuilder.setRoundNumber(100);
+    Set<LadderType> build1 = ladderTypeBuilder.build();
+    log.info("{}", build1);
+  }
 }
