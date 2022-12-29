@@ -28,6 +28,9 @@ public class LadderTypeBuilder {
   private Integer ladderNumber;
   @Setter
   @Accessors(chain = true)
+  private Integer roundNumber = 1;
+  @Setter
+  @Accessors(chain = true)
   private Integer assholeLadderNumber;
 
   public LadderTypeBuilder() {
@@ -83,7 +86,7 @@ public class LadderTypeBuilder {
       }
       case AUTO -> {
         ladderAutoTypeWeights.put(LadderType.FREE_AUTO,
-            ladderAutoTypeWeights.get(LadderType.FREE_AUTO) * 10);
+            Math.max(1.0f, ladderAutoTypeWeights.get(LadderType.FREE_AUTO) * 10));
         ladderAutoTypeWeights.put(LadderType.DEFAULT, 0.f);
       }
       case CHAOS -> {
@@ -129,6 +132,13 @@ public class LadderTypeBuilder {
     this.roundTypes.stream().sorted(new RoundTypeComparator()).forEach(this::handleRoundTypes);
     this.previousLadderType.stream().sorted(new LadderTypeComparator())
         .forEach(this::handlePreviousLadderType);
+
+    if (roundNumber == 100 && ladderNumber % 10 == 0) {
+      // make it no Auto for sure
+      ladderAutoTypeWeights.put(LadderType.DEFAULT, 0.f);
+      ladderAutoTypeWeights.put(LadderType.FREE_AUTO, 0.f);
+      ladderAutoTypeWeights.put(LadderType.NO_AUTO, 100.f);
+    }
 
     if (ladderNumber >= assholeLadderNumber) {
       ladderAutoTypeWeights.put(LadderType.NO_AUTO,

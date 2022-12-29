@@ -40,6 +40,7 @@ class LadderTypeBuilderTest {
       for (int i = 0; i < 100; i++) {
         LadderTypeBuilder builder = new LadderTypeBuilder();
         builder.setLadderNumber(2);
+        builder.setRoundNumber(1);
         builder.setAssholeLadderNumber(25);
         builder.setRoundTypes(roundTypes);
         builder.setPreviousLadderType(lastRoundTypes);
