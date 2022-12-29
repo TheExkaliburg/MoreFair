@@ -113,6 +113,11 @@ public class LadderTypeBuilder {
     }
   }
 
+  /**
+   * Uses the current state of the builder to determine the ladder type.
+   *
+   * @return a random ladder type based on the current round and ladder number
+   */
   public Set<LadderType> build() {
     Set<LadderType> ladderTypes = EnumSet.noneOf(LadderType.class);
 
