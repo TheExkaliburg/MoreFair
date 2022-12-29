@@ -1,6 +1,7 @@
 package de.kaliburg.morefair.game.chat;
 
 import de.kaliburg.morefair.FairConfig;
+import java.time.ZoneOffset;
 import lombok.Data;
 
 @Data
