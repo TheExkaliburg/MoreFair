@@ -5,12 +5,12 @@
     >
       <EditorContent
         :editor="editor"
-        class="w-full rounded-l-md border-1 border-button-border p-1 outline-0 overflow-x-hidden text-text caret-text whitespace-nowrap overflow-x-auto"
+        class="w-full rounded-l-md border-1 h-8 border-button-border p-1 outline-0 overflow-x-hidden text-text caret-text whitespace-nowrap overflow-x-auto"
         spellcheck="false"
         @keydown.enter.prevent="sendMessage"
       ></EditorContent>
       <button
-        class="w-1/4 max-w-xs rounded-r-md border-l-0 border-1 border-button-border py-1 text-button-text hover:text-button-text-hover hover:bg-button-bg-hover"
+        class="w-1/4 max-w-xs rounded-r-md h-8 border-l-0 border-1 border-button-border py-1 text-button-text hover:text-button-text-hover hover:bg-button-bg-hover"
         @click="sendMessage"
       >
         Send
