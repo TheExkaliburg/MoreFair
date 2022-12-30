@@ -26,13 +26,6 @@ export const useLadderStore = defineStore("ladder", () => {
   const api = useAPI();
   const stomp = useStomp();
 
-  const state = reactive({
-    isInitialized: false,
-    rankers: [] as Ranker[],
-    number: 1,
-    types: new Set() as Set<LadderType>,
-    basePointsToPromote: new Decimal(0),
-  });
   const isInitialized = ref<boolean>(false);
   const rankers = reactive<Ranker[]>([]);
   const number = ref<number>(1);
@@ -50,9 +43,9 @@ export const useLadderStore = defineStore("ladder", () => {
       .getLadder(ladderNumber)
       .then((res) => {
         const data: LadderData = res.data;
-        Object.assign(rankers, []);
+        rankers.length = 0;
         data.rankers.forEach((ranker) => {
-          state.rankers.push(new Ranker(ranker));
+          rankers.push(new Ranker(ranker));
         });
         Object.assign(types, new Set());
         data.types.forEach((s) => {
@@ -66,7 +59,17 @@ export const useLadderStore = defineStore("ladder", () => {
         ) {
           stomp.callbacks.onLadderEvent.push({
             identifier: "default",
-            callback: (_) => {},
+            callback: (body) => {
+              const data: RankerData = body.data;
+              const ranker = rankers.find(
+                (x) => x.accountId === data.accountId
+              );
+              if (ranker) {
+                Object.assign(ranker, new Ranker(data));
+              } else {
+                rankers.push(new Ranker(data));
+              }
+            },
           });
         }
 
@@ -91,13 +94,13 @@ export const useLadderStore = defineStore("ladder", () => {
 
   function calculateTick(deltaSeconds: number) {
     const delta = new Decimal(deltaSeconds);
-    const newRankers: Ranker[] = [...state.rankers];
-    newRankers.sort((a, b) => b.points.cmp(a.points));
+    // const newRankers: Ranker[] = [...rankers];
+    rankers.sort((a, b) => b.points.cmp(a.points));
 
-    for (let i = 0; i < newRankers.length; i++) {
-      const ranker = new Ranker(newRankers[i]);
-      newRankers[i] = ranker;
-      newRankers[i].rank = i + 1;
+    for (let i = 0; i < rankers.length; i++) {
+      const ranker = new Ranker(rankers[i]);
+      rankers[i] = ranker;
+      rankers[i].rank = i + 1;
 
       // If ranker still on ladder
       if (ranker.growing) {
@@ -112,42 +115,34 @@ export const useLadderStore = defineStore("ladder", () => {
         ranker.points = ranker.points.add(ranker.power.mul(delta).floor());
 
         // TODO: Vinegar & Grapes
-        newRankers[i] = ranker;
+        // rankers[i] = ranker;
 
         for (let j = i - 1; j >= 0; j--) {
-          const currentRanker = newRankers[j + 1];
-          if (currentRanker.points.cmp(newRankers[j].points) > 0) {
+          const currentRanker = rankers[j + 1];
+          if (currentRanker.points.cmp(rankers[j].points) > 0) {
             // Move 1 position up and move the ranker there 1 Position down
 
             // Move other Ranker 1 Place down
-            newRankers[j].rank = j + 2;
-            if (
-              newRankers[j].growing &&
-              newRankers[j].you &&
-              newRankers[j].multi > 1
-            ) {
-              newRankers[j].grapes = newRankers[j].grapes.add(1);
+            rankers[j].rank = j + 2;
+            if (rankers[j].growing && rankers[j].you && rankers[j].multi > 1) {
+              rankers[j].grapes = rankers[j].grapes.add(1);
             }
-            newRankers[j + 1] = newRankers[j];
+            rankers[j + 1] = rankers[j];
 
             // Move current Ranker 1 Place up
             currentRanker.rank = j + 1;
-            newRankers[j] = currentRanker;
+            rankers[j] = currentRanker;
           } else {
             break;
           }
         }
       }
     }
-
-    console.log(new Date(), deltaSeconds);
-    state.rankers.length = 0;
-    state.rankers.push(...newRankers);
   }
 
   return {
     // state
-    rankers: state.rankers,
+    rankers,
     number,
     types,
     basePointsToPromote,

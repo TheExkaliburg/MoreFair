@@ -1,9 +1,10 @@
 <template>
   <div>
-    <!--DynamicScroller
+    <DynamicScroller
       :buffer="1000"
-      :items="shownRanker"
+      :items="ladder.rankers"
       :min-item-size="23"
+      class="h-full overflow-y-scroll"
       key-field="rank"
       page-mode
     >
@@ -21,7 +22,7 @@
           :data-active="active"
           :data-index="index"
           :item="item"
-          :size-dependencies="item"
+          :size-dependencies="[item]"
         >
           <LadderWindowTableRow
             :active="active"
@@ -30,23 +31,20 @@
           />
         </DynamicScrollerItem>
       </template>
-    </DynamicScroller-->
-    <LadderWindowTableRow
+    </DynamicScroller>
+    <!--LadderWindowTableRow
       v-for="(ranker, index) in shownRanker"
       :key="index"
       :active="true"
       :index="index"
       :ranker="ranker"
-    />
+    /-->
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed } from "vue";
 import { useLadderStore } from "~/store/ladder";
 import LadderWindowTableRow from "~/components/ladder/LadderWindowTableRow.vue";
-
-const shownRanker = computed(() => [...ladder.rankers]);
 
 const ladder = useLadderStore();
 </script>

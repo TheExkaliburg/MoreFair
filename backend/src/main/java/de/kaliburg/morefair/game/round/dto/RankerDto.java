@@ -8,16 +8,15 @@ import lombok.Data;
 public class RankerDto {
 
   private Long accountId;
-  private Integer bias;
-  private boolean isYou = false;
-  private Integer multi;
+  private String username;
+  private Integer rank;
   private String points;
   private String power;
-  private Integer rank;
-  private String username;
-  private String tag;
-  private Integer ahPoints;
+  private Integer bias;
+  private Integer multi;
   private boolean isGrowing;
+  private String assholeTag;
+  private Integer ahPoints;
 
   public RankerDto(RankerEntity ranker, FairConfig config) {
     this.accountId = ranker.getAccount().getId();
@@ -28,7 +27,7 @@ public class RankerDto {
     this.bias = ranker.getBias();
     this.multi = ranker.getMultiplier();
     this.isGrowing = ranker.isGrowing();
-    this.tag = config.getAssholeTag(ranker.getAccount().getAssholeCount());
+    this.assholeTag = config.getAssholeTag(ranker.getAccount().getAssholeCount());
     this.ahPoints = ranker.getAccount().getAssholePoints();
   }
 }
