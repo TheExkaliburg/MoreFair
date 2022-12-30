@@ -4,14 +4,17 @@
       :buffer="1000"
       :items="ladder.rankers"
       :min-item-size="23"
-      class="h-full overflow-y-scroll"
+      class="h-full overflow-y-scroll text-sm"
       key-field="rank"
       page-mode
     >
       <template #before>
-        <div class="flex flex-row flex-nowrap justify-between items-center">
+        <div
+          class="flex flex-row flex-nowrap justify-between items-center font-bold text-text-light"
+        >
           <div class="w-full">#</div>
           <div class="w-full">Username</div>
+          <div class="w-full text-right">Power/s</div>
           <div class="w-full text-right">Power</div>
           <div class="w-full text-right">Points</div>
         </div>
