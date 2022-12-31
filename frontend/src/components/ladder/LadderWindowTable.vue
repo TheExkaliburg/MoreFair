@@ -10,7 +10,7 @@
     >
       <template #before>
         <div
-          class="flex flex-row flex-nowrap justify-between items-center font-bold text-text-light"
+          class="flex flex-row flex-nowrap justify-between items-center px-1 font-bold text-text-light"
         >
           <div class="w-full">#</div>
           <div class="w-full">Username</div>

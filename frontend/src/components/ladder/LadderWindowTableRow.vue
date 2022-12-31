@@ -1,18 +1,27 @@
 <template>
   <div
     v-if="active"
-    :class="{ 'text-text-light': !ranker.growing }"
-    class="flex flex-row flex-nowrap justify-between items-center text-sm"
+    :class="{
+      'bg-ladder-bg-promoted text-ladder-text-promoted': !ranker.growing,
+      'bg-ladder-bg-you text-ladder-text-you': isYou,
+    }"
+    class="flex flex-row flex-nowrap justify-between items-center px-1 text-sm"
   >
     <div class="w-full">
       {{ ranker.rank }} {{ ranker.assholeTag }}
-      <sub class="text-text-dark">{{ ranker.assholePoints }}</sub>
+      <sub :class="{ 'text-text-dark': !isYou }">{{
+        ranker.assholePoints
+      }}</sub>
     </div>
     <div class="w-full">
-      {{ ranker.username }}<sub class="text-text-dark">#{{ ranker.id }}</sub>
+      {{ ranker.username
+      }}<sub :class="{ 'text-text-dark': !isYou }">#{{ ranker.accountId }}</sub>
     </div>
     <div class="w-full text-right">
-      {{ formattedPowerPerSec }} [+{{ formattedBias }} x{{ formattedMulti }}]
+      {{ formattedPowerPerSec }}[<span class="text-eta-best"
+        >+{{ formattedBias }}</span
+      ><span class="text-eta-worst"> x{{ formattedMulti }}</span
+      >]
     </div>
     <div class="w-full text-right">{{ formattedPower }}</div>
     <div class="w-full text-right">{{ formattedPoints }}</div>
@@ -30,11 +39,13 @@ const props = defineProps({
   index: { type: Number, required: false, default: -1 },
 });
 
+const isYou = computed(() => props.ranker.accountId === 3);
+
 const formattedPowerPerSec = computed<string>(() => {
   if (!props.ranker.growing) return "";
   return `(+${useFormatter(
     (props.ranker.rank + props.ranker.bias) * props.ranker.multi
-  )}/s)`;
+  )}/s) `;
 });
 
 const formattedBias = computed<string>(() => {
