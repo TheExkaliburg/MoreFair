@@ -17,6 +17,7 @@ public class LadderTypeBuilder {
   private static final Random random = new Random();
   private final Map<LadderType, Float> ladderSizeTypeWeights = new HashMap<>();
   private final Map<LadderType, Float> ladderAutoTypeWeights = new HashMap<>();
+  private final Map<LadderType, Float> ladderCostTypeWeights = new HashMap<>();
   @Setter
   @Accessors(chain = true)
   private Set<RoundType> roundTypes = EnumSet.noneOf(RoundType.class);
@@ -40,6 +41,10 @@ public class LadderTypeBuilder {
     ladderAutoTypeWeights.put(LadderType.FREE_AUTO, 5.f);
     ladderAutoTypeWeights.put(LadderType.NO_AUTO, 2.f);
     ladderAutoTypeWeights.put(LadderType.DEFAULT, 100.f);
+
+    ladderCostTypeWeights.put(LadderType.CHEAP, 5.f);
+    ladderCostTypeWeights.put(LadderType.EXPENSIVE,5.f);
+    ladderCostTypeWeights.put(LadderType.DEFAULT, 100.f);
   }
 
   private void handlePreviousLadderType(LadderType ladderType) {
@@ -50,6 +55,9 @@ public class LadderTypeBuilder {
       }
       if (ladderAutoTypeWeights.containsKey(ladderType)) {
         ladderAutoTypeWeights.put(ladderType, ladderAutoTypeWeights.get(ladderType) / 2);
+      }
+      if (ladderCostTypeWeights.containsKey(ladderType)) {
+        ladderCostTypeWeights.put(ladderType, ladderCostTypeWeights.get(ladderType) / 2);
       }
 
       return;
@@ -80,6 +88,10 @@ public class LadderTypeBuilder {
         ladderSizeTypeWeights.put(LadderType.BIG, 0.f);
         ladderSizeTypeWeights.put(LadderType.GIGANTIC, 0.f);
         ladderSizeTypeWeights.put(LadderType.DEFAULT, 0.f);
+        ladderCostTypeWeights.put(LadderType.CHEAP,
+            ladderCostTypeWeights.get(LadderType.CHEAP) * 2);
+        ladderCostTypeWeights.put(LadderType.EXPENSIVE,
+            ladderCostTypeWeights.get(LadderType.EXPENSIVE) / 2);
       }
       case AUTO -> {
         ladderAutoTypeWeights.put(LadderType.FREE_AUTO,
@@ -92,6 +104,9 @@ public class LadderTypeBuilder {
         ladderSizeTypeWeights.put(LadderType.BIG, 1.f);
         ladderSizeTypeWeights.put(LadderType.GIGANTIC, 1.f);
         ladderSizeTypeWeights.put(LadderType.DEFAULT, 0.f);
+        ladderCostTypeWeights.put(LadderType.CHEAP, 1.f);
+        ladderCostTypeWeights.put(LadderType.EXPENSIVE, 1.f);
+        ladderCostTypeWeights.put(LadderType.DEFAULT, 1.f);
       }
       case SLOW -> {
         ladderSizeTypeWeights.put(LadderType.TINY, ladderSizeTypeWeights.get(LadderType.TINY) / 2);
@@ -103,6 +118,10 @@ public class LadderTypeBuilder {
         ladderAutoTypeWeights.put(LadderType.NO_AUTO, 0.f);
         ladderAutoTypeWeights.put(LadderType.FREE_AUTO,
             ladderAutoTypeWeights.get(LadderType.FREE_AUTO) * 2);
+        ladderCostTypeWeights.put(LadderType.CHEAP,
+            ladderCostTypeWeights.get(LadderType.CHEAP) / 2);
+        ladderCostTypeWeights.put(LadderType.EXPENSIVE,
+            ladderCostTypeWeights.get(LadderType.EXPENSIVE) * 2);
       }
       default -> {
         // do nothing
@@ -140,6 +159,7 @@ public class LadderTypeBuilder {
 
     ladderTypes.add(getRandomLadderType(ladderSizeTypeWeights, "Size"));
     ladderTypes.add(getRandomLadderType(ladderAutoTypeWeights, "Auto"));
+    ladderTypes.add(getRandomLadderType(ladderCostTypeWeights, "Cost"));
     if (ladderTypes.size() > 1) {
       ladderTypes.remove(LadderType.DEFAULT);
     }

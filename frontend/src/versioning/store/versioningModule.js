@@ -5,6 +5,14 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("MINOR", "CHEAP and EXPENSIVE Ladder Types", {
+          features: [
+            "CHEAP ladders have the cost to bias and multi reduced by 50%.",
+            "EXPENSIVE ladders have the cost to bias and multi increased by 50%.",
+            "CHEAP ladders are more common on FAST rounds, and EXPENSIVE ladders are more common on SLOW rounds.",
+            "CHAOS rounds have a much higher chance of rolling CHEAP or EXPENSIVE ladders, with equal chance for each.",
+          ],
+        }),
         new Version("PATCH", "Spectate Asshole Ladder", {
           features: [
             "Adding an option to being able to spectate the asshole ladder (experimental)",
