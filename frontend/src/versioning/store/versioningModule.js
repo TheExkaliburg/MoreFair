@@ -13,6 +13,42 @@ const versioningModule = {
             "CHAOS rounds have a much higher chance of rolling CHEAP or EXPENSIVE ladders, with equal chance for each.",
           ],
         }),
+        new Version("PATCH", "Timestamp for messages", {
+          fixes: [
+            "Should now show the timestamp of the message correctly, regarding timezone and locale",
+          ],
+        }),
+        new Version("PATCH", "Backslash breaking Chad - Fix v2", {
+          fixes: [
+            "Should escape the usernames properly on sending a message from Chad.",
+          ],
+        }),
+        new Version("PATCH", "Backslash breaking Chad - Fix", {
+          fixes: [
+            "Should escape the usernames properly on sending a message from Chad.",
+          ],
+        }),
+        new Version("PATCH", "Client Side Performance", {
+          improvements: [
+            "Excluded the insides of the Decimals from the reactive state since they never change, only get overwritten.",
+            "This was back when i tested it (August) a ~50% decrease in time it takes for a tick to process",
+          ],
+        }),
+        new Version("PATCH", "Deleting messages of muted/banned players", {
+          fixes: [
+            "Should now properly delete messages of muted/banned players",
+          ],
+        }),
+        new Version("PATCH", "Balancing SLOW + CHAOS", {
+          balancing: [
+            "CHAOS also has a chance to contain DEFAULT Ladders",
+            "SLOW doesn't contain SMALL and TINY anymore",
+            "SLOW contains less DEFAULT Ladders",
+          ],
+          fixes: [
+            "FAST + CHAOS can now generate something else besides SMALL ladders",
+          ],
+        }),
         new Version("PATCH", "Spectate Asshole Ladder", {
           features: [
             "Adding an option to being able to spectate the asshole ladder (experimental)",

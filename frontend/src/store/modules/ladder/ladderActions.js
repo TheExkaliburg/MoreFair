@@ -184,8 +184,18 @@ export default {
           { root: true }
         );
         break;
+      case "MUTE":
+      case "BAN":
+        dispatch(
+          {
+            type: "setupChat",
+            stompClient: stompClient,
+          },
+          { root: true }
+        );
+        break;
       case "CONFIRM":
-        // TODO: CONFIRM
+        confirm(event.message);
         break;
       case "INCREASE_ASSHOLE_LADDER":
         commit(

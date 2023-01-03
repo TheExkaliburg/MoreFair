@@ -45,7 +45,7 @@ public class ChatEntity {
   @JoinColumn(name = "game_id", nullable = false, foreignKey = @ForeignKey(name = "fk_chat_game"))
   private GameEntity game;
    */
-  @OneToMany(mappedBy = "chat", fetch = FetchType.EAGER)
+  @OneToMany(mappedBy = "chat", fetch = FetchType.LAZY)
   private List<MessageEntity> messages = new ArrayList<>();
   @NonNull
   @Column(nullable = false)

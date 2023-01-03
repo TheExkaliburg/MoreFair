@@ -31,7 +31,7 @@ const chatModule = {
         tag: "🂮",
         ahPoints: 5950,
         accountId: 1,
-        timeCreated: "Now",
+        timestamp: new Date().getTime() / 1000,
         metadata: "[]",
       });
     },

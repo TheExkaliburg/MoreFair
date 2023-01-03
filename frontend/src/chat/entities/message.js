@@ -5,9 +5,13 @@ class Message {
     this.tag = data.tag;
     this.ahPoints = data.ahPoints;
     this.accountId = data.accountId;
-    this.timeCreated = data.timeCreated;
+    this.timestamp = data.timestamp;
     // TODO: Json parse should feed a constructor of type Metadata
-    this.metadata = JSON.parse(data.metadata);
+    try {
+      this.metadata = JSON.parse(data.metadata);
+    } catch (e) {
+      this.metadata = [];
+    }
     this.flags = [];
   }
 
@@ -25,6 +29,22 @@ class Message {
 
   hasFlag(flag) {
     return this.flags.includes(flag);
+  }
+
+  getTimestampString() {
+    // Create a date object with the timestamp
+    const date = new Date(0);
+    date.setUTCSeconds(this.timestamp);
+
+    const options = {
+      weekday: "short",
+      hour: "numeric",
+      minute: "numeric",
+      hour12: false,
+    };
+
+    const formatter = new Intl.DateTimeFormat(navigator.language, options);
+    return formatter.format(date);
   }
 }
 

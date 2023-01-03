@@ -29,6 +29,9 @@ public class LadderTypeBuilder {
   private Integer ladderNumber;
   @Setter
   @Accessors(chain = true)
+  private Integer roundNumber = 1;
+  @Setter
+  @Accessors(chain = true)
   private Integer assholeLadderNumber;
 
   public LadderTypeBuilder() {
@@ -44,7 +47,7 @@ public class LadderTypeBuilder {
 
     ladderCostTypeWeights.put(LadderType.CHEAP, 5.f);
     ladderCostTypeWeights.put(LadderType.EXPENSIVE,5.f);
-    ladderCostTypeWeights.put(LadderType.DEFAULT, 100.f);
+    ladderCostTypeWeights.put(LadderType.DEFAULT, 90.f);
   }
 
   private void handlePreviousLadderType(LadderType ladderType) {
@@ -95,7 +98,7 @@ public class LadderTypeBuilder {
       }
       case AUTO -> {
         ladderAutoTypeWeights.put(LadderType.FREE_AUTO,
-            ladderAutoTypeWeights.get(LadderType.FREE_AUTO) * 10);
+            Math.max(1.0f, ladderAutoTypeWeights.get(LadderType.FREE_AUTO) * 10));
         ladderAutoTypeWeights.put(LadderType.DEFAULT, 0.f);
       }
       case CHAOS -> {
@@ -103,18 +106,18 @@ public class LadderTypeBuilder {
         ladderSizeTypeWeights.put(LadderType.SMALL, 1.f);
         ladderSizeTypeWeights.put(LadderType.BIG, 1.f);
         ladderSizeTypeWeights.put(LadderType.GIGANTIC, 1.f);
-        ladderSizeTypeWeights.put(LadderType.DEFAULT, 0.f);
+        ladderSizeTypeWeights.put(LadderType.DEFAULT, 1.f);
         ladderCostTypeWeights.put(LadderType.CHEAP, 1.f);
         ladderCostTypeWeights.put(LadderType.EXPENSIVE, 1.f);
         ladderCostTypeWeights.put(LadderType.DEFAULT, 1.f);
       }
       case SLOW -> {
-        ladderSizeTypeWeights.put(LadderType.TINY, ladderSizeTypeWeights.get(LadderType.TINY) / 2);
-        ladderSizeTypeWeights.put(LadderType.SMALL,
-            ladderSizeTypeWeights.get(LadderType.SMALL) / 2);
-        ladderSizeTypeWeights.put(LadderType.BIG, ladderSizeTypeWeights.get(LadderType.BIG) * 2);
+        ladderSizeTypeWeights.put(LadderType.TINY, 0.f);
+        ladderSizeTypeWeights.put(LadderType.SMALL, 0.f);
+        ladderSizeTypeWeights.put(LadderType.DEFAULT,
+            ladderSizeTypeWeights.get(LadderType.DEFAULT) / 5);
         ladderSizeTypeWeights.put(LadderType.GIGANTIC,
-            ladderSizeTypeWeights.get(LadderType.GIGANTIC) * 5);
+            ladderSizeTypeWeights.get(LadderType.GIGANTIC) * 2);
         ladderAutoTypeWeights.put(LadderType.NO_AUTO, 0.f);
         ladderAutoTypeWeights.put(LadderType.FREE_AUTO,
             ladderAutoTypeWeights.get(LadderType.FREE_AUTO) * 2);
@@ -139,6 +142,8 @@ public class LadderTypeBuilder {
       ladderSizeTypeWeights.put(LadderType.BIG, 0.f);
       ladderAutoTypeWeights.put(LadderType.FREE_AUTO, 0.f);
       ladderAutoTypeWeights.put(LadderType.NO_AUTO, 0.f);
+      ladderCostTypeWeights.put(LadderType.CHEAP, 0.f);
+      ladderCostTypeWeights.put(LadderType.EXPENSIVE, 0.f);
     }
 
     if (ladderNumber > 25) {
@@ -148,6 +153,13 @@ public class LadderTypeBuilder {
     this.roundTypes.stream().sorted(new RoundTypeComparator()).forEach(this::handleRoundTypes);
     this.previousLadderType.stream().sorted(new LadderTypeComparator())
         .forEach(this::handlePreviousLadderType);
+
+    if (roundNumber == 100 && ladderNumber % 10 == 0) {
+      // make it no Auto for sure
+      ladderAutoTypeWeights.put(LadderType.DEFAULT, 0.f);
+      ladderAutoTypeWeights.put(LadderType.FREE_AUTO, 0.f);
+      ladderAutoTypeWeights.put(LadderType.NO_AUTO, 100.f);
+    }
 
     if (ladderNumber >= assholeLadderNumber) {
       ladderAutoTypeWeights.put(LadderType.NO_AUTO,
