@@ -119,6 +119,7 @@ public final class LadderEntity {
 
     LadderTypeBuilder builder = new LadderTypeBuilder();
     builder.setLadderNumber(number);
+    builder.setRoundNumber(round.getNumber());
     builder.setAssholeLadderNumber(round.getAssholeLadderNumber());
     builder.setRoundTypes(round.getTypes());
     builder.setPreviousLadderType(previousLadderTypes);
