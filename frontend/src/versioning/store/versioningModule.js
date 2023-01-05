@@ -5,6 +5,9 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "Alt-Checks", {
+          fixes: ["Moderators should now be able to check for alts."],
+        }),
         new Version("PATCH", "Timestamp for messages", {
           fixes: [
             "Should now show the timestamp of the message correctly, regarding timezone and locale",
