@@ -6,7 +6,7 @@ const versioningModule = {
     return {
       versions: [
         new Version("PATCH", "Alt-Checks", {
-          fixes: ["Moderators should now be able to check for alts."],
+          features: ["Moderators should now be able to check for alts."],
         }),
         new Version("PATCH", "Timestamp for messages", {
           fixes: [
