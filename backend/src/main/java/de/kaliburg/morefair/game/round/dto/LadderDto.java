@@ -26,7 +26,6 @@ public class LadderDto {
       RankerDto rankerDto = new RankerDto(ranker, config);
       if (ranker.getAccount().getUuid().equals(account.getUuid())) {
         rankerDto = new RankerPrivateDto(ranker, config);
-        rankerDto.setYou(true);
       }
       this.rankers.add(rankerDto);
     }

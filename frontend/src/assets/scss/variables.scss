@@ -89,15 +89,17 @@ $color-saltpan: #ebede9;
   --toggle-circle-border-color: var(--background-color);
 
   // Ladder
-  --you-color: var(--background-dark-color);
-  --you-background-color: var(--text-dark-highlight-color);
-  --promoted-color: var(--text-light-highlight-color);
-  --promoted-background-color: var(--background-dark-color);
+  --ladder-bg-color: var(--background-color);
+  --ladder-bg-promoted-color: var(--background-dark-color);
+  --ladder-bg-you-color: var(--text-dark-highlight-color);
+  --ladder-text-color: var(--background-color);
+  --ladder-text-promoted-color: var(--main-secondary-color);
+  --ladder-text-you-color: var(--background-color);
 
   //ETA
-  --eta-best: #{$color-la-palma};
-  --eta-mid: var(--main-color);
-  --eta-worst: #{$color-claret};
+  --eta-best-color: #{$color-la-palma};
+  --eta-mid-color: var(--main-color);
+  --eta-worst-color: #{$color-claret};
 
   // Chat
   --header-color: var(--main-color);

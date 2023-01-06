@@ -32,6 +32,7 @@
             <id>debug</id>
             <modules>
                 <module>backend</module>
+                <module>spark</module>
             </modules>
         </profile>
         <profile>
@@ -42,6 +43,7 @@
             <modules>
                 <module>frontend</module>
                 <module>backend</module>
+                <module>spark</module>
             </modules>
         </profile>
     </profiles>

@@ -46,6 +46,17 @@ export type MessageData = {
   assholePoints: number;
 };
 
+// Set the options for the Intl.DateTimeFormat object
+const options: Intl.DateTimeFormatOptions = {
+  weekday: "short",
+  hour: "numeric",
+  minute: "numeric",
+  hour12: false,
+};
+
+// Create the Intl.DateTimeFormat object with the client's default locale
+const formatter = new Intl.DateTimeFormat(navigator.language, options);
+
 export class Message implements MessageData {
   id: number = 0;
   username: string = "";
@@ -81,14 +92,12 @@ export class Message implements MessageData {
   }
 
   getTimestampString() {
+    // Create a date object with the timestamp
     const date = new Date(0);
     date.setUTCSeconds(this.timestamp);
-    // format to weekday. hours:minutes
-    return date.toLocaleString("en-UK", {
-      weekday: "short",
-      hour: "numeric",
-      minute: "numeric",
-    });
+
+    // Format the date using the formatter object
+    return formatter.format(date);
   }
 
   getMessageParts(): MessagePart[] {
@@ -143,17 +152,3 @@ export class Message implements MessageData {
     return result;
   }
 }
-
-/*
-const m = new Message({
-  id: 1,
-  username: "test",
-  message: "test {$} {@} test",
-  metadata: '[{"g":"group","i":5},{"u":"user","i":9,"id":1}]',
-  timestamp: 0,
-  tag: "",
-  assholePoints: 0,
-});
-
-console.log(m.getMessageParts());
-*/

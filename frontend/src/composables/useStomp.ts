@@ -1,11 +1,19 @@
 import { Client } from "@stomp/stompjs";
 import { MentionMeta, MessageData } from "~/store/entities/message";
 
+export enum LadderEventType {
+  JOIN,
+}
+
 export type OnTickBody = {
   delta: number;
 };
 export type OnChatEventBody = MessageData;
-export type OnLadderEventBody = {};
+export type OnLadderEventBody = {
+  eventType: LadderEventType;
+  accountId: number;
+  data: any;
+};
 export type OnRoundEventBody = {};
 export type OnAccountEventBody = {};
 

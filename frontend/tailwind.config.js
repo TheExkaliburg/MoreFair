@@ -43,6 +43,23 @@ module.exports = {
         background: {
           DEFAULT: "var(--background-color)",
         },
+        ladder: {
+          bg: {
+            DEFAULT: "var(--ladder-bg-color)",
+            promoted: "var(--ladder-bg-promoted-color)",
+            you: "var(--ladder-bg-you-color)",
+          },
+          text: {
+            DEFAULT: "var(--ladder-text-color)",
+            promoted: "var(--ladder-text-promoted-color)",
+            you: "var(--ladder-text-you-color)",
+          },
+        },
+        eta: {
+          best: "var(--eta-best-color)",
+          mid: "var(--eta-mid-color)",
+          worst: "var(--eta-worst-color)",
+        },
       },
       fontSize: {
         "2xs": "0.64rem",

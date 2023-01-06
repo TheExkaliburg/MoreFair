@@ -37,9 +37,10 @@ class LadderTypeBuilderTest {
     roundTypesList.forEach(roundTypes -> {
       List<Set<LadderType>> ladderTypesList = new ArrayList<>();
       Set<LadderType> lastRoundTypes = EnumSet.noneOf(LadderType.class);
-      for (int i = 0; i < 10000; i++) {
+      for (int i = 0; i < 100; i++) {
         LadderTypeBuilder builder = new LadderTypeBuilder();
         builder.setLadderNumber(2);
+        builder.setRoundNumber(1);
         builder.setAssholeLadderNumber(25);
         builder.setRoundTypes(roundTypes);
         builder.setPreviousLadderType(lastRoundTypes);

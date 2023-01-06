@@ -39,9 +39,9 @@ public class LadderController {
   public static final String APP_VINEGAR_DESTINATION = "/ladder/vinegar";
   public static final String APP_PROMOTE_DESTINATION = "/ladder/promote";
   public static final String APP_AUTOPROMOTE_DESTINATION = "/ladder/autopromote";
-  public static final String TOPIC_EVENTS_DESTINATION = "/ladder/events/{number}";
-  public static final String TOPIC_GLOBAL_EVENTS_DESTINATION = "/ladder/events";
-  public static final String PRIVATE_EVENTS_DESTINATION = "/ladder/events";
+  public static final String TOPIC_EVENTS_DESTINATION = "/ladder/event/{number}";
+  public static final String TOPIC_GLOBAL_EVENTS_DESTINATION = "/ladder/event";
+  public static final String PRIVATE_EVENTS_DESTINATION = "/ladder/event";
   private final AccountService accountService;
   private final WsUtils wsUtils;
   private final RoundService roundService;
