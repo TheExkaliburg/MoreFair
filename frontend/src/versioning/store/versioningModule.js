@@ -5,8 +5,14 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "Double Point Fix", {
+          fixes: [
+            "Fixed error handling while generating Round- and Ladder types, which made generating the first ladder on specific fail after calculating all the points. " +
+              "Because of this the next time it finishes the round and creates a new Round + Ladder it also recounted all the points.",
+          ],
+        }),
         new Version("PATCH", "Alt-Checks", {
-          fixes: ["Moderators should now be able to check for alts."],
+          features: ["Moderators should now be able to check for alts."],
         }),
         new Version("PATCH", "Timestamp for messages", {
           fixes: [
