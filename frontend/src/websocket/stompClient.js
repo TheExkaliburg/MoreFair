@@ -77,7 +77,8 @@ export class StompClient {
 function serializeClickEvent(event) {
   let serializableEvent = {
     isTrusted: event.isTrusted,
-    target: event.target.outerHTML,
+    screenX: event.screenX,
+    screenY: event.screenY,
   };
   return serializableEvent;
 }
