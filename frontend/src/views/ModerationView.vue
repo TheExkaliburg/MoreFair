@@ -76,6 +76,31 @@
               </button>
             </div>
           </div>
+          <div class="row m-1">
+            <div class="input-group">
+              <span class="input-group-text"> Find Alts for ID: </span>
+              <input
+                v-model="searchAltsInput"
+                class="form-control shadow-none"
+                maxlength="64"
+                name="name"
+                placeholder="Username"
+                type="text"
+                @keydown.enter="searchAlts"
+              />
+              <button
+                class="btn btn-outline-primary shadow-none"
+                href="#"
+                type="submit"
+                @click="searchAlts"
+              >
+                Send
+              </button>
+            </div>
+          </div>
+          <div class="row m-2">
+            <div>Result: {{ moderation.altSearchResults }}</div>
+          </div>
         </div>
       </div>
     </div>
@@ -93,10 +118,15 @@ const stompClient = inject("$stompClient");
 const moderation = computed(() => store.state.mod);
 
 const searchUsernameInput = ref("");
+const searchAltsInput = ref("");
 const actionUserIdInput = ref("");
 
 function searchUserName() {
   store.dispatch({ type: "mod/searchName", name: searchUsernameInput.value });
+}
+
+function searchAlts() {
+  store.dispatch({ type: "mod/searchAlts", id: searchAltsInput.value });
 }
 
 function ban() {
