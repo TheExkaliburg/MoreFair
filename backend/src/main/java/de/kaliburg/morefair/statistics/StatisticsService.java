@@ -4,27 +4,53 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import de.kaliburg.morefair.account.AccountEntity;
+import de.kaliburg.morefair.game.round.LadderEntity;
+import de.kaliburg.morefair.game.round.RankerEntity;
+import de.kaliburg.morefair.game.round.RoundEntity;
 import java.util.concurrent.CompletableFuture;
 import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 @RequiredArgsConstructor
 @Service
 @Slf4j
+@Transactional
 public class StatisticsService {
 
   private final LoginRepository loginRepository;
+  private final BiasRepository biasRepository;
+  private final MultiRepository multiRepository;
 
   public void login(AccountEntity account) {
     loginRepository.save(new LoginEntity(account));
   }
 
+  /**
+   * Records the moment before a user biases.
+   *
+   * @param ranker the Ranker of the user before they bias
+   */
+  public void recordBias(RankerEntity ranker, LadderEntity ladder, RoundEntity round) {
+    RankerRecord rankerRecord = new RankerRecord(ranker);
+    LadderRecord ladderRecord = new LadderRecord(ladder);
+    RoundRecord roundRecord = new RoundRecord(round);
+    biasRepository.save(new BiasEntity(rankerRecord, ladderRecord, roundRecord));
+  }
+
+  public void recordMulti(RankerEntity ranker, LadderEntity ladder, RoundEntity round) {
+    RankerRecord rankerRecord = new RankerRecord(ranker);
+    LadderRecord ladderRecord = new LadderRecord(ladder);
+    RoundRecord roundRecord = new RoundRecord(round);
+    multiRepository.save(new MultiEntity(rankerRecord, ladderRecord, roundRecord));
+  }
+
   @PostConstruct
-  @Scheduled(cron = "0 */10 * * * *")
+  @Scheduled(cron = "0 */30 * * * *")
   public void startAnalytics() {
     try {
       // Create a JSON object for the request body
