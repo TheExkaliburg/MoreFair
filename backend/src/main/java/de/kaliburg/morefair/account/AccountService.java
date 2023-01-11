@@ -115,6 +115,10 @@ public class AccountService implements UserDetailsService {
     return result;
   }
 
+  public List<AccountEntity> searchByIp(Integer ip) {
+    return accountRepository.findTop100ByLastIpOrderByLastLoginDesc(ip);
+  }
+  
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     AccountEntity account = accountRepository.findByUuid(UUID.fromString(username))
