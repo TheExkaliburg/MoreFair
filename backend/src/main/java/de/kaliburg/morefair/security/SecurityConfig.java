@@ -38,10 +38,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         authenticationManager(), accountService);
     customAuthenticationFilter.setFilterProcessesUrl("/api/auth/login");
 
+    http.cors();
     http.csrf().csrfTokenRepository(new CustomCookieCsrfTokenRepository());
     http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
     http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/auth/**").permitAll();
     http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/auth/**").permitAll();
+    http.authorizeRequests().antMatchers(HttpMethod.OPTIONS, "/api/**").permitAll();
     http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/**").authenticated();
     http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/**").authenticated();
     http.authorizeRequests().antMatchers(HttpMethod.PUT, "/api/**").authenticated();

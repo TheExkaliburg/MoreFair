@@ -10,28 +10,17 @@ module.exports = {
           bg: {
             DEFAULT: "var(--button-bg-color)",
             hover: "var(--button-bg-hover-color)",
+            selected: "var(--button-bg-selected-color)",
           },
           text: {
             DEFAULT: "var(--button-text-color)",
             hover: "var(--button-text-hover-color)",
+            selected: "var(--button-text-selected-color)",
           },
           border: {
             DEFAULT: "var(--button-border-color)",
             hover: "var(--button-border-hover-color)",
-          },
-        },
-        toggle: {
-          bg: {
-            on: "var(--toggle-bg-on-color)",
-            off: "var(--toggle-bg-off-color)",
-          },
-          border: "var(--toggle-border-color)",
-          circle: {
-            bg: {
-              on: "var(--toggle-circle-bg-on-color)",
-              off: "var(--toggle-circle-bg-off-color)",
-            },
-            border: "var(--toggle-inner-border-color)",
+            selected: "var(--button-border-selected-color)",
           },
         },
         text: {

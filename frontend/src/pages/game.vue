@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full h-screen flex flex-col lg:flex-row bg-background">
+  <div class="w-full h-full flex flex-col lg:flex-row bg-background">
     <LadderWindow
       v-if="uiStore.ladderEnabled"
       :class="uiStore.chatEnabled ? 'h-2/3 lg:w-7/10' : 'h-full lg:w-full'"

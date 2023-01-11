@@ -7,6 +7,12 @@ export const useUiStore = defineStore("ui", () => {
   const ladderEnabled = ref<boolean>(true);
   const chatEnabled = ref<boolean>(true);
 
+  // actions
+  function toggleSidebar() {
+    console.log("toggling sidebar", sidebarExpanded.value);
+    sidebarExpanded.value = !sidebarExpanded.value;
+  }
+
   // side-effects
   watch(ladderEnabled, (value: boolean) => {
     if (!value && !chatEnabled.value) {
@@ -23,5 +29,6 @@ export const useUiStore = defineStore("ui", () => {
     sidebarExpanded,
     ladderEnabled,
     chatEnabled,
+    toggleSidebar,
   };
 });
