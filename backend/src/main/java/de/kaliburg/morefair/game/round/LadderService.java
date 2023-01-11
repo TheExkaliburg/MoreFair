@@ -16,6 +16,7 @@ import de.kaliburg.morefair.game.GameResetEvent;
 import de.kaliburg.morefair.game.UpgradeUtils;
 import de.kaliburg.morefair.game.chat.ChatService;
 import de.kaliburg.morefair.game.chat.MessageService;
+import de.kaliburg.morefair.statistics.StatisticsService;
 import de.kaliburg.morefair.utils.FormattingUtils;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -59,6 +60,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   private final Semaphore ladderSemaphore = new Semaphore(1);
   private final LadderUtils ladderUtils;
   private final AccountService accountService;
+  private final StatisticsService statisticsService;
   private final RoundUtils roundUtils;
   private final ChatService chatService;
   private final UpgradeUtils upgradeUtils;
@@ -75,13 +77,15 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   private Map<Integer, LadderEntity> currentLadderMap = new HashMap<>();
 
   public LadderService(RankerService rankerService, LadderRepository ladderRepository,
-      LadderUtils ladderUtils, AccountService accountService, RoundUtils roundUtils,
+      LadderUtils ladderUtils, AccountService accountService, StatisticsService statisticsService,
+      RoundUtils roundUtils,
       ChatService chatService, UpgradeUtils upgradeUtils, ApplicationEventPublisher eventPublisher,
       @Lazy WsUtils wsUtils, FairConfig config, Gson gson) {
     this.rankerService = rankerService;
     this.ladderRepository = ladderRepository;
     this.ladderUtils = ladderUtils;
     this.accountService = accountService;
+    this.statisticsService = statisticsService;
     this.roundUtils = roundUtils;
     this.chatService = chatService;
     this.upgradeUtils = upgradeUtils;
@@ -394,6 +398,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
       RankerEntity ranker = findActiveRankerOfAccountOnLadder(event.getAccountId(), ladder);
       BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getNumber(), ranker.getBias());
       if (ranker.getPoints().compareTo(cost) >= 0) {
+        statisticsService.recordBias(ranker, ladder, currentRound);
         ranker.setPoints(BigInteger.ZERO);
         ranker.setBias(ranker.getBias() + 1);
         wsUtils.convertAndSendToTopic(LadderController.TOPIC_EVENTS_DESTINATION.replace("{number}",
@@ -419,6 +424,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
       RankerEntity ranker = findActiveRankerOfAccountOnLadder(event.getAccountId(), ladder);
       BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getNumber(), ranker.getMultiplier());
       if (ranker.getPower().compareTo(cost) >= 0) {
+        statisticsService.recordMulti(ranker, ladder, currentRound);
         ranker.setPoints(BigInteger.ZERO);
         ranker.setPower(BigInteger.ZERO);
         ranker.setBias(0);
