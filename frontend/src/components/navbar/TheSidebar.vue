@@ -3,7 +3,7 @@
     <div :class="classesForSize" class="-sm:hidden bg-navbar-bg shrink-0">
       <div
         :class="classesForSize"
-        class="flex flex-col justify-between fixed left-0 inset-y-0 pt-10 justify-between px-2 shrink-0 bg-navbar-bg"
+        class="flex flex-col justify-between fixed left-0 inset-y-0 pt-10 justify-between shrink-0 bg-navbar-bg"
       >
         <!--Top of the Canvas-->
         <div class="min-w-min flex flex-col justify-items-start content-around">
@@ -47,7 +47,7 @@ import {
 } from "@heroicons/vue/24/outline";
 import SidebarButton from "~/components/navbar/SidebarButton.vue";
 
-const classesForSize = "min-w-16 w-16 max-w-16 pl-4 px-4 py-2";
+const classesForSize = "min-w-12 w-12 max-w-12 px-2 py-2";
 </script>
 
 <style lang="scss" scoped></style>

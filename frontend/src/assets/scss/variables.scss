@@ -53,6 +53,8 @@ $color-conch: #a8b5b2;
 $color-jet-stream: #c7cfcc;
 $color-saltpan: #ebede9;
 
+$transparent: rgba(0, 0, 0, 0);
+
 
 :root {
   // Colors
@@ -107,6 +109,14 @@ $color-saltpan: #ebede9;
   // Link
   --link-hover-color: #{$color-st-tropaz};
   --link-color: #{$color-steel-blue};
+
+  // Scrollbar
+  --scrollbar-bg-color: #{$transparent};
+  --scrollbar-thumb-color: var(--background-dark-color);
+  --scrollbar-width: 0.75rem;
+  --scrollbar-thumb-border: 1px solid var(--scrollbar-thumb-border-color);
+  --scrollbar-thumb-border-color: var(--main-secondary-color);
+  --scrollbar-thumb-border-radius: 0.4rem;
 }
 
 :root.light {

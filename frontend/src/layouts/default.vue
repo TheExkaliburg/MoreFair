@@ -2,7 +2,7 @@
   <div class="flex flex-col h-screen">
     <TheBrandedNavBarWithOffCanvas />
     <TheSidebar class="restOfVerticalScreen">
-      <div class="restOfHorizontalScreen">
+      <div class="restOfHorizontalScreen -sm:w-screen">
         <slot />
       </div>
     </TheSidebar>

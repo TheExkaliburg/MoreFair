@@ -4,7 +4,7 @@
     :class="{
       '-translate-x-full backdrop-blur-xl': !uiStore.sidebarExpanded,
     }"
-    class="bg-navbar-bg fixed inset-y-0 left-0 pt-1.5 w-1/6 min-w-max max-w-full text-navbar-text px-4 py-1 transform transition-transform z-20 hover:overflow-y-scroll overflow-y-hidden"
+    class="bg-navbar-bg fixed inset-y-0 left-0 pt-1.5 w-1/8 min-w-max max-w-full text-navbar-text px-2 py-1 transform transition-transform z-20 overflow-y-scroll hide-scrollbar"
     tabindex="-1"
   >
     <div class="h-full flex flex-col justify-between">
@@ -75,4 +75,13 @@ onClickOutside(offCanvas, () => {
 });
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+</style>

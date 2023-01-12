@@ -1,6 +1,6 @@
 <template>
   <nav class="bg-navbar-bg">
-    <div class="mx-auto px-4">
+    <div class="mx-auto px-2">
       <div class="flex h-10 items-center justify-between">
         <BrandedSidebarToggle class="z-15" />
         <div class="flex space-x-1 items-center justify-end">

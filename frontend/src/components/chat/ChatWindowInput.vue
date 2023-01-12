@@ -5,7 +5,7 @@
     >
       <EditorContent
         :editor="editor"
-        class="w-full rounded-l-md border-1 h-8 border-button-border p-1 outline-0 overflow-x-hidden text-text caret-text whitespace-nowrap overflow-x-auto"
+        class="w-full rounded-l-md border-1 h-8 border-button-border p-1 outline-0 overflow-x-hidden text-text caret-text whitespace-nowrap overflow-x-auto overflow-y-hidden"
         spellcheck="false"
         @keydown.enter.prevent="sendMessage"
       ></EditorContent>
