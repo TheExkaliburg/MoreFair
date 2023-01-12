@@ -11,6 +11,7 @@ import java.util.concurrent.CompletableFuture;
 import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,9 @@ public class StatisticsService {
   private final AutoPromoteRecordRepository autoPromoteRecordRepository;
   private final PromoteRecordRepository promoteRecordRepository;
   private final ThrowVinegarRecordRepository throwVinegarRecordRepository;
+
+  @Value("${spring.profiles.active}")
+  private String activeProfile;
 
   public void recordLogin(AccountEntity account) {
     loginRecordRepository.save(new LoginRecordEntity(account));
@@ -116,6 +120,7 @@ public class StatisticsService {
   @Scheduled(cron = "0 */30 * * * *")
   public void startAnalytics() {
     try {
+      log.info("Profile: {}", activeProfile);
       // Create a JSON object for the request body
       JsonObject jsonBody = new JsonObject();
       jsonBody.addProperty("action", "CreateSubmissionRequest");
@@ -141,6 +146,7 @@ public class StatisticsService {
 
       // Add the "appArgs" property
       JsonArray appArgs = new JsonArray();
+      appArgs.add(activeProfile);
       jsonBody.add("appArgs", appArgs);
 
       // Convert the JSON object to a string
