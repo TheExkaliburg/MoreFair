@@ -7,14 +7,18 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class Login {
-    public static void main(String[] args) {
-        System.out.println("Hello, World!"); // Display the string.
-        Arrays.stream(args).forEach(System.out::println);
+    public static void main(String[] args) throws Exception {
+        if (args.length < 1) {
+            throw new Exception("The arguments are meant to be: '{activeProfile}'");
+        }
+
+        String db = MongoConnector.translateProfileToDatabase(args[0]);
+
         SparkSession spark = SparkSession.builder()
                 .master("local")
                 .appName("MongoSparkConnectorIntro")
-                .config("spark.mongodb.read.connection.uri", "mongodb://localhost/MreFair")
-                .config("spark.mongodb.write.connection.uri", "mongodb://localhost/MoreFair")
+                .config("spark.mongodb.read.connection.uri", "mongodb://localhost/" + db)
+                .config("spark.mongodb.write.connection.uri", "mongodb://localhost/" + db)
                 .getOrCreate();
 
         Dataset<Row> loginRows = MongoConnector.read(spark, "login");
