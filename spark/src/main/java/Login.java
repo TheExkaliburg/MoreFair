@@ -22,6 +22,7 @@ public class Login {
                 .getOrCreate();
 
         Dataset<Row> loginRows = MongoConnector.read(spark, "login");
+        loginRows.show();
 
         Dataset<Row> result = loginRows.groupBy("account._id").count().sort("count");
 
