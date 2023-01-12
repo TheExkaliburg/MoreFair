@@ -28,6 +28,6 @@ public class Login {
 
         result.show();
 
-        result.write().format("mongodb").mode("append").save();
+        MongoConnector.write(result, "loginCount");
     }
 }
