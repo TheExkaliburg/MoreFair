@@ -26,6 +26,8 @@ public class StatisticsService {
   private final BiasRecordRepository biasRecordRepository;
   private final MultiRecordRepository multiRecordRepository;
   private final AutoPromoteRecordRepository autoPromoteRecordRepository;
+  private final PromoteRecordRepository promoteRecordRepository;
+  private final ThrowVinegarRecordRepository throwVinegarRecordRepository;
 
   public void login(AccountEntity account) {
     loginRecordRepository.save(new LoginRecordEntity(account));
@@ -75,8 +77,40 @@ public class StatisticsService {
   }
 
   /**
+   * Records the moment before a user promotes to the next ladder.
+   *
+   * @param ranker the Ranker of the user before they promote to the next ladder
+   * @param ladder the ladder with all rankers before they promote to the next ladder
+   * @param round  the round with all ladders before they promote to the next ladder
+   */
+  public void recordPromote(RankerEntity ranker, LadderEntity ladder, RoundEntity round) {
+    RankerRecord rankerRecord = new RankerRecord(ranker);
+    LadderRecord ladderRecord = new LadderRecord(ladder);
+    RoundRecord roundRecord = new RoundRecord(round);
+    promoteRecordRepository.save(
+        new PromoteRecordEntity(rankerRecord, ladderRecord, roundRecord));
+  }
+
+  /**
+   * Records the moment before a user throws vinegar.
+   *
+   * @param ranker the Ranker of the user before they throw vinegar
+   * @param ladder the ladder with all rankers before they throw vinegar
+   * @param round  the round with all ladders before they throw vinegar
+   */
+  public void recordVinegarThrow(RankerEntity ranker, RankerEntity target, LadderEntity ladder,
+      RoundEntity round) {
+    RankerRecord rankerRecord = new RankerRecord(ranker);
+    RankerRecord targetRecord = new RankerRecord(target);
+    LadderRecord ladderRecord = new LadderRecord(ladder);
+    RoundRecord roundRecord = new RoundRecord(round);
+    throwVinegarRecordRepository.save(
+        new ThrowVinegarRecordEntity(rankerRecord, targetRecord, ladderRecord, roundRecord));
+  }
+
+  /**
    * Sends a Request to the local spark-master to start a new job. Sends the html request as a
-   * future, so it doesn't block the thread.
+   * completable future, so it doesn't block the thread.
    */
   @PostConstruct
   @Scheduled(cron = "0 */30 * * * *")
