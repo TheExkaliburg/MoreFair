@@ -9,7 +9,7 @@ public class MongoConnector {
 
   public static String translateProfileToDatabase(String activeProfile) {
     String result = "MoreFair";
-    if(activeProfile == "staging") {
+    if(activeProfile.equals("staging")) {
       result += "Staging";
     }
     return result;
