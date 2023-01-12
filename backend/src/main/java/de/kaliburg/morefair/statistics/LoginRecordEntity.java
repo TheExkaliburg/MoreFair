@@ -9,13 +9,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "login")
 @Data
-public class LoginEntity {
+public class LoginRecordEntity {
 
   private Instant createdOn = Instant.now();
   @NonNull
   private Account account;
 
-  public LoginEntity(AccountEntity account) {
+  public LoginRecordEntity(AccountEntity account) {
     this.account = new Account(account.getId(), account.getUsername());
   }
 
