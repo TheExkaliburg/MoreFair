@@ -15,4 +15,8 @@ public class MongoConnector {
     return result;
   }
 
+  public static void write(Dataset<Row> dataset, String collection) {
+    dataset.write().format("mongodb").insertInto(collection);
+  }
+
 }
