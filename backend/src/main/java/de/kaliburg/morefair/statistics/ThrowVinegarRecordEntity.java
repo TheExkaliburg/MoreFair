@@ -12,10 +12,13 @@ public class ThrowVinegarRecordEntity extends AbstractGameEventRecord {
 
   @NonNull
   private RankerRecord target;
+  @NonNull
+  private RankerRecord second;
 
   public ThrowVinegarRecordEntity(@NonNull RankerRecord ranker, @NonNull RankerRecord target,
-      @NonNull LadderRecord ladder, @NonNull RoundRecord round) {
+      @NonNull RankerRecord second, @NonNull LadderRecord ladder, @NonNull RoundRecord round) {
     super(ranker, ladder, round);
     this.target = target;
+    this.second = second;
   }
 }

@@ -1,22 +1,39 @@
+import lombok.Data;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 
+import static org.apache.spark.sql.functions.collect_list;
+import static org.apache.spark.sql.functions.current_timestamp;
+import static org.apache.spark.sql.functions.struct;
+import static org.apache.spark.sql.functions.col;
+
+
+@Data
 public class MongoConnector {
-  public static Dataset<Row> read(SparkSession spark, String collection) {
-    return spark.read().format("mongodb").option("spark.mongodb.read.collection", collection).load();
+  private final SparkSession sparkSession;
+  public MongoConnector(SparkSession sparkSession) {
+    this.sparkSession = sparkSession;
   }
 
-  public static String translateProfileToDatabase(String activeProfile) {
-    String result = "MoreFair";
-    if(activeProfile.equals("staging")) {
-      result += "Staging";
-    }
-    return result;
+  public Dataset<Row> read(String collection) {
+    // TODO: find a way to only read in the newest record from last Week
+    return sparkSession.read().format("mongodb")
+        .option("spark.mongodb.read.collection", collection)
+        .load();
   }
 
-  public static void write(Dataset<Row> dataset, String collection) {
-    dataset.write().format("mongodb").insertInto(collection);
+  public void write(Dataset<Row> dataset, String collection) {
+    Dataset<Row> dataSetWithData = dataset.withColumn("data", struct(col("*")));
+    Dataset<Row> dataSetOnlyData = dataSetWithData.groupBy().agg(collect_list("data").alias(
+        "data"));
+    Dataset<Row> dataSetWithTimestamp = dataSetOnlyData.withColumn("createdOn",
+        current_timestamp());
+
+    dataSetWithTimestamp.printSchema();
+    dataSetWithTimestamp.show();
+    dataSetWithTimestamp.write().format("mongodb").mode("append").option("spark.mongodb.write.collection",
+        collection).save();
   }
 
 }

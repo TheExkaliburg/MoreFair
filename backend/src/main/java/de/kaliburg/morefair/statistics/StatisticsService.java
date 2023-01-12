@@ -7,11 +7,13 @@ import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.game.round.LadderEntity;
 import de.kaliburg.morefair.game.round.RankerEntity;
 import de.kaliburg.morefair.game.round.RoundEntity;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 @Transactional
 public class StatisticsService {
 
+  private final MongoTemplate mongoTemplate;
   private final LoginRecordRepository loginRecordRepository;
   private final BiasRecordRepository biasRecordRepository;
   private final MultiRecordRepository multiRecordRepository;
@@ -32,6 +35,23 @@ public class StatisticsService {
 
   @Value("${spring.profiles.active}")
   private String activeProfile;
+
+  @PostConstruct
+  public void prepareCollections() {
+    createCollection(LoginRecordEntity.class);
+    createCollection(BiasRecordEntity.class);
+    createCollection(MultiRecordEntity.class);
+    createCollection(AutoPromoteRecordEntity.class);
+    createCollection(PromoteRecordEntity.class);
+    createCollection(ThrowVinegarRecordEntity.class);
+  }
+
+  private <T> void createCollection(Class<T> clazz) {
+    if (!mongoTemplate.collectionExists(clazz)) {
+      mongoTemplate.createCollection(clazz);
+    }
+  }
+
 
   public void recordLogin(AccountEntity account) {
     loginRecordRepository.save(new LoginRecordEntity(account));
@@ -106,19 +126,41 @@ public class StatisticsService {
       RoundEntity round) {
     RankerRecord rankerRecord = new RankerRecord(ranker);
     RankerRecord targetRecord = new RankerRecord(target);
+    List<RankerEntity> rankers = ladder.getRankers();
+    RankerRecord secondRecord = new RankerRecord(rankers.get(1));
     LadderRecord ladderRecord = new LadderRecord(ladder);
     RoundRecord roundRecord = new RoundRecord(round);
     throwVinegarRecordRepository.save(
-        new ThrowVinegarRecordEntity(rankerRecord, targetRecord, ladderRecord, roundRecord));
+        new ThrowVinegarRecordEntity(rankerRecord, targetRecord, secondRecord, ladderRecord,
+            roundRecord));
+  }
+
+
+  /**
+   * Sends a request to start the General Analytics for the Server.
+   */
+  @PostConstruct
+  @Scheduled(cron = "0 */30 * * * *")
+  public void startGeneralAnalytics() {
+    startAnalytics("GeneralAnalytics");
+  }
+
+  /**
+   * Sends a request to start the Round Statistics for the Server.
+   * TODO: This is currently only done on startup, but should be done after each round-end.
+   */
+  @PostConstruct
+  public void startRoundStatistics() {
+    startAnalytics("RoundStatistics");
   }
 
   /**
    * Sends a Request to the local spark-master to start a new job. Sends the html request as a
    * completable future, so it doesn't block the thread.
+   *
+   * @param mainClass the main Class of the Spark Application that should be run on the cluster
    */
-  @PostConstruct
-  @Scheduled(cron = "0 */30 * * * *")
-  public void startAnalytics() {
+  public void startAnalytics(String mainClass) {
     try {
       log.info("Profile: {}", activeProfile);
       // Create a JSON object for the request body
@@ -137,7 +179,7 @@ public class StatisticsService {
       // Add the other properties
       jsonBody.addProperty("appResource", "/bin/morefair-staging/spark.jar");
       jsonBody.addProperty("clientSparkVersion", "3.3.1");
-      jsonBody.addProperty("mainClass", "Login");
+      jsonBody.addProperty("mainClass", mainClass);
 
       // Add the "environmentVariables" property
       JsonObject environmentVariables = new JsonObject();
