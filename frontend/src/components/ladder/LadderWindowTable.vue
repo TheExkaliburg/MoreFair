@@ -1,10 +1,10 @@
 <template>
-  <div>
+  <div class="shrink">
     <DynamicScroller
       :buffer="1000"
       :items="ladder.rankers"
       :min-item-size="23"
-      class="h-full overflow-y-scroll text-sm"
+      class="max-h-full overflow-y-scroll text-sm"
       key-field="rank"
       page-mode
     >

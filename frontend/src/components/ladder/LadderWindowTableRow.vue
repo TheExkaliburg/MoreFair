@@ -7,24 +7,28 @@
     }"
     class="flex flex-row flex-nowrap justify-between items-center px-1 text-sm"
   >
-    <div class="w-full">
+    <div class="w-full whitespace-nowrap overflow-hidden">
       {{ ranker.rank }} {{ ranker.assholeTag }}
       <sub :class="{ 'text-text-dark': !isYou }">{{
         ranker.assholePoints
       }}</sub>
     </div>
-    <div class="w-full">
+    <div class="w-full whitespace-nowrap overflow-hidden">
       {{ ranker.username
       }}<sub :class="{ 'text-text-dark': !isYou }">#{{ ranker.accountId }}</sub>
     </div>
-    <div class="w-full text-right">
+    <div class="w-full text-right whitespace-nowrap overflow-hidden">
       {{ formattedPowerPerSec }}[<span class="text-eta-best"
         >+{{ formattedBias }}</span
       ><span class="text-eta-worst"> x{{ formattedMulti }}</span
       >]
     </div>
-    <div class="w-full text-right">{{ formattedPower }}</div>
-    <div class="w-full text-right">{{ formattedPoints }}</div>
+    <div class="w-full text-right whitespace-nowrap overflow-hidden">
+      {{ formattedPower }}
+    </div>
+    <div class="w-full text-right whitespace-nowrap overflow-hidden">
+      {{ formattedPoints }}
+    </div>
   </div>
 </template>
 
