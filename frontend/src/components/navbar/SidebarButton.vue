@@ -19,7 +19,7 @@
     <div v-else class="h-7 w-7 text-button-text">
       <slot name="icon"></slot>
     </div>
-    <span class="h-7 px-2 w-fit text-left">{{ label }}</span>
+    <span class="h-7 pl-8 px-2 w-fit text-left">{{ label }}</span>
   </button>
 </template>
 
