@@ -464,6 +464,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
       }
 
       if (ladderUtils.canBuyAutoPromote(ladder, ranker, currentRound)) {
+        statisticsService.recordAutoPromote(ranker, ladder, currentRound);
         ranker.setGrapes(ranker.getGrapes().subtract(cost));
         ranker.setAutoPromote(true);
         wsUtils.convertAndSendToUser(ranker.getAccount().getUuid(),
@@ -489,6 +490,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
     try {
       RankerEntity ranker = findActiveRankerOfAccountOnLadder(event.getAccountId(), ladder);
       if (ladderUtils.canPromote(ladder, ranker)) {
+        statisticsService.recordPromote(ranker, ladder, currentRound);
         AccountEntity account = accountService.find(ranker.getAccount());
         log.info("[L{}] Promotion for {} (#{})", ladder.getNumber(), account.getUsername(),
             account.getId());
@@ -630,6 +632,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
       }
 
       if (ladderUtils.canThrowVinegarAt(ladder, ranker, target)) {
+        statisticsService.recordVinegarThrow(ranker, target, ladder, currentRound);
         BigInteger rankerVinegar = ranker.getVinegar();
         BigInteger targetVinegar = target.getVinegar();
 

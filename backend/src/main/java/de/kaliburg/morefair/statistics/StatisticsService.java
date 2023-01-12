@@ -22,33 +22,96 @@ import org.springframework.web.client.RestTemplate;
 @Transactional
 public class StatisticsService {
 
-  private final LoginRepository loginRepository;
-  private final BiasRepository biasRepository;
-  private final MultiRepository multiRepository;
+  private final LoginRecordRepository loginRecordRepository;
+  private final BiasRecordRepository biasRecordRepository;
+  private final MultiRecordRepository multiRecordRepository;
+  private final AutoPromoteRecordRepository autoPromoteRecordRepository;
+  private final PromoteRecordRepository promoteRecordRepository;
+  private final ThrowVinegarRecordRepository throwVinegarRecordRepository;
 
   public void login(AccountEntity account) {
-    loginRepository.save(new LoginEntity(account));
+    loginRecordRepository.save(new LoginRecordEntity(account));
   }
 
   /**
    * Records the moment before a user biases.
    *
    * @param ranker the Ranker of the user before they bias
+   * @param ladder the ladder with all rankers before they multiply
+   * @param round  the round with all ladders before they multiply
    */
   public void recordBias(RankerEntity ranker, LadderEntity ladder, RoundEntity round) {
     RankerRecord rankerRecord = new RankerRecord(ranker);
     LadderRecord ladderRecord = new LadderRecord(ladder);
     RoundRecord roundRecord = new RoundRecord(round);
-    biasRepository.save(new BiasEntity(rankerRecord, ladderRecord, roundRecord));
+    biasRecordRepository.save(new BiasRecordEntity(rankerRecord, ladderRecord, roundRecord));
   }
 
+  /**
+   * Records the moment before a user multiplies.
+   *
+   * @param ranker the Ranker of the user before they multiply
+   * @param ladder the ladder with all rankers before they multiply
+   * @param round  the round with all ladders before they multiply
+   */
   public void recordMulti(RankerEntity ranker, LadderEntity ladder, RoundEntity round) {
     RankerRecord rankerRecord = new RankerRecord(ranker);
     LadderRecord ladderRecord = new LadderRecord(ladder);
     RoundRecord roundRecord = new RoundRecord(round);
-    multiRepository.save(new MultiEntity(rankerRecord, ladderRecord, roundRecord));
+    multiRecordRepository.save(new MultiRecordEntity(rankerRecord, ladderRecord, roundRecord));
   }
 
+  /**
+   * Records the moment before a user buys auto-promote.
+   *
+   * @param ranker the Ranker of the user before they buy auto-promote
+   * @param ladder the ladder with all rankers before they buy auto-promote
+   * @param round  the round with all ladders before they buy auto-promote
+   */
+  public void recordAutoPromote(RankerEntity ranker, LadderEntity ladder, RoundEntity round) {
+    RankerRecord rankerRecord = new RankerRecord(ranker);
+    LadderRecord ladderRecord = new LadderRecord(ladder);
+    RoundRecord roundRecord = new RoundRecord(round);
+    autoPromoteRecordRepository.save(
+        new AutoPromoteRecordEntity(rankerRecord, ladderRecord, roundRecord));
+  }
+
+  /**
+   * Records the moment before a user promotes to the next ladder.
+   *
+   * @param ranker the Ranker of the user before they promote to the next ladder
+   * @param ladder the ladder with all rankers before they promote to the next ladder
+   * @param round  the round with all ladders before they promote to the next ladder
+   */
+  public void recordPromote(RankerEntity ranker, LadderEntity ladder, RoundEntity round) {
+    RankerRecord rankerRecord = new RankerRecord(ranker);
+    LadderRecord ladderRecord = new LadderRecord(ladder);
+    RoundRecord roundRecord = new RoundRecord(round);
+    promoteRecordRepository.save(
+        new PromoteRecordEntity(rankerRecord, ladderRecord, roundRecord));
+  }
+
+  /**
+   * Records the moment before a user throws vinegar.
+   *
+   * @param ranker the Ranker of the user before they throw vinegar
+   * @param ladder the ladder with all rankers before they throw vinegar
+   * @param round  the round with all ladders before they throw vinegar
+   */
+  public void recordVinegarThrow(RankerEntity ranker, RankerEntity target, LadderEntity ladder,
+      RoundEntity round) {
+    RankerRecord rankerRecord = new RankerRecord(ranker);
+    RankerRecord targetRecord = new RankerRecord(target);
+    LadderRecord ladderRecord = new LadderRecord(ladder);
+    RoundRecord roundRecord = new RoundRecord(round);
+    throwVinegarRecordRepository.save(
+        new ThrowVinegarRecordEntity(rankerRecord, targetRecord, ladderRecord, roundRecord));
+  }
+
+  /**
+   * Sends a Request to the local spark-master to start a new job. Sends the html request as a
+   * completable future, so it doesn't block the thread.
+   */
   @PostConstruct
   @Scheduled(cron = "0 */30 * * * *")
   public void startAnalytics() {
