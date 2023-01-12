@@ -101,7 +101,7 @@ public class AccountController {
       }
 
       account = accountService.login(account, principal);
-      statisticsService.login(account);
+      statisticsService.recordLogin(account);
       int highestLadder = rankerService.findCurrentRankersOfAccount(account, currentRound).stream()
           .mapToInt(r -> r.getLadder().getNumber()).max().orElse(1);
 
