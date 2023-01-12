@@ -29,7 +29,7 @@ public class StatisticsService {
   private final PromoteRecordRepository promoteRecordRepository;
   private final ThrowVinegarRecordRepository throwVinegarRecordRepository;
 
-  public void login(AccountEntity account) {
+  public void recordLogin(AccountEntity account) {
     loginRecordRepository.save(new LoginRecordEntity(account));
   }
 

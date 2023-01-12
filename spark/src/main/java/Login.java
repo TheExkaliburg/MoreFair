@@ -10,19 +10,13 @@ public class Login {
         SparkSession spark = SparkSession.builder()
                 .master("local")
                 .appName("MongoSparkConnectorIntro")
-                .config("spark.mongodb.read.connection.uri", "mongodb://localhost/test.login")
-                .config("spark.mongodb.write.connection.uri", "mongodb://localhost/test.loginResults")
+                .config("spark.mongodb.read.connection.uri", "mongodb://localhost/moreFair")
+                .config("spark.mongodb.write.connection.uri", "mongodb://localhost/moreFair")
                 .getOrCreate();
 
-        Dataset<Row> df = spark.read().format("mongodb").load();
+        Dataset<Row> loginRows = MongoConnector.read(spark, "login");
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DATE, -1);
-        Date yesterday = calendar.getTime();
-
-        // Dataset<Row> entriesFromLastHour = df.where("createdOn >= '" + yesterday + "'");
-
-        Dataset<Row> result = df.groupBy("account._id").count().sort("count");
+        Dataset<Row> result = loginRows.groupBy("account._id").count().sort("count");
 
         result.show();
 
