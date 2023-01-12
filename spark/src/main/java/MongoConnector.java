@@ -4,7 +4,7 @@ import org.apache.spark.sql.SparkSession;
 
 public class MongoConnector {
   public static Dataset<Row> read(SparkSession spark, String collection) {
-    return spark.read().format("mongodb").option("collection", collection).load();
+    return spark.read().format("mongodb").option("spark.mongodb.read.collection", collection).load();
   }
 
   public static String translateProfileToDatabase(String activeProfile) {
