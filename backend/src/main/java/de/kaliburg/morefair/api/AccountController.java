@@ -50,7 +50,7 @@ public class AccountController {
         accountService.save(account);
       }
 
-      statisticsService.login(account);
+      statisticsService.recordLogin(account);
       RoundEntity currentRound = roundService.getCurrentRound();
       int highestLadder = rankerService.findCurrentRankersOfAccount(account, currentRound).stream()
           .mapToInt(r -> r.getLadder().getNumber()).max().orElse(1);
