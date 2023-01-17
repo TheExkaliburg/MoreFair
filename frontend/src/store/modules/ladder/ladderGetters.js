@@ -46,11 +46,7 @@ export default {
     return ladderUtils.canThrowVinegar(rootState.settings, state);
   },
   getNextUpgradeCost: (state) => (currentUpgrade) => {
-    return ladderUtils.getNextUpgradeCost(
-      state,
-      currentUpgrade,
-      Array.from(state.types).join(",")
-    );
+    return ladderUtils.getNextUpgradeCost(state, currentUpgrade, state.types);
   },
   getVinegarThrowCost(state, _, rootState) {
     return ladderUtils.getVinegarThrowCost(rootState.settings, state);

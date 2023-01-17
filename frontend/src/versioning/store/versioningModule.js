@@ -13,6 +13,16 @@ const versioningModule = {
             "CHAOS rounds have a much higher chance of rolling CHEAP or EXPENSIVE ladders, with equal chance for each.",
           ],
         }),
+        new Version("PATCH", "Double Point Fix", {
+          fixes: [
+            "Fixed error handling while generating Round- and Ladder types, which made generating the first ladder on specific fail after calculating all the points. " +
+              "Because of this the next time it finishes the round and creates a new Round + Ladder it also recounted all the points.",
+          ],
+        }),
+        new Version("PATCH", "Alt-Checks", {
+          features: ["Moderators should now be able to check for alts."],
+        }),
+
         new Version("PATCH", "Timestamp for messages", {
           fixes: [
             "Should now show the timestamp of the message correctly, regarding timezone and locale",

@@ -26,5 +26,8 @@ public interface AccountRepository extends JpaRepository<AccountEntity, Long> {
   List<AccountEntity> findTop100ByUsernameContainsIgnoreCaseOrderByLastLoginDesc(
       @Param("username") @NonNull String username);
 
+  List<AccountEntity> findTop100ByLastIpOrderByLastLoginDesc(
+      @Param("lastIp") Integer lastIp);
+
 
 }
