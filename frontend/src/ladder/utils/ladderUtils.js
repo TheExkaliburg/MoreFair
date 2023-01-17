@@ -41,10 +41,10 @@ export default {
   },
   getNextUpgradeCost(ladder, currentUpgrade, ladderTypes) {
     let costMult = 1;
-    if (ladderTypes.indexOf("CHEAP") >= 0) {
+    if (ladderTypes.has("CHEAP")) {
       costMult = 0.5;
     }
-    if (ladderTypes.indexOf("EXPENSIVE") >= 0) {
+    if (ladderTypes.has("EXPENSIVE")) {
       costMult = 1.5;
     }
     return new Decimal(

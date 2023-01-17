@@ -49,7 +49,7 @@ export default {
     return ladderUtils.getNextUpgradeCost(
       state,
       currentUpgrade,
-      Array.from(state.types).join(",")
+      state.types
     );
   },
   getVinegarThrowCost(state, _, rootState) {

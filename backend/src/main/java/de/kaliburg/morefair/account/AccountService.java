@@ -104,4 +104,8 @@ public class AccountService {
     eventPublisher.publishEvent(new AccountServiceEvent(this, result));
     return result;
   }
+
+  public List<AccountEntity> searchByIp(Integer ip) {
+    return accountRepository.findTop100ByLastIpOrderByLastLoginDesc(ip);
+  }
 }
