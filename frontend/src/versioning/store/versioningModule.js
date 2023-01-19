@@ -5,6 +5,14 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("MINOR", "CHEAP and EXPENSIVE Ladder Types", {
+          features: [
+            "CHEAP ladders have the cost to bias and multi reduced by 50%.",
+            "EXPENSIVE ladders have the cost to bias and multi increased by 50%.",
+            "CHEAP ladders are more common on FAST rounds, and EXPENSIVE ladders are more common on SLOW rounds.",
+            "CHAOS rounds have a much higher chance of rolling CHEAP or EXPENSIVE ladders, with equal chance for each.",
+          ],
+        }),
         new Version("PATCH", "Double Point Fix", {
           fixes: [
             "Fixed error handling while generating Round- and Ladder types, which made generating the first ladder on specific fail after calculating all the points. " +
@@ -14,6 +22,7 @@ const versioningModule = {
         new Version("PATCH", "Alt-Checks", {
           features: ["Moderators should now be able to check for alts."],
         }),
+
         new Version("PATCH", "Timestamp for messages", {
           fixes: [
             "Should now show the timestamp of the message correctly, regarding timezone and locale",

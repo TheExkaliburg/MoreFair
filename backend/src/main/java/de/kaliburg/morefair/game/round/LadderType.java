@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public enum LadderType implements Comparable<LadderType> {
-  DEFAULT, TINY, SMALL, BIG, GIGANTIC, FREE_AUTO, NO_AUTO, ASSHOLE;
+  DEFAULT, TINY, SMALL, BIG, GIGANTIC, FREE_AUTO, NO_AUTO, ASSHOLE, CHEAP, EXPENSIVE;
 
   @Getter
   private int priority = 0;
