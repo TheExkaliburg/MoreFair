@@ -39,9 +39,16 @@ export default {
   getVinegarThrowCost(settings, ladder) {
     return settings.baseVinegarNeededToThrow.mul(new Decimal(ladder.number));
   },
-  getNextUpgradeCost(ladder, currentUpgrade) {
+  getNextUpgradeCost(ladder, currentUpgrade, ladderTypes) {
+    let costMult = 1;
+    if (ladderTypes.has("CHEAP")) {
+      costMult = 0.5;
+    }
+    if (ladderTypes.has("EXPENSIVE")) {
+      costMult = 1.5;
+    }
     return new Decimal(
-      Math.round(Math.pow(ladder.number + 1, currentUpgrade + 1))
+      Math.round(Math.pow(ladder.number + 1, currentUpgrade + 1) * costMult)
     );
   },
   calculatePointsNeededForPromote(settings, ladder) {

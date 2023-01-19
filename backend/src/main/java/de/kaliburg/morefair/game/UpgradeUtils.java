@@ -4,6 +4,9 @@ import de.kaliburg.morefair.FairConfig;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.util.Set;
+
+import de.kaliburg.morefair.game.round.LadderType;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -29,6 +32,19 @@ public class UpgradeUtils {
     BigInteger result = ladder.pow(currentUpgrade + 1);
 
     return result;
+  }
+
+  public BigInteger buyUpgradeCost(Integer ladderNumber, Integer currentUpgrade, Set<LadderType> ladderTypes) {
+    BigDecimal costMulti = BigDecimal.valueOf(1.0f);
+    if (ladderTypes.contains(LadderType.CHEAP)) {
+      costMulti = BigDecimal.valueOf(0.5f);
+    }
+    if (ladderTypes.contains(LadderType.EXPENSIVE)) {
+      costMulti = BigDecimal.valueOf(1.5f);
+    }
+    BigDecimal ladder = BigDecimal.valueOf(ladderNumber + 1);
+    BigDecimal result = ladder.pow(currentUpgrade + 1).multiply(costMulti);
+    return result.toBigInteger();
   }
 
   public BigInteger throwVinegarCost(Integer ladderNum) {
