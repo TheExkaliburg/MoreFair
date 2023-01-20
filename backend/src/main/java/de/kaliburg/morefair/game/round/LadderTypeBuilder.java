@@ -45,9 +45,9 @@ public class LadderTypeBuilder {
     ladderAutoTypeWeights.put(LadderType.NO_AUTO, 2.f);
     ladderAutoTypeWeights.put(LadderType.DEFAULT, 100.f);
 
-    ladderCostTypeWeights.put(LadderType.CHEAP, 5.f);
-    ladderCostTypeWeights.put(LadderType.EXPENSIVE,5.f);
-    ladderCostTypeWeights.put(LadderType.DEFAULT, 90.f);
+    ladderCostTypeWeights.put(LadderType.CHEAP, 10.f);
+    ladderCostTypeWeights.put(LadderType.EXPENSIVE, 10.f);
+    ladderCostTypeWeights.put(LadderType.DEFAULT, 100.f);
   }
 
   private void handlePreviousLadderType(LadderType ladderType) {
