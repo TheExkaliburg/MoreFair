@@ -40,16 +40,22 @@ export default {
     return settings.baseVinegarNeededToThrow.mul(new Decimal(ladder.number));
   },
   getNextUpgradeCost(ladder, currentUpgrade, ladderTypes) {
-    let costMult = 1;
+    let flatMulti = 1;
+    let ladderMulti = 1;
     if (ladderTypes.has("CHEAP")) {
-      costMult = 0.5;
+      ladderMulti = 0.5;
+      flatMulti = 0.5;
     }
     if (ladderTypes.has("EXPENSIVE")) {
-      costMult = 1.5;
+      ladderMulti = 1.5;
+      flatMulti = 1.5;
     }
-    return new Decimal(
-      Math.round(Math.pow(ladder.number + 1, currentUpgrade + 1) * costMult)
-    );
+
+    let ladderDec = new Decimal(ladder.number);
+    ladderDec = ladderDec.mul(ladderMulti).add(new Decimal(1));
+
+    let result = ladderDec.pow(currentUpgrade + 1).mul(flatMulti);
+    return result.round().max(new Decimal(1));
   },
   calculatePointsNeededForPromote(settings, ladder) {
     // If not enough Players -> Infinity
