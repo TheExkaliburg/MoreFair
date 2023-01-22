@@ -5,6 +5,12 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "CHEAP and EXPENSIVE also scales with ladders", {
+          balancing: [
+            "CHEAP ladders have the cost to bias and multi reduced as if they are half their ladder number and then by and additional 50%.",
+            "EXPENSIVE ladders have the cost to bias and multi increased as if they are 1.5x their ladder number and then by and additional 50%.",
+          ],
+        }),
         new Version("MINOR", "CHEAP and EXPENSIVE Ladder Types", {
           features: [
             "CHEAP ladders have the cost to bias and multi reduced by 50%.",
