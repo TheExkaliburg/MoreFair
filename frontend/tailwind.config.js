@@ -56,6 +56,9 @@ module.exports = {
         "4xs": "0.41rem",
         "5xs": "0.328rem",
       },
+      spacing: {
+        reader: "60em",
+      },
     },
   },
   plugins: [],

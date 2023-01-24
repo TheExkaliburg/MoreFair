@@ -16,7 +16,7 @@
       </div>
       <!--Bottom of the Canvas-->
       <div class="min-w-min flex flex-col justify-items-start content-around">
-        <NuxtLink to="/">
+        <NuxtLink to="/options">
           <SidebarButton :label="optionsLabel">
             <template #icon>
               <Cog8ToothIcon />
