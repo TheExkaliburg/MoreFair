@@ -72,6 +72,7 @@ $transparent: rgba(0, 0, 0, 0);
   --text-dark-highlight-color: #{$color-dark-coral};
   --text-placeholder-color: #{$color-claret};
   --text-error-color: var(--placeholder-color);
+  --reader-width: 50em;
 
   // Buttons
   --button-bg-color: var(--background-color);

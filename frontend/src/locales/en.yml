@@ -12,3 +12,5 @@ components:
       discord: Discord
       privacy: Privacy Policy
       impressum: Impressum
+options:
+  showAssholePoints: Show asshole-points subsection

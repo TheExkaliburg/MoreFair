@@ -57,7 +57,7 @@ module.exports = {
         "5xs": "0.328rem",
       },
       spacing: {
-        reader: "60em",
+        reader: "var(--reader-width)",
       },
     },
   },

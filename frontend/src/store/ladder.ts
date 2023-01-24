@@ -124,7 +124,10 @@ export const useLadderStore = defineStore("ladder", () => {
 
             // Move other Ranker 1 Place down
             rankers[j].rank = j + 2;
-            if (rankers[j].growing && rankers[j].you && rankers[j].multi > 1) {
+            if (
+              rankers[j].growing /* TODO: && rankers[j].you */ &&
+              rankers[j].multi > 1
+            ) {
               rankers[j].grapes = rankers[j].grapes.add(1);
             }
             rankers[j + 1] = rankers[j];
