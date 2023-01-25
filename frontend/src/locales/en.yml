@@ -13,4 +13,27 @@ components:
       privacy: Privacy Policy
       impressum: Impressum
 options:
+  section:
+    general: General
   showAssholePoints: Show asshole-points subsection
+  showEta: Show ETA to Top/Ranker
+  followOwnRanker: Follow own Ranker
+  etaColors: ETA Colors
+  showBiasAndMulti: Show bias/multi for ranker
+  showPowerGain: Show power-gain for ranker
+  hidePromotedPlayers: Hide promoted players
+  hideVinegarAndGrapes: Hide vinegar and grape count
+  enableSpectateAssholeLadder: Enable spectating asshole ladder
+  hideHelpText: Hide help text
+  subscribedMentions: Subscribed mentions
+  playSoundOnMention: Play sound on mention
+  playSoundOnFirst: Play sound on reaching first
+  playSoundOnPromote: Play sound on promotion
+  notificationVolume: Notification volume
+  enableModPage: Enable mod page
+  enableChatFeatures: Enable chat features
+  enableLadderFeatures: Enable ladder features
+  unrestrictedAccess: Unrestricted ladder & chat access
+
+
+

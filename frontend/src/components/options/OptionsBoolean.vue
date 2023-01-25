@@ -2,10 +2,9 @@
   <div class="flex flex-row justify-between space-x-2">
     <div class="w-1/3">{{ formattedName }}:</div>
     <input
-      :value="option.value"
-      class="bg-transparent border-button-border border-1 border-dashed w-reader max-w-2/3"
+      :checked="option.value"
       type="checkbox"
-      @input="(event) => emit('update', Boolean(event.target.value))"
+      @input="$emit('update', $event.target.checked)"
     />
   </div>
 </template>
@@ -13,15 +12,16 @@
 <script lang="ts" setup>
 const props = defineProps({
   option: { type: Object, required: true },
+  label: { type: String, required: true },
 });
 
 const lang = useLang("options");
 
 const formattedName = computed(() => {
-  return lang(props.option.key);
+  return lang(props.label);
 });
 
-const emit = defineEmits<{
+defineEmits<{
   (event: "update", value: boolean): void;
 }>();
 </script>

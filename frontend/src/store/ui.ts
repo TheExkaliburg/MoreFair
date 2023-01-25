@@ -9,7 +9,6 @@ export const useUiStore = defineStore("ui", () => {
 
   // actions
   function toggleSidebar() {
-    console.log("toggling sidebar", sidebarExpanded.value);
     sidebarExpanded.value = !sidebarExpanded.value;
   }
 
