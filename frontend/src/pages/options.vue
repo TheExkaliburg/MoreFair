@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-row w-full justify-evenly text-text mt-12">
-    <div class="flex flex-col w-full max-w-reader space-y-2 px-2">
+    <div class="flex flex-col w-full max-w-reader space-y-2 px-2 text-sm">
       <template v-for="entry in currentOptionsArray" :key="entry">
         <OptionsSection
           v-if="entry.value instanceof OptionsGroup"

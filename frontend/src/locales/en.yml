@@ -15,9 +15,12 @@ components:
 options:
   section:
     general: General
+    ladder: Ladder
+    chat: Chat
+    moderation: Moderation
   showAssholePoints: Show asshole-points subsection
-  showEta: Show ETA to Top/Ranker
-  followOwnRanker: Follow own Ranker
+  showEta: Show ETA to top/ranker
+  followOwnRanker: Follow own ranker
   etaColors: ETA Colors
   showBiasAndMulti: Show bias/multi for ranker
   showPowerGain: Show power-gain for ranker

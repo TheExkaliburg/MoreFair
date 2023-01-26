@@ -1,6 +1,11 @@
 <template>
   <div class="flex flex-row justify-between space-x-2">
-    <div class="w-1/3">{{ formattedName }}:</div>
+    <div
+      class="cursor-pointer select-none overflow-hidden"
+      @click="$emit('update', !option.value)"
+    >
+      {{ formattedName }}:
+    </div>
     <input
       :checked="option.value"
       type="checkbox"

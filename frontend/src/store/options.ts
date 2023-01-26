@@ -94,6 +94,7 @@ function read(value) {
 }
 
 function write(value) {
-  deleteEntriesWithKey(value, ["transient"]);
-  return StorageSerializers.object.write(value);
+  const temp = JSON.parse(JSON.stringify(value));
+  deleteEntriesWithKey(temp, ["transient"]);
+  return StorageSerializers.object.write(temp);
 }

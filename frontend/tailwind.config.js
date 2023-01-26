@@ -49,6 +49,9 @@ module.exports = {
           mid: "var(--eta-mid-color)",
           worst: "var(--eta-worst-color)",
         },
+        checkbox: {
+          DEFAULT: "var(--checkbox-accent-color)",
+        },
       },
       fontSize: {
         "2xs": "0.64rem",

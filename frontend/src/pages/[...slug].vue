@@ -1,6 +1,6 @@
 <template>
   <main class="px-4 flex flex-col items-center h-full overflow-y-scroll">
-    <ContentDoc class="text-text max-w-screen w-reader">
+    <ContentDoc class="text-text max-w-full w-reader">
       <template #not-found>
         <div class="text-text">Cannot find the page you are looking for.</div>
       </template>
