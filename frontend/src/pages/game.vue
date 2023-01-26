@@ -32,5 +32,9 @@ useStomp();
 onMounted(() => {
   useChatStore().init();
   useLadderStore().init();
+  const tour = useTutorialTour();
+  if (!tour.getFlag()) {
+    tour.start();
+  }
 });
 </script>

@@ -23,8 +23,8 @@
             </template>
           </SidebarButton>
         </NuxtLink>
-        <NuxtLink to="/">
-          <SidebarButton :label="helpLabel">
+        <NuxtLink @click="help">
+          <SidebarButton :label="helpLabel" data-tutorial="help">
             <template #icon>
               <QuestionMarkCircleIcon />
             </template>
@@ -68,11 +68,14 @@ const discordLabel = computed<string>(() => lang("discord"));
 const privacyLabel = computed<string>(() => lang("privacy"));
 const impressumLabel = computed<string>(() => lang("impressum"));
 
-uiStore.sidebarExpanded = false;
-
 onClickOutside(offCanvas, () => {
   uiStore.sidebarExpanded = false;
 });
+
+function help() {
+  useTutorialTour().start();
+  uiStore.sidebarExpanded = false;
+}
 </script>
 
 <style lang="scss" scoped>

@@ -50,10 +50,10 @@ const defaultValues = {
 };
 
 export const useOptionsStore = defineStore("options", () => {
-  const initialValue = {};
-  Object.assign(initialValue, defaultValues);
+  const initialValues = {};
+  Object.assign(initialValues, defaultValues);
 
-  const state = useStorage("options", initialValue, localStorage, {
+  const state = useStorage("options", initialValues, localStorage, {
     serializer: {
       read,
       write,

@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     "~/assets/scss/styles.scss",
     "@fortawesome/fontawesome-svg-core/styles.css",
     "vue-virtual-scroller/dist/vue-virtual-scroller.css",
+    "intro.js/introjs.css",
   ],
   modules: [
     "@pinia/nuxt",
