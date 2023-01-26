@@ -3,7 +3,7 @@
     class="flex flex-col justify-between items-center relative px-1.5 p-1 overflow-hidden text-text max-h-full"
   >
     <LadderWindowHeader class="h-8 w-full shrink-0" />
-    <LadderWindowTable class="w-full flex-auto overflow-y-auto" />
+    <LadderWindowTable class="w-full flex-auto overflow-y-hidden" />
     <LadderWindowBody class="min-h-fit w-full shrink-0" />
   </div>
 </template>

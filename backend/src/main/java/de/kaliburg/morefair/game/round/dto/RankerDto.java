@@ -16,7 +16,7 @@ public class RankerDto {
   private Integer multi;
   private boolean isGrowing;
   private String assholeTag;
-  private Integer ahPoints;
+  private Integer assholePoints;
 
   public RankerDto(RankerEntity ranker, FairConfig config) {
     this.accountId = ranker.getAccount().getId();
@@ -28,6 +28,6 @@ public class RankerDto {
     this.multi = ranker.getMultiplier();
     this.isGrowing = ranker.isGrowing();
     this.assholeTag = config.getAssholeTag(ranker.getAccount().getAssholeCount());
-    this.ahPoints = ranker.getAccount().getAssholePoints();
+    this.assholePoints = ranker.getAccount().getAssholePoints();
   }
 }

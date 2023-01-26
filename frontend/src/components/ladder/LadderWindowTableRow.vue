@@ -5,28 +5,34 @@
       'bg-ladder-bg-promoted text-ladder-text-promoted': !ranker.growing,
       'bg-ladder-bg-you text-ladder-text-you': isYou,
     }"
-    class="flex flex-row flex-nowrap justify-between items-center px-1 text-sm"
+    class="grid grid-cols-24 gap-1 px-1 text-sm"
   >
-    <div class="w-full whitespace-nowrap overflow-hidden">
+    <div class="col-span-3 sm:col-span-2 whitespace-nowrap overflow-hidden">
       {{ ranker.rank }} {{ ranker.assholeTag }}
       <sub :class="{ 'text-text-dark': !isYou }">{{
         ranker.assholePoints
       }}</sub>
     </div>
-    <div class="w-full whitespace-nowrap overflow-hidden">
+    <div class="col-span-9 sm:col-span-8 whitespace-nowrap overflow-hidden">
       {{ ranker.username
       }}<sub :class="{ 'text-text-dark': !isYou }">#{{ ranker.accountId }}</sub>
     </div>
-    <div class="w-full text-right whitespace-nowrap overflow-hidden">
+    <div
+      class="col-span-6 text-right whitespace-nowrap overflow-hidden hidden sm:block"
+    >
       {{ formattedPowerPerSec }}[<span class="text-eta-best"
         >+{{ formattedBias }}</span
       ><span class="text-eta-worst"> x{{ formattedMulti }}</span
       >]
     </div>
-    <div class="w-full text-right whitespace-nowrap overflow-hidden">
+    <div
+      class="col-span-6 sm:col-span-4 text-right whitespace-nowrap overflow-hidden"
+    >
       {{ formattedPower }}
     </div>
-    <div class="w-full text-right whitespace-nowrap overflow-hidden">
+    <div
+      class="col-span-6 sm:col-span-4 text-right whitespace-nowrap overflow-hidden"
+    >
       {{ formattedPoints }}
     </div>
   </div>

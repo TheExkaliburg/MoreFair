@@ -1,22 +1,21 @@
 <template>
   <div class="shrink">
     <DynamicScroller
-      :buffer="1000"
+      :buffer="200"
       :items="ladder.rankers"
       :min-item-size="23"
-      class="max-h-full overflow-y-scroll text-sm"
+      class="h-full overflow-y-auto text-sm"
       key-field="rank"
       page-mode
     >
       <template #before>
         <div
-          class="flex flex-row flex-nowrap justify-between items-center px-1 font-bold text-text-light"
+          class="grid grid-cols-24 gap-1 px-1 px-1 font-bold text-text-light sticky top-0"
         >
-          <div class="w-full">#</div>
-          <div class="w-full">Username</div>
-          <div class="w-full text-right">Power/s</div>
-          <div class="w-full text-right">Power</div>
-          <div class="w-full text-right">Points</div>
+          <div class="col-span-3">#</div>
+          <div class="col-span-9">Username</div>
+          <div class="col-span-6 text-right">Power</div>
+          <div class="col-span-6 text-right">Points</div>
         </div>
       </template>
       <template #default="{ item, index, active }">
@@ -35,17 +34,11 @@
         </DynamicScrollerItem>
       </template>
     </DynamicScroller>
-    <!--LadderWindowTableRow
-      v-for="(ranker, index) in shownRanker"
-      :key="index"
-      :active="true"
-      :index="index"
-      :ranker="ranker"
-    /-->
   </div>
 </template>
 
 <script lang="ts" setup>
+import { DynamicScroller, DynamicScrollerItem } from "vue-virtual-scroller";
 import { useLadderStore } from "~/store/ladder";
 import LadderWindowTableRow from "~/components/ladder/LadderWindowTableRow.vue";
 

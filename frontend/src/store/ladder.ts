@@ -46,6 +46,11 @@ export const useLadderStore = defineStore("ladder", () => {
         rankers.length = 0;
         data.rankers.forEach((ranker) => {
           rankers.push(new Ranker(ranker));
+          rankers.push(new Ranker(ranker));
+          rankers.push(new Ranker(ranker));
+          rankers.push(new Ranker(ranker));
+          rankers.push(new Ranker(ranker));
+          rankers.push(new Ranker(ranker));
         });
         Object.assign(types, new Set());
         data.types.forEach((s) => {
