@@ -13,7 +13,7 @@ public class SqlConnector {
   public Dataset<Row> read(String table) {
     return sparkSession.read().format("jdbc")
         .option("url", "jdbc:postgresql://localhost:5432/MoreFairStaging")
-        .option("drive", "org.postgresql.Driver")
+        .option("driver", "org.postgresql.Driver")
         .option("user", System.getenv("SQL_USERNAME"))
         .option("password", System.getenv("SQL_PASSWORD"))
         .option("dbtable", table)
@@ -23,7 +23,7 @@ public class SqlConnector {
   public Dataset<Row> read(String table, String whereClause) {
     return sparkSession.read().format("jdbc")
         .option("url", "jdbc:postgresql://localhost:5432/MoreFairStaging")
-        .option("drive", "org.postgresql.Driver")
+        .option("driver", "org.postgresql.Driver")
         .option("user", System.getenv("SQL_USERNAME"))
         .option("password", System.getenv("SQL_PASSWORD"))
         .option("query", "SELECT * FROM " + table + " WHERE " + whereClause)
