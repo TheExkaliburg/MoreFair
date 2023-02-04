@@ -3,6 +3,7 @@ package de.kaliburg.morefair.statistics;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import de.kaliburg.morefair.MoreFairApplication;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.game.round.LadderEntity;
 import de.kaliburg.morefair.game.round.RankerEntity;
@@ -182,7 +183,12 @@ public class StatisticsService {
       jsonBody.add("sparkProperties", sparkProperties);
 
       // Add the other properties
-      jsonBody.addProperty("appResource", "/bin/morefair-staging/spark.jar");
+      // TODO: make the path based on the current jar
+      String jarPath =
+          MoreFairApplication.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+      System.out.println(jarPath);
+
+      jsonBody.addProperty("appResource", jarPath + "/spark.jar");
       jsonBody.addProperty("clientSparkVersion", "3.3.1");
       jsonBody.addProperty("mainClass", mainClass);
 
@@ -191,11 +197,11 @@ public class StatisticsService {
       environmentVariables.addProperty("SPARK_ENV_LOADED", "1");
       environmentVariables.addProperty("SQL_USERNAME", sqlUsername);
       environmentVariables.addProperty("SQL_PASSWORD", sqlPassword);
+      environmentVariables.addProperty("PROFILE", activeProfile);
       jsonBody.add("environmentVariables", environmentVariables);
 
       // Add the "appArgs" property
       JsonArray appArgs = new JsonArray();
-      appArgs.add(activeProfile);
       jsonBody.add("appArgs", appArgs);
 
       // Convert the JSON object to a string

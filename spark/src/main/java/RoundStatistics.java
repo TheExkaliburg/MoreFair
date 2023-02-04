@@ -5,12 +5,7 @@ import org.apache.spark.sql.SparkSession;
 public class RoundStatistics {
   public static void main(String[] args) throws Exception{
 
-    try {
-      Class.forName("org.postgresql.Driver");
-      System.out.println("PostgreSQL driver found");
-    } catch (ClassNotFoundException e) {
-      System.out.println("PostgreSQL driver not found");
-    }
+
 
 
     SparkSession spark = SparkUtils.createSparkSession(args);
@@ -18,6 +13,7 @@ public class RoundStatistics {
     SqlConnector sqlConnector = new SqlConnector(spark);
 
     Dataset<Row> accounts = sqlConnector.read("account");
+    Dataset<Row> game = sqlConnector.read("game");
 
     accounts.printSchema();
 
