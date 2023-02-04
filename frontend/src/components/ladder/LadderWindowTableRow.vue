@@ -40,8 +40,8 @@
 
 <script lang="ts" setup>
 import { computed } from "vue";
-import { Ranker } from "~/store/entities/ranker";
-import { useFormatter } from "~/composables/useFormatter";
+import { Ranker } from "../../store/entities/ranker";
+import { useFormatter } from "../../composables/useFormatter";
 
 const props = defineProps({
   ranker: { type: Ranker, required: true },

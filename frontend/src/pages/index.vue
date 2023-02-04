@@ -5,8 +5,8 @@
     <div class="text-5xl text-text">FairGame</div>
     <div class="flex flex-row justify-center content-center">
       <FairButton class="mx-1 my-3" @click="registerGuest"
-        >Play as Guest</FairButton
-      >
+        >Play as Guest
+      </FairButton>
       <FairButton class="mx-1 my-3" @click="openLoginModal">Login</FairButton>
     </div>
     <div class="text-text">Guest-UUID: {{ authStore.uuid }}</div>
@@ -20,28 +20,29 @@
 </template>
 
 <script lang="ts" setup>
-import { onBeforeMount } from "vue";
+import { onMounted, ref } from "vue";
+import { navigateTo } from "nuxt/app";
+import FairButton from "../components/interactables/FairButton.vue";
+import TheAuthenticationDialog from "../components/auth/TheAuthenticationDialog.vue";
 import { useAuthStore } from "~/store/authentication";
-import FairButton from "~/components/interactables/FairButton.vue";
-import TheAuthenticationDialog from "~/components/auth/TheAuthenticationDialog.vue";
 
 const authStore = useAuthStore();
 definePageMeta({ layout: "empty" });
 
 const isLoginModalOpen = ref<boolean>(false);
 
-onBeforeMount(async () => {
+onMounted(async () => {
   // If guest-uuid exists try logging in
   if (authStore.isGuest) {
-    await authStore.login(authStore.uuid, authStore.uuid);
+    await authStore.login(authStore.state.uuid, authStore.state.uuid);
   }
-  if (authStore.authenticationStatus) {
-    return await navigateTo("/game");
+  if (authStore.state.authenticationStatus) {
+    await navigateTo("/game");
   }
 });
 
 function openLoginModal() {
-  if (authStore.authenticationStatus) {
+  if (authStore.state.authenticationStatus) {
     return navigateTo("/game");
   }
 
@@ -49,8 +50,9 @@ function openLoginModal() {
 }
 
 async function registerGuest() {
-  if (authStore.authenticationStatus) {
-    return await navigateTo("/game");
+  if (authStore.state.authenticationStatus) {
+    await navigateTo("/game");
+    return;
   }
 
   if (

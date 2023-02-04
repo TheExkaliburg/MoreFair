@@ -38,9 +38,8 @@
 </template>
 
 <script lang="ts" setup>
-import { DynamicScroller, DynamicScrollerItem } from "vue-virtual-scroller";
+import LadderWindowTableRow from "../../components/ladder/LadderWindowTableRow.vue";
 import { useLadderStore } from "~/store/ladder";
-import LadderWindowTableRow from "~/components/ladder/LadderWindowTableRow.vue";
 
 const ladder = useLadderStore();
 </script>

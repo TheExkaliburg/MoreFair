@@ -25,7 +25,7 @@
 
 <script lang="ts" setup>
 import { Bars3Icon } from "@heroicons/vue/24/outline";
-import { useUiStore } from "~/store/ui";
+import { useUiStore } from "../../store/ui";
 
 const uiStore = useUiStore();
 </script>

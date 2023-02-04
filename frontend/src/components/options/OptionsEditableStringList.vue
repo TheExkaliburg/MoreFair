@@ -45,6 +45,9 @@
 </template>
 
 <script lang="ts" setup>
+import { computed, ref } from "vue";
+import { useLang } from "../../composables/useLang";
+
 const props = defineProps({
   option: { type: Object, required: true },
   label: { type: String, required: true },

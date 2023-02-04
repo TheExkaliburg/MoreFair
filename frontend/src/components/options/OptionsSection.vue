@@ -32,16 +32,18 @@
 </template>
 
 <script lang="ts" setup>
-import OptionsBoolean from "~/components/options/OptionsBoolean.vue";
+import { computed } from "vue";
+import OptionsBoolean from "../../components/options/OptionsBoolean.vue";
 import {
   BooleanOption,
   EditableStringListOption,
   EnumOption,
   RangeOption,
-} from "~/store/entities/option";
-import OptionsStringEnum from "~/components/options/OptionsStringEnum.vue";
-import OptionsRange from "~/components/options/OptionsRange.vue";
-import OptionsEditableStringList from "~/components/options/OptionsEditableStringList.vue";
+} from "../../store/entities/option";
+import OptionsStringEnum from "../../components/options/OptionsStringEnum.vue";
+import OptionsRange from "../../components/options/OptionsRange.vue";
+import OptionsEditableStringList from "../../components/options/OptionsEditableStringList.vue";
+import { useLang } from "../../composables/useLang";
 
 const props = defineProps({
   options: { type: Object, required: true },

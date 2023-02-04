@@ -7,7 +7,7 @@ import {
   EnumOption,
   OptionsGroup,
   RangeOption,
-} from "~/store/entities/option";
+} from "./entities/option";
 
 export const enum EtaColorType {
   OFF = "Off",
@@ -69,7 +69,7 @@ export const useOptionsStore = defineStore("options", () => {
   };
 });
 
-function deleteOldValues(state, defaults) {
+function deleteOldValues(state: any, defaults: any) {
   Object.keys(state).forEach((key) => {
     if (!(key in defaults)) {
       delete state[key];
@@ -79,7 +79,7 @@ function deleteOldValues(state, defaults) {
   });
 }
 
-function deleteEntriesWithKey(state: object, keys: string[]) {
+function deleteEntriesWithKey(state: any, keys: string[]) {
   Object.keys(state).forEach((key) => {
     if (keys.includes(key)) {
       delete state[key];
@@ -89,11 +89,11 @@ function deleteEntriesWithKey(state: object, keys: string[]) {
   });
 }
 
-function read(value) {
+function read(value: any) {
   return StorageSerializers.object.read(value);
 }
 
-function write(value) {
+function write(value: any) {
   const temp = JSON.parse(JSON.stringify(value));
   deleteEntriesWithKey(temp, ["transient"]);
   return StorageSerializers.object.write(temp);

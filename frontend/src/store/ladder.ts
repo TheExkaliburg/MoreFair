@@ -1,8 +1,9 @@
 import { defineStore } from "pinia";
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 import Decimal from "break_infinity.js";
-import { Ranker, RankerData } from "~/store/entities/ranker";
-import { OnTickBody } from "~/composables/useStomp";
+import { OnTickBody, useStomp } from "../composables/useStomp";
+import { useAPI } from "../composables/useAPI";
+import { Ranker, RankerData } from "./entities/ranker";
 
 export enum LadderType {
   DEFAULT,
@@ -45,11 +46,6 @@ export const useLadderStore = defineStore("ladder", () => {
         const data: LadderData = res.data;
         rankers.length = 0;
         data.rankers.forEach((ranker) => {
-          rankers.push(new Ranker(ranker));
-          rankers.push(new Ranker(ranker));
-          rankers.push(new Ranker(ranker));
-          rankers.push(new Ranker(ranker));
-          rankers.push(new Ranker(ranker));
           rankers.push(new Ranker(ranker));
         });
         Object.assign(types, new Set());

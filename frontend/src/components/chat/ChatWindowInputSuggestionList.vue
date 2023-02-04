@@ -1,4 +1,3 @@
-@@ -0,0 +1,69 @@
 <template>
   <div>
     <Listbox>
@@ -31,7 +30,7 @@
 </template>
 <script lang="ts" setup>
 import { Listbox, ListboxOption, ListboxOptions } from "@headlessui/vue";
-import { watch } from "vue";
+import { computed, ref, watch } from "vue";
 
 const props = defineProps({
   items: { type: Array, required: true },
@@ -50,7 +49,7 @@ const formattedItemsArray = computed(() => {
 });
 
 const selectedIndex = ref<number>(0);
-const list = ref(null);
+const list = ref();
 
 watch(props.items, () => {
   selectedIndex.value = 0;
@@ -66,8 +65,8 @@ function onKeyDown(event: KeyboardEvent) {
     event.preventDefault();
     selectedIndex.value =
       (selectedIndex.value + props.items.length - 1) % props.items.length;
-    // selected.value[0].scrollIntoView({ behavior: "smooth", block: "nearest" });
-    list.value.$el.children[selectedIndex.value]?.scrollIntoView({
+
+    list.value?.$el.children[selectedIndex.value]?.scrollIntoView({
       block: "nearest",
     });
     return true;
@@ -77,7 +76,8 @@ function onKeyDown(event: KeyboardEvent) {
     event.preventDefault();
     selectedIndex.value = (selectedIndex.value + 1) % props.items.length;
     // selected.value[0].scrollIntoView({ behavior: "smooth", block: "nearest" });
-    list.value.$el.children[selectedIndex.value]?.scrollIntoView({
+    console.log(list.value);
+    list.value?.$el.children[selectedIndex.value]?.scrollIntoView({
       block: "nearest",
     });
     return true;

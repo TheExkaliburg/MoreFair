@@ -19,8 +19,8 @@
 </template>
 
 <script lang="ts" setup>
-import ChatWindowContentMessageBody from "~/components/chat/ChatWindowContentMessageBody.vue";
-import { Message } from "~/store/entities/message";
+import ChatWindowContentMessageBody from "../../components/chat/ChatWindowContentMessageBody.vue";
+import { Message } from "../../store/entities/message";
 
 defineProps({
   message: {

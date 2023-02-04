@@ -33,7 +33,7 @@
 </template>
 
 <script lang="ts" setup>
-import FairButton from "~/components/interactables/FairButton.vue";
+import FairButton from "../../components/interactables/FairButton.vue";
 </script>
 
 <style scoped></style>

@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
+import { navigateTo } from "nuxt/app";
 import Cookies from "js-cookie";
-import { navigateTo } from "#app";
 
 const isDevMode = process.env.NODE_ENV !== "production";
 

@@ -11,8 +11,8 @@
 </template>
 
 <script lang="ts" setup>
-import PaginationButtonGroup from "~/components/interactables/PaginationButtonGroup.vue";
-import { useChatStore } from "~/store/chat";
+import PaginationButtonGroup from "../../components/interactables/PaginationButtonGroup.vue";
+import { useChatStore } from "../../store/chat";
 
 const chatStore = useChatStore();
 

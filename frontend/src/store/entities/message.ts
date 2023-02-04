@@ -31,7 +31,7 @@ export class MessagePart {
     this.text = text;
   }
 
-  is(type) {
+  is(type: MessagePartType) {
     if (this.type === type) return true;
   }
 }

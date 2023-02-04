@@ -1,8 +1,8 @@
 import { defineStore } from "pinia";
 import { reactive, ref } from "vue";
-import { MentionMeta, Message, MessageData } from "~/store/entities/message";
-import { useStomp } from "~/composables/useStomp";
-import { useAPI } from "~/composables/useAPI";
+import { useStomp } from "../composables/useStomp";
+import { useAPI } from "../composables/useAPI";
+import { MentionMeta, Message, MessageData } from "./entities/message";
 
 export type ChatData = {
   messages: MessageData[];

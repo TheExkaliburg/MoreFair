@@ -9,12 +9,12 @@ const defaultValues = {
 
 export function useTutorialTour() {
   const tour = introJs();
-  const steps = [
+  const steps: introJs.Step[] = [
     {
       intro: "Welcome to the tutorial!",
     },
     {
-      element: document.querySelector("[data-tutorial='help']"),
+      element: document.querySelector("[data-tutorial='help']") || undefined,
       title: "This was it!",
       intro:
         "If you ever need this tutorial again, just click this help button again.",
@@ -40,7 +40,7 @@ export function useTutorialTour() {
     tour.onbeforechange((targetElement) => {
       return new Promise<void>((resolve) => {
         if (targetElement.dataset.tutorial === "help") {
-          useUiStore().sidebarExpanded = true;
+          useUiStore().state.sidebarExpanded = true;
           setTimeout(() => resolve(), 150);
         } else {
           resolve();

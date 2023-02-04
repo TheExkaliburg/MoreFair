@@ -10,8 +10,8 @@
 </template>
 
 <script lang="ts" setup>
-import TheSidebar from "~/components/navbar/TheSidebar.vue";
-import TheBrandedNavBarWithOffCanvas from "~/components/navbar/TheBrandedNavBarWithOffCanvas.vue";
+import TheSidebar from "../components/navbar/TheSidebar.vue";
+import TheBrandedNavBarWithOffCanvas from "../components/navbar/TheBrandedNavBarWithOffCanvas.vue";
 </script>
 
 <style lang="scss" scoped>

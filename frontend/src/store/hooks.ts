@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { ref } from "vue";
 
 export const useHooksStore = defineStore("hooks", () => {
   const onTicks = ref<Function[]>([]);

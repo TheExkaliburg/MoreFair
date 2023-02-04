@@ -11,5 +11,5 @@
 </template>
 
 <script lang="ts" setup>
-import PaginationButtonGroup from "~/components/interactables/PaginationButtonGroup.vue";
+import PaginationButtonGroup from "../../components/interactables/PaginationButtonGroup.vue";
 </script>

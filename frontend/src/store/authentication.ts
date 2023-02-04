@@ -1,13 +1,18 @@
 import { defineStore } from "pinia";
 import Cookies from "js-cookie";
-import { watch } from "vue";
-import { useAPI } from "~/composables/useAPI";
+import { computed, ref, watch } from "vue";
+import { useAPI } from "../composables/useAPI";
 
 export const useAuthStore = defineStore("auth", () => {
   const API = useAPI();
   // vars
   const uuid = ref<string>(Cookies.get("_uuid") || "");
   const authenticationStatus = ref<boolean>(false);
+
+  const state = reactive({
+    uuid,
+    authenticationStatus,
+  });
 
   API.auth.authenticationStatus().then((response) => {
     authenticationStatus.value = Boolean(response.data);
@@ -76,8 +81,7 @@ export const useAuthStore = defineStore("auth", () => {
 
   return {
     // vars
-    uuid,
-    authenticationStatus,
+    state,
     // getters
     isGuest,
     homeLocation,

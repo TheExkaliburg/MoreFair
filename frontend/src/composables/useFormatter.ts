@@ -1,3 +1,4 @@
+// @ts-ignore
 import { numberformat } from "swarm-numberformat";
 import Decimal from "break_infinity.js";
 
