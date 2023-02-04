@@ -189,7 +189,7 @@ public class StatisticsService {
       // Add the "environmentVariables" property
       JsonObject environmentVariables = new JsonObject();
       environmentVariables.addProperty("SPARK_ENV_LOADED", "1");
-      environmentVariables.addProperty("SQL_USERNAME", sqlPassword);
+      environmentVariables.addProperty("SQL_USERNAME", sqlUsername);
       environmentVariables.addProperty("SQL_PASSWORD", sqlPassword);
       jsonBody.add("environmentVariables", environmentVariables);
 
