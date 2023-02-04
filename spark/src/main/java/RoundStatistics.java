@@ -20,5 +20,7 @@ public class RoundStatistics {
         .union(throwVinegarRows.select("ranker.account", "createdOn"))
         .withColumnRenamed("ranker.account", "account");
   */
+    System.out.println(System.getenv());
+    System.out.println(System.getenv("SQL_PASSWORD"));
   }
 }

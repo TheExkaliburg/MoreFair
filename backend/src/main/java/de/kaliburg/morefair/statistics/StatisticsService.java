@@ -36,6 +36,8 @@ public class StatisticsService {
   @Value("${spring.profiles.active}")
   private String activeProfile;
 
+  private String sqlPassword = "test";
+
   @PostConstruct
   public void prepareCollections() {
     createCollection(LoginRecordEntity.class);
@@ -184,6 +186,7 @@ public class StatisticsService {
       // Add the "environmentVariables" property
       JsonObject environmentVariables = new JsonObject();
       environmentVariables.addProperty("SPARK_ENV_LOADED", "1");
+      environmentVariables.addProperty("SQL_PASSWORD", sqlPassword);
       jsonBody.add("environmentVariables", environmentVariables);
 
       // Add the "appArgs" property
