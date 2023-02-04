@@ -8,6 +8,7 @@ import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.game.round.LadderEntity;
 import de.kaliburg.morefair.game.round.RankerEntity;
 import de.kaliburg.morefair.game.round.RoundEntity;
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import javax.annotation.PostConstruct;
@@ -184,11 +185,13 @@ public class StatisticsService {
 
       // Add the other properties
       // TODO: make the path based on the current jar
-      String jarPath =
-          MoreFairApplication.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-      System.out.println(jarPath);
+      File jarFile =
+          new File(MoreFairApplication.class.getProtectionDomain().getCodeSource().getLocation()
+              .getPath());
+      String path = jarFile.getParentFile().getParent();
+      System.out.println(path);
 
-      jsonBody.addProperty("appResource", jarPath + "/spark.jar");
+      jsonBody.addProperty("appResource", path + "/spark.jar");
       jsonBody.addProperty("clientSparkVersion", "3.3.1");
       jsonBody.addProperty("mainClass", mainClass);
 
