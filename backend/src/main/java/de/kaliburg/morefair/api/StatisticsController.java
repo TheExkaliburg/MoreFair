@@ -47,7 +47,7 @@ public class StatisticsController {
   }
 
   @GetMapping(value = "/round", produces = "application/json")
-  public ResponseEntity<?> getRoundStatistics(
+  public ResponseEntity<RoundStatisticsEntity> getRoundStatistics(
       @RequestParam(name = "round", required = false) Integer roundNumber) {
     try {
       if (roundNumber == null) {
@@ -60,7 +60,6 @@ public class StatisticsController {
 
       RoundStatisticsEntity results = statisticsService.getRoundStatistics(roundNumber);
       if (results == null) {
-        log.info("No RoundStatistic Found");
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
       }
       return new ResponseEntity<>(results, HttpStatus.OK);

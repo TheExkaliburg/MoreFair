@@ -5,5 +5,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface RoundStatisticsRepository extends MongoRepository<RoundStatisticsEntity, Long> {
 
-  Optional<RoundStatisticsEntity> findByRoundId(Integer id);
+  Optional<RoundStatisticsEntity> findByRoundId(Long id);
 }
