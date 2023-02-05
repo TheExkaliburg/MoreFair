@@ -20,13 +20,13 @@ public class SqlConnector {
         .load();
   }
 
-  public Dataset<Row> read(String table, String whereClause) {
+  public Dataset<Row> query(String query) {
     return sparkSession.read().format("jdbc")
         .option("url", "jdbc:postgresql://localhost:5432/" + SparkUtils.getDatabaseName())
         .option("driver", "org.postgresql.Driver")
         .option("user", System.getenv("SQL_USERNAME"))
         .option("password", System.getenv("SQL_PASSWORD"))
-        .option("query", "SELECT * FROM " + table + " WHERE " + whereClause)
+        .option("query", query)
         .load();
   }
 }

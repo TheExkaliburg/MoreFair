@@ -8,13 +8,17 @@ import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.game.round.LadderEntity;
 import de.kaliburg.morefair.game.round.RankerEntity;
 import de.kaliburg.morefair.game.round.RoundEntity;
+import de.kaliburg.morefair.game.round.RoundService;
 import java.io.File;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -35,9 +39,11 @@ public class StatisticsService {
   private final PromoteRecordRepository promoteRecordRepository;
   private final ThrowVinegarRecordRepository throwVinegarRecordRepository;
 
+  @Lazy
+  @Autowired
+  private RoundService roundService;
   @Value("${spring.profiles.active}")
   private String activeProfile;
-
   @Value("${spring.datasource.password}")
   private String sqlPassword;
   @Value("${spring.datasource.username}")
@@ -58,7 +64,6 @@ public class StatisticsService {
       mongoTemplate.createCollection(clazz);
     }
   }
-
 
   public void recordLogin(AccountEntity account) {
     loginRecordRepository.save(new LoginRecordEntity(account));
@@ -142,23 +147,26 @@ public class StatisticsService {
             roundRecord));
   }
 
-
   /**
    * Sends a request to start the General Analytics for the Server.
    */
   @PostConstruct
   @Scheduled(cron = "0 */30 * * * *")
   public void startGeneralAnalytics() {
-    startAnalytics("GeneralAnalytics");
+    startAnalytics("GeneralAnalytics", null);
   }
 
   /**
    * Sends a request to start the Round Statistics for the Server.
-   * TODO: This is currently only done on startup, but should be done after each round-end.
    */
+  public void startRoundStatistics(long roundId) {
+    startAnalytics("RoundStatistics", roundId);
+  }
+
+  // TODO: Delete this function once testing is through
   @PostConstruct
-  public void startRoundStatistics() {
-    startAnalytics("RoundStatistics");
+  public void debugStartup() {
+    startRoundStatistics(1);
   }
 
   /**
@@ -167,9 +175,8 @@ public class StatisticsService {
    *
    * @param mainClass the main Class of the Spark Application that should be run on the cluster
    */
-  public void startAnalytics(String mainClass) {
+  public void startAnalytics(String mainClass, @Nullable Long currentRoundId) {
     try {
-      log.info("Profile: {}", activeProfile);
       // Create a JSON object for the request body
       JsonObject jsonBody = new JsonObject();
       jsonBody.addProperty("action", "CreateSubmissionRequest");
@@ -189,7 +196,6 @@ public class StatisticsService {
           new File(MoreFairApplication.class.getProtectionDomain().getCodeSource().getLocation()
               .getPath());
       String path = jarFile.getParentFile().getParent();
-      System.out.println(path);
 
       jsonBody.addProperty("appResource", path + "/spark.jar");
       jsonBody.addProperty("clientSparkVersion", "3.3.1");
@@ -205,6 +211,9 @@ public class StatisticsService {
 
       // Add the "appArgs" property
       JsonArray appArgs = new JsonArray();
+      if (currentRoundId != null) {
+        appArgs.add(currentRoundId);
+      }
       jsonBody.add("appArgs", appArgs);
 
       // Convert the JSON object to a string
