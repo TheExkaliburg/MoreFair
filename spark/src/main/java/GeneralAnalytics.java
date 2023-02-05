@@ -81,10 +81,6 @@ public class GeneralAnalytics {
             )
         );
 
-        timePerHour.show();
-        accountActivityInSeconds.show();
-        analysis.show();
-
         // mongoConnector.write(analysis, "generalAnalysis");
     }
 
