@@ -1,7 +1,12 @@
 import static org.apache.spark.sql.functions.col;
 import static org.apache.spark.sql.functions.collect_list;
 import static org.apache.spark.sql.functions.expr;
+import static org.apache.spark.sql.functions.first;
+import static org.apache.spark.sql.functions.greatest;
+import static org.apache.spark.sql.functions.lit;
+import static org.apache.spark.sql.functions.max;
 import static org.apache.spark.sql.functions.row_number;
+import static org.apache.spark.sql.functions.sum;
 
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -46,10 +51,21 @@ public class RoundStatistics {
     promotedRankerPoints.printSchema();
 
     promotedRankerPoints = promotedRankerPoints.withColumn("promotion_points",
-        expr("10 - dense_rank + 1")
+        greatest(expr("10 - dense_rank + 1"), lit(0))
     );
     promotedRankerPoints.show(100);
     promotedRankerPoints.printSchema();
+
+    Dataset<Row> rankerPointsPerLadder = promotedRankerPoints.groupBy("account_id")
+        .agg(
+            collect_list("promotion_points").as("points"),
+            first("account_id").as("account_id"),
+            sum("promotion_points").as("total")
+        )
+        .sort(col("total").desc());
+
+    rankerPointsPerLadder.show();
+    rankerPointsPerLadder.printSchema();
 
     /*
     WindowSpec window = Window.partitionBy("ladder_id").orderBy("rank");
