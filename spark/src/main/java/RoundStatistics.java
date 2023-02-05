@@ -81,7 +81,7 @@ public class RoundStatistics {
     Dataset<Row> roundStatistics = championsOfTheLadder
         .withColumn("champions", struct(col("*")))
         .groupBy().agg(
-            lit(roundId).alias("id"),
+            lit(roundId).alias("round_id"),
             collect_list("champions").alias("champions")
         );
 

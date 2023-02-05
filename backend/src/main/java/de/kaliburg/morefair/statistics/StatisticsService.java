@@ -1,17 +1,41 @@
 package de.kaliburg.morefair.statistics;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.MoreFairApplication;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.game.round.LadderEntity;
 import de.kaliburg.morefair.game.round.RankerEntity;
 import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
+import de.kaliburg.morefair.game.round.dto.RoundResultsDto;
+import de.kaliburg.morefair.statistics.records.AutoPromoteRecordEntity;
+import de.kaliburg.morefair.statistics.records.AutoPromoteRecordRepository;
+import de.kaliburg.morefair.statistics.records.BiasRecordEntity;
+import de.kaliburg.morefair.statistics.records.BiasRecordRepository;
+import de.kaliburg.morefair.statistics.records.LadderRecord;
+import de.kaliburg.morefair.statistics.records.LoginRecordEntity;
+import de.kaliburg.morefair.statistics.records.LoginRecordRepository;
+import de.kaliburg.morefair.statistics.records.MultiRecordEntity;
+import de.kaliburg.morefair.statistics.records.MultiRecordRepository;
+import de.kaliburg.morefair.statistics.records.PromoteRecordEntity;
+import de.kaliburg.morefair.statistics.records.PromoteRecordRepository;
+import de.kaliburg.morefair.statistics.records.RankerRecord;
+import de.kaliburg.morefair.statistics.records.RoundRecord;
+import de.kaliburg.morefair.statistics.records.ThrowVinegarRecordEntity;
+import de.kaliburg.morefair.statistics.records.ThrowVinegarRecordRepository;
+import de.kaliburg.morefair.statistics.results.RoundStatisticsEntity;
+import de.kaliburg.morefair.statistics.results.RoundStatisticsRepository;
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +43,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,39 +54,30 @@ import org.springframework.web.client.RestTemplate;
 @Transactional
 public class StatisticsService {
 
-  private final MongoTemplate mongoTemplate;
   private final LoginRecordRepository loginRecordRepository;
   private final BiasRecordRepository biasRecordRepository;
   private final MultiRecordRepository multiRecordRepository;
   private final AutoPromoteRecordRepository autoPromoteRecordRepository;
   private final PromoteRecordRepository promoteRecordRepository;
   private final ThrowVinegarRecordRepository throwVinegarRecordRepository;
+  private final RoundStatisticsRepository roundStatisticsRepository;
 
-  @Lazy
   @Autowired
-  private RoundService roundService;
+  @Lazy
+  private final RoundService roundService;
+
+  private final FairConfig config;
+  private final Cache<Integer, RoundResultsDto> roundResultsCache =
+      Caffeine.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).maximumSize(10).build();
+  private final LoadingCache<Long, Boolean> hasStartedStatisticsJobRecently =
+      Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build(number -> false);
+
   @Value("${spring.profiles.active}")
   private String activeProfile;
   @Value("${spring.datasource.password}")
   private String sqlPassword;
   @Value("${spring.datasource.username}")
   private String sqlUsername;
-
-  @PostConstruct
-  public void prepareCollections() {
-    createCollection(LoginRecordEntity.class);
-    createCollection(BiasRecordEntity.class);
-    createCollection(MultiRecordEntity.class);
-    createCollection(AutoPromoteRecordEntity.class);
-    createCollection(PromoteRecordEntity.class);
-    createCollection(ThrowVinegarRecordEntity.class);
-  }
-
-  private <T> void createCollection(Class<T> clazz) {
-    if (!mongoTemplate.collectionExists(clazz)) {
-      mongoTemplate.createCollection(clazz);
-    }
-  }
 
   public void recordLogin(AccountEntity account) {
     loginRecordRepository.save(new LoginRecordEntity(account));
@@ -161,12 +175,7 @@ public class StatisticsService {
    */
   public void startRoundStatistics(long roundId) {
     startAnalytics("RoundStatistics", roundId);
-  }
-
-  // TODO: Delete this function once testing is through
-  @PostConstruct
-  public void debugStartup() {
-    startRoundStatistics(115);
+    hasStartedStatisticsJobRecently.put(roundId, true);
   }
 
   /**
@@ -239,5 +248,36 @@ public class StatisticsService {
       log.error(e.getMessage());
       e.printStackTrace();
     }
+  }
+
+  public RoundResultsDto getRoundResults(Integer number) {
+    RoundResultsDto result = roundResultsCache.getIfPresent(number);
+    if (result == null) {
+      RoundEntity round = roundService.find(number);
+      if (round == null) {
+        return null;
+      }
+      result = new RoundResultsDto(round, config);
+      roundResultsCache.put(number, result);
+    }
+    return result;
+  }
+
+  public RoundStatisticsEntity getRoundStatistics(Integer number) {
+    RoundEntity round = roundService.find(number);
+    if (round == null) {
+      return null;
+    }
+
+    Optional<RoundStatisticsEntity> statistics = roundStatisticsRepository.findByRoundId(
+        round.getId());
+    if (statistics.isEmpty()) {
+      Boolean request = hasStartedStatisticsJobRecently.get(round.getId());
+      if (request != null && !request) {
+        startRoundStatistics(round.getId());
+      }
+    }
+
+    return statistics.orElse(null);
   }
 }
