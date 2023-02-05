@@ -67,6 +67,9 @@ public class GeneralAnalytics {
             .orderBy(col("hour"));
 
 
+        accountActivityInSeconds.printSchema();
+        timePerHour.printSchema();
+
         Dataset<Row> analysis = accountActivityInSeconds
             .withColumn("accountActivity", struct(col("*")));
         analysis = analysis.groupBy()
