@@ -274,8 +274,7 @@ public class StatisticsService {
       return null;
     }
 
-    Optional<RoundStatisticsEntity> statistics = roundStatisticsRepository.findByRoundId(
-        round.getId());
+    Optional<RoundStatisticsEntity> statistics = roundStatisticsRepository.findByRoundId(17);
     if (statistics.isEmpty()) {
       log.info("statistics was empty");
       startRoundStatistics(round.getId());
