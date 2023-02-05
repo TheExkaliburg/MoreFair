@@ -67,10 +67,6 @@ public class GeneralAnalytics {
             .agg(sum("diff").as("totalSeconds"))
             .orderBy(col("hour"));
 
-
-        accountActivityInSeconds.printSchema();
-        timePerHour.printSchema();
-
         Dataset<Row> analysis = accountActivityInSeconds
             .withColumn("accountActivity", struct(col("*")));
         analysis = analysis.groupBy()
@@ -85,8 +81,7 @@ public class GeneralAnalytics {
             )
         );
 
-        analysis.printSchema();
-        analysis.show(100);
+        mongoConnector.write(analysis, "generalAnalysis");
     }
 
 }
