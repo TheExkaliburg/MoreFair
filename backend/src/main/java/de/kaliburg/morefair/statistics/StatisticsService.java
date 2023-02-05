@@ -192,13 +192,17 @@ public class StatisticsService {
 
       // Add the other properties
       // TODO: make the path based on the current jar
-      File jarFile =
-          new File(
-              MoreFairApplication.class.getProtectionDomain().getCodeSource().getLocation().toURI()
-                  .getPath());
-      String path = jarFile.getAbsolutePath();
+      String jarPath = MoreFairApplication.class.getProtectionDomain().getCodeSource().getLocation()
+          .getPath();
+      if (jarPath.contains("!")) {
+        jarPath = jarPath.substring(0, jarPath.lastIndexOf("!"));
+        jarPath = jarPath.substring(0, jarPath.lastIndexOf("/"));
+      }
+      File jarFile = new File(jarPath);
+      String actualPath = jarFile.getParentFile().getParent();
+      log.debug(actualPath);
 
-      jsonBody.addProperty("appResource", path + "/spark.jar");
+      jsonBody.addProperty("appResource", actualPath + "/spark.jar");
       jsonBody.addProperty("clientSparkVersion", "3.3.1");
       jsonBody.addProperty("mainClass", mainClass);
 
