@@ -62,14 +62,9 @@ public class GeneralAnalytics {
             .withColumnRenamed("sum(diff)", "activityInSec")
             .sort(desc("activityInSec"));
 
-        accountActivityInSeconds.printSchema();
-        accountActivityInSeconds.show(100);
-
         Dataset<Row> timePerHour = accountActionsWithDiff.groupBy("hour")
             .agg(sum("diff").as("totalSeconds"))
             .orderBy(col("hour"));
-        timePerHour.printSchema();
-        timePerHour.show(100);
 
 
         Dataset<Row> analysis = accountActivityInSeconds
@@ -77,7 +72,7 @@ public class GeneralAnalytics {
         analysis = analysis.groupBy()
             .agg(collect_list("accountActivity").alias("accountActivity"));
         analysis = analysis.withColumn("createdOn", current_timestamp());
-        analysis = analysis.withColumn("activityPerHour", timePerHour.col("*"));
+        analysis = analysis.withColumn("activityPerHour", struct(timePerHour.col("*")));
 
         analysis.printSchema();
         analysis.show();
