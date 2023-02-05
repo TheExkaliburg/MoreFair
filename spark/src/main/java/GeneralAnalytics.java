@@ -72,7 +72,7 @@ public class GeneralAnalytics {
         analysis = analysis.groupBy()
             .agg(collect_list("accountActivity").alias("accountActivity"));
         analysis = analysis.withColumn("createdOn", current_timestamp());
-        analysis = analysis.withColumn("activityPerHour", struct(timePerHour.col("*")));
+        //analysis = analysis.withColumn("activityPerHour", struct(timePerHour.col("*")));
 
         analysis.printSchema();
         analysis.show();
