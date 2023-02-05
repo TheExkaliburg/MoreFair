@@ -60,6 +60,7 @@ public class StatisticsController {
 
       RoundStatisticsEntity results = statisticsService.getRoundStatistics(roundNumber);
       if (results == null) {
+        log.info("No RoundStatistic Found");
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
       }
       return new ResponseEntity<>(results, HttpStatus.OK);

@@ -174,7 +174,11 @@ public class StatisticsService {
    * Sends a request to start the Round Statistics for the Server.
    */
   public void startRoundStatistics(long roundId) {
-    startAnalytics("RoundStatistics", roundId);
+    Boolean request = hasStartedStatisticsJobRecently.get(roundId);
+    if (request != null && !request) {
+      log.info("starting roundStatistics");
+      startAnalytics("RoundStatistics", roundId);
+    }
     hasStartedStatisticsJobRecently.put(roundId, true);
   }
 
@@ -266,16 +270,15 @@ public class StatisticsService {
   public RoundStatisticsEntity getRoundStatistics(Integer number) {
     RoundEntity round = roundService.find(number);
     if (round == null) {
+      log.info("round was null");
       return null;
     }
 
     Optional<RoundStatisticsEntity> statistics = roundStatisticsRepository.findByRoundId(
         round.getId());
     if (statistics.isEmpty()) {
-      Boolean request = hasStartedStatisticsJobRecently.get(round.getId());
-      if (request != null && !request) {
-        startRoundStatistics(round.getId());
-      }
+      log.info("statistics was empty");
+      startRoundStatistics(round.getId());
     }
 
     return statistics.orElse(null);
