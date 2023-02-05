@@ -62,7 +62,7 @@ public class RoundStatistics {
 
     Dataset<Row> rankerPointsPerLadder = promotedRankerPoints.groupBy("account_id")
         .agg(
-            first("account_id").as("account_id"),
+            //first("account_id").as("account_id"),
             collect_list("promotion_points").as("points"),
             sum("promotion_points").as("total")
         )
