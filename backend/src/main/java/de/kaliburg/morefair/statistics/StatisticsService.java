@@ -165,7 +165,7 @@ public class StatisticsService {
    * Sends a request to start the General Analytics for the Server.
    */
   @PostConstruct
-  @Scheduled(cron = "0 */30 * * * *")
+  @Scheduled(cron = "0 0 8 * * *")
   public void startGeneralAnalytics() {
     startAnalytics("GeneralAnalytics", null);
   }
