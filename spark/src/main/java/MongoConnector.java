@@ -31,16 +31,19 @@ public class MongoConnector {
   }
 
   public void write(Dataset<Row> dataset, String collection) {
-    Dataset<Row> dataSetWithData = dataset.withColumn("data", struct(col("*")));
+   /* Dataset<Row> dataSetWithData = dataset.withColumn("data", struct(col("*")));
     Dataset<Row> dataSetOnlyData = dataSetWithData.groupBy().agg(collect_list("data").alias(
         "data"));
     Dataset<Row> dataSetWithTimestamp = dataSetOnlyData.withColumn("createdOn",
         current_timestamp());
 
-    dataSetWithTimestamp.printSchema();
-    dataSetWithTimestamp.show();
-    dataSetWithTimestamp.write().format("mongodb").mode("append").option("spark.mongodb.write.collection",
-        collection).save();
+    */
+
+    dataset.printSchema();
+    dataset.show();
+    dataset.write().format("mongodb").mode("append")
+        .option("spark.mongodb.write.collection", collection)
+        .save();
   }
 
 }

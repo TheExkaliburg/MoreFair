@@ -7,8 +7,11 @@ import static org.apache.spark.sql.functions.lit;
 import static org.apache.spark.sql.functions.max;
 import static org.apache.spark.sql.functions.rank;
 import static org.apache.spark.sql.functions.row_number;
+import static org.apache.spark.sql.functions.struct;
 import static org.apache.spark.sql.functions.sum;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -24,6 +27,7 @@ public class RoundStatistics {
     int roundId = Integer.parseInt(args[0]);
     SparkSession spark = SparkUtils.createSparkSession();
     SqlConnector sqlConnector = new SqlConnector(spark);
+    MongoConnector mongoConnector = new MongoConnector(spark);
 
     Dataset<Row> account = sqlConnector.query("SELECT DISTINCT(account.*) FROM account "
         + "INNER JOIN ranker on ranker.account_id = account.id "
@@ -62,23 +66,25 @@ public class RoundStatistics {
           greatest(expr("10 - dense_rank + 1"), lit(0))
     );
 
-    Dataset<Row> rankerPointsPerLadder = promotedRankerPoints.groupBy("account_id")
+    Dataset<Row> championsOfTheLadder = promotedRankerPoints.groupBy("account_id")
         .agg(
             collect_list("promotion_points").as("points"),
             sum("promotion_points").as("total")
         )
         .filter("total > 0")
         .sort(col("total").desc());
-    rankerPointsPerLadder = rankerPointsPerLadder
-        .join(account, rankerPointsPerLadder.col("account_id")
+    championsOfTheLadder = championsOfTheLadder
+        .join(account, championsOfTheLadder.col("account_id")
             .equalTo(account.col("id")))
         .select("account_id", "username", "points", "total");
 
-    rankerPointsPerLadder.show(100);
-    rankerPointsPerLadder.printSchema();
-  }
+    Dataset<Row> roundStatistics = championsOfTheLadder
+        .withColumn("championsOfTheLadder", struct(col("*")))
+        .groupBy().agg(
+            lit(roundId).alias("id"),
+            collect_list("data").alias("data")
+        );
 
-  public static Dataset<Row> resultStatistics(int roundId, Dataset<Row> rankerPointsPerLadder) {
-    return null;
+    mongoConnector.write(roundStatistics, "roundStatistics");
   }
 }
