@@ -79,10 +79,10 @@ public class RoundStatistics {
         .select("account_id", "username", "points", "total");
 
     Dataset<Row> roundStatistics = championsOfTheLadder
-        .withColumn("championsOfTheLadder", struct(col("*")))
+        .withColumn("champions", struct(col("*")))
         .groupBy().agg(
             lit(roundId).alias("id"),
-            collect_list("data").alias("data")
+            collect_list("champions").alias("champions")
         );
 
     mongoConnector.write(roundStatistics, "roundStatistics");
