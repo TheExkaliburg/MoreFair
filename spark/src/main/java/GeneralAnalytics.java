@@ -22,7 +22,7 @@ import org.apache.spark.sql.expressions.WindowSpec;
 @Slf4j
 public class GeneralAnalytics {
     public static void main(String[] args) throws Exception {
-        SparkSession spark = SparkUtils.createSparkSession(args);
+        SparkSession spark = SparkUtils.createSparkSession();
 
         // Dataset<Row> loginRows = MongoConnector.read(spark, "login");
         // Dataset<Row> result = loginRows.groupBy("account._id").count().sort("count");

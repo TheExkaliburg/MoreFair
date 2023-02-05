@@ -1,11 +1,7 @@
 import org.apache.spark.sql.SparkSession;
 
 public class SparkUtils {
-  public static SparkSession createSparkSession(String[] args) throws Exception {
-    if (args.length < 1) {
-      throw new IllegalArgumentException("The arguments are meant to be: '{activeProfile}'");
-    }
-
+  public static SparkSession createSparkSession() throws Exception {
     String database = getDatabaseName();
 
     return SparkSession.builder()

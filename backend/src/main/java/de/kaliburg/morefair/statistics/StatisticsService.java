@@ -191,7 +191,6 @@ public class StatisticsService {
       jsonBody.add("sparkProperties", sparkProperties);
 
       // Add the other properties
-      // TODO: make the path based on the current jar
       String jarPath = MoreFairApplication.class.getProtectionDomain().getCodeSource().getLocation()
           .getPath();
       if (jarPath.contains("!")) {
