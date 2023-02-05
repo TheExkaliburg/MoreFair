@@ -176,7 +176,7 @@ public class StatisticsService {
   public void startRoundStatistics(long roundId) {
     Boolean request = hasStartedStatisticsJobRecently.get(roundId);
     if (request != null && !request) {
-      log.info("starting roundStatistics for roundId: {}", roundId);
+      log.info("Starting RoundStatistics for roundId: {}", roundId);
       startAnalytics("RoundStatistics", roundId);
     }
     hasStartedStatisticsJobRecently.put(roundId, true);
@@ -212,7 +212,6 @@ public class StatisticsService {
       }
       File jarFile = new File(jarPath);
       String actualPath = jarFile.getParentFile().getParent();
-      log.debug(actualPath);
 
       jsonBody.addProperty("appResource", actualPath + "/spark.jar");
       jsonBody.addProperty("clientSparkVersion", "3.3.1");
