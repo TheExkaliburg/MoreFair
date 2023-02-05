@@ -1,5 +1,7 @@
 import static org.apache.spark.sql.functions.col;
+import static org.apache.spark.sql.functions.collect_list;
 import static org.apache.spark.sql.functions.count;
+import static org.apache.spark.sql.functions.current_timestamp;
 import static org.apache.spark.sql.functions.desc;
 import static org.apache.spark.sql.functions.hour;
 import static org.apache.spark.sql.functions.lag;
@@ -68,6 +70,17 @@ public class GeneralAnalytics {
             .orderBy(col("hour"));
         timePerHour.printSchema();
         timePerHour.show(100);
+
+
+        Dataset<Row> analysis = accountActivityInSeconds
+            .withColumn("accountActivity", struct(col("*")));
+        analysis = analysis.groupBy()
+            .agg(collect_list("accountActivity").alias("accountActivity"));
+        analysis = analysis.withColumn("createdOn", current_timestamp());
+        analysis = analysis.withColumn("activityPerHour", timePerHour.col("*"));
+
+        analysis.printSchema();
+        analysis.show();
     }
 
 }
