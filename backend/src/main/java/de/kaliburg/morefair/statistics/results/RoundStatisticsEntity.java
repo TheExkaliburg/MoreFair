@@ -8,13 +8,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Getter
 public class RoundStatisticsEntity {
 
-  private Long roundId;
+  private Integer roundId;
   private List<Champion> champions;
 
   @Getter
   public static class Champion {
 
-    private Long accountId;
+    private Integer accountId;
     private String username;
     private List<Integer> points;
     private Integer total;

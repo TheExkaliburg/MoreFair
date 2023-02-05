@@ -76,12 +76,13 @@ public class RoundStatistics {
     championsOfTheLadder = championsOfTheLadder
         .join(account, championsOfTheLadder.col("account_id")
             .equalTo(account.col("id")))
-        .select("account_id", "username", "points", "total");
+        .select("account_id", "username", "points", "total")
+        .withColumnRenamed("account_id", "accountId");
 
     Dataset<Row> roundStatistics = championsOfTheLadder
         .withColumn("champions", struct(col("*")))
         .groupBy().agg(
-            lit(roundId).alias("round_id"),
+            lit(roundId).alias("roundId"),
             collect_list("champions").alias("champions")
         );
 
