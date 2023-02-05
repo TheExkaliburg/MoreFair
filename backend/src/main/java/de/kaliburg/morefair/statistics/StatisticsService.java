@@ -166,7 +166,7 @@ public class StatisticsService {
   // TODO: Delete this function once testing is through
   @PostConstruct
   public void debugStartup() {
-    startRoundStatistics(1);
+    startRoundStatistics(115);
   }
 
   /**
