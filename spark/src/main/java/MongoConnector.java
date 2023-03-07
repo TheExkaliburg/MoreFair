@@ -11,22 +11,27 @@ import static org.apache.spark.sql.functions.col;
 
 @Data
 public class MongoConnector {
+  public final static String RECENT_PIPELINE = "[{'$match': {'createdOn': {'$gte': new Date(new Date() - 30 * 24 * 60 * 60 * 1000)}}}]";
   private final SparkSession sparkSession;
   public MongoConnector(SparkSession sparkSession) {
     this.sparkSession = sparkSession;
   }
 
   public Dataset<Row> read(String collection) {
-    // TODO: find a way to only read in the newest record from last Week
     return sparkSession.read().format("mongodb")
         .option("spark.mongodb.read.collection", collection)
         .load();
   }
 
-  public Dataset<Row> read(String collection, String aggregation) {
+  public Dataset<Row> readRecent(String collection) {
+    // TODO: find a way to only read in the newest record from last Week
+    return read(collection, RECENT_PIPELINE);
+  }
+
+  public Dataset<Row> read(String collection, String aggregationPipeline) {
     return sparkSession.read().format("mongodb")
         .option("spark.mongodb.read.collection", collection)
-        .option("spark.mongodb.read.aggregation.pipeline", aggregation)
+        .option("spark.mongodb.read.aggregation.pipeline", aggregationPipeline)
         .load();
   }
 

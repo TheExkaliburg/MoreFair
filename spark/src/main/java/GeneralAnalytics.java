@@ -33,11 +33,11 @@ public class GeneralAnalytics {
 
         MongoConnector mongoConnector = new MongoConnector(spark);
 
-        NullableDatasetRow biasRows = new NullableDatasetRow(mongoConnector.read("bias"));
-        NullableDatasetRow multiRows =  new NullableDatasetRow(mongoConnector.read("multi"));
-        NullableDatasetRow promoteRows =  new NullableDatasetRow(mongoConnector.read("promote"));
-        NullableDatasetRow autoPromoteRows =  new NullableDatasetRow(mongoConnector.read("autoPromote"));
-        NullableDatasetRow throwVinegarRows =  new NullableDatasetRow(mongoConnector.read("throwVinegar"));
+        NullableDatasetRow biasRows = new NullableDatasetRow(mongoConnector.readRecent("bias"));
+        NullableDatasetRow multiRows =  new NullableDatasetRow(mongoConnector.readRecent("multi"));
+        NullableDatasetRow promoteRows =  new NullableDatasetRow(mongoConnector.readRecent("promote"));
+        NullableDatasetRow autoPromoteRows =  new NullableDatasetRow(mongoConnector.readRecent("autoPromote"));
+        NullableDatasetRow throwVinegarRows =  new NullableDatasetRow(mongoConnector.readRecent("throwVinegar"));
 
         Dataset<Row> actionByAccount = biasRows.select("ranker.account", "createdOn")
             .union(multiRows.select("ranker.account", "createdOn"))
