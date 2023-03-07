@@ -1,19 +1,48 @@
 package de.kaliburg.morefair.statistics;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import de.kaliburg.morefair.FairConfig;
+import de.kaliburg.morefair.MoreFairApplication;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.game.round.LadderEntity;
 import de.kaliburg.morefair.game.round.RankerEntity;
 import de.kaliburg.morefair.game.round.RoundEntity;
+import de.kaliburg.morefair.game.round.RoundService;
+import de.kaliburg.morefair.game.round.dto.RoundResultsDto;
+import de.kaliburg.morefair.statistics.records.AutoPromoteRecordEntity;
+import de.kaliburg.morefair.statistics.records.AutoPromoteRecordRepository;
+import de.kaliburg.morefair.statistics.records.BiasRecordEntity;
+import de.kaliburg.morefair.statistics.records.BiasRecordRepository;
+import de.kaliburg.morefair.statistics.records.LadderRecord;
+import de.kaliburg.morefair.statistics.records.LoginRecordEntity;
+import de.kaliburg.morefair.statistics.records.LoginRecordRepository;
+import de.kaliburg.morefair.statistics.records.MultiRecordEntity;
+import de.kaliburg.morefair.statistics.records.MultiRecordRepository;
+import de.kaliburg.morefair.statistics.records.PromoteRecordEntity;
+import de.kaliburg.morefair.statistics.records.PromoteRecordRepository;
+import de.kaliburg.morefair.statistics.records.RankerRecord;
+import de.kaliburg.morefair.statistics.records.RoundRecord;
+import de.kaliburg.morefair.statistics.records.ThrowVinegarRecordEntity;
+import de.kaliburg.morefair.statistics.records.ThrowVinegarRecordRepository;
+import de.kaliburg.morefair.statistics.results.RoundStatisticsEntity;
+import de.kaliburg.morefair.statistics.results.RoundStatisticsRepository;
+import java.io.File;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,33 +54,30 @@ import org.springframework.web.client.RestTemplate;
 @Transactional
 public class StatisticsService {
 
-  private final MongoTemplate mongoTemplate;
   private final LoginRecordRepository loginRecordRepository;
   private final BiasRecordRepository biasRecordRepository;
   private final MultiRecordRepository multiRecordRepository;
   private final AutoPromoteRecordRepository autoPromoteRecordRepository;
   private final PromoteRecordRepository promoteRecordRepository;
   private final ThrowVinegarRecordRepository throwVinegarRecordRepository;
+  private final RoundStatisticsRepository roundStatisticsRepository;
+
+  @Autowired
+  @Lazy
+  private final RoundService roundService;
+
+  private final FairConfig config;
+  private final Cache<Integer, RoundResultsDto> roundResultsCache =
+      Caffeine.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).maximumSize(10).build();
+  private final LoadingCache<Long, Boolean> hasStartedStatisticsJobRecently =
+      Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build(number -> false);
 
   @Value("${spring.profiles.active}")
   private String activeProfile;
-
-  @PostConstruct
-  public void prepareCollections() {
-    createCollection(LoginRecordEntity.class);
-    createCollection(BiasRecordEntity.class);
-    createCollection(MultiRecordEntity.class);
-    createCollection(AutoPromoteRecordEntity.class);
-    createCollection(PromoteRecordEntity.class);
-    createCollection(ThrowVinegarRecordEntity.class);
-  }
-
-  private <T> void createCollection(Class<T> clazz) {
-    if (!mongoTemplate.collectionExists(clazz)) {
-      mongoTemplate.createCollection(clazz);
-    }
-  }
-
+  @Value("${spring.datasource.password}")
+  private String sqlPassword;
+  @Value("${spring.datasource.username}")
+  private String sqlUsername;
 
   public void recordLogin(AccountEntity account) {
     loginRecordRepository.save(new LoginRecordEntity(account));
@@ -135,23 +161,25 @@ public class StatisticsService {
             roundRecord));
   }
 
-
   /**
    * Sends a request to start the General Analytics for the Server.
    */
   @PostConstruct
-  @Scheduled(cron = "0 */30 * * * *")
+  @Scheduled(cron = "0 0 8 * * *")
   public void startGeneralAnalytics() {
-    startAnalytics("GeneralAnalytics");
+    startAnalytics("GeneralAnalytics", null);
   }
 
   /**
    * Sends a request to start the Round Statistics for the Server.
-   * TODO: This is currently only done on startup, but should be done after each round-end.
    */
-  @PostConstruct
-  public void startRoundStatistics() {
-    startAnalytics("RoundStatistics");
+  public void startRoundStatistics(long roundId) {
+    Boolean request = hasStartedStatisticsJobRecently.get(roundId);
+    if (request != null && !request) {
+      log.info("Starting RoundStatistics for roundId: {}", roundId);
+      startAnalytics("RoundStatistics", roundId);
+    }
+    hasStartedStatisticsJobRecently.put(roundId, true);
   }
 
   /**
@@ -160,9 +188,8 @@ public class StatisticsService {
    *
    * @param mainClass the main Class of the Spark Application that should be run on the cluster
    */
-  public void startAnalytics(String mainClass) {
+  public void startAnalytics(String mainClass, @Nullable Long currentRoundId) {
     try {
-      log.info("Profile: {}", activeProfile);
       // Create a JSON object for the request body
       JsonObject jsonBody = new JsonObject();
       jsonBody.addProperty("action", "CreateSubmissionRequest");
@@ -177,18 +204,32 @@ public class StatisticsService {
       jsonBody.add("sparkProperties", sparkProperties);
 
       // Add the other properties
-      jsonBody.addProperty("appResource", "/bin/morefair-staging/spark.jar");
+      String jarPath = MoreFairApplication.class.getProtectionDomain().getCodeSource().getLocation()
+          .getPath();
+      if (jarPath.contains("!")) {
+        jarPath = jarPath.substring(0, jarPath.lastIndexOf("!"));
+        jarPath = jarPath.substring(0, jarPath.lastIndexOf("/"));
+      }
+      File jarFile = new File(jarPath);
+      String actualPath = jarFile.getParentFile().getParent();
+
+      jsonBody.addProperty("appResource", actualPath + "/spark.jar");
       jsonBody.addProperty("clientSparkVersion", "3.3.1");
       jsonBody.addProperty("mainClass", mainClass);
 
       // Add the "environmentVariables" property
       JsonObject environmentVariables = new JsonObject();
       environmentVariables.addProperty("SPARK_ENV_LOADED", "1");
+      environmentVariables.addProperty("SQL_USERNAME", sqlUsername);
+      environmentVariables.addProperty("SQL_PASSWORD", sqlPassword);
+      environmentVariables.addProperty("PROFILE", activeProfile);
       jsonBody.add("environmentVariables", environmentVariables);
 
       // Add the "appArgs" property
       JsonArray appArgs = new JsonArray();
-      appArgs.add(activeProfile);
+      if (currentRoundId != null) {
+        appArgs.add(currentRoundId);
+      }
       jsonBody.add("appArgs", appArgs);
 
       // Convert the JSON object to a string
@@ -210,5 +251,33 @@ public class StatisticsService {
       log.error(e.getMessage());
       e.printStackTrace();
     }
+  }
+
+  public RoundResultsDto getRoundResults(Integer number) {
+    RoundResultsDto result = roundResultsCache.getIfPresent(number);
+    if (result == null) {
+      RoundEntity round = roundService.find(number);
+      if (round == null) {
+        return null;
+      }
+      result = new RoundResultsDto(round, config);
+      roundResultsCache.put(number, result);
+    }
+    return result;
+  }
+
+  public RoundStatisticsEntity getRoundStatistics(Integer number) {
+    RoundEntity round = roundService.find(number);
+    if (round == null) {
+      return null;
+    }
+
+    Optional<RoundStatisticsEntity> statistics = roundStatisticsRepository.findByRoundId(
+        round.getId());
+    if (statistics.isEmpty()) {
+      startRoundStatistics(round.getId());
+    }
+
+    return statistics.orElse(null);
   }
 }

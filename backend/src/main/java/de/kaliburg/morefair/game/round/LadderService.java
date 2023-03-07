@@ -77,7 +77,8 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   private Map<Integer, LadderEntity> currentLadderMap = new HashMap<>();
 
   public LadderService(RankerService rankerService, LadderRepository ladderRepository,
-      LadderUtils ladderUtils, AccountService accountService, StatisticsService statisticsService,
+      LadderUtils ladderUtils, AccountService accountService,
+      @Lazy StatisticsService statisticsService,
       RoundUtils roundUtils,
       ChatService chatService, UpgradeUtils upgradeUtils, ApplicationEventPublisher eventPublisher,
       @Lazy WsUtils wsUtils, FairConfig config, Gson gson) {
@@ -396,7 +397,8 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   boolean buyBias(Event event, LadderEntity ladder) {
     try {
       RankerEntity ranker = findActiveRankerOfAccountOnLadder(event.getAccountId(), ladder);
-      BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getNumber(), ranker.getBias(), ladder.getTypes());
+      BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getNumber(), ranker.getBias(),
+          ladder.getTypes());
       if (ranker.getPoints().compareTo(cost) >= 0) {
         statisticsService.recordBias(ranker, ladder, currentRound);
         ranker.setPoints(BigInteger.ZERO);
@@ -422,7 +424,8 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   boolean buyMulti(Event event, LadderEntity ladder) {
     try {
       RankerEntity ranker = findActiveRankerOfAccountOnLadder(event.getAccountId(), ladder);
-      BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getNumber(), ranker.getMultiplier(), ladder.getTypes());
+      BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getNumber(), ranker.getMultiplier(),
+          ladder.getTypes());
       if (ranker.getPower().compareTo(cost) >= 0) {
         statisticsService.recordMulti(ranker, ladder, currentRound);
         ranker.setPoints(BigInteger.ZERO);

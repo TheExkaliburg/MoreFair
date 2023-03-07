@@ -1,13 +1,8 @@
-import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
 
 public class SparkUtils {
-  public static SparkSession createSparkSession(String[] args) throws Exception {
-    if (args.length < 1) {
-      throw new IllegalArgumentException("The arguments are meant to be: '{activeProfile}'");
-    }
-
-    String database = translateProfileToDatabase(args[0]);
+  public static SparkSession createSparkSession() throws Exception {
+    String database = getDatabaseName();
 
     return SparkSession.builder()
         .master("local")
@@ -20,9 +15,9 @@ public class SparkUtils {
         .getOrCreate();
   }
 
-  public static String translateProfileToDatabase(String activeProfile) {
+  public static String getDatabaseName() {
     String result = "MoreFair";
-    if(activeProfile.equals("staging")) {
+    if(System.getenv("PROFILE").equals("staging")) {
       result += "Staging";
     }
     return result;

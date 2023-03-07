@@ -11,6 +11,7 @@ import de.kaliburg.morefair.game.round.RankerService;
 import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.security.SecurityUtils;
+import de.kaliburg.morefair.statistics.StatisticsService;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -48,12 +49,14 @@ public class GameService implements ApplicationListener<GameResetEvent> {
   private final AccountService accountService;
   private final FairConfig config;
   private final SecurityUtils securityUtils;
+  private final StatisticsService statisticsService;
   @Getter
   private GameEntity game;
 
   GameService(GameRepository gameRepository, RoundService roundService,
       LadderService ladderService, RankerService rankerService, ChatService chatService,
-      AccountService accountService, FairConfig config, SecurityUtils securityUtils) {
+      AccountService accountService, FairConfig config, StatisticsService statisticsService,
+      SecurityUtils securityUtils) {
     this.gameRepository = gameRepository;
     this.roundService = roundService;
     this.ladderService = ladderService;
@@ -61,6 +64,7 @@ public class GameService implements ApplicationListener<GameResetEvent> {
     this.chatService = chatService;
     this.accountService = accountService;
     this.config = config;
+    this.statisticsService = statisticsService;
     this.securityUtils = securityUtils;
   }
 
@@ -111,6 +115,7 @@ public class GameService implements ApplicationListener<GameResetEvent> {
   @Transactional
   @Override
   public void onApplicationEvent(@NonNull GameResetEvent event) {
+    long oldRoundId = game.getCurrentRound().getId();
     roundService.getCurrentRound().setClosedOn(OffsetDateTime.now(ZoneOffset.UTC));
     roundService.save(roundService.getCurrentRound());
 
@@ -119,5 +124,7 @@ public class GameService implements ApplicationListener<GameResetEvent> {
     game = gameRepository.save(game);
     chatService.saveStateToDatabase();
     initialGameSetup();
+
+    statisticsService.startRoundStatistics(oldRoundId);
   }
 }

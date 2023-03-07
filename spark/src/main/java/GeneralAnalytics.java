@@ -1,6 +1,9 @@
 import static org.apache.spark.sql.functions.col;
+import static org.apache.spark.sql.functions.collect_list;
 import static org.apache.spark.sql.functions.count;
+import static org.apache.spark.sql.functions.current_timestamp;
 import static org.apache.spark.sql.functions.desc;
+import static org.apache.spark.sql.functions.first;
 import static org.apache.spark.sql.functions.hour;
 import static org.apache.spark.sql.functions.lag;
 import static org.apache.spark.sql.functions.lead;
@@ -22,7 +25,7 @@ import org.apache.spark.sql.expressions.WindowSpec;
 @Slf4j
 public class GeneralAnalytics {
     public static void main(String[] args) throws Exception {
-        SparkSession spark = SparkUtils.createSparkSession(args);
+        SparkSession spark = SparkUtils.createSparkSession();
 
         // Dataset<Row> loginRows = MongoConnector.read(spark, "login");
         // Dataset<Row> result = loginRows.groupBy("account._id").count().sort("count");
@@ -60,14 +63,25 @@ public class GeneralAnalytics {
             .withColumnRenamed("sum(diff)", "activityInSec")
             .sort(desc("activityInSec"));
 
-        accountActivityInSeconds.printSchema();
-        accountActivityInSeconds.show(100);
-
         Dataset<Row> timePerHour = accountActionsWithDiff.groupBy("hour")
             .agg(sum("diff").as("totalSeconds"))
             .orderBy(col("hour"));
-        timePerHour.printSchema();
-        timePerHour.show(100);
+
+        Dataset<Row> analysis = accountActivityInSeconds
+            .withColumn("accountActivity", struct(col("*")));
+        analysis = analysis.groupBy()
+            .agg(
+                current_timestamp().alias("createdOn"),
+                collect_list("accountActivity").alias("accountActivity")
+            );
+        analysis = analysis.join(timePerHour
+            .withColumn("activityPerHour", struct(timePerHour.col("*")))
+            .groupBy().agg(
+                collect_list("activityPerHour").alias("activityPerHour")
+            )
+        );
+
+        // mongoConnector.write(analysis, "generalAnalysis");
     }
 
 }

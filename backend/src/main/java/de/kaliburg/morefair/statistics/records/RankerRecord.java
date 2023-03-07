@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.statistics;
+package de.kaliburg.morefair.statistics.records;
 
 import de.kaliburg.morefair.game.round.RankerEntity;
 import java.math.BigInteger;
