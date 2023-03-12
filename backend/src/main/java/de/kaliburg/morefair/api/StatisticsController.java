@@ -3,6 +3,7 @@ package de.kaliburg.morefair.api;
 import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.game.round.dto.RoundResultsDto;
 import de.kaliburg.morefair.statistics.StatisticsService;
+import de.kaliburg.morefair.statistics.results.ActivityAnalysisEntity;
 import de.kaliburg.morefair.statistics.results.RoundStatisticsEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,6 +60,21 @@ public class StatisticsController {
       }
 
       RoundStatisticsEntity results = statisticsService.getRoundStatistics(roundNumber);
+      if (results == null) {
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      }
+      return new ResponseEntity<>(results, HttpStatus.OK);
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      e.printStackTrace();
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GetMapping(value = "/activity", produces = "application/json")
+  public ResponseEntity<ActivityAnalysisEntity> getRoundStatistics() {
+    try {
+      ActivityAnalysisEntity results = statisticsService.getActivityAnalysis();
       if (results == null) {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
       }
