@@ -11,6 +11,7 @@ import static org.apache.spark.sql.functions.lead;
 import static org.apache.spark.sql.functions.struct;
 import static org.apache.spark.sql.functions.sum;
 import static org.apache.spark.sql.functions.timestamp_seconds;
+import static org.apache.spark.sql.functions.to_date;
 import static org.apache.spark.sql.functions.to_utc_timestamp;
 import static org.apache.spark.sql.functions.unix_timestamp;
 import static org.apache.spark.sql.functions.when;
@@ -59,7 +60,8 @@ public class GeneralAnalytics {
                 when(differenceInColumns.leq(1800), differenceInColumns).otherwise(60)
             )
             .withColumn("hour", hour(col("createdOn")))
-            .withColumn("weekday", dayofweek(col("createdOn")));
+            .withColumn("weekday", dayofweek(col("createdOn")))
+            .withColumn("date", to_date(col("createdOn")));
 
         accountActionsWithDiff.show(100);
 
@@ -72,6 +74,9 @@ public class GeneralAnalytics {
             .agg(sum("diff").as("totalSeconds"))
             .orderBy(col("hour"));
 
+        Dataset<Row> timePerWeekday = accountActionsWithDiff.groupBy("weekday")
+            .agg(sum("diff").as("totalSeconds"))
+            .orderBy(col("weekday"));
 
 
         Dataset<Row> analysis = accountActivityInSeconds
