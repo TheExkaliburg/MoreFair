@@ -88,14 +88,17 @@ public class GeneralAnalytics {
         .agg(sum("diff").as("totalSeconds"))
         .orderBy("date");
 
+    // Writing everything into a final object
     Dataset<Row> activityAnalytics = timePerAccount
         .withColumn("timePerAccount", struct(col("*")))
         .groupBy().agg(
             current_timestamp().alias("createdOn"),
             collect_list("timePerAccount").alias("timePerAccount")
         );
-
     activityAnalytics = SparkUtils.addDatasetAsChild(activityAnalytics, timePerHour, "timePerHour");
+    activityAnalytics = SparkUtils.addDatasetAsChild(activityAnalytics, timePerWeekday,
+        "timePerWeekday");
+    activityAnalytics = SparkUtils.addDatasetAsChild(activityAnalytics, timePerDay, "timePerDay");
 
     mongoConnector.write(activityAnalytics, "generalAnalysis");
   }
