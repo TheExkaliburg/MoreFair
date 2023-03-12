@@ -13,7 +13,7 @@ const versioningModule = {
           ],
           features: [
             "using spark and mongodb to get some more accurate statistics regarding the game",
-          ]
+          ],
         }),
         new Version("PATCH", "CHEAP and EXPENSIVE also scales with ladders", {
           balancing: [
