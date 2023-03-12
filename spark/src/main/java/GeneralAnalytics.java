@@ -31,6 +31,7 @@ public class GeneralAnalytics {
 
     MongoConnector mongoConnector = new MongoConnector(spark);
 
+    /*
     NullableDatasetRow biasRows = new NullableDatasetRow(mongoConnector.readRecent("bias"));
     NullableDatasetRow multiRows = new NullableDatasetRow(mongoConnector.readRecent("multi"));
     NullableDatasetRow promoteRows = new NullableDatasetRow(mongoConnector.readRecent("promote"));
@@ -38,13 +39,21 @@ public class GeneralAnalytics {
         mongoConnector.readRecent("autoPromote"));
     NullableDatasetRow throwVinegarRows = new NullableDatasetRow(
         mongoConnector.readRecent("throwVinegar"));
+     */
+
+    Dataset<Row> biasRows = mongoConnector.readRecent("bias");
+    Dataset<Row> multiRows = mongoConnector.readRecent("multi");
+    Dataset<Row> promoteRows = mongoConnector.readRecent("promote");
+    Dataset<Row> autoPromoteRows = mongoConnector.readRecent("autoPromote");
+    Dataset<Row> throwVinegarRows = mongoConnector.readRecent("throwVinegar");
 
     Dataset<Row> actionByAccount = biasRows.select("ranker.account", "createdOn")
         .union(multiRows.select("ranker.account", "createdOn"))
         .union(promoteRows.select("ranker.account", "createdOn"))
         .union(autoPromoteRows.select("ranker.account", "createdOn"))
         .union(throwVinegarRows.select("ranker.account", "createdOn"))
-        .getDataset().withColumnRenamed("ranker.account", "account");
+        //.getDataset()
+        .withColumnRenamed("ranker.account", "account");
 
     WindowSpec window = Window.partitionBy("account").orderBy("createdOn");
     Column createdOnColumn = unix_timestamp(col("createdOn"));
@@ -61,6 +70,7 @@ public class GeneralAnalytics {
         .withColumn("weekday", dayofweek(col("createdOn")))
         .withColumn("date", to_date(col("createdOn")));
 
+    // Using activity times to get total/avg times per account/hour/weekday/date
     Dataset<Row> timePerAccount = accountActionsWithDiff.groupBy("account", "date")
         .agg(sum("diff").as("totalSeconds"))
         .groupBy("account").agg(
