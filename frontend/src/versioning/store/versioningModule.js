@@ -5,6 +5,16 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "Spark and Statistic Endpoints", {
+          api: [
+            "changing the api for the raw round stats from /roundStats /api/stats/round/raw",
+            "adding a new api endpoint to receive the equivalent of the community-created 'Champions of the Ladder' at /api/stats/round",
+            "adding a new api endpoint for a analysis of the activity in the last 28 days at /api/stats/activity",
+          ],
+          features: [
+            "using spark and mongodb to get some more accurate statistics regarding the game",
+          ]
+        }),
         new Version("PATCH", "CHEAP and EXPENSIVE also scales with ladders", {
           balancing: [
             "CHEAP ladders have the cost to bias and multi reduced as if they are half their ladder number and then by and additional 50%.",
