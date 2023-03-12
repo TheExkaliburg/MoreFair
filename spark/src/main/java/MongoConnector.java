@@ -38,8 +38,8 @@ public class MongoConnector {
   }
 
   public void write(Dataset<Row> dataset, String collection) {
-    dataset.printSchema();
-    dataset.show();
+    //dataset.printSchema();
+    //dataset.show();
     dataset.write().format("mongodb").mode("append")
         .option("spark.mongodb.write.collection", collection)
         .save();
