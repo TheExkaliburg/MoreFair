@@ -1,3 +1,4 @@
+import static org.apache.spark.sql.functions.avg;
 import static org.apache.spark.sql.functions.col;
 import static org.apache.spark.sql.functions.collect_list;
 import static org.apache.spark.sql.functions.count;
@@ -63,16 +64,20 @@ public class GeneralAnalytics {
             .withColumn("weekday", dayofweek(col("createdOn")))
             .withColumn("date", to_date(col("createdOn")));
 
-        accountActionsWithDiff.show(100);
-
         Dataset<Row> accountActivityInSeconds = accountActionsWithDiff
             .groupBy("account").sum("diff")
             .withColumnRenamed("sum(diff)", "activityInSec")
             .sort(desc("activityInSec"));
 
-        Dataset<Row> timePerHour = accountActionsWithDiff.groupBy("hour")
-            .agg(sum("diff").as("totalSeconds"))
+        Dataset<Row> timePerHour = accountActionsWithDiff.groupBy("hour", "date")
+            .agg(sum("diff").as("totalSeconds"));
+
+        timePerHour.show(100);
+
+        timePerHour = timePerHour.groupBy("hour").agg(avg("totalSeconds")).as("avgSeconds")
             .orderBy(col("hour"));
+
+        timePerHour.show(100);
 
         Dataset<Row> timePerWeekday = accountActionsWithDiff.groupBy("weekday")
             .agg(sum("diff").as("totalSeconds"))
