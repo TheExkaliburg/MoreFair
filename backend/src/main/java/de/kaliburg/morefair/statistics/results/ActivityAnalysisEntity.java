@@ -21,6 +21,7 @@ public class ActivityAnalysisEntity {
     private Long account;
     private Double avgSeconds;
     private Long totalSeconds;
+    private Long days;
   }
 
   @Getter

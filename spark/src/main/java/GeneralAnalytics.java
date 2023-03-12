@@ -1,6 +1,7 @@
 import static org.apache.spark.sql.functions.avg;
 import static org.apache.spark.sql.functions.col;
 import static org.apache.spark.sql.functions.collect_list;
+import static org.apache.spark.sql.functions.count_distinct;
 import static org.apache.spark.sql.functions.current_timestamp;
 import static org.apache.spark.sql.functions.dayofweek;
 import static org.apache.spark.sql.functions.hour;
@@ -75,7 +76,8 @@ public class GeneralAnalytics {
         .agg(sum("diff").as("totalSeconds"))
         .groupBy("account").agg(
             avg("totalSeconds").as("avgSeconds"),
-            sum("totalSeconds").as("totalSeconds")
+            sum("totalSeconds").as("totalSeconds"),
+            count_distinct(col("date")).as("days")
         )
         .orderBy(col("account"));
 
