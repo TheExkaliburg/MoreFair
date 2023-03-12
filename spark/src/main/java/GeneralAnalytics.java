@@ -31,6 +31,7 @@ public class GeneralAnalytics {
     // MongoConnector.write(result, "loginCount");
 
     MongoConnector mongoConnector = new MongoConnector(spark);
+    SqlConnector sqlConnector = new SqlConnector(spark);
 
     /*
     NullableDatasetRow biasRows = new NullableDatasetRow(mongoConnector.readRecent("bias"));
@@ -47,12 +48,17 @@ public class GeneralAnalytics {
     Dataset<Row> promoteRows = mongoConnector.readRecent("promote");
     Dataset<Row> autoPromoteRows = mongoConnector.readRecent("autoPromote");
     Dataset<Row> throwVinegarRows = mongoConnector.readRecent("throwVinegar");
+    Dataset<Row> messagesSent = sqlConnector.query("SELECT message.* FROM message "
+            + "WHERE created_on >= NOW() - INTERVAL '28 days'")
+        .withColumnRenamed("created_on", "created_on")
+        .withColumnRenamed("account_id", "ranker.account");
 
     Dataset<Row> actionByAccount = biasRows.select("ranker.account", "createdOn")
         .union(multiRows.select("ranker.account", "createdOn"))
         .union(promoteRows.select("ranker.account", "createdOn"))
         .union(autoPromoteRows.select("ranker.account", "createdOn"))
         .union(throwVinegarRows.select("ranker.account", "createdOn"))
+        .union(messagesSent.select("ranker.account", "createdOn"))
         //.getDataset()
         .withColumnRenamed("ranker.account", "account");
 
