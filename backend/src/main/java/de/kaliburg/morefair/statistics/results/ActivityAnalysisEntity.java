@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.statistics.results;
 
-import java.sql.Timestamp;
+import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.Getter;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Getter
 public class ActivityAnalysisEntity {
 
-  private Timestamp createdOn;
+  private OffsetDateTime createdOn;
   private List<TimePerAccount> timePerAccount;
   private List<TimePerHour> timePerHour;
   private List<TimePerWeekday> timePerWeekday;
@@ -43,7 +43,7 @@ public class ActivityAnalysisEntity {
   @Getter
   public static class TimePerDay {
 
-    private Timestamp date;
+    private OffsetDateTime date;
     private Long totalSeconds;
   }
 }
