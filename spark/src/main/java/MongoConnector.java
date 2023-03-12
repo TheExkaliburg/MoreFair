@@ -3,17 +3,16 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 
-import static org.apache.spark.sql.functions.collect_list;
-import static org.apache.spark.sql.functions.current_timestamp;
-import static org.apache.spark.sql.functions.struct;
-import static org.apache.spark.sql.functions.col;
-
 
 @Data
 public class MongoConnector {
-  public final static long RECENT_TIMESTAMP = System.currentTimeMillis() - 30L * 24L * 60L * 60L * 1000L;
-  public final static String RECENT_PIPELINE = "[{'$match': {'createdOn': {'$gte': new Date(" + RECENT_TIMESTAMP + ")}}}]";
+
+  public final static long RECENT_TIMESTAMP =
+      System.currentTimeMillis() - 28L * 24L * 60L * 60L * 1000L;
+  public final static String RECENT_PIPELINE =
+      "[{'$match': {'createdOn': {'$gte': new Date(" + RECENT_TIMESTAMP + ")}}}]";
   private final SparkSession sparkSession;
+
   public MongoConnector(SparkSession sparkSession) {
     this.sparkSession = sparkSession;
   }

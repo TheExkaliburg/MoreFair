@@ -8,6 +8,7 @@ import org.apache.spark.sql.Row;
 @Data
 @Slf4j
 public class NullableDatasetRow {
+
   @Nonnull
   private Dataset<Row> dataset;
 
@@ -18,7 +19,7 @@ public class NullableDatasetRow {
   }
 
   public NullableDatasetRow select(String col, String... cols) {
-    if(this.isEmpty()) {
+    if (this.isEmpty()) {
       return this;
     }
 
@@ -26,7 +27,7 @@ public class NullableDatasetRow {
   }
 
   public NullableDatasetRow union(NullableDatasetRow other) {
-    if(other.isEmpty()) {
+    if (other.isEmpty()) {
       return this;
     }
     if (this.isEmpty()) {
@@ -45,7 +46,7 @@ public class NullableDatasetRow {
   }
 
   public long count() {
-    if(count != null) {
+    if (count != null) {
       return this.count;
     }
 
