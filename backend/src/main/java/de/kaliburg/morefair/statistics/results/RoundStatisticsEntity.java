@@ -13,7 +13,6 @@ public class RoundStatisticsEntity {
 
   @Getter
   public static class Champion {
-
     private Long accountId;
     private String username;
     private List<Integer> points;

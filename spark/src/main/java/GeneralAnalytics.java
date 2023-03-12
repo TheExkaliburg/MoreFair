@@ -2,6 +2,7 @@ import static org.apache.spark.sql.functions.col;
 import static org.apache.spark.sql.functions.collect_list;
 import static org.apache.spark.sql.functions.count;
 import static org.apache.spark.sql.functions.current_timestamp;
+import static org.apache.spark.sql.functions.dayofweek;
 import static org.apache.spark.sql.functions.desc;
 import static org.apache.spark.sql.functions.first;
 import static org.apache.spark.sql.functions.hour;
@@ -46,8 +47,6 @@ public class GeneralAnalytics {
             .union(throwVinegarRows.select("ranker.account", "createdOn"))
             .getDataset().withColumnRenamed("ranker.account", "account");
 
-        actionByAccount.show(100);
-
         WindowSpec window = Window.partitionBy("account").orderBy("createdOn");
         Column createdOnColumn = unix_timestamp(col("createdOn"));
         Column nextCreatedOnColumn = unix_timestamp(lead(col("createdOn"), 1).over(window));
@@ -58,7 +57,11 @@ public class GeneralAnalytics {
                 // When the createdOn are closer than 30 minutes, then the difference is added in
                 // the diff column, otherwise we add a minute of activity
                 when(differenceInColumns.leq(1800), differenceInColumns).otherwise(60)
-        ).withColumn("hour", hour(col("createdOn")));
+            )
+            .withColumn("hour", hour(col("createdOn")))
+            .withColumn("weekday", dayofweek(col("createdOn")));
+
+        accountActionsWithDiff.show(100);
 
         Dataset<Row> accountActivityInSeconds = accountActionsWithDiff
             .groupBy("account").sum("diff")
@@ -68,6 +71,8 @@ public class GeneralAnalytics {
         Dataset<Row> timePerHour = accountActionsWithDiff.groupBy("hour")
             .agg(sum("diff").as("totalSeconds"))
             .orderBy(col("hour"));
+
+
 
         Dataset<Row> analysis = accountActivityInSeconds
             .withColumn("accountActivity", struct(col("*")));
