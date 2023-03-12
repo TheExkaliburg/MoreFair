@@ -50,17 +50,17 @@ public class GeneralAnalytics {
     Dataset<Row> throwVinegarRows = mongoConnector.readRecent("throwVinegar");
     Dataset<Row> messagesSent = sqlConnector.query("SELECT message.* FROM message "
             + "WHERE created_on >= NOW() - INTERVAL '28 days'")
-        .withColumnRenamed("created_on", "created_on")
-        .withColumnRenamed("account_id", "ranker.account");
+        .withColumnRenamed("created_on", "createdOn")
+        .withColumnRenamed("account_id", "account");
 
     Dataset<Row> actionByAccount = biasRows.select("ranker.account", "createdOn")
         .union(multiRows.select("ranker.account", "createdOn"))
         .union(promoteRows.select("ranker.account", "createdOn"))
         .union(autoPromoteRows.select("ranker.account", "createdOn"))
         .union(throwVinegarRows.select("ranker.account", "createdOn"))
-        .union(messagesSent.select("ranker.account", "createdOn"))
         //.getDataset()
-        .withColumnRenamed("ranker.account", "account");
+        .withColumnRenamed("ranker.account", "account")
+        .union(messagesSent.select("account", "createdOn"));
 
     WindowSpec window = Window.partitionBy("account").orderBy("createdOn");
     Column createdOnColumn = unix_timestamp(col("createdOn"));
