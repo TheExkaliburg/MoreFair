@@ -46,6 +46,8 @@ public class GeneralAnalytics {
             .union(throwVinegarRows.select("ranker.account", "createdOn"))
             .getDataset().withColumnRenamed("ranker.account", "account");
 
+        actionByAccount.show(100);
+
         WindowSpec window = Window.partitionBy("account").orderBy("createdOn");
         Column createdOnColumn = unix_timestamp(col("createdOn"));
         Column nextCreatedOnColumn = unix_timestamp(lead(col("createdOn"), 1).over(window));
