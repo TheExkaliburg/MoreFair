@@ -7,7 +7,11 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "prepare": "cd .. && husky install frontend/.husky",
-    "lintfix": "eslint --fix --ext \".ts,.js,.vue\" --ignore-path .eslintignore ."
+    "lintfix": "eslint --fix --ext \".ts,.js,.vue\" --ignore-path .eslintignore .",
+    "clean": "rm -rf node_modules && rm -rf .nuxt",
+    "clean::win": "rd /s /q node_modules && rd /s /q .nuxt",
+    "clean-install": "pnpm run clean || pnpm install",
+    "clean-install::win": "pnpm run clean::win || pnpm install"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.1.2",
