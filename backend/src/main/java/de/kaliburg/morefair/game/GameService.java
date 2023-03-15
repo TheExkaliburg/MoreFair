@@ -82,7 +82,7 @@ public class GameService implements ApplicationListener<GameResetEvent> {
   }
 
   @Transactional
-  @Scheduled(initialDelay = 60000, fixedRate = 60000)
+  @Scheduled(initialDelay = 60 * 1000, fixedRate = 60 * 1000)
   @PreDestroy
   void saveStateToDatabase() {
     game = gameRepository.save(game);
