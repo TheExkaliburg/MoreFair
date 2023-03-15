@@ -106,10 +106,13 @@ function sendMessage() {
   const metadata = [];
 
   for (const node of textNodes) {
-    if (node?.attrs === undefined) continue;
     if (node.type === "text") {
       result += node.text;
-    } else if (node.type === "userMention") {
+      continue;
+    }
+
+    if (node?.attrs === undefined) continue;
+    if (node.type === "userMention") {
       result += "{@}";
       metadata.push({
         u: node.attrs.id,

@@ -100,16 +100,6 @@
       <groupId>org.springframework.boot</groupId>
     </dependency>
     <dependency>
-      <artifactId>spring-boot-starter-thymeleaf</artifactId>
-      <exclusions>
-        <exclusion>
-          <artifactId>thymeleaf-layout-dialect</artifactId>
-          <groupId>nz.net.ultraq.thymeleaf</groupId>
-        </exclusion>
-      </exclusions>
-      <groupId>org.springframework.boot</groupId>
-    </dependency>
-    <dependency>
       <artifactId>spring-boot-starter-web</artifactId>
       <groupId>org.springframework.boot</groupId>
     </dependency>

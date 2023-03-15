@@ -14,7 +14,7 @@
     <div class="flex items-center min-w-fit">
       <div class="flex-shrink-0">
         <!--FairGame Logo and Branding with a link to the main page-->
-        <NuxtLink class="flex space-x-1" to="/">
+        <NuxtLink :to="authStore.homeLocation" class="flex space-x-1">
           <img alt="FairGame" class="w-7 h-7" src="/favicon.ico" />
           <span class="text-xl text-navbar-text">FairGame</span>
         </NuxtLink>
@@ -25,9 +25,11 @@
 
 <script lang="ts" setup>
 import { Bars3Icon } from "@heroicons/vue/24/outline";
-import { useUiStore } from "../../store/ui";
+import { useUiStore } from "~/store/ui";
+import { useAuthStore } from "~/store/authentication";
 
 const uiStore = useUiStore();
+const authStore = useAuthStore();
 </script>
 
 <style scoped></style>

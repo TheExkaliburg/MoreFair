@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import { navigateTo } from "nuxt/app";
 import FairButton from "../components/interactables/FairButton.vue";
 import TheAuthenticationDialog from "../components/auth/TheAuthenticationDialog.vue";
@@ -31,15 +31,16 @@ definePageMeta({ layout: "empty" });
 
 const isLoginModalOpen = ref<boolean>(false);
 
-onMounted(async () => {
+/*
+onMounted(() => {
   // If guest-uuid exists try logging in
   if (authStore.isGuest) {
-    await authStore.login(authStore.state.uuid, authStore.state.uuid);
+    // await authStore.login(authStore.state.uuid, authStore.state.uuid);
   }
   if (authStore.state.authenticationStatus) {
-    await navigateTo("/game");
+    // await navigateTo("/game");
   }
-});
+}); */
 
 function openLoginModal() {
   if (authStore.state.authenticationStatus) {

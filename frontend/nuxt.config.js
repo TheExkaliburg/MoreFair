@@ -35,7 +35,7 @@ export default defineNuxtConfig({
     locales: [
       {
         code: "en",
-        file: "en.yaml",
+        file: "en.yml",
       },
     ],
     defaultLocale: "en",

@@ -14,9 +14,16 @@ export const useAuthStore = defineStore("auth", () => {
     authenticationStatus,
   });
 
-  API.auth.authenticationStatus().then((response) => {
-    authenticationStatus.value = Boolean(response.data);
-  });
+  API.auth
+    .authenticationStatus()
+    .then((response) => {
+      authenticationStatus.value = Boolean(response.data);
+    })
+    .catch((error) => {
+      if (error.status === 401) {
+        authenticationStatus.value = Boolean(false);
+      }
+    });
 
   // getters
   const isGuest = computed<boolean>(() => {
