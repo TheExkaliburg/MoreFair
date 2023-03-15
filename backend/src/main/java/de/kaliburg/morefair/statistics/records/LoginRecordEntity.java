@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.statistics;
+package de.kaliburg.morefair.statistics.records;
 
 import de.kaliburg.morefair.account.AccountEntity;
 import java.time.Instant;

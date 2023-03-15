@@ -1,5 +1,9 @@
-package de.kaliburg.morefair.statistics;
+package de.kaliburg.morefair.statistics.records;
 
+import de.kaliburg.morefair.statistics.records.AbstractGameEventRecord;
+import de.kaliburg.morefair.statistics.records.LadderRecord;
+import de.kaliburg.morefair.statistics.records.RankerRecord;
+import de.kaliburg.morefair.statistics.records.RoundRecord;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
