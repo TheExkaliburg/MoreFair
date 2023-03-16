@@ -1,5 +1,5 @@
 <template>
-  <div class="shrink">
+  <div class="overflow-y-auto">
     <!--DynamicScroller
       :buffer="200"
       :items="ladder.rankers"
@@ -35,24 +35,39 @@
       </template>
     </DynamicScroller-->
     <div
-      class="grid grid-cols-24 gap-1 px-1 px-1 font-bold text-text-light sticky top-0"
+      class="grid grid-cols-24 sm:grid-cols-48 gap-1 px-1 font-bold text-text-light sm:sticky top-0 bg-background z-1"
     >
       <div class="col-span-3">#</div>
-      <div class="col-span-9">Username</div>
-      <div class="col-span-6 text-right">Power</div>
-      <div class="col-span-6 text-right">Points</div>
+      <div class="col-span-9">{{ lang("username") }}</div>
+      <div class="col-span-6 text-right order-last">{{ lang("power") }}</div>
+      <div class="col-span-6 text-right order-last">{{ lang("points") }}</div>
+      <div class="hidden sm:block col-span-7 text-right">
+        {{ lang("etaPromote") }}
+      </div>
+      <div class="hidden sm:block col-span-7 text-right">
+        {{ lang("etaYou") }}
+      </div>
+      <div class="hidden sm:block col-span-10 text-right">
+        {{ lang("powerGain") }}
+      </div>
     </div>
-    <div v-for="(ranker, index) in ladder.rankers" :key="ranker.accountId">
-      <LadderWindowTableRow :index="Number(index)" :ranker="ranker" />
-    </div>
+    <LadderWindowTableRow
+      v-for="(ranker, index) in ladder.rankers"
+      :key="ranker.accountId"
+      :index="Number(index)"
+      :ranker="ranker"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
 import { useLadderStore } from "~/store/ladder";
 import LadderWindowTableRow from "~/components/ladder/LadderWindowTableRow.vue";
+import { useLang } from "~/composables/useLang";
 
 const ladder = useLadderStore();
+
+const lang = useLang("components.ladder.table");
 </script>
 
 <style scoped></style>

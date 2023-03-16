@@ -12,6 +12,19 @@ components:
       discord: Discord
       privacy: Privacy Policy
       impressum: Impressum
+  ladder:
+    table:
+      username: Username
+      power: Power
+      points: Points
+      etaPromote: ETA -> L
+      etaYou: ETA -> You
+      powerGain: Power-Gain
+    buttons:
+      multi: Multi
+      bias: Bias
+      autopromote: Buy Autopromote
+      vinegar: Throw all Vinegar
 options:
   section:
     general: General
