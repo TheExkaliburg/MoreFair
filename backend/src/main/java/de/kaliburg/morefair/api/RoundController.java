@@ -1,6 +1,7 @@
 package de.kaliburg.morefair.api;
 
 import de.kaliburg.morefair.FairConfig;
+import de.kaliburg.morefair.exceptions.ErrorDto;
 import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.game.round.dto.RoundDto;
 import lombok.RequiredArgsConstructor;
@@ -22,14 +23,14 @@ public class RoundController {
   private final FairConfig fairConfig;
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<RoundDto> getCurrentRound() {
+  public ResponseEntity<?> getCurrentRound() {
     try {
       return new ResponseEntity<>(new RoundDto(roundService.getCurrentRound(), fairConfig),
           HttpStatus.OK);
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+      return ResponseEntity.internalServerError().body(new ErrorDto(e));
     }
   }
 }

@@ -1,17 +1,19 @@
 package de.kaliburg.morefair.game.round;
 
 import java.util.Comparator;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-@AllArgsConstructor
 public enum RoundType {
   DEFAULT, FAST, SLOW, AUTO, CHAOS(1);
 
   @Getter
   private int priority = 0;
+
+  RoundType(int priority) {
+    this.priority = priority;
+  }
 }
 
 class RoundTypeComparator implements Comparator<RoundType> {

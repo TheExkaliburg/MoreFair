@@ -4,7 +4,7 @@
       <div class="flex h-10 items-center justify-between">
         <BrandedSidebarToggle class="z-15" />
         <div class="flex space-x-1 items-center justify-end">
-          <ToggleIconButton v-model="uiStore.ladderEnabled">
+          <ToggleIconButton v-model="uiStore.state.ladderEnabled">
             <template #icon>
               <TableCellsIcon />
             </template>
@@ -12,7 +12,7 @@
               <TableCellsIconSolid />
             </template>
           </ToggleIconButton>
-          <ToggleIconButton v-model="uiStore.chatEnabled">
+          <ToggleIconButton v-model="uiStore.state.chatEnabled">
             <template #icon>
               <ChatBubbleLeftEllipsisIcon />
             </template>

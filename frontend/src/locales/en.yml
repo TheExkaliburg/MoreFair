@@ -17,8 +17,8 @@ components:
       username: Username
       power: Power
       points: Points
-      etaPromote: ETA -> L
-      etaYou: ETA -> You
+      eta: ETA
+      you: You
       powerGain: Power-Gain
     buttons:
       multi: Multi

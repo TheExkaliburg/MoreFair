@@ -10,7 +10,9 @@
       <FairButton class="mx-1 my-3" @click="openLoginModal">Login</FairButton>
     </div>
     <div class="text-text">Guest-UUID: {{ authStore.uuid }}</div>
-    <div class="text-text">Logged in: {{ authStore.authenticationStatus }}</div>
+    <div class="text-text">
+      Logged in: {{ authStore.state.authenticationStatus }}
+    </div>
     <div class="text-text"></div>
     <TheAuthenticationDialog
       :open="isLoginModalOpen"

@@ -28,6 +28,8 @@ import { useStomp } from "~/composables/useStomp";
 import { useChatStore } from "~/store/chat";
 import { useLadderStore } from "~/store/ladder";
 import { useTutorialTour } from "~/composables/useTour";
+import { useRoundStore } from "~/store/round";
+import { useAccountStore } from "~/store/account";
 
 const uiStore = useUiStore();
 
@@ -38,6 +40,8 @@ useStomp();
 onMounted(() => {
   useChatStore().init();
   useLadderStore().init();
+  useRoundStore().init();
+  useAccountStore().init();
   const tour = useTutorialTour();
   if (!tour.getFlag()) {
     tour.start();

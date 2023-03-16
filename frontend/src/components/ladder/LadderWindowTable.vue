@@ -42,17 +42,17 @@
       <div class="col-span-6 text-right order-last">{{ lang("power") }}</div>
       <div class="col-span-6 text-right order-last">{{ lang("points") }}</div>
       <div class="hidden sm:block col-span-7 text-right">
-        {{ lang("etaPromote") }}
+        {{ lang("eta") }} -> L{{ ladder.state.number + 1 }}
       </div>
       <div class="hidden sm:block col-span-7 text-right">
-        {{ lang("etaYou") }}
+        {{ lang("eta") }} -> {{ lang("you") }}
       </div>
       <div class="hidden sm:block col-span-10 text-right">
         {{ lang("powerGain") }}
       </div>
     </div>
     <LadderWindowTableRow
-      v-for="(ranker, index) in ladder.rankers"
+      v-for="(ranker, index) in ladder.state.rankers"
       :key="ranker.accountId"
       :index="Number(index)"
       :ranker="ranker"

@@ -14,7 +14,7 @@
 
 <script lang="ts" setup>
 import ChatWindowContentMessage from "../../components/chat/ChatWindowContentMessage.vue";
-import { useChatStore } from "../../store/chat";
+import { useChatStore } from "~/store/chat";
 
 const chatStore = await useChatStore();
 </script>

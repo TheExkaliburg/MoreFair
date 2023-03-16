@@ -1,9 +1,10 @@
 import { defineStore } from "pinia";
-import { reactive, ref } from "vue";
+import { computed, reactive, ref } from "vue";
 import Decimal from "break_infinity.js";
-import { OnTickBody, useStomp } from "../composables/useStomp";
-import { useAPI } from "../composables/useAPI";
 import { Ranker, RankerData } from "./entities/ranker";
+import { OnTickBody, useStomp } from "~/composables/useStomp";
+import { useAPI } from "~/composables/useAPI";
+import { useAccountStore } from "~/store/account";
 
 export enum LadderType {
   DEFAULT,
@@ -14,6 +15,8 @@ export enum LadderType {
   FREE_AUTO,
   NO_AUTO,
   ASSHOLE,
+  CHEAP,
+  EXPENSIVE,
 }
 
 export type LadderData = {
@@ -23,19 +26,33 @@ export type LadderData = {
   basePointsToPromote: string;
 };
 
+export type LadderState = {
+  rankers: Ranker[];
+  number: number;
+  types: Set<LadderType>;
+  basePointsToPromote: Decimal;
+};
+
 export const useLadderStore = defineStore("ladder", () => {
   const api = useAPI();
   const stomp = useStomp();
+  const account = useAccountStore();
 
   const isInitialized = ref<boolean>(false);
-  const rankers = reactive<Ranker[]>([]);
-  const number = ref<number>(1);
-  const types = reactive<Set<LadderType>>(new Set());
-  const basePointsToPromote = ref<Decimal>(new Decimal(0));
+  const state = reactive<LadderState>({
+    rankers: <Ranker[]>[],
+    number: 1,
+    types: new Set<LadderType>([LadderType.DEFAULT]),
+    basePointsToPromote: new Decimal(0),
+  });
+
+  const yourRanker = computed<Ranker | undefined>(() =>
+    state.rankers.find((r) => r.accountId === account.state.accountId)
+  );
 
   function init() {
     if (isInitialized.value) return;
-    getLadder(number.value);
+    getLadder(state.number);
   }
 
   function getLadder(ladderNumber: number) {
@@ -44,16 +61,16 @@ export const useLadderStore = defineStore("ladder", () => {
       .getLadder(ladderNumber)
       .then((res) => {
         const data: LadderData = res.data;
-        rankers.length = 0;
+        state.rankers = [];
         data.rankers.forEach((ranker) => {
-          rankers.push(new Ranker(ranker));
+          state.rankers.push(new Ranker(ranker));
         });
-        Object.assign(types, new Set());
+        state.types = new Set();
         data.types.forEach((s) => {
-          types.add(s);
+          state.types.add(s);
         });
-        number.value = data.number;
-        basePointsToPromote.value = new Decimal(data.basePointsToPromote);
+        state.number = data.number;
+        state.basePointsToPromote = new Decimal(data.basePointsToPromote);
 
         if (
           !stomp.callbacks.onLadderEvent.some((x) => x.identifier === "default")
@@ -62,13 +79,13 @@ export const useLadderStore = defineStore("ladder", () => {
             identifier: "default",
             callback: (body) => {
               const data: RankerData = body.data;
-              const ranker = rankers.find(
+              const ranker = state.rankers.find(
                 (x) => x.accountId === data.accountId
               );
               if (ranker) {
                 Object.assign(ranker, new Ranker(data));
               } else {
-                rankers.push(new Ranker(data));
+                state.rankers.push(new Ranker(data));
               }
             },
           });
@@ -89,53 +106,49 @@ export const useLadderStore = defineStore("ladder", () => {
   }
 
   function changeLadder(newNumber: number) {
-    stomp.wsApi.ladder.changeLadder(number.value, newNumber, true);
+    stomp.wsApi.ladder.changeLadder(state.number, newNumber, true);
     getLadder(newNumber);
   }
 
   function calculateTick(deltaSeconds: number) {
     const delta = new Decimal(deltaSeconds);
-    // const newRankers: Ranker[] = [...rankers];
-    rankers.sort((a, b) => b.points.cmp(a.points));
+    state.rankers.sort((a, b) => b.points.cmp(a.points));
 
-    for (let i = 0; i < rankers.length; i++) {
-      const ranker = new Ranker(rankers[i]);
-      rankers[i] = ranker;
-      rankers[i].rank = i + 1;
+    for (let i = 0; i < state.rankers.length; i++) {
+      const ranker = new Ranker(state.rankers[i]);
+      state.rankers[i] = ranker;
+      state.rankers[i].rank = i + 1;
 
       // If ranker still on ladder
       if (ranker.growing) {
         // Power & Points
         if (ranker.rank !== 1) {
           ranker.power = ranker.power.add(
-            new Decimal((ranker.bias + ranker.rank + 1) * ranker.multi)
+            new Decimal((ranker.bias + ranker.rank) * ranker.multi)
               .mul(delta)
               .floor()
           );
         }
         ranker.points = ranker.points.add(ranker.power.mul(delta).floor());
 
-        // TODO: Vinegar & Grapes
-        // rankers[i] = ranker;
-
         for (let j = i - 1; j >= 0; j--) {
-          const currentRanker = rankers[j + 1];
-          if (currentRanker.points.cmp(rankers[j].points) > 0) {
+          const currentRanker = state.rankers[j + 1];
+          if (currentRanker.points.cmp(state.rankers[j].points) > 0) {
             // Move 1 position up and move the ranker there 1 Position down
 
             // Move other Ranker 1 Place down
-            rankers[j].rank = j + 2;
+            state.rankers[j].rank = j + 2;
             if (
-              rankers[j].growing /* TODO: && rankers[j].you */ &&
-              rankers[j].multi > 1
+              state.rankers[j].growing /* TODO: && rankers[j].you */ &&
+              state.rankers[j].multi > 1
             ) {
-              rankers[j].grapes = rankers[j].grapes.add(1);
+              state.rankers[j].grapes = state.rankers[j].grapes.add(1);
             }
-            rankers[j + 1] = rankers[j];
+            state.rankers[j + 1] = state.rankers[j];
 
             // Move current Ranker 1 Place up
             currentRanker.rank = j + 1;
-            rankers[j] = currentRanker;
+            state.rankers[j] = currentRanker;
           } else {
             break;
           }
@@ -145,11 +158,9 @@ export const useLadderStore = defineStore("ladder", () => {
   }
 
   return {
-    // state
-    rankers,
-    number,
-    types,
-    basePointsToPromote,
+    state,
+    // getter
+    yourRanker,
     // actions
     init,
     changeLadder,

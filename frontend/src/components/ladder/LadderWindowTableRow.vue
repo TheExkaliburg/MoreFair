@@ -1,6 +1,7 @@
 <template>
   <div
     v-if="active"
+    ref="el"
     :class="{
       'bg-ladder-bg-promoted text-ladder-text-promoted': !ranker.growing,
       'bg-ladder-bg-you text-ladder-text-you': isYou,
@@ -46,18 +47,28 @@
 
 <script lang="ts" setup>
 import { computed } from "vue";
+import { MaybeElement, useElementVisibility } from "@vueuse/core";
 import { Ranker } from "~/store/entities/ranker";
 import { useFormatter } from "~/composables/useFormatter";
+import { useLadderUtils } from "~/composables/useLadderUtils";
 
 const props = defineProps({
   ranker: { type: Ranker, required: true },
   active: { type: Boolean, required: false, default: true },
   index: { type: Number, required: false, default: -1 },
 });
+useLadderUtils();
 
-const isYou = computed(() => props.ranker.accountId === 3);
+const el = ref<MaybeElement>();
+const isVisible = useElementVisibility(el.value);
+
+const isYou = computed(() => props.ranker.accountId === 2);
+const isFirst = computed(() => {
+  return props.index === 0;
+});
 
 const formattedPowerPerSec = computed<string>(() => {
+  if (!isVisible) return "";
   if (!props.ranker.growing) return "";
   return `(+${useFormatter(
     (props.ranker.rank + props.ranker.bias) * props.ranker.multi
@@ -65,22 +76,22 @@ const formattedPowerPerSec = computed<string>(() => {
 });
 
 const formattedBias = computed<string>(() => {
+  if (!isVisible) return "";
   return props.ranker.bias.toString().padStart(2, "0");
 });
 
 const formattedMulti = computed<string>(() => {
+  if (!isVisible) return "";
   return props.ranker.multi.toString().padStart(2, "0");
 });
 
-const formattedPower = computed(() => {
+const formattedPower = computed<string>(() => {
+  if (!isVisible) return "";
   return useFormatter(props.ranker.power);
 });
-const formattedPoints = computed(() => {
+const formattedPoints = computed<string>(() => {
+  if (!isVisible) return "";
   return useFormatter(props.ranker.points);
-});
-
-const isFirst = computed(() => {
-  return props.index === 0;
 });
 </script>
 
