@@ -38,4 +38,9 @@ export class Ranker implements RankerData {
     this.grapes = Object.freeze(new Decimal(this.grapes));
     this.vinegar = Object.freeze(new Decimal(this.vinegar));
   }
+
+  getPowerPerSecond(): Decimal {
+    if (this.rank === 1 || !this.growing) return new Decimal(0);
+    return new Decimal((this.bias + this.rank - 1) * this.multi);
+  }
 }
