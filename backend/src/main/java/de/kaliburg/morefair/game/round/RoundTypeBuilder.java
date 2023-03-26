@@ -46,7 +46,6 @@ public class RoundTypeBuilder {
   }
 
   public Set<RoundType> build() {
-    Set<RoundType> roundTypes = EnumSet.noneOf(RoundType.class);
     if (roundNumber == 100) {
       roundSpeedTypeWeights.put(RoundType.DEFAULT, 0.f);
       roundSpeedTypeWeights.put(RoundType.FAST, 0.f);
@@ -64,14 +63,20 @@ public class RoundTypeBuilder {
       roundChaosTypeWeights.put(RoundType.DEFAULT, 1.f);
     }
 
-    roundTypes.stream().sorted(new RoundTypeComparator()).forEach(this::handlePreviousRoundType);
-
-    roundTypes.add(getRandomLadderType(roundSpeedTypeWeights, "Speed"));
-    roundTypes.add(getRandomLadderType(roundAutoTypeWeights, "Auto"));
-    roundTypes.add(getRandomLadderType(roundChaosTypeWeights, "Chaos"));
-    if (roundTypes.size() > 1) {
-      roundTypes.remove(RoundType.DEFAULT);
-    }
+    Set<RoundType> roundTypes;
+    int iterations = 0;
+    do {
+      roundTypes = EnumSet.noneOf(RoundType.class);
+      roundTypes.stream().sorted(new RoundTypeComparator()).forEach(this::handlePreviousRoundType);
+      roundTypes.add(getRandomLadderType(roundSpeedTypeWeights, "Speed"));
+      roundTypes.add(getRandomLadderType(roundAutoTypeWeights, "Auto"));
+      roundTypes.add(getRandomLadderType(roundChaosTypeWeights, "Chaos"));
+      if (roundTypes.size() > 1) {
+        roundTypes.remove(RoundType.DEFAULT);
+      }
+      iterations++;
+    } while (previousRoundType.equals(roundTypes) && iterations < 100);
+    log.debug("Rerolled {} times to not get a duplicate round.", iterations);
     return roundTypes;
   }
 
@@ -102,7 +107,7 @@ public class RoundTypeBuilder {
       List<Entry<Float, RoundType>> sortedInverseLookupEntries = createInverseLookupTable(
           weights).entrySet().stream().sorted(Entry.comparingByKey()).toList();
 
-      log.info("Random {} percentage for R{}: {}/{}", categoryName, roundNumber, randomNumber,
+      log.debug("Random {} percentage for R{}: {}/{}", categoryName, roundNumber, randomNumber,
           totalWeight);
       for (Map.Entry<Float, RoundType> entry : sortedInverseLookupEntries) {
         log.info("Checking {} percentage: {}/{}", entry.getValue(), entry.getKey(), totalWeight);

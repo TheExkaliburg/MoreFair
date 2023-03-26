@@ -65,7 +65,8 @@ public class RoundService {
    */
   @Transactional
   public RoundEntity create(Integer number) {
-    RoundEntity result = new RoundEntity(number, config);
+    RoundEntity previousRound = find(number - 1);
+    RoundEntity result = new RoundEntity(number, config, previousRound);
     result = roundRepository.save(result);
     LadderEntity ladder = ladderService.createLadder(result, 1);
     result.getLadders().add(ladder);
@@ -96,7 +97,7 @@ public class RoundService {
   }
 
   public RoundEntity find(Integer number) {
-    if (getCurrentRound().getNumber().equals(number)) {
+    if (getCurrentRound() != null && getCurrentRound().getNumber().equals(number)) {
       return getCurrentRound();
     }
     return roundRepository.findByNumber(number).orElse(null);
