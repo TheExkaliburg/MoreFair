@@ -5,6 +5,11 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "Back-to-Back Protection for Rounds", {
+          improvements: [
+            "adding a back-to-back protection for round-types, making it almost impossible to roll the same combinations of modifiers for the round twice",
+          ],
+        }),
         new Version("PATCH", "Spark and Statistic Endpoints", {
           api: [
             "changing the api for the raw round stats from /roundStats /api/stats/round/raw",
