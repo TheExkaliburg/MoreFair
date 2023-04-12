@@ -53,7 +53,6 @@ public class GeneralAnalytics {
         .withColumnRenamed("created_on", "createdOn")
         .withColumnRenamed("account_id", "account");
 
-
     Dataset<Row> actionByAccount = biasRows.select("ranker.account", "createdOn")
         .union(multiRows.select("ranker.account", "createdOn"))
         .union(promoteRows.select("ranker.account", "createdOn"))
