@@ -93,7 +93,7 @@ public class RoundEntity {
       }
     }
 
-    double percentage = random.nextDouble(0.5, 1.5);
+    double percentage = getRoundBasePointRequirementMultiplier();
 
     BigDecimal baseDec = new BigDecimal(config.getBasePointsToPromote());
     baseDec = baseDec.multiply(BigDecimal.valueOf(percentage));
@@ -115,6 +115,26 @@ public class RoundEntity {
     }
 
     types = builder.build();
+  }
+
+  private double getRoundBasePointRequirementMultiplier() {
+    double lowerBound = 0.5f;
+    double upperBound = 1.5f;
+
+    if(types.contains(RoundType.CHAOS)) {
+      lowerBound /= 2.0f;
+      upperBound *= 1.25f;
+    }
+    else if (types.contains(RoundType.FAST)) {
+      lowerBound /= 2.0f;
+      upperBound /= 2.0f;
+    }
+    else if (types.contains(RoundType.SLOW)) {
+      lowerBound *= 1.25f;
+      upperBound *= 1.25f;
+    }
+
+    return random.nextDouble(lowerBound, upperBound);
   }
 
   public Integer getAssholeLadderNumber() {
