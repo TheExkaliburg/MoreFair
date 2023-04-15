@@ -5,6 +5,15 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version(
+          "PATCH",
+          "Round Modifier impact the Round Base Point Requirement",
+          {
+            improvements: [
+              "SLOW, FAST and CHAOS now slightly impact the Round Base Point Requirement.",
+            ],
+          }
+        ),
         new Version("PATCH", "Back-to-Back Protection for Rounds", {
           improvements: [
             "adding a back-to-back protection for round-types, making it almost impossible to roll the same combinations of modifiers for the round twice",
