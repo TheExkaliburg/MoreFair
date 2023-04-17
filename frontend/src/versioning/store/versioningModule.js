@@ -5,6 +5,90 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version(
+          "PATCH",
+          "Round Modifier impact the Round Base Point Requirement",
+          {
+            improvements: [
+              "SLOW, FAST and CHAOS now slightly impact the Round Base Point Requirement.",
+            ],
+          }
+        ),
+        new Version("PATCH", "Back-to-Back Protection for Rounds", {
+          improvements: [
+            "adding a back-to-back protection for round-types, making it almost impossible to roll the same combinations of modifiers for the round twice",
+          ],
+        }),
+        new Version("PATCH", "Spark and Statistic Endpoints", {
+          api: [
+            "changing the api for the raw round stats from /roundStats /api/stats/round/raw",
+            "adding a new api endpoint to receive the equivalent of the community-created 'Champions of the Ladder' at /api/stats/round",
+            "adding a new api endpoint for a analysis of the activity in the last 28 days at /api/stats/activity",
+          ],
+          features: [
+            "using spark and mongodb to get some more accurate statistics regarding the game",
+          ],
+        }),
+        new Version("PATCH", "CHEAP and EXPENSIVE also scales with ladders", {
+          balancing: [
+            "CHEAP ladders have the cost to bias and multi reduced as if they are half their ladder number and then by and additional 50%.",
+            "EXPENSIVE ladders have the cost to bias and multi increased as if they are 1.5x their ladder number and then by and additional 50%.",
+          ],
+        }),
+        new Version("MINOR", "CHEAP and EXPENSIVE Ladder Types", {
+          features: [
+            "CHEAP ladders have the cost to bias and multi reduced by 50%.",
+            "EXPENSIVE ladders have the cost to bias and multi increased by 50%.",
+            "CHEAP ladders are more common on FAST rounds, and EXPENSIVE ladders are more common on SLOW rounds.",
+            "CHAOS rounds have a much higher chance of rolling CHEAP or EXPENSIVE ladders, with equal chance for each.",
+          ],
+        }),
+        new Version("PATCH", "Double Point Fix", {
+          fixes: [
+            "Fixed error handling while generating Round- and Ladder types, which made generating the first ladder on specific fail after calculating all the points. " +
+              "Because of this the next time it finishes the round and creates a new Round + Ladder it also recounted all the points.",
+          ],
+        }),
+        new Version("PATCH", "Alt-Checks", {
+          features: ["Moderators should now be able to check for alts."],
+        }),
+
+        new Version("PATCH", "Timestamp for messages", {
+          fixes: [
+            "Should now show the timestamp of the message correctly, regarding timezone and locale",
+          ],
+        }),
+        new Version("PATCH", "Backslash breaking Chad - Fix v2", {
+          fixes: [
+            "Should escape the usernames properly on sending a message from Chad.",
+          ],
+        }),
+        new Version("PATCH", "Backslash breaking Chad - Fix", {
+          fixes: [
+            "Should escape the usernames properly on sending a message from Chad.",
+          ],
+        }),
+        new Version("PATCH", "Client Side Performance", {
+          improvements: [
+            "Excluded the insides of the Decimals from the reactive state since they never change, only get overwritten.",
+            "This was back when i tested it (August) a ~50% decrease in time it takes for a tick to process",
+          ],
+        }),
+        new Version("PATCH", "Deleting messages of muted/banned players", {
+          fixes: [
+            "Should now properly delete messages of muted/banned players",
+          ],
+        }),
+        new Version("PATCH", "Balancing SLOW + CHAOS", {
+          balancing: [
+            "CHAOS also has a chance to contain DEFAULT Ladders",
+            "SLOW doesn't contain SMALL and TINY anymore",
+            "SLOW contains less DEFAULT Ladders",
+          ],
+          fixes: [
+            "FAST + CHAOS can now generate something else besides SMALL ladders",
+          ],
+        }),
         new Version("PATCH", "Spectate Asshole Ladder", {
           features: [
             "Adding an option to being able to spectate the asshole ladder (experimental)",

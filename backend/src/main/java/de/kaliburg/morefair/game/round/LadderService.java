@@ -1,5 +1,7 @@
 package de.kaliburg.morefair.game.round;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
@@ -14,6 +16,7 @@ import de.kaliburg.morefair.game.GameResetEvent;
 import de.kaliburg.morefair.game.UpgradeUtils;
 import de.kaliburg.morefair.game.chat.ChatService;
 import de.kaliburg.morefair.game.chat.MessageService;
+import de.kaliburg.morefair.statistics.StatisticsService;
 import de.kaliburg.morefair.utils.FormattingUtils;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -57,6 +60,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   private final Semaphore ladderSemaphore = new Semaphore(1);
   private final LadderUtils ladderUtils;
   private final AccountService accountService;
+  private final StatisticsService statisticsService;
   private final RoundUtils roundUtils;
   private final ChatService chatService;
   private final UpgradeUtils upgradeUtils;
@@ -65,6 +69,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   private final Map<Integer, List<Event>> eventMap = new HashMap<>();
   private final WsUtils wsUtils;
   private final FairConfig config;
+  private final Gson gson;
   @Getter(AccessLevel.PACKAGE)
   @Setter(AccessLevel.PACKAGE)
   private RoundEntity currentRound;
@@ -72,19 +77,23 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   private Map<Integer, LadderEntity> currentLadderMap = new HashMap<>();
 
   public LadderService(RankerService rankerService, LadderRepository ladderRepository,
-      LadderUtils ladderUtils, AccountService accountService, RoundUtils roundUtils,
+      LadderUtils ladderUtils, AccountService accountService,
+      @Lazy StatisticsService statisticsService,
+      RoundUtils roundUtils,
       ChatService chatService, UpgradeUtils upgradeUtils, ApplicationEventPublisher eventPublisher,
-      @Lazy WsUtils wsUtils, FairConfig config) {
+      @Lazy WsUtils wsUtils, FairConfig config, Gson gson) {
     this.rankerService = rankerService;
     this.ladderRepository = ladderRepository;
     this.ladderUtils = ladderUtils;
     this.accountService = accountService;
+    this.statisticsService = statisticsService;
     this.roundUtils = roundUtils;
     this.chatService = chatService;
     this.upgradeUtils = upgradeUtils;
     this.eventPublisher = eventPublisher;
     this.wsUtils = wsUtils;
     this.config = config;
+    this.gson = gson;
   }
 
   @Transactional
@@ -388,8 +397,10 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   boolean buyBias(Event event, LadderEntity ladder) {
     try {
       RankerEntity ranker = findActiveRankerOfAccountOnLadder(event.getAccountId(), ladder);
-      BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getNumber(), ranker.getBias());
+      BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getNumber(), ranker.getBias(),
+          ladder.getTypes());
       if (ranker.getPoints().compareTo(cost) >= 0) {
+        statisticsService.recordBias(ranker, ladder, currentRound);
         ranker.setPoints(BigInteger.ZERO);
         ranker.setBias(ranker.getBias() + 1);
         wsUtils.convertAndSendToTopic(GameController.TOPIC_EVENTS_DESTINATION.replace("{number}",
@@ -413,8 +424,10 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   boolean buyMulti(Event event, LadderEntity ladder) {
     try {
       RankerEntity ranker = findActiveRankerOfAccountOnLadder(event.getAccountId(), ladder);
-      BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getNumber(), ranker.getMultiplier());
+      BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getNumber(), ranker.getMultiplier(),
+          ladder.getTypes());
       if (ranker.getPower().compareTo(cost) >= 0) {
+        statisticsService.recordMulti(ranker, ladder, currentRound);
         ranker.setPoints(BigInteger.ZERO);
         ranker.setPower(BigInteger.ZERO);
         ranker.setBias(0);
@@ -454,6 +467,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
       }
 
       if (ladderUtils.canBuyAutoPromote(ladder, ranker, currentRound)) {
+        statisticsService.recordAutoPromote(ranker, ladder, currentRound);
         ranker.setGrapes(ranker.getGrapes().subtract(cost));
         ranker.setAutoPromote(true);
         wsUtils.convertAndSendToUser(ranker.getAccount().getUuid(),
@@ -479,6 +493,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
     try {
       RankerEntity ranker = findActiveRankerOfAccountOnLadder(event.getAccountId(), ladder);
       if (ladderUtils.canPromote(ladder, ranker)) {
+        statisticsService.recordPromote(ranker, ladder, currentRound);
         AccountEntity account = accountService.find(ranker.getAccount());
         log.info("[L{}] Promotion for {} (#{})", ladder.getNumber(), account.getUsername(),
             account.getId());
@@ -548,14 +563,23 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
         // Logic for the Asshole-Ladder
         if (newRanker.getUnlocks().getPressedAssholeButton()) {
+          JsonObject object1 = new JsonObject();
+          object1.addProperty("u", account.getUsername());
+          object1.addProperty("id", account.getId());
+          object1.addProperty("i", 0);
+
           AccountEntity broadCaster = accountService.findBroadcaster();
+          JsonObject object2 = new JsonObject();
+          object2.addProperty("u", broadCaster.getUsername());
+          object2.addProperty("id", broadCaster.getId());
+          object2.addProperty("i", 20);
+
+          String metadataString = gson.toJson(new JsonObject[]{object1, object2});
+
           chatService.sendGlobalMessage("{@} was welcomed by {@}. They are the "
-                  + FormattingUtils.ordinal(newLadder.getRankers().size())
-                  + " lucky initiate for the " + FormattingUtils.ordinal(
-                  currentRound.getNumber()) + " big ritual.",
-              "[{\"u\":\"" + account.getUsername() + "\",\"id\":\"" + account.getId()
-                  + "\",\"i\":0},{\"u\":\"" + broadCaster.getUsername() + "\",\"id\":\""
-                  + broadCaster.getId() + "\",\"i\":20}]");
+              + FormattingUtils.ordinal(newLadder.getRankers().size())
+              + " lucky initiate for the " + FormattingUtils.ordinal(
+              currentRound.getNumber()) + " big ritual.", metadataString);
 
           int neededAssholesForReset = currentRound.getAssholesForReset();
           int assholeCount = newLadder.getRankers().size();
@@ -611,6 +635,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
       }
 
       if (ladderUtils.canThrowVinegarAt(ladder, ranker, target)) {
+        statisticsService.recordVinegarThrow(ranker, target, ladder, currentRound);
         BigInteger rankerVinegar = ranker.getVinegar();
         BigInteger targetVinegar = target.getVinegar();
 

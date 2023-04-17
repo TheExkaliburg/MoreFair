@@ -130,6 +130,7 @@ public class ModerationController {
       target.setAccessRole(AccountAccessRole.BANNED_PLAYER);
       target.setUsername("BANNED");
       target = accountService.save(target);
+      chatService.deleteMessagesOfAccount(target);
       log.info("{} (#{}) is banning the account {} (#{})", account.getUsername(), account.getId(),
           target.getUsername(), target.getId());
       wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
@@ -159,6 +160,7 @@ public class ModerationController {
       target.setAccessRole(AccountAccessRole.MUTED_PLAYER);
       target.setUsername(target.getUsername() + "(MUTED)");
       target = accountService.save(target);
+      chatService.deleteMessagesOfAccount(target);
       log.info("{} (#{}) is muting the account {} (#{})", account.getUsername(), account.getId(),
           target.getUsername(), target.getId());
       wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
@@ -299,6 +301,31 @@ public class ModerationController {
 
       Map<Long, String> result = accountsWithName.stream()
           .collect(Collectors.toMap(AccountEntity::getId, AccountEntity::getUsername));
+      return new ResponseEntity<>(result, HttpStatus.OK);
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      e.printStackTrace();
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GetMapping(value = "/mod/search/alts", produces = "application/json")
+  public ResponseEntity<Map<Long, String>> searcAlts(
+      @CookieValue(name = "_uuid", defaultValue = "") String uuid, @RequestParam("id") String id) {
+    try {
+      if (uuid.isBlank()) {
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+      }
+
+      AccountEntity account = accountService.find(UUID.fromString(uuid));
+      if (account == null || !account.isMod()) {
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+      }
+      AccountEntity target = accountService.find(Long.parseLong(id));
+      List<AccountEntity> accountsWithIp = accountService.searchByIp(target.getLastIp());
+      Map<Long, String> result = accountsWithIp.stream().collect(Collectors.toMap(
+          AccountEntity::getId, AccountEntity::getUsername));
+
       return new ResponseEntity<>(result, HttpStatus.OK);
     } catch (Exception e) {
       log.error(e.getMessage());

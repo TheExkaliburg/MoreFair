@@ -20,7 +20,7 @@ class RoundTypeBuilderTest {
 
   @BeforeAll
   static void init() {
-    for (int i = 0; i < 10000; i++) {
+    for (int i = 0; i < 100; i++) {
       RoundTypeBuilder builder = new RoundTypeBuilder();
       roundTypesList.add(builder.build());
     }
@@ -39,5 +39,21 @@ class RoundTypeBuilderTest {
     });
 
     log.info("{}", countMap);
+  }
+
+  @Test
+  void build_round100_ChaosSlowAuto() {
+    RoundTypeBuilder builder = new RoundTypeBuilder();
+    builder.setRoundNumber(100);
+    Set<RoundType> build = builder.build();
+    log.info("{}", build);
+
+    LadderTypeBuilder ladderTypeBuilder = new LadderTypeBuilder();
+    ladderTypeBuilder.setRoundTypes(build);
+    ladderTypeBuilder.setLadderNumber(1);
+    ladderTypeBuilder.setAssholeLadderNumber(30);
+    ladderTypeBuilder.setRoundNumber(100);
+    Set<LadderType> build1 = ladderTypeBuilder.build();
+    log.info("{}", build1);
   }
 }

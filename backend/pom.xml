@@ -141,7 +141,7 @@
     <dependency>
       <artifactId>commons-text</artifactId>
       <groupId>org.apache.commons</groupId>
-      <version>1.9</version>
+      <version>1.10.0</version>
     </dependency>
     <!--PostgreSQL -->
     <dependency>
@@ -177,6 +177,12 @@
       <artifactId>stomp-websocket</artifactId>
       <groupId>org.webjars</groupId>
       <version>2.3.3</version>
+    </dependency>
+    <!-- MongoDB -->
+    <dependency>
+      <artifactId>spring-boot-starter-data-mongodb</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <version>3.0.0</version>
     </dependency>
 
     <dependency>

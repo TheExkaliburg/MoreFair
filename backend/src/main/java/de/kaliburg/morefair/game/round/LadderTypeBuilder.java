@@ -17,6 +17,7 @@ public class LadderTypeBuilder {
   private static final Random random = new Random();
   private final Map<LadderType, Float> ladderSizeTypeWeights = new HashMap<>();
   private final Map<LadderType, Float> ladderAutoTypeWeights = new HashMap<>();
+  private final Map<LadderType, Float> ladderCostTypeWeights = new HashMap<>();
   @Setter
   @Accessors(chain = true)
   private Set<RoundType> roundTypes = EnumSet.noneOf(RoundType.class);
@@ -26,6 +27,9 @@ public class LadderTypeBuilder {
   @Setter
   @Accessors(chain = true)
   private Integer ladderNumber;
+  @Setter
+  @Accessors(chain = true)
+  private Integer roundNumber = 1;
   @Setter
   @Accessors(chain = true)
   private Integer assholeLadderNumber;
@@ -40,6 +44,10 @@ public class LadderTypeBuilder {
     ladderAutoTypeWeights.put(LadderType.FREE_AUTO, 5.f);
     ladderAutoTypeWeights.put(LadderType.NO_AUTO, 2.f);
     ladderAutoTypeWeights.put(LadderType.DEFAULT, 100.f);
+
+    ladderCostTypeWeights.put(LadderType.CHEAP, 10.f);
+    ladderCostTypeWeights.put(LadderType.EXPENSIVE, 10.f);
+    ladderCostTypeWeights.put(LadderType.DEFAULT, 100.f);
   }
 
   private void handlePreviousLadderType(LadderType ladderType) {
@@ -50,6 +58,9 @@ public class LadderTypeBuilder {
       }
       if (ladderAutoTypeWeights.containsKey(ladderType)) {
         ladderAutoTypeWeights.put(ladderType, ladderAutoTypeWeights.get(ladderType) / 2);
+      }
+      if (ladderCostTypeWeights.containsKey(ladderType)) {
+        ladderCostTypeWeights.put(ladderType, ladderCostTypeWeights.get(ladderType) / 2);
       }
 
       return;
@@ -80,10 +91,14 @@ public class LadderTypeBuilder {
         ladderSizeTypeWeights.put(LadderType.BIG, 0.f);
         ladderSizeTypeWeights.put(LadderType.GIGANTIC, 0.f);
         ladderSizeTypeWeights.put(LadderType.DEFAULT, 0.f);
+        ladderCostTypeWeights.put(LadderType.CHEAP,
+            ladderCostTypeWeights.get(LadderType.CHEAP) * 2);
+        ladderCostTypeWeights.put(LadderType.EXPENSIVE,
+            ladderCostTypeWeights.get(LadderType.EXPENSIVE) / 2);
       }
       case AUTO -> {
         ladderAutoTypeWeights.put(LadderType.FREE_AUTO,
-            ladderAutoTypeWeights.get(LadderType.FREE_AUTO) * 10);
+            Math.max(1.0f, ladderAutoTypeWeights.get(LadderType.FREE_AUTO) * 10));
         ladderAutoTypeWeights.put(LadderType.DEFAULT, 0.f);
       }
       case CHAOS -> {
@@ -91,18 +106,25 @@ public class LadderTypeBuilder {
         ladderSizeTypeWeights.put(LadderType.SMALL, 1.f);
         ladderSizeTypeWeights.put(LadderType.BIG, 1.f);
         ladderSizeTypeWeights.put(LadderType.GIGANTIC, 1.f);
-        ladderSizeTypeWeights.put(LadderType.DEFAULT, 0.f);
+        ladderSizeTypeWeights.put(LadderType.DEFAULT, 1.f);
+        ladderCostTypeWeights.put(LadderType.CHEAP, 1.f);
+        ladderCostTypeWeights.put(LadderType.EXPENSIVE, 1.f);
+        ladderCostTypeWeights.put(LadderType.DEFAULT, 1.f);
       }
       case SLOW -> {
-        ladderSizeTypeWeights.put(LadderType.TINY, ladderSizeTypeWeights.get(LadderType.TINY) / 2);
-        ladderSizeTypeWeights.put(LadderType.SMALL,
-            ladderSizeTypeWeights.get(LadderType.SMALL) / 2);
-        ladderSizeTypeWeights.put(LadderType.BIG, ladderSizeTypeWeights.get(LadderType.BIG) * 2);
+        ladderSizeTypeWeights.put(LadderType.TINY, 0.f);
+        ladderSizeTypeWeights.put(LadderType.SMALL, 0.f);
+        ladderSizeTypeWeights.put(LadderType.DEFAULT,
+            ladderSizeTypeWeights.get(LadderType.DEFAULT) / 5);
         ladderSizeTypeWeights.put(LadderType.GIGANTIC,
-            ladderSizeTypeWeights.get(LadderType.GIGANTIC) * 5);
+            ladderSizeTypeWeights.get(LadderType.GIGANTIC) * 2);
         ladderAutoTypeWeights.put(LadderType.NO_AUTO, 0.f);
         ladderAutoTypeWeights.put(LadderType.FREE_AUTO,
             ladderAutoTypeWeights.get(LadderType.FREE_AUTO) * 2);
+        ladderCostTypeWeights.put(LadderType.CHEAP,
+            ladderCostTypeWeights.get(LadderType.CHEAP) / 2);
+        ladderCostTypeWeights.put(LadderType.EXPENSIVE,
+            ladderCostTypeWeights.get(LadderType.EXPENSIVE) * 2);
       }
       default -> {
         // do nothing
@@ -120,6 +142,8 @@ public class LadderTypeBuilder {
       ladderSizeTypeWeights.put(LadderType.BIG, 0.f);
       ladderAutoTypeWeights.put(LadderType.FREE_AUTO, 0.f);
       ladderAutoTypeWeights.put(LadderType.NO_AUTO, 0.f);
+      ladderCostTypeWeights.put(LadderType.CHEAP, 0.f);
+      ladderCostTypeWeights.put(LadderType.EXPENSIVE, 0.f);
     }
 
     if (ladderNumber > 25) {
@@ -129,6 +153,13 @@ public class LadderTypeBuilder {
     this.roundTypes.stream().sorted(new RoundTypeComparator()).forEach(this::handleRoundTypes);
     this.previousLadderType.stream().sorted(new LadderTypeComparator())
         .forEach(this::handlePreviousLadderType);
+
+    if (roundNumber == 100 && ladderNumber % 10 == 0) {
+      // make it no Auto for sure
+      ladderAutoTypeWeights.put(LadderType.DEFAULT, 0.f);
+      ladderAutoTypeWeights.put(LadderType.FREE_AUTO, 0.f);
+      ladderAutoTypeWeights.put(LadderType.NO_AUTO, 100.f);
+    }
 
     if (ladderNumber >= assholeLadderNumber) {
       ladderAutoTypeWeights.put(LadderType.NO_AUTO,
@@ -140,6 +171,7 @@ public class LadderTypeBuilder {
 
     ladderTypes.add(getRandomLadderType(ladderSizeTypeWeights, "Size"));
     ladderTypes.add(getRandomLadderType(ladderAutoTypeWeights, "Auto"));
+    ladderTypes.add(getRandomLadderType(ladderCostTypeWeights, "Cost"));
     if (ladderTypes.size() > 1) {
       ladderTypes.remove(LadderType.DEFAULT);
     }
@@ -147,31 +179,42 @@ public class LadderTypeBuilder {
   }
 
   private Map<Float, LadderType> createInverseLookupTable(Map<LadderType, Float> weights) {
-    Map<Float, LadderType> inverseLookupTable = new HashMap<>();
-    float currentWeight = 0;
-    for (Map.Entry<LadderType, Float> entry : weights.entrySet()) {
-      if (entry.getValue() <= 0) {
-        continue;
+    try {
+      Map<Float, LadderType> inverseLookupTable = new HashMap<>();
+      float currentWeight = 0;
+      for (Map.Entry<LadderType, Float> entry : weights.entrySet()) {
+        if (entry.getValue() <= 0) {
+          continue;
+        }
+        currentWeight += entry.getValue();
+        inverseLookupTable.put(currentWeight, entry.getKey());
       }
-      currentWeight += entry.getValue();
-      inverseLookupTable.put(currentWeight, entry.getKey());
+      return inverseLookupTable;
+    } catch (Exception e) {
+      log.error("Error creating inverse lookup table", e);
+      Map<Float, LadderType> inverseLookupTable = new HashMap<>();
+      inverseLookupTable.put(1.f, LadderType.DEFAULT);
+      return inverseLookupTable;
     }
-    return inverseLookupTable;
   }
 
   private LadderType getRandomLadderType(Map<LadderType, Float> weights, String categoryName) {
-    float totalWeight = weights.values().stream().reduce(0.f, Float::sum);
-    float randomNumber = random.nextFloat(totalWeight);
-    List<Entry<Float, LadderType>> inverseLookupEntries = createInverseLookupTable(
-        weights).entrySet().stream().sorted(Entry.comparingByKey()).toList();
+    try {
+      float totalWeight = weights.values().stream().reduce(0.f, Float::sum);
+      float randomNumber = random.nextFloat(totalWeight);
+      List<Entry<Float, LadderType>> inverseLookupEntries = createInverseLookupTable(
+          weights).entrySet().stream().sorted(Entry.comparingByKey()).toList();
 
-    log.info("Random {} percentage for L{}: {}/{}", categoryName, ladderNumber, randomNumber,
-        totalWeight);
-    for (Map.Entry<Float, LadderType> entry : inverseLookupEntries) {
-      log.info("Checking {} percentage: {}/{}", entry.getValue(), entry.getKey(), totalWeight);
-      if (randomNumber < entry.getKey()) {
-        return entry.getValue();
+      log.info("Random {} percentage for L{}: {}/{}", categoryName, ladderNumber, randomNumber,
+          totalWeight);
+      for (Map.Entry<Float, LadderType> entry : inverseLookupEntries) {
+        log.info("Checking {} percentage: {}/{}", entry.getValue(), entry.getKey(), totalWeight);
+        if (randomNumber < entry.getKey()) {
+          return entry.getValue();
+        }
       }
+    } catch (Exception e) {
+      log.error("Error getting random ladder type", e);
     }
     return LadderType.DEFAULT;
   }
