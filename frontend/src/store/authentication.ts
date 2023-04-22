@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import Cookies from "js-cookie";
 import { computed, ref, watch } from "vue";
-import { useAPI } from "../composables/useAPI";
+import { useAPI } from "~/composables/useAPI";
 
 export const useAuthStore = defineStore("auth", () => {
   const API = useAPI();

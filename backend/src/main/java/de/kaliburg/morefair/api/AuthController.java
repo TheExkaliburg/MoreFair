@@ -1,6 +1,5 @@
 package de.kaliburg.morefair.api;
 
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import de.kaliburg.morefair.account.AccountEntity;
@@ -9,14 +8,13 @@ import de.kaliburg.morefair.api.utils.HttpUtils;
 import de.kaliburg.morefair.api.utils.RequestThrottler;
 import de.kaliburg.morefair.security.SecurityUtils;
 import de.kaliburg.morefair.serivces.EmailService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import java.net.URI;
-import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -66,6 +64,13 @@ public class AuthController {
   @GetMapping
   public ResponseEntity<?> getAuthenticationStatus(Authentication authentication) {
     return ResponseEntity.ok(authentication != null && authentication.isAuthenticated());
+  }
+
+  @PostMapping(value = "/login")
+  public ResponseEntity<?> login(HttpServletRequest request) {
+    HttpSession s = request.getSession();
+    log.debug(s.toString());
+    return ResponseEntity.ok().build();
   }
 
   @PostMapping(value = "/register", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
@@ -136,39 +141,6 @@ public class AuthController {
     accountService.save(account);
 
     return ResponseEntity.ok("Password changed");
-  }
-
-  // API endpoint for revoking all jwt tokens for a specific account
-  @PostMapping(value = "/revoke", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-  public ResponseEntity<?> revokeJwtTokens(HttpServletRequest request) throws Exception {
-    DecodedJWT jwt = securityUtils.getJwtFromRequest(request);
-    if (jwt == null) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in");
-    }
-
-    String username = jwt.getSubject();
-    AccountEntity account = accountService.findByUsername(username);
-    if (account == null) {
-      return ResponseEntity.internalServerError().body("Account not found");
-    }
-
-    // if jwt got issued before lastRevoke, it is not valid anymore
-
-    if (Instant.now().isBefore(jwt.getIssuedAtAsInstant())) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Token is not valid yet");
-    }
-    if (Instant.now().isAfter(jwt.getExpiresAtAsInstant())) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is not valid anymore");
-    }
-
-    if (account.getLastRevoke().toInstant().isAfter(jwt.getIssuedAtAsInstant())) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token revoked");
-    }
-
-    account.setLastRevoke(OffsetDateTime.now());
-    accountService.save(account);
-
-    return ResponseEntity.ok("All tokens revoked");
   }
 
   // API for Creating, saving and sending a new token via mail for resetting the password
@@ -283,15 +255,16 @@ public class AuthController {
     URI uri = HttpUtils.createCreatedUri("/api/auth/signup/guest");
     return ResponseEntity.created(uri).body(account.getUsername());
   }
+
+  @Data
+  @RequiredArgsConstructor
+  @AllArgsConstructor
+  public class UserRegistrationDetails {
+
+    private String username = "";
+    private String password = "";
+    private String uuid = "";
+    private boolean used = true;
+  }
 }
 
-@Data
-@RequiredArgsConstructor
-@AllArgsConstructor
-class UserRegistrationDetails {
-
-  private String username = "";
-  private String password = "";
-  private String uuid = "";
-  private boolean used = true;
-}

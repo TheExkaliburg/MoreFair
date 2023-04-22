@@ -1,7 +1,7 @@
 package de.kaliburg.morefair.security;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
@@ -18,10 +18,8 @@ public class CustomCookieCsrfTokenRepository implements CsrfTokenRepository {
   @Override
   public void saveToken(CsrfToken token, HttpServletRequest request, HttpServletResponse response) {
     String tokenValue = token != null ? token.getToken() : "";
-
     response.addHeader("Set-Cookie", "XSRF-TOKEN=" + tokenValue + "; Path=/; "
         + "SameSite=Strict; Secure");
-
   }
 
   @Override

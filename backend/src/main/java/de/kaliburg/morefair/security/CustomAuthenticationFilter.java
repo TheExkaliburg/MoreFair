@@ -1,63 +1,41 @@
 package de.kaliburg.morefair.security;
 
-import de.kaliburg.morefair.account.AccountEntity;
-import de.kaliburg.morefair.account.AccountService;
-import javax.servlet.FilterChain;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import lombok.RequiredArgsConstructor;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Slf4j
-@RequiredArgsConstructor
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
+  private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REQUEST_MATCHER =
+      new AntPathRequestMatcher("/api/auth/login", "POST");
+
+
   private final AuthenticationManager authenticationManager;
-  private final AccountService accountService;
 
-  @Override
-  public Authentication attemptAuthentication(HttpServletRequest request,
-      HttpServletResponse response) throws AuthenticationException {
-    String username = super.obtainUsername(request);
-    username = username != null ? username : "";
-    username = username.trim();
-    String password = super.obtainPassword(request);
-    password = password != null ? password : "";
 
-    AccountEntity account = accountService.findByUsername(username);
-    if (account == null) {
-      throw new UsernameNotFoundException("User not found");
-    }
-
-    UsernamePasswordAuthenticationToken authenticationToken =
-        new UsernamePasswordAuthenticationToken(account.getUuid().toString(), password);
-
-    super.setDetails(request, authenticationToken);
-
-    return authenticationManager.authenticate(authenticationToken);
+  public CustomAuthenticationFilter(AuthenticationManager authenticationManager) {
+    super(authenticationManager);
+    this.setRequiresAuthenticationRequestMatcher(DEFAULT_ANT_PATH_REQUEST_MATCHER);
+    this.authenticationManager = authenticationManager;
   }
 
   @Override
   protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
-      FilterChain chain, Authentication authResult) {
+      FilterChain chain, Authentication authResult) throws IOException, ServletException {
+    super.successfulAuthentication(request, response, chain, authResult);
     HttpSession session = request.getSession(false);
     if (session != null) {
       session.invalidate();
     }
-
-    session = request.getSession();
-
-    SecurityContext context = SecurityContextHolder.createEmptyContext();
-    context.setAuthentication(authResult);
-    SecurityContextHolder.setContext(context);
+    request.getSession();
   }
 }

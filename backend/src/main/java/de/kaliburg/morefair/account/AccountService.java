@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-import javax.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * This Service handles all the accounts.
@@ -118,10 +118,10 @@ public class AccountService implements UserDetailsService {
   public List<AccountEntity> searchByIp(Integer ip) {
     return accountRepository.findTop100ByLastIpOrderByLastLoginDesc(ip);
   }
-  
+
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    AccountEntity account = accountRepository.findByUuid(UUID.fromString(username))
+    AccountEntity account = accountRepository.findByUsername(username)
         .orElseThrow(() -> new UsernameNotFoundException("Account not found"));
 
     Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
