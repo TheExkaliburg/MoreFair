@@ -127,7 +127,7 @@ public class AccountService implements UserDetailsService {
     Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
     authorities.add(new SimpleGrantedAuthority(account.getAccessRole().name()));
 
-    return new User(account.getUuid().toString(), account.getPassword(), authorities);
+    return new User(account.getUsername(), account.getPassword(), authorities);
   }
 
   public AccountEntity findByUsername(String username) {

@@ -45,6 +45,7 @@ const API = {
       const params = new URLSearchParams();
       params.append("username", username);
       params.append("password", password);
+      params.append("remember-me", "true");
       return axiosInstance.post("/api/auth/login", params, {
         withCredentials: true,
       });

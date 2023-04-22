@@ -70,6 +70,8 @@ public class SecurityConfig {
         .anyRequest()
         .permitAll()
     );
+    http.addFilterAfter(new SessionAttributesFilter(accountService),
+        UsernamePasswordAuthenticationFilter.class);
     http.logout().logoutUrl("/api/auth/logout").logoutSuccessUrl("/");
     http.exceptionHandling()
         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
@@ -104,14 +106,12 @@ public class SecurityConfig {
         new PersistentTokenBasedRememberMeServices(config.getSecrets().getRememberMe(),
             accountService, redisTokenRepository);
     rememberMeService.setTokenValiditySeconds(86400 * RedisTokenRepositoryImpl.TOKEN_VALID_DAYS);
-    rememberMeService.setAlwaysRemember(true);
     rememberMeService.setUseSecureCookie(true);
-    rememberMeService.
     return rememberMeService;
   }
 
   @Bean
   public AuthenticationSuccessHandler authenticationSuccessHandler() {
-    return new CustomAuthenticationSuccessHandler();
+    return new CustomAuthenticationSuccessHandler(accountService);
   }
 }

@@ -20,6 +20,7 @@ public class CustomCookieCsrfTokenRepository implements CsrfTokenRepository {
     String tokenValue = token != null ? token.getToken() : "";
     response.addHeader("Set-Cookie", "XSRF-TOKEN=" + tokenValue + "; Path=/; "
         + "SameSite=Strict; Secure");
+
   }
 
   @Override
