@@ -7,10 +7,12 @@
       <div>Points</div>
     </div>
     <div class="flex flex-row">
-      <FairButton class="w-full rounded-r-none"
+      <FairButton :disabled="isButtonLocked" class="w-full rounded-r-none"
         >+1 {{ lang("multi") }}
       </FairButton>
-      <FairButton class="w-full rounded-l-none border-l-0"
+      <FairButton
+        :disabled="isButtonLocked"
+        class="w-full rounded-l-none border-l-0"
         >+1 {{ lang("bias") }}
       </FairButton>
     </div>
@@ -21,12 +23,12 @@
       <p>Vinegar</p>
     </div>
     <div class="flex flex-row w-full">
-      <FairButton class="w-full rounded-r-none"
+      <FairButton :disabled="isButtonLocked" class="w-full rounded-r-none"
         >{{ lang("autopromote") }}
       </FairButton>
       <FairButton
-        :disabled="true"
-        class="w-full rounded-l-none border-l-0 disabled"
+        :disabled="isButtonLocked"
+        class="w-full rounded-l-none border-l-0"
         >{{ lang("vinegar") }}
       </FairButton>
     </div>
@@ -41,8 +43,13 @@
 <script lang="ts" setup>
 import FairButton from "../../components/interactables/FairButton.vue";
 import { useLang } from "~/composables/useLang";
+import { useOptionsStore } from "~/store/options";
 
 const lang = useLang("components.ladder.buttons");
+const optionsStore = useOptionsStore();
+const isButtonLocked = computed<boolean>(() => {
+  return optionsStore.state.ladder.lockButtons.value;
+});
 </script>
 
 <style scoped></style>
