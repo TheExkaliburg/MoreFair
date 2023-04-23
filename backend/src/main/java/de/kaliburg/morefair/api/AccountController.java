@@ -44,8 +44,11 @@ public class AccountController {
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> getAccount(HttpSession session) {
     try {
-      AccountEntity account =
-          accountService.find(SessionUtils.getUuid(session));
+      AccountEntity account = accountService.find(SessionUtils.getUuid(session));
+
+      if (account == null) {
+        return ResponseEntity.notFound().build();
+      }
 
       if (account.getAchievements() == null) {
         account.setAchievements(new AchievementsEntity(account));

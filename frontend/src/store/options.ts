@@ -33,6 +33,7 @@ const defaultValues = {
     hideVinegarAndGrapes: new BooleanOption(false),
     enableSpectateAssholeLadder: new BooleanOption(false),
     hideHelpText: new BooleanOption(false),
+    lockButtons: new BooleanOption(false),
   }),
   chat: new OptionsGroup({
     subscribedMentions: new EditableStringListOption(["here"]),

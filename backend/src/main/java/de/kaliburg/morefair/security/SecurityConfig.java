@@ -52,15 +52,15 @@ public class SecurityConfig {
     );
     http.addFilter(usernamePasswordAuthenticationFilter());
     http.authorizeHttpRequests((requests) -> requests
-            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/api/auth/**"))
-            .permitAll()
+        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/api/auth/**"))
+        .permitAll()
 
-            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/auth/**"))
-            .permitAll()
+        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/auth/**"))
+        .permitAll()
 
-            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/socket/fair"))
-            .permitAll()
-/*
+        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/socket/fair"))
+        .permitAll()
+
         .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.OPTIONS, "/api/**"))
         .authenticated()
 
@@ -78,9 +78,9 @@ public class SecurityConfig {
 
         .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.DELETE, "/api/**"))
         .authenticated()
-*/
-            .anyRequest()
-            .permitAll()
+
+        .anyRequest()
+        .permitAll()
     );
     http.rememberMe().rememberMeServices(rememberMeServices());
     http.addFilterAfter(new SessionAttributesFilter(accountService),

@@ -132,10 +132,17 @@ const API = {
   },
 };
 
+let isInitialized = false;
+if (!isInitialized) {
+  API.auth.authenticationStatus().then((_) => {
+    isInitialized = true;
+  });
+}
+
 export const useAPI = () => {
-  const xsrfToken = Cookies.get("XSRF-TOKEN");
-  if (!xsrfToken) {
-    // API.auth.authenticationStatus().then((_) => {});
-  }
+  /* if (!API.isInitialized) {
+    await API.auth.authenticationStatus();
+    API.isInitialized = true;
+  } */
   return API;
 };

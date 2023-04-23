@@ -28,4 +28,7 @@
 - MOD
   - TODO: Mod Page & options
 */
+import { useAPI } from "~/composables/useAPI";
+
+useAPI();
 </script>

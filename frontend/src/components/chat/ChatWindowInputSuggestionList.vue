@@ -75,8 +75,6 @@ function onKeyDown(event: KeyboardEvent) {
   if (event.key === "ArrowDown") {
     event.preventDefault();
     selectedIndex.value = (selectedIndex.value + 1) % props.items.length;
-    // selected.value[0].scrollIntoView({ behavior: "smooth", block: "nearest" });
-    console.log(list.value);
     list.value?.$el.children[selectedIndex.value]?.scrollIntoView({
       block: "nearest",
     });

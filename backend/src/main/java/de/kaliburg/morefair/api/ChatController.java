@@ -17,7 +17,6 @@ import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.security.SessionUtils;
 import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -25,7 +24,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -56,8 +54,7 @@ public class ChatController {
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> initChat(@RequestParam("number") Integer number,
-      Authentication authentication, HttpSession session) {
+  public ResponseEntity<?> initChat(@RequestParam("number") Integer number, HttpSession session) {
     try {
       AccountEntity account = accountService.find(SessionUtils.getUuid(session));
       if (account == null || account.isBanned()) {
@@ -89,7 +86,7 @@ public class ChatController {
 
   @MessageMapping(APP_CHAT_DESTINATION)
   public void postChat(WsMetaMessage wsMessage, @DestinationVariable("number") Integer number,
-      Authentication authentication) {
+      HttpSession session) {
     try {
       String message = wsMessage.getContent();
       String metadata = wsMessage.getMetadata();
@@ -102,7 +99,7 @@ public class ChatController {
         return;
       }
 
-      AccountEntity account = accountService.find(UUID.fromString(authentication.getName()));
+      AccountEntity account = accountService.find(SessionUtils.getUuid(session));
       if (account == null || account.isMuted()) {
         return;
       }
