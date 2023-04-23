@@ -23,12 +23,13 @@ public class SessionAttributesFilter extends GenericFilterBean {
   public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse,
       FilterChain filterChain) throws IOException, ServletException {
     HttpServletRequest request = (HttpServletRequest) servletRequest;
-    HttpSession session = request.getSession();
+    HttpSession session = request.getSession(false);
 
     if (session != null) {
       Object uuidObj = session.getAttribute("UUID");
       if (uuidObj == null) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication =
+            SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()
             && authentication.getName() != null) {
           AccountEntity account = accountService.findByUsername(authentication.getName());

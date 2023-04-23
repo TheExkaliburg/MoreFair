@@ -24,7 +24,6 @@ export const useAuthStore = defineStore("auth", () => {
         authenticationStatus.value = Boolean(false);
       }
     });
-
   // getters
   const isGuest = computed<boolean>(() => {
     return uuid.value !== "";

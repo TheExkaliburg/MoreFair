@@ -28,7 +28,7 @@ import FairButton from "../components/interactables/FairButton.vue";
 import TheAuthenticationDialog from "../components/auth/TheAuthenticationDialog.vue";
 import { useAuthStore } from "~/store/authentication";
 
-const authStore = useAuthStore();
+const authStore = await useAuthStore();
 definePageMeta({ layout: "empty" });
 
 const isLoginModalOpen = ref<boolean>(false);

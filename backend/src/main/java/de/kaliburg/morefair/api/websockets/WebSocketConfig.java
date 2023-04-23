@@ -19,6 +19,6 @@ public class WebSocketConfig extends AbstractSessionWebSocketMessageBrokerConfig
 
   @Override
   protected void configureStompEndpoints(StompEndpointRegistry registry) {
-    registry.addEndpoint("/api/fairsocket").setAllowedOriginPatterns("*");
+    registry.addEndpoint("/socket/fair").setAllowedOriginPatterns("*");
   }
 }

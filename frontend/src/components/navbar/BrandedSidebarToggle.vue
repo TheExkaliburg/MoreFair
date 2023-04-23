@@ -29,7 +29,7 @@ import { useUiStore } from "~/store/ui";
 import { useAuthStore } from "~/store/authentication";
 
 const uiStore = useUiStore();
-const authStore = useAuthStore();
+const authStore = await useAuthStore();
 </script>
 
 <style scoped></style>

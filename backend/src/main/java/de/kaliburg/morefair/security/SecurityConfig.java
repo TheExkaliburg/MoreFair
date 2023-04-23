@@ -3,6 +3,7 @@ package de.kaliburg.morefair.security;
 import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountService;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.http.SameSiteCookies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,9 +20,11 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
+import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
+import org.springframework.session.web.http.CookieSerializer;
+import org.springframework.session.web.http.DefaultCookieSerializer;
 
 @Configuration
 @EnableWebSecurity
@@ -36,19 +39,28 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
     http.cors().disable();
-    http.csrf().csrfTokenRepository(new CustomCookieCsrfTokenRepository()).disable();
-    http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
+    http.csrf(csrf -> csrf
+        .csrfTokenRepository(new CustomCookieCsrfTokenRepository())
+        .csrfTokenRequestHandler(new XorCsrfTokenRequestAttributeHandler()::handle)
+    );
+    http.sessionManagement(
+        session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+    );
+    http.securityContext(securityContext -> securityContext
+        .requireExplicitSave(false)
+    );
     http.addFilter(usernamePasswordAuthenticationFilter());
-    http.rememberMe().rememberMeServices(rememberMeServices());
     http.authorizeHttpRequests((requests) -> requests
-        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/api/auth/**"))
-        .permitAll()
+            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/api/auth/**"))
+            .permitAll()
 
-        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/auth/**"))
-        .permitAll()
+            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/auth/**"))
+            .permitAll()
 
+            .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/socket/fair"))
+            .permitAll()
+/*
         .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.OPTIONS, "/api/**"))
         .authenticated()
 
@@ -66,10 +78,11 @@ public class SecurityConfig {
 
         .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.DELETE, "/api/**"))
         .authenticated()
-
-        .anyRequest()
-        .permitAll()
+*/
+            .anyRequest()
+            .permitAll()
     );
+    http.rememberMe().rememberMeServices(rememberMeServices());
     http.addFilterAfter(new SessionAttributesFilter(accountService),
         UsernamePasswordAuthenticationFilter.class);
     http.logout().logoutUrl("/api/auth/logout").logoutSuccessUrl("/");
@@ -102,11 +115,12 @@ public class SecurityConfig {
 
   @Bean
   public RememberMeServices rememberMeServices() {
-    PersistentTokenBasedRememberMeServices rememberMeService =
-        new PersistentTokenBasedRememberMeServices(config.getSecrets().getRememberMe(),
+    CustomPersistentTokenBasedRememberMeServices rememberMeService =
+        new CustomPersistentTokenBasedRememberMeServices(config.getSecrets().getRememberMe(),
             accountService, redisTokenRepository);
     rememberMeService.setTokenValiditySeconds(86400 * RedisTokenRepositoryImpl.TOKEN_VALID_DAYS);
     rememberMeService.setUseSecureCookie(true);
+    rememberMeService.setAlwaysRemember(false);
     return rememberMeService;
   }
 
@@ -114,4 +128,13 @@ public class SecurityConfig {
   public AuthenticationSuccessHandler authenticationSuccessHandler() {
     return new CustomAuthenticationSuccessHandler(accountService);
   }
+
+  @Bean
+  public CookieSerializer cookieSerializer() {
+    DefaultCookieSerializer serializer = new DefaultCookieSerializer();
+    serializer.setSameSite(SameSiteCookies.STRICT.getValue());
+    return serializer;
+  }
+
+
 }

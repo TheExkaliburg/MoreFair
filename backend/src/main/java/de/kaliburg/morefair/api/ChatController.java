@@ -8,13 +8,14 @@ import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WsMetaMessage;
 import de.kaliburg.morefair.game.chat.ChatDto;
 import de.kaliburg.morefair.game.chat.ChatService;
-import de.kaliburg.morefair.game.chat.MessageDto;
 import de.kaliburg.morefair.game.chat.MessageEntity;
 import de.kaliburg.morefair.game.chat.MessageService;
 import de.kaliburg.morefair.game.round.LadderService;
 import de.kaliburg.morefair.game.round.RankerEntity;
 import de.kaliburg.morefair.game.round.RankerService;
 import de.kaliburg.morefair.game.round.RoundService;
+import de.kaliburg.morefair.security.SessionUtils;
+import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -56,13 +57,13 @@ public class ChatController {
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> initChat(@RequestParam("number") Integer number,
-      Authentication authentication) {
+      Authentication authentication, HttpSession session) {
     try {
-      log.trace("/app/chat/init/{} from {}", number, authentication.getName());
-      AccountEntity account = accountService.find(UUID.fromString(authentication.getName()));
+      AccountEntity account = accountService.find(SessionUtils.getUuid(session));
       if (account == null || account.isBanned()) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       }
+      log.trace("/app/chat/init/{} from {}#{}", number, account.getDisplayName(), account.getId());
 
       RankerEntity ranker = ladderService.findFirstActiveRankerOfAccountThisRound(account);
       if (ranker == null) {

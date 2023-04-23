@@ -35,6 +35,23 @@ axiosInstance.interceptors.response.use(
     if (error.response?.status === 401) {
       navigateTo("/");
     }
+    if (error.response?.status === 403) {
+      const headers = error.config?.headers;
+      if (headers === undefined) return Promise.reject(error);
+      const isRetry = Boolean(headers["X-RETRY"]);
+      if (!isRetry) {
+        const xsrfToken = Cookies.get("XSRF-TOKEN");
+        if (xsrfToken) {
+          const config = error.config;
+          config.headers = {
+            ...config.headers,
+            "X-XSRF-TOKEN": xsrfToken,
+            "X-RETRY": true,
+          };
+          return axiosInstance.request(config);
+        }
+      }
+    }
     return Promise.reject(error);
   }
 );
@@ -118,7 +135,7 @@ const API = {
 export const useAPI = () => {
   const xsrfToken = Cookies.get("XSRF-TOKEN");
   if (!xsrfToken) {
-    API.auth.authenticationStatus().then((_) => {});
+    // API.auth.authenticationStatus().then((_) => {});
   }
   return API;
 };

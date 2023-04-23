@@ -40,8 +40,8 @@ const callbacks: StompCallbacks = {
 
 const isDevMode = process.env.NODE_ENV !== "production";
 const connection = isDevMode
-  ? "ws://localhost:8080/api/fairsocket"
-  : `ws://${window.location.host}/api/fairsocket`;
+  ? "ws://localhost:8080/socket/fair"
+  : `ws://${window.location.host}/socket/fair`;
 
 const client = new Client({
   brokerURL: connection,
