@@ -155,22 +155,22 @@ const wsApi = (client: Client) => {
       },
       buyBias: () => {
         client.publish({
-          destination: "/app/ladder/buyBias",
+          destination: "/app/ladder/bias",
         });
       },
       buyMulti: () => {
         client.publish({
-          destination: "/app/ladder/buyMulti",
+          destination: "/app/ladder/multi",
         });
       },
       throwVinegar: () => {
         client.publish({
-          destination: "/app/ladder/throwVinegar",
+          destination: "/app/ladder/vinegar",
         });
       },
       buyAutoPromote: () => {
         client.publish({
-          destination: "/app/ladder/autoPromote",
+          destination: "/app/ladder/autopromote",
         });
       },
       promote: () => {

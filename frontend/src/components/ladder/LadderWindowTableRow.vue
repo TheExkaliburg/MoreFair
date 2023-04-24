@@ -5,7 +5,7 @@
     :class="{
       'bg-ladder-bg-promoted text-ladder-text-promoted': !ranker.growing,
       'bg-ladder-bg-you text-ladder-text-you': isYou,
-      'sticky top-0 z-1': isFirst,
+      'bg-ladder-bg sticky z-1 top-0': isFirst,
     }"
     class="grid grid-cols-24 sm:grid-cols-48 gap-1 px-1 text-sm select-none"
   >

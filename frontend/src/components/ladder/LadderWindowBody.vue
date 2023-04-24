@@ -21,11 +21,13 @@
       <FairButton
         :disabled="!canBuyMulti || isButtonLocked"
         class="w-full rounded-r-none"
+        @click="buyMulti"
         >+1 {{ lang("multi") }}
       </FairButton>
       <FairButton
         :disabled="!canBuyBias || isButtonLocked"
         class="w-full rounded-l-none border-l-0"
+        @click="buyBias"
         >+1 {{ lang("bias") }}
       </FairButton>
     </div>
@@ -49,19 +51,22 @@
       <FairButton
         :disabled="!canBuyAutoPromote || isButtonLocked"
         class="w-full rounded-r-none"
+        @click="buyAutoPromote"
         >{{ lang("autopromote") }}
       </FairButton>
       <FairButton
         v-if="yourRanker.rank === 1"
         :disabled="!canThrowVinegar || isButtonLocked"
         class="w-full rounded-l-none border-l-0"
+        @click="throwVinegar"
         >{{ lang("vinegar") }}
       </FairButton>
       <FairButton
         v-else
         :disabled="!canPromote || isButtonLocked"
         class="w-full rounded-l-none border-l-0"
-        >{{ lang("promote") }}
+        @click="promote"
+        >{{ promoteLabel }}
       </FairButton>
     </div>
     <div
@@ -77,7 +82,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from "vue";
+import { computed, onMounted, ref } from "vue";
 import FairButton from "../../components/interactables/FairButton.vue";
 import { useLang } from "~/composables/useLang";
 import { useOptionsStore } from "~/store/options";
@@ -85,10 +90,13 @@ import { useLadderStore } from "~/store/ladder";
 import { Ranker } from "~/store/entities/ranker";
 import { useFormatter } from "~/composables/useFormatter";
 import { useLadderUtils } from "~/composables/useLadderUtils";
+import { useRoundStore } from "~/store/round";
+import { useStomp } from "~/composables/useStomp";
 
 const lang = useLang("components.ladder.buttons");
 const optionsStore = useOptionsStore();
 const ladderStore = useLadderStore();
+const roundStore = useRoundStore();
 const ladderUtils = useLadderUtils();
 const isButtonLocked = computed<boolean>(() => {
   return optionsStore.state.ladder.lockButtons.value;
@@ -153,6 +161,69 @@ const canPromote = computed<boolean>(() => {
   return (
     ladderUtils.getPointsNeededToPromote.value.cmp(yourRanker.value.points) <= 0
   );
+});
+const promoteLabel = computed<string>(() => {
+  return ladderStore.state.number < roundStore.state.assholeLadder
+    ? lang("promote")
+    : lang("asshole");
+});
+
+const pressedBiasRecently = ref<boolean>(false);
+const pressedMultiRecently = ref<boolean>(false);
+const pressedVinegarRecently = ref<boolean>(false);
+const pressedAutoPromoteRecently = ref<boolean>(false);
+const pressedPromoteRecently = ref<boolean>(false);
+
+function handleTick() {
+  pressedBiasRecently.value = false;
+  pressedMultiRecently.value = false;
+  pressedVinegarRecently.value = false;
+  pressedAutoPromoteRecently.value = false;
+  pressedPromoteRecently.value = false;
+}
+
+function buyBias() {
+  if (pressedBiasRecently.value) return;
+  pressedBiasRecently.value = true;
+  useStomp().wsApi.ladder.buyBias();
+}
+
+function buyMulti() {
+  if (pressedMultiRecently.value) return;
+  pressedMultiRecently.value = true;
+  useStomp().wsApi.ladder.buyMulti();
+}
+
+function buyAutoPromote() {
+  if (pressedAutoPromoteRecently.value) return;
+  pressedAutoPromoteRecently.value = true;
+  useStomp().wsApi.ladder.buyAutoPromote();
+}
+
+function throwVinegar() {
+  if (pressedVinegarRecently.value) return;
+  pressedVinegarRecently.value = true;
+  useStomp().wsApi.ladder.throwVinegar();
+}
+
+function promote() {
+  if (pressedPromoteRecently.value) return;
+  pressedPromoteRecently.value = true;
+  useStomp().wsApi.ladder.promote();
+}
+
+onMounted(() => {
+  const onTickCallback = useStomp().callbacks.onTick.find(
+    (x) => x.identifier === "fair_ladder_buttons"
+  );
+  if (onTickCallback === undefined) {
+    useStomp().callbacks.onTick.push({
+      identifier: "fair_ladder_buttons",
+      callback: handleTick,
+    });
+  } else {
+    onTickCallback.callback = handleTick;
+  }
 });
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="overflow-y-auto">
+  <div class="overflow-y-auto h-full" @scroll="onScroll">
     <!--DynamicScroller
       :buffer="200"
       :items="ladder.rankers"
@@ -35,7 +35,7 @@
       </template>
     </DynamicScroller-->
     <div
-      class="grid grid-cols-24 sm:grid-cols-48 gap-1 px-1 font-bold text-text-light sm:sticky top-0 bg-background z-1"
+      class="grid grid-cols-24 sm:grid-cols-48 gap-1 px-1 font-bold text-text-light top-0 bg-background z-1"
     >
       <div class="col-span-3">#</div>
       <div class="col-span-9">{{ lang("username") }}</div>
@@ -51,12 +51,17 @@
         {{ lang("powerGain") }}
       </div>
     </div>
-    <LadderWindowTableRow
-      v-for="(ranker, index) in ladder.state.rankers"
-      :key="ranker.accountId"
-      :index="Number(index)"
-      :ranker="ranker"
-    />
+    <div>
+      <LadderWindowTableRow
+        v-for="(ranker, index) in ladder.state.rankers"
+        :key="ranker.accountId"
+        :class="{
+          'border-button-border border-b-1': isScrolled && index === 0,
+        }"
+        :index="Number(index)"
+        :ranker="ranker"
+      />
+    </div>
   </div>
 </template>
 
@@ -68,6 +73,11 @@ import { useLang } from "~/composables/useLang";
 const ladder = useLadderStore();
 
 const lang = useLang("components.ladder.table");
+const isScrolled = ref<boolean>(false);
+
+function onScroll(e: any) {
+  isScrolled.value = e.target?.scrollTop > 0;
+}
 </script>
 
 <style scoped></style>
