@@ -14,8 +14,7 @@ import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.game.round.RoundUtils;
 import de.kaliburg.morefair.game.round.dto.LadderDto;
-import de.kaliburg.morefair.security.SessionUtils;
-import jakarta.servlet.http.HttpSession;
+import de.kaliburg.morefair.security.SecurityUtils;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -54,9 +53,9 @@ public class LadderController {
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> initLadder(@RequestParam(value = "number") Integer number,
-      Authentication authentication, HttpSession session) {
+      Authentication authentication) {
     try {
-      AccountEntity account = accountService.find(SessionUtils.getUuid(session));
+      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
       if (account == null || account.isBanned()) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       }

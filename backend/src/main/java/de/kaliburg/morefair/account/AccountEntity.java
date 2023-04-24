@@ -9,15 +9,14 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -25,9 +24,15 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Entity
-@Table(name = "account", uniqueConstraints = {
-    @UniqueConstraint(name = "uk_uuid", columnNames = "uuid"),
-    @UniqueConstraint(name = "uk_username", columnNames = "username")})
+@Table(name = "account",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_uuid", columnNames = "uuid"),
+        @UniqueConstraint(name = "uk_username", columnNames = "username")
+    },
+    indexes = {
+        @Index(name = "idx_username", columnList = "username", unique = true)
+    }
+)
 @Getter
 @Setter
 @Accessors(chain = true)
@@ -75,7 +80,7 @@ public class AccountEntity {
   private AccountAccessRole accessRole = AccountAccessRole.PLAYER;
   @OneToOne(mappedBy = "account", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   private AchievementsEntity achievements = new AchievementsEntity(this);
- 
+
   public boolean isOwner() {
     return accessRole.equals(AccountAccessRole.OWNER);
   }

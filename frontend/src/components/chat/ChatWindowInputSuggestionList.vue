@@ -3,7 +3,7 @@
     <Listbox>
       <ListboxOptions
         ref="list"
-        class="absolute bottom-6 bg-background max-h-32 w-min overflow-auto z-1 border-1 border-button-border rounded-md pl-0"
+        class="absolute bottom-6 bg-background max-h-32 w-min overflow-y-auto z-1 border-1 border-button-border rounded-md pl-0 overflow-x-hidden"
         static
       >
         <ListboxOption
@@ -16,7 +16,7 @@
             <a
               :ref="index === selectedIndex ? 'selected' : ''"
               :class="{ 'bg-white': index === selectedIndex }"
-              class="w-full px-2 text-left text-text-light hover:text-button-text-hover hover:bg-button-bg-hover whitespace-nowrap"
+              class="w-full pr-4 px-2 p text-left text-text-light hover:text-button-text-hover hover:bg-button-bg-hover whitespace-nowrap"
               href="#"
               @click="selectItem(index)"
               @keydown="onKeyDown"

@@ -1,6 +1,7 @@
 package de.kaliburg.morefair.account;
 
 import de.kaliburg.morefair.api.websockets.UserPrincipal;
+import de.kaliburg.morefair.security.UserDetailsWithUuid;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -10,7 +11,6 @@ import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -127,7 +127,8 @@ public class AccountService implements UserDetailsService {
     Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
     authorities.add(new SimpleGrantedAuthority(account.getAccessRole().name()));
 
-    return new User(account.getUsername(), account.getPassword(), authorities);
+    return new UserDetailsWithUuid(account.getUsername(), account.getPassword(), authorities,
+        account.getUuid());
   }
 
   public AccountEntity findByUsername(String username) {

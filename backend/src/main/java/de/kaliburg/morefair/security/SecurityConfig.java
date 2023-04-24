@@ -83,8 +83,6 @@ public class SecurityConfig {
         .permitAll()
     );
     http.rememberMe().rememberMeServices(rememberMeServices());
-    http.addFilterAfter(new SessionAttributesFilter(accountService),
-        UsernamePasswordAuthenticationFilter.class);
     http.logout().logoutUrl("/api/auth/logout").logoutSuccessUrl("/");
     http.exceptionHandling()
         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
@@ -126,7 +124,7 @@ public class SecurityConfig {
 
   @Bean
   public AuthenticationSuccessHandler authenticationSuccessHandler() {
-    return new CustomAuthenticationSuccessHandler(accountService);
+    return new CustomAuthenticationSuccessHandler();
   }
 
   @Bean

@@ -14,8 +14,7 @@ import de.kaliburg.morefair.game.round.LadderService;
 import de.kaliburg.morefair.game.round.RankerEntity;
 import de.kaliburg.morefair.game.round.RankerService;
 import de.kaliburg.morefair.game.round.RoundService;
-import de.kaliburg.morefair.security.SessionUtils;
-import jakarta.servlet.http.HttpSession;
+import de.kaliburg.morefair.security.SecurityUtils;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -24,6 +23,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,9 +55,10 @@ public class ChatController {
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> initChat(@RequestParam("number") Integer number, HttpSession session) {
+  public ResponseEntity<?> initChat(@RequestParam("number") Integer number,
+      Authentication authentication) {
     try {
-      AccountEntity account = accountService.find(SessionUtils.getUuid(session));
+      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
       if (account == null || account.isBanned()) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       }
@@ -85,8 +87,11 @@ public class ChatController {
   }
 
   @MessageMapping(APP_CHAT_DESTINATION)
-  public void postChat(WsMetaMessage wsMessage, @DestinationVariable("number") Integer number,
-      HttpSession session) {
+  public void postChat(
+      @DestinationVariable("number") Integer number,
+      @Payload WsMetaMessage wsMessage,
+      Authentication authentication
+  ) {
     try {
       String message = wsMessage.getContent();
       String metadata = wsMessage.getMetadata();
@@ -99,7 +104,7 @@ public class ChatController {
         return;
       }
 
-      AccountEntity account = accountService.find(SessionUtils.getUuid(session));
+      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
       if (account == null || account.isMuted()) {
         return;
       }

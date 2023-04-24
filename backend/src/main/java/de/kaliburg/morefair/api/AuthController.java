@@ -67,9 +67,7 @@ public class AuthController {
   }
 
   @PostMapping(value = "/login")
-  public ResponseEntity<?> login(HttpServletRequest request) {
-    HttpSession s = request.getSession();
-    log.debug(s.toString());
+  public ResponseEntity<?> login() {
     return ResponseEntity.ok().build();
   }
 
@@ -125,9 +123,9 @@ public class AuthController {
       return ResponseEntity.badRequest().body("Password must be at most 64 characters long");
     }
 
-    String uuid = authentication.getName();
+    UUID uuid = SecurityUtils.getUuid(authentication);
 
-    AccountEntity account = accountService.find(UUID.fromString(uuid));
+    AccountEntity account = accountService.find(uuid);
     if (account == null) {
       return ResponseEntity.badRequest().body("Account not found");
     }

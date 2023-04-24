@@ -15,7 +15,6 @@
   - TODO: ETA & Colors
   - TODO: Accounts need to be featured in the mention suggestions
 - OPTIONS
-  - TODO: Options Page
   - TODO: Groups need to be featured in the groups suggestions
   - TODO: Shortcuts
 - RULES
