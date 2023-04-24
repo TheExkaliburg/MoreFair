@@ -131,7 +131,7 @@ function sendMessage() {
 
     if (result.startsWith(" ")) result = result.trimStart();
   }
-  chatStore.sendMessage(result, metadata);
+  chatStore.actions.sendMessage(result, metadata);
   editor.value.commands.clearContent(true);
 }
 

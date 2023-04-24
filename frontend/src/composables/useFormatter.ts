@@ -14,5 +14,7 @@ const numberFormatter = new numberformat.Formatter({
 });
 
 export const useFormatter = (number: Decimal | number) => {
+  if (typeof number === "number" && !isFinite(number)) return "∞";
+
   return numberFormatter.format(number);
 };

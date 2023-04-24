@@ -26,33 +26,33 @@ export const useLadderUtils = () => {
 
   const canThrowVinegar = computed<boolean>(() => {
     return (
-      ladder.yourRanker.value !== undefined &&
+      ladder.getters.yourRanker !== undefined &&
       ladder.state.rankers[0].growing &&
-      ladder.yourRanker.value.rank !== 1 &&
+      ladder.getters.yourRanker.rank !== 1 &&
       ladder.state.rankers[0].points.cmp(getMinimumPointsForPromote.value) >=
         0 &&
       ladder.state.rankers.length >= getMinimumPeopleForPromote.value &&
-      ladder.yourRanker.value.vinegar.cmp(getVinegarThrowCost.value) >= 0
+      ladder.getters.yourRanker.vinegar.cmp(getVinegarThrowCost.value) >= 0
     );
   });
 
-  const getPointsNeededForPromote = computed<Decimal>(() => {
+  const getPointsNeededToPromote = computed<Decimal>(() => {
     // If not enough Players -> Infinity
     if (
       ladder.state.rankers.length < 2 ||
-      ladder.yourRanker.value === undefined
+      ladder.getters.yourRanker === undefined
     ) {
       return new Decimal(Infinity);
     }
 
     const leadingRanker =
-      ladder.state.rankers[0].accountId === ladder.yourRanker.value.accountId
-        ? ladder.yourRanker.value
+      ladder.state.rankers[0].accountId === ladder.getters.yourRanker.accountId
+        ? ladder.getters.yourRanker
         : ladder.state.rankers[0];
     const pursuingRanker =
-      ladder.state.rankers[0].accountId === ladder.yourRanker.value.accountId
+      ladder.state.rankers[0].accountId === ladder.getters.yourRanker.accountId
         ? ladder.state.rankers[1]
-        : ladder.yourRanker.value;
+        : ladder.getters.yourRanker;
 
     // How many more points does the ranker gain against his pursuer, every second
     const powerDiff = (
@@ -65,7 +65,7 @@ export const useLadderUtils = () => {
       .abs();
 
     return Decimal.max(
-      (leadingRanker.accountId === ladder.yourRanker.value.accountId
+      (leadingRanker.accountId === ladder.getters.yourRanker.accountId
         ? pursuingRanker
         : leadingRanker
       ).points.add(neededPointDiff),
@@ -74,9 +74,9 @@ export const useLadderUtils = () => {
   });
 
   const canPromote = computed<boolean>(() => {
-    if (ladder.yourRanker.value === undefined) return false;
+    if (ladder.getters.yourRanker === undefined) return false;
     if (
-      ladder.yourRanker.value.points.cmp(getPointsNeededForPromote.value) < 0
+      ladder.getters.yourRanker.points.cmp(getPointsNeededToPromote.value) < 0
     ) {
       return false;
     }
@@ -85,13 +85,13 @@ export const useLadderUtils = () => {
       return false;
     }
 
-    return ladder.yourRanker.value.rank <= 1;
+    return ladder.getters.yourRanker.rank <= 1;
   });
 
   const canBuyAutoPromote = computed<boolean>(() => {
-    if (ladder.yourRanker.value === undefined) return false;
+    if (ladder.getters.yourRanker === undefined) return false;
     if (
-      ladder.yourRanker.value.autoPromote ||
+      ladder.getters.yourRanker.autoPromote ||
       ladder.state.types.has(LadderType.FREE_AUTO) ||
       ladder.state.types.has(LadderType.NO_AUTO)
     ) {
@@ -99,8 +99,8 @@ export const useLadderUtils = () => {
     }
 
     return (
-      ladder.yourRanker.value.grapes.cmp(
-        getAutoPromoteCost(ladder.yourRanker.value.rank)
+      ladder.getters.yourRanker.grapes.cmp(
+        getAutoPromoteCost(ladder.getters.yourRanker.rank)
       ) >= 0 && ladder.state.number >= round.state.autoPromoteLadder
     );
   });
@@ -131,14 +131,32 @@ export const useLadderUtils = () => {
     return result.round().max(new Decimal(1));
   }
 
+  const getYourBiasCost = computed<Decimal>(() => {
+    if (ladder.getters.yourRanker === undefined) return new Decimal(Infinity);
+    return getNextUpgradeCost(ladder.getters.yourRanker.bias);
+  });
+
+  const getYourMultiCost = computed<Decimal>(() => {
+    if (ladder.getters.yourRanker === undefined) return new Decimal(Infinity);
+    return getNextUpgradeCost(ladder.getters.yourRanker.multi);
+  });
+
+  const getYourAutoPromoteCost = computed<Decimal>(() => {
+    if (ladder.getters.yourRanker === undefined) return new Decimal(Infinity);
+    return getAutoPromoteCost(ladder.getters.yourRanker.rank);
+  });
+
   return {
     getMinimumPointsForPromote,
     getMinimumPeopleForPromote,
     getVinegarThrowCost,
     canThrowVinegar,
-    getPointsNeededForPromote,
+    getPointsNeededToPromote,
     canPromote,
     canBuyAutoPromote,
+    getYourBiasCost,
+    getYourMultiCost,
+    getYourAutoPromoteCost,
     getAutoPromoteCost,
     getNextUpgradeCost,
   };

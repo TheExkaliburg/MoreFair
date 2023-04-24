@@ -38,10 +38,10 @@ definePageMeta({ layout: "default" });
 useStomp();
 
 onMounted(() => {
-  useChatStore().init();
-  useLadderStore().init();
-  useRoundStore().init();
-  useAccountStore().init();
+  useChatStore().actions.init();
+  useLadderStore().actions.init();
+  useRoundStore().actions.init();
+  useAccountStore().actions.init();
   const tour = useTutorialTour();
   if (!tour.getFlag()) {
     tour.start();

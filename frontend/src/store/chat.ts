@@ -1,11 +1,16 @@
 import { defineStore } from "pinia";
 import { reactive, ref } from "vue";
-import { useStomp } from "../composables/useStomp";
-import { useAPI } from "../composables/useAPI";
 import { MentionMeta, Message, MessageData } from "./entities/message";
+import { useStomp } from "~/composables/useStomp";
+import { useAPI } from "~/composables/useAPI";
 
 export type ChatData = {
   messages: MessageData[];
+  number: number;
+};
+
+export type ChatState = {
+  messages: Message[];
   number: number;
 };
 
@@ -14,12 +19,15 @@ export const useChatStore = defineStore("chat", () => {
   const stomp = useStomp();
 
   const isInitialized = ref<boolean>(false);
-  const messages = reactive<Message[]>([]);
-  const number = ref<number>(1);
+  const state = reactive<ChatState>({
+    messages: <Message[]>[],
+    number: 1,
+  });
+  const getters = reactive({});
 
   function init() {
     if (isInitialized.value) return;
-    getChat(number.value);
+    getChat(state.number);
   }
 
   function getChat(chatNumber: number) {
@@ -28,24 +36,26 @@ export const useChatStore = defineStore("chat", () => {
       .getChat(chatNumber)
       .then((response) => {
         const data: ChatData = response.data;
-        Object.assign(messages, []);
+        Object.assign(state.messages, []);
         data.messages.forEach((message) => {
           const msg = new Message(message);
           msg.setFlag("old");
-          messages.unshift(msg);
+          state.messages.unshift(msg);
         });
-        number.value = data.number;
+        state.number = data.number;
 
         if (
-          !stomp.callbacks.onChatEvent.some((x) => x.identifier === "default")
+          !stomp.callbacks.onChatEvent.some(
+            (x) => x.identifier === "fair_chat_event"
+          )
         ) {
           stomp.callbacks.onChatEvent.push({
-            identifier: "default",
+            identifier: "fair_chat_event",
             callback: (body) => {
-              if (messages.length > 50) {
-                messages.shift();
+              if (state.messages.length > 50) {
+                state.messages.shift();
               }
-              messages.push(new Message(body));
+              state.messages.push(new Message(body));
             },
           });
         }
@@ -56,21 +66,21 @@ export const useChatStore = defineStore("chat", () => {
   }
 
   function sendMessage(message: string, metadata: MentionMeta[]) {
-    stomp.wsApi.chat.sendMessage(message, metadata, number.value);
+    stomp.wsApi.chat.sendMessage(message, metadata, state.number);
   }
 
   function changeChat(newNumber: number) {
-    stomp.wsApi.chat.changeChat(number.value, newNumber, true);
+    stomp.wsApi.chat.changeChat(state.number, newNumber, true);
     getChat(newNumber);
   }
 
   return {
-    // state
-    messages,
-    number,
-    // actions
-    init,
-    sendMessage,
-    changeChat,
+    state,
+    getters,
+    actions: {
+      init,
+      sendMessage,
+      changeChat,
+    },
   };
 });

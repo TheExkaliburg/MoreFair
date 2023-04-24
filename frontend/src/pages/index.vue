@@ -9,7 +9,7 @@
       </FairButton>
       <FairButton class="mx-1 my-3" @click="openLoginModal">Login</FairButton>
     </div>
-    <div class="text-text">Guest-UUID: {{ authStore.uuid }}</div>
+    <div class="text-text">Guest-UUID: {{ authStore.state.uuid }}</div>
     <div class="text-text">
       Logged in: {{ authStore.state.authenticationStatus }}
     </div>
@@ -59,7 +59,7 @@ async function registerGuest() {
   }
 
   if (
-    authStore.isGuest ||
+    authStore.getters.isGuest ||
     confirm(
       "As guest your account cannot access all features a normal account could. " +
         "You are also more susceptible to malicious scripts.\n\n " +

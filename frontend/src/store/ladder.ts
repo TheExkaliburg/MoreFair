@@ -45,10 +45,11 @@ export const useLadderStore = defineStore("ladder", () => {
     types: new Set<LadderType>([LadderType.DEFAULT]),
     basePointsToPromote: new Decimal(0),
   });
-
-  const yourRanker = computed<Ranker | undefined>(() =>
-    state.rankers.find((r) => r.accountId === account.state.accountId)
-  );
+  const getters = reactive({
+    yourRanker: computed<Ranker | undefined>(() =>
+      state.rankers.find((r) => r.accountId === account.state.accountId)
+    ),
+  });
 
   function init() {
     if (isInitialized.value) return;
@@ -73,10 +74,12 @@ export const useLadderStore = defineStore("ladder", () => {
         state.basePointsToPromote = new Decimal(data.basePointsToPromote);
 
         if (
-          !stomp.callbacks.onLadderEvent.some((x) => x.identifier === "default")
+          !stomp.callbacks.onLadderEvent.some(
+            (x) => x.identifier === "fair_ladder_event"
+          )
         ) {
           stomp.callbacks.onLadderEvent.push({
-            identifier: "default",
+            identifier: "fair_ladder_event",
             callback: (body) => {
               const data: RankerData = body.data;
               const ranker = state.rankers.find(
@@ -91,9 +94,13 @@ export const useLadderStore = defineStore("ladder", () => {
           });
         }
 
-        if (!stomp.callbacks.onTick.some((x) => x.identifier === "default")) {
+        if (
+          !stomp.callbacks.onTick.some(
+            (x) => x.identifier === "fair_ladder_calculateTick"
+          )
+        ) {
           stomp.callbacks.onTick.push({
-            identifier: "default",
+            identifier: "fair_ladder_calculateTick",
             callback: (body: OnTickBody) => {
               calculateTick(body.delta);
             },
@@ -106,6 +113,7 @@ export const useLadderStore = defineStore("ladder", () => {
   }
 
   function changeLadder(newNumber: number) {
+    console.log("changeLadder", newNumber);
     stomp.wsApi.ladder.changeLadder(state.number, newNumber, true);
     getLadder(newNumber);
   }
@@ -159,10 +167,11 @@ export const useLadderStore = defineStore("ladder", () => {
 
   return {
     state,
-    // getter
-    yourRanker,
+    getters,
     // actions
-    init,
-    changeLadder,
+    actions: {
+      init,
+      changeLadder,
+    },
   };
 });

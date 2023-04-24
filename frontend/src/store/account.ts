@@ -26,6 +26,7 @@ export const useAccountStore = defineStore("account", () => {
     accountId: 1,
     highestCurrentLadder: 1,
   });
+  const getters = reactive({});
 
   function init() {
     if (isInitialized.value) return;
@@ -35,7 +36,6 @@ export const useAccountStore = defineStore("account", () => {
   function getAccountDetails() {
     api.account.getAccountDetails().then((res) => {
       const data: AccountData = res.data;
-      console.log(data);
       state.accessRole = data.accessRole;
       state.accountId = data.accountId;
       state.highestCurrentLadder = data.highestCurrentLadder;
@@ -44,6 +44,9 @@ export const useAccountStore = defineStore("account", () => {
 
   return {
     state,
-    init,
+    getters,
+    actions: {
+      init,
+    },
   };
 });

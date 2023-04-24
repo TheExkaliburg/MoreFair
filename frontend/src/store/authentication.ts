@@ -14,6 +14,15 @@ export const useAuthStore = defineStore("auth", () => {
     authenticationStatus,
   });
 
+  const getters = reactive({
+    isGuest: computed<boolean>(() => {
+      return uuid.value !== "";
+    }),
+    homeLocation: computed<string>(() => {
+      return authenticationStatus.value ? "/game" : "/";
+    }),
+  });
+
   API.auth
     .authenticationStatus()
     .then((response) => {
@@ -24,13 +33,6 @@ export const useAuthStore = defineStore("auth", () => {
         authenticationStatus.value = Boolean(false);
       }
     });
-  // getters
-  const isGuest = computed<boolean>(() => {
-    return uuid.value !== "";
-  });
-  const homeLocation = computed<string>(() => {
-    return authenticationStatus.value ? "/game" : "/";
-  });
 
   // actions
   async function registerGuest() {
@@ -63,7 +65,7 @@ export const useAuthStore = defineStore("auth", () => {
       // 200 - OK
       if (response.status === 200) {
         authenticationStatus.value = true;
-        if (isGuest.value) {
+        if (getters.isGuest) {
           Cookies.set("_uuid", uuid.value, {
             expires: 365,
             secure: true,
@@ -86,12 +88,14 @@ export const useAuthStore = defineStore("auth", () => {
   });
 
   return {
-    // vars
     state,
-    // getters
-    isGuest,
-    homeLocation,
+    getters,
     // actions
+    actions: {
+      login,
+      registerGuest,
+      registerAccount,
+    },
     login,
     registerGuest,
     registerAccount,

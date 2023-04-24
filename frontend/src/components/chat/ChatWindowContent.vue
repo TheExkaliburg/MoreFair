@@ -4,7 +4,7 @@
   >
     <div class="h-4 w-full lg:hidden">&nbsp;</div>
     <ChatWindowContentMessage
-      v-for="m in chatStore.messages"
+      v-for="m in chatStore.state.messages"
       :key="m"
       :message="m"
       class="py-1"

@@ -31,6 +31,7 @@ export const useRoundStore = defineStore("round", () => {
     types: new Set([RoundType.DEFAULT]),
     settings: new RoundSettings({}),
   });
+  const getters = reactive({});
 
   function init() {
     if (isInitialized.value) return;
@@ -56,7 +57,10 @@ export const useRoundStore = defineStore("round", () => {
 
   return {
     state,
+    getters,
     // actions
-    init,
+    actions: {
+      init,
+    },
   };
 });

@@ -25,6 +25,8 @@ components:
       bias: Bias
       autopromote: Buy Autopromote
       vinegar: Throw all Vinegar
+      promote: Promote
+      asshole: Be Asshole
 options:
   section:
     general: General

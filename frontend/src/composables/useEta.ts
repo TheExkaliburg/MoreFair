@@ -49,7 +49,7 @@ export const useEta = (ranker: Ranker) => {
   }
 
   function toPromotionRequirement(): number {
-    return toPoints(ladderUtils.getPointsNeededForPromote.value);
+    return toPoints(ladderUtils.getPointsNeededToPromote.value);
   }
 
   function toPromote(): number {
