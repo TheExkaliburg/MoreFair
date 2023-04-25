@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col w-full">
+  <div class="flex flex-col w-full 2xl:w-1/2 2xl:self-end">
     <div
       class="flex flex-row text-xs lg:text-sm w-full justify-between text-text-light"
     >
@@ -55,7 +55,7 @@
         >{{ lang("autopromote") }}
       </FairButton>
       <FairButton
-        v-if="yourRanker.rank === 1"
+        v-if="yourRanker.rank !== 1"
         :disabled="!canThrowVinegar || isButtonLocked"
         class="w-full rounded-l-none border-l-0"
         @click="throwVinegar"
@@ -103,7 +103,7 @@ const isButtonLocked = computed<boolean>(() => {
 });
 
 const yourRanker = computed<Ranker>(() => {
-  return ladderStore.getters.yourRanker ?? new Ranker({});
+  return ladderStore.getters.yourRanker ?? new Ranker({ rank: Infinity });
 });
 
 const yourFormattedMulti = computed<string>(() => {

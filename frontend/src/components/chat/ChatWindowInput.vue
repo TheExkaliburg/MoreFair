@@ -68,7 +68,10 @@ const editor = useEditor({
       HTMLAttributes: {
         class: "mention",
       },
-      suggestion: useUserSuggestion(["Grapes", "Banana", "Apple"]),
+      suggestion: useUserSuggestion(),
+      renderLabel: ({ node }) => {
+        return `@${node.attrs.id.username}#${node.attrs.id.accountId}`;
+      },
     }),
     Mention.extend({ name: "emojiMention" }).configure({
       HTMLAttributes: {
@@ -83,7 +86,7 @@ const editor = useEditor({
       HTMLAttributes: {
         class: "mention",
       },
-      suggestion: useGroupSuggestion(["mod", "here", "train"]),
+      suggestion: useGroupSuggestion(),
       renderLabel: ({ node }) => {
         return `$${node.attrs.label ?? node.attrs.id}$`;
       },
@@ -115,9 +118,9 @@ function sendMessage() {
     if (node.type === "userMention") {
       result += "{@}";
       metadata.push({
-        u: node.attrs.id,
+        u: node.attrs.id.username,
         i: result.length - 3,
-        id: 0,
+        id: node.attrs.id.accountId,
       });
     } else if (node.type === "emojiMention") {
       result += node.attrs.id.emoji;

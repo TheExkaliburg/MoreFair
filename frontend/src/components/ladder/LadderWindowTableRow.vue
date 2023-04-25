@@ -36,11 +36,21 @@
     <div class="col-span-7 text-right whitespace-nowrap overflow-hidden">
       {{ etaToYourRanker }}
     </div>
-    <div class="col-span-10 text-right whitespace-nowrap overflow-hidden">
-      {{ formattedPowerPerSec }}[<span class="text-eta-best"
-        >+{{ formattedBias }}</span
-      ><span class="text-eta-worst"> x{{ formattedMulti }}</span
-      >]
+    <div
+      v-if="
+        options.state.ladder.showBiasAndMulti.value ||
+        options.state.ladder.showPowerGain.value
+      "
+      class="col-span-10 text-right whitespace-nowrap overflow-hidden"
+    >
+      <span v-if="options.state.ladder.showPowerGain.value">{{
+        formattedPowerPerSec
+      }}</span
+      ><span v-if="options.state.ladder.showBiasAndMulti.value"
+        >[<span class="text-eta-best">+{{ formattedBias }}</span
+        ><span class="text-eta-worst"> x{{ formattedMulti }}</span
+        >]</span
+      >
     </div>
   </div>
 </template>
@@ -52,6 +62,7 @@ import { Ranker } from "~/store/entities/ranker";
 import { useFormatter, useTimeFormatter } from "~/composables/useFormatter";
 import { useEta } from "~/composables/useEta";
 import { useLadderStore } from "~/store/ladder";
+import { useOptionsStore } from "~/store/options";
 
 const props = defineProps({
   ranker: { type: Ranker, required: true },
@@ -60,6 +71,7 @@ const props = defineProps({
 });
 
 const ladder = useLadderStore();
+const options = useOptionsStore();
 
 const el = ref<MaybeElement>();
 const isVisible = useElementVisibility(el.value);

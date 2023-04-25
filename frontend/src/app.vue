@@ -6,28 +6,15 @@
 
 <script lang="ts" setup>
 /*
-- AUTHENTICATION
-- CHAD
-- LADDER
-  - TODO: LadderView
-  - TODO: Virtual Scrolling
-  - TODO: Controls
-  - TODO: ETA & Colors
-  - TODO: Accounts need to be featured in the mention suggestions
-- OPTIONS
-  - TODO: Groups need to be featured in the groups suggestions
-  - TODO: Shortcuts
-- RULES
-  - TODO: Rules Page
-  - TODO: Agree on Login
-- HELP
-  - TODO: content with .md
-- ABOUT
-  - TODO: Impressum
-- MOD
-  - TODO: Mod Page & options
-*/
-import { useAPI } from "~/composables/useAPI";
-
+- TODO: LadderWindowTable needs to have a variable amount of columns
+- TODO: ETA-Colors
+- TODO: wire the Accounts to the mentions
+- TODO: wire the groups to the mentions
+- TODO: Rules page, that you need to agree to register/login
+- TODO: Overhault Privacy Policy
+- TODO: Mod-Page, and options for mods
+- TODO: Make sure all the options are working
+- TODO: Account Page to change name, password, email, export uuid, import uuid etc.
+ */
 useAPI();
 </script>

@@ -75,9 +75,17 @@ const ladder = useLadderStore();
 const lang = useLang("components.ladder.table");
 const isScrolled = ref<boolean>(false);
 
+useStomp().addCallback(
+  useStomp().callbacks.onTick,
+  "fair_ladder_follow",
+  followRanker
+);
+
 function onScroll(e: any) {
   isScrolled.value = e.target?.scrollTop > 0;
 }
+
+function followRanker() {}
 </script>
 
 <style scoped></style>

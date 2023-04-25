@@ -49,6 +49,9 @@ export const useLadderStore = defineStore("ladder", () => {
     yourRanker: computed<Ranker | undefined>(() =>
       state.rankers.find((r) => r.accountId === account.state.accountId)
     ),
+    allAccountNames: computed<string[]>(() =>
+      state.rankers.map((r) => r.username)
+    ),
   });
 
   function init() {

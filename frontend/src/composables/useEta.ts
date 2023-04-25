@@ -104,9 +104,6 @@ export const useEta = (ranker: Ranker) => {
     if (ladder.getters.yourRanker?.accountId === ranker.accountId)
       return toPoints(ladderUtils.getYourPointsNeededToPromote.value);
 
-    if (ranker.rank === 1)
-      console.log(toPoints(ladderUtils.getPointsNeededToPromote(ranker)));
-
     return toPoints(ladderUtils.getPointsNeededToPromote(ranker));
   }
 

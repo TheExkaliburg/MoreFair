@@ -4,6 +4,9 @@ import { PluginKey } from "prosemirror-state";
 import ChatWindowInputUserMentionList from "../components/chat/ChatWindowInputSuggestionList.vue";
 
 import emojiJson from "../assets/emoji.json";
+import { useLadderStore } from "~/store/ladder";
+import { useOptionsStore } from "~/store/options";
+import { Ranker } from "~/store/entities/ranker";
 
 export type EmojiDataEntry = {
   emoji: string;
@@ -16,6 +19,8 @@ export type EmojiDataEntry = {
 };
 
 const emojiData: EmojiDataEntry[] = emojiJson;
+const ladderStore = useLadderStore();
+const optionsStore = useOptionsStore();
 
 const render = (format: Function) => () => {
   let component: any;
@@ -63,24 +68,27 @@ const render = (format: Function) => () => {
   };
 };
 
-export const useUserSuggestion = (list: Array<string>) => {
+export const useUserSuggestion = () => {
   return {
     items: ({ query }: { query: string }) => {
+      const list = ladderStore.state.rankers;
       const queryLower = query.toLowerCase();
       if (queryLower.length < 1) return [];
 
       if (queryLower.startsWith("#")) {
         if (queryLower.length < 2) return [];
-        return list.filter((_, index) =>
-          String(index + 1).includes(queryLower.substring(1))
+        return list.filter((item) =>
+          String(item.accountId).includes(queryLower.substring(1))
         );
       } else {
         if (queryLower.length < 1) return [];
-        return list.filter((item) => item.toLowerCase().startsWith(queryLower));
+        return list.filter((item) =>
+          item.username.toLowerCase().startsWith(queryLower)
+        );
       }
     },
     pluginKey: new PluginKey("userSuggestion"),
-    render: render((item: string) => item),
+    render: render((item: Ranker) => `${item.username}#${item.accountId}`),
   };
 };
 
@@ -104,13 +112,16 @@ export const useEmojiSuggestion = () => {
   };
 };
 
-export const useGroupSuggestion = (list: Array<string>) => {
+export const useGroupSuggestion = () => {
   return {
     char: "$",
     items: ({ query }: { query: string }) => {
+      const list = optionsStore.state.chat.subscribedMentions.get();
       const queryLower = query.toLowerCase();
       return [
-        ...list.filter((item) => item.toLowerCase().startsWith(queryLower)),
+        ...list.filter((item: string) =>
+          item.toLowerCase().startsWith(queryLower)
+        ),
         queryLower,
       ];
     },
