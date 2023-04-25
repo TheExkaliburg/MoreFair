@@ -38,6 +38,22 @@ const callbacks: StompCallbacks = {
   onAccountEvent: [],
 };
 
+function addCallback(
+  event: StompCallback<any>[],
+  identifier: string,
+  callback: (body: any) => void
+) {
+  const eventCallback = event.find((e) => e.identifier === identifier);
+  if (eventCallback === undefined) {
+    event.push({
+      identifier,
+      callback,
+    });
+  } else {
+    eventCallback.callback = callback;
+  }
+}
+
 const isDevMode = process.env.NODE_ENV !== "production";
 const connection = isDevMode
   ? "ws://localhost:8080/socket/fair"
@@ -191,5 +207,6 @@ export const useStomp = () => {
   return {
     wsApi: wsApi(client),
     callbacks,
+    addCallback,
   };
 };

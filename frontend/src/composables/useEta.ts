@@ -2,12 +2,35 @@ import Decimal from "break_infinity.js";
 import { Ranker } from "~/store/entities/ranker";
 import { useLadderStore } from "~/store/ladder";
 import { useLadderUtils } from "~/composables/useLadderUtils";
+import { useStomp } from "~/composables/useStomp";
+
+const etaRankerCache = new Map<Ranker, Map<Ranker, number>>();
+const etaPointsCache = new Map<Ranker, Map<Decimal, number>>();
+const etaPowerCache = new Map<Ranker, Map<Decimal, number>>();
+
+const stomp = useStomp();
+stomp.addCallback(stomp.callbacks.onTick, "fair_eta_cache_reset", resetCache);
+
+function resetCache() {
+  etaRankerCache.clear();
+  etaPointsCache.clear();
+  etaPowerCache.clear();
+}
 
 export const useEta = (ranker: Ranker) => {
   const ladder = useLadderStore();
   const ladderUtils = useLadderUtils();
 
   function toRanker(target: Ranker): number {
+    let cachedMap = etaRankerCache.get(ranker);
+    if (cachedMap !== undefined) {
+      const cachedValue = cachedMap.get(target);
+      if (cachedValue !== undefined) return cachedValue;
+    } else {
+      cachedMap = new Map<Ranker, number>();
+      etaRankerCache.set(ranker, cachedMap);
+    }
+
     // Calculating the relative acceleration of the two players
     const rankerAcc = ranker.getPowerPerSecond();
     const targetAcc = target.getPowerPerSecond();
@@ -18,26 +41,55 @@ export const useEta = (ranker: Ranker) => {
     const speedDiff = targetSpeed.sub(rankerSpeed);
     // Calculating the current distance between the two players
     const pointsDiff = target.points.sub(ranker.points);
-    return solveQuadratic(
+    const result = solveQuadratic(
       accDiff.div(new Decimal(2)),
       speedDiff,
       pointsDiff
     ).toNumber();
+    cachedMap.set(target, result);
+    return result;
   }
 
   function toPoints(target: Decimal): number {
+    if (target.cmp(ranker.points) <= 0) return 0;
+
+    let cachedMap = etaPointsCache.get(ranker);
+    if (cachedMap !== undefined) {
+      const cachedValue = cachedMap.get(target);
+      if (cachedValue !== undefined) return cachedValue;
+    } else {
+      cachedMap = new Map<Decimal, number>();
+      etaPointsCache.set(ranker, cachedMap);
+    }
+
     const accDiff = ranker.getPowerPerSecond().negate();
     const speedDiff = ranker.growing ? ranker.power.negate() : new Decimal(0);
     const pointsDiff = target.sub(ranker.points);
-    return solveQuadratic(
+    const result = solveQuadratic(
       accDiff.div(new Decimal(2)),
       speedDiff,
       pointsDiff
     ).toNumber();
+    cachedMap.set(target, result);
+    return result;
   }
 
   function toPower(target: Decimal): number {
-    return target.sub(ranker.power).div(ranker.getPowerPerSecond()).toNumber();
+    let cachedMap = etaPowerCache.get(ranker);
+    if (cachedMap !== undefined) {
+      const cachedValue = cachedMap.get(target);
+      if (cachedValue !== undefined) return cachedValue;
+    } else {
+      cachedMap = new Map<Decimal, number>();
+      etaPowerCache.set(ranker, cachedMap);
+    }
+
+    const result = target
+      .sub(ranker.power)
+      .div(ranker.getPowerPerSecond())
+      .toNumber();
+    cachedMap.set(target, result);
+    return result;
   }
 
   function toRank(rank: number): number {
@@ -49,7 +101,13 @@ export const useEta = (ranker: Ranker) => {
   }
 
   function toPromotionRequirement(): number {
-    return toPoints(ladderUtils.getPointsNeededToPromote.value);
+    if (ladder.getters.yourRanker?.accountId === ranker.accountId)
+      return toPoints(ladderUtils.getYourPointsNeededToPromote.value);
+
+    if (ranker.rank === 1)
+      console.log(toPoints(ladderUtils.getPointsNeededToPromote(ranker)));
+
+    return toPoints(ladderUtils.getPointsNeededToPromote(ranker));
   }
 
   function toPromote(): number {
@@ -57,6 +115,13 @@ export const useEta = (ranker: Ranker) => {
 
     // We are already first place So we only need to reach the promotion limit.
     if (ranker.rank === 1) {
+      return etaRequirement;
+    }
+
+    // If no one hit the base points requirement already then we show the eta to the first place.
+    if (
+      ladder.state.rankers[0].points.cmp(ladder.state.basePointsToPromote) < 0
+    ) {
       return etaRequirement;
     }
 

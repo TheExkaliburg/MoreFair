@@ -138,7 +138,7 @@ const yourVinegarThrowCostFormatted = computed<string>(() => {
   return useFormatter(ladderUtils.getVinegarThrowCost.value);
 });
 const pointsNeededToPromoteFormatted = computed<string>(() => {
-  return useFormatter(ladderUtils.getPointsNeededToPromote.value);
+  return useFormatter(ladderUtils.getYourPointsNeededToPromote.value);
 });
 
 const canBuyBias = computed<boolean>(() => {
@@ -159,7 +159,9 @@ const canThrowVinegar = computed<boolean>(() => {
 });
 const canPromote = computed<boolean>(() => {
   return (
-    ladderUtils.getPointsNeededToPromote.value.cmp(yourRanker.value.points) <= 0
+    ladderUtils.getYourPointsNeededToPromote.value.cmp(
+      yourRanker.value.points
+    ) <= 0
   );
 });
 const promoteLabel = computed<string>(() => {
@@ -213,17 +215,11 @@ function promote() {
 }
 
 onMounted(() => {
-  const onTickCallback = useStomp().callbacks.onTick.find(
-    (x) => x.identifier === "fair_ladder_buttons"
+  useStomp().addCallback(
+    useStomp().callbacks.onTick,
+    "fair_ladder_buttons",
+    handleTick
   );
-  if (onTickCallback === undefined) {
-    useStomp().callbacks.onTick.push({
-      identifier: "fair_ladder_buttons",
-      callback: handleTick,
-    });
-  } else {
-    onTickCallback.callback = handleTick;
-  }
 });
 </script>
 

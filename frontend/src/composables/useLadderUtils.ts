@@ -2,6 +2,7 @@ import Decimal from "break_infinity.js";
 import { computed } from "vue";
 import { LadderType, useLadderStore } from "~/store/ladder";
 import { useRoundStore } from "~/store/round";
+import { Ranker } from "~/store/entities/ranker";
 
 export const useLadderUtils = () => {
   const ladder = useLadderStore();
@@ -36,23 +37,19 @@ export const useLadderUtils = () => {
     );
   });
 
-  const getPointsNeededToPromote = computed<Decimal>(() => {
+  const getYourPointsNeededToPromote = computed<Decimal>(() => {
+    if (ladder.getters.yourRanker === undefined) return new Decimal(Infinity);
+    return getPointsNeededToPromote(ladder.getters.yourRanker);
+  });
+
+  function getPointsNeededToPromote(ranker: Ranker) {
     // If not enough Players -> Infinity
-    if (
-      ladder.state.rankers.length < 2 ||
-      ladder.getters.yourRanker === undefined
-    ) {
+    if (ladder.state.rankers.length < 2 || ranker === undefined) {
       return new Decimal(Infinity);
     }
 
-    const leadingRanker =
-      ladder.state.rankers[0].accountId === ladder.getters.yourRanker.accountId
-        ? ladder.getters.yourRanker
-        : ladder.state.rankers[0];
-    const pursuingRanker =
-      ladder.state.rankers[0].accountId === ladder.getters.yourRanker.accountId
-        ? ladder.state.rankers[1]
-        : ladder.getters.yourRanker;
+    const leadingRanker = ranker.rank === 1 ? ranker : ladder.state.rankers[0];
+    const pursuingRanker = ranker.rank === 1 ? ladder.state.rankers[1] : ranker;
 
     // How many more points does the ranker gain against his pursuer, every second
     const powerDiff = (
@@ -63,20 +60,29 @@ export const useLadderUtils = () => {
     const neededPointDiff = powerDiff
       .mul(round.state.settings.manualPromoteWaitTime)
       .abs();
+    /*
+    if (ranker.rank === 1) {
+      console.log("neededPointDiff", neededPointDiff.toString());
+      console.log(
+        "neededPointTotal",
+        useFormatter(pursuingRanker.points.add(neededPointDiff))
+      );
+    }
+    */
 
     return Decimal.max(
-      (leadingRanker.accountId === ladder.getters.yourRanker.accountId
-        ? pursuingRanker
-        : leadingRanker
-      ).points.add(neededPointDiff),
+      (ranker.rank === 1 ? pursuingRanker : leadingRanker).points.add(
+        neededPointDiff
+      ),
       getMinimumPointsForPromote.value
     );
-  });
+  }
 
   const canPromote = computed<boolean>(() => {
     if (ladder.getters.yourRanker === undefined) return false;
     if (
-      ladder.getters.yourRanker.points.cmp(getPointsNeededToPromote.value) < 0
+      ladder.getters.yourRanker.points.cmp(getYourPointsNeededToPromote.value) <
+      0
     ) {
       return false;
     }
@@ -151,6 +157,7 @@ export const useLadderUtils = () => {
     getMinimumPeopleForPromote,
     getVinegarThrowCost,
     canThrowVinegar,
+    getYourPointsNeededToPromote,
     getPointsNeededToPromote,
     canPromote,
     canBuyAutoPromote,

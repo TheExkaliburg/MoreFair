@@ -31,10 +31,10 @@
       {{ formattedPoints }}
     </div>
     <div class="col-span-7 text-right whitespace-nowrap overflow-hidden">
-      100:52:07
+      {{ etaToNextLadder }}
     </div>
     <div class="col-span-7 text-right whitespace-nowrap overflow-hidden">
-      1:04:12
+      {{ etaToYourRanker }}
     </div>
     <div class="col-span-10 text-right whitespace-nowrap overflow-hidden">
       {{ formattedPowerPerSec }}[<span class="text-eta-best"
@@ -49,20 +49,24 @@
 import { computed } from "vue";
 import { MaybeElement, useElementVisibility } from "@vueuse/core";
 import { Ranker } from "~/store/entities/ranker";
-import { useFormatter } from "~/composables/useFormatter";
-import { useLadderUtils } from "~/composables/useLadderUtils";
+import { useFormatter, useTimeFormatter } from "~/composables/useFormatter";
+import { useEta } from "~/composables/useEta";
+import { useLadderStore } from "~/store/ladder";
 
 const props = defineProps({
   ranker: { type: Ranker, required: true },
   active: { type: Boolean, required: false, default: true },
   index: { type: Number, required: false, default: -1 },
 });
-useLadderUtils();
+
+const ladder = useLadderStore();
 
 const el = ref<MaybeElement>();
 const isVisible = useElementVisibility(el.value);
 
-const isYou = computed(() => props.ranker.accountId === 2);
+const isYou = computed(
+  () => props.ranker.accountId === ladder.getters.yourRanker?.accountId
+);
 const isFirst = computed(() => {
   return props.index === 0;
 });
@@ -92,6 +96,20 @@ const formattedPower = computed<string>(() => {
 const formattedPoints = computed<string>(() => {
   if (!isVisible) return "";
   return useFormatter(props.ranker.points);
+});
+
+const etaToNextLadder = computed<string>(() => {
+  if (!isVisible) return "";
+  return useTimeFormatter(useEta(props.ranker).toPromote()); // useTimeFormatter(useEta(props.ranker).toPromote());
+});
+
+const etaToYourRanker = computed<string>(() => {
+  if (!isVisible) return "";
+  if (ladder.getters.yourRanker === undefined)
+    return useTimeFormatter(Infinity);
+  return useTimeFormatter(
+    useEta(props.ranker).toRanker(ladder.getters.yourRanker)
+  );
 });
 </script>
 
