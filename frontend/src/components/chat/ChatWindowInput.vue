@@ -29,21 +29,18 @@
 
 <script lang="ts" setup>
 import { EditorContent, Node, useEditor } from "@tiptap/vue-3";
-import { onBeforeUnmount } from "vue";
+import { onBeforeUnmount, ref } from "vue";
 import { Paragraph } from "@tiptap/extension-paragraph";
 import { Text } from "@tiptap/extension-text";
 import { Mention } from "@tiptap/extension-mention";
 import { CharacterCount } from "@tiptap/extension-character-count";
 import { Placeholder } from "@tiptap/extension-placeholder";
-import { useDomUtils } from "~/composables/useDomUtils";
 import { useChatStore } from "~/store/chat";
 import {
   useEmojiSuggestion,
   useGroupSuggestion,
   useUserSuggestion,
 } from "~/composables/useSuggestion";
-
-useDomUtils();
 
 const chatStore = useChatStore();
 
@@ -98,7 +95,9 @@ const editor = useEditor({
 });
 
 function sendMessage() {
+  if (!editor?.value) return;
   const messageJson = editor.value.getJSON();
+  if (!messageJson?.content) return;
   const textNodes = messageJson.content[0]?.content;
 
   if (!textNodes) return;
@@ -109,7 +108,11 @@ function sendMessage() {
   for (const node of textNodes) {
     if (node.type === "text") {
       result += node.text;
-    } else if (node.type === "userMention") {
+      continue;
+    }
+
+    if (node?.attrs === undefined) continue;
+    if (node.type === "userMention") {
       result += "{@}";
       metadata.push({
         u: node.attrs.id,
@@ -128,12 +131,12 @@ function sendMessage() {
 
     if (result.startsWith(" ")) result = result.trimStart();
   }
-  chatStore.sendMessage(result, metadata);
+  chatStore.actions.sendMessage(result, metadata);
   editor.value.commands.clearContent(true);
 }
 
 onBeforeUnmount(() => {
-  editor.value.destroy();
+  editor.value?.destroy();
 });
 </script>
 <style lang="scss" scoped>

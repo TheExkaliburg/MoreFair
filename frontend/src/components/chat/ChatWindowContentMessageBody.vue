@@ -29,7 +29,7 @@ import {
   Message,
   MessagePart,
   MessagePartType,
-} from "~/store/entities/message";
+} from "../../store/entities/message";
 
 const props = defineProps({
   message: {

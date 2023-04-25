@@ -5,12 +5,14 @@
     <div class="text-5xl text-text">FairGame</div>
     <div class="flex flex-row justify-center content-center">
       <FairButton class="mx-1 my-3" @click="registerGuest"
-        >Play as Guest</FairButton
-      >
+        >Play as Guest
+      </FairButton>
       <FairButton class="mx-1 my-3" @click="openLoginModal">Login</FairButton>
     </div>
-    <div class="text-text">Guest-UUID: {{ authStore.uuid }}</div>
-    <div class="text-text">Logged in: {{ authStore.authenticationStatus }}</div>
+    <div class="text-text">Guest-UUID: {{ authStore.state.uuid }}</div>
+    <div class="text-text">
+      Logged in: {{ authStore.state.authenticationStatus }}
+    </div>
     <div class="text-text"></div>
     <TheAuthenticationDialog
       :open="isLoginModalOpen"
@@ -20,28 +22,30 @@
 </template>
 
 <script lang="ts" setup>
-import { onBeforeMount } from "vue";
+import { ref } from "vue";
+import { navigateTo } from "nuxt/app";
+import FairButton from "../components/interactables/FairButton.vue";
+import TheAuthenticationDialog from "../components/auth/TheAuthenticationDialog.vue";
 import { useAuthStore } from "~/store/authentication";
-import FairButton from "~/components/interactables/FairButton.vue";
-import TheAuthenticationDialog from "~/components/auth/TheAuthenticationDialog.vue";
 
-const authStore = useAuthStore();
+const authStore = await useAuthStore();
 definePageMeta({ layout: "empty" });
 
 const isLoginModalOpen = ref<boolean>(false);
 
-onBeforeMount(async () => {
+/*
+onMounted(() => {
   // If guest-uuid exists try logging in
   if (authStore.isGuest) {
-    await authStore.login(authStore.uuid, authStore.uuid);
+    // await authStore.login(authStore.state.uuid, authStore.state.uuid);
   }
-  if (authStore.authenticationStatus) {
-    return await navigateTo("/game");
+  if (authStore.state.authenticationStatus) {
+    // await navigateTo("/game");
   }
-});
+}); */
 
 function openLoginModal() {
-  if (authStore.authenticationStatus) {
+  if (authStore.state.authenticationStatus) {
     return navigateTo("/game");
   }
 
@@ -49,12 +53,13 @@ function openLoginModal() {
 }
 
 async function registerGuest() {
-  if (authStore.authenticationStatus) {
-    return await navigateTo("/game");
+  if (authStore.state.authenticationStatus) {
+    await navigateTo("/game");
+    return;
   }
 
   if (
-    authStore.isGuest ||
+    authStore.getters.isGuest ||
     confirm(
       "As guest your account cannot access all features a normal account could. " +
         "You are also more susceptible to malicious scripts.\n\n " +

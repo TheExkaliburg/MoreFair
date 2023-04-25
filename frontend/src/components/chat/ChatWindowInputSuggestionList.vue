@@ -1,10 +1,9 @@
-@@ -0,0 +1,69 @@
 <template>
   <div>
     <Listbox>
       <ListboxOptions
         ref="list"
-        class="absolute bottom-6 bg-background max-h-32 w-min overflow-auto z-1 border-1 border-button-border rounded-md pl-0"
+        class="absolute bottom-6 bg-background max-h-32 w-min overflow-y-auto z-1 border-1 border-button-border rounded-md pl-0 overflow-x-hidden"
         static
       >
         <ListboxOption
@@ -17,7 +16,7 @@
             <a
               :ref="index === selectedIndex ? 'selected' : ''"
               :class="{ 'bg-white': index === selectedIndex }"
-              class="w-full px-2 text-left text-text-light hover:text-button-text-hover hover:bg-button-bg-hover whitespace-nowrap"
+              class="w-full pr-4 px-2 p text-left text-text-light hover:text-button-text-hover hover:bg-button-bg-hover whitespace-nowrap"
               href="#"
               @click="selectItem(index)"
               @keydown="onKeyDown"
@@ -31,7 +30,7 @@
 </template>
 <script lang="ts" setup>
 import { Listbox, ListboxOption, ListboxOptions } from "@headlessui/vue";
-import { watch } from "vue";
+import { computed, ref, watch } from "vue";
 
 const props = defineProps({
   items: { type: Array, required: true },
@@ -50,7 +49,7 @@ const formattedItemsArray = computed(() => {
 });
 
 const selectedIndex = ref<number>(0);
-const list = ref(null);
+const list = ref();
 
 watch(props.items, () => {
   selectedIndex.value = 0;
@@ -66,8 +65,8 @@ function onKeyDown(event: KeyboardEvent) {
     event.preventDefault();
     selectedIndex.value =
       (selectedIndex.value + props.items.length - 1) % props.items.length;
-    // selected.value[0].scrollIntoView({ behavior: "smooth", block: "nearest" });
-    list.value.$el.children[selectedIndex.value]?.scrollIntoView({
+
+    list.value?.$el.children[selectedIndex.value]?.scrollIntoView({
       block: "nearest",
     });
     return true;
@@ -76,8 +75,7 @@ function onKeyDown(event: KeyboardEvent) {
   if (event.key === "ArrowDown") {
     event.preventDefault();
     selectedIndex.value = (selectedIndex.value + 1) % props.items.length;
-    // selected.value[0].scrollIntoView({ behavior: "smooth", block: "nearest" });
-    list.value.$el.children[selectedIndex.value]?.scrollIntoView({
+    list.value?.$el.children[selectedIndex.value]?.scrollIntoView({
       block: "nearest",
     });
     return true;

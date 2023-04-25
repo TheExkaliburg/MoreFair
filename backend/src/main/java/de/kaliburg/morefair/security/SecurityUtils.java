@@ -1,15 +1,13 @@
 package de.kaliburg.morefair.security;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import de.kaliburg.morefair.api.utils.HttpUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import java.security.SecureRandom;
-import javax.servlet.http.HttpServletRequest;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,8 +16,6 @@ import org.springframework.stereotype.Component;
 public class SecurityUtils {
 
   private static final SecureRandom secureRandom = new SecureRandom();
-  private final Secrets secrets;
-  private final Argon2PasswordEncoder argon2PasswordEncoder;
 
 
   public static String generatePassword() {
@@ -39,19 +35,13 @@ public class SecurityUtils {
     }
   }
 
-  public DecodedJWT verifyToken(String token) {
-    return JWT.require(getAlgorithm()).build().verify(token);
-  }
-
-  public Algorithm getAlgorithm() {
-    return Algorithm.HMAC256(secrets.getRememberMeKey().getBytes());
-  }
-
-  public DecodedJWT getJwtFromRequest(HttpServletRequest request) {
-    String authorizationHeader = request.getHeader("Authorization");
-    if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-      String token = authorizationHeader.substring("Bearer ".length());
-      return verifyToken(token);
+  public static UUID getUuid(Authentication authentication) {
+    if (authentication == null) {
+      return null;
+    }
+    Object principal = authentication.getPrincipal();
+    if (principal instanceof UserDetailsWithUuid) {
+      return ((UserDetailsWithUuid) principal).getUuid();
     }
     return null;
   }

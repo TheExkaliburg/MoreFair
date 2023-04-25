@@ -1,6 +1,21 @@
 package de.kaliburg.morefair.game.round;
 
 import de.kaliburg.morefair.FairConfig;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.OffsetDateTime;
@@ -10,27 +25,13 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j2;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @Log4j2
 @Entity
@@ -77,11 +78,12 @@ public class RoundEntity {
   @Column(nullable = false)
   private Float percentageOfAdditionalAssholes;
 
-  public RoundEntity(@NonNull Integer number, FairConfig config) {
+  public RoundEntity(@NonNull Integer number, FairConfig config,
+      @Nullable RoundEntity previousRound) {
     this.number = number;
     this.baseAssholeLadder = config.getBaseAssholeLadder();
 
-    determineRoundTypes();
+    determineRoundTypes(previousRound);
 
     if (types.contains(RoundType.CHAOS)) {
       // CHAOS rounds add a random number of additional ladders (up to 15)
@@ -91,7 +93,7 @@ public class RoundEntity {
       }
     }
 
-    double percentage = random.nextDouble(0.5, 1.5);
+    double percentage = getRoundBasePointRequirementMultiplier();
 
     BigDecimal baseDec = new BigDecimal(config.getBasePointsToPromote());
     baseDec = baseDec.multiply(BigDecimal.valueOf(percentage));
@@ -99,12 +101,38 @@ public class RoundEntity {
     this.percentageOfAdditionalAssholes = random.nextFloat(100);
   }
 
-  private void determineRoundTypes() {
+  public RoundEntity(@NonNull Integer number, FairConfig config) {
+    this(number, config, null);
+  }
+
+  private void determineRoundTypes(RoundEntity previousRound) {
     types.clear();
 
     RoundTypeBuilder builder = new RoundTypeBuilder();
     builder.setRoundNumber(number);
+    if (previousRound != null) {
+      builder.setPreviousRoundType(previousRound.getTypes());
+    }
+
     types = builder.build();
+  }
+
+  private double getRoundBasePointRequirementMultiplier() {
+    double lowerBound = 0.5f;
+    double upperBound = 1.5f;
+
+    if (types.contains(RoundType.CHAOS)) {
+      lowerBound /= 2.0f;
+      upperBound *= 1.25f;
+    } else if (types.contains(RoundType.FAST)) {
+      lowerBound /= 2.0f;
+      upperBound /= 2.0f;
+    } else if (types.contains(RoundType.SLOW)) {
+      lowerBound *= 1.25f;
+      upperBound *= 1.25f;
+    }
+
+    return random.nextDouble(lowerBound, upperBound);
   }
 
   public Integer getAssholeLadderNumber() {

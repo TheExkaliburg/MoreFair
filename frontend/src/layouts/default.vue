@@ -2,7 +2,10 @@
   <div class="flex flex-col h-screen">
     <TheBrandedNavBarWithOffCanvas />
     <TheSidebar class="restOfVerticalScreen">
-      <div class="restOfHorizontalScreen -sm:w-screen">
+      <div
+        class="restOfHorizontalScreen -sm:w-screen"
+        @click="uiStore.state.sidebarExpanded = false"
+      >
         <slot />
       </div>
     </TheSidebar>
@@ -10,8 +13,11 @@
 </template>
 
 <script lang="ts" setup>
-import TheSidebar from "~/components/navbar/TheSidebar.vue";
-import TheBrandedNavBarWithOffCanvas from "~/components/navbar/TheBrandedNavBarWithOffCanvas.vue";
+import TheSidebar from "../components/navbar/TheSidebar.vue";
+import TheBrandedNavBarWithOffCanvas from "../components/navbar/TheBrandedNavBarWithOffCanvas.vue";
+import { useUiStore } from "~/store/ui";
+
+const uiStore = useUiStore();
 </script>
 
 <style lang="scss" scoped>

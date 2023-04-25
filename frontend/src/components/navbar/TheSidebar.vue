@@ -19,7 +19,7 @@
               </template>
             </SidebarButton>
           </NuxtLink>
-          <NuxtLink to="/help">
+          <NuxtLink @click="help">
             <SidebarButton>
               <template #icon>
                 <QuestionMarkCircleIcon />
@@ -46,8 +46,13 @@ import {
   QuestionMarkCircleIcon,
 } from "@heroicons/vue/24/outline";
 import SidebarButton from "~/components/navbar/SidebarButton.vue";
+import { useTutorialTour } from "~/composables/useTour";
 
 const classesForSize = "min-w-12 w-12 max-w-12 px-2 py-2";
+
+function help() {
+  useTutorialTour().start();
+}
 </script>
 
 <style lang="scss" scoped></style>

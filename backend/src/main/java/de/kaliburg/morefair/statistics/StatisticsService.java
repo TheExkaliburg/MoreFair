@@ -29,14 +29,16 @@ import de.kaliburg.morefair.statistics.records.RankerRecord;
 import de.kaliburg.morefair.statistics.records.RoundRecord;
 import de.kaliburg.morefair.statistics.records.ThrowVinegarRecordEntity;
 import de.kaliburg.morefair.statistics.records.ThrowVinegarRecordRepository;
+import de.kaliburg.morefair.statistics.results.ActivityAnalysisEntity;
+import de.kaliburg.morefair.statistics.results.ActivityAnalysisRepository;
 import de.kaliburg.morefair.statistics.results.RoundStatisticsEntity;
 import de.kaliburg.morefair.statistics.results.RoundStatisticsRepository;
+import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -61,6 +63,7 @@ public class StatisticsService {
   private final PromoteRecordRepository promoteRecordRepository;
   private final ThrowVinegarRecordRepository throwVinegarRecordRepository;
   private final RoundStatisticsRepository roundStatisticsRepository;
+  private final ActivityAnalysisRepository activityAnalysisRepository;
 
   @Autowired
   @Lazy
@@ -165,7 +168,7 @@ public class StatisticsService {
    * Sends a request to start the General Analytics for the Server.
    */
   @PostConstruct
-  @Scheduled(cron = "0 0 8 * * *")
+  @Scheduled(fixedRate = 24 * 60 * 60 * 1000)
   public void startGeneralAnalytics() {
     startAnalytics("GeneralAnalytics", null);
   }
@@ -279,5 +282,10 @@ public class StatisticsService {
     }
 
     return statistics.orElse(null);
+  }
+
+  public ActivityAnalysisEntity getActivityAnalysis() {
+    return activityAnalysisRepository.findTopByOrderByCreatedOnDesc()
+        .orElse(null);
   }
 }

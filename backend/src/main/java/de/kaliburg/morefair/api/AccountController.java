@@ -10,8 +10,8 @@ import de.kaliburg.morefair.events.types.EventType;
 import de.kaliburg.morefair.game.round.RankerService;
 import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
+import de.kaliburg.morefair.security.SecurityUtils;
 import de.kaliburg.morefair.statistics.StatisticsService;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
@@ -43,7 +43,11 @@ public class AccountController {
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> getAccount(Authentication authentication) {
     try {
-      AccountEntity account = accountService.find(UUID.fromString(authentication.getName()));
+      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
+
+      if (account == null) {
+        return ResponseEntity.notFound().build();
+      }
 
       if (account.getAchievements() == null) {
         account.setAchievements(new AchievementsEntity(account));
@@ -73,7 +77,7 @@ public class AccountController {
         displayName = displayName.substring(0, 32);
       }
 
-      AccountEntity account = accountService.findByUsername(authentication.getName());
+      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
 
       log.info("[G] RENAME: {} (#{}) -> {}", account.getDisplayName(), account.getId(),
           displayName);

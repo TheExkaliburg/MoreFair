@@ -1,6 +1,5 @@
-import { defineNuxtConfig } from "nuxt";
+import { defineNuxtConfig } from "nuxt/config";
 
-// https://v3.nuxtjs.org/api/configuration/nuxt.config
 export default defineNuxtConfig({
   css: [
     "virtual:windi.css",
@@ -8,27 +7,17 @@ export default defineNuxtConfig({
     "~/assets/scss/styles.scss",
     "@fortawesome/fontawesome-svg-core/styles.css",
     "vue-virtual-scroller/dist/vue-virtual-scroller.css",
+    "intro.js/minified/introjs.min.css",
   ],
   modules: [
     "@pinia/nuxt",
     "nuxt-windicss",
     "@vueuse/nuxt",
-    "@intlify/nuxt3",
     "@nuxt/content",
+    "@nuxtjs/i18n",
   ],
-  windicss: {
-    analyze: true,
-  },
   srcDir: "src/",
   build: {
-    postcss: {
-      postcssOptions: {
-        plugins: {
-          tailwindcss: {},
-          autoprefixer: {},
-        },
-      },
-    },
     transpile: [
       "@fortawesome/fontawesome-svg-core",
       "@fortawesome/free-brands-svg-icons",
@@ -38,15 +27,23 @@ export default defineNuxtConfig({
       "@headlessui/vue",
       "@heroicons/vue",
       "vue-virtual-scroller",
+      "vue-i18n",
     ],
   },
-  intlify: {
-    localeDir: "locales",
+  ssr: false,
+  i18n: {
+    locales: [
+      {
+        code: "en",
+        file: "en.yml",
+      },
+    ],
+    defaultLocale: "en",
+    lazy: true,
+    langDir: "locales/",
     vueI18n: {
-      locale: "en",
+      legacy: false,
       fallbackLocale: "en",
-      availableLocales: ["en"],
     },
   },
-  ssr: false,
 });

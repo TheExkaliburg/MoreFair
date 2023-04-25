@@ -2,7 +2,7 @@
   <div
     ref="offCanvas"
     :class="{
-      '-translate-x-full backdrop-blur-xl': !uiStore.sidebarExpanded,
+      '-translate-x-full backdrop-blur-xl': !uiStore.state.sidebarExpanded,
     }"
     class="bg-navbar-bg fixed inset-y-0 left-0 pt-1.5 w-1/10 min-w-max max-w-full text-navbar-text px-2 py-1 transform transition-transform z-20 overflow-y-scroll hide-scrollbar"
     tabindex="-1"
@@ -23,8 +23,8 @@
             </template>
           </SidebarButton>
         </NuxtLink>
-        <NuxtLink to="/">
-          <SidebarButton :label="helpLabel">
+        <NuxtLink @click="help">
+          <SidebarButton :label="helpLabel" data-tutorial="help">
             <template #icon>
               <QuestionMarkCircleIcon />
             </template>
@@ -53,13 +53,15 @@ import {
 } from "@heroicons/vue/24/outline";
 
 import { computed, ref } from "vue";
+import { MaybeElement, onClickOutside } from "@vueuse/core";
+import SidebarButton from "../../components/navbar/SidebarButton.vue";
+import BrandedSidebarToggle from "../../components/navbar/BrandedSidebarToggle.vue";
 import { useUiStore } from "~/store/ui";
-import SidebarButton from "~/components/navbar/SidebarButton.vue";
-import { onClickOutside, useLang } from "#imports";
-import BrandedSidebarToggle from "~/components/navbar/BrandedSidebarToggle.vue";
+import { useTutorialTour } from "~/composables/useTour";
+import { useLang } from "~/composables/useLang";
 
 const uiStore = useUiStore();
-const offCanvas = ref<HTMLElement | null>(null);
+const offCanvas = ref<MaybeElement>();
 
 const lang = useLang("components.navbar.offcanvas-sidebar");
 const optionsLabel = computed<string>(() => lang("options"));
@@ -68,11 +70,15 @@ const discordLabel = computed<string>(() => lang("discord"));
 const privacyLabel = computed<string>(() => lang("privacy"));
 const impressumLabel = computed<string>(() => lang("impressum"));
 
-uiStore.sidebarExpanded = false;
-
-onClickOutside(offCanvas, () => {
-  uiStore.sidebarExpanded = false;
+onClickOutside(offCanvas.value, () => {
+  console.log("click outside");
+  uiStore.state.sidebarExpanded = false;
 });
+
+function help() {
+  useTutorialTour().start();
+  uiStore.state.sidebarExpanded = false;
+}
 </script>
 
 <style lang="scss" scoped>

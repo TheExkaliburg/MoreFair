@@ -20,7 +20,7 @@ html {
   border: var(--scrollbar-thumb-border);
 }
 
-div {
+div, ul {
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb-border-color) var(--scrollbar-bg-color);
 }

@@ -1,8 +1,9 @@
 import { VueRenderer } from "@tiptap/vue-3";
 import tippy from "tippy.js";
 import { PluginKey } from "prosemirror-state";
-import ChatWindowInputUserMentionList from "~/components/chat/ChatWindowInputSuggestionList.vue";
-import emojiJson from "~/assets/emoji.json";
+import ChatWindowInputUserMentionList from "../components/chat/ChatWindowInputSuggestionList.vue";
+
+import emojiJson from "../assets/emoji.json";
 
 export type EmojiDataEntry = {
   emoji: string;
@@ -17,10 +18,10 @@ export type EmojiDataEntry = {
 const emojiData: EmojiDataEntry[] = emojiJson;
 
 const render = (format: Function) => () => {
-  let component;
-  let popup;
+  let component: any;
+  let popup: any;
   return {
-    onStart: (props) => {
+    onStart: (props: any) => {
       component = new VueRenderer(ChatWindowInputUserMentionList, {
         props: { ...props, format },
         editor: props.editor,
@@ -38,7 +39,7 @@ const render = (format: Function) => () => {
         placement: "bottom-start",
       });
     },
-    onUpdate(props) {
+    onUpdate(props: any) {
       component.updateProps(props);
       if (!props.clientRect) {
         return;
@@ -47,7 +48,7 @@ const render = (format: Function) => () => {
         getReferenceClientRect: props.clientRect,
       });
     },
-    onKeyDown(props) {
+    onKeyDown(props: any) {
       if (props.event.key === "Escape") {
         popup[0].hide();
         return true;
@@ -64,7 +65,7 @@ const render = (format: Function) => () => {
 
 export const useUserSuggestion = (list: Array<string>) => {
   return {
-    items: ({ query }) => {
+    items: ({ query }: { query: string }) => {
       const queryLower = query.toLowerCase();
       if (queryLower.length < 1) return [];
 
@@ -79,14 +80,14 @@ export const useUserSuggestion = (list: Array<string>) => {
       }
     },
     pluginKey: new PluginKey("userSuggestion"),
-    render: render((item) => item),
+    render: render((item: string) => item),
   };
 };
 
 export const useEmojiSuggestion = () => {
   return {
     char: ":",
-    items: ({ query }) => {
+    items: ({ query }: { query: string }) => {
       const queryLower = query.toLowerCase();
       if (queryLower.length < 3) return [];
       return emojiData.filter((item) => {
@@ -97,14 +98,16 @@ export const useEmojiSuggestion = () => {
       });
     },
     pluginKey: new PluginKey("emojiSuggestion"),
-    render: render((item) => `${item.emoji}: ${item.aliases[0]}`),
+    render: render(
+      (item: EmojiDataEntry) => `${item.emoji}: ${item.aliases[0]}`
+    ),
   };
 };
 
 export const useGroupSuggestion = (list: Array<string>) => {
   return {
     char: "$",
-    items: ({ query }) => {
+    items: ({ query }: { query: string }) => {
       const queryLower = query.toLowerCase();
       return [
         ...list.filter((item) => item.toLowerCase().startsWith(queryLower)),
@@ -112,6 +115,6 @@ export const useGroupSuggestion = (list: Array<string>) => {
       ];
     },
     pluginKey: new PluginKey("groupSuggestion"),
-    render: render((item) => `$${item}$`),
+    render: render((item: string) => `$${item}$`),
   };
 };

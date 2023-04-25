@@ -1,3 +1,4 @@
+// @ts-ignore
 import { numberformat } from "swarm-numberformat";
 import Decimal from "break_infinity.js";
 
@@ -13,5 +14,7 @@ const numberFormatter = new numberformat.Formatter({
 });
 
 export const useFormatter = (number: Decimal | number) => {
+  if (typeof number === "number" && !isFinite(number)) return "∞";
+
   return numberFormatter.format(number);
 };

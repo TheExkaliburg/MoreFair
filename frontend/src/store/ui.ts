@@ -1,33 +1,39 @@
 import { defineStore } from "pinia";
-import { ref, watch } from "vue";
+import { reactive, watch } from "vue";
 
 export const useUiStore = defineStore("ui", () => {
   // variables
-  const sidebarExpanded = ref<boolean>(false);
-  const ladderEnabled = ref<boolean>(true);
-  const chatEnabled = ref<boolean>(true);
+  const state = reactive({
+    sidebarExpanded: false,
+    ladderEnabled: true,
+    chatEnabled: true,
+  });
 
   // actions
   function toggleSidebar() {
-    sidebarExpanded.value = !sidebarExpanded.value;
+    state.sidebarExpanded = !state.sidebarExpanded;
   }
 
   // side-effects
-  watch(ladderEnabled, (value: boolean) => {
-    if (!value && !chatEnabled.value) {
-      chatEnabled.value = true;
+  watch(
+    () => state.ladderEnabled,
+    (value: boolean) => {
+      if (!value && !state.chatEnabled) {
+        state.chatEnabled = true;
+      }
     }
-  });
-  watch(chatEnabled, (value: boolean) => {
-    if (!value && !ladderEnabled.value) {
-      ladderEnabled.value = true;
+  );
+  watch(
+    () => state.chatEnabled,
+    (value: boolean) => {
+      if (!value && !state.ladderEnabled) {
+        state.ladderEnabled = true;
+      }
     }
-  });
+  );
 
   return {
-    sidebarExpanded,
-    ladderEnabled,
-    chatEnabled,
+    state,
     toggleSidebar,
   };
 });

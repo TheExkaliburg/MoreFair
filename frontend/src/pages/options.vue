@@ -13,9 +13,10 @@
 </template>
 
 <script lang="ts" setup>
-import { useOptionsStore } from "~/store/options";
-import OptionsSection from "~/components/options/OptionsSection.vue";
-import { OptionsGroup } from "~/store/entities/option";
+import { computed } from "vue";
+import { useOptionsStore } from "../store/options";
+import OptionsSection from "../components/options/OptionsSection.vue";
+import { OptionsGroup } from "../store/entities/option";
 
 // definePageMeta({ layout: "default-without-sidebar" });
 

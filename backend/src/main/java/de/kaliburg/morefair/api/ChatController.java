@@ -8,15 +8,14 @@ import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WsMetaMessage;
 import de.kaliburg.morefair.game.chat.ChatDto;
 import de.kaliburg.morefair.game.chat.ChatService;
-import de.kaliburg.morefair.game.chat.MessageDto;
 import de.kaliburg.morefair.game.chat.MessageEntity;
 import de.kaliburg.morefair.game.chat.MessageService;
 import de.kaliburg.morefair.game.round.LadderService;
 import de.kaliburg.morefair.game.round.RankerEntity;
 import de.kaliburg.morefair.game.round.RankerService;
 import de.kaliburg.morefair.game.round.RoundService;
+import de.kaliburg.morefair.security.SecurityUtils;
 import java.util.ArrayList;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -24,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -58,11 +58,11 @@ public class ChatController {
   public ResponseEntity<?> initChat(@RequestParam("number") Integer number,
       Authentication authentication) {
     try {
-      log.trace("/app/chat/init/{} from {}", number, authentication.getName());
-      AccountEntity account = accountService.find(UUID.fromString(authentication.getName()));
+      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
       if (account == null || account.isBanned()) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       }
+      log.trace("/app/chat/init/{} from {}#{}", number, account.getDisplayName(), account.getId());
 
       RankerEntity ranker = ladderService.findFirstActiveRankerOfAccountThisRound(account);
       if (ranker == null) {
@@ -87,8 +87,11 @@ public class ChatController {
   }
 
   @MessageMapping(APP_CHAT_DESTINATION)
-  public void postChat(WsMetaMessage wsMessage, @DestinationVariable("number") Integer number,
-      Authentication authentication) {
+  public void postChat(
+      @DestinationVariable("number") Integer number,
+      @Payload WsMetaMessage wsMessage,
+      Authentication authentication
+  ) {
     try {
       String message = wsMessage.getContent();
       String metadata = wsMessage.getMetadata();
@@ -101,7 +104,7 @@ public class ChatController {
         return;
       }
 
-      AccountEntity account = accountService.find(UUID.fromString(authentication.getName()));
+      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
       if (account == null || account.isMuted()) {
         return;
       }

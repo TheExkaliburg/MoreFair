@@ -1,7 +1,7 @@
-import { useI18n } from "vue-i18n";
+import { useNuxtApp } from "#app";
 
 export const useLang = (prefix?: string) => {
-  const { t } = useI18n();
+  const t = useNuxtApp().$i18n.t;
   if (prefix !== undefined) {
     return (key: string) => t(`${prefix}.${key}`);
   } else {

@@ -40,8 +40,8 @@ const callbacks: StompCallbacks = {
 
 const isDevMode = process.env.NODE_ENV !== "production";
 const connection = isDevMode
-  ? "ws://localhost:8080/api/fairsocket"
-  : `ws://${window.location.host}/api/fairsocket`;
+  ? "ws://localhost:8080/socket/fair"
+  : `ws://${window.location.host}/socket/fair`;
 
 const client = new Client({
   brokerURL: connection,
@@ -155,22 +155,22 @@ const wsApi = (client: Client) => {
       },
       buyBias: () => {
         client.publish({
-          destination: "/app/ladder/buyBias",
+          destination: "/app/ladder/bias",
         });
       },
       buyMulti: () => {
         client.publish({
-          destination: "/app/ladder/buyMulti",
+          destination: "/app/ladder/multi",
         });
       },
       throwVinegar: () => {
         client.publish({
-          destination: "/app/ladder/throwVinegar",
+          destination: "/app/ladder/vinegar",
         });
       },
       buyAutoPromote: () => {
         client.publish({
-          destination: "/app/ladder/autoPromote",
+          destination: "/app/ladder/autopromote",
         });
       },
       promote: () => {

@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
+import { navigateTo } from "nuxt/app";
 import Cookies from "js-cookie";
-import { navigateTo } from "#app";
 
 const isDevMode = process.env.NODE_ENV !== "production";
 
@@ -35,6 +35,23 @@ axiosInstance.interceptors.response.use(
     if (error.response?.status === 401) {
       navigateTo("/");
     }
+    if (error.response?.status === 403) {
+      const headers = error.config?.headers;
+      if (headers === undefined) return Promise.reject(error);
+      const isRetry = Boolean(headers["X-RETRY"]);
+      if (!isRetry) {
+        const xsrfToken = Cookies.get("XSRF-TOKEN");
+        if (xsrfToken) {
+          const config = error.config;
+          config.headers = {
+            ...config.headers,
+            "X-XSRF-TOKEN": xsrfToken,
+            "X-RETRY": true,
+          };
+          return axiosInstance.request(config);
+        }
+      }
+    }
     return Promise.reject(error);
   }
 );
@@ -45,6 +62,7 @@ const API = {
       const params = new URLSearchParams();
       params.append("username", username);
       params.append("password", password);
+      params.append("remember-me", "true");
       return axiosInstance.post("/api/auth/login", params, {
         withCredentials: true,
       });
@@ -114,10 +132,17 @@ const API = {
   },
 };
 
+let isInitialized = false;
+if (!isInitialized) {
+  API.auth.authenticationStatus().then((_) => {
+    isInitialized = true;
+  });
+}
+
 export const useAPI = () => {
-  const xsrfToken = Cookies.get("XSRF-TOKEN");
-  if (!xsrfToken) {
-    API.auth.authenticationStatus().then((_) => {});
-  }
+  /* if (!API.isInitialized) {
+    await API.auth.authenticationStatus();
+    API.isInitialized = true;
+  } */
   return API;
 };

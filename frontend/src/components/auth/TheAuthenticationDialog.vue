@@ -71,8 +71,8 @@ import {
   DialogTitle,
 } from "@headlessui/vue";
 import { FeedbackType } from "@zxcvbn-ts/core/dist/types";
-import { useZxcvbn } from "~/composables/useZxcvbn";
-import { useAPI } from "~/composables/useAPI";
+import { useZxcvbn } from "../../composables/useZxcvbn";
+import { useAPI } from "../../composables/useAPI";
 
 const isLogin = ref<boolean>(true);
 
@@ -99,7 +99,7 @@ const strength = computed<{
   return { score, feedback, toString: `Score: ${score}` };
 });
 
-function signup(event) {
+function signup(event: Event) {
   event.preventDefault();
 
   // Check with regex if email is valid
@@ -140,7 +140,7 @@ function signup(event) {
   });
 }
 
-function login(event) {
+function login(event: Event) {
   event.preventDefault();
   api.auth.login(email.value, password.value).then((response) => {
     if (response.status === 200) {

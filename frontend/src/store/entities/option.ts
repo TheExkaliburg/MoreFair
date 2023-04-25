@@ -3,9 +3,10 @@ abstract class Option<T> {
   isActive: () => boolean;
   value: T;
 
-  protected constructor() {
+  constructor(value: T) {
     this.isVisited = () => true;
     this.isActive = () => true;
+    this.value = value;
   }
 
   get(): T {
@@ -25,12 +26,7 @@ export class OptionsGroup {
   }
 }
 
-export class BooleanOption extends Option<boolean> {
-  constructor(value: boolean) {
-    super();
-    this.value = value;
-  }
-}
+export class BooleanOption extends Option<boolean> {}
 
 export class RangeOption extends Option<number> {
   transient: {
@@ -39,8 +35,7 @@ export class RangeOption extends Option<number> {
   } = { min: 0, max: 100 };
 
   constructor(value: number, min: number, max: number) {
-    super();
-    this.value = value;
+    super(value);
     this.transient.min = min;
     this.transient.max = max;
   }
@@ -52,15 +47,9 @@ export class EnumOption extends Option<string> {
   } = { options: [] };
 
   constructor(value: string, options: string[]) {
-    super();
-    this.value = value;
+    super(value);
     this.transient = { options };
   }
 }
 
-export class EditableStringListOption extends Option<string[]> {
-  constructor(value: string[]) {
-    super();
-    this.value = value;
-  }
-}
+export class EditableStringListOption extends Option<string[]> {}

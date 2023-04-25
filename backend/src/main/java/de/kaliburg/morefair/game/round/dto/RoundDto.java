@@ -9,23 +9,33 @@ import lombok.Data;
 @Data
 public class RoundDto {
 
-  private String basePointsForPromote;
-  private Integer minimumPeopleForPromote;
+  private RoundSettingsDto settings;
   private Integer assholeLadder;
-  private String baseVinegarNeededToThrow;
-  private String baseGrapesNeededToAutoPromote;
   private Integer autoPromoteLadder;
-  private Integer manualPromoteWaitTime;
   private Set<RoundType> types;
 
   public RoundDto(RoundEntity currentRound, FairConfig config) {
-    basePointsForPromote = currentRound.getBasePointsRequirement().toString();
-    minimumPeopleForPromote = config.getBaseAssholeLadder();
-    baseVinegarNeededToThrow = config.getBaseVinegarToThrow().toString();
+    settings = new RoundSettingsDto(currentRound, config);
     autoPromoteLadder = config.getAutoPromoteLadder();
-    manualPromoteWaitTime = config.getManualPromoteWaitTime();
-    baseGrapesNeededToAutoPromote = config.getBaseGrapesToBuyAutoPromote().toString();
     assholeLadder = currentRound.getAssholeLadderNumber();
     types = currentRound.getTypes();
+  }
+
+  @Data
+  public class RoundSettingsDto {
+
+    private String basePointsForPromote;
+    private Integer minimumPeopleForPromote;
+    private String baseVinegarNeededToThrow;
+    private String baseGrapesNeededToAutoPromote;
+    private Integer manualPromoteWaitTime;
+
+    public RoundSettingsDto(RoundEntity currentRound, FairConfig config) {
+      basePointsForPromote = currentRound.getBasePointsRequirement().toString();
+      minimumPeopleForPromote = config.getBaseAssholeLadder();
+      baseVinegarNeededToThrow = config.getBaseVinegarToThrow().toString();
+      manualPromoteWaitTime = config.getManualPromoteWaitTime();
+      baseGrapesNeededToAutoPromote = config.getBaseGrapesToBuyAutoPromote().toString();
+    }
   }
 }

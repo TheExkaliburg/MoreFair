@@ -12,12 +12,12 @@ import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.security.SecurityUtils;
 import de.kaliburg.morefair.statistics.StatisticsService;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
@@ -48,8 +48,8 @@ public class GameService implements ApplicationListener<GameResetEvent> {
   private final ChatService chatService;
   private final AccountService accountService;
   private final FairConfig config;
-  private final SecurityUtils securityUtils;
   private final StatisticsService statisticsService;
+  private final SecurityUtils securityUtils;
   @Getter
   private GameEntity game;
 
@@ -64,8 +64,8 @@ public class GameService implements ApplicationListener<GameResetEvent> {
     this.chatService = chatService;
     this.accountService = accountService;
     this.config = config;
-    this.statisticsService = statisticsService;
     this.securityUtils = securityUtils;
+    this.statisticsService = statisticsService;
   }
 
   @PostConstruct
@@ -82,7 +82,7 @@ public class GameService implements ApplicationListener<GameResetEvent> {
   }
 
   @Transactional
-  @Scheduled(initialDelay = 60000, fixedRate = 60000)
+  @Scheduled(initialDelay = 60 * 1000, fixedRate = 60 * 1000)
   @PreDestroy
   void saveStateToDatabase() {
     game = gameRepository.save(game);

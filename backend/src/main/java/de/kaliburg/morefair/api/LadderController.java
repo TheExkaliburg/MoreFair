@@ -14,6 +14,7 @@ import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.game.round.RoundUtils;
 import de.kaliburg.morefair.game.round.dto.LadderDto;
+import de.kaliburg.morefair.security.SecurityUtils;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -54,11 +55,11 @@ public class LadderController {
   public ResponseEntity<?> initLadder(@RequestParam(value = "number") Integer number,
       Authentication authentication) {
     try {
-      log.debug("/app/game/init/{} from {}", number, authentication.getName());
-      AccountEntity account = accountService.find(UUID.fromString(authentication.getName()));
+      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
       if (account == null || account.isBanned()) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       }
+      log.debug("/app/game/init/{} from {}#{}", number, account.getDisplayName(), account.getId());
       RankerEntity ranker = ladderService.findFirstActiveRankerOfAccountThisRound(account);
       if (ranker == null) {
         ranker = roundService.createNewRanker(account);

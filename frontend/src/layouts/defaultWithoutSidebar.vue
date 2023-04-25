@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts" setup>
-import TheBrandedNavBarWithOffCanvas from "~/components/navbar/TheBrandedNavBarWithOffCanvas.vue";
+import TheBrandedNavBarWithOffCanvas from "../components/navbar/TheBrandedNavBarWithOffCanvas.vue";
 </script>
 
 <style lang="scss" scoped>

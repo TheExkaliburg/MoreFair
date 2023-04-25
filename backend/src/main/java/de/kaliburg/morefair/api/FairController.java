@@ -16,5 +16,4 @@ public class FairController {
   public String forward() {
     return "forward:/";
   }
-
 }

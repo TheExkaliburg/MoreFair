@@ -77,7 +77,7 @@ import {
 } from "@headlessui/vue";
 
 import { ChevronDownIcon } from "@heroicons/vue/24/outline";
-import PaginationButtonGroupButton from "~/components/interactables/pagination/PaginationButtonGroupButton.vue";
+import PaginationButtonGroupButton from "../../components/interactables/pagination/PaginationButtonGroupButton.vue";
 
 defineProps({
   max: { type: Number, required: true, default: 1 },

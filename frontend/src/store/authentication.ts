@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import Cookies from "js-cookie";
-import { watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { useAPI } from "~/composables/useAPI";
 
 export const useAuthStore = defineStore("auth", () => {
@@ -9,17 +9,30 @@ export const useAuthStore = defineStore("auth", () => {
   const uuid = ref<string>(Cookies.get("_uuid") || "");
   const authenticationStatus = ref<boolean>(false);
 
-  API.auth.authenticationStatus().then((response) => {
-    authenticationStatus.value = Boolean(response.data);
+  const state = reactive({
+    uuid,
+    authenticationStatus,
   });
 
-  // getters
-  const isGuest = computed<boolean>(() => {
-    return uuid.value !== "";
+  const getters = reactive({
+    isGuest: computed<boolean>(() => {
+      return uuid.value !== "";
+    }),
+    homeLocation: computed<string>(() => {
+      return authenticationStatus.value ? "/game" : "/";
+    }),
   });
-  const homeLocation = computed<string>(() => {
-    return authenticationStatus.value ? "/game" : "/";
-  });
+
+  API.auth
+    .authenticationStatus()
+    .then((response) => {
+      authenticationStatus.value = Boolean(response.data);
+    })
+    .catch((error) => {
+      if (error.status === 401) {
+        authenticationStatus.value = Boolean(false);
+      }
+    });
 
   // actions
   async function registerGuest() {
@@ -52,7 +65,7 @@ export const useAuthStore = defineStore("auth", () => {
       // 200 - OK
       if (response.status === 200) {
         authenticationStatus.value = true;
-        if (isGuest.value) {
+        if (getters.isGuest) {
           Cookies.set("_uuid", uuid.value, {
             expires: 365,
             secure: true,
@@ -75,13 +88,14 @@ export const useAuthStore = defineStore("auth", () => {
   });
 
   return {
-    // vars
-    uuid,
-    authenticationStatus,
-    // getters
-    isGuest,
-    homeLocation,
+    state,
+    getters,
     // actions
+    actions: {
+      login,
+      registerGuest,
+      registerAccount,
+    },
     login,
     registerGuest,
     registerAccount,
