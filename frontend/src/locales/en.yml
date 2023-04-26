@@ -27,6 +27,10 @@ components:
       vinegar: Throw all Vinegar
       promote: Promote
       asshole: Be Asshole
+      info:
+        grapes: Grapes
+        vinegar: Vinegar
+        active: Active
 options:
   section:
     general: General
@@ -52,6 +56,7 @@ options:
   enableChatFeatures: Enable chat features
   enableLadderFeatures: Enable ladder features
   unrestrictedAccess: Unrestricted ladder & chat access
+  lockButtons: Lock Buttons
 
 
 

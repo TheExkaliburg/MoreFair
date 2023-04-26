@@ -38,13 +38,14 @@
         {{ yourFormattedGrapes }}/<span class="text-text-dark">{{
           yourAutoPromoteCostFormatted
         }}</span>
-        Grapes
+        {{ lang("info.grapes") }}
+        <span v-if="yourRanker.autoPromote">( {{ lang("info.active") }})</span>
       </p>
       <p>
         {{ yourFormattedVinegar }}/<span class="text-text-dark">{{
           yourVinegarThrowCostFormatted
         }}</span>
-        Vinegar
+        {{ lang("info.vinegar") }}
       </p>
     </div>
     <div class="flex flex-row w-full">
@@ -75,7 +76,7 @@
       <p>
         Promote at
         <span class="text-text-dark">{{ pointsNeededToPromoteFormatted }}</span>
-        Points
+        Points ({{ yourPercentageToPromotion }}%) ({{ yourTimeToPromotion }})
       </p>
     </div>
   </div>
@@ -88,7 +89,7 @@ import { useLang } from "~/composables/useLang";
 import { useOptionsStore } from "~/store/options";
 import { useLadderStore } from "~/store/ladder";
 import { Ranker } from "~/store/entities/ranker";
-import { useFormatter } from "~/composables/useFormatter";
+import { useFormatter, useTimeFormatter } from "~/composables/useFormatter";
 import { useLadderUtils } from "~/composables/useLadderUtils";
 import { useRoundStore } from "~/store/round";
 import { useStomp } from "~/composables/useStomp";
@@ -104,6 +105,17 @@ const isButtonLocked = computed<boolean>(() => {
 
 const yourRanker = computed<Ranker>(() => {
   return ladderStore.getters.yourRanker ?? new Ranker({ rank: Infinity });
+});
+const yourTimeToPromotion = computed<string>(() => {
+  return useTimeFormatter(useEta(yourRanker.value).toPromote());
+});
+
+const yourPercentageToPromotion = computed<string>(() => {
+  return useFormatter(
+    yourRanker.value.points
+      .mul(100)
+      .div(ladderUtils.getYourPointsNeededToPromote.value)
+  );
 });
 
 const yourFormattedMulti = computed<string>(() => {
@@ -185,31 +197,31 @@ function handleTick() {
 }
 
 function buyBias() {
-  if (pressedBiasRecently.value) return;
+  if (pressedBiasRecently.value || !canBuyBias.value) return;
   pressedBiasRecently.value = true;
   useStomp().wsApi.ladder.buyBias();
 }
 
 function buyMulti() {
-  if (pressedMultiRecently.value) return;
+  if (pressedMultiRecently.value || !canBuyMulti.value) return;
   pressedMultiRecently.value = true;
   useStomp().wsApi.ladder.buyMulti();
 }
 
 function buyAutoPromote() {
-  if (pressedAutoPromoteRecently.value) return;
+  if (pressedAutoPromoteRecently.value || !canBuyAutoPromote.value) return;
   pressedAutoPromoteRecently.value = true;
   useStomp().wsApi.ladder.buyAutoPromote();
 }
 
 function throwVinegar() {
-  if (pressedVinegarRecently.value) return;
+  if (pressedVinegarRecently.value || !canThrowVinegar.value) return;
   pressedVinegarRecently.value = true;
   useStomp().wsApi.ladder.throwVinegar();
 }
 
 function promote() {
-  if (pressedPromoteRecently.value) return;
+  if (pressedPromoteRecently.value || !canPromote.value) return;
   pressedPromoteRecently.value = true;
   useStomp().wsApi.ladder.promote();
 }
