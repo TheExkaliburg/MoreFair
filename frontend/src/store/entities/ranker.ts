@@ -39,8 +39,8 @@ export class Ranker implements RankerData {
     this.vinegar = Object.freeze(new Decimal(this.vinegar));
   }
 
-  getPowerPerSecond(): Decimal {
-    if (this.rank === 1 || !this.growing) return new Decimal(0);
-    return new Decimal((this.bias + this.rank - 1) * this.multi);
+  getPowerPerSecond(rank: number = this.rank): Decimal {
+    if (rank === 1 || !this.growing) return new Decimal(0);
+    return new Decimal((this.bias + rank - 1) * this.multi);
   }
 }

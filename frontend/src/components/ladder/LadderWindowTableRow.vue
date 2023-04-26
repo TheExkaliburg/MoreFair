@@ -5,7 +5,8 @@
     :class="{
       'bg-ladder-bg-promoted text-ladder-text-promoted': !ranker.growing,
       'bg-ladder-bg-you text-ladder-text-you': isYou,
-      'bg-ladder-bg sticky z-1 top-0': isFirst,
+      'sticky z-1 top-0': isFirst,
+      'bg-ladder-bg': isFirst && !isYou && ranker.growing,
     }"
     class="grid grid-cols-24 sm:grid-cols-48 gap-1 px-1 text-sm select-none"
   >
@@ -62,8 +63,8 @@
           >+{{ formattedBias }}</span
         ><span
           :class="{
-            'text-eta-best': canBuyMulit,
-            'text-eta-worst': !canBuyMulit,
+            'text-eta-best': canBuyMulti,
+            'text-eta-worst': !canBuyMulti,
           }"
         >
           x{{ formattedMulti }}</span
@@ -132,7 +133,11 @@ const formattedPoints = computed<string>(() => {
 
 const etaToNextLadderFormatted = computed<string>(() => {
   if (!isVisible) return "";
-  return useTimeFormatter(useEta(props.ranker).toPromote()); // useTimeFormatter(useEta(props.ranker).toPromote());
+  return useTimeFormatter(etaToNextLadder.value);
+});
+
+const etaToNextLadder = computed<number>(() => {
+  return useEta(props.ranker).toPromote();
 });
 
 const etaToYourRankerFormatted = computed<string>(() => {
@@ -151,7 +156,7 @@ const canBuyBias = computed<boolean>(() => {
   return upgradeCost.cmp(props.ranker.points) <= 0;
 });
 
-const canBuyMulit = computed<boolean>(() => {
+const canBuyMulti = computed<boolean>(() => {
   if (!isVisible) return false;
   const upgradeCost = ladderUtils.getNextUpgradeCost(props.ranker.multi);
   return upgradeCost.cmp(props.ranker.power) <= 0;
@@ -166,14 +171,14 @@ const etaPercentage = computed<number>(() => {
   const yourRanker = ladderStore.getters.yourRanker;
   if (yourRanker === undefined) return -100;
 
-  const etaYouToRanker = etaToYourRanker.value;
+  const etaRankerToPromote = etaToNextLadder.value;
   const etaYouToPromote = useEta(yourRanker).toPromote();
 
   // we want to return a percentage for our animation interpolation
   // 0 is to overtake now
   // 50 is eta to overtake equals eta to first
   // 100 is eta to overtake equals eta to first * 2
-  let gradientPercent = (etaYouToRanker / etaYouToPromote) * 50;
+  let gradientPercent = (etaYouToPromote / etaRankerToPromote) * 50;
   gradientPercent = Math.min(Math.max(gradientPercent, 0), 100);
 
   // check if the ranker is behind us
@@ -182,7 +187,7 @@ const etaPercentage = computed<number>(() => {
     // 0 is eta to overtake equals eta to first * 2
     // 50 is eta to overtake equals eta to first
     // 100 is 0 seconds to overtake
-    gradientPercent = 100 - gradientPercent;
+    // gradientPercent = 100 - gradientPercent;
   }
 
   if (optionsStore.state.ladder.etaColors.value === EtaColorType.COLORS) {
@@ -215,6 +220,6 @@ const etaPercentage = computed<number>(() => {
 .etaProgressAnimation {
   // The Animation moves through the keyframes but is paused,
   // so only the negative delay can change anything for it
-  animation: 101s linear paused etaProgress;
+  animation: 101s ease-in-out paused etaProgress;
 }
 </style>

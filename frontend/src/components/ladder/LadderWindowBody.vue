@@ -93,6 +93,7 @@ import { useFormatter, useTimeFormatter } from "~/composables/useFormatter";
 import { useLadderUtils } from "~/composables/useLadderUtils";
 import { useRoundStore } from "~/store/round";
 import { useStomp } from "~/composables/useStomp";
+import { useEta } from "~/composables/useEta";
 
 const lang = useLang("components.ladder.buttons");
 const optionsStore = useOptionsStore();
@@ -104,7 +105,7 @@ const isButtonLocked = computed<boolean>(() => {
 });
 
 const yourRanker = computed<Ranker>(() => {
-  return ladderStore.getters.yourRanker ?? new Ranker({ rank: Infinity });
+  return ladderStore.getters.yourRanker ?? new Ranker({ rank: 0 });
 });
 const yourTimeToPromotion = computed<string>(() => {
   return useTimeFormatter(useEta(yourRanker.value).toPromote());

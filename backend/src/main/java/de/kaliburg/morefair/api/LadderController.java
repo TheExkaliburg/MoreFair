@@ -106,8 +106,10 @@ public class LadderController {
   }
 
   @MessageMapping(APP_MULTI_DESTINATION)
-  public void buyMulti(SimpMessageHeaderAccessor sha, WsObservedMessage wsMessage) {
+  public void buyMulti(SimpMessageHeaderAccessor sha, Authentication authentication,
+      String object) {
     try {
+      WsObservedMessage wsMessage = new WsObservedMessage();
       String uuid = wsMessage.getUuid();
       AccountEntity account = accountService.find(UUID.fromString(uuid));
       if (account == null || account.isBanned()) {

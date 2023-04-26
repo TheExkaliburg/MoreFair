@@ -31,6 +31,19 @@ function resetCache() {
   etaPowerCache.clear();
 }
 
+function getPowerGainDifferenceToRank(
+  ranker: Ranker,
+  targetRank: number = 1
+): Decimal {
+  const rank = ranker.rank;
+  if (rank < 1 || !isFinite(rank)) return new Decimal(0);
+
+  const powerGainAtStart = ranker.getPowerPerSecond(rank);
+  const powerGainAtEnd = ranker.getPowerPerSecond(targetRank + 1);
+
+  return powerGainAtStart.add(powerGainAtEnd).div(new Decimal(2));
+}
+
 export const useEta = (ranker: Ranker) => {
   const ladder = useLadderStore();
   const ladderUtils = useLadderUtils();
@@ -50,8 +63,14 @@ export const useEta = (ranker: Ranker) => {
     }
 
     // Calculating the relative acceleration of the two players
-    const rankerAcc = ranker.getPowerPerSecond();
-    const targetAcc = target.getPowerPerSecond();
+    const rankerAcc = getPowerGainDifferenceToRank(
+      ranker,
+      target.rank < ranker.rank && !target.growing ? target.rank : 1
+    );
+    const targetAcc = getPowerGainDifferenceToRank(
+      target,
+      ranker.rank < target.rank && !ranker.growing ? ranker.rank : 1
+    );
     const accDiff = targetAcc.sub(rankerAcc);
     // Calculating the relative current speed of the two players
     const rankerSpeed = ranker.growing ? ranker.power : new Decimal(0);
@@ -59,11 +78,7 @@ export const useEta = (ranker: Ranker) => {
     const speedDiff = targetSpeed.sub(rankerSpeed);
     // Calculating the current distance between the two players
     const pointsDiff = target.points.sub(ranker.points);
-    const result = solveQuadratic(
-      accDiff.div(new Decimal(2)),
-      speedDiff,
-      pointsDiff
-    ).toNumber();
+    const result = solveQuadratic(accDiff, speedDiff, pointsDiff).toNumber();
 
     // saving the value in both maps (target -> ranker and ranker -> target)
     cachedMap.set(target, result);
@@ -89,14 +104,27 @@ export const useEta = (ranker: Ranker) => {
       etaPointsCache.set(ranker, cachedMap);
     }
 
-    const accDiff = ranker.getPowerPerSecond().negate();
+    // We are looking where the number is on the ladder and what the rank would be there, then we set that as target rank
+    // If we cannot find the number on the ladder then its under the lowest person
+    // if that's the case or the number is already under us, we set the targetRank to 1 above ours
+    // this theoretically shouldn't be the case since we check if the points are under us already, but typescripts needs it explicitly
+    let targetRank = 1;
+    if (ladder.state.rankers.length > 0) {
+      const pseudoRanker = ladder.state.rankers.find(
+        (r) => r.points.cmp(target) < 0
+      );
+
+      if (pseudoRanker === undefined || pseudoRanker.rank >= ranker.rank) {
+        targetRank = ranker.rank - 1;
+      } else {
+        targetRank = pseudoRanker.rank;
+      }
+    }
+
+    const accDiff = getPowerGainDifferenceToRank(ranker, targetRank).negate();
     const speedDiff = ranker.growing ? ranker.power.negate() : new Decimal(0);
     const pointsDiff = target.sub(ranker.points);
-    const result = solveQuadratic(
-      accDiff.div(new Decimal(2)),
-      speedDiff,
-      pointsDiff
-    ).toNumber();
+    const result = solveQuadratic(accDiff, speedDiff, pointsDiff).toNumber();
     cachedMap.set(target, result);
     return result;
   }
@@ -142,7 +170,7 @@ export const useEta = (ranker: Ranker) => {
       return etaRequirement;
     }
 
-    // If no one hit the base points requirement already then we show the eta to the first place.
+    // If no one hit the base points requirement already then we show the eta to the requirement.
     if (
       ladder.state.rankers[0].points.cmp(ladder.state.basePointsToPromote) < 0
     ) {
