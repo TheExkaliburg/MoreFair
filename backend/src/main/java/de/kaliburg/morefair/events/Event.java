@@ -1,6 +1,5 @@
 package de.kaliburg.morefair.events;
 
-import de.kaliburg.morefair.events.types.LadderEventType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
@@ -9,10 +8,10 @@ import lombok.RequiredArgsConstructor;
 @Data
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class Event {
+public class Event<T extends Enum<T>> {
 
   @NonNull
-  private LadderEventType eventType;
+  private Enum<T> eventType;
   @NonNull
   private Long accountId;
   private Object data;

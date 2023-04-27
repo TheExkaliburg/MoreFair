@@ -37,7 +37,7 @@ export class MessagePart {
 }
 
 export type MessageData = {
-  id: number;
+  accountId: number;
   username: string;
   message: string;
   metadata: string;
@@ -58,7 +58,7 @@ const options: Intl.DateTimeFormatOptions = {
 const formatter = new Intl.DateTimeFormat(navigator.language, options);
 
 export class Message implements MessageData {
-  id: number = 0;
+  accountId: number = 0;
   username: string = "";
   message: string = "";
   metadata: string = "[]";

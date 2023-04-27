@@ -6,7 +6,7 @@ import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.account.AchievementsEntity;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.events.Event;
-import de.kaliburg.morefair.events.types.LadderEventType;
+import de.kaliburg.morefair.events.types.AccountEventTypes;
 import de.kaliburg.morefair.game.round.RankerService;
 import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
@@ -86,7 +86,7 @@ public class AccountController {
       accountService.save(account);
 
       wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION,
-          new Event(LadderEventType.NAME_CHANGE, account.getId(),
+          new Event<>(AccountEventTypes.NAME_CHANGE, account.getId(),
               account.getDisplayName()));
 
       return ResponseEntity.ok(displayName);

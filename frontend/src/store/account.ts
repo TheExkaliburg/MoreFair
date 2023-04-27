@@ -36,6 +36,11 @@ export const useAccountStore = defineStore("account", () => {
     getAccountDetails();
   }
 
+  function reset() {
+    isInitialized.value = false;
+    init();
+  }
+
   function getAccountDetails() {
     api.account.getAccountDetails().then((res) => {
       const data: AccountData = res.data;
@@ -52,6 +57,7 @@ export const useAccountStore = defineStore("account", () => {
     getters,
     actions: {
       init,
+      reset,
     },
   };
 });

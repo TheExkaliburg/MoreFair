@@ -39,9 +39,9 @@ definePageMeta({ layout: "default" });
 useStomp();
 
 onMounted(() => {
+  useRoundStore().actions.init();
   useChatStore().actions.init();
   useLadderStore().actions.init();
-  useRoundStore().actions.init();
   useAccountStore().actions.init();
   const tour = useTutorialTour();
   if (!tour.getFlag() && useAuthStore().state.authenticationStatus) {

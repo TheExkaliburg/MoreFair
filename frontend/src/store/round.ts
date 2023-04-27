@@ -5,6 +5,15 @@ import {
   RoundSettings,
   RoundSettingsData,
 } from "~/store/entities/roundSettings";
+import {
+  OnRoundEventBody,
+  RoundEventType,
+  useStomp,
+} from "~/composables/useStomp";
+import { useChatStore } from "~/store/chat";
+import { useLadderStore } from "~/store/ladder";
+import { useAccountStore } from "~/store/account";
+import { useToasts } from "~/composables/useToasts";
 
 export enum RoundType {
   DEFAULT,
@@ -38,6 +47,11 @@ export const useRoundStore = defineStore("round", () => {
     getCurrentRound();
   }
 
+  function reset() {
+    isInitialized.value = false;
+    init();
+  }
+
   function getCurrentRound() {
     isInitialized.value = true;
     api.round
@@ -49,18 +63,50 @@ export const useRoundStore = defineStore("round", () => {
         state.assholeLadder = data.assholeLadder;
         state.autoPromoteLadder = data.autoPromoteLadder;
         state.settings = new RoundSettings(data.settings);
+
+        const stomp = useStomp();
+        stomp.addCallback(
+          stomp.callbacks.onRoundEvent,
+          "fair_round_events",
+          handleRoundEvent
+        );
       })
       .catch((_) => {
         isInitialized.value = false;
       });
   }
 
+  function handleRoundEvent(body: OnRoundEventBody) {
+    const event = body.eventType;
+    switch (event) {
+      case RoundEventType.INCREASE_ASSHOLE_LADDER:
+        state.assholeLadder = body.data;
+        break;
+      case RoundEventType.RESET:
+        isInitialized.value = false;
+        useStomp().reset();
+        setTimeout(() => {
+          useRoundStore().actions.reset();
+          useChatStore().actions.reset();
+          useLadderStore().actions.reset();
+          useAccountStore().actions.reset();
+          useToasts(
+            "Chad was successful in turning back the time, the only thing left from this future is a mark on the initiates that helped in the final ritual."
+          );
+        }, 6000); // 1 sec more than the reconnect-timer of the stomp client
+        break;
+      default:
+        console.error("Unknown event type", event);
+        break;
+    }
+  }
+
   return {
     state,
     getters,
-    // actions
     actions: {
       init,
+      reset,
     },
   };
 });

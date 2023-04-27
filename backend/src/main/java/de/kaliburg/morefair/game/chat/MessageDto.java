@@ -9,7 +9,7 @@ public class MessageDto {
 
   private final String message;
   private final String username;
-  private final Long id;
+  private final Long accountId;
   private final Long timestamp;
   private final String tag;
   private final Integer assholePoints;
@@ -20,7 +20,7 @@ public class MessageDto {
     this.assholePoints = message.getAccount().getAssholePoints();
     this.message = message.getMessage();
     this.username = message.getAccount().getDisplayName();
-    this.id = message.getAccount().getId();
+    this.accountId = message.getAccount().getId();
     this.timestamp = message.getCreatedOn().withOffsetSameInstant(ZoneOffset.UTC).toEpochSecond();
     this.metadata = message.getMetadata();
   }

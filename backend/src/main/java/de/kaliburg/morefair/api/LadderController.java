@@ -7,7 +7,7 @@ import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WsMessage;
 import de.kaliburg.morefair.data.ModServerMessageData;
 import de.kaliburg.morefair.events.Event;
-import de.kaliburg.morefair.events.types.LadderEventType;
+import de.kaliburg.morefair.events.types.LadderEventTypes;
 import de.kaliburg.morefair.game.round.LadderService;
 import de.kaliburg.morefair.game.round.RankerEntity;
 import de.kaliburg.morefair.game.round.RoundEntity;
@@ -97,7 +97,7 @@ public class LadderController {
           sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
       wsUtils.convertAndSendToTopic(ModerationController.TOPIC_EVENTS_DESTINATION + num, data);
-      ladderService.addEvent(num, new Event(LadderEventType.BUY_BIAS, account.getId()));
+      ladderService.addEvent(num, new Event<>(LadderEventTypes.BUY_BIAS, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
@@ -120,7 +120,7 @@ public class LadderController {
       ModServerMessageData data = new ModServerMessageData(account.getId(), sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
       wsUtils.convertAndSendToTopic(ModerationController.TOPIC_EVENTS_DESTINATION + num, data);
-      ladderService.addEvent(num, new Event(LadderEventType.BUY_MULTI, account.getId()));
+      ladderService.addEvent(num, new Event<>(LadderEventTypes.BUY_MULTI, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
@@ -144,7 +144,7 @@ public class LadderController {
           sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
       wsUtils.convertAndSendToTopic(ModerationController.TOPIC_EVENTS_DESTINATION + num, data);
-      ladderService.addEvent(num, new Event(LadderEventType.THROW_VINEGAR, account.getId()));
+      ladderService.addEvent(num, new Event<>(LadderEventTypes.THROW_VINEGAR, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
@@ -169,7 +169,7 @@ public class LadderController {
           sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
       wsUtils.convertAndSendToTopic(ModerationController.TOPIC_EVENTS_DESTINATION + num, data);
-      ladderService.addEvent(num, new Event(LadderEventType.PROMOTE, account.getId()));
+      ladderService.addEvent(num, new Event<>(LadderEventTypes.PROMOTE, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
@@ -193,7 +193,7 @@ public class LadderController {
           sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
       wsUtils.convertAndSendToTopic(ModerationController.TOPIC_EVENTS_DESTINATION + num, data);
-      ladderService.addEvent(num, new Event(LadderEventType.BUY_AUTO_PROMOTE, account.getId()));
+      ladderService.addEvent(num, new Event<>(LadderEventTypes.BUY_AUTO_PROMOTE, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();

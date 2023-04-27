@@ -1,6 +1,7 @@
 import { Client } from "@stomp/stompjs";
 import { MentionMeta, MessageData } from "~/store/entities/message";
 import { useAccountStore } from "~/store/account";
+import { useChatStore } from "~/store/chat";
 
 export enum LadderEventType {
   BUY_BIAS = "BUY_BIAS",
@@ -10,6 +11,20 @@ export enum LadderEventType {
   SOFT_RESET_POINTS = "SOFT_RESET_POINTS",
   PROMOTE = "PROMOTE",
   JOIN = "JOIN",
+  ADD_FREE_AUTO = "ADD_FREE_AUTO",
+}
+
+export enum AccountEventType {
+  BAN = "BAN",
+  FREE = "FREE",
+  MUTE = "MUTE",
+  MOD = "MOD",
+  NAME_CHANGE = "NAME_CHANGE",
+}
+
+export enum RoundEventType {
+  RESET = "RESET",
+  INCREASE_ASSHOLE_LADDER = "INCREASE_ASSHOLE_LADDER",
 }
 
 export type OnTickBody = {
@@ -19,10 +34,17 @@ export type OnChatEventBody = MessageData;
 export type OnLadderEventBody = {
   eventType: LadderEventType;
   accountId: number;
-  data: any;
+  data?: any;
 };
-export type OnRoundEventBody = {};
-export type OnAccountEventBody = {};
+export type OnRoundEventBody = {
+  eventType: RoundEventType;
+  data?: any;
+};
+export type OnAccountEventBody = {
+  eventType: AccountEventType;
+  accountId: number;
+  data?: any;
+};
 
 export type StompCallback<T> = {
   callback: (body: T) => void;
@@ -97,10 +119,6 @@ client.onConnect = (_) => {
     const body: OnRoundEventBody = JSON.parse(message.body);
     callbacks.onRoundEvent.forEach(({ callback }) => callback(body));
   });
-  client.subscribe("/user/queue/round/event", (message) => {
-    const body: OnRoundEventBody = JSON.parse(message.body);
-    callbacks.onRoundEvent.forEach(({ callback }) => callback(body));
-  });
 
   client.subscribe("/topic/ladder/event/1", (message) => {
     const body: OnLadderEventBody = JSON.parse(message.body);
@@ -120,6 +138,8 @@ client.onConnect = (_) => {
 
 function connectPrivateChannel(uuid: string) {
   if (uuid === undefined || isPrivateConnectionEstablished) return;
+  if (!client.connected) return;
+  console.log("Reconnect private channel");
   isPrivateConnectionEstablished = true;
 
   client.subscribe(`/private/${uuid}/ladder/event`, (message) => {
@@ -139,7 +159,14 @@ client.onStompError = (frame) => {
 
 client.onDisconnect = (_) => {
   isPrivateConnectionEstablished = false;
+  useChatStore().actions.addSystemMessage(
+    "You have been disconnected from the server, this could be because of a restart or an update. Please try reconnecting in a few minutes or try Discord if you cannot connect at all anymore."
+  );
 };
+
+function reset() {
+  client.deactivate().then();
+}
 
 function parseEvent(e: Event): string {
   return JSON.stringify(e);
@@ -159,7 +186,7 @@ const wsApi = (client: Client) => {
       changeChat: (
         currentNumber: number,
         newNumber: number,
-        unsubscribe?: boolean
+        unsubscribe: boolean = true
       ) => {
         if (unsubscribe) {
           client.unsubscribe(`/topic/chat/event/${currentNumber}`);
@@ -187,7 +214,7 @@ const wsApi = (client: Client) => {
       changeLadder: (
         currentNumber: number,
         newNumber: number,
-        unsubscribe?: boolean
+        unsubscribe: boolean = true
       ) => {
         if (unsubscribe) {
           client.unsubscribe(`/topic/ladder/event/${currentNumber}`);
@@ -243,7 +270,7 @@ const wsApi = (client: Client) => {
 
 export const useStomp = () => {
   // only activate the client if it is not already active
-  while (!client.active) {
+  if (!client.active) {
     client.activate();
   }
 
@@ -252,5 +279,6 @@ export const useStomp = () => {
     callbacks,
     addCallback,
     connectPrivateChannel,
+    reset,
   };
 };

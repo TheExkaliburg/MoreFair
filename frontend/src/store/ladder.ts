@@ -13,6 +13,7 @@ import { useAccountStore } from "~/store/account";
 import { useLadderUtils } from "~/composables/useLadderUtils";
 import { useChatStore } from "~/store/chat";
 import { useFormatter } from "~/composables/useFormatter";
+import { useToasts } from "~/composables/useToasts";
 
 export enum LadderType {
   DEFAULT,
@@ -71,6 +72,11 @@ export const useLadderStore = defineStore("ladder", () => {
     getLadder(state.number);
   }
 
+  function reset() {
+    isInitialized.value = false;
+    init();
+  }
+
   function getLadder(ladderNumber: number) {
     isInitialized.value = true;
     api.ladder
@@ -90,7 +96,7 @@ export const useLadderStore = defineStore("ladder", () => {
 
         stomp.addCallback(
           stomp.callbacks.onLadderEvent,
-          "fair_ladder_publicEvent",
+          "fair_ladder_events",
           (body) => {
             console.log(body);
             state.events.push(body);
@@ -231,6 +237,12 @@ export const useLadderStore = defineStore("ladder", () => {
         case LadderEventType.JOIN:
           handleJoinEvent(event);
           break;
+        case LadderEventType.ADD_FREE_AUTO:
+          state.types.add(LadderType.FREE_AUTO);
+          useToasts(
+            `Since other rankers breached another Ladder, everyone on this ladder got gifted a free auto promote! (No Refunds)`
+          );
+          break;
         default:
           console.error("Unknown event type", event);
           break;
@@ -257,13 +269,11 @@ export const useLadderStore = defineStore("ladder", () => {
           event.data.success ? "successfully" : ""
         } threw  ${useFormatter(vinegarThrown)} vinegar at you!`
       );
-      chatStore.actions.addLocalMessage({
-        id: 1,
-        username: "Chad",
-        message: `{@} saw {@} throwing vinegar at {@}. They've ${
+      chatStore.actions.addSystemMessage(
+        `{@} saw {@} throwing vinegar at {@}. They've ${
           event.data.success ? "successfully" : ""
         } used ${useFormatter(vinegarThrown)} vinegar!`,
-        metadata: JSON.stringify([
+        JSON.stringify([
           { u: "Chad", i: 0, id: 1 },
           { u: ranker.username, i: 8, id: ranker.accountId },
           {
@@ -271,11 +281,8 @@ export const useLadderStore = defineStore("ladder", () => {
             i: 32,
             id: getters.yourRanker.accountId,
           },
-        ]),
-        timestamp: Math.floor(Date.now() / 1000),
-        tag: "🂮",
-        assholePoints: 5950,
-      });
+        ])
+      );
     }
   }
 
@@ -292,6 +299,7 @@ export const useLadderStore = defineStore("ladder", () => {
     // actions
     actions: {
       init,
+      reset,
       changeLadder,
     },
   };

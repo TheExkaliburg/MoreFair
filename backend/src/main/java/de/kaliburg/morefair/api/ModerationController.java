@@ -8,7 +8,7 @@ import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WsMessage;
 import de.kaliburg.morefair.data.ModChatData;
 import de.kaliburg.morefair.events.Event;
-import de.kaliburg.morefair.events.types.LadderEventType;
+import de.kaliburg.morefair.events.types.AccountEventTypes;
 import de.kaliburg.morefair.game.chat.ChatService;
 import de.kaliburg.morefair.game.chat.MessageEntity;
 import de.kaliburg.morefair.game.chat.MessageService;
@@ -107,8 +107,8 @@ public class ModerationController {
       chatService.deleteMessagesOfAccount(target);
       log.info("{} (#{}) is banning the account {} (#{})", account.getUsername(), account.getId(),
           target.getUsername(), target.getId());
-      wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
-          LadderEventType.BAN, target.getId()));
+      wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event<>(
+          AccountEventTypes.BAN, target.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
@@ -133,8 +133,8 @@ public class ModerationController {
       chatService.deleteMessagesOfAccount(target);
       log.info("{} (#{}) is muting the account {} (#{})", account.getUsername(), account.getId(),
           target.getUsername(), target.getId());
-      wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
-          LadderEventType.MUTE, target.getId()));
+      wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event<>(
+          AccountEventTypes.MUTE, target.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
@@ -158,8 +158,8 @@ public class ModerationController {
       log.info("{} (#{}) is freeing the account {} (#{})", account.getDisplayName(),
           account.getId(),
           target.getDisplayName(), target.getId());
-      wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
-          LadderEventType.FREE, target.getId()));
+      wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event<>(
+          AccountEventTypes.FREE, target.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
@@ -190,8 +190,8 @@ public class ModerationController {
       target = accountService.save(target);
       log.info("{} (#{}) is renaming the account {} (#{}) to {}", account.getDisplayName(),
           account.getId(), target.getDisplayName(), target.getId(), username);
-      wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
-          LadderEventType.NAME_CHANGE, target.getId(), username));
+      wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event<>(
+          AccountEventTypes.NAME_CHANGE, target.getId(), username));
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
@@ -214,8 +214,8 @@ public class ModerationController {
       }
 
       AccountEntity target = accountService.find(id);
-      wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
-          LadderEventType.MOD, target.getId(), text));
+      wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event<>(
+          AccountEventTypes.MOD, target.getId(), text));
       log.info("{} (#{}) is prompting the account {} (#{}) with {}", account.getDisplayName(),
           account.getId(), target.getDisplayName(), target.getId(), text);
     } catch (Exception e) {
@@ -241,8 +241,8 @@ public class ModerationController {
       target = accountService.save(target);
       log.info("{} (#{}) is modding the account {} (#{})", account.getDisplayName(),
           account.getId(), target.getDisplayName(), target.getId());
-      wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
-          LadderEventType.MOD, target.getId(), account.getId()));
+      wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event<>(
+          AccountEventTypes.MOD, target.getId(), account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();

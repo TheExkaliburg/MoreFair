@@ -30,6 +30,11 @@ export const useChatStore = defineStore("chat", () => {
     getChat(state.number);
   }
 
+  function reset() {
+    isInitialized.value = false;
+    init();
+  }
+
   function getChat(chatNumber: number) {
     isInitialized.value = true;
     api.chat
@@ -42,6 +47,8 @@ export const useChatStore = defineStore("chat", () => {
           msg.setFlag("old");
           state.messages.unshift(msg);
         });
+
+        stomp.wsApi.chat.changeChat(state.number, data.number);
         state.number = data.number;
 
         stomp.addCallback(
@@ -71,14 +78,28 @@ export const useChatStore = defineStore("chat", () => {
     state.messages.push(new Message(body));
   }
 
+  function addSystemMessage(message: string, metadata: string = "[]") {
+    addLocalMessage({
+      accountId: 1,
+      username: "Chad",
+      message,
+      metadata,
+      timestamp: Math.floor(Date.now() / 1000),
+      tag: "🂮",
+      assholePoints: 5950,
+    });
+  }
+
   return {
     state,
     getters,
     actions: {
       init,
+      reset,
       sendMessage,
       changeChat,
       addLocalMessage,
+      addSystemMessage,
     },
   };
 });

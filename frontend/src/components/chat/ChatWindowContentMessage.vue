@@ -3,7 +3,7 @@
     <div class="flex flex-row text-sm justify-between pr-3">
       <span class="text-text-light truncate basis-1/4 flex-auto">
         {{ message.username }}
-        <sub class="text-text-dark">&nbsp;#{{ message.id }} </sub>
+        <sub class="text-text-dark">&nbsp;#{{ message.accountId }} </sub>
       </span>
       <span class="text-text-light basis-1/4 grow flex-auto"
         ><strong>{{ message.tag }}</strong
