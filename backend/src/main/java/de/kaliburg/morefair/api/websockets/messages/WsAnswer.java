@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class WSMessageAnswer<T> {
+public class WsAnswer<T> {
 
   @NonNull
   private T content;

@@ -8,11 +8,12 @@ import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WsMessage;
 import de.kaliburg.morefair.data.ModChatData;
 import de.kaliburg.morefair.events.Event;
-import de.kaliburg.morefair.events.types.EventType;
+import de.kaliburg.morefair.events.types.LadderEventType;
 import de.kaliburg.morefair.game.chat.ChatService;
 import de.kaliburg.morefair.game.chat.MessageEntity;
 import de.kaliburg.morefair.game.chat.MessageService;
 import de.kaliburg.morefair.game.round.LadderService;
+import de.kaliburg.morefair.security.SecurityUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -62,36 +64,11 @@ public class ModerationController {
     this.config = config;
   }
 
-  /*@MessageMapping(INFO_REQUEST)
-  public void info(SimpMessageHeaderAccessor sha, WsMessage wsMessage) throws Exception {
-    try {
-      String uuid = wsMessage.getUuid();
-
-      AccountEntity account = accountService.find(UUID.fromString(uuid));
-      if (account == null || !(account.getAccessRole().equals(AccountAccessRole.MODERATOR)
-          || account.getAccessRole().equals(AccountAccessRole.OWNER))) {
-        wsUtils.convertAndSendToUser(sha, INFO_DESTINATION, HttpStatus.FORBIDDEN);
-      } else {
-        Integer highestLadderNumber = ladderService.getHighestLadder().getNumber();
-        ModerationInfoData infoData = new ModerationInfoData(highestLadderNumber,
-            account.getAccessRole());
-        wsUtils.convertAndSendToUser(sha, INFO_DESTINATION, infoData);
-      }
-    } catch (IllegalArgumentException e) {
-      wsUtils.convertAndSendToUser(sha, INFO_DESTINATION, HttpStatus.BAD_REQUEST);
-    } catch (Exception e) {
-      wsUtils.convertAndSendToUser(sha, INFO_DESTINATION, HttpStatus.INTERNAL_SERVER_ERROR);
-      log.error(e.getMessage());
-      e.printStackTrace();
-    }
-  }*/
-
   @MessageMapping(APP_CHAT_INIT_DESTINATION)
-  public void chat(SimpMessageHeaderAccessor sha, WsMessage wsMessage) throws Exception {
+  public void chat(SimpMessageHeaderAccessor sha, Authentication authentication) throws Exception {
     try {
-      String uuid = wsMessage.getUuid();
 
-      AccountEntity account = accountService.find(UUID.fromString(uuid));
+      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
       if (account == null || !(account.getAccessRole()
           .equals(AccountAccessRole.MODERATOR) || account.getAccessRole()
           .equals(AccountAccessRole.OWNER))) {
@@ -112,13 +89,10 @@ public class ModerationController {
   }
 
   @MessageMapping(APP_BAN_DESTINATION)
-  public void ban(SimpMessageHeaderAccessor sha, WsMessage wsMessage,
-      @DestinationVariable("id") Long id)
-      throws Exception {
+  public void ban(Authentication authentication, @DestinationVariable("id") Long id) {
     try {
-      String uuid = wsMessage.getUuid();
 
-      AccountEntity account = accountService.find(UUID.fromString(uuid));
+      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
       if (account == null || !account.isMod()) {
         return;
       }
@@ -134,7 +108,7 @@ public class ModerationController {
       log.info("{} (#{}) is banning the account {} (#{})", account.getUsername(), account.getId(),
           target.getUsername(), target.getId());
       wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
-          EventType.BAN, target.getId()));
+          LadderEventType.BAN, target.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
@@ -142,13 +116,9 @@ public class ModerationController {
   }
 
   @MessageMapping(APP_MUTE_DESTINATION)
-  public void mute(SimpMessageHeaderAccessor sha, WsMessage wsMessage,
-      @DestinationVariable("id") Long id)
-      throws Exception {
+  public void mute(Authentication authentication, @DestinationVariable("id") Long id) {
     try {
-      String uuid = wsMessage.getUuid();
-
-      AccountEntity account = accountService.find(UUID.fromString(uuid));
+      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
       if (account == null || !account.isMod()) {
         return;
       }
@@ -164,7 +134,7 @@ public class ModerationController {
       log.info("{} (#{}) is muting the account {} (#{})", account.getUsername(), account.getId(),
           target.getUsername(), target.getId());
       wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
-          EventType.MUTE, target.getId()));
+          LadderEventType.MUTE, target.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
@@ -172,12 +142,9 @@ public class ModerationController {
   }
 
   @MessageMapping(APP_FREE_DESTINATION)
-  public void free(SimpMessageHeaderAccessor sha, WsMessage wsMessage,
-      @DestinationVariable("id") Long id) {
+  public void free(Authentication authentication, @DestinationVariable("id") Long id) {
     try {
-      String uuid = wsMessage.getUuid();
-
-      AccountEntity account = accountService.find(UUID.fromString(uuid));
+      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
       if (account == null || !account.isMod()) {
         return;
       }
@@ -192,7 +159,7 @@ public class ModerationController {
           account.getId(),
           target.getDisplayName(), target.getId());
       wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
-          EventType.FREE, target.getId()));
+          LadderEventType.FREE, target.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
@@ -200,9 +167,8 @@ public class ModerationController {
   }
 
   @MessageMapping(APP_RENAME_DESTINATION)
-  public void changeName(SimpMessageHeaderAccessor sha, WsMessage wsMessage,
-      @DestinationVariable("id") Long id)
-      throws Exception {
+  public void changeName(Authentication authentication, WsMessage wsMessage,
+      @DestinationVariable("id") Long id) {
     try {
       String username = wsMessage.getContent();
       username = username.trim();
@@ -211,9 +177,7 @@ public class ModerationController {
       }
       username = username;
 
-      String uuid = wsMessage.getUuid();
-
-      AccountEntity account = accountService.find(UUID.fromString(uuid));
+      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
       if (account == null || !account.isMod()) {
         return;
       }
@@ -227,7 +191,7 @@ public class ModerationController {
       log.info("{} (#{}) is renaming the account {} (#{}) to {}", account.getDisplayName(),
           account.getId(), target.getDisplayName(), target.getId(), username);
       wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
-          EventType.NAME_CHANGE, target.getId(), username));
+          LadderEventType.NAME_CHANGE, target.getId(), username));
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
@@ -235,20 +199,23 @@ public class ModerationController {
   }
 
   @MessageMapping(APP_PROMPT_DESTINATION)
-  public void promptConfirm(SimpMessageHeaderAccessor sha, WsMessage wsMessage,
+  public void promptConfirm(Authentication authentication, WsMessage wsMessage,
       @DestinationVariable("id") Long id) {
     try {
-      String uuid = wsMessage.getUuid();
       String text = wsMessage.getContent();
 
-      AccountEntity account = accountService.find(UUID.fromString(uuid));
+      if (text == null) {
+        throw new IllegalArgumentException();
+      }
+
+      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
       if (account == null || !account.isMod()) {
         return;
       }
 
       AccountEntity target = accountService.find(id);
       wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
-          EventType.MOD, target.getId(), text));
+          LadderEventType.MOD, target.getId(), text));
       log.info("{} (#{}) is prompting the account {} (#{}) with {}", account.getDisplayName(),
           account.getId(), target.getDisplayName(), target.getId(), text);
     } catch (Exception e) {
@@ -258,13 +225,10 @@ public class ModerationController {
   }
 
   @MessageMapping(APP_MOD_DESTINATION)
-  public void mod(SimpMessageHeaderAccessor sha, WsMessage wsMessage,
-      @DestinationVariable("id") Long id)
-      throws Exception {
+  public void mod(Authentication authentication, @DestinationVariable("id") Long id) {
     try {
-      String uuid = wsMessage.getUuid();
 
-      AccountEntity account = accountService.find(UUID.fromString(uuid));
+      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
       if (account == null || !account.isOwner()) {
         return;
       }
@@ -278,7 +242,7 @@ public class ModerationController {
       log.info("{} (#{}) is modding the account {} (#{})", account.getDisplayName(),
           account.getId(), target.getDisplayName(), target.getId());
       wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
-          EventType.MOD, target.getId(), account.getId()));
+          LadderEventType.MOD, target.getId(), account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();

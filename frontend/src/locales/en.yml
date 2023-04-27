@@ -19,6 +19,7 @@ components:
       points: Points
       eta: ETA
       you: You
+      ladder_short: L
       powerGain: Power-Gain
     buttons:
       multi: Multi
@@ -31,6 +32,11 @@ components:
         grapes: Grapes
         vinegar: Vinegar
         active: Active
+        points: Points
+        power: Power
+        promoteAt: Promote at
+        multi_short: M
+        bias_short: B
 options:
   section:
     general: General

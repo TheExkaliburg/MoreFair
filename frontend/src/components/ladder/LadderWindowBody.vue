@@ -7,25 +7,29 @@
         {{ yourFormattedPoints }}/<span class="text-text-dark">{{
           yourBiasCostFormatted
         }}</span>
-        Power [M: x{{ yourFormattedMulti }}]
+        {{ lang("info.power") }} [{{ lang("info.multi_short") }}: x{{
+          yourFormattedMulti
+        }}]
       </div>
       <div>
-        [B: +{{ yourFormattedBias }}] {{ yourFormattedPower }}/<span
-          class="text-text-dark"
-          >{{ yourMultiCostFormatted }}</span
-        >
-        Points
+        [{{ lang("info.bias_short") }}: +{{ yourFormattedBias }}]
+        {{ yourFormattedPower }}/<span class="text-text-dark">{{
+          yourMultiCostFormatted
+        }}</span>
+        {{ lang("info.points") }}
       </div>
     </div>
     <div class="flex flex-row">
       <FairButton
-        :disabled="!canBuyMulti || isButtonLocked"
+        :disabled="isMultiButtonDisabled"
+        :class="{ 'border-r-0': isMultiButtonDisabled }"
         class="w-full rounded-r-none"
         @click="buyMulti"
         >+1 {{ lang("multi") }}
       </FairButton>
       <FairButton
-        :disabled="!canBuyBias || isButtonLocked"
+        :disabled="isBiasButtonDisabled"
+        :class="{ 'border-l-1': isMultiButtonDisabled }"
         class="w-full rounded-l-none border-l-0"
         @click="buyBias"
         >+1 {{ lang("bias") }}
@@ -39,7 +43,7 @@
           yourAutoPromoteCostFormatted
         }}</span>
         {{ lang("info.grapes") }}
-        <span v-if="yourRanker.autoPromote">( {{ lang("info.active") }})</span>
+        <span v-if="yourRanker.autoPromote">({{ lang("info.active") }})</span>
       </p>
       <p>
         {{ yourFormattedVinegar }}/<span class="text-text-dark">{{
@@ -50,21 +54,24 @@
     </div>
     <div class="flex flex-row w-full">
       <FairButton
-        :disabled="!canBuyAutoPromote || isButtonLocked"
+        :class="{ 'border-r-0': isAutoPromoteButtonDisabled }"
+        :disabled="isAutoPromoteButtonDisabled"
         class="w-full rounded-r-none"
         @click="buyAutoPromote"
-        >{{ lang("autopromote") }}
+        >{{ lang("autopromote") }}x
       </FairButton>
       <FairButton
         v-if="yourRanker.rank !== 1"
-        :disabled="!canThrowVinegar || isButtonLocked"
+        :class="{ 'border-l-1': isAutoPromoteButtonDisabled }"
+        :disabled="isVinegarButtonDisabled"
         class="w-full rounded-l-none border-l-0"
         @click="throwVinegar"
         >{{ lang("vinegar") }}
       </FairButton>
       <FairButton
         v-else
-        :disabled="!canPromote || isButtonLocked"
+        :class="{ 'border-l-1': isAutoPromoteButtonDisabled }"
+        :disabled="isPromoteButtonDisabled"
         class="w-full rounded-l-none border-l-0"
         @click="promote"
         >{{ promoteLabel }}
@@ -74,9 +81,11 @@
       class="flex flex-row text-xs lg:text-sm w-full justify-between text-text-light"
     >
       <p>
-        Promote at
+        {{ lang("info.promoteAt") }}
         <span class="text-text-dark">{{ pointsNeededToPromoteFormatted }}</span>
-        Points ({{ yourPercentageToPromotion }}%) ({{ yourTimeToPromotion }})
+        {{ lang("info.points") }} ({{ yourPercentageToPromotion }}%) ({{
+          yourTimeToPromotion
+        }})
       </p>
     </div>
   </div>
@@ -162,7 +171,8 @@ const canBuyMulti = computed<boolean>(() => {
 });
 const canBuyAutoPromote = computed<boolean>(() => {
   return (
-    ladderUtils.getYourAutoPromoteCost.value.cmp(yourRanker.value.grapes) <= 0
+    ladderUtils.getYourAutoPromoteCost.value.cmp(yourRanker.value.grapes) <=
+      0 && !yourRanker.value.autoPromote
   );
 });
 const canThrowVinegar = computed<boolean>(() => {
@@ -189,6 +199,34 @@ const pressedVinegarRecently = ref<boolean>(false);
 const pressedAutoPromoteRecently = ref<boolean>(false);
 const pressedPromoteRecently = ref<boolean>(false);
 
+const isBiasButtonDisabled = computed<boolean>(() => {
+  return !canBuyBias.value || isButtonLocked.value || pressedBiasRecently.value;
+});
+const isMultiButtonDisabled = computed<boolean>(() => {
+  return (
+    !canBuyMulti.value || isButtonLocked.value || pressedMultiRecently.value
+  );
+});
+const isVinegarButtonDisabled = computed<boolean>(() => {
+  return (
+    !canThrowVinegar.value ||
+    isButtonLocked.value ||
+    pressedVinegarRecently.value
+  );
+});
+const isAutoPromoteButtonDisabled = computed<boolean>(() => {
+  return (
+    !canBuyAutoPromote.value ||
+    isButtonLocked.value ||
+    pressedAutoPromoteRecently.value
+  );
+});
+const isPromoteButtonDisabled = computed<boolean>(() => {
+  return (
+    !canPromote.value || isButtonLocked.value || pressedPromoteRecently.value
+  );
+});
+
 function handleTick() {
   pressedBiasRecently.value = false;
   pressedMultiRecently.value = false;
@@ -197,34 +235,34 @@ function handleTick() {
   pressedPromoteRecently.value = false;
 }
 
-function buyBias() {
+function buyBias(e: Event) {
   if (pressedBiasRecently.value || !canBuyBias.value) return;
   pressedBiasRecently.value = true;
-  useStomp().wsApi.ladder.buyBias();
+  useStomp().wsApi.ladder.buyBias(e);
 }
 
-function buyMulti() {
+function buyMulti(e: Event) {
   if (pressedMultiRecently.value || !canBuyMulti.value) return;
   pressedMultiRecently.value = true;
-  useStomp().wsApi.ladder.buyMulti();
+  useStomp().wsApi.ladder.buyMulti(e);
 }
 
-function buyAutoPromote() {
+function buyAutoPromote(e: Event) {
   if (pressedAutoPromoteRecently.value || !canBuyAutoPromote.value) return;
   pressedAutoPromoteRecently.value = true;
-  useStomp().wsApi.ladder.buyAutoPromote();
+  useStomp().wsApi.ladder.buyAutoPromote(e);
 }
 
-function throwVinegar() {
+function throwVinegar(e: Event) {
   if (pressedVinegarRecently.value || !canThrowVinegar.value) return;
   pressedVinegarRecently.value = true;
-  useStomp().wsApi.ladder.throwVinegar();
+  useStomp().wsApi.ladder.throwVinegar(e);
 }
 
-function promote() {
+function promote(e: Event) {
   if (pressedPromoteRecently.value || !canPromote.value) return;
   pressedPromoteRecently.value = true;
-  useStomp().wsApi.ladder.promote();
+  useStomp().wsApi.ladder.promote(e);
 }
 
 onMounted(() => {

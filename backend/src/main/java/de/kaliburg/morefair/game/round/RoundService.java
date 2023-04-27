@@ -7,7 +7,7 @@ import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.api.LadderController;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.events.Event;
-import de.kaliburg.morefair.events.types.EventType;
+import de.kaliburg.morefair.events.types.LadderEventType;
 import de.kaliburg.morefair.game.round.dto.RoundResultsDto;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -123,7 +123,7 @@ public class RoundService {
       getCurrentRound().setHighestAssholeCount(assholeCount);
       ladderService.setCurrentRound(save(getCurrentRound()));
       wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
-          EventType.INCREASE_ASSHOLE_LADDER, account.getId(),
+          LadderEventType.INCREASE_ASSHOLE_LADDER, account.getId(),
           roundUtils.getAssholeLadderNumber(getCurrentRound())));
     }
 

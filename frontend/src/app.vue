@@ -6,8 +6,8 @@
 
 <script lang="ts" setup>
 /*
-- TODO: Make the buttons work with the backend
 
+- TODO: Implement the non-ladder events
 - TODO: LadderWindowTable needs to have a variable amount of columns
 - TODO: Rules page, that you need to agree to register/login
 - TODO: Mod-Page, and options for mods

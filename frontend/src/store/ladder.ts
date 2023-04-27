@@ -2,9 +2,17 @@ import { defineStore } from "pinia";
 import { computed, reactive, ref } from "vue";
 import Decimal from "break_infinity.js";
 import { Ranker, RankerData } from "./entities/ranker";
-import { OnTickBody, useStomp } from "~/composables/useStomp";
+import {
+  LadderEventType,
+  OnLadderEventBody,
+  OnTickBody,
+  useStomp,
+} from "~/composables/useStomp";
 import { useAPI } from "~/composables/useAPI";
 import { useAccountStore } from "~/store/account";
+import { useLadderUtils } from "~/composables/useLadderUtils";
+import { useChatStore } from "~/store/chat";
+import { useFormatter } from "~/composables/useFormatter";
 
 export enum LadderType {
   DEFAULT,
@@ -31,12 +39,15 @@ export type LadderState = {
   number: number;
   types: Set<LadderType>;
   basePointsToPromote: Decimal;
+  events: OnLadderEventBody[];
 };
 
 export const useLadderStore = defineStore("ladder", () => {
   const api = useAPI();
   const stomp = useStomp();
-  const account = useAccountStore();
+  const chatStore = useChatStore();
+  const accountStore = useAccountStore();
+  const ladderUtils = useLadderUtils();
 
   const isInitialized = ref<boolean>(false);
   const state = reactive<LadderState>({
@@ -44,10 +55,11 @@ export const useLadderStore = defineStore("ladder", () => {
     number: 1,
     types: new Set<LadderType>([LadderType.DEFAULT]),
     basePointsToPromote: new Decimal(0),
+    events: [],
   });
   const getters = reactive({
     yourRanker: computed<Ranker | undefined>(() =>
-      state.rankers.find((r) => r.accountId === account.state.accountId)
+      state.rankers.find((r) => r.accountId === accountStore.state.accountId)
     ),
     allAccountNames: computed<string[]>(() =>
       state.rankers.map((r) => r.username)
@@ -76,39 +88,20 @@ export const useLadderStore = defineStore("ladder", () => {
         state.number = data.number;
         state.basePointsToPromote = new Decimal(data.basePointsToPromote);
 
-        if (
-          !stomp.callbacks.onLadderEvent.some(
-            (x) => x.identifier === "fair_ladder_event"
-          )
-        ) {
-          stomp.callbacks.onLadderEvent.push({
-            identifier: "fair_ladder_event",
-            callback: (body) => {
-              const data: RankerData = body.data;
-              const ranker = state.rankers.find(
-                (x) => x.accountId === data.accountId
-              );
-              if (ranker) {
-                Object.assign(ranker, new Ranker(data));
-              } else {
-                state.rankers.push(new Ranker(data));
-              }
-            },
-          });
-        }
+        stomp.addCallback(
+          stomp.callbacks.onLadderEvent,
+          "fair_ladder_publicEvent",
+          (body) => {
+            console.log(body);
+            state.events.push(body);
+          }
+        );
 
-        if (
-          !stomp.callbacks.onTick.some(
-            (x) => x.identifier === "fair_ladder_calculateTick"
-          )
-        ) {
-          stomp.callbacks.onTick.push({
-            identifier: "fair_ladder_calculateTick",
-            callback: (body: OnTickBody) => {
-              calculateTick(body.delta);
-            },
-          });
-        }
+        stomp.addCallback(
+          stomp.callbacks.onTick,
+          "fair_ladder_calculateTick",
+          (body: OnTickBody) => calculateTick(body.delta)
+        );
       })
       .catch((_) => {
         isInitialized.value = false;
@@ -122,25 +115,28 @@ export const useLadderStore = defineStore("ladder", () => {
   }
 
   function calculateTick(deltaSeconds: number) {
+    handleEvents();
+    state.events = [];
+
     const delta = new Decimal(deltaSeconds);
     state.rankers.sort((a, b) => b.points.cmp(a.points));
 
     for (let i = 0; i < state.rankers.length; i++) {
       const ranker = new Ranker(state.rankers[i]);
       state.rankers[i] = ranker;
-      state.rankers[i].rank = i + 1;
+      ranker.rank = i + 1;
 
       // If ranker still on ladder
       if (ranker.growing) {
         // Power & Points
         if (ranker.rank !== 1) {
-          ranker.power = ranker.power.add(
-            new Decimal((ranker.bias + ranker.rank) * ranker.multi)
-              .mul(delta)
-              .floor()
+          ranker.power = Object.freeze(
+            ranker.power.add(ranker.getPowerPerSecond().mul(delta).floor())
           );
         }
-        ranker.points = ranker.points.add(ranker.power.mul(delta).floor());
+        ranker.points = Object.freeze(
+          ranker.points.add(ranker.power.mul(delta).floor())
+        );
 
         for (let j = i - 1; j >= 0; j--) {
           const currentRanker = state.rankers[j + 1];
@@ -150,10 +146,13 @@ export const useLadderStore = defineStore("ladder", () => {
             // Move other Ranker 1 Place down
             state.rankers[j].rank = j + 2;
             if (
-              state.rankers[j].growing /* TODO: && rankers[j].you */ &&
+              state.rankers[j].growing &&
+              state.rankers[j].accountId === getters.yourRanker?.accountId &&
               state.rankers[j].multi > 1
             ) {
-              state.rankers[j].grapes = state.rankers[j].grapes.add(1);
+              state.rankers[j].grapes = Object.freeze(
+                state.rankers[j].grapes.add(1)
+              );
             }
             state.rankers[j + 1] = state.rankers[j];
 
@@ -166,6 +165,120 @@ export const useLadderStore = defineStore("ladder", () => {
         }
       }
     }
+
+    const yourRanker = getters.yourRanker;
+    if (yourRanker !== undefined) {
+      if (yourRanker.rank !== 1) {
+        yourRanker.vinegar = Object.freeze(
+          yourRanker.vinegar.add(yourRanker.grapes.mul(deltaSeconds).floor())
+        );
+      } else {
+        yourRanker.vinegar = Object.freeze(
+          yourRanker.vinegar
+            .mul(Decimal.pow(new Decimal(0.9975), deltaSeconds))
+            .floor()
+        );
+      }
+
+      if (yourRanker.rank === state.rankers.length) {
+        yourRanker.grapes = Object.freeze(
+          yourRanker.grapes.add(new Decimal(2))
+        );
+      }
+    }
+  }
+
+  function handleEvents() {
+    if (state.events.length > 0) console.log("handleEvents", state.events);
+    for (let i = 0; i < state.events.length; i++) {
+      const event = state.events[i];
+      let ranker = state.rankers.find((r) => r.accountId === event.accountId);
+      if (ranker === undefined && event.eventType === LadderEventType.JOIN)
+        ranker = new Ranker({});
+      if (ranker === undefined) break;
+
+      switch (event.eventType) {
+        case LadderEventType.BUY_BIAS:
+          ranker.bias += 1;
+          ranker.points = Object.freeze(new Decimal(0));
+          break;
+        case LadderEventType.BUY_MULTI:
+          ranker.multi += 1;
+          ranker.bias = 0;
+          ranker.points = Object.freeze(new Decimal(0));
+          ranker.power = Object.freeze(new Decimal(0));
+          break;
+        case LadderEventType.BUY_AUTO_PROMOTE:
+          ranker.autoPromote = true;
+          ranker.grapes = Object.freeze(
+            ranker.grapes.sub(
+              new Decimal(ladderUtils.getAutoPromoteCost(ranker.rank))
+            )
+          );
+          break;
+        case LadderEventType.THROW_VINEGAR:
+          handleThrowVinegarEvent(ranker, event);
+          break;
+        case LadderEventType.SOFT_RESET_POINTS:
+          ranker.points = Object.freeze(new Decimal(0));
+          ranker.power = Object.freeze(
+            ranker.power.div(new Decimal(2)).floor()
+          );
+          break;
+        case LadderEventType.PROMOTE:
+          ranker.growing = false;
+          break;
+        case LadderEventType.JOIN:
+          handleJoinEvent(event);
+          break;
+        default:
+          console.error("Unknown event type", event);
+          break;
+      }
+    }
+  }
+
+  function handleThrowVinegarEvent(ranker: Ranker, event: OnLadderEventBody) {
+    if (getters.yourRanker === undefined) return;
+    const vinegarThrown = new Decimal(event.data.amount);
+    console.log("vinegarThrown", vinegarThrown.toString());
+    if (ranker.accountId === getters.yourRanker.accountId) {
+      console.log("yourRanker", getters.yourRanker);
+      ranker.vinegar = Object.freeze(new Decimal(0));
+      return;
+    }
+
+    if (event.data.targetId === getters.yourRanker.accountId) {
+      getters.yourRanker.vinegar = Object.freeze(
+        getters.yourRanker.vinegar.sub(vinegarThrown)
+      );
+      chatStore.actions.addLocalMessage({
+        id: 1,
+        username: "Chad",
+        message: `{@} saw {@} throwing vinegar at {@}. They've ${
+          event.data.success ? "successfully" : ""
+        } used ${useFormatter(vinegarThrown)} vinegar!`,
+        metadata: JSON.stringify([
+          { u: "Chad", i: 0, id: 1 },
+          { u: ranker.username, i: 8, id: ranker.accountId },
+          {
+            u: getters.yourRanker.username,
+            i: 32,
+            id: getters.yourRanker.accountId,
+          },
+        ]),
+        timestamp: Math.floor(Date.now() / 1000),
+        tag: "🂮",
+        assholePoints: 5950,
+      });
+    }
+  }
+
+  function handleJoinEvent(event: OnLadderEventBody) {
+    if (state.rankers.some((r) => r.accountId === event.accountId)) return;
+    const data = event.data;
+    data.accountId = event.accountId;
+    state.rankers.push(new Ranker(data));
   }
 
   return {

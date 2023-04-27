@@ -5,7 +5,7 @@ import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.utils.RequestThrottler;
 import de.kaliburg.morefair.api.utils.WsUtils;
-import de.kaliburg.morefair.api.websockets.messages.WsMetaMessage;
+import de.kaliburg.morefair.api.websockets.messages.WsMessage;
 import de.kaliburg.morefair.game.chat.ChatDto;
 import de.kaliburg.morefair.game.chat.ChatService;
 import de.kaliburg.morefair.game.chat.MessageEntity;
@@ -18,6 +18,7 @@ import de.kaliburg.morefair.security.SecurityUtils;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -89,12 +90,17 @@ public class ChatController {
   @MessageMapping(APP_CHAT_DESTINATION)
   public void postChat(
       @DestinationVariable("number") Integer number,
-      @Payload WsMetaMessage wsMessage,
+      @Payload WsMessage wsMessage,
       Authentication authentication
   ) {
     try {
       String message = wsMessage.getContent();
       String metadata = wsMessage.getMetadata();
+
+      if (ObjectUtils.anyNull(message, metadata)) {
+        throw new IllegalArgumentException("message or metadata is null");
+      }
+
       message = message.trim();
       if (message.length() > 280) {
         message = message.substring(0, 280);

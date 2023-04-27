@@ -30,6 +30,7 @@ import { useLadderStore } from "~/store/ladder";
 import { useTutorialTour } from "~/composables/useTour";
 import { useRoundStore } from "~/store/round";
 import { useAccountStore } from "~/store/account";
+import { useAuthStore } from "~/store/authentication";
 
 const uiStore = useUiStore();
 
@@ -43,7 +44,7 @@ onMounted(() => {
   useRoundStore().actions.init();
   useAccountStore().actions.init();
   const tour = useTutorialTour();
-  if (!tour.getFlag()) {
+  if (!tour.getFlag() && useAuthStore().state.authenticationStatus) {
     tour.start();
   }
 });

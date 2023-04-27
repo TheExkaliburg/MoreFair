@@ -4,10 +4,10 @@ import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.utils.WsUtils;
-import de.kaliburg.morefair.api.websockets.messages.WsObservedMessage;
+import de.kaliburg.morefair.api.websockets.messages.WsMessage;
 import de.kaliburg.morefair.data.ModServerMessageData;
 import de.kaliburg.morefair.events.Event;
-import de.kaliburg.morefair.events.types.EventType;
+import de.kaliburg.morefair.events.types.LadderEventType;
 import de.kaliburg.morefair.game.round.LadderService;
 import de.kaliburg.morefair.game.round.RankerEntity;
 import de.kaliburg.morefair.game.round.RoundEntity;
@@ -15,7 +15,6 @@ import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.game.round.RoundUtils;
 import de.kaliburg.morefair.game.round.dto.LadderDto;
 import de.kaliburg.morefair.security.SecurityUtils;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -83,10 +82,10 @@ public class LadderController {
   }
 
   @MessageMapping(APP_BIAS_DESTINATION)
-  public void buyBias(SimpMessageHeaderAccessor sha, WsObservedMessage wsMessage) {
+  public void buyBias(SimpMessageHeaderAccessor sha, Authentication authentication,
+      WsMessage wsMessage) {
     try {
-      String uuid = wsMessage.getUuid();
-      AccountEntity account = accountService.find(UUID.fromString(uuid));
+      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
       if (account == null || account.isBanned()) {
         return;
       }
@@ -98,7 +97,7 @@ public class LadderController {
           sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
       wsUtils.convertAndSendToTopic(ModerationController.TOPIC_EVENTS_DESTINATION + num, data);
-      ladderService.addEvent(num, new Event(EventType.BUY_BIAS, account.getId()));
+      ladderService.addEvent(num, new Event(LadderEventType.BUY_BIAS, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
@@ -107,11 +106,9 @@ public class LadderController {
 
   @MessageMapping(APP_MULTI_DESTINATION)
   public void buyMulti(SimpMessageHeaderAccessor sha, Authentication authentication,
-      String object) {
+      WsMessage wsMessage) {
     try {
-      WsObservedMessage wsMessage = new WsObservedMessage();
-      String uuid = wsMessage.getUuid();
-      AccountEntity account = accountService.find(UUID.fromString(uuid));
+      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
       if (account == null || account.isBanned()) {
         return;
       }
@@ -119,12 +116,11 @@ public class LadderController {
       Integer num = ladderService.findFirstActiveRankerOfAccountThisRound(account).getLadder()
           .getNumber();
       log.info("[L{}] MULTI: {} (#{}) {}", num, account.getDisplayName(), account.getId(),
-          wsMessage.getEvent());
-      ModServerMessageData data = new ModServerMessageData(account.getId(),
-          sha.getDestination(),
+          wsMessage.getContent());
+      ModServerMessageData data = new ModServerMessageData(account.getId(), sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
       wsUtils.convertAndSendToTopic(ModerationController.TOPIC_EVENTS_DESTINATION + num, data);
-      ladderService.addEvent(num, new Event(EventType.BUY_MULTI, account.getId()));
+      ladderService.addEvent(num, new Event(LadderEventType.BUY_MULTI, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
@@ -132,10 +128,10 @@ public class LadderController {
   }
 
   @MessageMapping(APP_VINEGAR_DESTINATION)
-  public void throwVinegar(SimpMessageHeaderAccessor sha, WsObservedMessage wsMessage) {
+  public void throwVinegar(SimpMessageHeaderAccessor sha, Authentication authentication,
+      WsMessage wsMessage) {
     try {
-      String uuid = wsMessage.getUuid();
-      AccountEntity account = accountService.find(UUID.fromString(uuid));
+      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
       if (account == null || account.isBanned()) {
         return;
       }
@@ -148,7 +144,7 @@ public class LadderController {
           sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
       wsUtils.convertAndSendToTopic(ModerationController.TOPIC_EVENTS_DESTINATION + num, data);
-      ladderService.addEvent(num, new Event(EventType.THROW_VINEGAR, account.getId()));
+      ladderService.addEvent(num, new Event(LadderEventType.THROW_VINEGAR, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
@@ -156,10 +152,11 @@ public class LadderController {
   }
 
   @MessageMapping(APP_PROMOTE_DESTINATION)
-  public void promote(SimpMessageHeaderAccessor sha, WsObservedMessage wsMessage) {
+  public void promote(SimpMessageHeaderAccessor sha, Authentication authentication,
+      WsMessage wsMessage) {
     try {
-      String uuid = wsMessage.getUuid();
-      AccountEntity account = accountService.find(UUID.fromString(uuid));
+
+      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
       if (account == null || account.isBanned()) {
         return;
       }
@@ -172,7 +169,7 @@ public class LadderController {
           sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
       wsUtils.convertAndSendToTopic(ModerationController.TOPIC_EVENTS_DESTINATION + num, data);
-      ladderService.addEvent(num, new Event(EventType.PROMOTE, account.getId()));
+      ladderService.addEvent(num, new Event(LadderEventType.PROMOTE, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
@@ -180,10 +177,10 @@ public class LadderController {
   }
 
   @MessageMapping(APP_AUTOPROMOTE_DESTINATION)
-  public void buyAutoPromote(SimpMessageHeaderAccessor sha, WsObservedMessage wsMessage) {
+  public void buyAutoPromote(SimpMessageHeaderAccessor sha, Authentication authentication,
+      WsMessage wsMessage) {
     try {
-      String uuid = wsMessage.getUuid();
-      AccountEntity account = accountService.find(UUID.fromString(uuid));
+      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
       if (account == null || account.isBanned()) {
         return;
       }
@@ -196,7 +193,7 @@ public class LadderController {
           sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
       wsUtils.convertAndSendToTopic(ModerationController.TOPIC_EVENTS_DESTINATION + num, data);
-      ladderService.addEvent(num, new Event(EventType.BUY_AUTO_PROMOTE, account.getId()));
+      ladderService.addEvent(num, new Event(LadderEventType.BUY_AUTO_PROMOTE, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();

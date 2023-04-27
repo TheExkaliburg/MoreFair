@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { reactive, ref } from "vue";
 import { MentionMeta, Message, MessageData } from "./entities/message";
-import { useStomp } from "~/composables/useStomp";
+import { OnChatEventBody, useStomp } from "~/composables/useStomp";
 import { useAPI } from "~/composables/useAPI";
 
 export type ChatData = {
@@ -44,21 +44,11 @@ export const useChatStore = defineStore("chat", () => {
         });
         state.number = data.number;
 
-        if (
-          !stomp.callbacks.onChatEvent.some(
-            (x) => x.identifier === "fair_chat_event"
-          )
-        ) {
-          stomp.callbacks.onChatEvent.push({
-            identifier: "fair_chat_event",
-            callback: (body) => {
-              if (state.messages.length > 50) {
-                state.messages.shift();
-              }
-              state.messages.push(new Message(body));
-            },
-          });
-        }
+        stomp.addCallback(
+          stomp.callbacks.onChatEvent,
+          "fair_chat_event",
+          (body) => addLocalMessage(body)
+        );
       })
       .catch((_) => {
         isInitialized.value = false;
@@ -74,6 +64,13 @@ export const useChatStore = defineStore("chat", () => {
     getChat(newNumber);
   }
 
+  function addLocalMessage(body: OnChatEventBody) {
+    if (state.messages.length > 50) {
+      state.messages.shift();
+    }
+    state.messages.push(new Message(body));
+  }
+
   return {
     state,
     getters,
@@ -81,6 +78,7 @@ export const useChatStore = defineStore("chat", () => {
       init,
       sendMessage,
       changeChat,
+      addLocalMessage,
     },
   };
 });

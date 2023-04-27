@@ -2,6 +2,7 @@ package de.kaliburg.morefair.security;
 
 import de.kaliburg.morefair.api.utils.HttpUtils;
 import jakarta.servlet.http.HttpServletRequest;
+import java.security.Principal;
 import java.security.SecureRandom;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,16 @@ public class SecurityUtils {
     Object principal = authentication.getPrincipal();
     if (principal instanceof UserDetailsWithUuid) {
       return ((UserDetailsWithUuid) principal).getUuid();
+    }
+    return null;
+  }
+
+  public static UUID getUuid(Principal principal) {
+    if (principal == null) {
+      return null;
+    }
+    if (principal instanceof Authentication) {
+      return getUuid((Authentication) principal);
     }
     return null;
   }

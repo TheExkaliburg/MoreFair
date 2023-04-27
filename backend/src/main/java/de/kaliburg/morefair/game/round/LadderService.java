@@ -11,7 +11,7 @@ import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.data.JoinData;
 import de.kaliburg.morefair.events.data.VinegarData;
-import de.kaliburg.morefair.events.types.EventType;
+import de.kaliburg.morefair.events.types.LadderEventType;
 import de.kaliburg.morefair.game.GameResetEvent;
 import de.kaliburg.morefair.game.UpgradeUtils;
 import de.kaliburg.morefair.game.chat.ChatService;
@@ -353,7 +353,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         ladder.getRankers().size() + 1);
     ladder.getRankers().add(result);
 
-    Event joinEvent = new Event(EventType.JOIN, account.getId());
+    Event joinEvent = new Event(LadderEventType.JOIN, account.getId());
     joinEvent.setData(
         new JoinData(account.getDisplayName(), config.getAssholeTag(account.getAssholeCount()),
             account.getAssholePoints()));
@@ -599,7 +599,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
             saveStateToDatabase(currentRound);
             eventPublisher.publishEvent(new GameResetEvent(this));
             wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION,
-                new Event(EventType.RESET, account.getId()));
+                new Event(LadderEventType.RESET, account.getId()));
           }
         }
         return true;
@@ -659,8 +659,8 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
             LadderController.PRIVATE_EVENTS_DESTINATION, event);
 
         if (data.isSuccess()) {
-          if (!buyMulti(new Event(EventType.BUY_MULTI, targetAccount.getId()), ladder)) {
-            softResetPoints(new Event(EventType.SOFT_RESET_POINTS, targetAccount.getId()),
+          if (!buyMulti(new Event(LadderEventType.BUY_MULTI, targetAccount.getId()), ladder)) {
+            softResetPoints(new Event(LadderEventType.SOFT_RESET_POINTS, targetAccount.getId()),
                 ladder);
           }
         }

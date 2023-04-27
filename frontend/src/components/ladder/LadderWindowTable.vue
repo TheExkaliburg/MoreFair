@@ -42,7 +42,8 @@
       <div class="col-span-6 text-right order-last">{{ lang("power") }}</div>
       <div class="col-span-6 text-right order-last">{{ lang("points") }}</div>
       <div class="hidden sm:block col-span-7 text-right">
-        {{ lang("eta") }} -> L{{ ladder.state.number + 1 }}
+        {{ lang("eta") }} -> {{ lang("ladder_short")
+        }}{{ ladder.state.number + 1 }}
       </div>
       <div class="hidden sm:block col-span-7 text-right">
         {{ lang("eta") }} -> {{ lang("you") }}

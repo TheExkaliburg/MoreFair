@@ -4,7 +4,7 @@ import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.FairController;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.events.Event;
-import de.kaliburg.morefair.events.types.EventType;
+import de.kaliburg.morefair.events.types.LadderEventType;
 import de.kaliburg.morefair.game.chat.MessageService;
 import de.kaliburg.morefair.game.round.dto.HeartbeatDto;
 import java.math.BigInteger;
@@ -205,7 +205,7 @@ public class LadderCalculator {
         .contains(LadderType.FREE_AUTO)) && rankers.get(0).isGrowing()
         && ladderUtils.isLadderPromotable(ladder)) {
       ladderService.addEvent(ladder.getNumber(),
-          new Event(EventType.PROMOTE, rankers.get(0).getAccount().getId()));
+          new Event(LadderEventType.PROMOTE, rankers.get(0).getAccount().getId()));
     }
   }
 }

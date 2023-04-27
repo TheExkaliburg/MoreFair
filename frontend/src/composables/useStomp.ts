@@ -1,8 +1,15 @@
 import { Client } from "@stomp/stompjs";
 import { MentionMeta, MessageData } from "~/store/entities/message";
+import { useAccountStore } from "~/store/account";
 
 export enum LadderEventType {
-  JOIN,
+  BUY_BIAS = "BUY_BIAS",
+  BUY_MULTI = "BUY_MULTI",
+  BUY_AUTO_PROMOTE = "BUY_AUTO_PROMOTE",
+  THROW_VINEGAR = "THROW_VINEGAR",
+  SOFT_RESET_POINTS = "SOFT_RESET_POINTS",
+  PROMOTE = "PROMOTE",
+  JOIN = "JOIN",
 }
 
 export type OnTickBody = {
@@ -38,10 +45,10 @@ const callbacks: StompCallbacks = {
   onAccountEvent: [],
 };
 
-function addCallback(
-  event: StompCallback<any>[],
+function addCallback<T>(
+  event: StompCallback<T>[],
   identifier: string,
-  callback: (body: any) => void
+  callback: (body: T) => void
 ) {
   const eventCallback = event.find((e) => e.identifier === identifier);
   if (eventCallback === undefined) {
@@ -54,6 +61,7 @@ function addCallback(
   }
 }
 
+let isPrivateConnectionEstablished = false;
 const isDevMode = process.env.NODE_ENV !== "production";
 const connection = isDevMode
   ? "ws://localhost:8080/socket/fair"
@@ -70,6 +78,7 @@ const client = new Client({
 });
 
 client.onConnect = (_) => {
+  const accountStore = useAccountStore();
   client.subscribe("/topic/game/tick", (message) => {
     const body: OnTickBody = JSON.parse(message.body);
     callbacks.onTick.forEach(({ callback }) => callback(body));
@@ -97,33 +106,52 @@ client.onConnect = (_) => {
     const body: OnLadderEventBody = JSON.parse(message.body);
     callbacks.onLadderEvent.forEach(({ callback }) => callback(body));
   });
-  client.subscribe("/user/queue/ladder/event", (message) => {
-    const body: OnLadderEventBody = JSON.parse(message.body);
-    callbacks.onLadderEvent.forEach(({ callback }) => callback(body));
-  });
 
   client.subscribe("/topic/chat/event/1", (message) => {
     const body: OnChatEventBody = JSON.parse(message.body);
     callbacks.onChatEvent.forEach(({ callback }) => callback(body));
   });
-  client.subscribe("/user/queue/chat/event", (message) => {
+
+  const privateUuid = accountStore.state.uuid;
+  if (privateUuid !== "") {
+    connectPrivateChannel(privateUuid);
+  }
+};
+
+function connectPrivateChannel(uuid: string) {
+  if (uuid === undefined || isPrivateConnectionEstablished) return;
+  isPrivateConnectionEstablished = true;
+
+  client.subscribe(`/private/${uuid}/ladder/event`, (message) => {
+    const body: OnLadderEventBody = JSON.parse(message.body);
+    callbacks.onLadderEvent.forEach(({ callback }) => callback(body));
+  });
+  client.subscribe(`/private/${uuid}/chat/event`, (message) => {
     const body: OnChatEventBody = JSON.parse(message.body);
     callbacks.onChatEvent.forEach(({ callback }) => callback(body));
   });
-};
+}
 
 client.onStompError = (frame) => {
   console.log("Broker reported error: " + frame.headers.message);
   console.log("Additional details: " + frame.body);
 };
 
+client.onDisconnect = (_) => {
+  isPrivateConnectionEstablished = false;
+};
+
+function parseEvent(e: Event): string {
+  return JSON.stringify(e);
+}
+
 const wsApi = (client: Client) => {
   return {
     account: {
-      rename: () => {
+      rename: (name: string) => {
         client.publish({
           destination: "/app/account/rename",
-          body: JSON.stringify({ name: "test" }),
+          body: JSON.stringify({ content: name }),
         });
       },
     },
@@ -169,29 +197,44 @@ const wsApi = (client: Client) => {
           callbacks.onLadderEvent.forEach(({ callback }) => callback(body));
         });
       },
-      buyBias: () => {
+      buyBias: (e: Event) => {
         client.publish({
           destination: "/app/ladder/bias",
+          body: JSON.stringify({
+            event: parseEvent(e),
+          }),
         });
       },
-      buyMulti: () => {
+      buyMulti: (e: Event) => {
         client.publish({
           destination: "/app/ladder/multi",
+          body: JSON.stringify({
+            event: parseEvent(e),
+          }),
         });
       },
-      throwVinegar: () => {
+      throwVinegar: (e: Event) => {
         client.publish({
           destination: "/app/ladder/vinegar",
+          body: JSON.stringify({
+            event: parseEvent(e),
+          }),
         });
       },
-      buyAutoPromote: () => {
+      buyAutoPromote: (e: Event) => {
         client.publish({
           destination: "/app/ladder/autopromote",
+          body: JSON.stringify({
+            event: parseEvent(e),
+          }),
         });
       },
-      promote: () => {
+      promote: (e: Event) => {
         client.publish({
           destination: "/app/ladder/promote",
+          body: JSON.stringify({
+            event: parseEvent(e),
+          }),
         });
       },
     },
@@ -208,5 +251,6 @@ export const useStomp = () => {
     wsApi: wsApi(client),
     callbacks,
     addCallback,
+    connectPrivateChannel,
   };
 };

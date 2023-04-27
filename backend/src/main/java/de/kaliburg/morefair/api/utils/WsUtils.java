@@ -1,7 +1,6 @@
 package de.kaliburg.morefair.api.utils;
 
-import de.kaliburg.morefair.api.websockets.UserPrincipal;
-import de.kaliburg.morefair.api.websockets.messages.WSMessageAnswer;
+import de.kaliburg.morefair.api.websockets.messages.WsAnswer;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -59,7 +58,7 @@ public class WsUtils {
 
     log.debug("Message to {} at /user{}", sha.getUser().getName(), sb.toString());
     simpMessagingTemplate.convertAndSendToUser(sha.getUser().getName(), sb.toString(),
-        new WSMessageAnswer<>(content, status));
+        new WsAnswer<>(content, status));
   }
 
   /**
@@ -107,16 +106,5 @@ public class WsUtils {
     sb.append(dest);
 
     simpMessagingTemplate.convertAndSend(sb.toString(), content);
-  }
-
-  /**
-   * Retrieves the UserPrincipal from the SimpMessageHeaderAccessor.
-   *
-   * @param sha the SimpMessageHeaderAccessor that contains the UserPrincipal
-   * @return the UserPrincipal from the SimpMessageHeaderAccessor
-   */
-  public UserPrincipal convertMessageHeaderAccessorToUserPrincipal(
-      SimpMessageHeaderAccessor sha) {
-    return ((UserPrincipal) sha.getUser());
   }
 }

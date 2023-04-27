@@ -4,8 +4,6 @@ import { useLadderStore } from "~/store/ladder";
 import { useLadderUtils } from "~/composables/useLadderUtils";
 import { useStomp } from "~/composables/useStomp";
 
-let countCacheUses = 0;
-let countTotalUses = 0;
 const etaRankerCache = new Map<Ranker, Map<Ranker, number>>();
 const etaPointsCache = new Map<Ranker, Map<Decimal, number>>();
 const etaPowerCache = new Map<Ranker, Map<Decimal, number>>();
@@ -14,18 +12,6 @@ const stomp = useStomp();
 stomp.addCallback(stomp.callbacks.onTick, "fair_eta_cache_reset", resetCache);
 
 function resetCache() {
-  console.log(
-    "Resetting Eta Cache; total:",
-    countTotalUses,
-    "cache:",
-    countCacheUses,
-    "new:",
-    countTotalUses - countCacheUses
-  );
-
-  countTotalUses = 0;
-  countCacheUses = 0;
-
   etaRankerCache.clear();
   etaPointsCache.clear();
   etaPowerCache.clear();
@@ -49,12 +35,10 @@ export const useEta = (ranker: Ranker) => {
   const ladderUtils = useLadderUtils();
 
   function toRanker(target: Ranker): number {
-    countTotalUses++;
     let cachedMap = etaRankerCache.get(ranker);
     if (cachedMap !== undefined) {
       const cachedValue = cachedMap.get(target);
       if (cachedValue !== undefined) {
-        countCacheUses++;
         return cachedValue;
       }
     } else {

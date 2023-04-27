@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { reactive } from "vue";
 import { useAPI } from "~/composables/useAPI";
+import { useStomp } from "~/composables/useStomp";
 
 export enum AccessRole {
   OWNER,
@@ -15,6 +16,7 @@ export type AccountData = {
   accessRole: AccessRole.PLAYER;
   accountId: number;
   highestCurrentLadder: number;
+  uuid: string;
 };
 
 export const useAccountStore = defineStore("account", () => {
@@ -25,6 +27,7 @@ export const useAccountStore = defineStore("account", () => {
     accessRole: AccessRole.PLAYER,
     accountId: 1,
     highestCurrentLadder: 1,
+    uuid: "",
   });
   const getters = reactive({});
 
@@ -39,6 +42,8 @@ export const useAccountStore = defineStore("account", () => {
       state.accessRole = data.accessRole;
       state.accountId = data.accountId;
       state.highestCurrentLadder = data.highestCurrentLadder;
+      state.uuid = data.uuid;
+      useStomp().connectPrivateChannel(state.uuid);
     });
   }
 
