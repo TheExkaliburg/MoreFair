@@ -1,31 +1,9 @@
 import { Client } from "@stomp/stompjs";
 import { MentionMeta, MessageData } from "~/store/entities/message";
-import { useAccountStore } from "~/store/account";
+import { AccountEventType, useAccountStore } from "~/store/account";
 import { useChatStore } from "~/store/chat";
-
-export enum LadderEventType {
-  BUY_BIAS = "BUY_BIAS",
-  BUY_MULTI = "BUY_MULTI",
-  BUY_AUTO_PROMOTE = "BUY_AUTO_PROMOTE",
-  THROW_VINEGAR = "THROW_VINEGAR",
-  SOFT_RESET_POINTS = "SOFT_RESET_POINTS",
-  PROMOTE = "PROMOTE",
-  JOIN = "JOIN",
-  ADD_FREE_AUTO = "ADD_FREE_AUTO",
-}
-
-export enum AccountEventType {
-  BAN = "BAN",
-  FREE = "FREE",
-  MUTE = "MUTE",
-  MOD = "MOD",
-  NAME_CHANGE = "NAME_CHANGE",
-}
-
-export enum RoundEventType {
-  RESET = "RESET",
-  INCREASE_ASSHOLE_LADDER = "INCREASE_ASSHOLE_LADDER",
-}
+import { RoundEventType } from "~/store/round";
+import { LadderEventType } from "~/store/ladder";
 
 export type OnTickBody = {
   delta: number;
@@ -110,10 +88,6 @@ client.onConnect = (_) => {
     const body: OnAccountEventBody = JSON.parse(message.body);
     callbacks.onAccountEvent.forEach(({ callback }) => callback(body));
   });
-  client.subscribe("/user/queue/account/event", (message) => {
-    const body: OnAccountEventBody = JSON.parse(message.body);
-    callbacks.onAccountEvent.forEach(({ callback }) => callback(body));
-  });
 
   client.subscribe("/topic/round/event", (message) => {
     const body: OnRoundEventBody = JSON.parse(message.body);
@@ -149,6 +123,10 @@ function connectPrivateChannel(uuid: string) {
   client.subscribe(`/private/${uuid}/chat/event`, (message) => {
     const body: OnChatEventBody = JSON.parse(message.body);
     callbacks.onChatEvent.forEach(({ callback }) => callback(body));
+  });
+  client.subscribe(`/private/${uuid}/account/event`, (message) => {
+    const body: OnAccountEventBody = JSON.parse(message.body);
+    callbacks.onAccountEvent.forEach(({ callback }) => callback(body));
   });
 }
 
@@ -250,7 +228,7 @@ const wsApi = (client: Client) => {
       },
       buyAutoPromote: (e: Event) => {
         client.publish({
-          destination: "/app/ladder/autopromote",
+          destination: "/app/ladder/autoPromote",
           body: JSON.stringify({
             event: parseEvent(e),
           }),

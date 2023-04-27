@@ -34,14 +34,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequiredArgsConstructor
 public class LadderController {
 
-  public static final String APP_BIAS_DESTINATION = "/ladder/bias";
-  public static final String APP_MULTI_DESTINATION = "/ladder/multi";
-  public static final String APP_VINEGAR_DESTINATION = "/ladder/vinegar";
-  public static final String APP_PROMOTE_DESTINATION = "/ladder/promote";
-  public static final String APP_AUTOPROMOTE_DESTINATION = "/ladder/autopromote";
   public static final String TOPIC_EVENTS_DESTINATION = "/ladder/event/{number}";
-  public static final String TOPIC_GLOBAL_EVENTS_DESTINATION = "/ladder/event";
   public static final String PRIVATE_EVENTS_DESTINATION = "/ladder/event";
+  private static final String APP_BIAS_DESTINATION = "/ladder/bias";
+  private static final String APP_MULTI_DESTINATION = "/ladder/multi";
+  private static final String APP_VINEGAR_DESTINATION = "/ladder/vinegar";
+  private static final String APP_PROMOTE_DESTINATION = "/ladder/promote";
+  private static final String APP_AUTOPROMOTE_DESTINATION = "/ladder/autoPromote";
   private final AccountService accountService;
   private final WsUtils wsUtils;
   private final RoundService roundService;

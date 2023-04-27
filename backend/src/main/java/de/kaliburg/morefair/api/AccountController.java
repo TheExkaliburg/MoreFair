@@ -31,8 +31,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AccountController {
 
+  public static final String TOPIC_EVENTS_DESTINATION = "/account/event";
+  public static final String PRIVATE_EVENTS_DESTINATION = "/account/event";
   private static final String APP_RENAME_DESTINATION = "/account/name";
-
   private final AccountService accountService;
   private final WsUtils wsUtils;
   private final RoundService roundService;
@@ -85,7 +86,7 @@ public class AccountController {
       account.setDisplayName(displayName);
       accountService.save(account);
 
-      wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION,
+      wsUtils.convertAndSendToTopic(AccountController.TOPIC_EVENTS_DESTINATION,
           new Event<>(AccountEventTypes.NAME_CHANGE, account.getId(),
               account.getDisplayName()));
 

@@ -163,8 +163,7 @@ public class ChatService implements ApplicationListener<AccountServiceEvent> {
         }
 
         result = messageService.save(result);
-        wsUtils.convertAndSendToTopic(
-            ChatController.TOPIC_EVENTS_DESTINATION(number),
+        wsUtils.convertAndSendToTopicWithNumber(ChatController.TOPIC_EVENTS_DESTINATION, number,
             new MessageDto(result, config));
         return result;
       } finally {

@@ -17,7 +17,6 @@ import de.kaliburg.morefair.security.SecurityUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -27,7 +26,6 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -35,17 +33,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Log4j2
 public class ModerationController {
 
-  public static final String APP_CHAT_INIT_DESTINATION = "/mod/chat/init";
-  public static final String APP_BAN_DESTINATION = "/mod/ban/{id}";
-  public static final String APP_MUTE_DESTINATION = "/mod/mute/{id}";
-  public static final String APP_FREE_DESTINATION = "/mod/free/{id}";
-  public static final String APP_RENAME_DESTINATION = "/mod/rename/{id}";
-  public static final String APP_PROMPT_DESTINATION = "/mod/prompt/{id}";
-  public static final String APP_MOD_DESTINATION = "/mod/mod/{id}";
-  public static final String TOPIC_CHAT_EVENTS_DESTINATION = "/mod/chat/events";
   public static final String TOPIC_EVENTS_DESTINATION = "/mod/events";
   public static final String QUEUE_CHAT_INIT_DESTINATION = "/mod/chat/init";
-
+  private static final String APP_CHAT_INIT_DESTINATION = "/mod/chat/init";
+  private static final String APP_BAN_DESTINATION = "/mod/ban/{id}";
+  private static final String APP_MUTE_DESTINATION = "/mod/mute/{id}";
+  private static final String APP_FREE_DESTINATION = "/mod/free/{id}";
+  private static final String APP_RENAME_DESTINATION = "/mod/rename/{id}";
+  private static final String APP_PROMPT_DESTINATION = "/mod/prompt/{id}";
+  private static final String APP_MOD_DESTINATION = "/mod/mod/{id}";
   private final AccountService accountService;
   private final WsUtils wsUtils;
   private final LadderService ladderService;
@@ -64,27 +60,24 @@ public class ModerationController {
     this.config = config;
   }
 
-  @MessageMapping(APP_CHAT_INIT_DESTINATION)
-  public void chat(SimpMessageHeaderAccessor sha, Authentication authentication) throws Exception {
+  @GetMapping("/mod/chat")
+  public ResponseEntity<?> chat(SimpMessageHeaderAccessor sha, Authentication authentication)
+      throws Exception {
     try {
-
       AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
       if (account == null || !(account.getAccessRole()
           .equals(AccountAccessRole.MODERATOR) || account.getAccessRole()
           .equals(AccountAccessRole.OWNER))) {
-        wsUtils.convertAndSendToUser(sha, QUEUE_CHAT_INIT_DESTINATION, HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       } else {
         ArrayList<MessageEntity> messages = messageService.getAllMessages();
-        wsUtils.convertAndSendToUser(sha, QUEUE_CHAT_INIT_DESTINATION, new ModChatData(messages,
-            config));
+        return new ResponseEntity<>(new ModChatData(messages,
+            config), HttpStatus.OK);
       }
-    } catch (IllegalArgumentException e) {
-      wsUtils.convertAndSendToUser(sha, QUEUE_CHAT_INIT_DESTINATION, HttpStatus.BAD_REQUEST);
     } catch (Exception e) {
-      wsUtils.convertAndSendToUser(sha, QUEUE_CHAT_INIT_DESTINATION,
-          HttpStatus.INTERNAL_SERVER_ERROR);
       log.error(e.getMessage());
       e.printStackTrace();
+      return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -107,7 +100,7 @@ public class ModerationController {
       chatService.deleteMessagesOfAccount(target);
       log.info("{} (#{}) is banning the account {} (#{})", account.getUsername(), account.getId(),
           target.getUsername(), target.getId());
-      wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event<>(
+      wsUtils.convertAndSendToTopic(AccountController.TOPIC_EVENTS_DESTINATION, new Event<>(
           AccountEventTypes.BAN, target.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
@@ -133,7 +126,7 @@ public class ModerationController {
       chatService.deleteMessagesOfAccount(target);
       log.info("{} (#{}) is muting the account {} (#{})", account.getUsername(), account.getId(),
           target.getUsername(), target.getId());
-      wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event<>(
+      wsUtils.convertAndSendToTopic(AccountController.TOPIC_EVENTS_DESTINATION, new Event<>(
           AccountEventTypes.MUTE, target.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
@@ -158,7 +151,7 @@ public class ModerationController {
       log.info("{} (#{}) is freeing the account {} (#{})", account.getDisplayName(),
           account.getId(),
           target.getDisplayName(), target.getId());
-      wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event<>(
+      wsUtils.convertAndSendToTopic(AccountController.TOPIC_EVENTS_DESTINATION, new Event<>(
           AccountEventTypes.FREE, target.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
@@ -190,7 +183,7 @@ public class ModerationController {
       target = accountService.save(target);
       log.info("{} (#{}) is renaming the account {} (#{}) to {}", account.getDisplayName(),
           account.getId(), target.getDisplayName(), target.getId(), username);
-      wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event<>(
+      wsUtils.convertAndSendToTopic(AccountController.TOPIC_EVENTS_DESTINATION, new Event<>(
           AccountEventTypes.NAME_CHANGE, target.getId(), username));
     } catch (Exception e) {
       log.error(e.getMessage());
@@ -214,7 +207,7 @@ public class ModerationController {
       }
 
       AccountEntity target = accountService.find(id);
-      wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event<>(
+      wsUtils.convertAndSendToTopic(AccountController.TOPIC_EVENTS_DESTINATION, new Event<>(
           AccountEventTypes.MOD, target.getId(), text));
       log.info("{} (#{}) is prompting the account {} (#{}) with {}", account.getDisplayName(),
           account.getId(), target.getDisplayName(), target.getId(), text);
@@ -241,7 +234,7 @@ public class ModerationController {
       target = accountService.save(target);
       log.info("{} (#{}) is modding the account {} (#{})", account.getDisplayName(),
           account.getId(), target.getDisplayName(), target.getId());
-      wsUtils.convertAndSendToTopic(LadderController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event<>(
+      wsUtils.convertAndSendToTopic(AccountController.TOPIC_EVENTS_DESTINATION, new Event<>(
           AccountEventTypes.MOD, target.getId(), account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
@@ -251,14 +244,11 @@ public class ModerationController {
 
   @GetMapping(value = "/mod/search/user", produces = "application/json")
   public ResponseEntity<Map<Long, String>> searchUsername(
-      @CookieValue(name = "_uuid", defaultValue = "") String uuid,
+      Authentication authentication,
       @RequestParam("name") String name) {
     try {
-      if (uuid.isBlank()) {
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-      }
 
-      AccountEntity account = accountService.find(UUID.fromString(uuid));
+      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
       if (account == null || !account.isMod()) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       }
@@ -275,14 +265,11 @@ public class ModerationController {
   }
 
   @GetMapping(value = "/mod/search/alts", produces = "application/json")
-  public ResponseEntity<Map<Long, String>> searcAlts(
-      @CookieValue(name = "_uuid", defaultValue = "") String uuid, @RequestParam("id") String id) {
+  public ResponseEntity<Map<Long, String>> searchAlts(Authentication authentication,
+      @RequestParam("id") String id) {
     try {
-      if (uuid.isBlank()) {
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-      }
 
-      AccountEntity account = accountService.find(UUID.fromString(uuid));
+      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
       if (account == null || !account.isMod()) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       }

@@ -37,10 +37,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequiredArgsConstructor
 public class ChatController {
 
-  public static final String QUEUE_INIT_DESTINATION = "/chat/init";
-  public static final String PRIVATE_PROMPT_DESTINATION = "/chat/prompt";
-  public static final String APP_INIT_DESTINATION = "/chat/init/{number}";
-  public static final String APP_CHAT_DESTINATION = "/chat/{number}";
+  public static final String PRIVATE_EVENTS_DESTINATION = "/chat/events";
+  public static final String TOPIC_EVENTS_DESTINATION = "/chat/events/{number}";
+  private static final String APP_CHAT_DESTINATION = "/chat/{number}";
   private final AccountService accountService;
   private final RankerService rankerService;
   private final WsUtils wsUtils;
@@ -50,10 +49,6 @@ public class ChatController {
   private final FairConfig config;
   private final LadderService ladderService;
   private final MessageService messageService;
-
-  public static String TOPIC_EVENTS_DESTINATION(Integer number) {
-    return "/chat/event/{number}".replace("{number}", number.toString());
-  }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> initChat(@RequestParam("number") Integer number,

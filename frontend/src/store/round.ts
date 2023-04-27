@@ -5,11 +5,7 @@ import {
   RoundSettings,
   RoundSettingsData,
 } from "~/store/entities/roundSettings";
-import {
-  OnRoundEventBody,
-  RoundEventType,
-  useStomp,
-} from "~/composables/useStomp";
+import { OnRoundEventBody, useStomp } from "~/composables/useStomp";
 import { useChatStore } from "~/store/chat";
 import { useLadderStore } from "~/store/ladder";
 import { useAccountStore } from "~/store/account";
@@ -21,6 +17,11 @@ export enum RoundType {
   SLOW,
   AUTO,
   CHAOS,
+}
+
+export enum RoundEventType {
+  RESET = "RESET",
+  INCREASE_ASSHOLE_LADDER = "INCREASE_ASSHOLE_LADDER",
 }
 
 export type RoundData = {

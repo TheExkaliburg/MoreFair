@@ -6,14 +6,6 @@
 
 <script lang="ts" setup>
 /*
-
-- TODO: Implement the non-ladder events
-    - BAN (account)
-    - FREE (account)
-    - MUTE (account)
-    - MOD (account)
-    - NAME_CHANGE (account)
-
 - TODO: LadderWindowTable needs to have a variable amount of columns
 - TODO: Rules page, that you need to agree to register/login
 - TODO: Mod-Page, and options for mods

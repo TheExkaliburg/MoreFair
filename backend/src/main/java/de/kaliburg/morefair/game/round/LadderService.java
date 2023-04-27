@@ -359,8 +359,8 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
     joinEvent.setData(
         new JoinData(account.getDisplayName(), config.getAssholeTag(account.getAssholeCount()),
             account.getAssholePoints()));
-    wsUtils.convertAndSendToTopic(LadderController.TOPIC_EVENTS_DESTINATION.replace("{number}",
-        ladder.getNumber().toString()), joinEvent);
+    wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION, number,
+        joinEvent);
 
     return result;
   }

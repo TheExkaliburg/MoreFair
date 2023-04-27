@@ -3,7 +3,6 @@ import { computed, reactive, ref } from "vue";
 import Decimal from "break_infinity.js";
 import { Ranker, RankerData } from "./entities/ranker";
 import {
-  LadderEventType,
   OnLadderEventBody,
   OnTickBody,
   useStomp,
@@ -26,6 +25,17 @@ export enum LadderType {
   ASSHOLE,
   CHEAP,
   EXPENSIVE,
+}
+
+export enum LadderEventType {
+  BUY_BIAS = "BUY_BIAS",
+  BUY_MULTI = "BUY_MULTI",
+  BUY_AUTO_PROMOTE = "BUY_AUTO_PROMOTE",
+  THROW_VINEGAR = "THROW_VINEGAR",
+  SOFT_RESET_POINTS = "SOFT_RESET_POINTS",
+  PROMOTE = "PROMOTE",
+  JOIN = "JOIN",
+  ADD_FREE_AUTO = "ADD_FREE_AUTO",
 }
 
 export type LadderData = {

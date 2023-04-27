@@ -107,4 +107,8 @@ public class WsUtils {
 
     simpMessagingTemplate.convertAndSend(sb.toString(), content);
   }
+
+  public void convertAndSendToTopicWithNumber(String dest, Integer number, Object content) {
+    convertAndSendToTopic(dest.replace("{number}", number.toString()), content);
+  }
 }

@@ -1,7 +1,10 @@
 import { defineStore } from "pinia";
-import { reactive } from "vue";
+import { computed, reactive } from "vue";
 import { useAPI } from "~/composables/useAPI";
-import { useStomp } from "~/composables/useStomp";
+import { OnAccountEventBody, useStomp } from "~/composables/useStomp";
+import { useLadderStore } from "~/store/ladder";
+import { useChatStore } from "~/store/chat";
+import { useAuthStore } from "~/store/authentication";
 
 export enum AccessRole {
   OWNER,
@@ -12,9 +15,20 @@ export enum AccessRole {
   BROADCASTER,
 }
 
+export enum AccountEventType {
+  BAN = "BAN",
+  FREE = "FREE",
+  MUTE = "MUTE",
+  MOD = "MOD",
+  NAME_CHANGE = "NAME_CHANGE",
+  INCREASE_HIGHEST_LADDER = "INCREASE_HIGHEST_LADDER",
+}
+
 export type AccountData = {
-  accessRole: AccessRole.PLAYER;
+  accessRole: AccessRole;
   accountId: number;
+  username: string;
+  email: string;
   highestCurrentLadder: number;
   uuid: string;
 };
@@ -22,14 +36,20 @@ export type AccountData = {
 export const useAccountStore = defineStore("account", () => {
   const api = useAPI();
 
+  const ladderStore = useLadderStore();
+
   const isInitialized = ref<boolean>(false);
-  const state = reactive({
+  const state = reactive<AccountData>({
     accessRole: AccessRole.PLAYER,
     accountId: 1,
+    username: "Mystery Guest",
+    email: "",
     highestCurrentLadder: 1,
     uuid: "",
   });
-  const getters = reactive({});
+  const getters = reactive({
+    isGuest: computed<boolean>(() => useAuthStore().getters.isGuest),
+  });
 
   function init() {
     if (isInitialized.value) return;
@@ -48,8 +68,54 @@ export const useAccountStore = defineStore("account", () => {
       state.accountId = data.accountId;
       state.highestCurrentLadder = data.highestCurrentLadder;
       state.uuid = data.uuid;
-      useStomp().connectPrivateChannel(state.uuid);
+      const stomp = useStomp();
+      stomp.connectPrivateChannel(state.uuid);
+      stomp.addCallback(
+        stomp.callbacks.onAccountEvent,
+        "fair_account_events",
+        handleAccountEvents
+      );
     });
+  }
+
+  function handleAccountEvents(body: OnAccountEventBody) {
+    const event = body.eventType;
+    const isYou = state.accountId === body.accountId;
+    let ranker;
+    if (isYou) {
+      ranker = ladderStore.getters.yourRanker;
+    } else {
+      ranker = ladderStore.state.rankers.find(
+        (r) => r.accountId === body.accountId
+      );
+    }
+
+    if (ranker === undefined) return;
+
+    switch (event) {
+      case AccountEventType.NAME_CHANGE:
+        ranker.username = body.data;
+        useChatStore().actions.rename(body.accountId, body.data);
+        break;
+      case AccountEventType.MOD:
+        state.accessRole = AccessRole.MODERATOR;
+        break;
+      case AccountEventType.FREE:
+        state.accessRole = AccessRole.PLAYER;
+        break;
+      case AccountEventType.MUTE:
+        state.accessRole = AccessRole.MUTED_PLAYER;
+        break;
+      case AccountEventType.BAN:
+        state.accessRole = AccessRole.BANNED_PLAYER;
+        break;
+      case AccountEventType.INCREASE_HIGHEST_LADDER:
+        state.highestCurrentLadder = body.data;
+        break;
+      default:
+        console.error("Unknown account event type: " + event);
+        break;
+    }
   }
 
   return {

@@ -90,6 +90,14 @@ export const useChatStore = defineStore("chat", () => {
     });
   }
 
+  function rename(accountId: number, username: string) {
+    state.messages.forEach((message) => {
+      if (message.accountId === accountId) {
+        message.username = username;
+      }
+    });
+  }
+
   return {
     state,
     getters,
@@ -100,6 +108,7 @@ export const useChatStore = defineStore("chat", () => {
       changeChat,
       addLocalMessage,
       addSystemMessage,
+      rename,
     },
   };
 });
