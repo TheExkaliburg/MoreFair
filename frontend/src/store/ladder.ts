@@ -252,6 +252,11 @@ export const useLadderStore = defineStore("ladder", () => {
       getters.yourRanker.vinegar = Object.freeze(
         getters.yourRanker.vinegar.sub(vinegarThrown)
       );
+      useToasts(
+        `${ranker.username} (#${ranker.accountId}) ${
+          event.data.success ? "successfully" : ""
+        } threw  ${useFormatter(vinegarThrown)} vinegar at you!`
+      );
       chatStore.actions.addLocalMessage({
         id: 1,
         username: "Chad",

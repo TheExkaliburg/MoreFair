@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     "@fortawesome/fontawesome-svg-core/styles.css",
     "vue-virtual-scroller/dist/vue-virtual-scroller.css",
     "intro.js/minified/introjs.min.css",
+    "vue3-toastify/dist/index.css",
   ],
   modules: [
     "@pinia/nuxt",
@@ -28,6 +29,7 @@ export default defineNuxtConfig({
       "@heroicons/vue",
       "vue-virtual-scroller",
       "vue-i18n",
+      "vue3-toastify",
     ],
   },
   ssr: false,
