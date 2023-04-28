@@ -16,6 +16,13 @@
       </div>
       <!--Bottom of the Canvas-->
       <div class="min-w-min flex flex-col justify-items-start content-around">
+        <NuxtLink to="/account">
+          <SidebarButton :label="lang('account')">
+            <template #icon>
+              <UserCircleIcon />
+            </template>
+          </SidebarButton>
+        </NuxtLink>
         <NuxtLink to="/options">
           <SidebarButton :label="optionsLabel">
             <template #icon>
@@ -27,6 +34,13 @@
           <SidebarButton :label="helpLabel" data-tutorial="help">
             <template #icon>
               <QuestionMarkCircleIcon />
+            </template>
+          </SidebarButton>
+        </NuxtLink>
+        <NuxtLink to="/rules">
+          <SidebarButton :label="lang('rules')">
+            <template #icon>
+              <DocumentTextIcon />
             </template>
           </SidebarButton>
         </NuxtLink>
@@ -50,12 +64,14 @@
 import {
   Cog8ToothIcon,
   QuestionMarkCircleIcon,
+  UserCircleIcon,
+  DocumentTextIcon,
 } from "@heroicons/vue/24/outline";
-
 import { computed, ref } from "vue";
 import { MaybeElement, onClickOutside } from "@vueuse/core";
 import SidebarButton from "../../components/navbar/SidebarButton.vue";
 import BrandedSidebarToggle from "../../components/navbar/BrandedSidebarToggle.vue";
+import { NuxtLink } from "#components";
 import { useUiStore } from "~/store/ui";
 import { useTutorialTour } from "~/composables/useTour";
 import { useLang } from "~/composables/useLang";

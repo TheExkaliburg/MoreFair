@@ -12,6 +12,8 @@ components:
       discord: Discord
       privacy: Privacy Policy
       impressum: Impressum
+      account: Account
+      rules: Rules
   ladder:
     table:
       username: Username

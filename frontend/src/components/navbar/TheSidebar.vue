@@ -8,10 +8,17 @@
         <!--Top of the Canvas-->
         <div class="min-w-min flex flex-col justify-items-start content-around">
           <!--Leaving this spot free-->
-          <SidebarButton class="cursor-auto" />
+          <!--SidebarButton class="cursor-auto" /-->
         </div>
         <!--Bottom of the Canvas-->
         <div class="min-w-min flex flex-col justify-items-start content-around">
+          <NuxtLink to="/account">
+            <SidebarButton>
+              <template #icon>
+                <UserCircleIcon />
+              </template>
+            </SidebarButton>
+          </NuxtLink>
           <NuxtLink to="/options">
             <SidebarButton>
               <template #icon>
@@ -23,6 +30,13 @@
             <SidebarButton>
               <template #icon>
                 <QuestionMarkCircleIcon />
+              </template>
+            </SidebarButton>
+          </NuxtLink>
+          <NuxtLink to="/rules">
+            <SidebarButton>
+              <template #icon>
+                <DocumentTextIcon />
               </template>
             </SidebarButton>
           </NuxtLink>
@@ -44,6 +58,8 @@
 import {
   Cog8ToothIcon,
   QuestionMarkCircleIcon,
+  DocumentTextIcon,
+  UserCircleIcon,
 } from "@heroicons/vue/24/outline";
 import SidebarButton from "~/components/navbar/SidebarButton.vue";
 import { useTutorialTour } from "~/composables/useTour";
