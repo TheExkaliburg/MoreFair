@@ -110,7 +110,7 @@ public class RoundTypeBuilder {
       log.debug("Random {} percentage for R{}: {}/{}", categoryName, roundNumber, randomNumber,
           totalWeight);
       for (Map.Entry<Float, RoundType> entry : sortedInverseLookupEntries) {
-        log.info("Checking {} percentage: {}/{}", entry.getValue(), entry.getKey(), totalWeight);
+        log.debug("Checking {} percentage: {}/{}", entry.getValue(), entry.getKey(), totalWeight);
         if (randomNumber < entry.getKey()) {
           return entry.getValue();
         }

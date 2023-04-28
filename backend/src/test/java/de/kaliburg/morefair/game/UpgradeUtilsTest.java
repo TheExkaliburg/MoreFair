@@ -10,14 +10,19 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 /**
  * Tests for {@link UpgradeUtils}. for specific values in the config look at <a
  * href="https://docs.google.com/spreadsheets/d/1BH1Y-hv_zIho8QIsdxCp8Rmld__zBuviu_wL7Hhtb7s ">this
  * sheet</a>
  */
-@SpringBootTest
+@SpringBootTest(webEnvironment = WebEnvironment.MOCK)
+@AutoConfigureMockMvc
+@WebAppConfiguration
 @Slf4j
 class UpgradeUtilsTest {
 

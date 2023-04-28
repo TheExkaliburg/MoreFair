@@ -1,8 +1,8 @@
 package de.kaliburg.morefair.utils;
 
 import com.icegreen.greenmail.spring.GreenMailBean;
+import jakarta.mail.internet.MimeMessage;
 import java.util.Random;
-import javax.mail.internet.MimeMessage;
 
 public class ITUtils {
 
