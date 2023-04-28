@@ -39,10 +39,13 @@ definePageMeta({ layout: "default" });
 useStomp();
 
 onMounted(() => {
-  useRoundStore().actions.init();
-  useChatStore().actions.init();
-  useLadderStore().actions.init();
-  useAccountStore().actions.init();
+  useAccountStore()
+    .actions.init()
+    .then(() => {
+      useRoundStore().actions.init();
+      useChatStore().actions.init();
+      useLadderStore().actions.init();
+    });
   const tour = useTutorialTour();
   if (!tour.getFlag() && useAuthStore().state.authenticationStatus) {
     tour.start();

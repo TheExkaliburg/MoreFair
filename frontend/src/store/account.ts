@@ -52,22 +52,24 @@ export const useAccountStore = defineStore("account", () => {
   });
 
   function init() {
-    if (isInitialized.value) return;
-    getAccountDetails();
+    if (isInitialized.value) return Promise.resolve();
+    return getAccountDetails();
   }
 
   function reset() {
     isInitialized.value = false;
-    init();
+    return init();
   }
 
   function getAccountDetails() {
-    api.account.getAccountDetails().then((res) => {
+    return api.account.getAccountDetails().then((res) => {
       const data: AccountData = res.data;
       state.accessRole = data.accessRole;
       state.accountId = data.accountId;
       state.highestCurrentLadder = data.highestCurrentLadder;
       state.uuid = data.uuid;
+      state.username = data.username;
+      state.email = data.email;
       const stomp = useStomp();
       stomp.connectPrivateChannel(state.uuid);
       stomp.addCallback(
@@ -82,6 +84,7 @@ export const useAccountStore = defineStore("account", () => {
     const event = body.eventType;
     const isYou = state.accountId === body.accountId;
     let ranker;
+    console.log(body, isYou);
     if (isYou) {
       ranker = ladderStore.getters.yourRanker;
     } else {
@@ -111,6 +114,7 @@ export const useAccountStore = defineStore("account", () => {
         break;
       case AccountEventType.INCREASE_HIGHEST_LADDER:
         state.highestCurrentLadder = body.data;
+        console.log("increased highest ladder to " + body.data);
         break;
       default:
         console.error("Unknown account event type: " + event);

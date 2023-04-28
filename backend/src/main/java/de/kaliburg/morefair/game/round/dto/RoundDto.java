@@ -11,12 +11,14 @@ public class RoundDto {
 
   private RoundSettingsDto settings;
   private Integer assholeLadder;
+  private Integer topLadder;
   private Integer autoPromoteLadder;
   private Set<RoundType> types;
 
   public RoundDto(RoundEntity currentRound, FairConfig config) {
     settings = new RoundSettingsDto(currentRound, config);
     autoPromoteLadder = config.getAutoPromoteLadder();
+    topLadder = currentRound.getLadders().size();
     assholeLadder = currentRound.getAssholeLadderNumber();
     types = currentRound.getTypes();
   }

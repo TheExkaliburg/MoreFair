@@ -3,6 +3,7 @@ import { navigateTo } from "nuxt/app";
 import Cookies from "js-cookie";
 
 const isDevMode = process.env.NODE_ENV !== "production";
+let lastXsrfToken = Cookies.get("XSRF-TOKEN");
 
 export const axiosInstance = axios.create({
   baseURL: isDevMode ? "http://localhost:8080" : "",
@@ -17,6 +18,8 @@ axiosInstance.interceptors.request.use(
     }
 
     const xsrfToken = Cookies.get("XSRF-TOKEN");
+    lastXsrfToken = xsrfToken;
+
     if (!xsrfToken) return config;
 
     config.headers = {
@@ -36,6 +39,11 @@ axiosInstance.interceptors.response.use(
       navigateTo("/");
     }
     if (error.response?.status === 403) {
+      const xsrfCookie = Cookies.get("XSRF-TOKEN");
+      if (xsrfCookie === lastXsrfToken) {
+        return Promise.reject(error);
+      }
+
       const headers = error.config?.headers;
       if (headers === undefined) return Promise.reject(error);
       const isRetry = Boolean(headers["X-RETRY"]);
@@ -45,7 +53,6 @@ axiosInstance.interceptors.response.use(
           const config = error.config;
           config.headers = {
             ...config.headers,
-            "X-XSRF-TOKEN": xsrfToken,
             "X-RETRY": true,
           };
           return axiosInstance.request(config);

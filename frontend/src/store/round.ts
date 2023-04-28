@@ -22,12 +22,14 @@ export enum RoundType {
 export enum RoundEventType {
   RESET = "RESET",
   INCREASE_ASSHOLE_LADDER = "INCREASE_ASSHOLE_LADDER",
+  INCREASE_TOP_LADDER = "INCREASE_TOP_LADDER",
 }
 
 export type RoundData = {
   settings: RoundSettingsData;
   assholeLadder: number;
   autoPromoteLadder: number;
+  topLadder: number;
   types: RoundType[];
 };
 
@@ -39,6 +41,7 @@ export const useRoundStore = defineStore("round", () => {
     assholeLadder: 20,
     autoPromoteLadder: 1,
     types: new Set([RoundType.DEFAULT]),
+    topLadder: 1,
     settings: new RoundSettings({}),
   });
   const getters = reactive({});
@@ -64,6 +67,7 @@ export const useRoundStore = defineStore("round", () => {
         state.assholeLadder = data.assholeLadder;
         state.autoPromoteLadder = data.autoPromoteLadder;
         state.settings = new RoundSettings(data.settings);
+        state.topLadder = data.topLadder;
 
         const stomp = useStomp();
         stomp.addCallback(
@@ -81,16 +85,22 @@ export const useRoundStore = defineStore("round", () => {
     const event = body.eventType;
     switch (event) {
       case RoundEventType.INCREASE_ASSHOLE_LADDER:
-        state.assholeLadder = body.data;
+        state.assholeLadder = Math.max(body.data, state.assholeLadder);
+        break;
+      case RoundEventType.INCREASE_TOP_LADDER:
+        state.topLadder = Math.max(body.data, state.topLadder);
         break;
       case RoundEventType.RESET:
         isInitialized.value = false;
         useStomp().reset();
         setTimeout(() => {
-          useRoundStore().actions.reset();
-          useChatStore().actions.reset();
-          useLadderStore().actions.reset();
-          useAccountStore().actions.reset();
+          useAccountStore()
+            .actions.reset()
+            .then(() => {
+              useRoundStore().actions.reset();
+              useChatStore().actions.reset();
+              useLadderStore().actions.reset();
+            });
           useToasts(
             "Chad was successful in turning back the time, the only thing left from this future is a mark on the initiates that helped in the final ritual."
           );

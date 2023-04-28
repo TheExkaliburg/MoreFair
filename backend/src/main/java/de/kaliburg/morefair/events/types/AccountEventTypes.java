@@ -8,4 +8,5 @@ public enum AccountEventTypes {
   MUTE,
   CONFIRM,
   MOD,
+  INCREASE_HIGHEST_LADDER,
 }

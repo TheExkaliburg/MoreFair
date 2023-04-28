@@ -18,7 +18,9 @@ export type GroupMentionMeta = {
 
 export type MentionMeta = GroupMentionMeta | UserMentionMeta;
 
-function isGroupMentionMeta(meta: MentionMeta): meta is GroupMentionMeta {
+export function isGroupMentionMeta(
+  meta: MentionMeta
+): meta is GroupMentionMeta {
   return "g" in meta && "i" in meta;
 }
 

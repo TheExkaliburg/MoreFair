@@ -3,6 +3,7 @@ import { reactive, ref } from "vue";
 import { MentionMeta, Message, MessageData } from "./entities/message";
 import { OnChatEventBody, useStomp } from "~/composables/useStomp";
 import { useAPI } from "~/composables/useAPI";
+import { useAccountStore } from "~/store/account";
 
 export type ChatData = {
   messages: MessageData[];
@@ -18,6 +19,8 @@ export const useChatStore = defineStore("chat", () => {
   const api = useAPI();
   const stomp = useStomp();
 
+  const accountStore = useAccountStore();
+
   const isInitialized = ref<boolean>(false);
   const state = reactive<ChatState>({
     messages: <Message[]>[],
@@ -27,7 +30,7 @@ export const useChatStore = defineStore("chat", () => {
 
   function init() {
     if (isInitialized.value) return;
-    getChat(state.number);
+    getChat(accountStore.state.highestCurrentLadder);
   }
 
   function reset() {
@@ -67,7 +70,7 @@ export const useChatStore = defineStore("chat", () => {
   }
 
   function changeChat(newNumber: number) {
-    stomp.wsApi.chat.changeChat(state.number, newNumber, true);
+    stomp.wsApi.chat.changeChat(state.number, newNumber);
     getChat(newNumber);
   }
 
@@ -95,6 +98,15 @@ export const useChatStore = defineStore("chat", () => {
       if (message.accountId === accountId) {
         message.username = username;
       }
+      /* Since we don't update in the backend, mentions stay the way they are, but this would be how we update them in the frontend
+      const metadata = message.getMetadata();
+      metadata.forEach((meta) => {
+        if (!isGroupMentionMeta(meta) && meta.id === accountId) {
+          meta.u = username;
+        }
+      });
+      message.metadata = JSON.stringify(metadata);
+       */
     });
   }
 

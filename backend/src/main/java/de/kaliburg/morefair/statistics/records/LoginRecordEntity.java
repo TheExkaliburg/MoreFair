@@ -16,7 +16,7 @@ public class LoginRecordEntity {
   private Account account;
 
   public LoginRecordEntity(AccountEntity account) {
-    this.account = new Account(account.getId(), account.getUsername());
+    this.account = new Account(account.getId(), account.getDisplayName());
   }
 
   @Data

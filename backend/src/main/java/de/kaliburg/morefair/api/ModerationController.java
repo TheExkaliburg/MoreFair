@@ -98,8 +98,9 @@ public class ModerationController {
       target.setDisplayName("BANNED");
       target = accountService.save(target);
       chatService.deleteMessagesOfAccount(target);
-      log.info("{} (#{}) is banning the account {} (#{})", account.getUsername(), account.getId(),
-          target.getUsername(), target.getId());
+      log.info("{} (#{}) is banning the account {} (#{})", account.getDisplayName(),
+          account.getId(),
+          target.getDisplayName(), target.getId());
       wsUtils.convertAndSendToTopic(AccountController.TOPIC_EVENTS_DESTINATION, new Event<>(
           AccountEventTypes.BAN, target.getId()));
     } catch (Exception e) {
@@ -124,8 +125,8 @@ public class ModerationController {
       target.setDisplayName(target.getDisplayName() + "(MUTED)");
       target = accountService.save(target);
       chatService.deleteMessagesOfAccount(target);
-      log.info("{} (#{}) is muting the account {} (#{})", account.getUsername(), account.getId(),
-          target.getUsername(), target.getId());
+      log.info("{} (#{}) is muting the account {} (#{})", account.getDisplayName(), account.getId(),
+          target.getDisplayName(), target.getId());
       wsUtils.convertAndSendToTopic(AccountController.TOPIC_EVENTS_DESTINATION, new Event<>(
           AccountEventTypes.MUTE, target.getId()));
     } catch (Exception e) {
@@ -276,7 +277,7 @@ public class ModerationController {
       AccountEntity target = accountService.find(Long.parseLong(id));
       List<AccountEntity> accountsWithIp = accountService.searchByIp(target.getLastIp());
       Map<Long, String> result = accountsWithIp.stream().collect(Collectors.toMap(
-          AccountEntity::getId, AccountEntity::getUsername));
+          AccountEntity::getId, AccountEntity::getDisplayName));
 
       return new ResponseEntity<>(result, HttpStatus.OK);
     } catch (Exception e) {

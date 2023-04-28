@@ -79,7 +79,7 @@ export const useLadderStore = defineStore("ladder", () => {
 
   function init() {
     if (isInitialized.value) return;
-    getLadder(state.number);
+    getLadder(accountStore.state.highestCurrentLadder);
   }
 
   function reset() {
@@ -243,6 +243,11 @@ export const useLadderStore = defineStore("ladder", () => {
           break;
         case LadderEventType.PROMOTE:
           ranker.growing = false;
+          if (ranker.accountId === getters.yourRanker?.accountId) {
+            useChatStore().actions.changeChat(state.number + 1);
+            useLadderStore().actions.changeLadder(state.number + 1);
+            useAccountStore().state.highestCurrentLadder = state.number + 1;
+          }
           break;
         case LadderEventType.JOIN:
           handleJoinEvent(event);

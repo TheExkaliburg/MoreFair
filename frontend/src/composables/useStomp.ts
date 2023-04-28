@@ -166,6 +166,7 @@ const wsApi = (client: Client) => {
         newNumber: number,
         unsubscribe: boolean = true
       ) => {
+        if (currentNumber === newNumber) return;
         if (unsubscribe) {
           client.unsubscribe(`/topic/chat/event/${currentNumber}`);
         }
@@ -194,6 +195,7 @@ const wsApi = (client: Client) => {
         newNumber: number,
         unsubscribe: boolean = true
       ) => {
+        if (currentNumber === newNumber) return;
         if (unsubscribe) {
           client.unsubscribe(`/topic/ladder/event/${currentNumber}`);
         }

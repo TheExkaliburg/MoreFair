@@ -6,13 +6,22 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @Data
-@RequiredArgsConstructor
 @AllArgsConstructor
+@RequiredArgsConstructor
 public class Event<T extends Enum<T>> {
 
   @NonNull
   private Enum<T> eventType;
-  @NonNull
   private Long accountId;
   private Object data;
+
+  public Event(@NonNull Enum<T> eventType, Long accountId) {
+    this.eventType = eventType;
+    this.accountId = accountId;
+  }
+
+  public Event(@NonNull Enum<T> eventType, Object data) {
+    this.eventType = eventType;
+    this.data = data;
+  }
 }
