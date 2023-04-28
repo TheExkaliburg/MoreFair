@@ -1,9 +1,15 @@
 import { defineStore } from "pinia";
 import { reactive, ref } from "vue";
-import { MentionMeta, Message, MessageData } from "./entities/message";
+import {
+  isGroupMentionMeta,
+  MentionMeta,
+  Message,
+  MessageData,
+} from "./entities/message";
 import { OnChatEventBody, useStomp } from "~/composables/useStomp";
 import { useAPI } from "~/composables/useAPI";
 import { useAccountStore } from "~/store/account";
+import { SOUNDS, useSound } from "~/composables/useSound";
 
 export type ChatData = {
   messages: MessageData[];
@@ -51,13 +57,12 @@ export const useChatStore = defineStore("chat", () => {
           state.messages.unshift(msg);
         });
 
-        stomp.wsApi.chat.changeChat(state.number, data.number);
         state.number = data.number;
 
         stomp.addCallback(
           stomp.callbacks.onChatEvent,
           "fair_chat_event",
-          (body) => addLocalMessage(body)
+          (body) => addMessage(body)
         );
       })
       .catch((_) => {
@@ -70,19 +75,32 @@ export const useChatStore = defineStore("chat", () => {
   }
 
   function changeChat(newNumber: number) {
-    stomp.wsApi.chat.changeChat(state.number, newNumber);
+    stomp.wsApi.chat.changeChat(newNumber);
     getChat(newNumber);
   }
 
-  function addLocalMessage(body: OnChatEventBody) {
+  function addMessage(body: OnChatEventBody) {
+    const message = new Message(body);
     if (state.messages.length > 50) {
       state.messages.shift();
     }
-    state.messages.push(new Message(body));
+    state.messages.push(message);
+
+    // Find if one isn't a groupMention and has the id of the currentUser
+    const isMentioned = message.getMetadata().some((meta) => {
+      if (isGroupMentionMeta(meta)) {
+        return false;
+      }
+      return meta.id === accountStore.state.accountId;
+    });
+
+    if (isMentioned) {
+      useSound(SOUNDS.MENTION).play();
+    }
   }
 
   function addSystemMessage(message: string, metadata: string = "[]") {
-    addLocalMessage({
+    addMessage({
       accountId: 1,
       username: "Chad",
       message,
@@ -118,7 +136,7 @@ export const useChatStore = defineStore("chat", () => {
       reset,
       sendMessage,
       changeChat,
-      addLocalMessage,
+      addLocalMessage: addMessage,
       addSystemMessage,
       rename,
     },

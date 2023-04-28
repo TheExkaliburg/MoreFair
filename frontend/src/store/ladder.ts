@@ -13,6 +13,7 @@ import { useLadderUtils } from "~/composables/useLadderUtils";
 import { useChatStore } from "~/store/chat";
 import { useFormatter } from "~/composables/useFormatter";
 import { useToasts } from "~/composables/useToasts";
+import { SOUNDS, useSound } from "~/composables/useSound";
 
 export enum LadderType {
   DEFAULT = "DEFAULT",
@@ -129,11 +130,13 @@ export const useLadderStore = defineStore("ladder", () => {
 
   function changeLadder(newNumber: number) {
     console.log("changeLadder", newNumber);
-    stomp.wsApi.ladder.changeLadder(state.number, newNumber, true);
+    stomp.wsApi.ladder.changeLadder(newNumber);
     getLadder(newNumber);
   }
 
   function calculateTick(deltaSeconds: number) {
+    const wasFirst = getters.yourRanker?.rank === 1;
+
     handleEvents();
     state.events = [];
 
@@ -204,6 +207,11 @@ export const useLadderStore = defineStore("ladder", () => {
           yourRanker.grapes.add(new Decimal(2))
         );
       }
+    }
+
+    const isFirst = getters.yourRanker?.rank === 1;
+    if (isFirst && !wasFirst) {
+      useSound(SOUNDS.GOT_FIRST);
     }
   }
 

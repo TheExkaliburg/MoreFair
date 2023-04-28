@@ -1,4 +1,4 @@
-import { Client } from "@stomp/stompjs";
+import { Client, StompSubscription } from "@stomp/stompjs";
 import { MentionMeta, MessageData } from "~/store/entities/message";
 import { AccountEventType, useAccountStore } from "~/store/account";
 import { useChatStore } from "~/store/chat";
@@ -67,6 +67,11 @@ const connection = isDevMode
   ? "ws://localhost:8080/socket/fair"
   : `ws://${window.location.host}/socket/fair`;
 
+const subscribedChannel = {
+  ladder: {} as StompSubscription,
+  chat: {} as StompSubscription,
+};
+
 const client = new Client({
   brokerURL: connection,
   debug: (str) => {
@@ -94,16 +99,6 @@ client.onConnect = (_) => {
     callbacks.onRoundEvent.forEach(({ callback }) => callback(body));
   });
 
-  client.subscribe("/topic/ladder/event/1", (message) => {
-    const body: OnLadderEventBody = JSON.parse(message.body);
-    callbacks.onLadderEvent.forEach(({ callback }) => callback(body));
-  });
-
-  client.subscribe("/topic/chat/event/1", (message) => {
-    const body: OnChatEventBody = JSON.parse(message.body);
-    callbacks.onChatEvent.forEach(({ callback }) => callback(body));
-  });
-
   const privateUuid = accountStore.state.uuid;
   if (privateUuid !== "") {
     connectPrivateChannel(privateUuid);
@@ -115,6 +110,24 @@ function connectPrivateChannel(uuid: string) {
   if (!client.connected) return;
   console.log("Reconnect private channel");
   isPrivateConnectionEstablished = true;
+
+  const highestLadder = useAccountStore().state.highestCurrentLadder;
+
+  subscribedChannel.ladder = client.subscribe(
+    "/topic/ladder/event/" + highestLadder,
+    (message) => {
+      const body: OnLadderEventBody = JSON.parse(message.body);
+      callbacks.onLadderEvent.forEach(({ callback }) => callback(body));
+    }
+  );
+
+  subscribedChannel.chat = client.subscribe(
+    "/topic/chat/event/" + highestLadder,
+    (message) => {
+      const body: OnChatEventBody = JSON.parse(message.body);
+      callbacks.onChatEvent.forEach(({ callback }) => callback(body));
+    }
+  );
 
   client.subscribe(`/private/${uuid}/ladder/event`, (message) => {
     const body: OnLadderEventBody = JSON.parse(message.body);
@@ -161,19 +174,17 @@ const wsApi = (client: Client) => {
       },
     },
     chat: {
-      changeChat: (
-        currentNumber: number,
-        newNumber: number,
-        unsubscribe: boolean = true
-      ) => {
-        if (currentNumber === newNumber) return;
-        if (unsubscribe) {
-          client.unsubscribe(`/topic/chat/event/${currentNumber}`);
+      changeChat: (newNumber: number) => {
+        if (subscribedChannel?.chat) {
+          subscribedChannel.chat.unsubscribe();
         }
-        client.subscribe(`/topic/chat/event/${newNumber}`, (message) => {
-          const body: OnChatEventBody = JSON.parse(message.body);
-          callbacks.onChatEvent.forEach(({ callback }) => callback(body));
-        });
+        subscribedChannel.chat = client.subscribe(
+          `/topic/chat/event/${newNumber}`,
+          (message) => {
+            const body: OnChatEventBody = JSON.parse(message.body);
+            callbacks.onChatEvent.forEach(({ callback }) => callback(body));
+          }
+        );
       },
       sendMessage: (
         message: string,
@@ -190,19 +201,17 @@ const wsApi = (client: Client) => {
       },
     },
     ladder: {
-      changeLadder: (
-        currentNumber: number,
-        newNumber: number,
-        unsubscribe: boolean = true
-      ) => {
-        if (currentNumber === newNumber) return;
-        if (unsubscribe) {
-          client.unsubscribe(`/topic/ladder/event/${currentNumber}`);
+      changeLadder: (newNumber: number) => {
+        if (subscribedChannel?.ladder) {
+          subscribedChannel.ladder.unsubscribe();
         }
-        client.subscribe(`/topic/ladder/event/${newNumber}`, (message) => {
-          const body: OnLadderEventBody = JSON.parse(message.body);
-          callbacks.onLadderEvent.forEach(({ callback }) => callback(body));
-        });
+        subscribedChannel.ladder = client.subscribe(
+          `/topic/ladder/event/${newNumber}`,
+          (message) => {
+            const body: OnLadderEventBody = JSON.parse(message.body);
+            callbacks.onLadderEvent.forEach(({ callback }) => callback(body));
+          }
+        );
       },
       buyBias: (e: Event) => {
         client.publish({

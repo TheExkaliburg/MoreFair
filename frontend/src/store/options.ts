@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { deepMerge } from "@antfu/utils";
 import { StorageSerializers, useStorage } from "@vueuse/core";
+import { watch } from "vue";
 import {
   BooleanOption,
   EditableStringListOption,
@@ -37,9 +38,11 @@ const defaultValues = {
   }),
   chat: new OptionsGroup({
     subscribedMentions: new EditableStringListOption(["here"]),
+  }),
+  sound: new OptionsGroup({
+    playSoundOnPromotion: new BooleanOption(false),
     playSoundOnMention: new BooleanOption(false),
-    playSoundOnFirst: new BooleanOption(false),
-    playSoundOnPromote: new BooleanOption(false),
+    playSoundOnGotFirst: new BooleanOption(false),
     notificationVolume: new RangeOption(50, 0, 100),
   }),
   moderation: new OptionsGroup({
@@ -53,6 +56,7 @@ const defaultValues = {
 export const useOptionsStore = defineStore("options", () => {
   const initialValues = {};
   Object.assign(initialValues, defaultValues);
+  const cloneOfInitialValue = JSON.parse(JSON.stringify(initialValues));
 
   const state = useStorage("options", initialValues, localStorage, {
     serializer: {
@@ -63,7 +67,23 @@ export const useOptionsStore = defineStore("options", () => {
       deepMerge(defaultValue, storageValue),
   });
 
-  deleteOldValues(state.value, defaultValues);
+  deleteOldValues(state.value, cloneOfInitialValue);
+
+  watch(state.value.sound.playSoundOnGotFirst, (value) => {
+    if (value) {
+      useSound(SOUNDS.GOT_FIRST).play();
+    }
+  });
+  watch(state.value.sound.playSoundOnMention, (value) => {
+    if (value) {
+      useSound(SOUNDS.MENTION).play();
+    }
+  });
+  watch(state.value.sound.playSoundOnPromotion, (value) => {
+    if (value) {
+      useSound(SOUNDS.PROMOTION).play();
+    }
+  });
 
   return {
     state: state.value,

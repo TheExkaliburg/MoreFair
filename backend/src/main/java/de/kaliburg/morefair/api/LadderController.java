@@ -57,7 +57,7 @@ public class LadderController {
       if (account == null || account.isBanned()) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       }
-      log.debug("/app/game/init/{} from {}#{}", number, account.getDisplayName(), account.getId());
+      log.trace("/app/game/init/{} from {}#{}", number, account.getDisplayName(), account.getId());
       RankerEntity ranker = ladderService.findFirstActiveRankerOfAccountThisRound(account);
       if (ranker == null) {
         ranker = roundService.createNewRanker(account);

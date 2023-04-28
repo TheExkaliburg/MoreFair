@@ -6,11 +6,12 @@
 
 <script lang="ts" setup>
 /*
+- TODO: Table-Header stuff for small windows
 - TODO: Make sure all the options are working
 - TODO: Account Page to change name, password, email, upgrade, export uuid, import uuid etc.
-- TODO: Sounds on Ping/Top/Promote
 - TODO: Design Login/Register Page
     - need to agree to rules to register/login
+- TODO: Re-enable the Maven Build Pipeline
 
 // Can be done after the fairtest test-run
 - TODO: Look at chat auto-scrolling down

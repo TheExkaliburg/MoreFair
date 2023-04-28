@@ -37,8 +37,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequiredArgsConstructor
 public class ChatController {
 
-  public static final String PRIVATE_EVENTS_DESTINATION = "/chat/events";
-  public static final String TOPIC_EVENTS_DESTINATION = "/chat/events/{number}";
+  public static final String PRIVATE_EVENTS_DESTINATION = "/chat/event";
+  public static final String TOPIC_EVENTS_DESTINATION = "/chat/event/{number}";
   private static final String APP_CHAT_DESTINATION = "/chat/{number}";
   private final AccountService accountService;
   private final RankerService rankerService;

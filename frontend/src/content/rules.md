@@ -23,6 +23,6 @@ I appreciate everyone that's part of this amazing community. Thank you and have 
 <br/><br/>
 
 <p align="center">
-<img src="/img/grapeDoodle.png" alt="Take a grape :)"/>
+<img src="/img/grapeDoodle.png" alt="~ by doshMobile#0001" title="Take a grape :)"/>
 ~ by doshMobile#0001
 </p>

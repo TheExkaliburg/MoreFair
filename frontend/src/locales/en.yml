@@ -45,6 +45,7 @@ options:
     ladder: Ladder
     chat: Chat
     moderation: Moderation
+    sound: Sound
   showAssholePoints: Show asshole-points subsection
   showEta: Show ETA to top/ranker
   followOwnRanker: Follow own ranker
@@ -57,8 +58,8 @@ options:
   hideHelpText: Hide help text
   subscribedMentions: Subscribed mentions
   playSoundOnMention: Play sound on mention
-  playSoundOnFirst: Play sound on reaching first
-  playSoundOnPromote: Play sound on promotion
+  playSoundOnGotFirst: Play sound on reaching first
+  playSoundOnPromotion: Play sound on promotion
   notificationVolume: Notification volume
   enableModPage: Enable mod page
   enableChatFeatures: Enable chat features

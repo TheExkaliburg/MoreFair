@@ -5,6 +5,7 @@ import { OnAccountEventBody, useStomp } from "~/composables/useStomp";
 import { useLadderStore } from "~/store/ladder";
 import { useChatStore } from "~/store/chat";
 import { useAuthStore } from "~/store/authentication";
+import { SOUNDS, useSound } from "~/composables/useSound";
 
 export enum AccessRole {
   OWNER,
@@ -113,6 +114,7 @@ export const useAccountStore = defineStore("account", () => {
         state.accessRole = AccessRole.BANNED_PLAYER;
         break;
       case AccountEventType.INCREASE_HIGHEST_LADDER:
+        useSound(SOUNDS.PROMOTION).play();
         state.highestCurrentLadder = body.data;
         console.log("increased highest ladder to " + body.data);
         break;
