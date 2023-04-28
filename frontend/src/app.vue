@@ -6,7 +6,7 @@
 
 <script lang="ts" setup>
 /*
-- TODO: LadderWindowTable needs to have a variable amount of columns
+- TODO: Promotion should change Ladder, also ladder should be changed by default afterwards
 - TODO: Rules page, that you need to agree to register/login
 - TODO: Mod-Page, and options for mods
 - TODO: Make sure all the options are working

@@ -8,48 +8,65 @@
       'sticky z-1 top-0': isFirst,
       'bg-ladder-bg': isFirst && !isYou && ranker.growing,
     }"
-    class="grid grid-cols-24 sm:grid-cols-48 gap-1 px-1 text-sm select-none"
+    :style="tableSpaceStyles.total"
+    class="grid gap-1 px-1 text-sm select-none width-full"
   >
-    <div class="col-span-3 whitespace-nowrap overflow-hidden">
+    <div
+      class="whitespace-nowrap overflow-hidden"
+      :style="tableSpaceStyles.rank"
+    >
       {{ ranker.rank }} {{ ranker.assholeTag }}
       <sub :class="{ 'text-text-dark': !isYou }">{{
         ranker.assholePoints
       }}</sub>
     </div>
-    <div class="col-span-9 whitespace-nowrap overflow-hidden">
+    <div
+      class="whitespace-nowrap overflow-hidden"
+      :style="tableSpaceStyles.username"
+    >
       {{ ranker.username
       }}<sub :class="{ 'text-text-dark': !isYou }">#{{ ranker.accountId }}</sub>
     </div>
 
     <div
-      class="col-span-6 text-right whitespace-nowrap overflow-hidden sm:order-last"
+      class="text-right whitespace-nowrap overflow-hidden sm:order-last"
+      :style="tableSpaceStyles.power"
     >
       {{ formattedPower }}
     </div>
     <div
-      class="col-span-6 text-right whitespace-nowrap overflow-hidden sm:order-last etaProgressAnimation"
-      :style="'animation-delay: ' + etaPercentage + 's !important'"
+      class="text-right whitespace-nowrap overflow-hidden sm:order-last etaProgressAnimation"
+      :style="[
+        'animation-delay: ' + etaPercentage + 's !important',
+        tableSpaceStyles.points,
+      ]"
     >
       {{ formattedPoints }}
     </div>
     <div
-      class="col-span-7 text-right whitespace-nowrap overflow-hidden etaProgressAnimation"
-      :style="'animation-delay: ' + etaPercentage + 's !important'"
+      v-if="tableSpace.etaToLadder > 0"
+      class="text-right whitespace-nowrap overflow-hidden etaProgressAnimation"
+      :style="[
+        'animation-delay: ' + etaPercentage + 's !important',
+        tableSpaceStyles.etaToLadder,
+      ]"
     >
       {{ etaToNextLadderFormatted }}
     </div>
     <div
-      class="col-span-7 text-right whitespace-nowrap overflow-hidden etaProgressAnimation"
-      :style="'animation-delay: ' + etaPercentage + 's !important'"
+      v-if="tableSpace.etaToYou > 0"
+      class="text-right whitespace-nowrap overflow-hidden etaProgressAnimation"
+      :style="[
+        'animation-delay: ' + etaPercentage + 's !important',
+        tableSpaceStyles.etaToYou,
+      ]"
     >
       {{ etaToYourRankerFormatted }}
     </div>
     <div
-      v-if="
-        optionsStore.state.ladder.showBiasAndMulti.value ||
-        optionsStore.state.ladder.showPowerGain.value
-      "
-      class="col-span-10 text-right whitespace-nowrap overflow-hidden"
+      v-if="tableSpace.powerGain > 0"
+      class="text-right whitespace-nowrap overflow-hidden"
+      :style="tableSpaceStyles.powerGain"
     >
       <span v-if="optionsStore.state.ladder.showPowerGain.value">{{
         formattedPowerPerSec
@@ -83,6 +100,10 @@ import { useEta } from "~/composables/useEta";
 import { useLadderStore } from "~/store/ladder";
 import { EtaColorType, useOptionsStore } from "~/store/options";
 import { useLadderUtils } from "~/composables/useLadderUtils";
+import {
+  useTableSpace,
+  useTableSpaceStyles,
+} from "~/composables/useTableSpace";
 
 const props = defineProps({
   ranker: { type: Ranker, required: true },
@@ -104,12 +125,13 @@ const isFirst = computed(() => {
   return props.index === 0;
 });
 
+const tableSpaceStyles = useTableSpaceStyles();
+const tableSpace = useTableSpace();
+
 const formattedPowerPerSec = computed<string>(() => {
   if (!isVisible) return "";
   if (!props.ranker.growing) return "";
-  return `(+${useFormatter(
-    (props.ranker.rank + props.ranker.bias) * props.ranker.multi
-  )}/s) `;
+  return `(+${useFormatter(props.ranker.getPowerPerSecond())}/s) `;
 });
 
 const formattedBias = computed<string>(() => {

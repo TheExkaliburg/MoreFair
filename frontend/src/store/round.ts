@@ -102,6 +102,8 @@ export const useRoundStore = defineStore("round", () => {
     }
   }
 
+  // setTimeout(() => handleRoundEvent({ eventType: RoundEventType.RESET }), 1000);
+
   return {
     state,
     getters,

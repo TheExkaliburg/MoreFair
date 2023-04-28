@@ -41,7 +41,7 @@ export const useChatStore = defineStore("chat", () => {
       .getChat(chatNumber)
       .then((response) => {
         const data: ChatData = response.data;
-        Object.assign(state.messages, []);
+        state.messages = [];
         data.messages.forEach((message) => {
           const msg = new Message(message);
           msg.setFlag("old");

@@ -147,7 +147,7 @@ export const useLadderStore = defineStore("ladder", () => {
         // Power & Points
         if (ranker.rank !== 1) {
           ranker.power = Object.freeze(
-            ranker.power.add(ranker.getPowerPerSecond().mul(delta).floor())
+            ranker.power.add(ranker.getPowerPerSecond().mul(delta)).floor()
           );
         }
         ranker.points = Object.freeze(
