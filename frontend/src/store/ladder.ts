@@ -15,16 +15,16 @@ import { useFormatter } from "~/composables/useFormatter";
 import { useToasts } from "~/composables/useToasts";
 
 export enum LadderType {
-  DEFAULT,
-  TINY,
-  SMALL,
-  BIG,
-  GIGANTIC,
-  FREE_AUTO,
-  NO_AUTO,
-  ASSHOLE,
-  CHEAP,
-  EXPENSIVE,
+  DEFAULT = "DEFAULT",
+  TINY = "TINY",
+  SMALL = "SMALL",
+  BIG = "BIG",
+  GIGANTIC = "GIGANTIC",
+  FREE_AUTO = "FREE_AUTO",
+  NO_AUTO = "NO_AUTO",
+  ASSHOLE = "ASSHOLE",
+  CHEAP = "CHEAP",
+  EXPENSIVE = "EXPENSIVE",
 }
 
 export enum LadderEventType {
@@ -72,9 +72,12 @@ export const useLadderStore = defineStore("ladder", () => {
     yourRanker: computed<Ranker | undefined>(() =>
       state.rankers.find((r) => r.accountId === accountStore.state.accountId)
     ),
-    allAccountNames: computed<string[]>(() =>
-      state.rankers.map((r) => r.username)
+    activeRankers: computed<number>(
+      () => state.rankers.filter((r) => r.growing).length
     ),
+    formattedTypes: computed(() => {
+      return Array.from(state.types).join(",");
+    }),
   });
 
   function init() {

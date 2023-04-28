@@ -9,6 +9,7 @@
     </PaginationButtonGroupButton>
     <PaginationButtonGroupButton
       :class="current === 1 ? 'text-button-text-hover bg-button-bg-hover' : ''"
+      :disabled="max < current - 1"
       class="w-1/6"
       @click="emit('change', current === 1 ? current : current - 1)"
     >
@@ -62,6 +63,18 @@
               >
             </li>
           </ListboxOption>
+          <ListboxOption
+            v-if="showLast && last > max"
+            class="w-full flex flex-row"
+            as="li"
+          >
+            <a
+              class="w-full px-2 text-right text-text-light hover:text-button-text-hover hover:bg-button-bg-hover"
+              href="#"
+              @click="emit('change', last)"
+              >{{ prefix }} {{ last }}</a
+            >
+          </ListboxOption>
         </ListboxOptions>
       </transition>
     </Listbox>
@@ -84,6 +97,8 @@ defineProps({
   current: { type: Number, required: true, default: 1 },
   size: { type: Number, default: 3 },
   prefix: { type: String, default: "" },
+  showLast: { type: Boolean, default: false },
+  last: { type: Number, default: 1 },
 });
 
 const emit = defineEmits<{

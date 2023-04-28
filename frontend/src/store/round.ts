@@ -44,7 +44,11 @@ export const useRoundStore = defineStore("round", () => {
     topLadder: 1,
     settings: new RoundSettings({}),
   });
-  const getters = reactive({});
+  const getters = reactive({
+    formattedTypes: computed(() => {
+      return Array.from(state.types).join(",");
+    }),
+  });
 
   function init() {
     if (isInitialized.value) return;

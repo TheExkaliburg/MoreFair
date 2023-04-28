@@ -6,8 +6,6 @@
 
 <script lang="ts" setup>
 /*
-- TODO: Add Ladder Infos at the top of the ladder
-- TODO: Give free the assholeLadder (only if its actually unlocked)
 - TODO: Rules page, that you need to agree to register/login
 - TODO: Make sure all the options are working
 - TODO: Account Page to change name, password, email, upgrade, export uuid, import uuid etc.
@@ -20,7 +18,6 @@
 - TODO: Theme-Selector and customThemes
 - TODO: Overhauled Privacy Policy
 - TODO: Write Actual Tutorial
-
 
 // If im feeling funny but will probably only get done after rework is finished
 - TODO: Statistics
