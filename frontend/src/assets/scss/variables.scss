@@ -1,4 +1,5 @@
 // Palette
+// https://lospec.com/palette-list/apollo
 
 $color-midnight-express: #172038;
 $color-catalina-blue: #253a5e;
@@ -118,6 +119,11 @@ $transparent: rgba(0, 0, 0, 0);
   --scrollbar-thumb-border: 1px solid var(--scrollbar-thumb-border-color);
   --scrollbar-thumb-border-color: var(--main-secondary-color);
   --scrollbar-thumb-border-radius: 0.4rem;
+
+  // Modal
+  --modal-bg-color: var(--background-color);
+  --modal-text-color: var(--text-color);
+  --modal-text-title-color: var(--text-light-highlight-color);
 
   // Overwrite Toastify defaults
   --toastify-color-light: #{$color-jagger} !important;

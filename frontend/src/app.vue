@@ -6,7 +6,6 @@
 
 <script lang="ts" setup>
 /*
-- TODO: Table-Header stuff for small windows
 - TODO: Make sure all the options are working
 - TODO: Account Page to change name, password, email, upgrade, export uuid, import uuid etc.
 - TODO: Design Login/Register Page
@@ -21,6 +20,7 @@
 - TODO: Add Changelog back
 - TODO: Fix Backend-Testcases (correctness)
 - TODO: prerequisite options for other options
+- TODO: popover from navigation buttons
 
 // If im feeling funny but will probably only get done after rework is finished
 - TODO: Statistics

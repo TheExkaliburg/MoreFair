@@ -14,6 +14,7 @@ components:
       impressum: Impressum
       account: Account
       rules: Rules
+      information: Information
   ladder:
     table:
       username: Username

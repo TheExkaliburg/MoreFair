@@ -52,6 +52,13 @@ module.exports = {
         checkbox: {
           DEFAULT: "var(--checkbox-accent-color)",
         },
+        modal: {
+          bg: "var(--modal-bg-color)",
+          text: {
+            DEFAULT: "var(--modal-text-color)",
+            title: "var(--modal-text-title-color)",
+          },
+        },
       },
       fontSize: {
         "2xs": "0.64rem",

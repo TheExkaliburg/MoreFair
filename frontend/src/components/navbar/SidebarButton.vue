@@ -10,10 +10,10 @@
       @update:modelValue="emit('update:modelValue', $event)"
     >
       <template #icon>
-        <slot name="icon"></slot>
+        <slot name="icon" />
       </template>
       <template #selectedIcon>
-        <slot name="selectedIcon"></slot>
+        <slot name="selectedIcon" />
       </template>
     </ToggleIconButton>
     <div v-else class="h-7 w-7 text-button-text">
