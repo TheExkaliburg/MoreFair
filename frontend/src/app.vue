@@ -20,6 +20,7 @@
 - TODO: Write Actual Tutorial
 - TODO: Add Changelog back
 - TODO: Fix Backend-Testcases (correctness)
+- TODO: prerequisite options for other options
 
 // If im feeling funny but will probably only get done after rework is finished
 - TODO: Statistics
