@@ -6,10 +6,11 @@
 
 <script lang="ts" setup>
 /*
-- TODO: Make sure all the options are working
+- Point Base Requirment and Round Base Requirement
 - TODO: Account Page to change name, password, email, upgrade, export uuid, import uuid etc.
 - TODO: Design Login/Register Page
     - need to agree to rules to register/login
+- TODO: Figuring out the Database convert script
 
 // Can be done after the fairtest test-run
 - TODO: Look at chat auto-scrolling down
@@ -21,6 +22,7 @@
 - TODO: Fix Backend-Testcases (correctness)
 - TODO: prerequisite options for other options
 - TODO: popover from navigation buttons
+- TODO: add follow own ranker option
 
 // If im feeling funny but will probably only get done after rework is finished
 - TODO: Statistics

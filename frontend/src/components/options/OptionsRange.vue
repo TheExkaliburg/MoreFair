@@ -1,15 +1,19 @@
 <template>
   <div class="flex flex-row justify-between space-x-2">
-    <div class="select-none overflow-hidden">
+    <div
+      class="select-none overflow-hidden"
+      :class="{ 'opacity-50': !isActive }"
+    >
       {{ formattedName }}: {{ option.value }}
     </div>
     <input
+      :disabled="!isActive"
       :max="max"
       :min="min"
       :value="option.value"
       class="w-32 min-w-fit"
       type="range"
-      @input="$emit('update', $event.target.valueAsNumber)"
+      @input="change"
     />
   </div>
 </template>
@@ -24,6 +28,10 @@ const props = defineProps({
 });
 
 const lang = useLang("options");
+
+const isActive = computed<boolean>(() => {
+  return props.option.isActive();
+});
 
 const min = computed(() => {
   if (!props.option.transient?.min) {
@@ -43,9 +51,14 @@ const formattedName = computed(() => {
   return lang(props.label);
 });
 
-defineEmits<{
+const emit = defineEmits<{
   (event: "update", value: number): void;
 }>();
+
+function change(e: Event) {
+  if (!isActive.value) return;
+  emit("update", e.target.valueAsNumber);
+}
 </script>
 
 <style lang="scss" scoped></style>

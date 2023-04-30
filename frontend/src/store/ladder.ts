@@ -14,6 +14,7 @@ import { useChatStore } from "~/store/chat";
 import { useFormatter } from "~/composables/useFormatter";
 import { useToasts } from "~/composables/useToasts";
 import { SOUNDS, useSound } from "~/composables/useSound";
+import { useOptionsStore } from "~/store/options";
 
 export enum LadderType {
   DEFAULT = "DEFAULT",
@@ -58,6 +59,7 @@ export const useLadderStore = defineStore("ladder", () => {
   const api = useAPI();
   const stomp = useStomp();
   const chatStore = useChatStore();
+  const optionsStore = useOptionsStore();
   const accountStore = useAccountStore();
   const ladderUtils = useLadderUtils();
 
@@ -78,6 +80,15 @@ export const useLadderStore = defineStore("ladder", () => {
     ),
     formattedTypes: computed(() => {
       return Array.from(state.types).join(",");
+    }),
+    shownRankers: computed<Ranker[]>(() => {
+      let result = state.rankers;
+      if (optionsStore.state.ladder.hidePromotedPlayers.value) {
+        result = result.filter(
+          (r) => r.growing || r.accountId === getters.yourRanker?.accountId
+        );
+      }
+      return result;
     }),
   });
 

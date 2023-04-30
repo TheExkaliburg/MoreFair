@@ -1,11 +1,11 @@
 import { defineStore } from "pinia";
 import { deepMerge } from "@antfu/utils";
 import { StorageSerializers, useStorage } from "@vueuse/core";
-import { watch } from "vue";
 import {
   BooleanOption,
   EditableStringListOption,
   EnumOption,
+  ObjectFunctions,
   OptionsGroup,
   RangeOption,
 } from "./entities/option";
@@ -18,11 +18,11 @@ export const enum EtaColorType {
 
 const defaultValues = {
   general: new OptionsGroup({
-    showAssholePoints: new BooleanOption(true),
+    showAssholePoints: new BooleanOption(false),
   }),
   ladder: new OptionsGroup({
     showEta: new BooleanOption(true),
-    followOwnRanker: new BooleanOption(false),
+    // followOwnRanker: new BooleanOption(false),
     etaColors: new EnumOption(EtaColorType.OFF, [
       EtaColorType.OFF,
       EtaColorType.COLORS,
@@ -32,24 +32,30 @@ const defaultValues = {
     showPowerGain: new BooleanOption(true),
     hidePromotedPlayers: new BooleanOption(false),
     hideVinegarAndGrapes: new BooleanOption(false),
-    enableSpectateAssholeLadder: new BooleanOption(false),
-    hideHelpText: new BooleanOption(false),
     lockButtons: new BooleanOption(false),
   }),
   chat: new OptionsGroup({
     subscribedMentions: new EditableStringListOption(["here"]),
   }),
   sound: new OptionsGroup({
-    playSoundOnPromotion: new BooleanOption(false),
-    playSoundOnMention: new BooleanOption(false),
-    playSoundOnGotFirst: new BooleanOption(false),
+    playSoundOnPromotion: new BooleanOption(false).setCallback((value) => {
+      console.log(value);
+      if (value) {
+        useSound(SOUNDS.PROMOTION).play();
+      }
+    }),
+    playSoundOnMention: new BooleanOption(false).setCallback((value) => {
+      console.log(value);
+      if (value) {
+        useSound(SOUNDS.MENTION).play();
+      }
+    }),
+    playSoundOnGotFirst: new BooleanOption(false).setCallback((value) => {
+      if (value) {
+        useSound(SOUNDS.GOT_FIRST).play();
+      }
+    }),
     notificationVolume: new RangeOption(50, 0, 100),
-  }),
-  moderation: new OptionsGroup({
-    enableModPage: new BooleanOption(false),
-    enableChatFeatures: new BooleanOption(false),
-    enableLadderFeatures: new BooleanOption(false),
-    unrestrictedAccess: new BooleanOption(false),
   }),
 };
 
@@ -69,22 +75,6 @@ export const useOptionsStore = defineStore("options", () => {
 
   deleteOldValues(state.value, cloneOfInitialValue);
 
-  watch(state.value.sound.playSoundOnGotFirst, (value) => {
-    if (value) {
-      useSound(SOUNDS.GOT_FIRST).play();
-    }
-  });
-  watch(state.value.sound.playSoundOnMention, (value) => {
-    if (value) {
-      useSound(SOUNDS.MENTION).play();
-    }
-  });
-  watch(state.value.sound.playSoundOnPromotion, (value) => {
-    if (value) {
-      useSound(SOUNDS.PROMOTION).play();
-    }
-  });
-
   return {
     state: state.value,
   };
@@ -92,7 +82,7 @@ export const useOptionsStore = defineStore("options", () => {
 
 function deleteOldValues(state: any, defaults: any) {
   Object.keys(state).forEach((key) => {
-    if (!(key in defaults)) {
+    if (!(key in defaults) && !ObjectFunctions.includes(key)) {
       delete state[key];
     } else if (typeof state[key] === "object") {
       deleteOldValues(state[key], defaults[key]);

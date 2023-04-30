@@ -7,7 +7,11 @@
       </span>
       <span class="text-text-light basis-1/4 grow flex-auto"
         ><strong>{{ message.tag }}</strong
-        ><sub class="text-text-dark">{{ message.assholePoints }}</sub></span
+        ><sub
+          v-if="optionsStore.state.general.showAssholePoints.value"
+          class="text-text-dark"
+          >{{ message.assholePoints }}</sub
+        ></span
       >
       <span class="basis-1/4 grow flex-auto">
         {{ message.getTimestampString() }}
@@ -21,6 +25,9 @@
 <script lang="ts" setup>
 import ChatWindowContentMessageBody from "../../components/chat/ChatWindowContentMessageBody.vue";
 import { Message } from "../../store/entities/message";
+import { useOptionsStore } from "~/store/options";
+
+const optionsStore = useOptionsStore();
 
 defineProps({
   message: {

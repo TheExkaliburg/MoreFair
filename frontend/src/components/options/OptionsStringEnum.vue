@@ -1,5 +1,8 @@
 <template>
-  <div class="flex flex-row justify-between space-x-2 relative">
+  <div
+    class="flex flex-row justify-between space-x-2 relative"
+    :class="{ 'opacity-50 pointer-events-none': !isActive }"
+  >
     <div class="select-none overflow-hidden">{{ formattedName }}:</div>
     <Listbox v-model="selectedValue">
       <ListboxButton
@@ -55,6 +58,10 @@ const options = computed(() => {
 });
 
 const lang = useLang("options");
+
+const isActive = computed<boolean>(() => {
+  return props.option.isActive();
+});
 
 const formattedName = computed(() => {
   return lang(props.label);

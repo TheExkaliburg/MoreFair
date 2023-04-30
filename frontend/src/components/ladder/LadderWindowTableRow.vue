@@ -16,9 +16,11 @@
       :style="tableSpaceStyles.rank"
     >
       {{ ranker.rank }} {{ ranker.assholeTag }}
-      <sub :class="{ 'text-text-dark': !isYou }">{{
-        ranker.assholePoints
-      }}</sub>
+      <sub
+        v-if="optionsStore.state.general.showAssholePoints.value"
+        :class="{ 'text-text-dark': !isYou }"
+        >{{ ranker.assholePoints }}</sub
+      >
     </div>
     <div
       class="whitespace-nowrap overflow-hidden"

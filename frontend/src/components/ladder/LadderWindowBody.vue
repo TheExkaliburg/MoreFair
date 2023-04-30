@@ -3,7 +3,7 @@
     <div
       class="flex flex-row text-xs lg:text-sm w-full justify-between text-text-light"
     >
-      <div>
+      <div class="whitespace-nowrap">
         {{ yourFormattedPoints }}/<span class="text-text-dark">{{
           yourBiasCostFormatted
         }}</span>
@@ -11,7 +11,7 @@
           yourFormattedMulti
         }}]
       </div>
-      <div>
+      <div class="whitespace-nowrap">
         [{{ lang("info.bias_short") }}: +{{ yourFormattedBias }}]
         {{ yourFormattedPower }}/<span class="text-text-dark">{{
           yourMultiCostFormatted
@@ -110,7 +110,9 @@ const ladderStore = useLadderStore();
 const roundStore = useRoundStore();
 const ladderUtils = useLadderUtils();
 const isButtonLocked = computed<boolean>(() => {
-  return optionsStore.state.ladder.lockButtons.value;
+  return (
+    optionsStore.state.ladder.lockButtons.value || !yourRanker.value.growing
+  );
 });
 
 const yourRanker = computed<Ranker>(() => {
@@ -141,9 +143,11 @@ const yourFormattedPower = computed<string>(() => {
   return useFormatter(yourRanker.value.power);
 });
 const yourFormattedGrapes = computed<string>(() => {
+  if (optionsStore.state.ladder.hideVinegarAndGrapes.value) return "[Hidden]";
   return useFormatter(yourRanker.value.grapes);
 });
 const yourFormattedVinegar = computed<string>(() => {
+  if (optionsStore.state.ladder.hideVinegarAndGrapes.value) return "[Hidden]";
   return useFormatter(yourRanker.value.vinegar);
 });
 
@@ -262,7 +266,13 @@ function throwVinegar(e: Event) {
 function promote(e: Event) {
   if (pressedPromoteRecently.value || !canPromote.value) return;
   pressedPromoteRecently.value = true;
-  useStomp().wsApi.ladder.promote(e);
+  if (ladderStore.state.number >= roundStore.state.assholeLadder) {
+    if (confirm("Do you really wanna be an Asshole?!")) {
+      useStomp().wsApi.ladder.promote(e);
+    }
+  } else {
+    useStomp().wsApi.ladder.promote(e);
+  }
 }
 
 onMounted(() => {

@@ -1,12 +1,17 @@
 <template>
   <div class="flex flex-row justify-between space-x-2">
     <div
-      class="cursor-pointer select-none overflow-hidden"
-      @click="$emit('update', !option.value)"
+      :class="{
+        'opacity-50': !isActive,
+        'cursor-pointer': isActive,
+      }"
+      class="select-none overflow-hidden"
+      @click="click"
     >
       {{ formattedName }}:
     </div>
     <input
+      :disabled="!isActive"
       :checked="option.value"
       type="checkbox"
       @input="$emit('update', $event.target.checked)"
@@ -23,15 +28,23 @@ const props = defineProps({
   label: { type: String, required: true },
 });
 
+const isActive = computed<boolean>(() => {
+  return props.option.isActive();
+});
 const lang = useLang("options");
 
 const formattedName = computed(() => {
   return lang(props.label);
 });
 
-defineEmits<{
+const emit = defineEmits<{
   (event: "update", value: boolean): void;
 }>();
+
+function click() {
+  if (!isActive.value) return;
+  emit("update", !props.option.value);
+}
 </script>
 
 <style lang="scss" scoped></style>

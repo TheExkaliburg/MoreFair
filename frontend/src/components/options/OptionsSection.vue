@@ -6,25 +6,25 @@
         v-if="entry.value instanceof BooleanOption"
         :label="entry.key"
         :option="entry.value"
-        @update="entry.value.value = $event"
+        @update="entry.value.set($event)"
       />
       <OptionsStringEnum
         v-else-if="entry.value instanceof EnumOption"
         :label="entry.key"
         :option="entry.value"
-        @update="entry.value.value = $event"
+        @update="entry.value.set($event)"
       />
       <OptionsRange
         v-else-if="entry.value instanceof RangeOption"
         :label="entry.key"
         :option="entry.value"
-        @update="entry.value.value = $event"
+        @update="entry.value.set($event)"
       />
       <OptionsEditableStringList
         v-else-if="entry.value instanceof EditableStringListOption"
         :label="entry.key"
         :option="entry.value"
-        @update="entry.value.value = $event"
+        @update="entry.value.set($event)"
       />
       <div v-else>{{ entry.key }}, {{ entry.value.value }}</div>
     </template>
@@ -34,16 +34,16 @@
 <script lang="ts" setup>
 import { computed } from "vue";
 import OptionsBoolean from "../../components/options/OptionsBoolean.vue";
+import OptionsStringEnum from "../../components/options/OptionsStringEnum.vue";
+import OptionsRange from "../../components/options/OptionsRange.vue";
+import OptionsEditableStringList from "../../components/options/OptionsEditableStringList.vue";
 import {
   BooleanOption,
   EditableStringListOption,
   EnumOption,
   RangeOption,
-} from "../../store/entities/option";
-import OptionsStringEnum from "../../components/options/OptionsStringEnum.vue";
-import OptionsRange from "../../components/options/OptionsRange.vue";
-import OptionsEditableStringList from "../../components/options/OptionsEditableStringList.vue";
-import { useLang } from "../../composables/useLang";
+} from "~/store/entities/option";
+import { useLang } from "~/composables/useLang";
 
 const props = defineProps({
   options: { type: Object, required: true },

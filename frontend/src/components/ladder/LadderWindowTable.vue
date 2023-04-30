@@ -55,6 +55,7 @@
         {{ lang("points") }}
       </div>
       <div
+        v-if="optionsStore.state.ladder.showEta.value"
         class="whitespace-nowrap text-right"
         :style="tableSpaceClasses.etaToLadder"
       >
@@ -62,12 +63,17 @@
         }}{{ ladder.state.number + 1 }}
       </div>
       <div
+        v-if="optionsStore.state.ladder.showEta.value"
         class="whitespace-nowrap text-right"
         :style="tableSpaceClasses.etaToYou"
       >
         {{ lang("eta") }} -> {{ lang("you") }}
       </div>
       <div
+        v-if="
+          optionsStore.state.ladder.showBiasAndMulti.value ||
+          optionsStore.state.ladder.showPowerGain.value
+        "
         class="whitespace-nowrap text-right"
         :style="tableSpaceClasses.powerGain"
       >
@@ -76,7 +82,7 @@
     </div>
     <div>
       <LadderWindowTableRow
-        v-for="(ranker, index) in ladder.state.rankers"
+        v-for="(ranker, index) in ladder.getters.shownRankers"
         :key="ranker.accountId"
         :class="{
           'border-button-border border-b-1': isScrolled && index === 0,
@@ -93,8 +99,10 @@ import { useLadderStore } from "~/store/ladder";
 import LadderWindowTableRow from "~/components/ladder/LadderWindowTableRow.vue";
 import { useLang } from "~/composables/useLang";
 import { useTableSpaceStyles } from "~/composables/useTableSpace";
+import { useOptionsStore } from "~/store/options";
 
 const ladder = useLadderStore();
+const optionsStore = useOptionsStore();
 
 const lang = useLang("components.ladder.table");
 const isScrolled = ref<boolean>(false);
