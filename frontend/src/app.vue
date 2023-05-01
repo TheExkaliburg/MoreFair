@@ -6,7 +6,6 @@
 
 <script lang="ts" setup>
 /*
-- Point Base Requirment and Round Base Requirement
 - TODO: Account Page to change name, password, email, upgrade, export uuid, import uuid etc.
 - TODO: Design Login/Register Page
     - need to agree to rules to register/login

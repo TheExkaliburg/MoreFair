@@ -1,47 +1,67 @@
 <template>
   <div class="flex flex-row justify-between items-center text-button-text">
-    <ExtendedInformationModal
-      class="sm:hidden px-1 w-8"
-      title="Ladder Information"
-    >
-      <template #button><InformationCircleIcon /></template>
-      <div class="text-sm">
-        <div class="whitespace-nowrap">
-          Active Rankers: {{ ladderStore.getters.activeRankers }}/{{
-            ladderStore.state.rankers.length
-          }}
+    <div class="flex flex-row gap-6">
+      <ExtendedInformationModal
+        class="px-1 w-8 xl:invisible"
+        title="Ladder Information"
+      >
+        <template #button><InformationCircleIcon /></template>
+        <div class="text-sm">
+          <div class="whitespace-nowrap">
+            Active Rankers: {{ ladderStore.getters.activeRankers }}/{{
+              ladderStore.state.rankers.length
+            }}
+          </div>
+          <div class="whitespace-nowrap">
+            Ladders: {{ accountStore.state.highestCurrentLadder }}/{{
+              roundStore.state.assholeLadder
+            }}
+            ({{ roundStore.state.topLadder }})
+          </div>
+          <div class="whitespace-nowrap">
+            Round: [{{ roundStore.getters.formattedTypes }}]
+          </div>
+          <div class="whitespace-break-spaces">
+            Ladder: [{{ ladderStore.getters.formattedTypes }}]
+          </div>
+          <div class="whitespace-nowrap">
+            Base Points for Promotion: {{ formattedRoundPointsForPromotion }}
+          </div>
+          <div class="whitespace-nowrap">
+            Points for Promotion: {{ formattedPointsForPromotion }}
+          </div>
         </div>
-        <div class="whitespace-nowrap">
-          Ladders: {{ accountStore.state.highestCurrentLadder }}/{{
-            roundStore.state.assholeLadder
-          }}
-          ({{ roundStore.state.topLadder }})
+      </ExtendedInformationModal>
+      <div class="flex flex-row gap-6 text-xs -sm:hidden">
+        <div class="flex flex-col">
+          <div class="whitespace-nowrap">
+            Ladders: {{ accountStore.state.highestCurrentLadder }}/{{
+              roundStore.state.assholeLadder
+            }}
+            ({{ roundStore.state.topLadder }})
+          </div>
+          <div class="whitespace-nowrap">
+            Active Rankers: {{ ladderStore.getters.activeRankers }}/{{
+              ladderStore.state.rankers.length
+            }}
+          </div>
         </div>
-        <div class="whitespace-nowrap">
-          Round: [{{ roundStore.getters.formattedTypes }}]
+        <div class="flex flex-col">
+          <div class="whitespace-nowrap">
+            Round: [{{ roundStore.getters.formattedTypes }}]
+          </div>
+          <div class="whitespace-nowrap">
+            Ladder: [{{ ladderStore.getters.formattedTypes }}]
+          </div>
         </div>
-        <div class="whitespace-break-spaces">
-          Ladder: [{{ ladderStore.getters.formattedTypes }}]
+        <div class="flex flex-col -xl:hidden">
+          <div class="whitespace-nowrap">
+            Base Points for Promotion: {{ formattedRoundPointsForPromotion }}
+          </div>
+          <div class="whitespace-nowrap">
+            Points for Promotion: {{ formattedPointsForPromotion }}
+          </div>
         </div>
-      </div>
-    </ExtendedInformationModal>
-    <div class="-sm:hidden grid grid-cols-2 text-xs pl-8">
-      <div class="whitespace-nowrap">
-        Ladders: {{ accountStore.state.highestCurrentLadder }}/{{
-          roundStore.state.assholeLadder
-        }}
-        ({{ roundStore.state.topLadder }})
-      </div>
-      <div class="whitespace-nowrap">
-        Round: [{{ roundStore.getters.formattedTypes }}]
-      </div>
-      <div class="whitespace-nowrap">
-        Active Rankers: {{ ladderStore.getters.activeRankers }}/{{
-          ladderStore.state.rankers.length
-        }}
-      </div>
-      <div class="whitespace-nowrap">
-        Ladder: [{{ ladderStore.getters.formattedTypes }}]
       </div>
     </div>
     <PaginationButtonGroup
@@ -64,10 +84,19 @@ import { useLadderStore } from "~/store/ladder";
 import { useAccountStore } from "~/store/account";
 import { useRoundStore } from "~/store/round";
 import ExtendedInformationModal from "~/components/interactables/ExtendedInformationModal.vue";
+import { useFormatter } from "~/composables/useFormatter";
 
 const ladderStore = useLadderStore();
 const roundStore = useRoundStore();
 const accountStore = useAccountStore();
+
+const formattedRoundPointsForPromotion = computed<string>(() => {
+  return useFormatter(roundStore.state.settings.basePointsForPromote);
+});
+
+const formattedPointsForPromotion = computed<string>(() => {
+  return useFormatter(ladderStore.state.basePointsToPromote);
+});
 
 const isAssholeLadderOpen = computed<boolean>(
   () => roundStore.state.topLadder >= roundStore.state.assholeLadder
