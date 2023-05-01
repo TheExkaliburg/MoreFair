@@ -15,7 +15,6 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.OffsetDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -57,9 +56,6 @@ public class AccountEntity {
   private String password;
   @Column(nullable = false)
   private boolean guest = true;
-  @NonNull
-  @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
-  private OffsetDateTime lastRevoke = OffsetDateTime.now().minus(1, ChronoUnit.SECONDS);
   @NonNull
   @Column(nullable = false)
   private Integer assholePoints = 0;

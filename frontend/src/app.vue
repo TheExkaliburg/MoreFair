@@ -7,6 +7,18 @@
 <script lang="ts" setup>
 /*
 - TODO: Account Page to change name, password, email, upgrade, export uuid, import uuid etc.
++---------------+----------------+----------------+----------------+----------------+
+|               |       ui       |  functionality |     BigUI      |     Tests      |
++---------------+----------------+----------------+----------------+----------------+
+| Change Name   |      x         |  x             |                |                |
+| ChangePassword|                |                |                |                |
+| Change Email  |     x          |  x             |                |                |
+| Upgrade       |                |                |                |                |
+| Export UUID   |                |                |                |                |
+| Import UUID   |                |                |                |                |
++---------------+----------------+----------------+----------------+----------------+
+
+
 - TODO: Design Login/Register Page
     - need to agree to rules to register/login
 - TODO: Figuring out the Database convert script

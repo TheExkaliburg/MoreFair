@@ -1,10 +1,126 @@
-<template><div></div></template>
+<template>
+  <div class="flex flex-col gap-0 px-4 max-w-reader text-text">
+    <div class="h-8" />
+    <div>Account</div>
+    <div class="flex flex-row">
+      <FairInput
+        :model-value="shownUsername"
+        :class="{ 'pointer-events-none': !isEditingUsername }"
+        class="rounded-r-none w-2/3"
+        :readonly="!isEditingUsername"
+        @update:modelValue="newUsername = $event"
+      />
+      <FairButton class="w-1/3 rounded-l-none" @click="changeUsername">{{
+        isEditingUsername ? "Apply" : "Edit"
+      }}</FairButton>
+    </div>
+    <div class="h-8" />
+    <template v-if="!isGuest">
+      <div class="flex flex-row justify-around gap-3 max-w-reader">
+        <FairButton class="w-full">Export UUID</FairButton>
+        <FairButton class="w-full">Import UUID</FairButton>
+      </div>
+      <div class="h-8" />
+      <FairButton class="w-full max-w-reader">Upgrade Account</FairButton>
+    </template>
+    <template v-else>
+      <div>E-Mail</div>
+      <div class="flex flex-row">
+        <FairInput
+          :model-value="shownEmail"
+          :class="{ 'pointer-events-none': !isEditingEmail }"
+          class="rounded-r-none w-2/3"
+          :readonly="!isEditingEmail"
+          :type="isEditingEmail ? 'text' : 'password'"
+          autocomplete="off"
+          @update:modelValue="newEmail = $event"
+        />
+        <FairButton class="w-1/3 rounded-l-none" @click="changeEmail">{{
+          isEditingEmail ? "Apply" : "Edit"
+        }}</FairButton>
+        <ConfirmEmailChangeDialog
+          :open="openConfirmEmailChangeModal"
+          @close="openConfirmEmailChangeModal = false"
+        />
+      </div>
+      <div class="h-12" />
+      <FairButton @click="openChangePasswordModal = true"
+        >Change Password</FairButton
+      >
+      <ChangePasswordDialog
+        :open="openChangePasswordModal"
+        @close="openChangePasswordModal = false"
+      />
+    </template>
+  </div>
+</template>
 
 <script lang="ts" setup>
-import { definePageMeta } from "#imports";
+import { onMounted } from "vue";
+import { definePageMeta, useAPI } from "#imports";
+import { useAuthStore } from "~/store/authentication";
+import FairButton from "~/components/interactables/FairButton.vue";
+import FairInput from "~/components/interactables/FairInput.vue";
+import { useAccountStore } from "~/store/account";
+import ConfirmEmailChangeDialog from "~/components/account/ConfirmEmailChangeDialog.vue";
+import ChangePasswordDialog from "~/components/account/ChangePasswordDialog.vue";
 
 definePageMeta({
   layout: "default",
+});
+
+const authStore = useAuthStore();
+const accountStore = useAccountStore();
+
+const isGuest = authStore.getters.isGuest;
+
+const shownUsername = computed<string>(() => {
+  if (isEditingUsername.value) return newUsername.value;
+  return accountStore.state.username + "#" + accountStore.state.accountId;
+});
+const newUsername = ref<string>(accountStore.state.username);
+const isEditingUsername = ref<boolean>(false);
+
+const shownEmail = computed<string>(() => {
+  if (isEditingEmail.value) return newEmail.value;
+  return accountStore.state.email;
+});
+const newEmail = ref<string>(accountStore.state.username);
+const isEditingEmail = ref<boolean>(false);
+
+const openConfirmEmailChangeModal = ref<boolean>(false);
+const openChangePasswordModal = ref<boolean>(false);
+
+function changeUsername() {
+  if (!isEditingUsername.value) {
+    isEditingUsername.value = true;
+    newUsername.value = accountStore.state.username;
+    return;
+  }
+  useAPI()
+    .account.changeDisplayName(newUsername.value)
+    .then(() => {
+      isEditingUsername.value = false;
+    });
+}
+
+function changeEmail() {
+  if (!isEditingEmail.value) {
+    isEditingEmail.value = true;
+    newEmail.value = accountStore.state.email;
+  }
+
+  useAPI()
+    .auth.requestEmailChange(newEmail.value)
+    .then(() => {
+      isEditingEmail.value = false;
+      openConfirmEmailChangeModal.value = true;
+    });
+  openConfirmEmailChangeModal.value = true;
+}
+
+onMounted(() => {
+  accountStore.actions.init().then();
 });
 </script>
 

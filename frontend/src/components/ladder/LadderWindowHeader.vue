@@ -83,7 +83,7 @@ import PaginationButtonGroup from "../../components/interactables/PaginationButt
 import { useLadderStore } from "~/store/ladder";
 import { useAccountStore } from "~/store/account";
 import { useRoundStore } from "~/store/round";
-import ExtendedInformationModal from "~/components/interactables/ExtendedInformationModal.vue";
+import ExtendedInformationModal from "~/components/interactables/ExtendedInformationDialog.vue";
 import { useFormatter } from "~/composables/useFormatter";
 
 const ladderStore = useLadderStore();

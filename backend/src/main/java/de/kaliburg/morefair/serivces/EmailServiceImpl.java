@@ -48,4 +48,12 @@ public class EmailServiceImpl implements EmailService {
 
     sendEmail(username, "Reset your password", text);
   }
+
+  @Override
+  public void sendChangeEmailMail(String newMail, String confirmToken) {
+    String text = "The token for changing your email is:\n" + confirmToken;
+    text += "\n\nIf you did not request to change your email, please ignore this email.";
+
+    sendEmail(newMail, "Change of your email", text);
+  }
 }

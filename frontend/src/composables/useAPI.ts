@@ -101,6 +101,16 @@ const API = {
       params.append("password", password);
       return axiosInstance.post("/api/auth/password/reset", params);
     },
+    requestEmailChange: (email: string) => {
+      const params = new URLSearchParams();
+      params.append("email", email);
+      return axiosInstance.patch("/api/auth/email", params);
+    },
+    confirmEmailChange: (token: string) => {
+      const params = new URLSearchParams();
+      params.append("tokem", token);
+      return axiosInstance.post("/api/auth/email", params);
+    },
     logout: () => {
       return axiosInstance.post("/api/auth/logout");
     },
@@ -114,6 +124,7 @@ const API = {
       params.append("displayName", displayName);
       return axiosInstance.patch("/api/account/name", params);
     },
+
     getAccountDetails: () => {
       return axiosInstance.get("/api/account");
     },

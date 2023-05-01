@@ -71,8 +71,8 @@ import {
   DialogTitle,
 } from "@headlessui/vue";
 import { FeedbackType } from "@zxcvbn-ts/core/dist/types";
-import { useZxcvbn } from "../../composables/useZxcvbn";
-import { useAPI } from "../../composables/useAPI";
+import { useZxcvbn } from "~/composables/useZxcvbn";
+import { useAPI } from "~/composables/useAPI";
 
 const isLogin = ref<boolean>(true);
 

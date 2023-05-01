@@ -38,6 +38,7 @@ export const useAccountStore = defineStore("account", () => {
   const api = useAPI();
 
   const ladderStore = useLadderStore();
+  const stomp = useStomp();
 
   const isInitialized = ref<boolean>(false);
   const state = reactive<AccountData>({
@@ -71,7 +72,6 @@ export const useAccountStore = defineStore("account", () => {
       state.uuid = data.uuid;
       state.username = data.username;
       state.email = data.email;
-      const stomp = useStomp();
       stomp.connectPrivateChannel(state.uuid);
       stomp.addCallback(
         stomp.callbacks.onAccountEvent,
@@ -82,10 +82,10 @@ export const useAccountStore = defineStore("account", () => {
   }
 
   function handleAccountEvents(body: OnAccountEventBody) {
+    console.log(body);
     const event = body.eventType;
     const isYou = state.accountId === body.accountId;
     let ranker;
-    console.log(body, isYou);
     if (isYou) {
       ranker = ladderStore.getters.yourRanker;
     } else {
@@ -94,11 +94,10 @@ export const useAccountStore = defineStore("account", () => {
       );
     }
 
-    if (ranker === undefined) return;
-
     switch (event) {
       case AccountEventType.NAME_CHANGE:
-        ranker.username = body.data;
+        state.username = body.data;
+        if (ranker) ranker.username = body.data;
         useChatStore().actions.rename(body.accountId, body.data);
         break;
       case AccountEventType.MOD:
@@ -116,7 +115,6 @@ export const useAccountStore = defineStore("account", () => {
       case AccountEventType.INCREASE_HIGHEST_LADDER:
         useSound(SOUNDS.PROMOTION).play();
         state.highestCurrentLadder = body.data;
-        console.log("increased highest ladder to " + body.data);
         break;
       default:
         console.error("Unknown account event type: " + event);

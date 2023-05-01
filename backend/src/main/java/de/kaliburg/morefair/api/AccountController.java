@@ -16,10 +16,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -69,7 +69,7 @@ public class AccountController {
   }
 
 
-  @MessageMapping(APP_RENAME_DESTINATION)
+  @PatchMapping("/name")
   public ResponseEntity<?> updateDisplayName(Authentication authentication,
       @RequestParam("displayName") String displayName) {
     try {
@@ -79,6 +79,10 @@ public class AccountController {
       }
 
       AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
+
+      if (displayName.equals(account.getDisplayName())) {
+        return ResponseEntity.ok().build();
+      }
 
       log.info("[G] RENAME: {} (#{}) -> {}", account.getDisplayName(), account.getId(),
           displayName);
@@ -97,5 +101,6 @@ public class AccountController {
       return ResponseEntity.internalServerError().body(e.getMessage());
     }
   }
+
 
 }

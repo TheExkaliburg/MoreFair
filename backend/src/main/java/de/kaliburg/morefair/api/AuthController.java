@@ -26,6 +26,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -55,11 +56,15 @@ public class AuthController {
           .expireAfterWrite(1, TimeUnit.HOURS)
           .build(uuid -> "");
 
+  private final LoadingCache<String, String> changeEmailTokens =
+      Caffeine.newBuilder()
+          .expireAfterWrite(1, TimeUnit.HOURS)
+          .build(key -> null);
+
   // TODO: _uuid cookie automatisch setzen (registerGuest), lesen (upgradeAccount) und löschen
   //  (upgradeAccount)
   // TODO: auto reroute to /game on successful login
   // TODO: auto reroute to / if not authenticated
-  // TODO: Websockets via HttpSession
 
   @GetMapping
   public ResponseEntity<?> getAuthenticationStatus(Authentication authentication) {
@@ -113,8 +118,7 @@ public class AuthController {
   // API endpoint for changing password in combination with the old password
   @PostMapping(value = "/password/change", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   public ResponseEntity<?> changePassword(@RequestParam String oldPassword,
-      @RequestParam String newPassword, HttpServletRequest request, Authentication authentication)
-      throws Exception {
+      @RequestParam String newPassword, HttpSession session, Authentication authentication) {
 
     if (newPassword.length() < 8) {
       return ResponseEntity.badRequest().body("Password must be at least 8 characters long");
@@ -135,10 +139,10 @@ public class AuthController {
     }
 
     account.setPassword(passwordEncoder.encode(newPassword));
-    account.setLastRevoke(OffsetDateTime.now());
     accountService.save(account);
+    session.invalidate();
 
-    return ResponseEntity.ok("Password changed");
+    return ResponseEntity.ok("Password changed, please log back in with your new password.");
   }
 
   // API for Creating, saving and sending a new token via mail for resetting the password
@@ -186,7 +190,6 @@ public class AuthController {
     }
 
     account.setPassword(passwordEncoder.encode(newPassword));
-    account.setLastRevoke(OffsetDateTime.now());
     accountService.save(account);
 
     return ResponseEntity.ok("Password changed");
@@ -254,15 +257,84 @@ public class AuthController {
     return ResponseEntity.created(uri).body(account.getUsername());
   }
 
+  /**
+   * This PATCH endpoint is used to request an update to the email-address of an account.
+   *
+   * @param authentication The current authentication of the session.
+   * @param newMail        the new email address.
+   * @return
+   */
+  @PatchMapping("/email")
+  public ResponseEntity<?> requestUpdatedEmail(Authentication authentication,
+      @RequestParam("email") String newMail) {
+    try {
+      if (newMail.length() > 254) {
+        return ResponseEntity.badRequest().body("Email must be at most 254 characters long");
+      }
+      if (!emailRegexPattern.matcher(newMail).matches()) {
+        return ResponseEntity.badRequest().body("Invalid email address");
+      }
+
+      if (accountService.findByUsername(newMail) != null) {
+        return ResponseEntity.badRequest().body("Email address already in use");
+      }
+
+      URI uri = HttpUtils.createCreatedUri("/api/account/email");
+      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
+
+      if (account == null || account.isGuest()) {
+        return ResponseEntity.created(uri).body("Please look into your inbox for the reset token");
+      }
+
+      String confirmToken = UUID.randomUUID().toString();
+      changeEmailTokens.put(confirmToken, newMail);
+      emailService.sendChangeEmailMail(newMail, confirmToken);
+
+      return ResponseEntity.created(uri).body("Please look into your inbox for the reset token");
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      e.printStackTrace();
+      return ResponseEntity.internalServerError().body(e.getMessage());
+    }
+  }
+
+  @PostMapping("/email")
+  public ResponseEntity<?> confirmUpdatedEmail(Authentication authentication,
+      @RequestParam("token") String token) {
+    token = token.trim();
+
+    String newEmail = changeEmailTokens.getIfPresent(token);
+    if (newEmail == null) {
+      return ResponseEntity.badRequest().body("Invalid token");
+    }
+
+    AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
+    if (account == null) {
+      return ResponseEntity.badRequest().body("Account not found");
+    }
+
+    account.setUsername(newEmail);
+    return ResponseEntity.ok(newEmail);
+  }
+
   @Data
   @RequiredArgsConstructor
   @AllArgsConstructor
-  public class UserRegistrationDetails {
+  public static class UserRegistrationDetails {
 
     private String username = "";
     private String password = "";
     private String uuid = "";
     private boolean used = true;
+  }
+
+  @Data
+  @RequiredArgsConstructor
+  @AllArgsConstructor
+  public static class EmailChangeRequest {
+
+    private UUID uuid;
+    private String email;
   }
 }
 
