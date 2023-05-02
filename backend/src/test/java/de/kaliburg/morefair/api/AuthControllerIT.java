@@ -1,6 +1,7 @@
 package de.kaliburg.morefair.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -24,7 +25,6 @@ import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -46,7 +46,6 @@ import org.springframework.test.web.servlet.MockMvc;
 @WebAppConfiguration
 @ContextConfiguration
 // TODO: Fix all these test-cases for the new authentication
-@Disabled
 public class AuthControllerIT {
 
   @Autowired
@@ -57,8 +56,6 @@ public class AuthControllerIT {
   private MockMvc mockMvc;
   @Autowired
   private AccountRepository accountRepository;
-  @Autowired
-  private SecurityUtils securityUtils;
 
   @BeforeEach
   public void beforeEach() throws Exception {
@@ -67,7 +64,7 @@ public class AuthControllerIT {
 
   @Test
   public void registerLogin_default_authenticated() throws Exception {
-    String email = "test1@mail.de";
+    String email = "registerLogin_default_authenticated@mail.de";
     String password = SecurityUtils.generatePassword();
     String ip = ITUtils.randomIp();
     String xsrfToken = getXsrfToken();
@@ -77,6 +74,7 @@ public class AuthControllerIT {
     String session = login(email, password, ip, xsrfToken);
     AccountEntity account1 = accountRepository.findByUsername(email).orElseThrow();
     assertTrue(passwordEncoder.matches(password, account1.getPassword()));
+    assertTrue(getAuthenticationStatus(session));
   }
 
   @Test
@@ -90,7 +88,7 @@ public class AuthControllerIT {
 
     String session = login(email, password, ip, xsrfToken);
     String newPassword = SecurityUtils.generatePassword();
-    mockMvc.perform(post("/api/auth/password/change")
+    MockHttpServletResponse response = mockMvc.perform(post("/api/auth/password/change")
             .with(request -> {
               request.setRemoteAddr(ip);
               return request;
@@ -102,12 +100,19 @@ public class AuthControllerIT {
             .cookie(new Cookie("XSRF-TOKEN", xsrfToken))
             .cookie(new Cookie("SESSION", session)))
         .andExpect(status().isOk())
-        .andExpect(content().string("Password changed"));
+        .andExpect(
+            content().string("Password changed, please log back in with your new password."))
+        .andReturn().getResponse();
+
+    assertFalse(getAuthenticationStatus(session));
+    session = Objects.requireNonNull(response.getCookie("SESSION")).getValue();
+    assertFalse(getAuthenticationStatus(session));
+
   }
 
   @Test
-  public void registerForgotPasswordResetLogin_default_authenticated() throws Exception {
-    String email = "registerForgotPasswordResetLogin_default_authenticated@mail.de";
+  public void forgotPasswordReset_default_authenticated() throws Exception {
+    String email = "ForgotPasswordReset_default_authenticated@mail.de";
     String password = SecurityUtils.generatePassword();
     String ip = ITUtils.randomIp();
     String xsrfToken = getXsrfToken();
@@ -146,9 +151,37 @@ public class AuthControllerIT {
             .cookie(new Cookie("XSRF-TOKEN", xsrfToken)))
         .andExpect(status().isOk())
         .andExpect(content().string("Password changed"))
+        .andReturn().getResponse();
+
+    assertTrue(getAuthenticationStatus(session));
+  }
+
+  @Test
+  public void forgotPassword_wrongUsername_authenticated() throws Exception {
+    String email = "ForgotPasswordReset_wrongUsername_authenticated@mail.de";
+    String password = SecurityUtils.generatePassword();
+    String ip = ITUtils.randomIp();
+    String xsrfToken = getXsrfToken();
+    String registrationToken = registerUser(email, password, ip, xsrfToken);
+    confirmRegistrationToken(UUID.fromString(registrationToken).toString(), ip);
+
+    String session = login(email, password, ip, xsrfToken);
+
+    mockMvc.perform(post("/api/auth/password/forgot")
+            .with(request -> {
+              request.setRemoteAddr(ip);
+              return request;
+            })
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+            .param("username", email + "e")
+            .header("X-XSRF-TOKEN", xsrfToken)
+            .cookie(new Cookie("XSRF-TOKEN", xsrfToken)))
+        .andExpect(status().isCreated())
+        .andExpect(content().string("Please look into your inbox for the reset token"))
         .andReturn().getResponse().getContentAsString();
 
-
+    assertFalse(greenMailBean.getGreenMail().waitForIncomingEmail(2));
+    assertTrue(getAuthenticationStatus(session));
   }
 
 
@@ -176,6 +209,100 @@ public class AuthControllerIT {
   }
 
   @Test
+  public void changePassword_tooShortPassword_badRequest() throws Exception {
+    String email = "changePassword_tooShortPassword_badRequest@mail.de";
+    String password = SecurityUtils.generatePassword();
+    String ip = ITUtils.randomIp();
+    String xsrfToken = getXsrfToken();
+    String registrationToken = registerUser(email, password, ip, xsrfToken);
+    confirmRegistrationToken(registrationToken, ip);
+
+    String session = login(email, password, ip, xsrfToken);
+    String newPassword = SecurityUtils.generatePassword().substring(0, 4);
+
+    mockMvc.perform(post("/api/auth/password/change")
+            .with(request -> {
+              request.setRemoteAddr(ip);
+              return request;
+            })
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+            .param("oldPassword", password)
+            .param("newPassword", newPassword)
+            .header("X-XSRF-TOKEN", xsrfToken)
+            .cookie(new Cookie("XSRF-TOKEN", xsrfToken))
+            .cookie(new Cookie("SESSION", session)))
+        .andExpect(status().isBadRequest())
+        .andExpect(
+            content().string("Password must be at least 8 characters long."))
+        .andReturn().getResponse();
+
+    assertTrue(getAuthenticationStatus(session));
+  }
+
+  @Test
+  public void changePassword_tooLongPassword_badRequest() throws Exception {
+    String email = "changePassword_tooLongPassword_badRequest@mail.de";
+    String password = SecurityUtils.generatePassword();
+    String ip = ITUtils.randomIp();
+    String xsrfToken = getXsrfToken();
+    String registrationToken = registerUser(email, password, ip, xsrfToken);
+    confirmRegistrationToken(registrationToken, ip);
+
+    String session = login(email, password, ip, xsrfToken);
+    String newPassword = SecurityUtils.generatePassword() + SecurityUtils.generatePassword()
+        + SecurityUtils.generatePassword() + SecurityUtils.generatePassword();
+
+    mockMvc.perform(post("/api/auth/password/change")
+            .with(request -> {
+              request.setRemoteAddr(ip);
+              return request;
+            })
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+            .param("oldPassword", password)
+            .param("newPassword", newPassword)
+            .header("X-XSRF-TOKEN", xsrfToken)
+            .cookie(new Cookie("XSRF-TOKEN", xsrfToken))
+            .cookie(new Cookie("SESSION", session)))
+        .andExpect(status().isBadRequest())
+        .andExpect(
+            content().string("Password must be at most 64 characters long."))
+        .andReturn().getResponse();
+
+    assertTrue(getAuthenticationStatus(session));
+  }
+
+  @Test
+  public void changePassword_wrongPassword_badRequest() throws Exception {
+    String email = "changePassword_wrongPassword_badRequest@mail.de";
+    String password = SecurityUtils.generatePassword();
+    String ip = ITUtils.randomIp();
+    String xsrfToken = getXsrfToken();
+    String registrationToken = registerUser(email, password, ip, xsrfToken);
+    confirmRegistrationToken(registrationToken, ip);
+
+    String session = login(email, password, ip, xsrfToken);
+    String newPassword = SecurityUtils.generatePassword();
+
+    mockMvc.perform(post("/api/auth/password/change")
+            .with(request -> {
+              request.setRemoteAddr(ip);
+              return request;
+            })
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+            .param("oldPassword", newPassword)
+            .param("newPassword", newPassword)
+            .header("X-XSRF-TOKEN", xsrfToken)
+            .cookie(new Cookie("XSRF-TOKEN", xsrfToken))
+            .cookie(new Cookie("SESSION", session)))
+        .andExpect(status().isBadRequest())
+        .andExpect(
+            content().string("Wrong password"))
+        .andReturn().getResponse();
+
+    assertTrue(getAuthenticationStatus(session));
+  }
+
+  @Test
   public void register_tooLongPassword_badRequest() throws Exception {
     String email = "registerTooShortPassword@mail.de";
     String password = SecurityUtils.generatePassword();
@@ -198,6 +325,7 @@ public class AuthControllerIT {
         .andExpect(content().string("Password must be at most 64 characters long"))
         .andReturn().getResponse().getContentAsString();
   }
+
 
   @Test
   public void register_tooLongEmailPassword_badRequest() throws Exception {
@@ -223,7 +351,7 @@ public class AuthControllerIT {
   }
 
   @Test
-  @DataSet(cleanBefore = true, value = "yml/datasets/data_initial.yml")
+  @DataSet(cleanBefore = true)
   public void register_invalidEmail_badRequest() throws Exception {
     String email = "jbneßfq7ß09234";
     String password = SecurityUtils.generatePassword();
@@ -247,10 +375,10 @@ public class AuthControllerIT {
   }
 
   @Test
-  @DataSet(cleanBefore = true, value = "yml/datasets/data_initial.yml")
+  @DataSet(cleanBefore = true)
   public void register_multipleRequestsWithSameIp_statusForbidden() throws Exception {
-    String email1 = "test2@mail.de";
-    String email2 = "test3@mail.de";
+    String email1 = "register_multipleRequestsWithSameIp_statusForbidden1@mail.de";
+    String email2 = "register_multipleRequestsWithSameIp_statusForbidden2@mail.de";
     String password = SecurityUtils.generatePassword();
     String ip = ITUtils.randomIp();
     String xsrfToken = getXsrfToken();
@@ -273,7 +401,7 @@ public class AuthControllerIT {
   }
 
   @Test
-  @DataSet(cleanBefore = true, value = "yml/datasets/data_initial.yml")
+  @DataSet(cleanBefore = true)
   public void register_multipleRequestsWithSameEmail_badRequest() throws Exception {
     String email = "registerMultipleRequestsWithSameEmail@mail.de";
     String password = SecurityUtils.generatePassword();
@@ -308,10 +436,11 @@ public class AuthControllerIT {
 
     AccountEntity account1 = accountRepository.findByUsername(uuid).orElseThrow();
     assertTrue(passwordEncoder.matches(uuid, account1.getPassword()));
+    assertTrue(getAuthenticationStatus(session));
   }
 
   @Test
-  @DataSet(cleanBefore = true, value = "yml/datasets/data_initial.yml")
+  @DataSet(cleanBefore = true)
   public void registerGuest_multipleRequestsWithSameIp_statusForbidden() throws Exception {
     String ip = ITUtils.randomIp();
     String xsrfToken = getXsrfToken();
@@ -333,8 +462,8 @@ public class AuthControllerIT {
     List<AccountEntity> allAccounts = accountRepository.findAll();
     allAccounts.sort(Comparator.comparing(AccountEntity::getId));
 
-    assertEquals(2, allAccounts.size());
-    assertEquals(allAccounts.get(1).getUsername(), uuid);
+    assertEquals(1, allAccounts.size());
+    assertEquals(allAccounts.get(0).getUsername(), uuid);
   }
 
   @Test
@@ -377,9 +506,17 @@ public class AuthControllerIT {
     assertTrue(passwordEncoder.matches(password, account1.getPassword()));
   }
 
+  private Boolean getAuthenticationStatus(String session) throws Exception {
+    String content = mockMvc.perform(get("/api/auth")
+            .cookie(new Cookie("SESSION", session)))
+        .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+
+    return Boolean.parseBoolean(content);
+  }
+
   private String getXsrfToken() throws Exception {
-    MockHttpServletResponse response = mockMvc.perform(get("/api/auth/"))
-        .andExpect(status().isOk()).andReturn().getResponse();
+    MockHttpServletResponse response = mockMvc.perform(post("/api/auth/register/guest"))
+        .andExpect(status().isForbidden()).andReturn().getResponse();
 
     return Objects.requireNonNull(response.getCookie("XSRF-TOKEN")).getValue();
   }
@@ -411,6 +548,7 @@ public class AuthControllerIT {
             .param("username", email)
             .param("password", password)
             .header("X-XSRF-TOKEN", xsrfToken)
+            .cookie(new Cookie("XSRF-TOKEN", xsrfToken))
             .cookie(new Cookie("XSRF-TOKEN", xsrfToken)))
         .andExpect(status().isCreated())
         .andExpect(content().string("Please look into your inbox for a confirmation link"))

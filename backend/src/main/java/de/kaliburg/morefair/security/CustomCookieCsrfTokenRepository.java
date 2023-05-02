@@ -39,7 +39,6 @@ public class CustomCookieCsrfTokenRepository implements CsrfTokenRepository {
     } else {
       request.removeAttribute(CSRF_TOKEN_REMOVED_ATTRIBUTE_NAME);
     }
-    response.addHeader("X-ADDED-XSRF-COOKIE", "true");
   }
 
   @Override

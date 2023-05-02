@@ -11,17 +11,18 @@
 |               |       ui       |  functionality |     BigUI      |     Tests      |
 +---------------+----------------+----------------+----------------+----------------+
 | Change Name   |      x         |  x             |                |                |
-| ChangePassword|                |                |                |                |
+| ChangePassword|      x         | x              |                |                |
 | Change Email  |     x          |  x             |                |                |
 | Upgrade       |                |                |                |                |
-| Export UUID   |                |                |                |                |
-| Import UUID   |                |                |                |                |
+| Export UUID   |     x          |    x           |                |                |
+| Import UUID   |      x         |   x            |                |                |
 +---------------+----------------+----------------+----------------+----------------+
 
 
 - TODO: Design Login/Register Page
     - need to agree to rules to register/login
 - TODO: Figuring out the Database convert script
+- TODO: Writing a program to create all hashes from the uuids
 
 // Can be done after the fairtest test-run
 - TODO: Look at chat auto-scrolling down
@@ -30,7 +31,7 @@
 - TODO: Overhauled Privacy Policy
 - TODO: Write Actual Tutorial
 - TODO: Add Changelog back
-- TODO: Fix Backend-Testcases (correctness)
+- TODO: Add new Backend-Testcases for authentication (100% coverage)
 - TODO: prerequisite options for other options
 - TODO: popover from navigation buttons
 - TODO: add follow own ranker option

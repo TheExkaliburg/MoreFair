@@ -65,11 +65,15 @@ axiosInstance.interceptors.response.use(
 
 const API = {
   auth: {
-    login: (username: string, password: string) => {
+    login: (
+      username: string,
+      password: string,
+      rememberMe: boolean = false
+    ) => {
       const params = new URLSearchParams();
       params.append("username", username);
       params.append("password", password);
-      params.append("remember-me", "true");
+      if (rememberMe) params.append("remember-me", "true");
       return axiosInstance.post("/api/auth/login", params, {
         withCredentials: true,
       });

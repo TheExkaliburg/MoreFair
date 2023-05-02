@@ -15,10 +15,10 @@
       }}</FairButton>
     </div>
     <div class="h-8" />
-    <template v-if="!isGuest">
+    <template v-if="isGuest">
       <div class="flex flex-row justify-around gap-3 max-w-reader">
-        <FairButton class="w-full">Export UUID</FairButton>
-        <FairButton class="w-full">Import UUID</FairButton>
+        <FairButton class="w-full" @click="exportUuid">Export UUID</FairButton>
+        <FairButton class="w-full" @click="importUuid">Import UUID</FairButton>
       </div>
       <div class="h-8" />
       <FairButton class="w-full max-w-reader">Upgrade Account</FairButton>
@@ -57,6 +57,7 @@
 
 <script lang="ts" setup>
 import { onMounted } from "vue";
+import Cookies from "js-cookie";
 import { definePageMeta, useAPI } from "#imports";
 import { useAuthStore } from "~/store/authentication";
 import FairButton from "~/components/interactables/FairButton.vue";
@@ -117,6 +118,38 @@ function changeEmail() {
       openConfirmEmailChangeModal.value = true;
     });
   openConfirmEmailChangeModal.value = true;
+}
+
+async function exportUuid() {
+  const uuid = Cookies.get("_uuid");
+  if (uuid === undefined) {
+    alert("You don't have a UUID");
+    return;
+  }
+  await navigator.clipboard.writeText(uuid);
+  alert("Copied your UUID to clipboard! (don't loose it or give it away)");
+}
+
+function importUuid() {
+  const uuid = prompt(
+    "Paste your ID into here (your old uuid will be copied into your clipboard):"
+  );
+  if (uuid === null || undefined) return;
+  useAPI()
+    .auth.login(uuid, uuid, true)
+    .then(() => {
+      Cookies.set("_uuid", uuid, {
+        expires: 365,
+        secure: true,
+        sameSite: "strict",
+      });
+      alert("Successfully imported your UUID!");
+      window.location.reload();
+    })
+    .catch(() => {
+      alert("Failed to import your UUID!");
+      window.location.reload();
+    });
 }
 
 onMounted(() => {

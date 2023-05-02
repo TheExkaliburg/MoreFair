@@ -60,8 +60,12 @@ export const useAuthStore = defineStore("auth", () => {
     });
   }
 
-  async function login(username: string, password: string) {
-    await API.auth.login(username, password).then((response) => {
+  async function login(
+    username: string,
+    password: string,
+    rememberMe: boolean = false
+  ) {
+    await API.auth.login(username, password, rememberMe).then((response) => {
       // 200 - OK
       if (response.status === 200) {
         authenticationStatus.value = true;

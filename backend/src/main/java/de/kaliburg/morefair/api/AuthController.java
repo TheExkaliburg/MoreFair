@@ -121,18 +121,15 @@ public class AuthController {
       @RequestParam String newPassword, HttpSession session, Authentication authentication) {
 
     if (newPassword.length() < 8) {
-      return ResponseEntity.badRequest().body("Password must be at least 8 characters long");
+      return ResponseEntity.badRequest().body("Password must be at least 8 characters long.");
     }
     if (newPassword.length() > 64) {
-      return ResponseEntity.badRequest().body("Password must be at most 64 characters long");
+      return ResponseEntity.badRequest().body("Password must be at most 64 characters long.");
     }
 
     UUID uuid = SecurityUtils.getUuid(authentication);
 
     AccountEntity account = accountService.find(uuid);
-    if (account == null) {
-      return ResponseEntity.badRequest().body("Account not found");
-    }
 
     if (!passwordEncoder.matches(oldPassword, account.getPassword())) {
       return ResponseEntity.badRequest().body("Wrong password");
@@ -194,7 +191,6 @@ public class AuthController {
 
     return ResponseEntity.ok("Password changed");
   }
-
 
   @GetMapping(value = "/register/confirm", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> confirmRegistration(@RequestParam String token,
