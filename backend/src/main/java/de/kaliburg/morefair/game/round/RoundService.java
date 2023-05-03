@@ -119,7 +119,7 @@ public class RoundService {
 
     if (assholeCount > getCurrentRound().getHighestAssholeCount()
         && !getCurrentRound().getTypes().contains(RoundType.CHAOS)
-        && ladderService.find(baseAssholeLadderNumber) == null) {
+        && ladderService.findInCache(baseAssholeLadderNumber) == null) {
       getCurrentRound().setHighestAssholeCount(assholeCount);
       ladderService.setCurrentRound(save(getCurrentRound()));
       wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
