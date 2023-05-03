@@ -279,7 +279,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   }
 
   public LadderEntity find(LadderEntity ladder) {
-    return find(ladder.getNumber());
+    return findInCache(ladder.getNumber());
   }
 
   /**
@@ -289,7 +289,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
    * @param number the number of the ladder
    * @return the ladder, might be null if there is no ladder with the number
    */
-  public LadderEntity find(Integer number) {
+  public LadderEntity findInCache(Integer number) {
     LadderEntity ladder = currentLadderMap.get(number);
     if (ladder == null) {
       log.warn("Couldn't find the ladder with the number {} in cache, checking database.", number);
@@ -338,7 +338,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
    * @return The created ranker
    */
   RankerEntity createRanker(AccountEntity account, Integer number) {
-    LadderEntity ladder = find(number);
+    LadderEntity ladder = findInCache(number);
     account = accountService.find(account);
 
     if (ladder == null) {
@@ -510,17 +510,14 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         newRanker.setVinegar(ranker.getVinegar());
         newRanker.setGrapes(ranker.getGrapes());
         newRanker.getUnlocks().copy(ranker.getUnlocks());
-        LadderEntity newLadder = find(newRanker.getLadder().getNumber());
+        LadderEntity newLadder = findInCache(newRanker.getLadder().getNumber());
 
-        if (newLadder.getNumber() > currentRound.getModifiedBaseAssholeLadder()
-            && newLadder.getRankers().size() <= 1) {
-          LadderEntity autoLadder = find(
-              newLadder.getNumber() - currentRound.getModifiedBaseAssholeLadder());
-
-          if (autoLadder != null && !autoLadder.getTypes().contains(LadderType.FREE_AUTO)
-              && !autoLadder.getTypes().contains(LadderType.NO_AUTO)) {
-            autoLadder.getTypes().add(LadderType.FREE_AUTO);
-          }
+        // Auto-Ladder
+        Integer number = Math.floorDiv(newLadder.getNumber(), 2) - 2;
+        LadderEntity autoLadder = findInCache(number);
+        if (autoLadder != null && !autoLadder.getTypes().contains(LadderType.FREE_AUTO)
+            && !autoLadder.getTypes().contains(LadderType.NO_AUTO)) {
+          autoLadder.getTypes().add(LadderType.FREE_AUTO);
         }
 
         // Unlocks
@@ -597,7 +594,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
           // Is it time to reset the game
           if (assholeCount >= neededAssholesForReset) {
-            LadderEntity firstLadder = find(1);
+            LadderEntity firstLadder = findInCache(1);
             List<AccountEntity> accounts =
                 firstLadder.getRankers().stream().map(RankerEntity::getAccount).distinct().toList();
             for (AccountEntity entity : accounts) {

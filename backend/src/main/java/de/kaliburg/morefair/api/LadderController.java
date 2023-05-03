@@ -66,8 +66,8 @@ public class LadderController {
       if (account.isMod()
           || number.equals(roundUtils.getAssholeLadderNumber(roundService.getCurrentRound()))
           || number <= ranker.getLadder().getNumber()) {
-        LadderDto l = new LadderDto(ladderService.find(number), account, config);
         return ResponseEntity.ok(l);
+        LadderDto l = new LadderDto(ladderService.findInCache(number), account, config);
       } else {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       }
