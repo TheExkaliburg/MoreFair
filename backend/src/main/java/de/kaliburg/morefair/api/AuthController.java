@@ -177,9 +177,6 @@ public class AuthController {
     }
 
     AccountEntity account = accountService.findByUsername(username);
-    if (account == null) {
-      return ResponseEntity.internalServerError().body("Account not found");
-    }
 
     HttpSession session = request.getSession(false);
     if (session != null) {
