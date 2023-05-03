@@ -21,7 +21,15 @@
         <FairButton class="w-full" @click="importUuid">Import UUID</FairButton>
       </div>
       <div class="h-8" />
-      <FairButton class="w-full max-w-reader">Upgrade Account</FairButton>
+      <FairButton
+        class="w-full max-w-reader"
+        @click="openUpgradeAccountDialog = true"
+        >Upgrade Account</FairButton
+      >
+      <UpgradeAccountDialog
+        :open="openUpgradeAccountDialog"
+        @close="openUpgradeAccountDialog = false"
+      />
     </template>
     <template v-else>
       <div>E-Mail</div>
@@ -39,17 +47,17 @@
           isEditingEmail ? "Apply" : "Edit"
         }}</FairButton>
         <ConfirmEmailChangeDialog
-          :open="openConfirmEmailChangeModal"
-          @close="openConfirmEmailChangeModal = false"
+          :open="openConfirmEmailChangeDialog"
+          @close="openConfirmEmailChangeDialog = false"
         />
       </div>
       <div class="h-12" />
-      <FairButton @click="openChangePasswordModal = true"
+      <FairButton @click="openChangePasswordDialog = true"
         >Change Password</FairButton
       >
       <ChangePasswordDialog
-        :open="openChangePasswordModal"
-        @close="openChangePasswordModal = false"
+        :open="openChangePasswordDialog"
+        @close="openChangePasswordDialog = false"
       />
     </template>
   </div>
@@ -65,6 +73,7 @@ import FairInput from "~/components/interactables/FairInput.vue";
 import { useAccountStore } from "~/store/account";
 import ConfirmEmailChangeDialog from "~/components/account/ConfirmEmailChangeDialog.vue";
 import ChangePasswordDialog from "~/components/account/ChangePasswordDialog.vue";
+import UpgradeAccountDialog from "~/components/account/UpgradeAccountDialog.vue";
 
 definePageMeta({
   layout: "default",
@@ -89,8 +98,9 @@ const shownEmail = computed<string>(() => {
 const newEmail = ref<string>(accountStore.state.username);
 const isEditingEmail = ref<boolean>(false);
 
-const openConfirmEmailChangeModal = ref<boolean>(false);
-const openChangePasswordModal = ref<boolean>(false);
+const openConfirmEmailChangeDialog = ref<boolean>(false);
+const openChangePasswordDialog = ref<boolean>(false);
+const openUpgradeAccountDialog = ref<boolean>(false);
 
 function changeUsername() {
   if (!isEditingUsername.value) {
@@ -115,9 +125,9 @@ function changeEmail() {
     .auth.requestEmailChange(newEmail.value)
     .then(() => {
       isEditingEmail.value = false;
-      openConfirmEmailChangeModal.value = true;
+      openConfirmEmailChangeDialog.value = true;
     });
-  openConfirmEmailChangeModal.value = true;
+  openConfirmEmailChangeDialog.value = true;
 }
 
 async function exportUuid() {

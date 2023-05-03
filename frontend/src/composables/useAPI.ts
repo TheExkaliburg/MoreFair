@@ -162,9 +162,5 @@ if (!isInitialized) {
 }
 
 export const useAPI = () => {
-  /* if (!API.isInitialized) {
-    await API.auth.authenticationStatus();
-    API.isInitialized = true;
-  } */
   return API;
 };
