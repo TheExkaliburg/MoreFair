@@ -14,6 +14,7 @@ public class MessageDto {
   private final String tag;
   private final Integer assholePoints;
   private final String metadata;
+  private final Boolean isMod;
 
   public MessageDto(MessageEntity message, FairConfig config) {
     this.tag = config.getAssholeTag(message.getAccount().getAssholeCount());
@@ -23,5 +24,6 @@ public class MessageDto {
     this.accountId = message.getAccount().getId();
     this.timestamp = message.getCreatedOn().withOffsetSameInstant(ZoneOffset.UTC).toEpochSecond();
     this.metadata = message.getMetadata();
+    this.isMod = message.getAccount().isMod();
   }
 }

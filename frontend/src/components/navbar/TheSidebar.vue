@@ -12,35 +12,50 @@
         </div>
         <!--Bottom of the Canvas-->
         <div class="min-w-min flex flex-col justify-items-start content-around">
-          <NuxtLink to="/account">
+          <NuxtLink
+            v-tippy="{ content: lang('account'), placement: 'right' }"
+            to="/account"
+          >
             <SidebarButton>
               <template #icon>
                 <UserCircleIcon />
               </template>
             </SidebarButton>
           </NuxtLink>
-          <NuxtLink to="/options">
+          <NuxtLink
+            v-tippy="{ content: lang('options'), placement: 'right' }"
+            to="/options"
+          >
             <SidebarButton>
               <template #icon>
                 <Cog8ToothIcon />
               </template>
             </SidebarButton>
           </NuxtLink>
-          <NuxtLink @click="help">
+          <NuxtLink
+            v-tippy="{ content: lang('help'), placement: 'right' }"
+            @click="help"
+          >
             <SidebarButton>
               <template #icon>
                 <QuestionMarkCircleIcon />
               </template>
             </SidebarButton>
           </NuxtLink>
-          <NuxtLink to="/rules">
+          <NuxtLink
+            v-tippy="{ content: lang('rules'), placement: 'right' }"
+            to="/rules"
+          >
             <SidebarButton>
               <template #icon>
                 <DocumentTextIcon />
               </template>
             </SidebarButton>
           </NuxtLink>
-          <NuxtLink to="/">
+          <NuxtLink
+            v-tippy="{ content: lang('discord'), placement: 'right' }"
+            to="/"
+          >
             <SidebarButton>
               <template #icon>
                 <font-awesome-icon icon="fa-brands fa-discord" />
@@ -57,14 +72,16 @@
 <script lang="ts" setup>
 import {
   Cog8ToothIcon,
-  QuestionMarkCircleIcon,
   DocumentTextIcon,
+  QuestionMarkCircleIcon,
   UserCircleIcon,
 } from "@heroicons/vue/24/outline";
+import { useLang } from "../../composables/useLang";
 import SidebarButton from "~/components/navbar/SidebarButton.vue";
 import { useTutorialTour } from "~/composables/useTour";
 
 const classesForSize = "min-w-12 w-12 max-w-12 px-2 py-2";
+const lang = useLang("components.navbar.sidebar");
 
 function help() {
   useTutorialTour().start();

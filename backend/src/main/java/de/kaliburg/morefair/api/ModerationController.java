@@ -95,7 +95,7 @@ public class ModerationController {
         return;
       }
       target.setAccessRole(AccountAccessRole.BANNED_PLAYER);
-      target.setDisplayName("BANNED");
+      target.setDisplayName("[BANNED]");
       target = accountService.save(target);
       chatService.deleteMessagesOfAccount(target);
       log.info("{} (#{}) is banning the account {} (#{})", account.getDisplayName(),
@@ -122,7 +122,7 @@ public class ModerationController {
         return;
       }
       target.setAccessRole(AccountAccessRole.MUTED_PLAYER);
-      target.setDisplayName(target.getDisplayName() + "(MUTED)");
+      target.setDisplayName("[MUTED]" + target.getDisplayName());
       target = accountService.save(target);
       chatService.deleteMessagesOfAccount(target);
       log.info("{} (#{}) is muting the account {} (#{})", account.getDisplayName(), account.getId(),

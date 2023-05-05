@@ -63,9 +63,9 @@
 <script lang="ts" setup>
 import {
   Cog8ToothIcon,
+  DocumentTextIcon,
   QuestionMarkCircleIcon,
   UserCircleIcon,
-  DocumentTextIcon,
 } from "@heroicons/vue/24/outline";
 import { computed, ref } from "vue";
 import { MaybeElement, onClickOutside } from "@vueuse/core";
@@ -79,7 +79,7 @@ import { useLang } from "~/composables/useLang";
 const uiStore = useUiStore();
 const offCanvas = ref<MaybeElement>();
 
-const lang = useLang("components.navbar.offcanvas-sidebar");
+const lang = useLang("components.navbar.sidebar");
 const optionsLabel = computed<string>(() => lang("options"));
 const helpLabel = computed<string>(() => lang("help"));
 const discordLabel = computed<string>(() => lang("discord"));

@@ -2,11 +2,17 @@
   <div class="flex flex-col w-full">
     <div class="flex flex-row text-sm justify-between pr-3">
       <span class="text-text-light truncate basis-1/4 flex-auto">
+        <font-awesome-icon
+          v-if="!message.isMod"
+          v-tippy="{ content: 'MOD', placement: 'right' }"
+          class="text-text-mod"
+          icon="fa-solid fa-shield-halved"
+        />
         {{ message.username }}
         <sub class="text-text-dark">&nbsp;#{{ message.accountId }} </sub>
       </span>
-      <span class="text-text-light basis-1/4 grow flex-auto"
-        ><strong>{{ message.tag }}</strong
+      <span class="text-text-light basis-1/4 grow flex-auto">
+        <strong>{{ message.tag }}</strong
         ><sub
           v-if="optionsStore.state.general.showAssholePoints.value"
           class="text-text-dark"
@@ -24,7 +30,7 @@
 
 <script lang="ts" setup>
 import ChatWindowContentMessageBody from "../../components/chat/ChatWindowContentMessageBody.vue";
-import { Message } from "../../store/entities/message";
+import { Message } from "~/store/entities/message";
 import { useOptionsStore } from "~/store/options";
 
 const optionsStore = useOptionsStore();

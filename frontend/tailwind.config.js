@@ -28,6 +28,7 @@ module.exports = {
           light: "var(--text-light-highlight-color)",
           dark: "var(--text-dark-highlight-color)",
           placeholder: "var(--text-placeholder-color)",
+          mod: "var(--mod-color)",
         },
         background: {
           DEFAULT: "var(--background-color)",

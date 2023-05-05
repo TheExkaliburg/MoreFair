@@ -73,9 +73,18 @@ public class AccountController {
   public ResponseEntity<?> updateDisplayName(Authentication authentication,
       @RequestParam("displayName") String displayName) {
     try {
+      while (displayName.contains("[BANNED]") || displayName.contains("[MUTED]")) {
+        displayName = displayName.replace("[BANNED]", "");
+        displayName = displayName.replace("[MUTED]", "");
+      }
+
       displayName = displayName.trim();
       if (displayName.length() > 32) {
         displayName = displayName.substring(0, 32);
+      }
+
+      if (displayName.isBlank()) {
+        return ResponseEntity.badRequest().body("Display name cannot be blank");
       }
 
       AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));

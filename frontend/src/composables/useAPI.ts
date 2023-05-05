@@ -112,7 +112,7 @@ const API = {
     },
     confirmEmailChange: (token: string) => {
       const params = new URLSearchParams();
-      params.append("tokem", token);
+      params.append("token", token);
       return axiosInstance.post("/api/auth/email", params);
     },
     logout: () => {

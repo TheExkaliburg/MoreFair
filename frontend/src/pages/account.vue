@@ -4,15 +4,16 @@
     <div>Account</div>
     <div class="flex flex-row">
       <FairInput
-        :model-value="shownUsername"
         :class="{ 'pointer-events-none': !isEditingUsername }"
-        class="rounded-r-none w-2/3"
+        :model-value="shownUsername"
         :readonly="!isEditingUsername"
+        class="rounded-r-none w-2/3"
         @update:modelValue="newUsername = $event"
+        @keydown.enter="changeUsername"
       />
-      <FairButton class="w-1/3 rounded-l-none" @click="changeUsername">{{
-        isEditingUsername ? "Apply" : "Edit"
-      }}</FairButton>
+      <FairButton class="w-1/3 rounded-l-none" @click="changeUsername"
+        >{{ isEditingUsername ? "Apply" : "Edit" }}
+      </FairButton>
     </div>
     <div class="h-8" />
     <template v-if="isGuest">
@@ -24,8 +25,8 @@
       <FairButton
         class="w-full max-w-reader"
         @click="openUpgradeAccountDialog = true"
-        >Upgrade Account</FairButton
-      >
+        >Upgrade Account
+      </FairButton>
       <UpgradeAccountDialog
         :open="openUpgradeAccountDialog"
         @close="openUpgradeAccountDialog = false"
@@ -35,17 +36,17 @@
       <div>E-Mail</div>
       <div class="flex flex-row">
         <FairInput
-          :model-value="shownEmail"
           :class="{ 'pointer-events-none': !isEditingEmail }"
-          class="rounded-r-none w-2/3"
+          :model-value="shownEmail"
           :readonly="!isEditingEmail"
           :type="isEditingEmail ? 'text' : 'password'"
           autocomplete="off"
+          class="rounded-r-none w-2/3"
           @update:modelValue="newEmail = $event"
         />
-        <FairButton class="w-1/3 rounded-l-none" @click="changeEmail">{{
-          isEditingEmail ? "Apply" : "Edit"
-        }}</FairButton>
+        <FairButton class="w-1/3 rounded-l-none" @click="changeEmail"
+          >{{ isEditingEmail ? "Apply" : "Edit" }}
+        </FairButton>
         <ConfirmEmailChangeDialog
           :open="openConfirmEmailChangeDialog"
           @close="openConfirmEmailChangeDialog = false"
@@ -53,8 +54,8 @@
       </div>
       <div class="h-12" />
       <FairButton @click="openChangePasswordDialog = true"
-        >Change Password</FairButton
-      >
+        >Change Password
+      </FairButton>
       <ChangePasswordDialog
         :open="openChangePasswordDialog"
         @close="openChangePasswordDialog = false"
@@ -119,6 +120,7 @@ function changeEmail() {
   if (!isEditingEmail.value) {
     isEditingEmail.value = true;
     newEmail.value = accountStore.state.email;
+    return;
   }
 
   useAPI()

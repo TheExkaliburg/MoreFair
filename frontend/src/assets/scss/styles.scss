@@ -24,3 +24,19 @@ div, ul {
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb-border-color) var(--scrollbar-bg-color);
 }
+
+.tippy-box {
+  background-color: var(--tippy-background) !important;
+  color: var(--tippy-text) !important;
+
+  > .tippy-content {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  > .tippy-arrow {
+    color: var(--tippy-background) !important;
+  }
+
+
+}

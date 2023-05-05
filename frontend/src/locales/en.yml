@@ -3,7 +3,7 @@ pages:
     title: test
 components:
   navbar:
-    offcanvas-sidebar:
+    sidebar:
       back: Back
       ladder: Ladder
       chat: Chat
@@ -15,6 +15,9 @@ components:
       account: Account
       rules: Rules
       information: Information
+    lockButtons: Lock Buttons
+    enableChat: Enable Chat
+    enableLadder: Enable Ladder
   ladder:
     table:
       username: Username

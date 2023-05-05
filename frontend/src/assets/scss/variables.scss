@@ -102,6 +102,7 @@ $transparent: rgba(0, 0, 0, 0);
   // Chat
   --header-color: var(--main-color);
   --header-font-size: 14px;
+  --mod-color: #{$color-medium-red-violet};
 
   // navbar
   --navbar-bg-color: var(--background-dark-color);
@@ -126,8 +127,13 @@ $transparent: rgba(0, 0, 0, 0);
   --modal-text-title-color: var(--text-light-highlight-color);
 
   // Overwrite Toastify defaults
-  --toastify-color-light: #{$color-jagger} !important;
+  --toastify-color-light: #{$color-st-tropaz} !important;
   --toastify-text-color-light: var(--text-color) !important;
+
+  // Tippy Tooltips
+  --tippy-background: #{$color-asparagus};
+  --tippy-text: var(--background-color)
+
 }
 
 :root.light {

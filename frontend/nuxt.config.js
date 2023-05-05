@@ -9,6 +9,7 @@ export default defineNuxtConfig({
     "vue-virtual-scroller/dist/vue-virtual-scroller.css",
     "intro.js/minified/introjs.min.css",
     "vue3-toastify/dist/index.css",
+    "tippy.js/dist/tippy.css",
   ],
   modules: [
     "@pinia/nuxt",
@@ -30,6 +31,7 @@ export default defineNuxtConfig({
       "vue-virtual-scroller",
       "vue-i18n",
       "vue3-toastify",
+      "vue-tippy",
     ],
   },
   ssr: false,

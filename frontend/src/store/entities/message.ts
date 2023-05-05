@@ -46,6 +46,7 @@ export type MessageData = {
   timestamp: number;
   tag: string;
   assholePoints: number;
+  isMod: boolean;
 };
 
 // Set the options for the Intl.DateTimeFormat object
@@ -67,6 +68,7 @@ export class Message implements MessageData {
   timestamp: number = 0;
   tag: string = "";
   assholePoints: number = 0;
+  isMod: boolean = false;
   private flags: string[] = [];
 
   constructor(data: any) {
