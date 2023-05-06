@@ -22,6 +22,8 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
@@ -88,7 +90,12 @@ public class SecurityConfig {
         .permitAll()
     );
     http.rememberMe().rememberMeServices(rememberMeServices());
-    http.logout().logoutUrl("/api/auth/logout").logoutSuccessUrl("/");
+    http.logout(logout -> logout
+        .logoutUrl("/api/auth/logout")
+        .invalidateHttpSession(true)
+        .logoutSuccessHandler(logoutSuccessHandler())
+        .deleteCookies("remember-me")
+    );
     http.exceptionHandling()
         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
 
@@ -130,6 +137,11 @@ public class SecurityConfig {
   @Bean
   public AuthenticationSuccessHandler authenticationSuccessHandler() {
     return new CustomAuthenticationSuccessHandler();
+  }
+
+  @Bean
+  public LogoutSuccessHandler logoutSuccessHandler() {
+    return new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK);
   }
 
   @Bean

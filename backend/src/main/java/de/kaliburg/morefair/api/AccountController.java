@@ -4,6 +4,7 @@ import de.kaliburg.morefair.account.AccountDetailsDto;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.account.AchievementsEntity;
+import de.kaliburg.morefair.api.utils.HttpUtils;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.AccountEventTypes;
@@ -12,8 +13,11 @@ import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.security.SecurityUtils;
 import de.kaliburg.morefair.statistics.StatisticsService;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -84,13 +88,15 @@ public class AccountController {
       }
 
       if (displayName.isBlank()) {
-        return ResponseEntity.badRequest().body("Display name cannot be blank");
+        return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST, "Display name cannot be blank");
       }
 
       AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
 
       if (displayName.equals(account.getDisplayName())) {
-        return ResponseEntity.ok().build();
+        Map<String, String> result = new HashMap<>();
+        result.put("displayName", displayName);
+        return ResponseEntity.ok(result);
       }
 
       log.info("[G] RENAME: {} (#{}) -> {}", account.getDisplayName(), account.getId(),
@@ -103,7 +109,9 @@ public class AccountController {
           new Event<>(AccountEventTypes.NAME_CHANGE, account.getId(),
               account.getDisplayName()));
 
-      return ResponseEntity.ok(displayName);
+      Map<String, String> result = new HashMap<>();
+      result.put("displayName", displayName);
+      return ResponseEntity.ok(result);
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();

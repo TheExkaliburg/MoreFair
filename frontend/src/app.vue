@@ -6,19 +6,6 @@
 
 <script lang="ts" setup>
 /*
-- TODO: Account Page to change name, password, email, upgrade, export uuid, import uuid etc.
-+---------------+----------------+----------------+----------------+----------------+
-|               |       ui       |  functionality |     BigUI      |     Tests      |
-+---------------+----------------+----------------+----------------+----------------+
-| Change Name   |      x         |  x             |                |                |
-| ChangePassword|      x         | x              |                |                |
-| Change Email  |     x          |  x             |                |                |
-| Upgrade       |                |                |                |                |
-| Export UUID   |     x          |    x           |                |                |
-| Import UUID   |      x         |   x            |                |                |
-+---------------+----------------+----------------+----------------+----------------+
-
-
 - TODO: Design Login/Register Page
     - need to agree to rules to register/login
 - TODO: Figuring out the Database convert script
@@ -35,6 +22,17 @@
 - TODO: prerequisite options for other options
 - TODO: popover from navigation buttons
 - TODO: add follow own ranker option
+
++---------------+----------------+----------------+----------------+----------------+
+|               |       ui       |  functionality |     BigUI      |     Tests      |
++---------------+----------------+----------------+----------------+----------------+
+| Change Name   |      x         |  x             |                |                |
+| ChangePassword|      x         | x              |                |                |
+| Change Email  |     x          |  x             |                |                |
+| Upgrade       |     x          |  x             |                |                |
+| Export UUID   |     x          |    x           |                |                |
+| Import UUID   |      x         |   x            |                |                |
++---------------+----------------+----------------+----------------+----------------+
 
 // If im feeling funny but will probably only get done after rework is finished
 - TODO: Statistics

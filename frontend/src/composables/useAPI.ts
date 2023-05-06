@@ -1,6 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import { navigateTo } from "nuxt/app";
 import Cookies from "js-cookie";
+import { useAuthStore } from "~/store/authentication";
 
 const isDevMode = process.env.NODE_ENV !== "production";
 let lastXsrfToken = Cookies.get("XSRF-TOKEN");
@@ -36,6 +37,8 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     if (error.response?.status === 401) {
+      useAuthStore().state.authenticationStatus = false;
+      useAuthStore().state.uuid = Cookies.get("_uuid") || "";
       navigateTo("/");
     }
     if (error.response?.status === 403) {

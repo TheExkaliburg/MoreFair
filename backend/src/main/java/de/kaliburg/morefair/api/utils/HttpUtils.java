@@ -1,7 +1,6 @@
 package de.kaliburg.morefair.api.utils;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.URI;
@@ -9,6 +8,7 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.stereotype.Component;
@@ -56,9 +56,10 @@ public class HttpUtils {
         ServletUriComponentsBuilder.fromCurrentContextPath().path(apiPath).toUriString());
   }
 
-  public static void buildErrorMessage(HttpServletResponse response, String message, int status) {
+  public static ResponseEntity<Map<String, String>> buildErrorMessage(HttpStatus status,
+      String message) {
     Map<String, String> errors = new HashMap<>();
-    errors.put("error", message);
-    ResponseEntity.status(status).body(errors);
+    errors.put("message", message);
+    return ResponseEntity.status(status).body(errors);
   }
 }

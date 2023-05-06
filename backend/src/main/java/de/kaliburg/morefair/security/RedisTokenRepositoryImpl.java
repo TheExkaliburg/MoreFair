@@ -42,8 +42,6 @@ public class RedisTokenRepositoryImpl implements PersistentTokenRepository {
 
   @Override
   public void createNewToken(PersistentRememberMeToken token) {
-    log.debug("token create seriesId: [{}]", token.getSeries());
-
     val key = generateKey(token.getSeries());
 
     val data = Map.of(
@@ -91,7 +89,6 @@ public class RedisTokenRepositoryImpl implements PersistentTokenRepository {
 
   @Override
   public void removeUserTokens(String username) {
-    log.debug("token remove username: [{}]", username);
     byte[] hashKey = stringRedisSerializer.serialize(USERNAME);
     Objects.requireNonNull(redisTemplate.getConnectionFactory());
     val redisConnection = redisTemplate.getConnectionFactory().getConnection();

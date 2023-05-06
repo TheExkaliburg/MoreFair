@@ -1,5 +1,5 @@
 <template>
-  <Dialog :open="props.open" class="relative z-50">
+  <Dialog :open="props.open" class="relative z-50" @close="$emit('close')">
     <div aria-hidden="true" class="fixed inset-0 bg-black/30" />
     <div class="fixed inset-0 flex items-center justify-center p-4">
       <DialogPanel
@@ -52,7 +52,7 @@
                 type="checkbox"
               />
 
-              <div class="h-10 p-2">{{ strength.toString }}</div>
+              <div class="h-10 p-2">{{ zxcvbn.toString }}</div>
             </div>
           </div>
           <button name="submit" type="submit" value="submit">Submit</button>
@@ -63,91 +63,47 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import {
   Dialog,
   DialogDescription,
   DialogPanel,
   DialogTitle,
 } from "@headlessui/vue";
-import { FeedbackType } from "@zxcvbn-ts/core/dist/types";
 import { useZxcvbn } from "~/composables/useZxcvbn";
-import { useAPI } from "~/composables/useAPI";
+import { useAuthStore } from "~/store/authentication";
 
 const isLogin = ref<boolean>(true);
+const authStore = useAuthStore();
 
 const props = defineProps({
   open: { type: Boolean, required: false, default: false },
 });
-
-const zxcvbn = useZxcvbn();
-const api = useAPI();
 
 const email = ref<string>("");
 const password = ref<string>("");
 const repeatedPassword = ref<string>("");
 const showPassword = ref<boolean>(false);
 
-const strength = computed<{
-  score: number;
-  feedback: FeedbackType;
-  toString: string;
-}>(() => {
-  const result = zxcvbn(password.value);
-  const { score, feedback } = result;
-
-  return { score, feedback, toString: `Score: ${score}` };
-});
+const zxcvbn = useZxcvbn(password);
+const emit = defineEmits(["close"]);
 
 function signup(event: Event) {
   event.preventDefault();
-
-  // Check with regex if email is valid
-  if (
-    !email.value.match(
-      /^[a-zA-Z0-9_+&*-]+(?:\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,15}$/
-    )
-  ) {
-    alert("Invalid email");
-    return;
-  }
-
-  if (password.value.length > 64) {
-    alert("Password can only be 64 characters long");
-    return;
-  }
-  if (password.value.length < 8) {
-    alert("Password needs to be at least 8 characters long");
-    return;
-  }
-  if (strength.value.score < 3) {
-    alert(
-      `Password is too weak.\n\n${strength.value.feedback.warning}\n${strength.value.feedback.suggestions}`
-    );
-    return;
-  }
   if (!showPassword.value && password.value !== repeatedPassword.value) {
     alert("Passwords do not match");
     return;
   }
 
-  api.auth.register(email.value, password.value).then((response) => {
-    if (response.status === 201) {
-      alert(response.data);
-    } else {
-      alert("Error while registering");
-    }
+  authStore.actions.registerAccount(email.value, password.value).then(() => {
+    emit("close");
   });
 }
 
 function login(event: Event) {
   event.preventDefault();
-  api.auth.login(email.value, password.value).then((response) => {
-    if (response.status === 200) {
-      alert("Successfully logged in");
-    } else {
-      alert("Error while logging in");
-    }
+  authStore.login(email.value, password.value).then(() => {
+    emit("close");
   });
 }
 </script>

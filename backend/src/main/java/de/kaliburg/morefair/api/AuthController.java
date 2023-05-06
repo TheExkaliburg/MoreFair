@@ -8,10 +8,14 @@ import de.kaliburg.morefair.api.utils.HttpUtils;
 import de.kaliburg.morefair.api.utils.RequestThrottler;
 import de.kaliburg.morefair.security.SecurityUtils;
 import de.kaliburg.morefair.serivces.EmailService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.net.URI;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -24,6 +28,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -56,15 +61,12 @@ public class AuthController {
           .expireAfterWrite(1, TimeUnit.HOURS)
           .build(uuid -> "");
 
-  private final LoadingCache<String, String> changeEmailTokens =
+  private final LoadingCache<String, EmailChangeRequest> changeEmailTokens =
       Caffeine.newBuilder()
           .expireAfterWrite(1, TimeUnit.HOURS)
           .build(key -> null);
 
-  // TODO: _uuid cookie automatisch setzen (registerGuest), lesen (upgradeAccount) und löschen
-  //  (upgradeAccount)
-  // TODO: auto reroute to /game on successful login
-  // TODO: auto reroute to / if not authenticated
+  // TODO: _uuid cookie automatisch setzen (registerGuest) und löschen (upgradeAccount)
 
   @GetMapping
   public ResponseEntity<?> getAuthenticationStatus(Authentication authentication) {
@@ -78,176 +80,240 @@ public class AuthController {
 
   @PostMapping(value = "/register", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   public ResponseEntity<?> register(@RequestParam String username, @RequestParam String password,
-      HttpServletRequest request, @RequestParam(required = false) String uuid)
-      throws Exception {
+      HttpServletRequest request, @RequestParam(required = false) String uuid) {
+    try {
+      if (password.length() < 8) {
+        return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST,
+            "Password must be at least 8 characters long");
+      }
+      if (password.length() > 64) {
+        return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST,
+            "Password must be at most 64 characters long");
+      }
+      if (username.length() > 254) {
+        return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST,
+            "Email must be at most 254 characters long");
+      }
 
-    if (password.length() < 8) {
-      return ResponseEntity.badRequest().body("Password must be at least 8 characters long");
+      if (!emailRegexPattern.matcher(username).matches()) {
+        return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST,
+            "Invalid email address");
+      }
+
+      if (accountService.findByUsername(username) != null) {
+        return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST,
+            "Email address already in use");
+      }
+
+      Integer ip = HttpUtils.getIp(request);
+
+      if (!requestThrottler.canCreateAccount(ip)) {
+        return HttpUtils.buildErrorMessage(HttpStatus.TOO_MANY_REQUESTS,
+            "Too many requests");
+      }
+
+      String confirmToken = UUID.randomUUID().toString();
+      registrationTokens.put(confirmToken,
+          new UserRegistrationDetails(username, password, uuid, false));
+      emailService.sendRegistrationMail(username, confirmToken);
+
+      Map<String, String> response = new HashMap<>();
+      response.put("message", "Please look into your inbox for a confirmation link");
+      URI uri = HttpUtils.createCreatedUri("/api/auth/register");
+      return ResponseEntity.created(uri).body(response);
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      e.printStackTrace();
+      return HttpUtils.buildErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
-    if (password.length() > 64) {
-      return ResponseEntity.badRequest().body("Password must be at most 64 characters long");
-    }
-    if (username.length() > 254) {
-      return ResponseEntity.badRequest().body("Email must be at most 254 characters long");
-    }
 
-    if (!emailRegexPattern.matcher(username).matches()) {
-      return ResponseEntity.badRequest().body("Invalid email address");
-    }
 
-    if (accountService.findByUsername(username) != null) {
-      return ResponseEntity.badRequest().body("Email address already in use");
-    }
-
-    Integer ip = HttpUtils.getIp(request);
-
-    if (!requestThrottler.canCreateAccount(ip)) {
-      return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-          .body("Too many requests");
-    }
-
-    String confirmToken = UUID.randomUUID().toString();
-    registrationTokens.put(confirmToken,
-        new UserRegistrationDetails(username, password, uuid, false));
-    emailService.sendRegistrationMail(username, confirmToken);
-
-    URI uri = HttpUtils.createCreatedUri("/api/auth/register");
-    return ResponseEntity.created(uri).body("Please look into your inbox for a confirmation link");
   }
 
   // API endpoint for changing password in combination with the old password
   @PostMapping(value = "/password/change", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   public ResponseEntity<?> changePassword(@RequestParam String oldPassword,
-      @RequestParam String newPassword, HttpSession session, Authentication authentication) {
+      @RequestParam String newPassword, HttpServletRequest request,
+      HttpServletResponse response, Authentication authentication) {
+    try {
+      if (newPassword.length() < 8) {
+        return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST,
+            "Password must be at least 8 characters long.");
+      }
+      if (newPassword.length() > 64) {
+        return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST,
+            "Password must be at most 64 characters long.");
+      }
 
-    if (newPassword.length() < 8) {
-      return ResponseEntity.badRequest().body("Password must be at least 8 characters long.");
+      UUID uuid = SecurityUtils.getUuid(authentication);
+
+      AccountEntity account = accountService.find(uuid);
+
+      if (!passwordEncoder.matches(oldPassword, account.getPassword())) {
+        return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST, "Wrong password");
+      }
+
+      account.setPassword(passwordEncoder.encode(newPassword));
+      accountService.save(account);
+      SecurityContextLogoutHandler handler = new SecurityContextLogoutHandler();
+      handler.logout(request, response, null);
+
+      return ResponseEntity.ok("Password changed, please log back in with your new password.");
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      e.printStackTrace();
+      return HttpUtils.buildErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
-    if (newPassword.length() > 64) {
-      return ResponseEntity.badRequest().body("Password must be at most 64 characters long.");
-    }
-
-    UUID uuid = SecurityUtils.getUuid(authentication);
-
-    AccountEntity account = accountService.find(uuid);
-
-    if (!passwordEncoder.matches(oldPassword, account.getPassword())) {
-      return ResponseEntity.badRequest().body("Wrong password");
-    }
-
-    account.setPassword(passwordEncoder.encode(newPassword));
-    accountService.save(account);
-    session.invalidate();
-
-    return ResponseEntity.ok("Password changed, please log back in with your new password.");
   }
 
   // API for Creating, saving and sending a new token via mail for resetting the password
   @PostMapping(value = "/password/forgot", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-  public ResponseEntity<?> forgotPassword(@RequestParam String username, HttpServletRequest request)
-      throws Exception {
-    URI uri = HttpUtils.createCreatedUri("/api/auth/password/forgot");
-    AccountEntity account = accountService.findByUsername(username);
-    if (account == null || account.isGuest()) {
+  public ResponseEntity<?> forgotPassword(@RequestParam String username) {
+    try {
+      if (!emailRegexPattern.matcher(username).matches()) {
+        return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST, "Invalid email address");
+      }
+
+      URI uri = HttpUtils.createCreatedUri("/api/auth/password/forgot");
+      AccountEntity account = accountService.findByUsername(username);
+      if (account == null || account.isGuest()) {
+        return ResponseEntity.created(uri).body("Please look into your inbox for the reset token");
+      }
+
+      String confirmToken = UUID.randomUUID().toString();
+      passwordResetTokens.put(confirmToken, username);
+      emailService.sendPasswordResetMail(username, confirmToken);
+
       return ResponseEntity.created(uri).body("Please look into your inbox for the reset token");
+
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      e.printStackTrace();
+      return HttpUtils.buildErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
-
-    String confirmToken = UUID.randomUUID().toString();
-    passwordResetTokens.put(confirmToken, username);
-    emailService.sendPasswordResetMail(username, confirmToken);
-
-    return ResponseEntity.created(uri).body("Please look into your inbox for the reset token");
   }
 
   // API endpoint for changing password in combination with a passwordResetToken
   @PostMapping(value = "/password/reset", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   public ResponseEntity<?> resetPassword(@RequestParam String resetToken,
-      @RequestParam String newPassword, HttpServletRequest request) throws Exception {
+      @RequestParam String newPassword, HttpServletRequest request, HttpServletResponse response) {
 
-    if (newPassword.length() < 8) {
-      return ResponseEntity.badRequest().body("Password must be at least 8 characters long");
+    try {
+      if (newPassword.length() < 8) {
+        return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST,
+            "Password must be at least 8 characters long");
+      }
+      if (newPassword.length() > 64) {
+        return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST,
+            "Password must be at most 64 characters long");
+      }
+
+      String username = passwordResetTokens.getIfPresent(resetToken);
+      if (username == null) {
+        return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST, "Invalid token");
+      }
+
+      AccountEntity account = accountService.findByUsername(username);
+
+      HttpSession session = request.getSession(false);
+      if (session != null) {
+        SecurityContextLogoutHandler handler = new SecurityContextLogoutHandler();
+        handler.logout(request, response, null);
+      }
+
+      account.setPassword(passwordEncoder.encode(newPassword));
+      accountService.save(account);
+
+      Map<String, String> result = new HashMap<>();
+      result.put("message", "Password changed");
+      return ResponseEntity.ok(result);
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      e.printStackTrace();
+      return HttpUtils.buildErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
-    if (newPassword.length() > 64) {
-      return ResponseEntity.badRequest().body("Password must be at most 64 characters long");
-    }
-
-    String username = passwordResetTokens.getIfPresent(resetToken);
-    if (username == null) {
-      return ResponseEntity.badRequest().body("Invalid token");
-    }
-
-    AccountEntity account = accountService.findByUsername(username);
-
-    HttpSession session = request.getSession(false);
-    if (session != null) {
-      session.invalidate();
-    }
-
-    account.setPassword(passwordEncoder.encode(newPassword));
-    accountService.save(account);
-
-    return ResponseEntity.ok("Password changed");
   }
 
-  @GetMapping(value = "/register/confirm", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/register/confirm", produces = MediaType.TEXT_PLAIN_VALUE)
   public ResponseEntity<?> confirmRegistration(@RequestParam String token,
-      HttpServletRequest request)
-      throws Exception {
-    UserRegistrationDetails details = registrationTokens.getIfPresent(token);
-    if (details == null) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND)
-          .body("Invalid or expired confirmation token");
-    }
-    if (details.isUsed()) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND)
-          .body("Confirmation token already used");
-    }
+      HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+    try {
+      UserRegistrationDetails details = registrationTokens.getIfPresent(token);
+      if (details == null) {
+        return ResponseEntity.notFound().build();
+      }
+      if (details.isUsed()) {
+        return ResponseEntity.notFound().build();
+      }
 
-    Integer ip = HttpUtils.getIp(request);
-    String uuid = details.getUuid();
-    String username = details.getUsername();
-    String password = details.getPassword();
+      Integer ip = HttpUtils.getIp(request);
+      String uuid = details.getUuid();
+      String username = details.getUsername();
+      String password = details.getPassword();
 
-    if (uuid != null && !uuid.isEmpty()) {
-      AccountEntity account = accountService.findByUsername(uuid);
-      if (account != null && account.isGuest()) {
-        account.setUsername(username);
-        account.setPassword(passwordEncoder.encode(password));
-        account.setLastLogin(OffsetDateTime.now());
+      if (uuid != null && !uuid.isEmpty()) {
+        AccountEntity account = accountService.findByUsername(uuid);
+        if (account != null && account.isGuest()) {
+          account.setUsername(username);
+          account.setPassword(passwordEncoder.encode(password));
+          account.setLastLogin(OffsetDateTime.now());
+          account.setLastIp(ip);
+          account.setGuest(false);
+          accountService.save(account);
+        }
+      } else {
+        AccountEntity account = accountService.create(username, password, ip, false);
         account.setLastIp(ip);
-        account.setGuest(false);
+        account.setLastLogin(OffsetDateTime.now());
         accountService.save(account);
       }
-    } else {
-      AccountEntity account = accountService.create(username, password, ip, false);
-      account.setLastIp(ip);
-      account.setLastLogin(OffsetDateTime.now());
-      accountService.save(account);
+
+      registrationTokens.put(token,
+          new UserRegistrationDetails(username, SecurityUtils.generatePassword(), uuid, true));
+
+      // delete _uuid cookie
+      Cookie emptyCookie = new Cookie("_uuid", null);
+      emptyCookie.setPath("/");
+      emptyCookie.setMaxAge(0);
+      response.addCookie(emptyCookie);
+
+      SecurityContextLogoutHandler handler = new SecurityContextLogoutHandler();
+      handler.logout(request, response, null);
+
+      URI uri = HttpUtils.createCreatedUri("/api/auth/register/confirm");
+      return ResponseEntity.created(uri)
+          .body("Registration successful; Please log into your account");
+
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      e.printStackTrace();
+      return HttpUtils.buildErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
-    registrationTokens.put(token,
-        new UserRegistrationDetails(username, SecurityUtils.generatePassword(), uuid, true));
-
-    URI uri = HttpUtils.createCreatedUri("/api/auth/register/confirm");
-    return ResponseEntity.created(uri)
-        .body("Registration successful; Please log into your account");
   }
 
   @PostMapping(value = "/register/guest", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> registerGuest(HttpServletRequest request)
-      throws Exception {
-    Integer ip = HttpUtils.getIp(request);
+  public ResponseEntity<?> registerGuest(HttpServletRequest request) {
+    try {
+      Integer ip = HttpUtils.getIp(request);
 
-    if (!requestThrottler.canCreateAccount(ip)) {
-      return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-          .body("Too many requests");
+      if (!requestThrottler.canCreateAccount(ip)) {
+        return HttpUtils.buildErrorMessage(HttpStatus.TOO_MANY_REQUESTS,
+            "Too many requests");
+      }
+
+      UUID uuid = UUID.randomUUID();
+      AccountEntity account = accountService.create(uuid.toString(), uuid.toString(), ip, true);
+
+      URI uri = HttpUtils.createCreatedUri("/api/auth/signup/guest");
+      return ResponseEntity.created(uri).body(account.getUsername());
+
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      e.printStackTrace();
+      return HttpUtils.buildErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
-    UUID uuid = UUID.randomUUID();
-    AccountEntity account = accountService.create(uuid.toString(), uuid.toString(), ip, true);
-
-    URI uri = HttpUtils.createCreatedUri("/api/auth/signup/guest");
-    return ResponseEntity.created(uri).body(account.getUsername());
   }
 
   /**
@@ -259,55 +325,72 @@ public class AuthController {
    */
   @PatchMapping("/email")
   public ResponseEntity<?> requestUpdatedEmail(Authentication authentication,
-      @RequestParam("email") String newMail) {
+      @RequestParam("email") String newMail, HttpSession session) {
     try {
       if (newMail.length() > 254) {
-        return ResponseEntity.badRequest().body("Email must be at most 254 characters long");
+        return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST,
+            "Email must be at most 254 characters long");
       }
       if (!emailRegexPattern.matcher(newMail).matches()) {
-        return ResponseEntity.badRequest().body("Invalid email address");
+        return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST, "Invalid email address");
       }
 
       if (accountService.findByUsername(newMail) != null) {
-        return ResponseEntity.badRequest().body("Email address already in use");
+        return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST, "Email address already in use");
       }
 
       URI uri = HttpUtils.createCreatedUri("/api/account/email");
       AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
 
-      if (account == null || account.isGuest()) {
-        return ResponseEntity.created(uri).body("Please look into your inbox for the reset token");
+      if (account.isGuest()) {
+        return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST,
+            "You cannot change the email of a guest account");
       }
 
       String confirmToken = UUID.randomUUID().toString();
-      changeEmailTokens.put(confirmToken, newMail);
+      changeEmailTokens.put(confirmToken, new EmailChangeRequest(account.getUuid(), newMail));
       emailService.sendChangeEmailMail(newMail, confirmToken);
 
       return ResponseEntity.created(uri).body("Please look into your inbox for the reset token");
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
-      return ResponseEntity.internalServerError().body(e.getMessage());
+      return HttpUtils.buildErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }
 
   @PostMapping("/email")
-  public ResponseEntity<?> confirmUpdatedEmail(Authentication authentication,
-      @RequestParam("token") String token) {
-    token = token.trim();
+  public ResponseEntity<?> confirmUpdatedEmail(@RequestParam("token") String token,
+      HttpSession session, HttpServletRequest request, HttpServletResponse response) {
+    try {
+      token = token.trim();
 
-    String newEmail = changeEmailTokens.getIfPresent(token);
-    if (newEmail == null) {
-      return ResponseEntity.badRequest().body("Invalid token");
+      EmailChangeRequest details = changeEmailTokens.getIfPresent(token);
+      if (details == null) {
+        return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST, "Invalid or expired token");
+      }
+
+      AccountEntity account = accountService.find(details.getUuid());
+      if (account == null) {
+        return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST, "Account not found");
+      }
+
+      account.setUsername(details.getEmail());
+      accountService.save(account);
+
+      SecurityContextLogoutHandler handler = new SecurityContextLogoutHandler();
+      handler.logout(request, response, null);
+
+      Map<String, Object> result = new HashMap<>();
+      result.put("message", "Your email address has been updated");
+      result.put("email", details.getEmail());
+
+      return ResponseEntity.ok(result);
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      e.printStackTrace();
+      return HttpUtils.buildErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
-
-    AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
-    if (account == null) {
-      return ResponseEntity.badRequest().body("Account not found");
-    }
-
-    account.setUsername(newEmail);
-    return ResponseEntity.ok(newEmail);
   }
 
   @Data

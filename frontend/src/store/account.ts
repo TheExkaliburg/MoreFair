@@ -122,12 +122,26 @@ export const useAccountStore = defineStore("account", () => {
     }
   }
 
+  async function changeDisplayName(name: string) {
+    return await api.account
+      .changeDisplayName(name)
+      .then((res) => {
+        state.username = res.data.displayName;
+        return Promise.resolve(res);
+      })
+      .catch((err) => {
+        alert(err.response.data.message);
+        return Promise.reject(err);
+      });
+  }
+
   return {
     state,
     getters,
     actions: {
       init,
       reset,
+      changeDisplayName,
     },
   };
 });

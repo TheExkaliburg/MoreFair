@@ -61,13 +61,15 @@
         @close="openChangePasswordDialog = false"
       />
     </template>
+    <div class="h-12" />
+    <FairButton @click="authStore.actions.logout">Logout</FairButton>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { onMounted } from "vue";
 import Cookies from "js-cookie";
-import { definePageMeta, useAPI } from "#imports";
+import { definePageMeta } from "#imports";
 import { useAuthStore } from "~/store/authentication";
 import FairButton from "~/components/interactables/FairButton.vue";
 import FairInput from "~/components/interactables/FairInput.vue";
@@ -109,9 +111,18 @@ function changeUsername() {
     newUsername.value = accountStore.state.username;
     return;
   }
-  useAPI()
-    .account.changeDisplayName(newUsername.value)
+
+  if (accountStore.state.username === newUsername.value) {
+    isEditingUsername.value = false;
+    return;
+  }
+
+  accountStore.actions
+    .changeDisplayName(newUsername.value)
     .then(() => {
+      isEditingUsername.value = false;
+    })
+    .catch(() => {
       isEditingUsername.value = false;
     });
 }
@@ -123,13 +134,19 @@ function changeEmail() {
     return;
   }
 
-  useAPI()
-    .auth.requestEmailChange(newEmail.value)
+  if (accountStore.state.email === newEmail.value) {
+    isEditingEmail.value = false;
+    return;
+  }
+
+  // openConfirmEmailChangeDialog.value = true;
+  authStore.actions
+    .changeEmail(newEmail.value)
     .then(() => {
       isEditingEmail.value = false;
       openConfirmEmailChangeDialog.value = true;
-    });
-  openConfirmEmailChangeDialog.value = true;
+    })
+    .catch(() => {});
 }
 
 async function exportUuid() {
@@ -147,14 +164,9 @@ function importUuid() {
     "Paste your ID into here (your old uuid will be copied into your clipboard):"
   );
   if (uuid === null || undefined) return;
-  useAPI()
-    .auth.login(uuid, uuid, true)
+  authStore.actions
+    .login(uuid, uuid, true)
     .then(() => {
-      Cookies.set("_uuid", uuid, {
-        expires: 365,
-        secure: true,
-        sameSite: "strict",
-      });
       alert("Successfully imported your UUID!");
       window.location.reload();
     })
