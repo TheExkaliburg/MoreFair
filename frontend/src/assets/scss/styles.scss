@@ -25,6 +25,14 @@ div, ul {
   scrollbar-color: var(--scrollbar-thumb-border-color) var(--scrollbar-bg-color);
 }
 
+.md-content a {
+  color: var(--link-color);
+
+  &:hover {
+    color: var(--link-hover-color);
+  }
+}
+
 .md-content :is(h1, h2, h3, h4, h5, h6) > a {
   color: var(--text-color);
 
