@@ -21,6 +21,10 @@ public class DatabasePrepareService {
   @Scheduled(fixedRate = 1000 * 20)
   public void prepareDatabase() {
     List<AccountEntity> top100ByPasswordIsNull = accountRepository.findTop100ByPasswordIsNull();
+    if (top100ByPasswordIsNull.isEmpty()) {
+      return;
+    }
+
     log.info("Preparing the passwords of {} accounts", top100ByPasswordIsNull.size());
     top100ByPasswordIsNull.forEach(account -> {
       account.setPassword(passwordEncoder.encode(account.getUuid().toString()));

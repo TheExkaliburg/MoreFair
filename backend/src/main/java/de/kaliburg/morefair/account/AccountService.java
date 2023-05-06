@@ -7,8 +7,10 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 import javax.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -16,18 +18,13 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Log4j2
+@RequiredArgsConstructor
 public class AccountService {
 
   private final AccountRepository accountRepository;
   private final ApplicationEventPublisher eventPublisher;
-
+  private final PasswordEncoder passwordEncoder;
   private AccountEntity broadcasterAccount;
-
-  public AccountService(AccountRepository accountRepository,
-      ApplicationEventPublisher eventPublisher) {
-    this.accountRepository = accountRepository;
-    this.eventPublisher = eventPublisher;
-  }
 
   /**
    * Creates and saves a new account.
@@ -40,6 +37,7 @@ public class AccountService {
     if (principal != null) {
       result.setLastIp(principal.getIpAddress());
     }
+    result.setPassword(passwordEncoder.encode(result.getUuid().toString()));
 
     result = save(result);
 
@@ -49,6 +47,9 @@ public class AccountService {
 
   @Transactional
   public AccountEntity save(AccountEntity account) {
+    if (account.getPassword() == null) {
+      account.setPassword(passwordEncoder.encode(account.getUuid().toString()));
+    }
     AccountEntity result = accountRepository.save(account);
     eventPublisher.publishEvent(new AccountServiceEvent(this, List.of(result)));
     return result;
@@ -100,6 +101,12 @@ public class AccountService {
 
   @Transactional
   public List<AccountEntity> save(List<AccountEntity> accounts) {
+    accounts.forEach(account -> {
+      if (account.getPassword() == null) {
+        account.setPassword(passwordEncoder.encode(account.getUuid().toString()));
+      }
+    });
+
     List<AccountEntity> result = accountRepository.saveAll(accounts);
     eventPublisher.publishEvent(new AccountServiceEvent(this, result));
     return result;
