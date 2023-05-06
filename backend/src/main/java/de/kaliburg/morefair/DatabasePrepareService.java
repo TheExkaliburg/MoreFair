@@ -18,15 +18,15 @@ public class DatabasePrepareService {
 
   private final PasswordEncoder passwordEncoder;
 
-  @Scheduled(fixedRate = 1000 * 60)
+  @Scheduled(fixedRate = 1000 * 20)
   public void prepareDatabase() {
-    List<AccountEntity> top10ByPasswordIsNull = accountRepository.findTop10ByPasswordIsNull();
-    log.info("Preparing the passwords of {} accounts", top10ByPasswordIsNull.size());
-    top10ByPasswordIsNull.forEach(account -> {
+    List<AccountEntity> top100ByPasswordIsNull = accountRepository.findTop100ByPasswordIsNull();
+    log.info("Preparing the passwords of {} accounts", top100ByPasswordIsNull.size());
+    top100ByPasswordIsNull.forEach(account -> {
       account.setPassword(passwordEncoder.encode(account.getUuid().toString()));
       accountRepository.save(account);
     });
-    log.info("Prepared the password for {} accounts", top10ByPasswordIsNull.size());
+    log.info("Prepared the password for {} accounts", top100ByPasswordIsNull.size());
   }
 
 }
