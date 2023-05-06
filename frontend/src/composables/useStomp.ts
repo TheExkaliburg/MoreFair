@@ -4,6 +4,7 @@ import { AccountEventType, useAccountStore } from "~/store/account";
 import { useChatStore } from "~/store/chat";
 import { RoundEventType } from "~/store/round";
 import { LadderEventType } from "~/store/ladder";
+import { useAuthStore } from "~/store/authentication";
 
 export type OnTickBody = {
   delta: number;
@@ -108,7 +109,6 @@ client.onConnect = (_) => {
 function connectPrivateChannel(uuid: string) {
   if (uuid === undefined || isPrivateConnectionEstablished) return;
   if (!client.connected) return;
-  console.log("Reconnect private channel");
   isPrivateConnectionEstablished = true;
 
   const highestLadder = useAccountStore().state.highestCurrentLadder;
@@ -143,9 +143,15 @@ function connectPrivateChannel(uuid: string) {
   });
 }
 
-client.onStompError = (frame) => {
-  console.log("Broker reported error: " + frame.headers.message);
-  console.log("Additional details: " + frame.body);
+client.onStompError = (_) => {
+  isPrivateConnectionEstablished = false;
+  useAuthStore()
+    .actions.getAuthenticationStatus()
+    .then(() => {
+      if (!useAuthStore().state.authenticationStatus) {
+        reset();
+      }
+    });
 };
 
 client.onDisconnect = (_) => {

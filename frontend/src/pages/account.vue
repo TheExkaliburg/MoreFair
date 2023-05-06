@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col gap-0 px-4 max-w-reader text-text">
     <div class="h-8" />
-    <div>Account</div>
+    <div>{{ lang("account") }}:</div>
     <div class="flex flex-row">
       <FairInput
         :class="{ 'pointer-events-none': !isEditingUsername }"
@@ -12,7 +12,7 @@
         @keydown.enter="changeUsername"
       />
       <FairButton class="w-1/3 rounded-l-none" @click="changeUsername"
-        >{{ isEditingUsername ? "Apply" : "Edit" }}
+        >{{ isEditingUsername ? lang("apply") : lang("edit") }}
       </FairButton>
     </div>
     <div class="h-8" />
@@ -25,7 +25,7 @@
       <FairButton
         class="w-full max-w-reader"
         @click="openUpgradeAccountDialog = true"
-        >Upgrade Account
+        >{{ lang("linkAccount.title") }}
       </FairButton>
       <UpgradeAccountDialog
         :open="openUpgradeAccountDialog"
@@ -33,7 +33,7 @@
       />
     </template>
     <template v-else>
-      <div>E-Mail</div>
+      <div>{{ lang("email") }}</div>
       <div class="flex flex-row">
         <FairInput
           :class="{ 'pointer-events-none': !isEditingEmail }"
@@ -45,7 +45,7 @@
           @update:modelValue="newEmail = $event"
         />
         <FairButton class="w-1/3 rounded-l-none" @click="changeEmail"
-          >{{ isEditingEmail ? "Apply" : "Edit" }}
+          >{{ isEditingEmail ? lang("apply") : lang("edit") }}
         </FairButton>
         <ConfirmEmailChangeDialog
           :open="openConfirmEmailChangeDialog"
@@ -54,22 +54,23 @@
       </div>
       <div class="h-12" />
       <FairButton @click="openChangePasswordDialog = true"
-        >Change Password
+        >{{ lang("changePassword.title") }}
       </FairButton>
       <ChangePasswordDialog
         :open="openChangePasswordDialog"
         @close="openChangePasswordDialog = false"
       />
     </template>
-    <div class="h-12" />
-    <FairButton @click="authStore.actions.logout">Logout</FairButton>
+    <div class="h-8" />
+    <FairButton @click="authStore.actions.logout"
+      >{{ lang("logout") }}
+    </FairButton>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { onMounted } from "vue";
 import Cookies from "js-cookie";
-import { definePageMeta } from "#imports";
 import { useAuthStore } from "~/store/authentication";
 import FairButton from "~/components/interactables/FairButton.vue";
 import FairInput from "~/components/interactables/FairInput.vue";
@@ -77,11 +78,13 @@ import { useAccountStore } from "~/store/account";
 import ConfirmEmailChangeDialog from "~/components/account/ConfirmEmailChangeDialog.vue";
 import ChangePasswordDialog from "~/components/account/ChangePasswordDialog.vue";
 import UpgradeAccountDialog from "~/components/account/UpgradeAccountDialog.vue";
+import { useLang } from "~/composables/useLang";
 
 definePageMeta({
-  layout: "default",
+  title: "Account",
 });
 
+const lang = useLang("account");
 const authStore = useAuthStore();
 const accountStore = useAccountStore();
 

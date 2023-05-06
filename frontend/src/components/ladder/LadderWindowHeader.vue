@@ -5,7 +5,9 @@
         class="px-1 w-8 xl:invisible"
         title="Ladder Information"
       >
-        <template #button><InformationCircleIcon /></template>
+        <template #button>
+          <InformationCircleIcon />
+        </template>
         <div class="text-sm">
           <div class="whitespace-nowrap">
             Active Rankers: {{ ladderStore.getters.activeRankers }}/{{
@@ -18,12 +20,14 @@
             }}
             ({{ roundStore.state.topLadder }})
           </div>
+          <br />
           <div class="whitespace-nowrap">
             Round: [{{ roundStore.getters.formattedTypes }}]
           </div>
           <div class="whitespace-break-spaces">
             Ladder: [{{ ladderStore.getters.formattedTypes }}]
           </div>
+          <br />
           <div class="whitespace-nowrap">
             Base Points for Promotion: {{ formattedRoundPointsForPromotion }}
           </div>
@@ -66,11 +70,11 @@
     </div>
     <PaginationButtonGroup
       :current="ladderStore.state.number"
+      :last="roundStore.state.assholeLadder"
       :max="accountStore.state.highestCurrentLadder"
       :prefix="'Ladder'"
-      class="h-8 w-42 self-end bg-background z-2 text-base"
-      :last="roundStore.state.assholeLadder"
       :show-last="isAssholeLadderOpen"
+      class="h-8 w-42 self-end bg-background z-2 text-base"
       @change="(number) => ladderStore.actions.changeLadder(number)"
     />
   </div>

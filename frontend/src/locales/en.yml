@@ -70,6 +70,47 @@ options:
   enableLadderFeatures: Enable ladder features
   unrestrictedAccess: Unrestricted ladder & chat access
   lockButtons: Lock Buttons
-
-
-
+account:
+  account: Account
+  apply: Apply
+  edit: Edit
+  email: E-Mail
+  logout: Logout
+  changePassword:
+    title: Change Password
+    description: Please enter your current and new password below
+    currentPassword: Current Password
+    newPassword: New Password
+    repeatPassword: Repeat Password
+    submit: Submit
+  linkAccount:
+    title: Link Account to Email
+    description: Please enter your email and your password below to link your guest account to an email.
+    email: E-Mail
+    password: Password
+    repeatPassword: Repeat Password
+    submit: Submit
+  confirmEmail:
+    title: Confirm Email
+    description: Please go to your email-inbox and paste the token that was sent to you in the input below
+    submit: Submit
+  login:
+    title: Login
+    noAccount: Don't have an account?
+    email: E-Mail
+    password: Password
+    rememberMe: Remember me
+    submit: Submit
+  signup:
+    title: Signup
+    gotAccount: Already have an account?
+    email: E-Mail
+    password: Password
+    repeatPassword: Password
+    submit: Submit
+    agreeTo: By continuing, you are setting up a FairGame account and agree to our
+    rules: Rules
+    agreeTo2: and
+    privacy: Privacy Policy
+zxcvbn:
+  strength: Strength

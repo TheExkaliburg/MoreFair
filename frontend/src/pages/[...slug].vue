@@ -1,5 +1,7 @@
 <template>
-  <main class="px-4 flex flex-col items-center h-full overflow-y-scroll">
+  <main
+    class="px-4 flex flex-col items-center h-full overflow-y-scroll md-content"
+  >
     <ContentDoc class="text-text max-w-full w-reader">
       <template #not-found>
         <div class="text-text text-3xl">

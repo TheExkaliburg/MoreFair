@@ -129,10 +129,12 @@ $transparent: rgba(0, 0, 0, 0);
   // Overwrite Toastify defaults
   --toastify-color-light: #{$color-st-tropaz} !important;
   --toastify-text-color-light: var(--text-color) !important;
+  --toastify-color-error: #{$color-claret} !important;
+  --toastify-text-color-error: var(--text-color) !important;
 
   // Tippy Tooltips
-  --tippy-background: #{$color-asparagus};
-  --tippy-text: var(--background-color)
+  --tippy-background: #{$color-st-tropaz};
+  --tippy-text: var(--text-color)
 
 }
 

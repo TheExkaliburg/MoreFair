@@ -277,7 +277,8 @@ export const useLadderStore = defineStore("ladder", () => {
         case LadderEventType.ADD_FREE_AUTO:
           state.types.add(LadderType.FREE_AUTO);
           useToasts(
-            `Since other rankers breached another Ladder, everyone on this ladder got gifted a free auto promote! (No Refunds)`
+            `Since other rankers breached another Ladder, everyone on this ladder got gifted a free auto promote! (No Refunds)`,
+            { autoClose: false }
           );
           break;
         default:
@@ -290,9 +291,7 @@ export const useLadderStore = defineStore("ladder", () => {
   function handleThrowVinegarEvent(ranker: Ranker, event: OnLadderEventBody) {
     if (getters.yourRanker === undefined) return;
     const vinegarThrown = new Decimal(event.data.amount);
-    console.log("vinegarThrown", vinegarThrown.toString());
     if (ranker.accountId === getters.yourRanker.accountId) {
-      console.log("yourRanker", getters.yourRanker);
       ranker.vinegar = Object.freeze(new Decimal(0));
       return;
     }

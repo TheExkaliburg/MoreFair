@@ -5,27 +5,25 @@ import { navigateTo } from "nuxt/app";
 import { useAPI } from "~/composables/useAPI";
 import { useZxcvbn } from "~/composables/useZxcvbn";
 import { useAccountStore } from "~/store/account";
+import { useToasts } from "~/composables/useToasts";
 
 const emailRegex =
   /^[a-zA-Z0-9_+&*-]+(?:\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,15}$/;
 
 export const useAuthStore = defineStore("auth", () => {
   const API = useAPI();
-  // vars
-  const uuid = ref<string>(Cookies.get("_uuid") || "");
-  const authenticationStatus = ref<boolean>(false);
 
   const state = reactive({
-    uuid,
-    authenticationStatus,
+    uuid: ref<string>(Cookies.get("_uuid") || ""),
+    authenticationStatus: ref<boolean>(false),
   });
 
   const getters = reactive({
     isGuest: computed<boolean>(() => {
-      return uuid.value !== "";
+      return state.uuid !== "";
     }),
     homeLocation: computed<string>(() => {
-      return authenticationStatus.value ? "/game" : "/";
+      return state.authenticationStatus ? "/" : "/login";
     }),
   });
 
@@ -36,20 +34,20 @@ export const useAuthStore = defineStore("auth", () => {
     await API.auth
       .authenticationStatus()
       .then((response) => {
-        authenticationStatus.value = Boolean(response.data);
+        state.authenticationStatus = Boolean(response.data);
         return Promise.resolve(response);
       })
       .catch((error) => {
         if (error.status === 401) {
-          authenticationStatus.value = Boolean(false);
+          state.authenticationStatus = Boolean(false);
         }
         return Promise.reject(error);
       });
   }
 
   async function registerGuest() {
-    if (uuid.value !== "") {
-      return await login(uuid.value, uuid.value, true);
+    if (state.uuid !== "") {
+      return await login(state.uuid, state.uuid, true);
     }
 
     return await API.auth
@@ -57,13 +55,13 @@ export const useAuthStore = defineStore("auth", () => {
       .then(async (response) => {
         // 201 - Created
         if (response.status === 201) {
-          uuid.value = response.data;
-          return await login(uuid.value, uuid.value, true);
+          state.uuid = response.data;
+          return await login(state.uuid, state.uuid, true);
         }
         return Promise.resolve(response);
       })
       .catch((err) => {
-        alert(err.response.data.message);
+        useToasts(err.response.data.message, { type: "error" });
         return Promise.reject(err);
       });
   }
@@ -85,7 +83,7 @@ export const useAuthStore = defineStore("auth", () => {
         return Promise.resolve(response);
       })
       .catch((err) => {
-        alert(err.response.data.message);
+        useToasts(err.response.data.message, { type: "error" });
         return Promise.reject(err);
       });
   }
@@ -99,7 +97,7 @@ export const useAuthStore = defineStore("auth", () => {
       return Promise.reject(new Error("Already using an upgraded account"));
 
     return await API.auth
-      .register(email, password, uuid.value)
+      .register(email, password, state.uuid)
       .then((res) => {
         if (res.status === 201) {
           alert(res.data.message);
@@ -107,7 +105,7 @@ export const useAuthStore = defineStore("auth", () => {
         return Promise.resolve(res);
       })
       .catch((err) => {
-        alert(err.response.data.message);
+        useToasts(err.response.data.message, { type: "error" });
         return Promise.reject(err);
       });
   }
@@ -117,28 +115,27 @@ export const useAuthStore = defineStore("auth", () => {
     password: string,
     rememberMe: boolean = false
   ) {
-    if (state.authenticationStatus) navigateTo("/game");
-
+    if (state.authenticationStatus) navigateTo("/");
     return await API.auth
       .login(username, password, rememberMe)
       .then((response) => {
         // 200 - OK
         console.log(response);
         if (response.status === 200) {
-          authenticationStatus.value = true;
+          state.authenticationStatus = true;
           if (getters.isGuest) {
-            Cookies.set("_uuid", uuid.value, {
+            Cookies.set("_uuid", state.uuid, {
               expires: 365,
               secure: true,
               sameSite: "strict",
             });
           }
         }
-        navigateTo("/game");
+        navigateTo("/");
         return Promise.resolve(response);
       })
       .catch((err) => {
-        alert(err.response.data.message);
+        useToasts(err.response.data.message, { type: "error" });
         return Promise.reject(err);
       });
   }
@@ -149,8 +146,8 @@ export const useAuthStore = defineStore("auth", () => {
       .then((response) => {
         // 200 - OK
         if (response.status === 200) {
-          authenticationStatus.value = false;
-          window.location.href = "/";
+          state.authenticationStatus = false;
+          window.location.href = "/login";
         }
         return Promise.resolve(response);
       })
@@ -166,7 +163,7 @@ export const useAuthStore = defineStore("auth", () => {
       .forgotPassword(email)
       .then((res) => Promise.resolve(res))
       .catch((err) => {
-        alert(err.response.data.message);
+        useToasts(err.response.data.message, { type: "error" });
         return Promise.reject(err);
       });
   }
@@ -181,7 +178,7 @@ export const useAuthStore = defineStore("auth", () => {
         return Promise.resolve(res);
       })
       .catch((err) => {
-        alert(err.response.data.message);
+        useToasts(err.response.data.message, { type: "error" });
         return Promise.reject(err);
       });
   }
@@ -193,7 +190,7 @@ export const useAuthStore = defineStore("auth", () => {
       .requestEmailChange(email)
       .then((res) => Promise.resolve(res))
       .catch((err) => {
-        alert(err.response.data.message);
+        useToasts(err.response.data.message, { type: "error" });
         return Promise.reject(err);
       });
   }
@@ -206,7 +203,7 @@ export const useAuthStore = defineStore("auth", () => {
         return Promise.resolve(res);
       })
       .catch((err) => {
-        alert(err.response.data.message);
+        useToasts(err.response.data.message, { type: "error" });
         return Promise.reject(err);
       });
   }
@@ -219,27 +216,40 @@ export const useAuthStore = defineStore("auth", () => {
       .changePassword(oldPassword, newPassword)
       .then((res) => Promise.resolve(res))
       .catch((err) => {
-        alert(err.response.data.message);
+        useToasts(err.response.data.message, { type: "error" });
         return Promise.reject(err);
       });
   }
 
   // Side effects
-  watch(uuid, (value: string) => {
-    if (value !== "")
-      Cookies.set("_uuid", value, {
-        expires: 365,
-        secure: true,
-        sameSite: "strict",
-      });
-    else Cookies.remove("_uuid");
-  });
+  watch(
+    () => state.uuid,
+    (value: string) => {
+      if (value !== "")
+        Cookies.set("_uuid", value, {
+          expires: 365,
+          secure: true,
+          sameSite: "strict",
+        });
+      else Cookies.remove("_uuid");
+    }
+  );
+
+  setInterval(() => {
+    const uuidCookie = Cookies.get("_uuid") || undefined;
+    if (uuidCookie === undefined) {
+      state.uuid = "";
+      return;
+    }
+    if (uuidCookie !== state.uuid) state.uuid = uuidCookie;
+  }, 1000);
 
   return {
     state,
     getters,
     // actions
     actions: {
+      getAuthenticationStatus,
       login,
       logout,
       registerGuest,
@@ -251,27 +261,27 @@ export const useAuthStore = defineStore("auth", () => {
       forgotPassword,
       resetPassword,
     },
-    login,
-    registerGuest,
-    registerAccount,
   };
 });
 
 function checkPassword(password: string): boolean {
   if (password.length > 64) {
-    alert("Password can only be 64 characters long");
+    useToasts("Password can only be 64 characters long", { type: "error" });
     return false;
   }
   if (password.length < 8) {
-    alert("Password needs to be at least 8 characters long");
+    useToasts("Password needs to be at least 8 characters long", {
+      type: "error",
+    });
     return false;
   }
 
   const zxcvbn = useZxcvbn(password);
 
   if (zxcvbn.value.score < 3) {
-    alert(
-      `Password is too weak.\n\n${zxcvbn.value.feedback.warning}\n${zxcvbn.value.feedback.suggestions}`
+    useToasts(
+      `Password is too weak.\n\n${zxcvbn.value.feedback.warning}\n${zxcvbn.value.feedback.suggestions}`,
+      { type: "error" }
     );
     return false;
   }
@@ -281,13 +291,17 @@ function checkPassword(password: string): boolean {
 
 function checkEmail(email: string): boolean {
   if (email.length > 254) {
-    alert("Email needs to be less than 254 characters long");
+    useToasts("Email needs to be less than 254 characters long", {
+      type: "error",
+    });
     return false;
   }
 
   // Check with regex if email is valid
   if (!emailRegex.test(email)) {
-    alert("Email needs to be a valid email address");
+    useToasts("Email needs to be a valid email address", {
+      type: "error",
+    });
     return false;
   }
   return true;

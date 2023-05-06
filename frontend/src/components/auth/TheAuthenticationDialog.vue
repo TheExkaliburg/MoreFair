@@ -1,109 +1,172 @@
 <template>
-  <Dialog :open="props.open" class="relative z-50" @close="$emit('close')">
-    <div aria-hidden="true" class="fixed inset-0 bg-black/30" />
-    <div class="fixed inset-0 flex items-center justify-center p-4">
-      <DialogPanel
-        v-if="isLogin"
-        class="w-full max-w-sm rounded-3xl bg-pink-400 p-4"
-      >
-        <DialogTitle>Log in</DialogTitle>
-        <DialogDescription>
-          Don't have an account?
-          <a class="text-blue-600" href="#" @click="isLogin = false">Sign up</a>
-        </DialogDescription>
-        <form class="flex flex-col h-full" @submit="login">
-          <div class="h-10 py-3">E-Mail:</div>
-          <input v-model="email" class="" name="email" type="text" />
-          <div class="h-10 py-3">Password:</div>
-          <input v-model="password" name="password" type="password" />
-          <div class="h-10 py-3"></div>
-          <button name="submit" type="submit" value="submit">Submit</button>
-        </form>
-      </DialogPanel>
-      <DialogPanel v-else class="w-full max-w-sm rounded-3xl bg-pink-400 p-4">
-        <DialogTitle>Sign up</DialogTitle>
-        <DialogDescription>
-          Already have an account?
-          <a class="text-blue-600" href="#" @click="isLogin = true">Log in</a>
-        </DialogDescription>
-        <form class="flex flex-col h-full" @submit="signup">
-          <div class="h-10 py-3">E-Mail:</div>
-          <input v-model="email" class="" name="email" type="text" />
-          <div class="h-10 py-3">Password:</div>
-          <input
-            v-model="password"
-            :type="showPassword ? 'text' : 'password'"
-            name="password"
-          />
-          <div v-if="!showPassword" class="h-10 py-3">Repeat Password:</div>
-          <input
-            v-if="!showPassword"
-            v-model="repeatedPassword"
-            name="repeatedPassword"
-            type="password"
-          />
-          <div class="flex flex-row">
-            <div class="flex flex-row justify-center">
-              <div class="h-10 p-2 align-middle">Show Password:</div>
-              <input
-                v-model="showPassword"
-                class="p-2"
-                name="showPassword"
-                type="checkbox"
-              />
+  <FairDialog
+    v-if="isLogin"
+    :class="{ 'cursor-wait': isWaiting }"
+    :title="lang('login.title')"
+    @close="close"
+  >
+    <template #description>
+      {{ lang("login.noAccount") }}
+      <a href="#" @click="isLogin = false">{{ lang("signup.title") }}</a>
+    </template>
+    <form class="flex flex-col items-start" @submit.prevent>
+      <div class="pt-4">{{ lang("login.email") }}:</div>
+      <FairInput
+        v-model="email"
+        :disabled="isWaiting"
+        class=""
+        name="email"
+        type="text"
+      />
+      <div class="pt-4">{{ lang("login.password") }}:</div>
+      <FairInput
+        v-model="password"
+        :disabled="isWaiting"
+        name="password"
+        type="password"
+      />
+      <div class="flex flex-row pt-1 gap-2">
+        {{ lang("login.rememberMe") }}:
+        <FairCheckboxInput v-model="rememberMe" :disabled="isWaiting" />
+      </div>
+      <FairButton :disabled="isWaiting" class="mt-4 self-end" @click="login"
+        >{{ lang("login.submit") }}
+      </FairButton>
+    </form>
+  </FairDialog>
+  <FairDialog
+    v-else
+    :class="{ 'cursor-wait': isWaiting }"
+    :title="lang('signup.title')"
+    @close="close"
+  >
+    <template #description
+      >{{ lang("signup.gotAccount") }}
+      <a href="#" @click="isLogin = true">{{
+        lang("login.title")
+      }}</a></template
+    >
+    <form class="flex flex-col h-full" @submit.prevent>
+      <div class="pt-4">{{ lang("signup.email") }}:</div>
+      <FairInput
+        v-model="email"
+        :disabled="isWaiting"
+        class=""
+        name="email"
+        type="text"
+      />
+      <div class="pt-4">{{ lang("signup.password") }}:</div>
+      <FairInput
+        v-model="password"
+        :disabled="isWaiting"
+        :type="showPassword ? 'text' : 'password'"
+        name="password"
+      />
+      <div v-if="!showPassword" class="h-10 pt-4">
+        {{ lang("signup.repeatPassword") }}:
+      </div>
+      <FairInput
+        v-if="!showPassword"
+        v-model="repeatedPassword"
+        :disabled="isWaiting"
+        name="repeatedPassword"
+        type="password"
+      />
+      <div class="flex flex-row pt-1">
+        {{ zxcvbn.toString }}
+      </div>
 
-              <div class="h-10 p-2">{{ zxcvbn.toString }}</div>
-            </div>
-          </div>
-          <button name="submit" type="submit" value="submit">Submit</button>
-        </form>
-      </DialogPanel>
-    </div>
-  </Dialog>
+      <div class="flex flex-row pt-4">
+        <p>
+          {{ lang("signup.agreeTo") }}
+          <NuxtLink target="_blank" to="/rules"
+            >{{ lang("signup.rules") }}
+          </NuxtLink>
+          {{ lang("signup.agreeTo2") }}
+          <NuxtLink class="whitespace-nowrap" target="_blank" to="/privacy"
+            >{{ lang("signup.privacy") }}.
+          </NuxtLink>
+        </p>
+        <FairButton :disabled="isWaiting" class="self-end" @click="signup"
+          >{{ lang("signup.submit") }}
+        </FairButton>
+      </div>
+    </form>
+  </FairDialog>
 </template>
 
 <script lang="ts" setup>
 import { ref } from "vue";
-import {
-  Dialog,
-  DialogDescription,
-  DialogPanel,
-  DialogTitle,
-} from "@headlessui/vue";
 import { useZxcvbn } from "~/composables/useZxcvbn";
 import { useAuthStore } from "~/store/authentication";
+import FairDialog from "~/components/interactables/FairDialog.vue";
+import FairInput from "~/components/interactables/FairInput.vue";
+import FairButton from "~/components/interactables/FairButton.vue";
+import FairCheckboxInput from "~/components/interactables/FairCheckboxInput.vue";
+import { useLang } from "~/composables/useLang";
+import { useToasts } from "~/composables/useToasts";
 
+const lang = useLang("account");
 const isLogin = ref<boolean>(true);
 const authStore = useAuthStore();
-
-const props = defineProps({
-  open: { type: Boolean, required: false, default: false },
-});
 
 const email = ref<string>("");
 const password = ref<string>("");
 const repeatedPassword = ref<string>("");
 const showPassword = ref<boolean>(false);
+const rememberMe = ref<boolean>(false);
+const isWaiting = ref<boolean>(false);
 
 const zxcvbn = useZxcvbn(password);
 const emit = defineEmits(["close"]);
 
-function signup(event: Event) {
-  event.preventDefault();
+function signup() {
   if (!showPassword.value && password.value !== repeatedPassword.value) {
-    alert("Passwords do not match");
+    useToasts("Passwords do not match", { type: "error" });
     return;
   }
 
-  authStore.actions.registerAccount(email.value, password.value).then(() => {
-    emit("close");
-  });
+  authStore.actions
+    .registerAccount(email.value, password.value)
+    .then(() => {
+      isWaiting.value = false;
+      emit("close");
+    })
+    .catch(() => {
+      isWaiting.value = false;
+    });
 }
 
-function login(event: Event) {
-  event.preventDefault();
-  authStore.login(email.value, password.value).then(() => {
-    emit("close");
-  });
+function login() {
+  isWaiting.value = true;
+  authStore.actions
+    .login(email.value, password.value, rememberMe.value)
+    .then(() => {
+      isWaiting.value = false;
+      emit("close");
+    })
+    .catch(() => {
+      isWaiting.value = false;
+    });
+}
+
+function close() {
+  isLogin.value = true;
+  email.value = "";
+  password.value = "";
+  repeatedPassword.value = "";
+  showPassword.value = false;
+
+  emit("close");
 }
 </script>
+
+<style lang="scss" scoped>
+a {
+  color: var(--link-color);
+
+  &:hover {
+    color: var(--link-hover-color);
+  }
+}
+</style>

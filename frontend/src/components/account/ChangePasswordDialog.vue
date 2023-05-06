@@ -1,11 +1,11 @@
 <template>
   <FairDialog
-    description="Please enter your current and new password below:"
-    title="Change your Password"
+    :description="lang('description') + ':'"
+    :title="lang('title')"
     @close="close"
   >
     <form class="flex flex-col items-start" @submit.prevent>
-      <div class="pt-4">Current Password:</div>
+      <div class="pt-4">{{ lang("currentPassword") }}:</div>
       <FairInput
         v-model="currentPassword"
         autocomplete="current-password"
@@ -13,7 +13,7 @@
         required
         type="password"
       />
-      <div class="pt-4">New Password:</div>
+      <div class="pt-4">{{ lang("newPassword") }}:</div>
       <FairInput
         v-model="newPassword"
         autocomplete="new-password"
@@ -21,7 +21,7 @@
         required
         type="password"
       />
-      <div class="pt-4">Repeat Password:</div>
+      <div class="pt-4">{{ lang("repeatPassword") }}:</div>
       <FairInput
         v-model="repeatPassword"
         autocomplete="off"
@@ -34,7 +34,7 @@
         :disabled="!canSubmitPasswords"
         class="mt-4 self-end"
         @click="submit"
-        >Confirm
+        >{{ lang("submit") }}
       </FairButton>
     </form>
   </FairDialog>
@@ -46,7 +46,10 @@ import FairInput from "~/components/interactables/FairInput.vue";
 import FairButton from "~/components/interactables/FairButton.vue";
 import { useZxcvbn } from "~/composables/useZxcvbn";
 import { useAuthStore } from "~/store/authentication";
+import { useLang } from "~/composables/useLang";
+import { useToasts } from "~/composables/useToasts";
 
+const lang = useLang("account.changePassword");
 const emit = defineEmits(["close"]);
 
 const currentPassword = ref<string>("");
@@ -67,7 +70,7 @@ const zxcvbn = useZxcvbn(newPassword);
 
 function submit() {
   if (newPassword.value !== repeatPassword.value) {
-    alert("Passwords do not match");
+    useToasts("Passwords do not match", { type: "error" });
     return;
   }
 

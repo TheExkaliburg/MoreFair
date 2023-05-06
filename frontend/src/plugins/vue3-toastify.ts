@@ -4,7 +4,8 @@ import "vue3-toastify/dist/index.css";
 
 export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.use(Vue3Toastify, {
-    autoClose: false,
+    autoClose: 15 * 1000,
+    theme: "colored",
   } as ToastContainerOptions);
   return {
     provide: { toast },

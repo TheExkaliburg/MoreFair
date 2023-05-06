@@ -5,6 +5,7 @@ import { computed, Ref } from "vue";
 import { FeedbackType } from "@zxcvbn-ts/core/dist/types";
 
 export const useZxcvbn = (password: Ref<string> | string) => {
+  const lang = useLang("zxcvbn");
   const options = {
     translations: zxcvbnEnPackage.translations,
     graphs: zxcvbnCommonPackage.adjacencyGraphs,
@@ -23,7 +24,7 @@ export const useZxcvbn = (password: Ref<string> | string) => {
     }>(() => {
       const result = zxcvbn(password);
       const { score, feedback } = result;
-      return { score, feedback, toString: `Score: ${score}` };
+      return { score, feedback, toString: `${lang("strength")}: ${score}` };
     });
   }
 
@@ -34,6 +35,6 @@ export const useZxcvbn = (password: Ref<string> | string) => {
   }>(() => {
     const result = zxcvbn(password.value);
     const { score, feedback } = result;
-    return { score, feedback, toString: `Score: ${score}` };
+    return { score, feedback, toString: `${lang("strength")}: ${score}` };
   });
 };

@@ -29,7 +29,7 @@
 
 <script lang="ts" setup>
 import { EditorContent, Node, useEditor } from "@tiptap/vue-3";
-import { onBeforeUnmount, ref } from "vue";
+import { onBeforeUnmount, watch } from "vue";
 import { Paragraph } from "@tiptap/extension-paragraph";
 import { Text } from "@tiptap/extension-text";
 import { Mention } from "@tiptap/extension-mention";
@@ -44,7 +44,6 @@ import {
 
 const chatStore = useChatStore();
 
-const input = ref<string>("");
 const characterLimit = 280;
 
 const editor = useEditor({
@@ -93,9 +92,17 @@ const editor = useEditor({
     }),
   ],
   onUpdate: ({ editor }) => {
-    input.value = editor.getText();
+    chatStore.state.input = editor.getJSON();
   },
 });
+
+watch(
+  () => chatStore.state.input,
+  (newValue) => {
+    editor.value?.commands.setContent(newValue);
+  },
+  { deep: true }
+);
 
 function sendMessage() {
   if (!editor?.value) return;

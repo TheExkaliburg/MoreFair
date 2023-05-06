@@ -106,7 +106,8 @@ export const useRoundStore = defineStore("round", () => {
               useLadderStore().actions.reset();
             });
           useToasts(
-            "Chad was successful in turning back the time, the only thing left from this future is a mark on the initiates that helped in the final ritual."
+            "Chad was successful in turning back the time, the only thing left from this future is a mark on the initiates that helped in the final ritual.",
+            { autoClose: false }
           );
         }, 6000); // 1 sec more than the reconnect-timer of the stomp client
         break;

@@ -22,6 +22,7 @@
 - TODO: prerequisite options for other options
 - TODO: popover from navigation buttons
 - TODO: add follow own ranker option
+- TODO: click to mention in chat
 
 +---------------+----------------+----------------+----------------+----------------+
 |               |       ui       |  functionality |     BigUI      |     Tests      |

@@ -61,5 +61,3 @@ function close() {
   }
 }
 </script>
-
-<style scoped></style>

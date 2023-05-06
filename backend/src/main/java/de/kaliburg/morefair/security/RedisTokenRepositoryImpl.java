@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -32,12 +33,14 @@ public class RedisTokenRepositoryImpl implements PersistentTokenRepository {
   private static final String USERNAME = "username";
   private static final String TOKEN = "token";
   private static final String LAST_USED_DATE = "last_used_date";
-  private static final String NAME_SPACE = "spring:security:rememberMe:token:";
-
+  private static final String NAME_SPACE = "rememberMe";
   private final RedisTemplate<String, String> redisTemplate;
 
-  private static String generateKey(String series) {
-    return NAME_SPACE + series;
+  @Value("${spring.session.redis.namespace}")
+  private String redisNamespace;
+
+  private String generateKey(String series) {
+    return redisNamespace + ":" + NAME_SPACE + ":" + series;
   }
 
   @Override

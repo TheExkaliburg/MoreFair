@@ -56,7 +56,7 @@ import {
   LockClosedIcon as LockClosedIconSolid,
   TableCellsIcon as TableCellsIconSolid,
 } from "@heroicons/vue/24/solid";
-import { useLang } from "../../composables/useLang";
+import { useLang } from "~/composables/useLang";
 import OffCanvasBrandedSidebar from "~/components/navbar/OffCanvasSidebar.vue";
 import { useUiStore } from "~/store/ui";
 import ToggleIconButton from "~/components/ToggleIconButton.vue";

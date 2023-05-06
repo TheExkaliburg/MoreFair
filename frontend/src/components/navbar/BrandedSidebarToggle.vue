@@ -16,7 +16,9 @@
         <!--FairGame Logo and Branding with a link to the main page-->
         <NuxtLink :to="authStore.getters.homeLocation" class="flex space-x-1">
           <img alt="FairGame" class="w-7 h-7" src="/favicon.ico" />
-          <span class="text-xl text-navbar-text">FairGame</span>
+          <span class="text-xl text-text"
+            ><span class="text-text-light">Fair</span>Game</span
+          >
         </NuxtLink>
       </div>
     </div>

@@ -14,11 +14,11 @@
 
 <script lang="ts" setup>
 import { computed } from "vue";
-import { useOptionsStore } from "../store/options";
 import OptionsSection from "../components/options/OptionsSection.vue";
-import { OptionsGroup } from "../store/entities/option";
+import { useOptionsStore } from "~/store/options";
+import { OptionsGroup } from "~/store/entities/option";
 
-// definePageMeta({ layout: "default-without-sidebar" });
+definePageMeta({ title: "Options" });
 
 const currentOptionsArray = computed(() => {
   return Object.entries(options.state).map(([key, value]) => {

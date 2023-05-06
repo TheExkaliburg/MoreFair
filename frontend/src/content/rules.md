@@ -14,7 +14,7 @@ Please follow the rules below to keep things fair and comfy:
 
 If you have any questions, ideas, want to stay up to date to the latest updates or simply just want to chat with your
 fellow rankers, without having Chad listening, you can join us on our
-<a class="text-text-dark" href="https://discord.gg/ThKzCknfFr" target="_blank">Discord</a>.
+<a href="https://discord.gg/ThKzCknfFr" target="_blank">Discord</a>.
 
 <br/>
 You can also talk to a moderator about it:

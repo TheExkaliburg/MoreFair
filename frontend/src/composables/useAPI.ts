@@ -39,7 +39,7 @@ axiosInstance.interceptors.response.use(
     if (error.response?.status === 401) {
       useAuthStore().state.authenticationStatus = false;
       useAuthStore().state.uuid = Cookies.get("_uuid") || "";
-      navigateTo("/");
+      navigateTo("/login");
     }
     if (error.response?.status === 403) {
       const xsrfCookie = Cookies.get("XSRF-TOKEN");

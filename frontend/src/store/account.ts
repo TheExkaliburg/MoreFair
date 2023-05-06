@@ -6,6 +6,7 @@ import { useLadderStore } from "~/store/ladder";
 import { useChatStore } from "~/store/chat";
 import { useAuthStore } from "~/store/authentication";
 import { SOUNDS, useSound } from "~/composables/useSound";
+import { useToasts } from "~/composables/useToasts";
 
 export enum AccessRole {
   OWNER,
@@ -130,7 +131,7 @@ export const useAccountStore = defineStore("account", () => {
         return Promise.resolve(res);
       })
       .catch((err) => {
-        alert(err.response.data.message);
+        useToasts(err.response.data.message, { type: "error" });
         return Promise.reject(err);
       });
   }

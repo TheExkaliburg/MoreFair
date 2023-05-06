@@ -54,7 +54,8 @@
           </NuxtLink>
           <NuxtLink
             v-tippy="{ content: lang('discord'), placement: 'right' }"
-            to="/"
+            target="_blank"
+            to="https://discord.gg/ThKzCknfFr"
           >
             <SidebarButton>
               <template #icon>

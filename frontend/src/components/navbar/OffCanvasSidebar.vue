@@ -16,14 +16,14 @@
       </div>
       <!--Bottom of the Canvas-->
       <div class="min-w-min flex flex-col justify-items-start content-around">
-        <NuxtLink to="/account">
+        <NuxtLink to="/account" @click="close">
           <SidebarButton :label="lang('account')">
             <template #icon>
               <UserCircleIcon />
             </template>
           </SidebarButton>
         </NuxtLink>
-        <NuxtLink to="/options">
+        <NuxtLink to="/options" @click="close">
           <SidebarButton :label="optionsLabel">
             <template #icon>
               <Cog8ToothIcon />
@@ -37,14 +37,18 @@
             </template>
           </SidebarButton>
         </NuxtLink>
-        <NuxtLink to="/rules">
+        <NuxtLink to="/rules" @click="close">
           <SidebarButton :label="lang('rules')">
             <template #icon>
               <DocumentTextIcon />
             </template>
           </SidebarButton>
         </NuxtLink>
-        <NuxtLink to="/">
+        <NuxtLink
+          target="_blank"
+          to="https://discord.gg/ThKzCknfFr"
+          @click="close"
+        >
           <SidebarButton :label="discordLabel">
             <template #icon>
               <font-awesome-icon icon="fa-brands fa-discord" />
@@ -87,11 +91,15 @@ const privacyLabel = computed<string>(() => lang("privacy"));
 const impressumLabel = computed<string>(() => lang("impressum"));
 
 onClickOutside(offCanvas.value, () => {
-  console.log("click outside");
-  uiStore.state.sidebarExpanded = false;
+  close();
 });
 
+function close() {
+  uiStore.state.sidebarExpanded = false;
+}
+
 function help() {
+  close();
   useTutorialTour().start();
   uiStore.state.sidebarExpanded = false;
 }

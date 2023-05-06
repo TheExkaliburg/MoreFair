@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { reactive, ref } from "vue";
+import { JSONContent } from "@tiptap/core";
 import {
   isGroupMentionMeta,
   MentionMeta,
@@ -19,6 +20,7 @@ export type ChatData = {
 export type ChatState = {
   messages: Message[];
   number: number;
+  input: JSONContent;
 };
 
 export const useChatStore = defineStore("chat", () => {
@@ -31,6 +33,7 @@ export const useChatStore = defineStore("chat", () => {
   const state = reactive<ChatState>({
     messages: <Message[]>[],
     number: 1,
+    input: { type: "doc", content: [{ type: "paragraph" }] },
   });
   const getters = reactive({});
 
@@ -108,6 +111,7 @@ export const useChatStore = defineStore("chat", () => {
       timestamp: Math.floor(Date.now() / 1000),
       tag: "🂮",
       assholePoints: 5950,
+      isMod: false,
     });
   }
 

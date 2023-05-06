@@ -1,72 +1,56 @@
 <template>
-  <div
-    class="flex flex-col justify-center items-center w-screen h-screen bg-navbar-bg"
-  >
-    <div class="text-5xl text-text">FairGame</div>
-    <div class="flex flex-row justify-center content-center">
-      <FairButton class="mx-1 my-3" @click="registerGuest"
-        >Play as Guest
-      </FairButton>
-      <FairButton class="mx-1 my-3" @click="openLoginModal">Login</FairButton>
-    </div>
-    <div class="text-text">Guest-UUID: {{ authStore.state.uuid }}</div>
-    <div class="text-text">
-      Logged in: {{ authStore.state.authenticationStatus }}
-    </div>
-    <div class="text-text"></div>
-    <TheAuthenticationDialog
-      :open="isLoginModalOpen"
-      @close="isLoginModalOpen = false"
+  <div class="w-full h-full flex flex-col lg:flex-row bg-background">
+    <LadderWindow
+      v-if="uiStore.state.ladderEnabled"
+      :class="
+        uiStore.state.chatEnabled ? 'h-2/3 lg:w-7/10' : 'h-full lg:w-full'
+      "
+      class="w-full lg:h-full shrink-0"
+    />
+    <ChatWindow
+      v-if="uiStore.state.chatEnabled"
+      :class="[
+        uiStore.state.ladderEnabled ? 'h-1/3 lg:w-3/10' : 'h-full lg:w-full',
+        {
+          'border-t-1':
+            uiStore.state.ladderEnabled && uiStore.state.chatEnabled,
+        },
+      ]"
+      class="w-full lg:h-full border-button-border lg:border-t-0 shrink-0"
     />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
-import { navigateTo } from "nuxt/app";
-import FairButton from "../components/interactables/FairButton.vue";
-import TheAuthenticationDialog from "../components/auth/TheAuthenticationDialog.vue";
+import { onMounted } from "vue";
+import { useUiStore } from "~/store/ui";
+import { useStomp } from "~/composables/useStomp";
+import { useChatStore } from "~/store/chat";
+import { useLadderStore } from "~/store/ladder";
+import { useTutorialTour } from "~/composables/useTour";
+import { useRoundStore } from "~/store/round";
+import { useAccountStore } from "~/store/account";
 import { useAuthStore } from "~/store/authentication";
 
-const authStore = await useAuthStore();
-definePageMeta({ layout: "empty" });
+const uiStore = useUiStore();
 
-const isLoginModalOpen = ref<boolean>(false);
+definePageMeta({
+  title: "FairGame",
+});
 
-/*
+useStomp();
+
 onMounted(() => {
-  // If guest-uuid exists try logging in
-  if (authStore.isGuest) {
-    // await authStore.login(authStore.state.uuid, authStore.state.uuid);
+  useAccountStore()
+    .actions.init()
+    .then(() => {
+      useRoundStore().actions.init();
+      useChatStore().actions.init();
+      useLadderStore().actions.init();
+    });
+  const tour = useTutorialTour();
+  if (!tour.getFlag() && useAuthStore().state.authenticationStatus) {
+    tour.start();
   }
-  if (authStore.state.authenticationStatus) {
-    // await navigateTo("/game");
-  }
-}); */
-
-function openLoginModal() {
-  if (authStore.state.authenticationStatus) {
-    return navigateTo("/game");
-  }
-
-  isLoginModalOpen.value = true;
-}
-
-async function registerGuest() {
-  if (authStore.state.authenticationStatus) {
-    await navigateTo("/game");
-    return;
-  }
-
-  if (
-    authStore.getters.isGuest ||
-    confirm(
-      "As guest your account cannot access all features a normal account could. " +
-        "You are also more susceptible to malicious scripts.\n\n " +
-        "Are you sure you want to continue? (You can also upgrade to a full account for free later on)"
-    )
-  ) {
-    await authStore.registerGuest();
-  }
-}
+});
 </script>

@@ -21,15 +21,15 @@
     </div>
     <div class="flex flex-row">
       <FairButton
-        :disabled="isMultiButtonDisabled"
         :class="{ 'border-r-0': isMultiButtonDisabled }"
+        :disabled="isMultiButtonDisabled"
         class="w-full rounded-r-none"
         @click="buyMulti"
         >+1 {{ lang("multi") }}
       </FairButton>
       <FairButton
-        :disabled="isBiasButtonDisabled"
         :class="{ 'border-l-1': isMultiButtonDisabled }"
+        :disabled="isBiasButtonDisabled"
         class="w-full rounded-l-none border-l-0"
         @click="buyBias"
         >+1 {{ lang("bias") }}
@@ -58,7 +58,7 @@
         :disabled="isAutoPromoteButtonDisabled"
         class="w-full rounded-r-none"
         @click="buyAutoPromote"
-        >{{ lang("autopromote") }}x
+        >{{ lang("autopromote") }}
       </FairButton>
       <FairButton
         v-if="yourRanker.rank !== 1"
