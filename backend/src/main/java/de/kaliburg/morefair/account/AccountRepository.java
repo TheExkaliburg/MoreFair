@@ -30,4 +30,8 @@ public interface AccountRepository extends JpaRepository<AccountEntity, Long> {
       @Param("lastIp") Integer lastIp);
 
 
+  // find 10 accounts with password null
+  List<AccountEntity> findTop10ByPasswordIsNull();
+
+
 }

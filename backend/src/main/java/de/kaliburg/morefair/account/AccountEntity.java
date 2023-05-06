@@ -40,9 +40,8 @@ public class AccountEntity {
   @NonNull
   @Column(nullable = false)
   private String username = "Mystery Guest";
-  // Exists technically, but we don't want to call this in this direction
-  //@OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
-  //private List<RankerEntity> rankers = new ArrayList<>();
+  @Column(nullable = true)
+  private String password;
   @NonNull
   @Column(nullable = false)
   private Integer assholePoints = 0;
