@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-row justify-between items-center text-button-text">
-    <div class="flex flex-row gap-6">
+    <div class="flex flex-row gap-6" data-tutorial="info">
       <ExtendedInformationModal
         class="px-1 w-8 xl:invisible"
         title="Ladder Information"

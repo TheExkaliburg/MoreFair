@@ -3,22 +3,75 @@ import { useStorage } from "@vueuse/core";
 import { deepMerge } from "@antfu/utils";
 import { navigateTo } from "nuxt/app";
 import { useUiStore } from "~/store/ui";
+import { useLang } from "~/composables/useLang";
 
 const defaultValues = {
   showHelp: false,
 };
 
-export function useTutorialTour() {
+export const useTutorialTour = () => {
+  const lang = useLang("tour.tutorial");
   const tour = introJs();
+
+  navigateTo("/");
   const steps: introJs.Step[] = [
     {
-      intro: "Welcome to the tutorial!",
+      title: lang("welcome.title"),
+      intro: lang("welcome.intro"),
+    },
+    {
+      element: document.querySelector(".ranker-1") || undefined,
+      title: lang("goal1.title"),
+      intro: lang("goal1.intro"),
+      position: "bottom",
+    },
+    {
+      element: document.querySelector("[data-tutorial='info']") || undefined,
+      title: lang("goal2.title"),
+      intro: lang("goal2.intro"),
+      position: "bottom",
+    },
+    {
+      element: document.querySelector(".ranker-1 .points") || undefined,
+      title: lang("points.title"),
+      intro: lang("points.intro"),
+      position: "left",
+    },
+    {
+      element: document.querySelector(".ranker-you .power") || undefined,
+      title: lang("power.title"),
+      intro: lang("power.intro"),
+      position: "left",
+    },
+    {
+      element: document.querySelector("[data-tutorial='bias']") || undefined,
+      title: lang("bias.title"),
+      intro: lang("bias.intro"),
+      position: "top",
+    },
+    {
+      element: document.querySelector("[data-tutorial='multi']") || undefined,
+      title: lang("multi.title"),
+      intro: lang("multi.intro"),
+      position: "top",
+    },
+    {
+      element: document.querySelector("[data-tutorial='vinegar']") || undefined,
+      title: lang("vinegar.title"),
+      intro: lang("vinegar.intro"),
+      position: "top",
+    },
+    {
+      element: document.querySelector("[data-tutorial='grapes']") || undefined,
+      title: lang("grapes.title"),
+      intro: lang("grapes.intro"),
+      position: "top",
     },
     {
       element: document.querySelector("[data-tutorial='help']") || undefined,
-      title: "This was it!",
-      intro:
-        "If you ever need this tutorial again, just click this help button again.",
+      title: lang("end.title"),
+      intro: lang("end.intro"),
+      position: "top",
     },
   ];
 
@@ -63,4 +116,4 @@ export function useTutorialTour() {
     start,
     getFlag,
   };
-}
+};

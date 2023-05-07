@@ -1,19 +1,18 @@
 <template>
   <div
-    v-if="active"
     ref="el"
     :class="{
       'bg-ladder-bg-promoted text-ladder-text-promoted': !ranker.growing,
-      'bg-ladder-bg-you text-ladder-text-you': isYou,
-      'sticky z-1 top-0': isFirst,
+      'bg-ladder-bg-you text-ladder-text-you ranker-you': isYou,
+      'sticky z-1 top-0 ranker-1': isFirst,
       'bg-ladder-bg': isFirst && !isYou && ranker.growing,
     }"
     :style="tableSpaceStyles.total"
     class="grid gap-1 px-1 text-sm select-none width-full"
   >
     <div
-      class="whitespace-nowrap overflow-hidden"
       :style="tableSpaceStyles.rank"
+      class="whitespace-nowrap overflow-hidden"
     >
       {{ ranker.rank }} {{ ranker.assholeTag }}
       <sub
@@ -23,52 +22,52 @@
       >
     </div>
     <div
-      class="whitespace-nowrap overflow-hidden"
       :style="tableSpaceStyles.username"
+      class="whitespace-nowrap overflow-hidden"
     >
       {{ ranker.username
       }}<sub :class="{ 'text-text-dark': !isYou }">#{{ ranker.accountId }}</sub>
     </div>
 
     <div
-      class="text-right whitespace-nowrap overflow-hidden sm:order-last"
       :style="tableSpaceStyles.power"
+      class="text-right whitespace-nowrap overflow-hidden sm:order-last power"
     >
       {{ formattedPower }}
     </div>
     <div
-      class="text-right whitespace-nowrap overflow-hidden sm:order-last etaProgressAnimation"
       :style="[
         'animation-delay: ' + etaPercentage + 's !important',
         tableSpaceStyles.points,
       ]"
+      class="text-right whitespace-nowrap overflow-hidden sm:order-last etaProgressAnimation points"
     >
       {{ formattedPoints }}
     </div>
     <div
       v-if="tableSpace.etaToLadder > 0"
-      class="text-right whitespace-nowrap overflow-hidden etaProgressAnimation"
       :style="[
         'animation-delay: ' + etaPercentage + 's !important',
         tableSpaceStyles.etaToLadder,
       ]"
+      class="text-right whitespace-nowrap overflow-hidden etaProgressAnimation"
     >
       {{ etaToNextLadderFormatted }}
     </div>
     <div
       v-if="tableSpace.etaToYou > 0"
-      class="text-right whitespace-nowrap overflow-hidden etaProgressAnimation"
       :style="[
         'animation-delay: ' + etaPercentage + 's !important',
         tableSpaceStyles.etaToYou,
       ]"
+      class="text-right whitespace-nowrap overflow-hidden etaProgressAnimation"
     >
       {{ etaToYourRankerFormatted }}
     </div>
     <div
       v-if="tableSpace.powerGain > 0"
-      class="text-right whitespace-nowrap overflow-hidden"
       :style="tableSpaceStyles.powerGain"
+      class="text-right whitespace-nowrap overflow-hidden"
     >
       <span v-if="optionsStore.state.ladder.showPowerGain.value">{{
         formattedPowerPerSec
@@ -109,7 +108,6 @@ import {
 
 const props = defineProps({
   ranker: { type: Ranker, required: true },
-  active: { type: Boolean, required: false, default: true },
   index: { type: Number, required: false, default: -1 },
 });
 
@@ -228,7 +226,7 @@ const etaPercentage = computed<number>(() => {
 });
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 @keyframes etaProgress {
   0% {
     color: var(--eta-best-color);

@@ -24,6 +24,7 @@
         :class="{ 'border-r-0': isMultiButtonDisabled }"
         :disabled="isMultiButtonDisabled"
         class="w-full rounded-r-none"
+        data-tutorial="multi"
         @click="buyMulti"
         >+1 {{ lang("multi") }}
       </FairButton>
@@ -31,6 +32,7 @@
         :class="{ 'border-l-1': isMultiButtonDisabled }"
         :disabled="isBiasButtonDisabled"
         class="w-full rounded-l-none border-l-0"
+        data-tutorial="bias"
         @click="buyBias"
         >+1 {{ lang("bias") }}
       </FairButton>
@@ -38,14 +40,14 @@
     <div
       class="flex flex-row text-xs lg:text-sm w-full justify-between text-text-light"
     >
-      <p>
+      <p data-tutorial="grapes">
         {{ yourFormattedGrapes }}/<span class="text-text-dark">{{
           yourAutoPromoteCostFormatted
         }}</span>
         {{ lang("info.grapes") }}
         <span v-if="yourRanker.autoPromote">({{ lang("info.active") }})</span>
       </p>
-      <p>
+      <p data-tutorial="vinegar">
         {{ yourFormattedVinegar }}/<span class="text-text-dark">{{
           yourVinegarThrowCostFormatted
         }}</span>

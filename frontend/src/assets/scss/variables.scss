@@ -75,6 +75,10 @@ $transparent: rgba(0, 0, 0, 0);
   --text-error-color: var(--placeholder-color);
   --reader-width: 50em;
   --reader-width-div-2: calc(var(--reader-width) / 2);
+  --font-size-xs: 0.75rem;
+  --line-height-xs: 1rem;
+  --font-size-sm: 0.875rem;
+  --line-height-sm: 1.25rem;
 
   // Buttons
   --button-bg-color: var(--background-color);
@@ -102,7 +106,8 @@ $transparent: rgba(0, 0, 0, 0);
 
   // Chat
   --header-color: var(--main-color);
-  --header-font-size: 14px;
+  --header-font-size: var(--font-size-sm);
+  --header-line-height: var(--line-height-sm);
   --mod-color: #{$color-medium-red-violet};
 
   // navbar

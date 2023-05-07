@@ -67,6 +67,10 @@ div, ul {
   background-color: var(--tooltip-background) !important;
   color: var(--tooltip-text);
 
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+
+
   .introjs-tooltip-title {
     color: var(--tooltip-text);
   }
@@ -83,6 +87,24 @@ div, ul {
     &:hover {
       background-color: var(--tooltip-text);
       color: var(--tooltip-background);
+    }
+  }
+
+  .introjs-arrow {
+    &.top {
+      border-bottom-color: var(--tooltip-text);
+    }
+
+    &.right {
+      border-left-color: var(--tooltip-text) !important;
+    }
+
+    &.bottom {
+      border-top-color: var(--tooltip-text);
+    }
+
+    &.left {
+      border-right-color: var(--tooltip-text) !important;
     }
   }
 }

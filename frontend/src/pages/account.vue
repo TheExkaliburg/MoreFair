@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-col w-full h-full justify-center items-center gap-8 text-text"
+    class="flex flex-col w-full h-full justify-center items-center gap-8 text-text p-4"
   >
     <div class="max-w-reader/2 w-full flex flex-col">
       <div>{{ lang("account") }}:</div>

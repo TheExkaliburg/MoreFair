@@ -5,7 +5,12 @@
     <div
       class="flex flex-col justify-center items-center h-content py-16 w-full bg-navbar-bg relative border-text-dark border-y-1"
     >
-      <img alt="FairGame" class="h-32 absolute -top-16" src="/img/ladder.png" />
+      <img
+        alt="FairGame"
+        class="h-32 absolute -top-16"
+        draggable="false"
+        src="/img/ladder.png"
+      />
       <div class="pt-10 text-5xl text-text">
         <span class="text-text-light">Fair</span>Game
       </div>
