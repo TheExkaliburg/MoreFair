@@ -35,6 +35,12 @@ export default defineNuxtConfig({
     ],
   },
   ssr: false,
+  generate: {
+    routes: ["/impressum", "/privacy", "/rules"],
+  },
+  nitro: {
+    preset: "service-worker",
+  },
   i18n: {
     locales: [
       {
