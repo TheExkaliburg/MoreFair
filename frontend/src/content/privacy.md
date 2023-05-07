@@ -1,29 +1,29 @@
 # Privacy Policy
 
 We are very delighted that you have shown interest in our enterprise. Data protection is of a particularly high priority
-for the management of the Kaliburg. The use of the Internet pages of the Kaliburg is possible without any indication of
-personal data; however, if a data subject wants to use special enterprise services via our website, processing of
-personal data could become necessary. If the processing of personal data is necessary and there is no statutory basis
-for such processing, we generally obtain consent from the data subject.
+for the management of FairGame. The use of the Internet pages of FairGame is possible without any indication of personal
+data; however, if a data subject wants to use special enterprise services via our website, processing of personal data
+could become necessary. If the processing of personal data is necessary and there is no statutory basis for such
+processing, we generally obtain consent from the data subject.
 
 The processing of personal data, such as the name, address, e-mail address, or telephone number of a data subject shall
 always be in line with the General Data Protection Regulation (GDPR), and in accordance with the country-specific data
-protection regulations applicable to the Kaliburg. By means of this data protection declaration, our enterprise would
-like to inform the general public of the nature, scope, and purpose of the personal data we collect, use and process.
+protection regulations applicable to FairGame. By means of this data protection declaration, our enterprise would like
+to inform the general public of the nature, scope, and purpose of the personal data we collect, use and process.
 Furthermore, data subjects are informed, by means of this data protection declaration, of the rights to which they are
 entitled.
 
-As the controller, the Kaliburg has implemented numerous technical and organizational measures to ensure the most
-complete protection of personal data processed through this website. However, Internet-based data transmissions may in
-principle have security gaps, so absolute protection may not be guaranteed. For this reason, every data subject is free
-to transfer personal data to us via alternative means, e.g. by telephone.
+As the controller, FairGame has implemented numerous technical and organizational measures to ensure the most complete
+protection of personal data processed through this website. However, Internet-based data transmissions may in principle
+have security gaps, so absolute protection may not be guaranteed. For this reason, every data subject is free to
+transfer personal data to us via alternative means, e.g. by telephone.
 
 ## 1. Definitions
 
-The data protection declaration of the Kaliburg is based on the terms used by the European legislator for the adoption
-of the General Data Protection Regulation (GDPR). Our data protection declaration should be legible and understandable
-for the general public, as well as our customers and business partners. To ensure this, we would like to first explain
-the terminology used.
+The data protection declaration of FairGame is based on the terms used by the European legislator for the adoption of
+the General Data Protection Regulation (GDPR). Our data protection declaration should be legible and understandable for
+the general public, as well as our customers and business partners. To ensure this, we would like to first explain the
+terminology used.
 
 In this data protection declaration, we use, inter alia, the following terms:
 
@@ -103,7 +103,7 @@ Controller for the purposes of the General Data Protection Regulation (GDPR), ot
 Member states of the European Union and other provisions related to data protection is:
 
 ```
-Kaliburg
+Tobias Schmidt
 c/o Block Services
 Stuttgarter Str. 106
 70736 Fellbach
@@ -114,8 +114,8 @@ Website: fair.kaliburg.de
 
 ## 3. Cookies
 
-The Internet pages of the Kaliburg use cookies. Cookies are text files that are stored in a computer system via an
-Internet browser.
+The Internet pages of FairGame use cookies. Cookies are text files that are stored in a computer system via an Internet
+browser.
 
 Many Internet sites and servers use cookies. Many cookies contain a so-called cookie ID. A cookie ID is a unique
 identifier of the cookie. It consists of a character string through which Internet pages and servers can be assigned to
@@ -123,8 +123,8 @@ the specific Internet browser in which the cookie was stored. This allows visite
 differentiate the individual browser of the dats subject from other Internet browsers that contain other cookies. A
 specific Internet browser can be recognized and identified using the unique cookie ID.
 
-Through the use of cookies, the Kaliburg can provide the users of this website with more user-friendly services that
-would not be possible without the cookie setting.
+Through the use of cookies, FairGame can provide the users of this website with more user-friendly services that would
+not be possible without the cookie setting.
 
 By means of a cookie, the information and offers on our website can be optimized with the user in mind. Cookies allow
 us, as previously mentioned, to recognize our website users. The purpose of this recognition is to make it easier for
@@ -141,22 +141,21 @@ functions of our website may be entirely usable.
 
 ## 4. Collection of general data and information
 
-The website of the Kaliburg collects a series of general data and information when a data subject or automated system
-calls up the website. This general data and information are stored in the server log files. Collected may be (1) the
-browser types and versions used, (2) the operating system used by the accessing system, (3) the website from which an
-accessing system reaches our website (so-called referrers), (4) the sub-websites, (5) the date and time of access to the
-Internet site, (6) an Internet protocol address (IP address), (7) the Internet service provider of the accessing system,
-and (8) any other similar data and information that may be used in the event of attacks on our information technology
-systems.
+The website of FairGame collects a series of general data and information when a data subject or automated system calls
+up the website. This general data and information are stored in the server log files. Collected may be (1) the browser
+types and versions used, (2) the operating system used by the accessing system, (3) the website from which an accessing
+system reaches our website (so-called referrers), (4) the sub-websites, (5) the date and time of access to the Internet
+site, (6) an Internet protocol address (IP address), (7) the Internet service provider of the accessing system, and (8)
+any other similar data and information that may be used in the event of attacks on our information technology systems.
 
-When using these general data and information, the Kaliburg does not draw any conclusions about the data subject.
-Rather, this information is needed to (1) deliver the content of our website correctly, (2) optimize the content of our
-website as well as its advertisement, (3) ensure the long-term viability of our information technology systems and
-website technology, and (4) provide law enforcement authorities with the information necessary for criminal prosecution
-in case of a cyber-attack. Therefore, the Kaliburg analyzes anonymously collected data and information statistically,
-with the aim of increasing the data protection and data security of our enterprise, and to ensure an optimal level of
-protection for the personal data we process. The anonymous data of the server log files are stored separately from all
-personal data provided by a data subject.
+When using these general data and information, FairGame does not draw any conclusions about the data subject. Rather,
+this information is needed to (1) deliver the content of our website correctly, (2) optimize the content of our website
+as well as its advertisement, (3) ensure the long-term viability of our information technology systems and website
+technology, and (4) provide law enforcement authorities with the information necessary for criminal prosecution in case
+of a cyber-attack. Therefore, FairGame analyzes anonymously collected data and information statistically, with the aim
+of increasing the data protection and data security of our enterprise, and to ensure an optimal level of protection for
+the personal data we process. The anonymous data of the server log files are stored separately from all personal data
+provided by a data subject.
 
 ## 5. Registration on our website
 
@@ -248,14 +247,14 @@ Union or Member State law to which the controller is subject. The personal data 
 offer of information society services referred to in Article 8(1) of the GDPR.
 
 If one of the aforementioned reasons applies, and a data subject wishes to request the erasure of personal data stored
-by the Kaliburg, he or she may, at any time, contact any employee of the controller. An employee of Kaliburg shall
-promptly ensure that the erasure request is complied with immediately.
+by FairGame, he or she may, at any time, contact any employee of the controller. An employee of Kaliburg shall promptly
+ensure that the erasure request is complied with immediately.
 
 Where the controller has made personal data public and is obliged pursuant to Article 17(1) to erase the personal data,
 the controller, taking account of available technology and the cost of implementation, shall take reasonable steps,
 including technical measures, to inform other controllers processing the personal data that the data subject has
 requested erasure by such controllers of any links to, or copy or replication of, those personal data, as far as
-processing is not required. An employees of the Kaliburg will arrange the necessary measures in individual cases.
+processing is not required. An employees of FairGame will arrange the necessary measures in individual cases.
 
 ### e)Right of restriction of processing
 
@@ -269,8 +268,8 @@ legal claims. The data subject has objected to processing pursuant to Article 21
 whether the legitimate grounds of the controller override those of the data subject.
 
 If one of the aforementioned conditions is met, and a data subject wishes to request the restriction of the processing
-of personal data stored by the Kaliburg, he or she may at any time contact any employee of the controller. The employee
-of the Kaliburg will arrange the restriction of the processing.
+of personal data stored by FairGame, he or she may at any time contact any employee of the controller. The employee of
+FairGame will arrange the restriction of the processing.
 
 ### f) Right to data portability
 
@@ -287,7 +286,7 @@ Furthermore, in exercising his or her right to data portability pursuant to Arti
 shall have the right to have personal data transmitted directly from one controller to another, where technically
 feasible and when doing so does not adversely affect the rights and freedoms of others.
 
-In order to assert the right to data portability, the data subject may at any time contact any employee of the Kaliburg.
+In order to assert the right to data portability, the data subject may at any time contact any employee of FairGame.
 
 ### g) Right to object
 
@@ -299,19 +298,19 @@ The Kaliburg shall no longer process the personal data in the event of the objec
 compelling legitimate grounds for the processing which override the interests, rights and freedoms of the data subject,
 or for the establishment, exercise or defence of legal claims.
 
-If the Kaliburg processes personal data for direct marketing purposes, the data subject shall have the right to object
-at any time to processing of personal data concerning him or her for such marketing. This applies to profiling to the
-extent that it is related to such direct marketing. If the data subject objects to the Kaliburg to the processing for
-direct marketing purposes, the Kaliburg will no longer process the personal data for these purposes.
+If FairGame processes personal data for direct marketing purposes, the data subject shall have the right to object at
+any time to processing of personal data concerning him or her for such marketing. This applies to profiling to the
+extent that it is related to such direct marketing. If the data subject objects to FairGame to the processing for direct
+marketing purposes, FairGame will no longer process the personal data for these purposes.
 
 In addition, the data subject has the right, on grounds relating to his or her particular situation, to object to
-processing of personal data concerning him or her by the Kaliburg for scientific or historical research purposes, or for
+processing of personal data concerning him or her by FairGame for scientific or historical research purposes, or for
 statistical purposes pursuant to Article 89(1) of the GDPR, unless the processing is necessary for the performance of a
 task carried out for reasons of public interest.
 
-In order to exercise the right to object, the data subject may contact any employee of the Kaliburg. In addition, the
-data subject is free in the context of the use of information society services, and notwithstanding Directive
-2002/58/EC, to use his or her right to object by automated means using technical specifications.
+In order to exercise the right to object, the data subject may contact any employee of FairGame. In addition, the data
+subject is free in the context of the use of information society services, and notwithstanding Directive 2002/58/EC, to
+use his or her right to object by automated means using technical specifications.
 
 ### h) Automated individual decision-making, including profiling
 
@@ -323,12 +322,12 @@ which the controller is subject and which also lays down suitable measures to sa
 freedoms and legitimate interests, or (3) is not based on the data subject's explicit consent.
 
 If the decision (1) is necessary for entering into, or the performance of, a contract between the data subject and a
-data controller, or (2) it is based on the data subject's explicit consent, the Kaliburg shall implement suitable
-measures to safeguard the data subject's rights and freedoms and legitimate interests, at least the right to obtain
-human intervention on the part of the controller, to express his or her point of view and contest the decision.
+data controller, or (2) it is based on the data subject's explicit consent, FairGame shall implement suitable measures
+to safeguard the data subject's rights and freedoms and legitimate interests, at least the right to obtain human
+intervention on the part of the controller, to express his or her point of view and contest the decision.
 
 If the data subject wishes to exercise the rights concerning automated individual decision-making, he or she may, at any
-time, contact any employee of the Kaliburg.
+time, contact any employee of FairGame.
 
 ### i) Right to withdraw data protection consent
 
@@ -336,7 +335,7 @@ Each data subject shall have the right granted by the European legislator to wit
 of his or her personal data at any time.
 
 If the data subject wishes to exercise the right to withdraw the consent, he or she may, at any time, contact any
-employee of the Kaliburg.
+employee of FairGame.
 
 ## 8. Legal basis for the processing
 

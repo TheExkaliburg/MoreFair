@@ -13,7 +13,7 @@
 - TODO: Look at chat auto-scrolling down
 - TODO: Mod-Page, and options for mods
 - TODO: Theme-Selector and customThemes
-- TODO: Overhauled Privacy Policy
+- TODO: Style Tutorial Tour
 - TODO: Write Actual Tutorial
 - TODO: Add Changelog back
 - TODO: Add new Backend-Testcases for authentication (100% coverage)

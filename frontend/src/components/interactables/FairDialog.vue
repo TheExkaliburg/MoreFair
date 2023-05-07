@@ -1,6 +1,6 @@
 <template>
   <Dialog class="relative z-50" @close="close">
-    <div aria-hidden="true" class="fixed inset-0 bg-black/50" />
+    <div aria-hidden="true" class="fixed inset-0 bg-black/60" />
     <div class="fixed inset-0 flex items-center justify-center p-4">
       <DialogPanel
         class="w-full max-w-sm rounded-3xl bg-modal-bg text-modal-text p-4 relative text-sm overflow-y-auto"
