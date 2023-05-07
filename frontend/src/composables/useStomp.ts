@@ -66,7 +66,7 @@ let isPrivateConnectionEstablished = false;
 const isDevMode = process.env.NODE_ENV !== "production";
 const connection = isDevMode
   ? "ws://localhost:8080/socket/fair"
-  : `ws://${window.location.host}/socket/fair`;
+  : `wss://${window.location.host}/socket/fair`;
 
 const subscribedChannel = {
   ladder: {} as StompSubscription,

@@ -19,6 +19,11 @@ export default defineNuxtConfig({
     "@nuxtjs/i18n",
   ],
   srcDir: "src/",
+  content: {
+    experimental: {
+      clientDB: true,
+    },
+  },
   build: {
     transpile: [
       "@fortawesome/fontawesome-svg-core",
@@ -35,12 +40,6 @@ export default defineNuxtConfig({
     ],
   },
   ssr: false,
-  generate: {
-    routes: ["/impressum", "/privacy", "/rules"],
-  },
-  nitro: {
-    preset: "service-worker",
-  },
   i18n: {
     locales: [
       {

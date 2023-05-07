@@ -121,7 +121,7 @@ tour:
       intro: Welcome to the FairGame-Tutorial!
     goal1:
       title: Goal
-      intro: The game is seperated into Ladders, the goal of each Ladder is to reach the top and promote to the next one.
+      intro: The game is separated into Ladders, the goal of each Ladder is to reach the top and promote to the next one.
     goal2:
       title: Goal
       intro: The goal of the game is to reach the highest ladder in a round and promote before the game resets.
@@ -130,19 +130,19 @@ tour:
       intro: Points define your Rank. \n\n You need to reach the most points to promote to the next Ladder.
     power:
       title: Power
-      intro: Powers define how many points you get each Second. \n\n The lower you are on the ladder, the more points you get.
+      intro: Power defines how many points you get each Second. \n\n The lower you are on the ladder, the more points you get.
     bias:
       title: Bias
-      intro: You can use Bias to gain a flat increase in power per second, but Bias resets your points back to 0.
+      intro: You can use Bias to gain a flat increase in power per second. This upgrade resets your points back to 0.
     multi:
       title: Multi
-      intro: Multi can be used to increase your power per second multiplicatively. This Upgrade resets not only your points, but also your power.
+      intro: Multi can be used to increase your power per second multiplicatively. This upgrade resets not only your points, but also your power.
     vinegar:
       title: Vinegar
-      intro: Vinegar is used to throw at active Ranker at the top of you Ladder. \n\n If you have more than them they get thrown down to the bottom of your Ladder. \n\n If not, then they lose the amount of vinegar you've been throwing.
+      intro: Vinegar is used to throw at active Ranker at the top of you Ladder. \n\n If you have more than them they get thrown down to the bottom of your Ladder. \n\n If not, then they lose the amount of vinegar that you threw and they stay at the top.
     grapes:
       title: Grapes
-      intro: Grapes define how much vinegar/s you get. \n\n You get 2 Grapes for every second at the bottom of the Ladder and 1 Grape for every Ranker that passes you. \n\n You can also buy Autopromote with Grapes (cheapest at the bottom).
+      intro: Grapes define how much vinegar/s you get. \n\n You gain 2 Grapes for every second at the bottom of the Ladder and 1 Grape for every Ranker that passes you (if you are at x2 or above). \n\n You can also buy Autopromote with Grapes (cheapest at the bottom).
     end:
       title: That's it!
       intro: You are now ready to play FairGame. If you ever need this tutorial again, just click this help button again.
