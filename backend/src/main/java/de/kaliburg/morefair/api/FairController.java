@@ -13,7 +13,8 @@ public class FairController {
   public static final String TOPIC_TICK_DESTINATION = "/game/tick";
 
 
-  @RequestMapping(value = "{path:[^.]*}")
+  @RequestMapping(value = {"/login", "/account", "/changelog", "/options", "/impressum",
+      "/privacy", "/rules"})
   public String fallback() {
     return "forward:/";
   }

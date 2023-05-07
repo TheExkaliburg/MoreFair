@@ -50,6 +50,8 @@ public class AccountController {
     try {
       AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
 
+      log.info("[G] ACCOUNT: {} (#{})", account.getDisplayName(), account.getId());
+
       if (account == null) {
         return ResponseEntity.notFound().build();
       }
