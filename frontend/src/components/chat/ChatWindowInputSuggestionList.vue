@@ -1,9 +1,9 @@
 <template>
   <div>
-    <Listbox>
+    <Listbox v-if="items.length > 0">
       <ListboxOptions
         ref="list"
-        class="absolute bottom-6 bg-background max-h-32 w-min overflow-y-auto z-1 border-1 border-button-border rounded-md pl-0 overflow-x-hidden"
+        class="mb-0 bg-background max-h-32 w-min overflow-y-auto z-1 border-1 border-button-border rounded-md pl-0 overflow-x-hidden"
         static
       >
         <ListboxOption

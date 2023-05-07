@@ -45,6 +45,14 @@ div, ul {
   background-color: var(--tooltip-background) !important;
   color: var(--tooltip-text) !important;
 
+  &.tippy-suggestion {
+    background-color: transparent !important;
+
+    > .tippy-content {
+      padding: 0 0;
+    }
+  }
+
   > .tippy-content {
     font-size: 0.875rem;
     line-height: 1.25rem;

@@ -34,6 +34,7 @@ const render = (format: Function) => () => {
       if (!props.clientRect) {
         return;
       }
+
       popup = tippy("body", {
         getReferenceClientRect: props.clientRect,
         appendTo: () => document.body,
@@ -42,6 +43,12 @@ const render = (format: Function) => () => {
         interactive: true,
         trigger: "manual",
         placement: "bottom-start",
+        arrow: false,
+        onShow(instance) {
+          const tippyBox = instance.popper.querySelector(".tippy-box");
+          if (tippyBox === null) return;
+          tippyBox.classList.add("tippy-suggestion");
+        },
       });
     },
     onUpdate(props: any) {
@@ -97,7 +104,7 @@ export const useEmojiSuggestion = () => {
     char: ":",
     items: ({ query }: { query: string }) => {
       const queryLower = query.toLowerCase();
-      if (queryLower.length < 3) return [];
+      if (queryLower.length < 2) return [];
       return emojiData.filter((item) => {
         return (
           item.aliases.some((alias) => alias.startsWith(queryLower)) ||

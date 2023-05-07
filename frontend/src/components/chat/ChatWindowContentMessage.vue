@@ -1,18 +1,19 @@
 <template>
   <div class="flex flex-col w-full">
     <div class="flex flex-row text-sm justify-between pr-3">
-      <span
-        class="text-text-light truncate basis-5/8 cursor-pointer"
-        @click="mention"
-      >
+      <span class="text-text-light truncate basis-5/8">
         <font-awesome-icon
           v-if="message.isMod"
           v-tippy="{ content: 'MOD', placement: 'right' }"
           class="text-text-mod"
           icon="fa-solid fa-shield-halved"
         />
-        {{ message.username }}
-        <sub class="text-text-dark">&nbsp;#{{ message.accountId }} </sub>
+        <span class="cursor-pointer" @click="mention">
+          {{ message.username }}
+          <sub class="text-text-dark"
+            >&nbsp;#{{ message.accountId }}
+          </sub></span
+        >
       </span>
       <span class="text-text-light basis-1/8 flex-auto">
         <strong>{{ message.tag }}</strong
