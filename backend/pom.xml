@@ -206,6 +206,12 @@
       <version>1.36.0</version>
     </dependency>
     <dependency>
+      <artifactId>rider-core</artifactId>
+      <groupId>com.github.database-rider</groupId>
+      <scope>compile</scope>
+      <version>1.36.0</version>
+    </dependency>
+    <dependency>
       <artifactId>rider-junit5</artifactId>
       <groupId>com.github.database-rider</groupId>
       <scope>test</scope>
