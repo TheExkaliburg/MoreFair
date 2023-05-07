@@ -126,16 +126,15 @@ $transparent: rgba(0, 0, 0, 0);
   --modal-text-color: var(--text-color);
   --modal-text-title-color: var(--text-light-highlight-color);
 
+  // Tooltips and Notifications
+  --tooltip-background: #{$color-st-tropaz};
+  --tooltip-text: var(--text-color);
+
   // Overwrite Toastify defaults
-  --toastify-color-light: #{$color-st-tropaz} !important;
-  --toastify-text-color-light: var(--text-color) !important;
+  --toastify-color-light: var(--tooltip-background) !important;
+  --toastify-text-color-light: var(--tooltip-text) !important;
   --toastify-color-error: #{$color-claret} !important;
-  --toastify-text-color-error: var(--text-color) !important;
-
-  // Tippy Tooltips
-  --tippy-background: #{$color-st-tropaz};
-  --tippy-text: var(--text-color)
-
+  --toastify-text-color-error: var(--tooltip-text) !important;
 }
 
 :root.light {

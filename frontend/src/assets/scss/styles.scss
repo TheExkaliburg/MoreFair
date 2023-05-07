@@ -42,8 +42,8 @@ div, ul {
 }
 
 .tippy-box {
-  background-color: var(--tippy-background) !important;
-  color: var(--tippy-text) !important;
+  background-color: var(--tooltip-background) !important;
+  color: var(--tooltip-text) !important;
 
   > .tippy-content {
     font-size: 0.875rem;
@@ -51,8 +51,30 @@ div, ul {
   }
 
   > .tippy-arrow {
-    color: var(--tippy-background) !important;
+    color: var(--tooltip-background) !important;
+  }
+}
+
+.introjs-tooltip {
+  background-color: var(--tooltip-background) !important;
+  color: var(--tooltip-text);
+
+  .introjs-tooltip-title {
+    color: var(--tooltip-text);
   }
 
+  .introjs-skipbutton {
+    color: var(--tooltip-text);
+  }
 
+  .introjs-button {
+    background-color: var(--tooltip-background);
+    color: var(--tooltip-text);
+    text-shadow: none;
+
+    &:hover {
+      background-color: var(--tooltip-text);
+      color: var(--tooltip-background);
+    }
+  }
 }
