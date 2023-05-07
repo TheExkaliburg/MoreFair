@@ -4,8 +4,8 @@
       class="flex flex-row text-xs lg:text-sm w-full justify-between text-text-light"
     >
       <div class="whitespace-nowrap">
-        {{ yourFormattedPoints }}/<span class="text-text-dark">{{
-          yourBiasCostFormatted
+        {{ yourFormattedPower }}/<span class="text-text-dark">{{
+          yourMultiCostFormatted
         }}</span>
         {{ lang("info.power") }} [{{ lang("info.multi_short") }}: x{{
           yourFormattedMulti
@@ -13,8 +13,8 @@
       </div>
       <div class="whitespace-nowrap">
         [{{ lang("info.bias_short") }}: +{{ yourFormattedBias }}]
-        {{ yourFormattedPower }}/<span class="text-text-dark">{{
-          yourMultiCostFormatted
+        {{ yourFormattedPoints }}/<span class="text-text-dark">{{
+          yourBiasCostFormatted
         }}</span>
         {{ lang("info.points") }}
       </div>
