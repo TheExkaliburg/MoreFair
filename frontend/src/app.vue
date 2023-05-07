@@ -17,7 +17,6 @@
 - TODO: Write Actual Tutorial
 - TODO: Add Changelog back
 - TODO: Add new Backend-Testcases for authentication (100% coverage)
-- TODO: fix tippy.js conflict with vue tippy
 - TODO: add follow own ranker option
 - TODO: click to mention in chat should add the mention at the place of the cursor
 

@@ -1,5 +1,5 @@
 import { VueRenderer } from "@tiptap/vue-3";
-import tippy from "tippy.js";
+import { tippy } from "vue-tippy";
 import { PluginKey } from "prosemirror-state";
 import ChatWindowInputUserMentionList from "../components/chat/ChatWindowInputSuggestionList.vue";
 
