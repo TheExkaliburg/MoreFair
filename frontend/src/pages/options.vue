@@ -14,11 +14,14 @@
 
 <script lang="ts" setup>
 import { computed } from "vue";
+import { useSeoMeta } from "#head";
 import OptionsSection from "../components/options/OptionsSection.vue";
 import { useOptionsStore } from "~/store/options";
 import { OptionsGroup } from "~/store/entities/option";
 
-definePageMeta({ title: "Options" });
+useSeoMeta({
+  title: "Options",
+});
 
 const currentOptionsArray = computed(() => {
   return Object.entries(options.state).map(([key, value]) => {

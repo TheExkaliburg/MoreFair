@@ -69,6 +69,7 @@ module.exports = {
       },
       spacing: {
         reader: "var(--reader-width)",
+        "reader/2": "var(--reader-width-div-2)",
       },
     },
   },

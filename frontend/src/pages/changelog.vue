@@ -3,7 +3,9 @@
 </template>
 
 <script lang="ts" setup>
-definePageMeta({
+import { useSeoMeta } from "#head";
+
+useSeoMeta({
   title: "Changelog",
 });
 </script>

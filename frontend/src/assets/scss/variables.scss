@@ -74,6 +74,7 @@ $transparent: rgba(0, 0, 0, 0);
   --text-placeholder-color: #{$color-claret};
   --text-error-color: var(--placeholder-color);
   --reader-width: 50em;
+  --reader-width-div-2: calc(var(--reader-width) / 2);
 
   // Buttons
   --button-bg-color: var(--background-color);

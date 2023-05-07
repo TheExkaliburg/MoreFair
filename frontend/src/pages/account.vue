@@ -1,29 +1,32 @@
 <template>
-  <div class="flex flex-col gap-0 px-4 max-w-reader text-text">
-    <div class="h-8" />
-    <div>{{ lang("account") }}:</div>
-    <div class="flex flex-row">
-      <FairInput
-        :class="{ 'pointer-events-none': !isEditingUsername }"
-        :model-value="shownUsername"
-        :readonly="!isEditingUsername"
-        class="rounded-r-none w-2/3"
-        @update:modelValue="newUsername = $event"
-        @keydown.enter="changeUsername"
-      />
-      <FairButton class="w-1/3 rounded-l-none" @click="changeUsername"
-        >{{ isEditingUsername ? lang("apply") : lang("edit") }}
-      </FairButton>
+  <div
+    class="flex flex-col w-full h-full justify-center items-center gap-8 text-text"
+  >
+    <div class="max-w-reader/2 w-full flex flex-col">
+      <div>{{ lang("account") }}:</div>
+      <div class="flex flex-row">
+        <FairInput
+          :class="{ 'pointer-events-none': !isEditingUsername }"
+          :model-value="shownUsername"
+          :readonly="!isEditingUsername"
+          class="rounded-r-none w-2/3"
+          @update:modelValue="newUsername = $event"
+          @keydown.enter="changeUsername"
+        />
+        <FairButton class="w-1/3 rounded-l-none" @click="changeUsername"
+          >{{ isEditingUsername ? lang("apply") : lang("edit") }}
+        </FairButton>
+      </div>
     </div>
-    <div class="h-8" />
     <template v-if="isGuest">
-      <div class="flex flex-row justify-around gap-3 max-w-reader">
+      <div
+        class="flex flex-row w-full max-w-reader/2 justify-around gap-3 max-w-reader/2"
+      >
         <FairButton class="w-full" @click="exportUuid">Export UUID</FairButton>
         <FairButton class="w-full" @click="importUuid">Import UUID</FairButton>
       </div>
-      <div class="h-8" />
       <FairButton
-        class="w-full max-w-reader"
+        class="w-full max-w-reader/2"
         @click="openUpgradeAccountDialog = true"
         >{{ lang("linkAccount.title") }}
       </FairButton>
@@ -33,27 +36,30 @@
       />
     </template>
     <template v-else>
-      <div>{{ lang("email") }}</div>
-      <div class="flex flex-row">
-        <FairInput
-          :class="{ 'pointer-events-none': !isEditingEmail }"
-          :model-value="shownEmail"
-          :readonly="!isEditingEmail"
-          :type="isEditingEmail ? 'text' : 'password'"
-          autocomplete="off"
-          class="rounded-r-none w-2/3"
-          @update:modelValue="newEmail = $event"
-        />
-        <FairButton class="w-1/3 rounded-l-none" @click="changeEmail"
-          >{{ isEditingEmail ? lang("apply") : lang("edit") }}
-        </FairButton>
-        <ConfirmEmailChangeDialog
-          :open="openConfirmEmailChangeDialog"
-          @close="openConfirmEmailChangeDialog = false"
-        />
+      <div class="max-w-reader/2 -mt-5 w-full flex flex-col">
+        <div>{{ lang("email") }}:</div>
+        <div class="flex flex-row">
+          <FairInput
+            :class="{ 'pointer-events-none': !isEditingEmail }"
+            :model-value="shownEmail"
+            :readonly="!isEditingEmail"
+            :type="isEditingEmail ? 'text' : 'password'"
+            autocomplete="off"
+            class="rounded-r-none w-2/3"
+            @update:modelValue="newEmail = $event"
+          />
+          <FairButton class="w-1/3 rounded-l-none" @click="changeEmail"
+            >{{ isEditingEmail ? lang("apply") : lang("edit") }}
+          </FairButton>
+          <ConfirmEmailChangeDialog
+            :open="openConfirmEmailChangeDialog"
+            @close="openConfirmEmailChangeDialog = false"
+          />
+        </div>
       </div>
-      <div class="h-12" />
-      <FairButton @click="openChangePasswordDialog = true"
+      <FairButton
+        class="max-w-reader/2 w-full"
+        @click="openChangePasswordDialog = true"
         >{{ lang("changePassword.title") }}
       </FairButton>
       <ChangePasswordDialog
@@ -61,8 +67,7 @@
         @close="openChangePasswordDialog = false"
       />
     </template>
-    <div class="h-8" />
-    <FairButton @click="authStore.actions.logout"
+    <FairButton class="max-w-reader/2 w-full" @click="authStore.actions.logout"
       >{{ lang("logout") }}
     </FairButton>
   </div>
@@ -71,6 +76,7 @@
 <script lang="ts" setup>
 import { onMounted } from "vue";
 import Cookies from "js-cookie";
+import { useSeoMeta } from "#head";
 import { useAuthStore } from "~/store/authentication";
 import FairButton from "~/components/interactables/FairButton.vue";
 import FairInput from "~/components/interactables/FairInput.vue";
@@ -80,7 +86,7 @@ import ChangePasswordDialog from "~/components/account/ChangePasswordDialog.vue"
 import UpgradeAccountDialog from "~/components/account/UpgradeAccountDialog.vue";
 import { useLang } from "~/composables/useLang";
 
-definePageMeta({
+useSeoMeta({
   title: "Account",
 });
 
