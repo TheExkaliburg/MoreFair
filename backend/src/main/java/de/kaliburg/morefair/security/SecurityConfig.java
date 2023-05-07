@@ -64,6 +64,9 @@ public class SecurityConfig {
         .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/auth/**"))
         .permitAll()
 
+        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/_content/**"))
+        .permitAll()
+
         .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/socket/fair"))
         .permitAll()
 
