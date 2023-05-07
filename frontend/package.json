@@ -1,4 +1,12 @@
 {
+  "name": "fair-game",
+  "description": "The frontend to FairGame",
+  "author": {
+    "email": "kaliburg@pm.me",
+    "name": "Tobias Schmidt",
+    "url": "https://fair.kaliburg.de"
+  },
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "build": "nuxt build",
@@ -8,10 +16,10 @@
     "postinstall": "nuxt prepare",
     "prepare": "cd .. && husky install frontend/.husky",
     "lintfix": "eslint --fix --ext \".ts,.js,.vue\" --ignore-path .eslintignore .",
-    "clean": "rm -rf node_modules && rm -rf .nuxt",
-    "clean::win": "rd /s /q node_modules && rd /s /q .nuxt",
-    "clean-install": "pnpm run clean || pnpm install",
-    "clean-install::win": "pnpm run clean::win || pnpm install"
+    "clean": "rm -rf node_modules ; rm -rf .nuxt ; rm -rf .output ; rm -rf dist",
+    "clean::win": "rd /s /q node_modules & rd /s /q .nuxt & rd /s /q .output & rd /s /q dist",
+    "clean-install": "pnpm run clean ; pnpm install",
+    "clean-install::win": "pnpm run clean::win & pnpm install"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.1.2",

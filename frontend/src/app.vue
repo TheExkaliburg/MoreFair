@@ -6,10 +6,8 @@
 
 <script lang="ts" setup>
 /*
-- TODO: Design Login/Register Page
-    - need to agree to rules to register/login
 - TODO: Figuring out the Database convert script
-- TODO: Writing a program to create all hashes from the uuids
+- TODO: Install redis and checking environment variables
 
 // Can be done after the fairtest test-run
 - TODO: Look at chat auto-scrolling down
@@ -19,10 +17,9 @@
 - TODO: Write Actual Tutorial
 - TODO: Add Changelog back
 - TODO: Add new Backend-Testcases for authentication (100% coverage)
-- TODO: prerequisite options for other options
-- TODO: popover from navigation buttons
+- TODO: fix tippy.js conflict with vue tippy
 - TODO: add follow own ranker option
-- TODO: click to mention in chat
+- TODO: click to mention in chat should add the mention at the place of the cursor
 
 +---------------+----------------+----------------+----------------+----------------+
 |               |       ui       |  functionality |     BigUI      |     Tests      |
@@ -39,6 +36,7 @@
 - TODO: Statistics
 - TODO: Overhaul the Vinegar Throw Logic
 - TODO: Chat Overhaul (Local + Global)
+- TODO: play around with electron, maybe it will work maybe not
  */
 
 useAPI();
