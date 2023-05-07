@@ -223,12 +223,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <artifactId>rider-core</artifactId>
-      <groupId>com.github.database-rider</groupId>
-      <scope>compile</scope>
-      <version>1.34.0</version>
-    </dependency>
-    <dependency>
       <artifactId>greenmail-spring</artifactId>
       <groupId>com.icegreen</groupId>
       <scope>test</scope>
