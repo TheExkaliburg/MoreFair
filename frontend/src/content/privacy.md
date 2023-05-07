@@ -256,7 +256,7 @@ including technical measures, to inform other controllers processing the persona
 requested erasure by such controllers of any links to, or copy or replication of, those personal data, as far as
 processing is not required. An employees of FairGame will arrange the necessary measures in individual cases.
 
-### e)Right of restriction of processing
+### e) Right of restriction of processing
 
 Each data subject shall have the right granted by the European legislator to obtain from the controller restriction of
 processing where one of the following applies:

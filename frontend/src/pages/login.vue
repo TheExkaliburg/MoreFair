@@ -11,7 +11,7 @@
         draggable="false"
         src="/img/ladder.png"
       />
-      <div class="pt-10 text-5xl text-text">
+      <div class="pt-10 text-5xl text-text select-none">
         <span class="text-text-light">Fair</span>Game
       </div>
       <div class="flex flex-col justify-center content-center gap-3 pt-12 w-56">

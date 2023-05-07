@@ -6,8 +6,6 @@
 
 <script lang="ts" setup>
 /*
-- TODO: Figuring out the Database convert script
-- TODO: Install redis and checking environment variables
 
 // Can be done after the fairtest test-run
 - TODO: Look at chat auto-scrolling down
@@ -17,17 +15,8 @@
 - TODO: Add new Backend-Testcases for authentication (100% coverage)
 - TODO: add follow own ranker option
 - TODO: click to mention in chat should add the mention at the place of the cursor
-
-+---------------+----------------+----------------+----------------+----------------+
-|               |       ui       |  functionality |     BigUI      |     Tests      |
-+---------------+----------------+----------------+----------------+----------------+
-| Change Name   |      x         |  x             |                |                |
-| ChangePassword|      x         | x              |                |                |
-| Change Email  |     x          |  x             |                |                |
-| Upgrade       |     x          |  x             |                |                |
-| Export UUID   |     x          |    x           |                |                |
-| Import UUID   |      x         |   x            |                |                |
-+---------------+----------------+----------------+----------------+----------------+
+- TODO: Edge cases for vinegar throwing are still enabling the button when it shouldn't (less people than required etc.)
+- TODO: Multi Bias Timer
 
 // If im feeling funny but will probably only get done after rework is finished
 - TODO: Statistics

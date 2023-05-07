@@ -46,6 +46,8 @@ export const useEta = (ranker: Ranker) => {
       etaRankerCache.set(ranker, cachedMap);
     }
 
+    if (!ranker.growing) return Infinity;
+
     // Calculating the relative acceleration of the two players
     const rankerAcc = getPowerGainDifferenceToRank(
       ranker,
