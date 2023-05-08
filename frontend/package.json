@@ -16,11 +16,10 @@
     "postinstall": "nuxt prepare",
     "prepare": "cd .. && husky install frontend/.husky",
     "lintfix": "eslint --fix --ext \".ts,.js,.vue\" --ignore-path .eslintignore .",
-    "install": "pnpm install",
     "clean": "rm -rf node_modules ; rm -rf .nuxt ; rm -rf .output ; rm -rf dist",
     "clean::win": "rd /s /q node_modules & rd /s /q .nuxt & rd /s /q .output & rd /s /q dist",
-    "clean-install": "pnpm run clean ; pnpm run install",
-    "clean-install::win": "pnpm run clean::win & pnpm run install"
+    "clean-install": "pnpm run clean ; pnpm install",
+    "clean-install::win": "pnpm run clean::win & pnpm install"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.1.2",
