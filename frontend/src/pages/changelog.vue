@@ -3,8 +3,6 @@
 </template>
 
 <script lang="ts" setup>
-import { useSeoMeta } from "#head";
-
 useSeoMeta({
   title: "Changelog",
 });

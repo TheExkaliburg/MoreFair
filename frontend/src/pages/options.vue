@@ -14,7 +14,6 @@
 
 <script lang="ts" setup>
 import { computed } from "vue";
-import { useSeoMeta } from "#head";
 import OptionsSection from "../components/options/OptionsSection.vue";
 import { useOptionsStore } from "~/store/options";
 import { OptionsGroup } from "~/store/entities/option";

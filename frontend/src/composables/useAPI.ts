@@ -2,6 +2,7 @@ import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import { navigateTo } from "nuxt/app";
 import Cookies from "js-cookie";
 import { useAuthStore } from "~/store/authentication";
+import { useToasts } from "~/composables/useToasts";
 
 const isDevMode = process.env.NODE_ENV !== "production";
 let lastXsrfToken = Cookies.get("XSRF-TOKEN");
@@ -41,6 +42,12 @@ axiosInstance.interceptors.response.use(
       useAuthStore().state.uuid = Cookies.get("_uuid") || "";
       navigateTo("/login");
     }
+
+    // if status is 502, the server is down
+    if (error.response?.status === 502) {
+      useToasts("Server is down", { type: "error" });
+    }
+
     if (error.response?.status === 403) {
       const xsrfCookie = Cookies.get("XSRF-TOKEN");
       if (xsrfCookie === lastXsrfToken) {

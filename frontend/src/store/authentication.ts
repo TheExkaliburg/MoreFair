@@ -135,7 +135,11 @@ export const useAuthStore = defineStore("auth", () => {
         return Promise.resolve(response);
       })
       .catch((err) => {
-        useToasts(err.response.data.message, { type: "error" });
+        if (err.response.status === 401) {
+          useToasts("Invalid username or password", { type: "error" });
+        } else {
+          useToasts(err.response.data.message, { type: "error" });
+        }
         return Promise.reject(err);
       });
   }

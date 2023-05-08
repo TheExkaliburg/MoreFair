@@ -65,8 +65,8 @@
           </ListboxOption>
           <ListboxOption
             v-if="showLast && last > max"
-            class="w-full flex flex-row"
             as="li"
+            class="w-full flex flex-row"
           >
             <a
               class="w-full px-2 text-right text-text-light hover:text-button-text-hover hover:bg-button-bg-hover"
@@ -88,8 +88,7 @@ import {
   ListboxOption,
   ListboxOptions,
 } from "@headlessui/vue";
-
-import { ChevronDownIcon } from "@heroicons/vue/24/outline";
+import { ChevronDownIcon } from "@heroicons/vue/24/solid";
 import PaginationButtonGroupButton from "../../components/interactables/pagination/PaginationButtonGroupButton.vue";
 
 defineProps({

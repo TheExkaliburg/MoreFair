@@ -19,8 +19,6 @@ export type EmojiDataEntry = {
 };
 
 const emojiData: EmojiDataEntry[] = emojiJson;
-const ladderStore = useLadderStore();
-const optionsStore = useOptionsStore();
 
 const render = (format: Function) => () => {
   let component: any;
@@ -76,6 +74,7 @@ const render = (format: Function) => () => {
 };
 
 export const useUserSuggestion = () => {
+  const ladderStore = useLadderStore();
   return {
     items: ({ query }: { query: string }) => {
       const list = ladderStore.state.rankers;
@@ -120,6 +119,7 @@ export const useEmojiSuggestion = () => {
 };
 
 export const useGroupSuggestion = () => {
+  const optionsStore = useOptionsStore();
   return {
     char: "$",
     items: ({ query }: { query: string }) => {

@@ -76,7 +76,6 @@
 <script lang="ts" setup>
 import { onMounted } from "vue";
 import Cookies from "js-cookie";
-import { useSeoMeta } from "#head";
 import { useAuthStore } from "~/store/authentication";
 import FairButton from "~/components/interactables/FairButton.vue";
 import FairInput from "~/components/interactables/FairInput.vue";

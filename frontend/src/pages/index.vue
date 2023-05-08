@@ -23,7 +23,6 @@
 
 <script lang="ts" setup>
 import { onMounted } from "vue";
-import { useSeoMeta } from "#head";
 import { useUiStore } from "~/store/ui";
 import { useStomp } from "~/composables/useStomp";
 import { useChatStore } from "~/store/chat";

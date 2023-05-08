@@ -82,7 +82,6 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import { navigateTo } from "nuxt/app";
-import { useSeoMeta } from "#head";
 import FairButton from "../components/interactables/FairButton.vue";
 import TheAuthenticationDialog from "../components/auth/TheAuthenticationDialog.vue";
 import { useAuthStore } from "~/store/authentication";
