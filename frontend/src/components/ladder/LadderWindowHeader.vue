@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-row justify-between items-center text-button-text">
-    <div class="flex flex-row gap-6" data-tutorial="info">
+    <div class="flex flex-row sm:gap-6">
       <ExtendedInformationModal
         class="px-1 w-8 xl:invisible"
         title="Ladder Information"
@@ -36,9 +36,9 @@
           </div>
         </div>
       </ExtendedInformationModal>
-      <div class="flex flex-row gap-6 text-xs -sm:hidden">
+      <div class="flex flex-row gap-6 text-xs">
         <div class="flex flex-col">
-          <div class="whitespace-nowrap">
+          <div class="whitespace-nowrap" data-tutorial="info">
             Ladders: {{ accountStore.state.highestCurrentLadder }}/{{
               roundStore.state.assholeLadder
             }}
@@ -50,7 +50,7 @@
             }}
           </div>
         </div>
-        <div class="flex flex-col">
+        <div class="flex flex-col -sm:hidden">
           <div class="whitespace-nowrap">
             Round: [{{ roundStore.getters.formattedTypes }}]
           </div>

@@ -170,7 +170,7 @@ public class AuthController {
 
   // API for Creating, saving and sending a new token via mail for resetting the password
   @PostMapping(value = "/password/forgot", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-  public ResponseEntity<?> forgotPassword(@RequestParam String username) {
+  public ResponseEntity<?> forgotPassword(@RequestParam("username") String username) {
     try {
       if (!emailRegexPattern.matcher(username).matches()) {
         return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST, "Invalid email address");
@@ -198,8 +198,9 @@ public class AuthController {
 
   // API endpoint for changing password in combination with a passwordResetToken
   @PostMapping(value = "/password/reset", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-  public ResponseEntity<?> resetPassword(@RequestParam String resetToken,
-      @RequestParam String newPassword, HttpServletRequest request, HttpServletResponse response) {
+  public ResponseEntity<?> resetPassword(@RequestParam("token") String resetToken,
+      @RequestParam("password") String newPassword, HttpServletRequest request,
+      HttpServletResponse response) {
 
     try {
       if (newPassword.length() < 8) {

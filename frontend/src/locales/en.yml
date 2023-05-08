@@ -112,6 +112,17 @@ account:
     rules: Rules
     agreeTo2: and
     privacy: Privacy Policy
+  forgotPassword:
+    title: Forgot Password
+    description1: Please enter your email below to receive a password reset token.
+    description1a: Got a token already?
+    email: E-Mail
+    submit: Submit
+    description2: Please look into your inbox and copy the token into the input below. Then choose a new password.
+    token: Token
+    newPassword: New Password
+    repeatPassword: Repeat Password
+
 zxcvbn:
   strength: Strength
 tour:

@@ -76,9 +76,8 @@ export const useAuthStore = defineStore("auth", () => {
     return await API.auth
       .register(email, password)
       .then((response) => {
-        // 201 - Created
         if (response.status === 201) {
-          alert(response.data.message);
+          useToasts(response.data.message);
         }
         return Promise.resolve(response);
       })
@@ -100,7 +99,7 @@ export const useAuthStore = defineStore("auth", () => {
       .register(email, password, state.uuid)
       .then((res) => {
         if (res.status === 201) {
-          alert(res.data.message);
+          useToasts(res.data.message);
         }
         return Promise.resolve(res);
       })
@@ -164,7 +163,12 @@ export const useAuthStore = defineStore("auth", () => {
 
     return await API.auth
       .forgotPassword(email)
-      .then((res) => Promise.resolve(res))
+      .then((res) => {
+        if (res.status === 201) {
+          useToasts(res.data.message);
+        }
+        Promise.resolve(res);
+      })
       .catch((err) => {
         useToasts(err.response.data.message, { type: "error" });
         return Promise.reject(err);

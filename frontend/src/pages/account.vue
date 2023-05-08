@@ -84,6 +84,7 @@ import ConfirmEmailChangeDialog from "~/components/account/ConfirmEmailChangeDia
 import ChangePasswordDialog from "~/components/account/ChangePasswordDialog.vue";
 import UpgradeAccountDialog from "~/components/account/UpgradeAccountDialog.vue";
 import { useLang } from "~/composables/useLang";
+import { useToasts } from "~/composables/useToasts";
 
 useSeoMeta({
   title: "Account",
@@ -160,11 +161,11 @@ function changeEmail() {
 async function exportUuid() {
   const uuid = Cookies.get("_uuid");
   if (uuid === undefined) {
-    alert("You don't have a UUID");
+    useToasts("You don't have a UUID", { type: "error" });
     return;
   }
   await navigator.clipboard.writeText(uuid);
-  alert("Copied your UUID to clipboard! (don't loose it or give it away)");
+  useToasts("Copied your UUID to clipboard! (don't loose it or give it away)");
 }
 
 function importUuid() {

@@ -25,9 +25,20 @@
         name="password"
         type="password"
       />
-      <div class="flex flex-row pt-1 gap-2">
-        {{ lang("login.rememberMe") }}:
-        <FairCheckboxInput v-model="rememberMe" :disabled="isWaiting" />
+      <div class="flex flex-row w-full pt-1 justify-between">
+        <div class="flex flex-row gap-2">
+          <span
+            class="cursor-pointer select-none"
+            @click="rememberMe = !rememberMe"
+            >{{ lang("login.rememberMe") }}:</span
+          >
+          <FairCheckboxInput v-model="rememberMe" :disabled="isWaiting" />
+        </div>
+        <a href="#" @click="openForgotPassword = true"> Forgot Password?</a>
+        <ForgotPasswordDialog
+          :open="openForgotPassword"
+          @close="openForgotPassword = false"
+        />
       </div>
       <FairButton :disabled="isWaiting" class="mt-4 self-end" @click="login"
         >{{ lang("login.submit") }}
@@ -105,6 +116,7 @@ import FairButton from "~/components/interactables/FairButton.vue";
 import FairCheckboxInput from "~/components/interactables/FairCheckboxInput.vue";
 import { useLang } from "~/composables/useLang";
 import { useToasts } from "~/composables/useToasts";
+import ForgotPasswordDialog from "~/components/auth/ForgotPasswordDialog.vue";
 
 const lang = useLang("account");
 const isLogin = ref<boolean>(true);
@@ -116,11 +128,13 @@ const repeatedPassword = ref<string>("");
 const showPassword = ref<boolean>(false);
 const rememberMe = ref<boolean>(false);
 const isWaiting = ref<boolean>(false);
+const openForgotPassword = ref<boolean>(false);
 
 const zxcvbn = useZxcvbn(password);
 const emit = defineEmits(["close"]);
 
 function signup() {
+  isWaiting.value = true;
   if (!showPassword.value && password.value !== repeatedPassword.value) {
     useToasts("Passwords do not match", { type: "error" });
     return;
@@ -130,7 +144,7 @@ function signup() {
     .registerAccount(email.value, password.value)
     .then(() => {
       isWaiting.value = false;
-      emit("close");
+      close();
     })
     .catch(() => {
       isWaiting.value = false;
@@ -143,7 +157,7 @@ function login() {
     .login(email.value, password.value, rememberMe.value)
     .then(() => {
       isWaiting.value = false;
-      emit("close");
+      close();
     })
     .catch(() => {
       isWaiting.value = false;
