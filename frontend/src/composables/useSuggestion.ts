@@ -80,7 +80,7 @@ export const useUserSuggestion = () => {
     items: ({ query }: { query: string }) => {
       const list = ladderStore.state.rankers;
       const queryLower = query.toLowerCase();
-      if (queryLower.length < 1) return [];
+      if (queryLower.length < 1) return list;
 
       if (queryLower.startsWith("#")) {
         if (queryLower.length < 2) return [];
