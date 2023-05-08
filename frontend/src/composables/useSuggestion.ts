@@ -42,7 +42,7 @@ const render = (format: Function) => () => {
         showOnCreate: true,
         interactive: true,
         trigger: "manual",
-        placement: "bottom-start",
+        placement: "top-start",
         arrow: false,
         onShow(instance) {
           const tippyBox = instance.popper.querySelector(".tippy-box");

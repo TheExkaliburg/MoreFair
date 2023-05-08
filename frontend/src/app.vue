@@ -17,6 +17,8 @@
 - TODO: click to mention in chat should add the mention at the place of the cursor
 - TODO: Edge cases for vinegar throwing are still enabling the button when it shouldn't (less people than required etc.)
 - TODO: Multi Bias Timer
+- TODO: Add UI for the forgot password
+- TODO: Chat suggestions are weird on mobile
 
 // If im feeling funny but will probably only get done after rework is finished
 - TODO: Statistics
