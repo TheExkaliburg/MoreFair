@@ -80,6 +80,7 @@ const API = {
       password: string,
       rememberMe: boolean = false
     ) => {
+      username = username.toLowerCase();
       const params = new URLSearchParams();
       params.append("username", username);
       params.append("password", password);
@@ -92,6 +93,7 @@ const API = {
       return axiosInstance.post("/api/auth/register/guest");
     },
     register: (username: string, password: string, uuid?: string) => {
+      username = username.toLowerCase();
       const params = new URLSearchParams();
       params.append("username", username);
       params.append("password", password);
@@ -105,6 +107,7 @@ const API = {
       return axiosInstance.post("/api/auth/password/change", params);
     },
     forgotPassword: (username: string) => {
+      username = username.toLowerCase();
       const params = new URLSearchParams();
       params.append("username", username);
       return axiosInstance.post("/api/auth/password/forgot", params);
@@ -116,6 +119,7 @@ const API = {
       return axiosInstance.post("/api/auth/password/reset", params);
     },
     requestEmailChange: (email: string) => {
+      email = email.toLowerCase();
       const params = new URLSearchParams();
       params.append("email", email);
       return axiosInstance.patch("/api/auth/email", params);

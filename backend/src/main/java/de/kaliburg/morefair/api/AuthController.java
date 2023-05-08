@@ -82,6 +82,8 @@ public class AuthController {
   public ResponseEntity<?> register(@RequestParam String username, @RequestParam String password,
       HttpServletRequest request, @RequestParam(required = false) String uuid) {
     try {
+      username = username.toLowerCase();
+
       if (password.length() < 8) {
         return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST,
             "Password must be at least 8 characters long");
@@ -174,6 +176,7 @@ public class AuthController {
         return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST, "Invalid email address");
       }
 
+      username = username.toLowerCase();
       URI uri = HttpUtils.createCreatedUri("/api/auth/password/forgot");
       AccountEntity account = accountService.findByUsername(username);
       if (account == null || account.isGuest()) {
@@ -327,6 +330,7 @@ public class AuthController {
   public ResponseEntity<?> requestUpdatedEmail(Authentication authentication,
       @RequestParam("email") String newMail, HttpSession session) {
     try {
+      newMail = newMail.toLowerCase();
       if (newMail.length() > 254) {
         return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST,
             "Email must be at most 254 characters long");
