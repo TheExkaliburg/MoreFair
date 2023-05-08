@@ -120,7 +120,6 @@ export const useAuthStore = defineStore("auth", () => {
       .login(username, password, rememberMe)
       .then((response) => {
         // 200 - OK
-        console.log(response);
         if (response.status === 200) {
           state.authenticationStatus = true;
           if (getters.isGuest) {

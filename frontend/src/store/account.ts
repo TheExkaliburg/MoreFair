@@ -83,7 +83,6 @@ export const useAccountStore = defineStore("account", () => {
   }
 
   function handleAccountEvents(body: OnAccountEventBody) {
-    console.log(body);
     const event = body.eventType;
     const isYou = state.accountId === body.accountId;
     let ranker;

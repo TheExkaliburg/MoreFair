@@ -26,5 +26,11 @@ module.exports = {
         "vue/no-v-for-template-key": "off",
       },
     },
+    {
+      files: ["src/**/*.vue", "src/**/*.ts", "src/**/*.js"],
+      rules: {
+        "no-console": ["warn", { allow: ["warn", "error", "info"] }],
+      },
+    },
   ],
 };

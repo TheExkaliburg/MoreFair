@@ -123,7 +123,6 @@ export const useLadderStore = defineStore("ladder", () => {
           stomp.callbacks.onLadderEvent,
           "fair_ladder_events",
           (body) => {
-            console.log(body);
             state.events.push(body);
           }
         );
@@ -140,7 +139,6 @@ export const useLadderStore = defineStore("ladder", () => {
   }
 
   function changeLadder(newNumber: number) {
-    console.log("changeLadder", newNumber);
     stomp.wsApi.ladder.changeLadder(newNumber);
     getLadder(newNumber);
   }
@@ -227,7 +225,6 @@ export const useLadderStore = defineStore("ladder", () => {
   }
 
   function handleEvents() {
-    if (state.events.length > 0) console.log("handleEvents", state.events);
     for (let i = 0; i < state.events.length; i++) {
       const event = state.events[i];
       let ranker = state.rankers.find((r) => r.accountId === event.accountId);
@@ -278,7 +275,7 @@ export const useLadderStore = defineStore("ladder", () => {
           state.types.add(LadderType.FREE_AUTO);
           useToasts(
             `Since other rankers breached another Ladder, everyone on this ladder got gifted a free auto promote! (No Refunds)`,
-            { autoClose: false }
+            { autoClose: 60 }
           );
           break;
         default:

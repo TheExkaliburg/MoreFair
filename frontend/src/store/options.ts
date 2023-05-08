@@ -39,13 +39,11 @@ const defaultValues = {
   }),
   sound: new OptionsGroup({
     playSoundOnPromotion: new BooleanOption(false).setCallback((value) => {
-      console.log(value);
       if (value) {
         useSound(SOUNDS.PROMOTION).play();
       }
     }),
     playSoundOnMention: new BooleanOption(false).setCallback((value) => {
-      console.log(value);
       if (value) {
         useSound(SOUNDS.MENTION).play();
       }
