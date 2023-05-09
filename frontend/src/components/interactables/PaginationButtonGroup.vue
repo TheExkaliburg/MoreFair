@@ -1,6 +1,7 @@
 <template>
   <div class="w-32 flex flex-row text-text content-center relative">
     <PaginationButtonGroupButton
+      :class="{ 'border-r-1': max < current - 1 }"
       :disabled="max === 1"
       class="w-1/6 border-r-0 rounded-l-md"
       @click="emit('change', 1)"
