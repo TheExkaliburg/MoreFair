@@ -149,6 +149,8 @@ export const useEta = (ranker: Ranker) => {
   }
 
   function toPromote(): number {
+    if (ranker.rank === 1 && !ranker.growing) return Infinity;
+
     const etaRequirement = toPromotionRequirement();
 
     // We are already first place So we only need to reach the promotion limit.
