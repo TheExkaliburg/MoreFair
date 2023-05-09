@@ -186,7 +186,8 @@ const canBuyAutoPromote = computed<boolean>(() => {
     ladderUtils.getYourAutoPromoteCost.value.cmp(yourRanker.value.grapes) <=
       0 &&
     !yourRanker.value.autoPromote &&
-    !ladderStore.state.types.has(LadderType.FREE_AUTO)
+    !ladderStore.state.types.has(LadderType.FREE_AUTO) &&
+    !ladderStore.state.types.has(LadderType.NO_AUTO)
   );
 });
 const canThrowVinegar = computed<boolean>(() => {
