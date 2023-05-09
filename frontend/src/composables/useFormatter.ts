@@ -16,7 +16,11 @@ const numberFormatter = new numberformat.Formatter({
 export const useFormatter = (number: Decimal | number) => {
   if (typeof number === "number" && !isFinite(number)) return "∞";
 
-  return numberFormatter.format(number);
+  let result = numberFormatter.format(number);
+
+  if (result === "Infinity") result = "∞";
+
+  return result;
 };
 
 export const useTimeFormatter = (seconds: number) => {
