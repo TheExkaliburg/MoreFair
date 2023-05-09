@@ -9,6 +9,8 @@ import { useToasts } from "~/composables/useToasts";
 
 const emailRegex =
   /^[a-zA-Z0-9_+&*-]+(?:\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,15}$/;
+const uuidRegex =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export const useAuthStore = defineStore("auth", () => {
   const API = useAPI();
@@ -121,12 +123,15 @@ export const useAuthStore = defineStore("auth", () => {
         // 200 - OK
         if (response.status === 200) {
           state.authenticationStatus = true;
-          if (getters.isGuest) {
+
+          if (uuidRegex.test(username) && username === password) {
             Cookies.set("_uuid", state.uuid, {
               expires: 365,
               secure: true,
               sameSite: "strict",
             });
+          } else {
+            state.uuid = "";
           }
         }
         navigateTo("/");
