@@ -45,7 +45,13 @@
           yourAutoPromoteCostFormatted
         }}</span>
         {{ lang("info.grapes") }}
-        <span v-if="yourRanker.autoPromote">({{ lang("info.active") }})</span>
+        <span
+          v-if="
+            yourRanker.autoPromote ||
+            ladderStore.state.types.has(LadderType.FREE_AUTO)
+          "
+          >({{ lang("info.active") }})</span
+        >
       </p>
       <p data-tutorial="vinegar">
         {{ yourFormattedVinegar }}/<span class="text-text-dark">{{
@@ -98,7 +104,7 @@ import { computed, onMounted, ref } from "vue";
 import FairButton from "../../components/interactables/FairButton.vue";
 import { useLang } from "~/composables/useLang";
 import { useOptionsStore } from "~/store/options";
-import { useLadderStore } from "~/store/ladder";
+import { LadderType, useLadderStore } from "~/store/ladder";
 import { Ranker } from "~/store/entities/ranker";
 import { useFormatter, useTimeFormatter } from "~/composables/useFormatter";
 import { useLadderUtils } from "~/composables/useLadderUtils";
@@ -178,12 +184,16 @@ const canBuyMulti = computed<boolean>(() => {
 const canBuyAutoPromote = computed<boolean>(() => {
   return (
     ladderUtils.getYourAutoPromoteCost.value.cmp(yourRanker.value.grapes) <=
-      0 && !yourRanker.value.autoPromote
+      0 &&
+    !yourRanker.value.autoPromote &&
+    !ladderStore.state.types.has(LadderType.FREE_AUTO)
   );
 });
 const canThrowVinegar = computed<boolean>(() => {
   return (
-    ladderUtils.getVinegarThrowCost.value.cmp(yourRanker.value.vinegar) <= 0
+    ladderUtils.getVinegarThrowCost.value.cmp(yourRanker.value.vinegar) <= 0 &&
+    ladderStore.state.rankers[0].growing &&
+    ladderUtils.isLadderUnlocked.value
   );
 });
 const canPromote = computed<boolean>(() => {

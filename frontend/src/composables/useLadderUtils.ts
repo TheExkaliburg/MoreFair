@@ -42,6 +42,13 @@ export const useLadderUtils = () => {
     return getPointsNeededToPromote(ladder.getters.yourRanker);
   });
 
+  const isLadderUnlocked = computed<boolean>(() => {
+    return (
+      ladder.state.rankers.length >= getMinimumPeopleForPromote.value &&
+      ladder.state.rankers[0].points.cmp(getMinimumPointsForPromote.value) >= 0
+    );
+  });
+
   function getPointsNeededToPromote(ranker: Ranker) {
     // If not enough Players -> Infinity
     if (ladder.state.rankers.length < 2 || ranker === undefined) {
@@ -157,6 +164,7 @@ export const useLadderUtils = () => {
     getMinimumPeopleForPromote,
     getVinegarThrowCost,
     canThrowVinegar,
+    isLadderUnlocked,
     getYourPointsNeededToPromote,
     getPointsNeededToPromote,
     canPromote,
