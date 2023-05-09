@@ -203,7 +203,8 @@ export const useLadderStore = defineStore("ladder", () => {
         yourRanker.vinegar = Object.freeze(
           yourRanker.vinegar.add(yourRanker.grapes.mul(deltaSeconds).floor())
         );
-      } else {
+      }
+      if (yourRanker.rank === 1 && ladderUtils.isLadderPromotable.value) {
         yourRanker.vinegar = Object.freeze(
           yourRanker.vinegar
             .mul(Decimal.pow(new Decimal(0.9975), deltaSeconds))
@@ -211,7 +212,10 @@ export const useLadderStore = defineStore("ladder", () => {
         );
       }
 
-      if (yourRanker.rank === state.rankers.length) {
+      if (
+        yourRanker.rank === state.rankers.length &&
+        state.rankers.length > 1
+      ) {
         yourRanker.grapes = Object.freeze(
           yourRanker.grapes.add(new Decimal(2))
         );

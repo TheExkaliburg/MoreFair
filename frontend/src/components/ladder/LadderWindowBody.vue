@@ -194,7 +194,7 @@ const canThrowVinegar = computed<boolean>(() => {
   return (
     ladderUtils.getVinegarThrowCost.value.cmp(yourRanker.value.vinegar) <= 0 &&
     ladderStore.state.rankers[0].growing &&
-    ladderUtils.isLadderUnlocked.value
+    ladderUtils.isLadderPromotable.value
   );
 });
 const canPromote = computed<boolean>(() => {

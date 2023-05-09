@@ -43,8 +43,12 @@ export const useLadderUtils = () => {
   });
 
   const isLadderUnlocked = computed<boolean>(() => {
+    return ladder.state.rankers.length >= getMinimumPeopleForPromote.value;
+  });
+
+  const isLadderPromotable = computed<boolean>(() => {
     return (
-      ladder.state.rankers.length >= getMinimumPeopleForPromote.value &&
+      isLadderUnlocked.value &&
       ladder.state.rankers[0].points.cmp(getMinimumPointsForPromote.value) >= 0
     );
   });
@@ -167,7 +171,7 @@ export const useLadderUtils = () => {
     getMinimumPeopleForPromote,
     getVinegarThrowCost,
     canThrowVinegar,
-    isLadderUnlocked,
+    isLadderPromotable,
     getYourPointsNeededToPromote,
     getPointsNeededToPromote,
     canPromote,
