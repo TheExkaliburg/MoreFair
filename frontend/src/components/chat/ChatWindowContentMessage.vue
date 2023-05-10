@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col w-full">
+  <div ref="el" class="flex flex-col w-full">
     <div class="flex flex-row text-sm justify-between pr-3">
       <span class="text-text-light truncate basis-5/8">
         <font-awesome-icon
@@ -41,11 +41,18 @@ import { useChatStore } from "~/store/chat";
 const optionsStore = useOptionsStore();
 const chatStore = useChatStore();
 
-const props = defineProps({
-  message: {
-    type: Message,
-    required: true,
-  },
+const props = defineProps<{ message: Message; index: number }>();
+
+const el = ref<null | HTMLElement>(null);
+
+const isLastMessage = computed<boolean>(() => {
+  return props.index === chatStore.state.messages.length - 1;
+});
+
+onMounted(() => {
+  if (isLastMessage.value) {
+    el.value?.scrollIntoView();
+  }
 });
 
 function mention() {

@@ -7,14 +7,17 @@
 <script lang="ts" setup>
 /*
 
-// Can be done after the fairtest test-run
-- TODO: Look at chat auto-scrolling down
+// Pages
 - TODO: Mod-Page, and options for mods
 - TODO: Theme-Selector and customThemes
 - TODO: Add Changelog back
-- TODO: Add new Backend-Testcases for authentication (100% coverage)
+
+// QoL
 - TODO: add follow own ranker option
 - TODO: click to mention in chat should add the mention at the place of the cursor
+
+// Backend
+- TODO: Add new Backend-Testcases for authentication (100% coverage)
 
 // If im feeling funny but will probably only get done after rework is finished
 - TODO: Statistics

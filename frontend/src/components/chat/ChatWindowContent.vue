@@ -4,8 +4,9 @@
   >
     <div class="h-4 w-full lg:hidden">&nbsp;</div>
     <ChatWindowContentMessage
-      v-for="m in chatStore.state.messages"
+      v-for="(m, i) in chatStore.state.messages"
       :key="m"
+      :index="i"
       :message="m"
       class="py-1"
     />
