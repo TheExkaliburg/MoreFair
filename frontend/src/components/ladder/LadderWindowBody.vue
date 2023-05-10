@@ -201,7 +201,9 @@ const canPromote = computed<boolean>(() => {
   return (
     ladderUtils.getYourPointsNeededToPromote.value.cmp(
       yourRanker.value.points
-    ) <= 0
+    ) <= 0 &&
+    yourRanker.value.growing &&
+    ladderUtils.isLadderPromotable.value
   );
 });
 const promoteLabel = computed<string>(() => {
