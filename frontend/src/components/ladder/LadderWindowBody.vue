@@ -2,7 +2,7 @@
   <div class="flex flex-col w-full 2xl:w-1/2 2xl:self-end relative">
     <LockClosedIcon
       v-if="optionsStore.state.ladder.lockButtons.value"
-      class="absolute w-24 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 text-text-light opacity-70"
+      class="absolute w-24 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 text-text-light opacity-50"
     />
     <div
       class="flex flex-row text-xs lg:text-sm w-full justify-between text-text-light"
