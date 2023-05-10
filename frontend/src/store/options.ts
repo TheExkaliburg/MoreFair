@@ -1,14 +1,12 @@
 import { defineStore } from "pinia";
-import { deepMerge } from "@antfu/utils";
-import { StorageSerializers, useStorage } from "@vueuse/core";
 import {
   BooleanOption,
   EditableStringListOption,
   EnumOption,
-  ObjectFunctions,
   OptionsGroup,
   RangeOption,
 } from "./entities/option";
+import { useLocalStorage } from "~/composables/useLocalStorage";
 
 export const enum EtaColorType {
   OFF = "Off",
@@ -57,53 +55,11 @@ const defaultValues = {
   }),
 };
 
+const optionsStorage = useLocalStorage("options", defaultValues);
+
 export const useOptionsStore = defineStore("options", () => {
-  const initialValues = {};
-  Object.assign(initialValues, defaultValues);
-  const cloneOfInitialValue = JSON.parse(JSON.stringify(initialValues));
-
-  const state = useStorage("options", initialValues, localStorage, {
-    serializer: {
-      read,
-      write,
-    },
-    mergeDefaults: (storageValue, defaultValue) =>
-      deepMerge(defaultValue, storageValue),
-  });
-
-  deleteOldValues(state.value, cloneOfInitialValue);
-
+  const state = optionsStorage;
   return {
-    state: state.value,
+    state,
   };
 });
-
-function deleteOldValues(state: any, defaults: any) {
-  Object.keys(state).forEach((key) => {
-    if (!(key in defaults) && !ObjectFunctions.includes(key)) {
-      delete state[key];
-    } else if (typeof state[key] === "object") {
-      deleteOldValues(state[key], defaults[key]);
-    }
-  });
-}
-
-function deleteEntriesWithKey(state: any, keys: string[]) {
-  Object.keys(state).forEach((key) => {
-    if (keys.includes(key)) {
-      delete state[key];
-    } else if (typeof state[key] === "object") {
-      deleteEntriesWithKey(state[key], keys);
-    }
-  });
-}
-
-function read(value: any) {
-  return StorageSerializers.object.read(value);
-}
-
-function write(value: any) {
-  const temp = JSON.parse(JSON.stringify(value));
-  deleteEntriesWithKey(temp, ["transient"]);
-  return StorageSerializers.object.write(temp);
-}

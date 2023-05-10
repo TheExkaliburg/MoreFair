@@ -22,16 +22,16 @@ useSeoMeta({
   title: "Options",
 });
 
+const optionsStore = useOptionsStore();
+
 const currentOptionsArray = computed(() => {
-  return Object.entries(options.state).map(([key, value]) => {
+  return Object.entries(optionsStore.state).map(([key, value]) => {
     return {
       key,
       value,
     };
   });
 });
-
-const options = useOptionsStore();
 </script>
 
 <style lang="scss"></style>
