@@ -1,5 +1,9 @@
 <template>
-  <div class="flex flex-col w-full 2xl:w-1/2 2xl:self-end">
+  <div class="flex flex-col w-full 2xl:w-1/2 2xl:self-end relative">
+    <LockClosedIcon
+      v-if="optionsStore.state.ladder.lockButtons.value"
+      class="absolute w-24 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 text-text-light opacity-70"
+    />
     <div
       class="flex flex-row text-xs lg:text-sm w-full justify-between text-text-light"
     >
@@ -23,18 +27,20 @@
       <FairButton
         :class="{ 'border-r-0': isMultiButtonDisabled }"
         :disabled="isMultiButtonDisabled"
-        class="w-full rounded-r-none"
+        class="w-full rounded-r-none whitespace-nowrap"
         data-tutorial="multi"
         @click="buyMulti"
-        >{{ multiButtonLabel }}
+      >
+        {{ multiButtonLabel }}
       </FairButton>
       <FairButton
         :class="{ 'border-l-1': isMultiButtonDisabled }"
         :disabled="isBiasButtonDisabled"
-        class="w-full rounded-l-none border-l-0"
+        class="w-full rounded-l-none border-l-0 whitespace-nowrap"
         data-tutorial="bias"
         @click="buyBias"
-        >{{ biasButtonLabel }}
+      >
+        {{ biasButtonLabel }}
       </FairButton>
     </div>
     <div
@@ -64,25 +70,28 @@
       <FairButton
         :class="{ 'border-r-0': isAutoPromoteButtonDisabled }"
         :disabled="isAutoPromoteButtonDisabled"
-        class="w-full rounded-r-none"
+        class="w-full rounded-r-none whitespace-nowrap"
         @click="buyAutoPromote"
-        >{{ lang("autopromote") }}
+      >
+        {{ lang("autopromote") }}
       </FairButton>
       <FairButton
         v-if="yourRanker.rank !== 1"
         :class="{ 'border-l-1': isAutoPromoteButtonDisabled }"
         :disabled="isVinegarButtonDisabled"
-        class="w-full rounded-l-none border-l-0"
+        class="w-full rounded-l-none border-l-0 whitespace-nowrap"
         @click="throwVinegar"
-        >{{ lang("vinegar") }}
+      >
+        {{ lang("vinegar") }}
       </FairButton>
       <FairButton
         v-else
         :class="{ 'border-l-1': isAutoPromoteButtonDisabled }"
         :disabled="isPromoteButtonDisabled"
-        class="w-full rounded-l-none border-l-0"
+        class="w-full rounded-l-none border-l-0 whitespace-nowrap"
         @click="promote"
-        >{{ promoteLabel }}
+      >
+        {{ promoteLabel }}
       </FairButton>
     </div>
     <div
@@ -101,6 +110,7 @@
 
 <script lang="ts" setup>
 import { computed, onMounted, ref } from "vue";
+import { LockClosedIcon } from "@heroicons/vue/24/outline";
 import FairButton from "../../components/interactables/FairButton.vue";
 import { useLang } from "~/composables/useLang";
 import { useOptionsStore } from "~/store/options";
