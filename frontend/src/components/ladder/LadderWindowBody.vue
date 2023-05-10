@@ -26,7 +26,7 @@
         class="w-full rounded-r-none"
         data-tutorial="multi"
         @click="buyMulti"
-        >+1 {{ lang("multi") }}
+        >{{ multiButtonLabel }}
       </FairButton>
       <FairButton
         :class="{ 'border-l-1': isMultiButtonDisabled }"
@@ -34,7 +34,7 @@
         class="w-full rounded-l-none border-l-0"
         data-tutorial="bias"
         @click="buyBias"
-        >+1 {{ lang("bias") }}
+        >{{ biasButtonLabel }}
       </FairButton>
     </div>
     <div
@@ -124,7 +124,9 @@ const isButtonLocked = computed<boolean>(() => {
 });
 
 const yourRanker = computed<Ranker>(() => {
-  return ladderStore.getters.yourRanker ?? new Ranker({ rank: 0 });
+  return (
+    ladderStore.getters.yourRanker ?? new Ranker({ rank: 0, growing: false })
+  );
 });
 const yourTimeToPromotion = computed<string>(() => {
   return useTimeFormatter(useEta(yourRanker.value).toPromote());
@@ -136,6 +138,24 @@ const yourPercentageToPromotion = computed<string>(() => {
       .mul(100)
       .div(ladderUtils.getYourPointsNeededToPromote.value)
   );
+});
+
+const biasButtonLabel = computed<string>(() => {
+  if (canBuyBias.value) return `+1 ${lang("bias")}`;
+
+  const eta = useEta(yourRanker.value).toPoints(
+    ladderUtils.getYourBiasCost.value
+  );
+  return `+${lang("bias_short")} (${useTimeFormatter(eta)})`;
+});
+
+const multiButtonLabel = computed<string>(() => {
+  if (canBuyMulti.value) return `+1 ${lang("multi")}`;
+
+  const eta = useEta(yourRanker.value).toPower(
+    ladderUtils.getYourMultiCost.value
+  );
+  return `+${lang("multi_short")} (${useTimeFormatter(eta)})`;
 });
 
 const yourFormattedMulti = computed<string>(() => {

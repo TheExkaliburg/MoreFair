@@ -29,7 +29,9 @@ components:
       powerGain: Power-Gain
     buttons:
       multi: Multi
+      multi_short: M
       bias: Bias
+      bias_short: B
       autopromote: Buy Autopromote
       vinegar: Throw all Vinegar
       promote: Promote
@@ -122,7 +124,6 @@ account:
     token: Token
     newPassword: New Password
     repeatPassword: Repeat Password
-
 zxcvbn:
   strength: Strength
 tour:
