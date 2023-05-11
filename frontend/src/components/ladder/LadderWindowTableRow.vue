@@ -93,8 +93,8 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from "vue";
-import { MaybeElement, useElementVisibility } from "@vueuse/core";
+import { computed, onMounted, onUpdated } from "vue";
+import { useElementVisibility } from "@vueuse/core";
 import { Ranker } from "~/store/entities/ranker";
 import { useFormatter, useTimeFormatter } from "~/composables/useFormatter";
 import { useEta } from "~/composables/useEta";
@@ -115,7 +115,7 @@ const ladderStore = useLadderStore();
 const optionsStore = useOptionsStore();
 const ladderUtils = useLadderUtils();
 
-const el = ref<MaybeElement>();
+const el = ref<HTMLElement | null>();
 const isVisible = useElementVisibility(el.value);
 
 const isYou = computed(
@@ -223,6 +223,16 @@ const etaPercentage = computed<number>(() => {
   }
 
   return -gradientPercent;
+});
+
+onMounted(() => {
+  if (isYou.value && optionsStore.state.ladder.followOwnRanker.value)
+    el.value?.scrollIntoView();
+});
+
+onUpdated(() => {
+  if (isYou.value && optionsStore.state.ladder.followOwnRanker.value)
+    el.value?.scrollIntoView();
 });
 </script>
 

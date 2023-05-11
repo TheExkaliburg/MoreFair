@@ -20,7 +20,6 @@ const defaultValues = {
   }),
   ladder: new OptionsGroup({
     showEta: new BooleanOption(true),
-    // followOwnRanker: new BooleanOption(false),
     etaColors: new EnumOption(EtaColorType.OFF, [
       EtaColorType.OFF,
       EtaColorType.COLORS,
@@ -28,6 +27,7 @@ const defaultValues = {
     ]),
     showBiasAndMulti: new BooleanOption(true),
     showPowerGain: new BooleanOption(true),
+    followOwnRanker: new BooleanOption(false),
     hidePromotedPlayers: new BooleanOption(false),
     hideVinegarAndGrapes: new BooleanOption(false),
     lockButtons: new BooleanOption(false),
