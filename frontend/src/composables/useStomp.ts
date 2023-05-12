@@ -4,7 +4,6 @@ import { AccountEventType, useAccountStore } from "~/store/account";
 import { useChatStore } from "~/store/chat";
 import { RoundEventType } from "~/store/round";
 import { LadderEventType } from "~/store/ladder";
-import { useAuthStore } from "~/store/authentication";
 
 export type OnTickBody = {
   delta: number;
@@ -67,6 +66,9 @@ const isDevMode = process.env.NODE_ENV !== "production";
 const connection = isDevMode
   ? "ws://localhost:8080/socket/fair"
   : `wss://${window.location.host}/socket/fair`;
+const disconnectMessage =
+  "You have been disconnected from the server, this could be because of a restart or an update. Please try reconnecting in a few minutes or try Discord if you cannot connect at all anymore.";
+const reconnectTimeout = 1 * 60 * 1000;
 
 const subscribedChannel = {
   ladder: {} as StompSubscription,
@@ -79,7 +81,7 @@ const client = new Client({
     // eslint-disable-next-line no-console
     if (isDevMode) console.debug(str);
   },
-  reconnectDelay: 5000,
+  reconnectDelay: 0,
   heartbeatIncoming: 4000,
   heartbeatOutgoing: 4000,
 });
@@ -146,20 +148,29 @@ function connectPrivateChannel(uuid: string) {
 
 client.onStompError = (_) => {
   isPrivateConnectionEstablished = false;
-  useAuthStore()
-    .actions.getAuthenticationStatus()
-    .then(() => {
-      if (!useAuthStore().state.authenticationStatus) {
-        reset();
-      }
-    });
+  useToasts(disconnectMessage, { type: "error" });
+  useChatStore().actions.addSystemMessage(disconnectMessage);
+  setTimeout(() => {
+    window.location.reload();
+  }, reconnectTimeout);
 };
+
+client.onWebSocketClose(() => {
+  isPrivateConnectionEstablished = false;
+  useToasts(disconnectMessage, { type: "error" });
+  useChatStore().actions.addSystemMessage(disconnectMessage);
+  setTimeout(() => {
+    window.location.reload();
+  }, reconnectTimeout);
+});
 
 client.onDisconnect = (_) => {
   isPrivateConnectionEstablished = false;
-  useChatStore().actions.addSystemMessage(
-    "You have been disconnected from the server, this could be because of a restart or an update. Please try reconnecting in a few minutes or try Discord if you cannot connect at all anymore."
-  );
+
+  useChatStore().actions.addSystemMessage(disconnectMessage);
+  setTimeout(() => {
+    window.location.reload();
+  }, reconnectTimeout);
 };
 
 function reset() {

@@ -13,7 +13,6 @@
 - TODO: Add Changelog back
 
 // QoL
-- TODO: add follow own ranker option
 - TODO: click to mention in chat should add the mention at the place of the cursor
 
 // Backend

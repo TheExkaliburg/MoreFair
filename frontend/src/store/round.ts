@@ -6,9 +6,6 @@ import {
   RoundSettingsData,
 } from "~/store/entities/roundSettings";
 import { OnRoundEventBody, useStomp } from "~/composables/useStomp";
-import { useChatStore } from "~/store/chat";
-import { useLadderStore } from "~/store/ladder";
-import { useAccountStore } from "~/store/account";
 import { useToasts } from "~/composables/useToasts";
 
 export enum RoundType {
@@ -96,20 +93,11 @@ export const useRoundStore = defineStore("round", () => {
         break;
       case RoundEventType.RESET:
         isInitialized.value = false;
+        useToasts(
+          "Chad was successful in turning back the time, the only thing left from this future is a mark on the initiates that helped in the final ritual.",
+          { autoClose: false }
+        );
         useStomp().reset();
-        setTimeout(() => {
-          useAccountStore()
-            .actions.reset()
-            .then(() => {
-              useRoundStore().actions.reset();
-              useChatStore().actions.reset();
-              useLadderStore().actions.reset();
-            });
-          useToasts(
-            "Chad was successful in turning back the time, the only thing left from this future is a mark on the initiates that helped in the final ritual.",
-            { autoClose: false }
-          );
-        }, 6000); // 1 sec more than the reconnect-timer of the stomp client
         break;
       default:
         console.error("Unknown event type", event);

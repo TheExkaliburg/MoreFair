@@ -198,7 +198,7 @@ export const useLadderStore = defineStore("ladder", () => {
     }
 
     const yourRanker = getters.yourRanker;
-    if (yourRanker !== undefined) {
+    if (yourRanker !== undefined && yourRanker.growing) {
       if (yourRanker.rank !== 1) {
         yourRanker.vinegar = Object.freeze(
           yourRanker.vinegar.add(yourRanker.grapes.mul(deltaSeconds).floor())
