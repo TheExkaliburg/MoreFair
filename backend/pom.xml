@@ -215,6 +215,20 @@
       <scope>test</scope>
       <version>1.24.0</version>
     </dependency>
+    <!--dependency>
+      <artifactId>spring-boot-starter-security</artifactId>
+      <groupId>org.springframework.boot</groupId>
+    </dependency-->
+    <dependency>
+      <artifactId>spring-security-crypto</artifactId>
+      <groupId>org.springframework.security</groupId>
+      <version>6.0.3</version>
+    </dependency>
+    <dependency>
+      <artifactId>bcpkix-jdk15on</artifactId>
+      <groupId>org.bouncycastle</groupId>
+      <version>1.70</version>
+    </dependency>
   </dependencies>
 
   <modelVersion>4.0.0</modelVersion>

@@ -82,7 +82,7 @@ public class GameController {
       if (account.isMod()
           || number.equals(roundUtils.getAssholeLadderNumber(roundService.getCurrentRound()))
           || number <= ranker.getLadder().getNumber()) {
-        LadderDto l = new LadderDto(ladderService.find(number), account, config);
+        LadderDto l = new LadderDto(ladderService.findInCache(number), account, config);
         wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION, l);
       } else {
         wsUtils.convertAndSendToUser(sha, QUEUE_INIT_DESTINATION,
