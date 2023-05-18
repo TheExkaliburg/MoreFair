@@ -542,14 +542,16 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
               newRanker.getVinegar().multiply(BigInteger.valueOf(12)).divide(BigInteger.TEN));
         }
 
-        BigInteger autoPromoteCost = config.getBaseGrapesToBuyAutoPromote();
-
+        BigInteger autoPromoteCostForReward = config.getBaseGrapesToBuyAutoPromote();
+        if(currentRound.getTypes().contains(RoundType.CLIMBER)) {
+          autoPromoteCostForReward = autoPromoteCostForReward.multiply(BigInteger.valueOf(3L));
+        }
         if (newLadder.getRankers().size() <= 3) {
-          newRanker.setGrapes(newRanker.getGrapes().add(autoPromoteCost));
+          newRanker.setGrapes(newRanker.getGrapes().add(autoPromoteCostForReward));
         } else if (newLadder.getRankers().size() <= 5) {
-          newRanker.setGrapes(newRanker.getGrapes().add(autoPromoteCost.divide(BigInteger.TWO)));
+          newRanker.setGrapes(newRanker.getGrapes().add(autoPromoteCostForReward.divide(BigInteger.TWO)));
         } else if (newLadder.getRankers().size() <= currentRound.getBaseAssholeLadder()) {
-          newRanker.setGrapes(newRanker.getGrapes().add(autoPromoteCost.divide(BigInteger.TEN)));
+          newRanker.setGrapes(newRanker.getGrapes().add(autoPromoteCostForReward.divide(BigInteger.TEN)));
         }
 
         // Create new Chat if it doesn't exist

@@ -18,6 +18,7 @@ public class RoundTypeBuilder {
   private final Map<RoundType, Float> roundSpeedTypeWeights = new HashMap<>();
   private final Map<RoundType, Float> roundAutoTypeWeights = new HashMap<>();
   private final Map<RoundType, Float> roundChaosTypeWeights = new HashMap<>();
+  private final Map<RoundType,Float> roundGrapesTypeWeights = new HashMap<>();
 
   @Setter
   @Accessors(chain = true)
@@ -37,6 +38,11 @@ public class RoundTypeBuilder {
 
     roundChaosTypeWeights.put(RoundType.CHAOS, 10.f);
     roundChaosTypeWeights.put(RoundType.DEFAULT, 90.f);
+
+    roundGrapesTypeWeights.put(RoundType.FARMER,10.f);
+    roundGrapesTypeWeights.put(RoundType.CHOO_CHOO,10.f);
+    roundAutoTypeWeights.put(RoundType.CLIMBER,10.f);
+    roundAutoTypeWeights.put(RoundType.DEFAULT,70.f);
   }
 
   // TODO: add reference to last Round into this method
@@ -71,6 +77,7 @@ public class RoundTypeBuilder {
       roundTypes.add(getRandomLadderType(roundSpeedTypeWeights, "Speed"));
       roundTypes.add(getRandomLadderType(roundAutoTypeWeights, "Auto"));
       roundTypes.add(getRandomLadderType(roundChaosTypeWeights, "Chaos"));
+      roundTypes.add(getRandomLadderType(roundGrapesTypeWeights,"Grapes"));
       if (roundTypes.size() > 1) {
         roundTypes.remove(RoundType.DEFAULT);
       }

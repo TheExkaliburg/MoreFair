@@ -180,7 +180,11 @@ public class LadderCalculator {
             RankerEntity temp = rankers.get(j);
             temp.setRank(j + 2);
             if (temp.isGrowing() && temp.getMultiplier() > 1) {
-              temp.setGrapes(temp.getGrapes().add(BigInteger.ONE));
+              if(roundService.getCurrentRound().getTypes().contains(RoundType.CHOO_CHOO)) {
+                temp.setGrapes(temp.getGrapes().add(BigInteger.valueOf(3L)));
+              } else {
+                temp.setGrapes(temp.getGrapes().add(BigInteger.ONE));
+              }
             }
             rankers.set(j + 1, temp);
 
@@ -197,7 +201,11 @@ public class LadderCalculator {
     if (rankers.size() >= 1) {
       RankerEntity lastRanker = rankers.get(rankers.size() - 1);
       if (lastRanker.isGrowing()) {
-        lastRanker.addGrapes(BigInteger.valueOf(2), delta);
+        if(roundService.getCurrentRound().getTypes().contains(RoundType.FARMER)) {
+          lastRanker.addGrapes(BigInteger.valueOf(5),delta);
+        } else {
+          lastRanker.addGrapes(BigInteger.valueOf(2), delta);
+        }
       }
     }
 

@@ -6,6 +6,17 @@ const versioningModule = {
     return {
       versions: [
         new Version(
+            "MINOR",
+            "New Round Modifiers, CHOO_CHOO, FARM, and CLIMBER",
+            {
+                features:[
+                    "CHOO_CHOO rounds give three grapes when passed by another ranker",
+                    "FARMER rounds give five grapes to the last place ranker",
+                    "CLIMBER rounds triple the reward from placing in ladders."
+                ]
+            }
+        ),
+        new Version(
           "PATCH",
           "Round Modifier impact the Round Base Point Requirement",
           {

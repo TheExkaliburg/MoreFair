@@ -89,8 +89,13 @@ export default {
 
             // Move other Ranker 1 Place down
             rankers[j].rank = j + 2;
-            if (rankers[j].growing && rankers[j].you && rankers[j].multi > 1)
-              rankers[j].grapes = rankers[j].grapes.add(new Decimal(1));
+            if (rankers[j].growing && rankers[j].you && rankers[j].multi > 1) {
+              if(state.settings.roundTypes.includes('CHOO_CHOO')) {
+                    rankers[j].grapes = rankers[j].grapes.add(new Decimal(3));
+              } else {
+                    rankers[j].grapes = rankers[j].grapes.add(new Decimal(1));
+              }
+            }
             rankers[j + 1] = rankers[j];
 
             // Move this Ranker 1 Place up
@@ -119,9 +124,14 @@ export default {
     if (rankers.length >= 1) {
       let index = rankers.length - 1;
       if (rankers[index].growing && rankers[index].you)
+      if(state.settings.roundTypes.includes('FARMER')) {
+        rankers[index].grapes = rankers[index].grapes.add(
+                  new Decimal(5).mul(delta).floor()
+      } else {}
         rankers[index].grapes = rankers[index].grapes.add(
           new Decimal(2).mul(delta).floor()
         );
+      }
     }
 
     rootState.hooks.onTick.forEach((fn) => fn({ delta: delta }));
