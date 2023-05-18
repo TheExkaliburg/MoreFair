@@ -5,13 +5,6 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
-        new Version("PATCH", "FREE_AUTO formula change", {
-          balancing: [
-            "SLOW and FAST no longer impact how close the FREE_AUTO gets applied to ladders",
-            "FREE_AUTO now applies to the ladder = floor(topLadder / 2) - 2",
-            "This might not apply instantly, but only once the next ranker promotes into a corresponding ladder",
-          ],
-        }),
         new Version(
             "MINOR",
             "New Round Modifiers, CHOO_CHOO, FARM, and CLIMBER",
@@ -23,6 +16,13 @@ const versioningModule = {
                 ]
             }
         ),
+        new Version("PATCH", "FREE_AUTO formula change", {
+          balancing: [
+            "SLOW and FAST no longer impact how close the FREE_AUTO gets applied to ladders",
+            "FREE_AUTO now applies to the ladder = floor(topLadder / 2) - 2",
+            "This might not apply instantly, but only once the next ranker promotes into a corresponding ladder",
+          ],
+        }),
         new Version(
           "PATCH",
           "Round Modifier impact the Round Base Point Requirement",
