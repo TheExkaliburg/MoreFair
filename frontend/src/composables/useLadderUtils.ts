@@ -138,7 +138,7 @@ function getAutoPromoteCost(rank: number): Decimal {
   if (ladder.state.types.has(LadderType.NO_AUTO)) return new Decimal(Infinity);
 
   const minPeople = getMinimumPeopleForPromote.value;
-  const divisor = Math.max(rank, minPeople + 1, 1);
+  const divisor = Math.max(rank - minPeople + 1, 1);
   return round.state.settings.baseGrapesNeededToAutoPromote
     .div(new Decimal(divisor))
     .floor();
