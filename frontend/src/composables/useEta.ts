@@ -4,9 +4,9 @@ import { useLadderStore } from "~/store/ladder";
 import { useLadderUtils } from "~/composables/useLadderUtils";
 import { useStomp } from "~/composables/useStomp";
 
-const etaRankerCache = new Map<Ranker, Map<Ranker, number>>();
-const etaPointsCache = new Map<Ranker, Map<Decimal, number>>();
-const etaPowerCache = new Map<Ranker, Map<Decimal, number>>();
+const etaRankerCache = new Map<number, Map<number, number>>();
+const etaPointsCache = new Map<number, Map<Decimal, number>>();
+const etaPowerCache = new Map<number, Map<Decimal, number>>();
 
 const stomp = useStomp();
 stomp.addCallback(stomp.callbacks.onTick, "fair_eta_cache_reset", resetCache);
@@ -35,15 +35,15 @@ export const useEta = (ranker: Ranker) => {
   const ladderUtils = useLadderUtils();
 
   function toRanker(target: Ranker): number {
-    let cachedMap = etaRankerCache.get(ranker);
+    let cachedMap = etaRankerCache.get(ranker.accountId);
     if (cachedMap !== undefined) {
-      const cachedValue = cachedMap.get(target);
+      const cachedValue = cachedMap.get(target.accountId);
       if (cachedValue !== undefined) {
         return cachedValue;
       }
     } else {
-      cachedMap = new Map<Ranker, number>();
-      etaRankerCache.set(ranker, cachedMap);
+      cachedMap = new Map<number, number>();
+      etaRankerCache.set(ranker.accountId, cachedMap);
     }
 
     if (!ranker.growing && !target.growing) return Infinity;
@@ -67,13 +67,13 @@ export const useEta = (ranker: Ranker) => {
     const result = solveQuadratic(accDiff, speedDiff, pointsDiff).toNumber();
 
     // saving the value in both maps (target -> ranker and ranker -> target)
-    cachedMap.set(target, result);
-    cachedMap = etaRankerCache.get(target);
+    cachedMap.set(target.accountId, result);
+    cachedMap = etaRankerCache.get(target.accountId);
     if (cachedMap === undefined) {
-      cachedMap = new Map<Ranker, number>();
-      etaRankerCache.set(target, cachedMap);
+      cachedMap = new Map<number, number>();
+      etaRankerCache.set(target.accountId, cachedMap);
     }
-    cachedMap.set(ranker, result);
+    cachedMap.set(ranker.accountId, result);
 
     return result;
   }
@@ -81,13 +81,13 @@ export const useEta = (ranker: Ranker) => {
   function toPoints(target: Decimal): number {
     if (target.cmp(ranker.points) <= 0) return 0;
 
-    let cachedMap = etaPointsCache.get(ranker);
+    let cachedMap = etaPointsCache.get(ranker.accountId);
     if (cachedMap !== undefined) {
       const cachedValue = cachedMap.get(target);
       if (cachedValue !== undefined) return cachedValue;
     } else {
       cachedMap = new Map<Decimal, number>();
-      etaPointsCache.set(ranker, cachedMap);
+      etaPointsCache.set(ranker.accountId, cachedMap);
     }
 
     // We are looking where the number is on the ladder and what the rank would be there, then we set that as target rank
@@ -116,13 +116,13 @@ export const useEta = (ranker: Ranker) => {
   }
 
   function toPower(target: Decimal): number {
-    let cachedMap = etaPowerCache.get(ranker);
+    let cachedMap = etaPowerCache.get(ranker.accountId);
     if (cachedMap !== undefined) {
       const cachedValue = cachedMap.get(target);
       if (cachedValue !== undefined) return cachedValue;
     } else {
       cachedMap = new Map<Decimal, number>();
-      etaPowerCache.set(ranker, cachedMap);
+      etaPowerCache.set(ranker.accountId, cachedMap);
     }
 
     const result = target
