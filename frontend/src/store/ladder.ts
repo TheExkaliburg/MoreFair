@@ -147,7 +147,7 @@ export const useLadderStore = defineStore("ladder", () => {
     const wasFirst = getters.yourRanker?.rank === 1;
 
     handleEvents();
-    state.events = [];
+    state.events.length = 0;
 
     const delta = new Decimal(deltaSeconds);
     state.rankers.sort((a, b) => b.points.cmp(a.points));
