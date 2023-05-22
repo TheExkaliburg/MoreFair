@@ -1,6 +1,7 @@
 import { defineNuxtConfig } from "nuxt/config";
 
 export default defineNuxtConfig({
+  dev: false,
   css: [
     "virtual:windi.css",
     "virtual:windi-devtools",
