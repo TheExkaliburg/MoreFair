@@ -4,18 +4,19 @@ import zxcvbnEnPackage from "@zxcvbn-ts/language-en";
 import { computed, Ref } from "vue";
 import { FeedbackType, OptionsType } from "@zxcvbn-ts/core/dist/types";
 
-export const useZxcvbn = (password: Ref<string> | string) => {
-  const lang = useLang("zxcvbn");
-  const options: OptionsType = {
-    translations: zxcvbnEnPackage.translations,
-    graphs: zxcvbnCommonPackage.adjacencyGraphs,
-    dictionary: {
-      ...zxcvbnCommonPackage.dictionary,
-      ...zxcvbnEnPackage.dictionary,
-    },
-  };
-  zxcvbnOptions.setOptions(options);
+const lang = useLang("zxcvbn");
 
+const options: OptionsType = {
+  translations: zxcvbnEnPackage.translations,
+  graphs: zxcvbnCommonPackage.adjacencyGraphs,
+  dictionary: {
+    ...zxcvbnCommonPackage.dictionary,
+    ...zxcvbnEnPackage.dictionary,
+  },
+};
+zxcvbnOptions.setOptions(options);
+
+export const useZxcvbn = (password: Ref<string> | string) => {
   if (typeof password === "string") {
     return computed<{
       score: number;

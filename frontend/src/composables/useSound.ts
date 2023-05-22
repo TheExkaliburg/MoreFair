@@ -31,5 +31,5 @@ export const useSound = (soundName: string) => {
     return sound.play();
   }
 
-  return { play };
+  return { play, sound };
 };
