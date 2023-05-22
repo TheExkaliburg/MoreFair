@@ -1,41 +1,29 @@
-import { zxcvbn, zxcvbnOptions } from "@zxcvbn-ts/core";
-import zxcvbnCommonPackage from "@zxcvbn-ts/language-common";
-import zxcvbnEnPackage from "@zxcvbn-ts/language-en";
-import { computed, Ref } from "vue";
-import { FeedbackType, OptionsType } from "@zxcvbn-ts/core/dist/types";
+import { zxcvbnAsync, zxcvbnOptions } from "@zxcvbn-ts/core";
+import { OptionsType } from "@zxcvbn-ts/core/dist/types";
 
 const lang = useLang("zxcvbn");
+let isInitialized = false;
 
-const options: OptionsType = {
-  translations: zxcvbnEnPackage.translations,
-  graphs: zxcvbnCommonPackage.adjacencyGraphs,
-  dictionary: {
-    ...zxcvbnCommonPackage.dictionary,
-    ...zxcvbnEnPackage.dictionary,
-  },
-};
-zxcvbnOptions.setOptions(options);
+async function setOptions() {
+  const common = (await import("@zxcvbn-ts/language-common")).default;
+  const en = (await import("@zxcvbn-ts/language-en")).default;
+  const options: OptionsType = {
+    dictionary: {
+      ...common.dictionary,
+      ...en.dictionary,
+    },
+    graphs: common.adjacencyGraphs,
+    useLevenshteinDistance: true,
+    translations: en.translations,
+  };
+  zxcvbnOptions.setOptions(options);
+  isInitialized = true;
+}
 
-export const useZxcvbn = (password: Ref<string> | string) => {
-  if (typeof password === "string") {
-    return computed<{
-      score: number;
-      feedback: FeedbackType;
-      toString: string;
-    }>(() => {
-      const result = zxcvbn(password);
-      const { score, feedback } = result;
-      return { score, feedback, toString: `${lang("strength")}: ${score}` };
-    });
-  }
+export const useZxcvbn = async (password: string) => {
+  if (password.length > 0 && !isInitialized) await setOptions();
 
-  return computed<{
-    score: number;
-    feedback: FeedbackType;
-    toString: string;
-  }>(() => {
-    const result = zxcvbn(password.value);
-    const { score, feedback } = result;
-    return { score, feedback, toString: `${lang("strength")}: ${score}` };
-  });
+  const result = await zxcvbnAsync(password);
+  const { score, feedback } = result;
+  return { score, feedback, toString: `${lang("strength")}: ${score}` };
 };

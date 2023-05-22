@@ -6,13 +6,21 @@ export const SOUNDS = {
   GOT_FIRST: "gotFirst",
 };
 
-const audios: any = {
-  promotion: new Audio("/sounds/promotion.wav"),
-  mention: new Audio("/sounds/mention.wav"),
-  gotFirst: new Audio("/sounds/gotFirst.wav"),
-};
+let audios: any;
+let isInitialized = false;
+
+function initialize() {
+  audios = {
+    promotion: new Audio("/sounds/promotion.wav"),
+    mention: new Audio("/sounds/mention.wav"),
+    gotFirst: new Audio("/sounds/gotFirst.wav"),
+  };
+  isInitialized = true;
+}
 
 export const useSound = (soundName: string) => {
+  if (!isInitialized) initialize();
+
   let sound: HTMLAudioElement = audios[soundName];
   if (!sound) {
     sound = audios.mention;

@@ -36,7 +36,7 @@
         required
         type="password"
       />
-      <div>{{ zxcvbn.toString }}</div>
+      <div>{{ strength }}</div>
       <FairButton
         :class="{ 'cursor-wait': isSubmitting }"
         :disabled="!canSubmit || isSubmitting"
@@ -49,6 +49,8 @@
 </template>
 
 <script lang="ts" setup>
+import { watch } from "vue";
+import { debounce } from "@zxcvbn-ts/core";
 import FairDialog from "@/components/interactables/FairDialog.vue";
 import FairInput from "~/components/interactables/FairInput.vue";
 import { useZxcvbn } from "~/composables/useZxcvbn";
@@ -64,7 +66,18 @@ const lang = useLang("account.linkAccount");
 const email = ref<string>("");
 const password = ref<string>("");
 const repeatedPassword = ref<string>("");
-const zxcvbn = useZxcvbn(password);
+
+const strength = ref<string>((await useZxcvbn("")).toString);
+watch(
+  () => password.value,
+  debounce(
+    async (value) => {
+      strength.value = (await useZxcvbn(value)).toString;
+    },
+    200,
+    false
+  )
+);
 
 const isSubmitting = ref<boolean>(false);
 

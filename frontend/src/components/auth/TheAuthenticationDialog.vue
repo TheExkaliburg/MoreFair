@@ -84,7 +84,7 @@
         type="password"
       />
       <div class="flex flex-row pt-1">
-        {{ zxcvbn.toString }}
+        {{ strength }}
       </div>
 
       <div class="flex flex-row pt-4">
@@ -107,7 +107,8 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
+import { debounce } from "@zxcvbn-ts/core";
 import { useZxcvbn } from "~/composables/useZxcvbn";
 import { useAuthStore } from "~/store/authentication";
 import FairDialog from "~/components/interactables/FairDialog.vue";
@@ -130,7 +131,18 @@ const rememberMe = ref<boolean>(false);
 const isWaiting = ref<boolean>(false);
 const openForgotPassword = ref<boolean>(false);
 
-const zxcvbn = useZxcvbn(password);
+const strength = ref<string>((await useZxcvbn("")).toString);
+watch(
+  () => password.value,
+  debounce(
+    async (value) => {
+      strength.value = (await useZxcvbn(value)).toString;
+    },
+    200,
+    false
+  )
+);
+
 const emit = defineEmits(["close"]);
 
 function signup() {

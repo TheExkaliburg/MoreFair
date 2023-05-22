@@ -72,7 +72,7 @@ export const useAuthStore = defineStore("auth", () => {
     if (getters.isGuest) return await upgradeGuest(email, password);
 
     if (!checkEmail(email)) return Promise.reject(new Error("Invalid email"));
-    if (!checkPassword(password))
+    if (!(await checkPassword(password)))
       return Promise.reject(new Error("Invalid password"));
 
     return await API.auth
@@ -91,7 +91,7 @@ export const useAuthStore = defineStore("auth", () => {
 
   async function upgradeGuest(email: string, password: string) {
     if (!checkEmail(email)) return Promise.reject(new Error("Invalid email"));
-    if (!checkPassword(password))
+    if (!(await checkPassword(password)))
       return Promise.reject(new Error("Invalid password"));
 
     if (!getters.isGuest)
@@ -181,7 +181,7 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   async function resetPassword(token: string, password: string) {
-    if (!checkPassword(password))
+    if (!(await checkPassword(password)))
       return Promise.reject(new Error("Invalid password"));
 
     return await API.auth
@@ -221,7 +221,7 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   async function changePassword(oldPassword: string, newPassword: string) {
-    if (!checkPassword(newPassword))
+    if (!(await checkPassword(newPassword)))
       return Promise.reject(new Error("Invalid password"));
 
     return await API.auth
@@ -276,7 +276,7 @@ export const useAuthStore = defineStore("auth", () => {
   };
 });
 
-function checkPassword(password: string): boolean {
+async function checkPassword(password: string): Promise<boolean> {
   if (password.length > 64) {
     useToasts("Password can only be 64 characters long", { type: "error" });
     return false;
@@ -288,11 +288,13 @@ function checkPassword(password: string): boolean {
     return false;
   }
 
-  const zxcvbn = useZxcvbn(password);
+  const zxcvbn = await useZxcvbn(password);
 
-  if (zxcvbn.value.score < 3) {
+  if (zxcvbn.score < 3) {
     useToasts(
-      `Password is too weak.\n\n${zxcvbn.value.feedback.warning}\n${zxcvbn.value.feedback.suggestions}`,
+      `Password is too weak.\n\n${
+        zxcvbn.feedback.warning
+      }\n\n${zxcvbn.feedback.suggestions.join("\n")}`,
       { type: "error" }
     );
     return false;

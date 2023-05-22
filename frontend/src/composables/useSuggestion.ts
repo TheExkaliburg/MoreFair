@@ -2,11 +2,11 @@ import { VueRenderer } from "@tiptap/vue-3";
 import { tippy } from "vue-tippy";
 import { PluginKey } from "prosemirror-state";
 import ChatWindowInputUserMentionList from "../components/chat/ChatWindowInputSuggestionList.vue";
-
-import emojiJson from "../assets/emoji.json";
 import { useLadderStore } from "~/store/ladder";
 import { useOptionsStore } from "~/store/options";
 import { Ranker } from "~/store/entities/ranker";
+
+const emojiJson = () => import("../assets/emoji.json");
 
 export type EmojiDataEntry = {
   emoji: string;
@@ -17,8 +17,6 @@ export type EmojiDataEntry = {
   unicode_version: string;
   ios_version: string;
 };
-
-const emojiData: EmojiDataEntry[] = emojiJson;
 
 const render = (format: Function) => () => {
   let component: any;
@@ -101,7 +99,8 @@ export const useUserSuggestion = () => {
 export const useEmojiSuggestion = () => {
   return {
     char: ":",
-    items: ({ query }: { query: string }) => {
+    items: async ({ query }: { query: string }) => {
+      const emojiData: EmojiDataEntry[] = (await emojiJson()).default;
       const queryLower = query.toLowerCase();
       if (queryLower.length < 2) return [];
       return emojiData.filter((item) => {

@@ -29,7 +29,7 @@
         required
         type="password"
       />
-      <div>{{ zxcvbn.toString }}</div>
+      <div>{{ strength }}</div>
       <FairButton
         :disabled="!canSubmitPasswords"
         class="mt-4 self-end"
@@ -41,6 +41,8 @@
 </template>
 
 <script lang="ts" setup>
+import { debounce } from "@zxcvbn-ts/core";
+import { watch } from "vue";
 import FairDialog from "~/components/interactables/FairDialog.vue";
 import FairInput from "~/components/interactables/FairInput.vue";
 import FairButton from "~/components/interactables/FairButton.vue";
@@ -66,7 +68,17 @@ const canSubmitPasswords = computed<boolean>(() => {
   );
 });
 
-const zxcvbn = useZxcvbn(newPassword);
+const strength = ref<string>((await useZxcvbn("")).toString);
+watch(
+  () => newPassword.value,
+  debounce(
+    async (value) => {
+      strength.value = (await useZxcvbn(value)).toString;
+    },
+    200,
+    false
+  )
+);
 
 function submit() {
   if (newPassword.value !== repeatPassword.value) {
