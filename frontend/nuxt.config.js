@@ -1,6 +1,7 @@
 import { defineNuxtConfig } from "nuxt/config";
 
 export default defineNuxtConfig({
+  dev: false,
   css: [
     "virtual:windi.css",
     "virtual:windi-devtools",
@@ -50,6 +51,15 @@ export default defineNuxtConfig({
     vueI18n: {
       legacy: false,
       fallbackLocale: "en",
+    },
+  },
+  vite: {
+    build: {
+      terserOptions: {
+        compress: false,
+        mangle: false,
+      },
+      sourcemap: true,
     },
   },
 });

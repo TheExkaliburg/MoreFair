@@ -229,7 +229,8 @@ export const useLadderStore = defineStore("ladder", () => {
   }
 
   function handleEvents() {
-    for (let i = 0; i < state.events.length; i++) {
+    const eventsLength = state.events.length;
+    for (let i = 0; i < eventsLength; i++) {
       const event = state.events[i];
       let ranker = state.rankers.find((r) => r.accountId === event.accountId);
       if (ranker === undefined && event.eventType === LadderEventType.JOIN)
