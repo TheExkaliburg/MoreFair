@@ -54,7 +54,7 @@ export default defineNuxtConfig({
   },
   vite: {
     build: {
-      minify: false,
+      // minify: false,
     },
   },
 });
