@@ -153,20 +153,20 @@ export const useLadderStore = defineStore("ladder", () => {
     state.rankers.sort((a, b) => b.points.cmp(a.points));
 
     for (let i = 0; i < state.rankers.length; i++) {
-      const ranker = new Ranker(state.rankers[i]);
-      state.rankers[i] = ranker;
-      ranker.rank = i + 1;
+      state.rankers[i].rank = i + 1;
 
       // If ranker still on ladder
-      if (ranker.growing) {
+      if (state.rankers[i].growing) {
         // Power & Points
-        if (ranker.rank !== 1) {
-          ranker.power = Object.freeze(
-            ranker.power.add(ranker.getPowerPerSecond().mul(delta)).floor()
+        if (state.rankers[i].rank !== 1) {
+          state.rankers[i].power = Object.freeze(
+            state.rankers[i].power
+              .add(state.rankers[i].getPowerPerSecond().mul(delta))
+              .floor()
           );
         }
-        ranker.points = Object.freeze(
-          ranker.points.add(ranker.power.mul(delta).floor())
+        state.rankers[i].points = Object.freeze(
+          state.rankers[i].points.add(state.rankers[i].power.mul(delta).floor())
         );
 
         for (let j = i - 1; j >= 0; j--) {
