@@ -52,7 +52,6 @@ export type LadderState = {
   number: number;
   types: Set<LadderType>;
   basePointsToPromote: Decimal;
-  events: OnLadderEventBody[];
 };
 
 export const useLadderStore = defineStore("ladder", () => {
@@ -69,8 +68,9 @@ export const useLadderStore = defineStore("ladder", () => {
     number: 1,
     types: new Set<LadderType>([LadderType.DEFAULT]),
     basePointsToPromote: new Decimal(0),
-    events: [],
   });
+  const ladderEvents: OnLadderEventBody[] = [];
+
   const getters = reactive({
     yourRanker: computed<Ranker | undefined>(() =>
       state.rankers.find((r) => r.accountId === accountStore.state.accountId)
@@ -108,11 +108,11 @@ export const useLadderStore = defineStore("ladder", () => {
       .getLadder(ladderNumber)
       .then((res) => {
         const data: LadderData = res.data;
-        state.rankers = [];
+        state.rankers.length = 0;
         data.rankers.forEach((ranker) => {
           state.rankers.push(new Ranker(ranker));
         });
-        state.types = new Set();
+        state.types.clear();
         data.types.forEach((s) => {
           state.types.add(s);
         });
@@ -123,7 +123,7 @@ export const useLadderStore = defineStore("ladder", () => {
           stomp.callbacks.onLadderEvent,
           "fair_ladder_events",
           (body) => {
-            state.events.push(body);
+            ladderEvents.push(body);
           }
         );
 
@@ -147,7 +147,7 @@ export const useLadderStore = defineStore("ladder", () => {
     const wasFirst = getters.yourRanker?.rank === 1;
 
     handleEvents();
-    state.events.length = 0;
+    ladderEvents.length = 0;
 
     const delta = new Decimal(deltaSeconds);
     state.rankers.sort((a, b) => b.points.cmp(a.points));
@@ -229,9 +229,9 @@ export const useLadderStore = defineStore("ladder", () => {
   }
 
   function handleEvents() {
-    const eventsLength = state.events.length;
+    const eventsLength = ladderEvents.length;
     for (let i = 0; i < eventsLength; i++) {
-      const event = state.events[i];
+      const event = ladderEvents[i];
       let ranker = state.rankers.find((r) => r.accountId === event.accountId);
       if (ranker === undefined && event.eventType === LadderEventType.JOIN)
         ranker = new Ranker({});

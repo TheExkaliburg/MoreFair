@@ -63,7 +63,7 @@ export const useRoundStore = defineStore("round", () => {
       .getCurrentRound()
       .then((res) => {
         const data: RoundData = res.data;
-        state.types = new Set();
+        state.types.clear();
         data.types.forEach((t) => state.types.add(t));
         state.assholeLadder = data.assholeLadder;
         state.autoPromoteLadder = data.autoPromoteLadder;
