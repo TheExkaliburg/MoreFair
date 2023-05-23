@@ -8,6 +8,8 @@ const etaRankerCache = new Map<number, Map<number, number>>();
 const etaPointsCache = new Map<number, Map<Decimal, number>>();
 const etaPowerCache = new Map<number, Map<Decimal, number>>();
 
+const computedTrigger = ref<number>(0);
+
 const stomp = useStomp();
 stomp.addCallback(stomp.callbacks.onTick, "fair_eta_cache_reset", resetCache);
 
@@ -15,6 +17,7 @@ function resetCache() {
   etaRankerCache.clear();
   etaPointsCache.clear();
   etaPowerCache.clear();
+  computedTrigger.value = 1 - computedTrigger.value;
 }
 
 function getPowerGainDifferenceToRank(
@@ -35,6 +38,13 @@ export const useEta = (ranker: Ranker) => {
   const ladderUtils = useLadderUtils();
 
   function toRanker(target: Ranker): number {
+    // To make the computed always check this value so it recalculates after a tick
+    if (computedTrigger.value === Infinity)
+      console.error("toRanker", ranker, target);
+
+    if (ranker.rank === 1) {
+      console.log(ranker, "toRanker", target);
+    }
     let cachedMap = etaRankerCache.get(ranker.accountId);
     if (cachedMap !== undefined) {
       const cachedValue = cachedMap.get(target.accountId);
@@ -74,11 +84,13 @@ export const useEta = (ranker: Ranker) => {
       etaRankerCache.set(target.accountId, cachedMap);
     }
     cachedMap.set(ranker.accountId, result);
-
     return result;
   }
 
   function toPoints(target: Decimal): number {
+    // To make the computed always check this value so it recalculates after a tick
+    if (computedTrigger.value === Infinity)
+      console.error("toPoints", ranker, target);
     if (target.cmp(ranker.points) <= 0) return 0;
 
     let cachedMap = etaPointsCache.get(ranker.accountId);
@@ -116,6 +128,9 @@ export const useEta = (ranker: Ranker) => {
   }
 
   function toPower(target: Decimal): number {
+    // To make the computed always check this value so it recalculates after a tick
+    if (computedTrigger.value === Infinity)
+      console.error("toPoints", ranker, target);
     let cachedMap = etaPowerCache.get(ranker.accountId);
     if (cachedMap !== undefined) {
       const cachedValue = cachedMap.get(target);
