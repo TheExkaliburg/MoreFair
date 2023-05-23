@@ -12,7 +12,7 @@
       <div class="min-w-min flex flex-col justify-items-start content-around">
         <BrandedSidebarToggle />
         <!--Leaving this spot free-->
-        <SidebarButton class="cursor-auto" />
+        <!--SidebarButton class="cursor-auto" /-->
       </div>
       <!--Bottom of the Canvas-->
       <div class="min-w-min flex flex-col justify-items-start content-around">
@@ -33,17 +33,16 @@
             </template>
           </SidebarButton>
         </NuxtLink>
-        <NuxtLink aria-label="Start Tutorial" @click="help">
-          <SidebarButton
-            :label="helpLabel"
-            aria-label="Start Tutorial"
-            data-tutorial="help"
-          >
-            <template #icon>
-              <QuestionMarkCircleIcon />
-            </template>
-          </SidebarButton>
-        </NuxtLink>
+        <SidebarButton
+          :label="helpLabel"
+          aria-label="Start Tutorial"
+          data-tutorial="help"
+          @click="help"
+        >
+          <template #icon>
+            <QuestionMarkCircleIcon />
+          </template>
+        </SidebarButton>
         <NuxtLink to="/rules" @click="close">
           <SidebarButton :label="lang('rules')" aria-label="Goto Rules Page">
             <template #icon>

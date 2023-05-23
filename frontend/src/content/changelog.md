@@ -1,3 +1,7 @@
+---
+description: 'A list of all changes made to the game'
+---
+
 # Changelog
 
 ## 2.3.0 [PATCH]: Frontend Redesign

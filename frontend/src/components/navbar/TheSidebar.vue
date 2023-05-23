@@ -34,17 +34,15 @@
               </template>
             </SidebarButton>
           </NuxtLink>
-          <NuxtLink
+          <SidebarButton
             v-tippy="{ content: lang('help'), placement: 'right' }"
             aria-label="Start Tutorial"
             @click="help"
           >
-            <SidebarButton aria-label="Start Tutorial">
-              <template #icon>
-                <QuestionMarkCircleIcon />
-              </template>
-            </SidebarButton>
-          </NuxtLink>
+            <template #icon>
+              <QuestionMarkCircleIcon />
+            </template>
+          </SidebarButton>
           <NuxtLink
             v-tippy="{ content: lang('rules'), placement: 'right' }"
             aria-label="Goto Rules Page"

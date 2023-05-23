@@ -1,3 +1,7 @@
+---
+description: 'The privacy policy of FairGame'
+---
+
 # Privacy Policy
 
 We are very delighted that you have shown interest in our enterprise. Data protection is of a particularly high priority

@@ -36,6 +36,7 @@ const uiStore = useUiStore();
 
 useSeoMeta({
   title: "FairGame",
+  description: "A Competitive Incremental Game around Ladders and Races",
 });
 
 useStomp();

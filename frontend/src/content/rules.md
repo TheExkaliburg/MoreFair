@@ -1,3 +1,7 @@
+---
+description: 'The community rules of FairGame'
+---
+
 # Rules
 
 Please follow the rules below to keep things fair and comfy:

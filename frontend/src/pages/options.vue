@@ -20,6 +20,7 @@ import { OptionsGroup } from "~/store/entities/option";
 
 useSeoMeta({
   title: "Options",
+  description: "Change your options",
 });
 
 const optionsStore = useOptionsStore();

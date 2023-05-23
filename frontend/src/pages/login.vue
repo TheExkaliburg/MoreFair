@@ -95,6 +95,7 @@ definePageMeta({ layout: "empty" });
 
 useSeoMeta({
   title: "FairGame",
+  description: "Login or Signup for FairGame",
 });
 
 const isLoginModalOpen = ref<boolean>(false);

@@ -88,6 +88,7 @@ import { useToasts } from "~/composables/useToasts";
 
 useSeoMeta({
   title: "Account",
+  description: "Manage your account",
 });
 
 const lang = useLang("account");
