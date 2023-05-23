@@ -245,7 +245,7 @@
     <dependency>
       <artifactId>spring-session-core</artifactId>
       <groupId>org.springframework.session</groupId>
-      <version>3.0.0</version>
+      <version>3.0.1</version>
     </dependency>
   </dependencies>
 
