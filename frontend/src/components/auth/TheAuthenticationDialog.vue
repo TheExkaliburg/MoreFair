@@ -27,12 +27,17 @@
       />
       <div class="flex flex-row w-full pt-1 justify-between">
         <div class="flex flex-row gap-2">
-          <span
+          <label
             class="cursor-pointer select-none"
+            for="rememberMe"
             @click="rememberMe = !rememberMe"
-            >{{ lang("login.rememberMe") }}:</span
+            >{{ lang("login.rememberMe") }}:</label
           >
-          <FairCheckboxInput v-model="rememberMe" :disabled="isWaiting" />
+          <FairCheckboxInput
+            id="rememberMe"
+            v-model="rememberMe"
+            :disabled="isWaiting"
+          />
         </div>
         <a href="#" @click="openForgotPassword = true"> Forgot Password?</a>
         <ForgotPasswordDialog

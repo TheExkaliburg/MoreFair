@@ -7,6 +7,7 @@
           <ToggleIconButton
             v-model="optionsStore.state.ladder.lockButtons.value"
             v-tippy="{ content: lang('lockButtons'), placement: 'bottom' }"
+            aria-label="lock buttons"
           >
             <template #icon>
               <LockClosedIcon />
@@ -18,6 +19,7 @@
           <ToggleIconButton
             v-model="uiStore.state.ladderEnabled"
             v-tippy="{ content: lang('enableLadder'), placement: 'bottom' }"
+            aria-label="enable ladder view"
           >
             <template #icon>
               <TableCellsIcon />
@@ -29,6 +31,7 @@
           <ToggleIconButton
             v-model="uiStore.state.chatEnabled"
             v-tippy="{ content: lang('enableChat'), placement: 'bottom' }"
+            aria-label="enable chat view"
           >
             <template #icon>
               <ChatBubbleLeftEllipsisIcon />

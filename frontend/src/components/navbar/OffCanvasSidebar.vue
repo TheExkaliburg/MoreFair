@@ -16,40 +16,51 @@
       </div>
       <!--Bottom of the Canvas-->
       <div class="min-w-min flex flex-col justify-items-start content-around">
-        <NuxtLink to="/account" @click="close">
-          <SidebarButton :label="lang('account')">
+        <NuxtLink aria-label="Goto Account Page" to="/account" @click="close">
+          <SidebarButton
+            :label="lang('account')"
+            aria-label="Goto Account Page"
+          >
             <template #icon>
               <UserCircleIcon />
             </template>
           </SidebarButton>
         </NuxtLink>
-        <NuxtLink to="/options" @click="close">
-          <SidebarButton :label="optionsLabel">
+        <NuxtLink aria-label="Goto Options Page" to="/options" @click="close">
+          <SidebarButton :label="optionsLabel" aria-label="Goto Options Page">
             <template #icon>
               <Cog8ToothIcon />
             </template>
           </SidebarButton>
         </NuxtLink>
-        <NuxtLink @click="help">
-          <SidebarButton :label="helpLabel" data-tutorial="help">
+        <NuxtLink aria-label="Start Tutorial" @click="help">
+          <SidebarButton
+            :label="helpLabel"
+            aria-label="Start Tutorial"
+            data-tutorial="help"
+          >
             <template #icon>
               <QuestionMarkCircleIcon />
             </template>
           </SidebarButton>
         </NuxtLink>
         <NuxtLink to="/rules" @click="close">
-          <SidebarButton :label="lang('rules')">
+          <SidebarButton :label="lang('rules')" aria-label="Goto Rules Page">
             <template #icon>
               <DocumentTextIcon />
             </template>
           </SidebarButton>
         </NuxtLink>
         <NuxtLink
+          aria-label="Goto Community Discord"
           target="_blank"
           to="https://discord.gg/ThKzCknfFr"
           @click="close"
         >
-          <SidebarButton :label="discordLabel">
+          <SidebarButton
+            :label="discordLabel"
+            aria-label="Goto Community Discord"
+          >
             <template #icon>
               <font-awesome-icon icon="fa-brands fa-discord" />
             </template>

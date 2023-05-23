@@ -14,9 +14,10 @@
         <div class="min-w-min flex flex-col justify-items-start content-around">
           <NuxtLink
             v-tippy="{ content: lang('account'), placement: 'right' }"
+            aria-label="Goto Account Page"
             to="/account"
           >
-            <SidebarButton>
+            <SidebarButton aria-label="Goto Account Page">
               <template #icon>
                 <UserCircleIcon />
               </template>
@@ -24,9 +25,10 @@
           </NuxtLink>
           <NuxtLink
             v-tippy="{ content: lang('options'), placement: 'right' }"
+            aria-label="Goto Options Page"
             to="/options"
           >
-            <SidebarButton>
+            <SidebarButton aria-label="Goto Options Page">
               <template #icon>
                 <Cog8ToothIcon />
               </template>
@@ -34,9 +36,10 @@
           </NuxtLink>
           <NuxtLink
             v-tippy="{ content: lang('help'), placement: 'right' }"
+            aria-label="Start Tutorial"
             @click="help"
           >
-            <SidebarButton>
+            <SidebarButton aria-label="Start Tutorial">
               <template #icon>
                 <QuestionMarkCircleIcon />
               </template>
@@ -44,9 +47,10 @@
           </NuxtLink>
           <NuxtLink
             v-tippy="{ content: lang('rules'), placement: 'right' }"
+            aria-label="Goto Rules Page"
             to="/rules"
           >
-            <SidebarButton>
+            <SidebarButton aria-label="Goto Rules Page">
               <template #icon>
                 <DocumentTextIcon />
               </template>
@@ -54,10 +58,11 @@
           </NuxtLink>
           <NuxtLink
             v-tippy="{ content: lang('discord'), placement: 'right' }"
+            aria-label="Goto Community Discord"
             target="_blank"
             to="https://discord.gg/ThKzCknfFr"
           >
-            <SidebarButton>
+            <SidebarButton aria-label="Goto Community Discord">
               <template #icon>
                 <font-awesome-icon icon="fa-brands fa-discord" />
               </template>
@@ -77,7 +82,7 @@ import {
   QuestionMarkCircleIcon,
   UserCircleIcon,
 } from "@heroicons/vue/24/outline";
-import { useLang } from "../../composables/useLang";
+import { useLang } from "~/composables/useLang";
 import SidebarButton from "~/components/navbar/SidebarButton.vue";
 import { useTutorialTour } from "~/composables/useTour";
 

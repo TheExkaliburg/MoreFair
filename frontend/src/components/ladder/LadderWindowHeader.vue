@@ -2,6 +2,7 @@
   <div class="flex flex-row justify-between items-center text-button-text">
     <div class="flex flex-row sm:gap-6">
       <ExtendedInformationModal
+        aria-label="ladder information"
         class="px-1 w-8 xl:invisible"
         title="Ladder Information"
       >

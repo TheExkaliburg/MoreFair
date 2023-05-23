@@ -41,6 +41,7 @@ export default defineNuxtConfig({
     locales: [
       {
         code: "en",
+        iso: "en-US",
         file: "en.yml",
       },
     ],

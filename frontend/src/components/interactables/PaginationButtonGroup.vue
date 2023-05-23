@@ -39,7 +39,11 @@
       &raquo;
     </PaginationButtonGroupButton>
     <Listbox>
-      <ListboxButton :disabled="max === 1" as="template">
+      <ListboxButton
+        :disabled="max === 1"
+        aria-label="dropdown-menu"
+        as="template"
+      >
         <PaginationButtonGroupButton
           class="w-1/6 border-l-0 rounded-r-md w-full flex justify-center items-center"
         >
