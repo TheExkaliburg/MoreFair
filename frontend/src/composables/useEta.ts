@@ -38,13 +38,10 @@ export const useEta = (ranker: Ranker) => {
   const ladderUtils = useLadderUtils();
 
   function toRanker(target: Ranker): number {
-    // To make the computed always check this value so it recalculates after a tick
+    // To make the computed always check this value, so it recalculates after a tick
     if (computedTrigger.value === Infinity)
       console.error("toRanker", ranker, target);
 
-    if (ranker.rank === 1) {
-      console.log(ranker, "toRanker", target);
-    }
     let cachedMap = etaRankerCache.get(ranker.accountId);
     if (cachedMap !== undefined) {
       const cachedValue = cachedMap.get(target.accountId);
@@ -88,7 +85,7 @@ export const useEta = (ranker: Ranker) => {
   }
 
   function toPoints(target: Decimal): number {
-    // To make the computed always check this value so it recalculates after a tick
+    // To make the computed always check this value, so it recalculates after a tick
     if (computedTrigger.value === Infinity)
       console.error("toPoints", ranker, target);
     if (target.cmp(ranker.points) <= 0) return 0;
@@ -128,7 +125,7 @@ export const useEta = (ranker: Ranker) => {
   }
 
   function toPower(target: Decimal): number {
-    // To make the computed always check this value so it recalculates after a tick
+    // To make the computed always check this value, so it recalculates after a tick
     if (computedTrigger.value === Infinity)
       console.error("toPoints", ranker, target);
     let cachedMap = etaPowerCache.get(ranker.accountId);
