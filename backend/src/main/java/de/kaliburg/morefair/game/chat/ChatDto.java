@@ -18,7 +18,7 @@ public class ChatDto {
     sortedMessages.sort((o1, o2) -> o2.getCreatedOn().compareTo(o1.getCreatedOn()));
     sortedMessages = sortedMessages.subList(0, Math.min(30, sortedMessages.size()));
     for (MessageEntity m : sortedMessages) {
-      messages.add(new MessageDto(m, config));
+      this.messages.add(new MessageDto(m, config));
     }
   }
 }

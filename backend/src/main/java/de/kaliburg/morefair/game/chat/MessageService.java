@@ -4,7 +4,6 @@ import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.game.round.LadderRepository;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
@@ -72,8 +71,8 @@ public class MessageService {
     return messageRepository.findByUuid(uuid).orElseThrow();
   }
 
-  public ArrayList<MessageEntity> getAllMessages() {
-    return new ArrayList<>();
+  public List<MessageEntity> getNewestMessages() {
+    return messageRepository.findTop50ByDeletedOnNullOrderByCreatedOnDesc();
   }
 
   public List<MessageEntity> loadMessages(ChatEntity chat) {

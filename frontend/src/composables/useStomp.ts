@@ -4,6 +4,7 @@ import { AccountEventType, useAccountStore } from "~/store/account";
 import { useChatStore } from "~/store/chat";
 import { RoundEventType } from "~/store/round";
 import { LadderEventType } from "~/store/ladder";
+import { ChatLogMessageData } from "~/store/moderation";
 
 export type OnTickBody = {
   delta: number;
@@ -24,6 +25,9 @@ export type OnAccountEventBody = {
   data?: any;
 };
 
+export type OnModChatEventBody = OnChatEventBody & ChatLogMessageData;
+export type OnModLogEventBody = {};
+
 export type StompCallback<T> = {
   callback: (body: T) => void;
   identifier: string;
@@ -35,6 +39,8 @@ export type StompCallbacks = {
   onLadderEvent: StompCallback<OnLadderEventBody>[];
   onRoundEvent: StompCallback<OnRoundEventBody>[];
   onAccountEvent: StompCallback<OnAccountEventBody>[];
+  onModChatEvent: StompCallback<OnModChatEventBody>[];
+  onModLogEvent: StompCallback<OnModLogEventBody>[];
 };
 
 const callbacks: StompCallbacks = {
@@ -43,6 +49,8 @@ const callbacks: StompCallbacks = {
   onLadderEvent: [],
   onRoundEvent: [],
   onAccountEvent: [],
+  onModChatEvent: [],
+  onModLogEvent: [],
 };
 
 function addCallback<T>(
@@ -143,6 +151,23 @@ function connectPrivateChannel(uuid: string) {
   client.subscribe(`/private/${uuid}/account/event`, (message) => {
     const body: OnAccountEventBody = JSON.parse(message.body);
     callbacks.onAccountEvent.forEach(({ callback }) => callback(body));
+  });
+
+  connectModeratorChannel();
+}
+
+function connectModeratorChannel() {
+  if (!client.connected) return;
+  if (!useAccountStore().getters.isMod) return;
+
+  client.subscribe("/topic/moderation/chat/event", (message) => {
+    const body: OnModChatEventBody = JSON.parse(message.body);
+    callbacks.onModChatEvent.forEach(({ callback }) => callback(body));
+  });
+
+  client.subscribe("/topic/moderation/log/event", (message) => {
+    const body: OnModLogEventBody = JSON.parse(message.body);
+    callbacks.onModLogEvent.forEach(({ callback }) => callback(body));
   });
 }
 

@@ -95,7 +95,7 @@ public class LadderController {
       ModServerMessageData data = new ModServerMessageData(account.getId(),
           sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
-      wsUtils.convertAndSendToTopic(ModerationController.TOPIC_EVENTS_DESTINATION + num, data);
+      wsUtils.convertAndSendToTopic(ModerationController.TOPIC_LOG_EVENTS_DESTINATION + num, data);
       ladderService.addEvent(num, new Event<>(LadderEventTypes.BUY_BIAS, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
@@ -118,7 +118,7 @@ public class LadderController {
           wsMessage.getContent());
       ModServerMessageData data = new ModServerMessageData(account.getId(), sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
-      wsUtils.convertAndSendToTopic(ModerationController.TOPIC_EVENTS_DESTINATION + num, data);
+      wsUtils.convertAndSendToTopic(ModerationController.TOPIC_LOG_EVENTS_DESTINATION + num, data);
       ladderService.addEvent(num, new Event<>(LadderEventTypes.BUY_MULTI, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
@@ -142,7 +142,7 @@ public class LadderController {
       ModServerMessageData data = new ModServerMessageData(account.getId(),
           sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
-      wsUtils.convertAndSendToTopic(ModerationController.TOPIC_EVENTS_DESTINATION + num, data);
+      wsUtils.convertAndSendToTopic(ModerationController.TOPIC_LOG_EVENTS_DESTINATION + num, data);
       ladderService.addEvent(num, new Event<>(LadderEventTypes.THROW_VINEGAR, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
@@ -167,7 +167,7 @@ public class LadderController {
       ModServerMessageData data = new ModServerMessageData(account.getId(),
           sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
-      wsUtils.convertAndSendToTopic(ModerationController.TOPIC_EVENTS_DESTINATION + num, data);
+      wsUtils.convertAndSendToTopic(ModerationController.TOPIC_LOG_EVENTS_DESTINATION + num, data);
       ladderService.addEvent(num, new Event<>(LadderEventTypes.PROMOTE, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());
@@ -191,7 +191,7 @@ public class LadderController {
       ModServerMessageData data = new ModServerMessageData(account.getId(),
           sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
-      wsUtils.convertAndSendToTopic(ModerationController.TOPIC_EVENTS_DESTINATION + num, data);
+      wsUtils.convertAndSendToTopic(ModerationController.TOPIC_LOG_EVENTS_DESTINATION + num, data);
       ladderService.addEvent(num, new Event<>(LadderEventTypes.BUY_AUTO_PROMOTE, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage());

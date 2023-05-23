@@ -2,7 +2,8 @@
   <div ref="el" class="flex flex-col w-full">
     <div class="flex flex-row text-sm justify-between pr-3">
       <span class="text-text-light truncate basis-5/8">
-        <span class="cursor-pointer" @click="mention">
+        <span>
+          L{{ message.chatNumber }}:
           <font-awesome-icon
             v-if="message.isMod"
             v-tippy="{ content: 'MOD', placement: 'right' }"
@@ -26,7 +27,7 @@
       <span class="basis-1/4">
         {{ message.getTimestampString() }}
       </span>
-      <span v-if="false" class="text-end flex-none">...</span>
+      <span class="text-end flex-none">...</span>
     </div>
     <ChatWindowContentMessageBody :message="message" />
   </div>
@@ -34,19 +35,21 @@
 
 <script lang="ts" setup>
 import ChatWindowContentMessageBody from "../../components/chat/ChatWindowContentMessageBody.vue";
-import { Message } from "~/store/entities/message";
 import { useOptionsStore } from "~/store/options";
-import { useChatStore } from "~/store/chat";
+import { ChatLogMessage, useModerationStore } from "~/store/moderation";
 
 const optionsStore = useOptionsStore();
-const chatStore = useChatStore();
+const moderationStore = useModerationStore();
 
-const props = defineProps<{ message: Message; index: number }>();
+const props = defineProps<{
+  message: ChatLogMessage;
+  index: number;
+}>();
 
 const el = ref<null | HTMLElement>(null);
 
 const isLastMessage = computed<boolean>(() => {
-  return props.index === chatStore.state.messages.length - 1;
+  return props.index === moderationStore.state.chatLog.length - 1;
 });
 
 onMounted(() => {
@@ -54,30 +57,6 @@ onMounted(() => {
     el.value?.scrollIntoView();
   }
 });
-
-function mention() {
-  const content = [
-    {
-      type: "userMention",
-      attrs: {
-        id: {
-          username: props.message.username,
-          accountId: props.message.accountId,
-        },
-        label: null,
-      },
-    },
-    { type: "text", text: " " },
-  ];
-  const baseContentArray = chatStore.state.input.content;
-  if (baseContentArray && baseContentArray.length === 1) {
-    if (baseContentArray[0].content === undefined) {
-      baseContentArray[0].content = content;
-    } else {
-      baseContentArray[0].content.push(...content);
-    }
-  }
-
-  chatStore.state.input.content = baseContentArray;
-}
 </script>
+
+<style scoped></style>

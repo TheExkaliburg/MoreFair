@@ -9,12 +9,12 @@ import { SOUNDS, useSound } from "~/composables/useSound";
 import { useToasts } from "~/composables/useToasts";
 
 export enum AccessRole {
-  OWNER,
-  MODERATOR,
-  PLAYER,
-  MUTED_PLAYER,
-  BANNED_PLAYER,
-  BROADCASTER,
+  OWNER = "OWNER",
+  MODERATOR = "MODERATOR",
+  PLAYER = "PLAYER",
+  MUTED_PLAYER = "MUTED_PLAYER",
+  BANNED_PLAYER = "BANNED_PLAYER",
+  BROADCASTER = "BROADCASTER",
 }
 
 export enum AccountEventType {
@@ -52,6 +52,12 @@ export const useAccountStore = defineStore("account", () => {
   });
   const getters = reactive({
     isGuest: computed<boolean>(() => useAuthStore().getters.isGuest),
+    isMod: computed<boolean>(() => {
+      return (
+        state.accessRole === AccessRole.MODERATOR ||
+        state.accessRole === AccessRole.OWNER
+      );
+    }),
   });
 
   function init() {

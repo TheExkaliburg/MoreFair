@@ -6,7 +6,9 @@ import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.utils.RequestThrottler;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WsMessage;
+import de.kaliburg.morefair.data.ModMessageDto;
 import de.kaliburg.morefair.game.chat.ChatDto;
+import de.kaliburg.morefair.game.chat.ChatEntity;
 import de.kaliburg.morefair.game.chat.ChatService;
 import de.kaliburg.morefair.game.chat.MessageEntity;
 import de.kaliburg.morefair.game.chat.MessageService;
@@ -15,7 +17,6 @@ import de.kaliburg.morefair.game.round.RankerEntity;
 import de.kaliburg.morefair.game.round.RankerService;
 import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.security.SecurityUtils;
-import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.ObjectUtils;
@@ -66,8 +67,8 @@ public class ChatController {
       }
 
       if (account.isMod() || number <= ranker.getLadder().getNumber()) {
-        ArrayList<MessageEntity> messages = messageService.getAllMessages();
-        ChatDto c = new ChatDto(chatService.find(number), config);
+        ChatEntity chatEntity = chatService.find(number);
+        ChatDto c = new ChatDto(chatEntity, config);
         return new ResponseEntity<>(c, HttpStatus.OK);
       } else {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -112,7 +113,10 @@ public class ChatController {
       RankerEntity ranker = ladderService.findFirstActiveRankerOfAccountThisRound(account);
       if (account.isMod()
           || (number <= ranker.getLadder().getNumber() && throttler.canPostMessage(account))) {
-        chatService.sendMessageToChat(account, number, message, metadata);
+        MessageEntity messageEntity = chatService.sendMessageToChat(account, number, message,
+            metadata);
+        wsUtils.convertAndSendToTopic(ModerationController.TOPIC_CHAT_EVENTS_DESTINATION,
+            new ModMessageDto(messageEntity, config));
         log.info("[CHAT {}] {} (#{}): {}", number, account.getDisplayName(), account.getId(),
             message);
       }

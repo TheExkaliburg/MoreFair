@@ -106,7 +106,7 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
       }
     }
 
-    if (topicDestination.contains("/topic/mod/")) {
+    if (topicDestination.contains("/topic/moderation/")) {
       return false;
     }
 

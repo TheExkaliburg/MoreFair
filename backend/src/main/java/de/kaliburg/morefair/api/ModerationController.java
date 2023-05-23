@@ -4,9 +4,10 @@ import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountAccessRole;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
+import de.kaliburg.morefair.api.utils.HttpUtils;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WsMessage;
-import de.kaliburg.morefair.data.ModChatData;
+import de.kaliburg.morefair.data.ModChatDto;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.AccountEventTypes;
 import de.kaliburg.morefair.game.chat.ChatService;
@@ -14,28 +15,29 @@ import de.kaliburg.morefair.game.chat.MessageEntity;
 import de.kaliburg.morefair.game.chat.MessageService;
 import de.kaliburg.morefair.game.round.LadderService;
 import de.kaliburg.morefair.security.SecurityUtils;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @Log4j2
+@RequestMapping("/api/moderation")
+@RequiredArgsConstructor
 public class ModerationController {
 
-  public static final String TOPIC_EVENTS_DESTINATION = "/mod/events";
-  public static final String QUEUE_CHAT_INIT_DESTINATION = "/mod/chat/init";
-  private static final String APP_CHAT_INIT_DESTINATION = "/mod/chat/init";
+  public static final String TOPIC_LOG_EVENTS_DESTINATION = "/moderation/log/event";
+  public static final String TOPIC_CHAT_EVENTS_DESTINATION = "/moderation/chat/event";
   private static final String APP_BAN_DESTINATION = "/mod/ban/{id}";
   private static final String APP_MUTE_DESTINATION = "/mod/mute/{id}";
   private static final String APP_FREE_DESTINATION = "/mod/free/{id}";
@@ -49,35 +51,20 @@ public class ModerationController {
   private final ChatService chatService;
   private final FairConfig config;
 
-  public ModerationController(AccountService accountService, WsUtils wsUtils,
-      LadderService ladderService,
-      MessageService messageService, ChatService chatService, FairConfig config) {
-    this.accountService = accountService;
-    this.wsUtils = wsUtils;
-    this.ladderService = ladderService;
-    this.messageService = messageService;
-    this.chatService = chatService;
-    this.config = config;
-  }
-
-  @GetMapping("/mod/chat")
-  public ResponseEntity<?> chat(SimpMessageHeaderAccessor sha, Authentication authentication)
-      throws Exception {
+  @GetMapping("/chat")
+  public ResponseEntity<?> getChat(Authentication authentication) {
     try {
       AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
-      if (account == null || !(account.getAccessRole()
-          .equals(AccountAccessRole.MODERATOR) || account.getAccessRole()
-          .equals(AccountAccessRole.OWNER))) {
+      if (account == null || !account.isMod()) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       } else {
-        ArrayList<MessageEntity> messages = messageService.getAllMessages();
-        return new ResponseEntity<>(new ModChatData(messages,
-            config), HttpStatus.OK);
+        List<MessageEntity> messages = messageService.getNewestMessages();
+        return new ResponseEntity<>(new ModChatDto(messages, config), HttpStatus.OK);
       }
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
-      return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+      return HttpUtils.buildErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }
 

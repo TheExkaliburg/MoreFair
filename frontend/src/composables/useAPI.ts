@@ -166,6 +166,11 @@ const API = {
       return axiosInstance.get("/api/round");
     },
   },
+  moderation: {
+    getChatLog: () => {
+      return axiosInstance.get("/api/moderation/chat");
+    },
+  },
 };
 
 let isInitialized = false;
