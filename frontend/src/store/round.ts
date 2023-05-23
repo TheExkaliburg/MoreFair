@@ -9,11 +9,11 @@ import { OnRoundEventBody, useStomp } from "~/composables/useStomp";
 import { useToasts } from "~/composables/useToasts";
 
 export enum RoundType {
-  DEFAULT,
-  FAST,
-  SLOW,
-  AUTO,
-  CHAOS,
+  DEFAULT = "DEFAULT",
+  FAST = "FAST",
+  SLOW = "SLOW",
+  AUTO = "AUTO",
+  CHAOS = "CHAOS",
 }
 
 export enum RoundEventType {

@@ -23,10 +23,18 @@
           </div>
           <br />
           <div class="whitespace-nowrap">
-            Round: [{{ roundStore.getters.formattedTypes }}]
+            Round:
+            <TypeInformation
+              :types="roundStore.state.types"
+              placement="bottom"
+            />
           </div>
           <div class="whitespace-break-spaces">
-            Ladder: [{{ ladderStore.getters.formattedTypes }}]
+            Ladder:
+            <TypeInformation
+              :types="ladderStore.state.types"
+              placement="bottom"
+            />
           </div>
           <br />
           <div class="whitespace-nowrap">
@@ -53,10 +61,18 @@
         </div>
         <div class="flex flex-col -sm:hidden">
           <div class="whitespace-nowrap">
-            Round: [{{ roundStore.getters.formattedTypes }}]
+            Round:
+            <TypeInformation
+              :types="roundStore.state.types"
+              placement="bottom"
+            />
           </div>
           <div class="whitespace-nowrap">
-            Ladder: [{{ ladderStore.getters.formattedTypes }}]
+            Ladder:
+            <TypeInformation
+              :types="ladderStore.state.types"
+              placement="bottom"
+            />
           </div>
         </div>
         <div class="flex flex-col -xl:hidden">
@@ -90,6 +106,7 @@ import { useAccountStore } from "~/store/account";
 import { useRoundStore } from "~/store/round";
 import ExtendedInformationModal from "~/components/interactables/ExtendedInformationDialog.vue";
 import { useFormatter } from "~/composables/useFormatter";
+import TypeInformation from "~/components/ladder/TypeInformation.vue";
 
 const ladderStore = useLadderStore();
 const roundStore = useRoundStore();

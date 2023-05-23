@@ -158,3 +158,8 @@ tour:
     end:
       title: That's it!
       intro: You are now ready to play FairGame. If you ever need this tutorial again, just click this help button again.
+modifier:
+  DEFAULT:
+    title: Default
+    description: Nothing special, nothing crazy, just the default
+    short: DEF
