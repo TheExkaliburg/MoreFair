@@ -161,5 +161,57 @@ tour:
 modifier:
   DEFAULT:
     title: Default
-    description: Nothing special, nothing crazy, just the default
+    description: Nothing special at all.
     identifier: DEF
+  FAST:
+    title: Fast
+    description: Smaller ladders, and fewer of them.
+    identifier: FAST
+  SLOW:
+    title: Slow
+    description: Larger ladders, and more of them.
+    identifier: SLOW
+  CHAOS:
+    title: Chaos
+    description: Anything can happen, with random ladder counts and sizes.
+    identifier: CHAOS
+  AUTO:
+    title: Auto
+    description: Free auto-promote is applied to almost all ladders. No auto is slightly more common.
+    identifier: AUTO
+  BIG:
+    title: Big
+    description: This ladder is longer than usual.
+    identifier: BIG
+  GIGANTIC:
+    title: Gigantic
+    description: This ladder is much longer than usual.
+    identifier: GIGA
+  SMALL:
+    title: Small
+    description: This ladder is shorter than usual.
+    identifier: SMALL
+  TINY:
+    title: Tiny
+    description: This ladder is much shorter than usual.
+    identifier: TINY
+  FREE_AUTO:
+    title: Free Auto
+    description: Auto-promote is automatically gifted to all rankers on this ladder.
+    identifier: FAUTO
+  NO_AUTO:
+    title: No-Auto
+    description: Auto-promote cannot be purchased on this ladder.
+    identifier: NAUTO
+  CHEAP:
+    title: Cheap
+    description: Multi and bias purchases are cheaper on this ladder.
+    identifier: CHEAP
+  EXPENSIVE:
+    title: Expensive
+    description: Multi and bias purchases are more expensive on this ladder.
+    identifier: EXPSV
+  ASSHOLE:
+    title: Asshole
+    description: The final ladder - promotion from here will grant entry to Chad's ritual.
+    identifier: AH
