@@ -1,7 +1,9 @@
 <template>
-  <span v-tippy="{ content: description, placement: placement }">{{
-    identifier
-  }}</span>
+  <span
+    v-tippy="{ content: description, placement: placement }"
+    class="cursor-default"
+    >{{ identifier }}</span
+  >
 </template>
 
 <script lang="ts" setup>
