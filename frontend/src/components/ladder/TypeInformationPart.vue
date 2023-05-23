@@ -15,7 +15,7 @@ const props = defineProps<{
 
 const lang = useLang("modifier." + props.type);
 const identifier = computed<string>(() => {
-  return lang("short");
+  return lang("identifier");
 });
 const description = computed<string>(() => {
   return `${lang("title")}: ${lang("description")}`;

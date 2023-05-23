@@ -162,4 +162,4 @@ modifier:
   DEFAULT:
     title: Default
     description: Nothing special, nothing crazy, just the default
-    short: DEF
+    identifier: DEF
