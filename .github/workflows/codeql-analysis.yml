@@ -21,8 +21,8 @@ on:
     - cron: '15 19 * * 6'
 
 jobs:
-  analyze:
-    name: Analyze
+  java:
+    name: Analyze Java code
     runs-on: ubuntu-latest
     permissions:
       actions: read
@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'java', 'javascript' ]
+        language: [ 'java' ]
         # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby' ]
         # Learn more about CodeQL language support at https://git.io/codeql-language-support
 
@@ -44,15 +44,6 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 17
-          languages: 'java'
-          language: 'java'
-
-      - name: Setup pnpm
-        if: matrix.language == 'javascript'
-        uses: pnpm/action-setup@v2.2.4
-        working-directory: frontend
-        with:
-          version: latest
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
@@ -62,11 +53,6 @@ jobs:
       - name: Build with Maven
         if: matrix.language == 'java'
         run: maven clean package -Pdebug
-
-      - name: Build with pnpm
-        if: matrix.language == 'javascript'
-        working-directory: frontend
-        run: pnpm run generate
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
