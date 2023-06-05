@@ -50,8 +50,6 @@ jobs:
       - name: Setup pnpm
         if: matrix.language == 'javascript'
         uses: pnpm/action-setup@v2.2.4
-        with:
-          version: next-8
 
       # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
@@ -60,9 +58,13 @@ jobs:
           languages: ${{ matrix.language }}
 
       # Builds
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v2
+      - run: |
+          maven clean package -Pdebug
+        if: matrix.language == 'java'
 
+      - run: |
+          cd frontend
+        if: matrix.language == 'javascript'
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
