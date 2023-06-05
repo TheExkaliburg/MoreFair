@@ -247,6 +247,12 @@
       <groupId>org.springframework.session</groupId>
       <version>3.0.1</version>
     </dependency>
+    <dependency>
+      <artifactId>embedded-redis</artifactId>
+      <groupId>it.ozimov</groupId>
+      <scope>test</scope>
+      <version>0.7.3</version>
+    </dependency>
   </dependencies>
 
   <modelVersion>4.0.0</modelVersion>

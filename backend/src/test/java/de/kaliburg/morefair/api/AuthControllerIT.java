@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.github.database.rider.core.api.dataset.DataSet;
@@ -26,6 +27,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +41,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import redis.embedded.RedisServer;
 
 @SpringBootTest(webEnvironment = WebEnvironment.MOCK, classes =
     MoreFairApplication.class)
@@ -59,9 +63,22 @@ public class AuthControllerIT {
   @Autowired
   private AccountRepository accountRepository;
 
+  private RedisServer redisServer;
+
   @BeforeEach
   public void beforeEach() throws Exception {
     greenMailBean.getGreenMail().purgeEmailFromAllMailboxes();
+  }
+
+  @BeforeAll
+  public void beforeAll() {
+    redisServer = RedisServer.builder().port(6370).setting("maxmemory 128M").build();
+    redisServer.start();
+  }
+
+  @AfterAll
+  public void afterAll() throws Exception {
+    redisServer.stop();
   }
 
   @Test
@@ -338,7 +355,8 @@ public class AuthControllerIT {
             .header("X-XSRF-TOKEN", xsrfToken)
             .cookie(new Cookie("XSRF-TOKEN", xsrfToken)))
         .andExpect(status().isBadRequest())
-        .andExpect(content().string("Password must be at most 64 characters long"))
+        .andExpect(
+            jsonPath("$.message").value("Please look into your inbox for a confirmation link"))
         .andReturn().getResponse();
 
     assertTrue(getAuthenticationStatus(session));
@@ -780,7 +798,8 @@ public class AuthControllerIT {
             .cookie(new Cookie("XSRF-TOKEN", xsrfToken))
             .cookie(new Cookie("XSRF-TOKEN", xsrfToken)))
         .andExpect(status().isCreated())
-        .andExpect(content().string("Please look into your inbox for a confirmation link"))
+        .andExpect(jsonPath("$.message")
+            .value("Please look into your inbox for a confirmation link"))
         .andReturn().getResponse().getContentAsString();
 
     assertTrue(greenMailBean.getGreenMail().waitForIncomingEmail(emailCount + 1));
@@ -823,7 +842,7 @@ public class AuthControllerIT {
             })
             .param("token", token))
         .andExpect(status().isCreated())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN_VALUE))
         .andExpect(content().string("Registration successful; Please log into your account"));
   }
 
