@@ -42,11 +42,13 @@ jobs:
     strategy:
       fail-fast: true
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
       - name: Setup Java
-          uses: actions/setup-java@v3
-          with:
-            distribution: 'temurin'
-            java-version: 17
-            cache: maven
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          cache: maven
       - name: Build with Maven
         run: mvn package -Pdebug
