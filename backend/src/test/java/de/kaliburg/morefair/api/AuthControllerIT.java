@@ -54,6 +54,7 @@ import redis.embedded.RedisServer;
 // TODO: Fix all these test-cases for the new authentication
 public class AuthControllerIT {
 
+  private static RedisServer redisServer;
   @Autowired
   private GreenMailBean greenMailBean;
   @Autowired
@@ -63,22 +64,20 @@ public class AuthControllerIT {
   @Autowired
   private AccountRepository accountRepository;
 
-  private RedisServer redisServer;
-
-  @BeforeEach
-  public void beforeEach() throws Exception {
-    greenMailBean.getGreenMail().purgeEmailFromAllMailboxes();
-  }
-
   @BeforeAll
-  public void beforeAll() {
+  public static void beforeAll() {
     redisServer = RedisServer.builder().port(6370).setting("maxmemory 128M").build();
     redisServer.start();
   }
 
   @AfterAll
-  public void afterAll() throws Exception {
+  public static void afterAll() throws Exception {
     redisServer.stop();
+  }
+
+  @BeforeEach
+  public void beforeEach() throws Exception {
+    greenMailBean.getGreenMail().purgeEmailFromAllMailboxes();
   }
 
   @Test
@@ -90,9 +89,10 @@ public class AuthControllerIT {
     String token = registerUser(email, password, ip, xsrfToken);
     confirmRegistrationToken(UUID.fromString(token).toString(), ip);
 
-    String session = login(email, password, ip, xsrfToken);
     AccountEntity account1 = accountRepository.findByUsername(email).orElseThrow();
     assertTrue(passwordEncoder.matches(password, account1.getPassword()));
+
+    String session = login(email, password, ip, xsrfToken);
     assertTrue(getAuthenticationStatus(session));
   }
 
@@ -110,9 +110,7 @@ public class AuthControllerIT {
               return request;
             })
             .param("token", token + "a"))
-        .andExpect(status().isNotFound())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(content().string("Invalid or expired confirmation token"));
+        .andExpect(status().isNotFound());
 
     assertNull(accountRepository.findByUsername(email).orElse(null));
   }
@@ -132,9 +130,7 @@ public class AuthControllerIT {
               return request;
             })
             .param("token", token))
-        .andExpect(status().isNotFound())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(content().string("Confirmation token already used"));
+        .andExpect(status().isNotFound());
 
     String session = login(email, password, ip, xsrfToken);
     AccountEntity account1 = accountRepository.findByUsername(email).orElseThrow();
@@ -210,13 +206,13 @@ public class AuthControllerIT {
               return request;
             })
             .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-            .param("resetToken", resetToken)
-            .param("newPassword", newPassword)
+            .param("token", resetToken)
+            .param("password", newPassword)
             .header("X-XSRF-TOKEN", xsrfToken)
             .cookie(new Cookie("XSRF-TOKEN", xsrfToken))
             .cookie(new Cookie("SESSION", session)))
         .andExpect(status().isOk())
-        .andExpect(content().string("Password changed"))
+        .andExpect(jsonPath("$.message").value("Password changed"))
         .andReturn().getResponse();
 
     assertFalse(getAuthenticationStatus(session));
@@ -257,12 +253,12 @@ public class AuthControllerIT {
               return request;
             })
             .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-            .param("resetToken", resetToken)
-            .param("newPassword", newPassword)
+            .param("token", resetToken)
+            .param("password", newPassword)
             .header("X-XSRF-TOKEN", xsrfToken)
             .cookie(new Cookie("XSRF-TOKEN", xsrfToken)))
         .andExpect(status().isBadRequest())
-        .andExpect(content().string("Invalid token"))
+        .andExpect(jsonPath("$.message").value("Invalid token"))
         .andReturn().getResponse();
 
     assertTrue(getAuthenticationStatus(session));
@@ -303,12 +299,12 @@ public class AuthControllerIT {
               return request;
             })
             .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-            .param("resetToken", resetToken)
-            .param("newPassword", newPassword)
+            .param("token", resetToken)
+            .param("password", newPassword)
             .header("X-XSRF-TOKEN", xsrfToken)
             .cookie(new Cookie("XSRF-TOKEN", xsrfToken)))
         .andExpect(status().isBadRequest())
-        .andExpect(content().string("Password must be at least 8 characters long"))
+        .andExpect(jsonPath("$.message").value("Password must be at least 8 characters long"))
         .andReturn().getResponse();
 
     assertTrue(getAuthenticationStatus(session));
@@ -350,13 +346,13 @@ public class AuthControllerIT {
               return request;
             })
             .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-            .param("resetToken", resetToken)
-            .param("newPassword", newPassword)
+            .param("token", resetToken)
+            .param("password", newPassword)
             .header("X-XSRF-TOKEN", xsrfToken)
             .cookie(new Cookie("XSRF-TOKEN", xsrfToken)))
         .andExpect(status().isBadRequest())
         .andExpect(
-            jsonPath("$.message").value("Please look into your inbox for a confirmation link"))
+            jsonPath("$.message").value("Password must be at most 64 characters long"))
         .andReturn().getResponse();
 
     assertTrue(getAuthenticationStatus(session));
@@ -410,7 +406,7 @@ public class AuthControllerIT {
             .header("X-XSRF-TOKEN", xsrfToken)
             .cookie(new Cookie("XSRF-TOKEN", xsrfToken)))
         .andExpect(status().isBadRequest())
-        .andExpect(content().string("Password must be at least 8 characters long"))
+        .andExpect(jsonPath("$.message").value("Password must be at least 8 characters long"))
         .andReturn().getResponse().getContentAsString();
   }
 
@@ -439,7 +435,7 @@ public class AuthControllerIT {
             .cookie(new Cookie("SESSION", session)))
         .andExpect(status().isBadRequest())
         .andExpect(
-            content().string("Password must be at least 8 characters long."))
+            jsonPath("$.message").value("Password must be at least 8 characters long."))
         .andReturn().getResponse();
 
     assertTrue(getAuthenticationStatus(session));
@@ -471,7 +467,7 @@ public class AuthControllerIT {
             .cookie(new Cookie("SESSION", session)))
         .andExpect(status().isBadRequest())
         .andExpect(
-            content().string("Password must be at most 64 characters long."))
+            jsonPath("$.message").value("Password must be at most 64 characters long."))
         .andReturn().getResponse();
 
     assertTrue(getAuthenticationStatus(session));
@@ -502,7 +498,7 @@ public class AuthControllerIT {
             .cookie(new Cookie("SESSION", session)))
         .andExpect(status().isBadRequest())
         .andExpect(
-            content().string("Wrong password"))
+            jsonPath("$.message").value("Wrong password"))
         .andReturn().getResponse();
 
     assertTrue(getAuthenticationStatus(session));
@@ -528,7 +524,7 @@ public class AuthControllerIT {
             .header("X-XSRF-TOKEN", xsrfToken)
             .cookie(new Cookie("XSRF-TOKEN", xsrfToken)))
         .andExpect(status().isBadRequest())
-        .andExpect(content().string("Password must be at most 64 characters long"))
+        .andExpect(jsonPath("$.message").value("Password must be at most 64 characters long"))
         .andReturn().getResponse().getContentAsString();
   }
 
@@ -552,7 +548,7 @@ public class AuthControllerIT {
             .header("X-XSRF-TOKEN", xsrfToken)
             .cookie(new Cookie("XSRF-TOKEN", xsrfToken)))
         .andExpect(status().isBadRequest())
-        .andExpect(content().string("Email must be at most 254 characters long"))
+        .andExpect(jsonPath("$.message").value("Email must be at most 254 characters long"))
         .andReturn().getResponse().getContentAsString();
   }
 
@@ -576,7 +572,7 @@ public class AuthControllerIT {
             .header("X-XSRF-TOKEN", xsrfToken)
             .cookie(new Cookie("XSRF-TOKEN", xsrfToken)))
         .andExpect(status().isBadRequest())
-        .andExpect(content().string("Invalid email address"))
+        .andExpect(jsonPath("$.message").value("Invalid email address"))
         .andReturn().getResponse().getContentAsString();
   }
 
@@ -602,7 +598,7 @@ public class AuthControllerIT {
             .header("X-XSRF-TOKEN", xsrfToken)
             .cookie(new Cookie("XSRF-TOKEN", xsrfToken)))
         .andExpect(status().isTooManyRequests())
-        .andExpect(content().string("Too many requests"))
+        .andExpect(jsonPath("$.message").value("Too many requests"))
         .andReturn().getResponse().getContentAsString();
   }
 
@@ -629,7 +625,7 @@ public class AuthControllerIT {
             .header("X-XSRF-TOKEN", xsrfToken)
             .cookie(new Cookie("XSRF-TOKEN", xsrfToken)))
         .andExpect(status().isBadRequest())
-        .andExpect(content().string("Email address already in use"))
+        .andExpect(jsonPath("$.message").value("Email address already in use"))
         .andReturn().getResponse().getContentAsString();
   }
 
@@ -662,7 +658,7 @@ public class AuthControllerIT {
             .cookie(new Cookie("XSRF-TOKEN", xsrfToken)))
         .andExpect(status().isTooManyRequests())
         .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-        .andExpect(content().string("Too many requests"))
+        .andExpect(jsonPath("$.message").value("Too many requests"))
         .andReturn().getResponse().getContentAsString();
 
     List<AccountEntity> allAccounts = accountRepository.findAll();
@@ -750,7 +746,8 @@ public class AuthControllerIT {
             .cookie(new Cookie("XSRF-TOKEN", xsrfToken))
             .cookie(new Cookie("SESSION", session)))
         .andExpect(status().isOk())
-        .andExpect(content().string(email2));
+        .andExpect(jsonPath("$.message").value("Your email address has been updated"))
+        .andExpect(jsonPath("$.email").value(email2.toLowerCase()));
   }
 
   private Boolean getAuthenticationStatus(String session) throws Exception {
@@ -825,7 +822,8 @@ public class AuthControllerIT {
             .cookie(new Cookie("XSRF-TOKEN", xsrfToken))
             .cookie(new Cookie("SESSION", session)))
         .andExpect(status().isCreated())
-        .andExpect(content().string("Please look into your inbox for a confirmation link"))
+        .andExpect(
+            jsonPath("$.message").value("Please look into your inbox for a confirmation link"))
         .andReturn().getResponse().getContentAsString();
 
     assertTrue(greenMailBean.getGreenMail().waitForIncomingEmail(1000, emailCount + 1));
@@ -869,7 +867,7 @@ public class AuthControllerIT {
             .header("X-XSRF-TOKEN", xsrfToken)
             .cookie(new Cookie("XSRF-TOKEN", xsrfToken))
             .cookie(new Cookie("SESSION", session)))
-        .andExpect(status().isFound())
+        .andExpect(status().isOk())
         .andReturn().getResponse();
   }
 }

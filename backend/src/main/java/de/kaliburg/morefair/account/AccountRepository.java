@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AccountRepository extends JpaRepository<AccountEntity, Long> {
 
-  @Query("select a from AccountEntity a where a.username = :username")
+  @Query("select a from AccountEntity a where LOWER(a.username) = LOWER(:username)")
   Optional<AccountEntity> findByUsername(@Param("username") String username);
 
   @Query("SELECT a FROM AccountEntity a WHERE a.uuid = :uuid")
