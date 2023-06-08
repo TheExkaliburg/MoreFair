@@ -46,7 +46,7 @@ jobs:
 
       - name: Build with Maven
         if: matrix.language == 'java'
-        run: mvn -B package -pl backend
+        run: mvn -B package -Pdebug
 
       - name: Build with pnpm
         if: matrix.language == 'javascript'
