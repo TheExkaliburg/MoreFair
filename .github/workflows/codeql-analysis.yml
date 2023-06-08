@@ -11,7 +11,7 @@ on:
 
 jobs:
   analyze:
-    name: Analyze and Build Java code
+    name: Analyze
     runs-on: ubuntu-latest
     permissions:
       actions: read
@@ -27,6 +27,8 @@ jobs:
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
 
       - name: Setup Java
         if: matrix.language == 'java'
