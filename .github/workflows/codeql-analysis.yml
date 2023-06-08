@@ -49,6 +49,7 @@ jobs:
       - name: Build with pnpm
         if: matrix.language == 'javascript'
         run: |
+          cd frontend
           pnpm install
           pnpm run generate
 
