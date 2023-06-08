@@ -12,13 +12,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.github.database.rider.core.api.dataset.DataSet;
 import com.github.database.rider.junit5.api.DBRider;
 import com.icegreen.greenmail.spring.GreenMailBean;
 import de.kaliburg.morefair.MoreFairApplication;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountRepository;
 import de.kaliburg.morefair.security.SecurityUtils;
+import de.kaliburg.morefair.utils.FairTest;
 import de.kaliburg.morefair.utils.ITUtils;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.Cookie;
@@ -38,23 +38,19 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import redis.embedded.RedisServer;
 
 @SpringBootTest(webEnvironment = WebEnvironment.MOCK, classes =
     MoreFairApplication.class)
 @AutoConfigureMockMvc
-//@TestPropertySource(locations = "classpath:application.properties")
 @DBRider
 @Slf4j
-@WebAppConfiguration
-@ContextConfiguration
-// TODO: Fix all these test-cases for the new authentication
-public class AuthControllerIT {
+@FairTest
+public class AuthControllerTest {
 
   private static RedisServer redisServer;
+  private static GreenMailBean greenMailBeanStatic;
   @Autowired
   private GreenMailBean greenMailBean;
   @Autowired
@@ -71,8 +67,15 @@ public class AuthControllerIT {
   }
 
   @AfterAll
-  public static void afterAll() throws Exception {
+  public static void afterAll() {
     redisServer.stop();
+    //greenMailBeanStatic.stop();
+  }
+
+  // Setter method for the static variable
+  @Autowired
+  public void setGreenMailBeanStatic(GreenMailBean greenMailBean) {
+    greenMailBeanStatic = greenMailBean;
   }
 
   @BeforeEach
@@ -173,7 +176,7 @@ public class AuthControllerIT {
 
   @Test
   public void forgotPasswordReset_default_authenticated() throws Exception {
-    String email = "ForgotPasswordReset_default_authenticated@mail.de";
+    String email = "forgotPasswordReset_default_authenticated@mail.de";
     String password = SecurityUtils.generatePassword();
     String ip = ITUtils.randomIp();
     String xsrfToken = getXsrfToken();
@@ -220,7 +223,7 @@ public class AuthControllerIT {
 
   @Test
   public void forgotPasswordReset_wrongToken_badRequest() throws Exception {
-    String email = "ForgotPasswordReset_default_authenticated@mail.de";
+    String email = "forgotPasswordReset_wrongToken_badRequest@mail.de";
     String password = SecurityUtils.generatePassword();
     String ip = ITUtils.randomIp();
     String xsrfToken = getXsrfToken();
@@ -553,7 +556,6 @@ public class AuthControllerIT {
   }
 
   @Test
-  @DataSet(cleanBefore = true)
   public void register_invalidEmail_badRequest() throws Exception {
     String email = "jbneßfq7ß09234";
     String password = SecurityUtils.generatePassword();
@@ -577,7 +579,6 @@ public class AuthControllerIT {
   }
 
   @Test
-  @DataSet(cleanBefore = true)
   public void register_multipleRequestsWithSameIp_statusForbidden() throws Exception {
     String email1 = "register_multipleRequestsWithSameIp_statusForbidden1@mail.de";
     String email2 = "register_multipleRequestsWithSameIp_statusForbidden2@mail.de";
@@ -603,7 +604,6 @@ public class AuthControllerIT {
   }
 
   @Test
-  @DataSet(cleanBefore = true)
   public void register_multipleRequestsWithSameEmail_badRequest() throws Exception {
     String email = "registerMultipleRequestsWithSameEmail@mail.de";
     String password = SecurityUtils.generatePassword();
@@ -642,11 +642,12 @@ public class AuthControllerIT {
   }
 
   @Test
-  @DataSet(cleanBefore = true)
   public void registerGuest_multipleRequestsWithSameIp_statusForbidden() throws Exception {
     String ip = ITUtils.randomIp();
     String xsrfToken = getXsrfToken();
     final String uuid = registerGuest(ip, xsrfToken);
+
+    List<AccountEntity> allAccountsBefore = accountRepository.findAll();
 
     mockMvc
         .perform(post("/api/auth/register/guest")
@@ -664,8 +665,8 @@ public class AuthControllerIT {
     List<AccountEntity> allAccounts = accountRepository.findAll();
     allAccounts.sort(Comparator.comparing(AccountEntity::getId));
 
-    assertEquals(1, allAccounts.size());
-    assertEquals(allAccounts.get(0).getUsername(), uuid);
+    assertEquals(allAccountsBefore.size(), allAccounts.size());
+    assertEquals(allAccounts.get(allAccounts.size() - 1).getUsername(), uuid);
   }
 
   @Test

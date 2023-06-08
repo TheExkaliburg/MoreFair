@@ -1,15 +1,11 @@
 package de.kaliburg.morefair.game.round;
 
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.util.Set;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 @Slf4j
 public class LadderTypeBuilder {
@@ -18,6 +14,7 @@ public class LadderTypeBuilder {
   private final Map<LadderType, Float> ladderSizeTypeWeights = new HashMap<>();
   private final Map<LadderType, Float> ladderAutoTypeWeights = new HashMap<>();
   private final Map<LadderType, Float> ladderCostTypeWeights = new HashMap<>();
+
   @Setter
   @Accessors(chain = true)
   private Set<RoundType> roundTypes = EnumSet.noneOf(RoundType.class);
@@ -48,6 +45,10 @@ public class LadderTypeBuilder {
     ladderCostTypeWeights.put(LadderType.CHEAP, 10.f);
     ladderCostTypeWeights.put(LadderType.EXPENSIVE, 10.f);
     ladderCostTypeWeights.put(LadderType.DEFAULT, 100.f);
+  }
+
+  public static LadderTypeBuilder builder() {
+    return new LadderTypeBuilder();
   }
 
   private void handlePreviousLadderType(LadderType ladderType) {
@@ -207,20 +208,24 @@ public class LadderTypeBuilder {
     try {
       float totalWeight = weights.values().stream().reduce(0.f, Float::sum);
       float randomNumber = random.nextFloat(totalWeight);
-      List<Entry<Float, LadderType>> inverseLookupEntries = createInverseLookupTable(
-          weights).entrySet().stream().sorted(Entry.comparingByKey()).toList();
+            List<Entry<Float, LadderType>> inverseLookupEntries = createInverseLookupTable(
+                    weights).entrySet().stream().sorted(Entry.comparingByKey()).toList();
 
-      log.debug("Random {} percentage for L{}: {}/{}", categoryName, ladderNumber, randomNumber,
-          totalWeight);
-      for (Map.Entry<Float, LadderType> entry : inverseLookupEntries) {
-        log.debug("Checking {} percentage: {}/{}", entry.getValue(), entry.getKey(), totalWeight);
-        if (randomNumber < entry.getKey()) {
-          return entry.getValue();
+            log.debug("Random {} percentage for L{}: {}/{}", categoryName, ladderNumber, randomNumber,
+                    totalWeight);
+            for (Map.Entry<Float, LadderType> entry : inverseLookupEntries) {
+                log.debug("Checking {} percentage: {}/{}", entry.getValue(), entry.getKey(), totalWeight);
+                if (randomNumber < entry.getKey()) {
+                    return entry.getValue();
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error getting random ladder type. Category: {}, Weights: {}, RoundTypes: {}",
+                    categoryName,
+                    weights,
+                    roundTypes,
+                    e);
         }
-      }
-    } catch (Exception e) {
-      log.error("Error getting random ladder type", e);
+        return LadderType.DEFAULT;
     }
-    return LadderType.DEFAULT;
-  }
 }
