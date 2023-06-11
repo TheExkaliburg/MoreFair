@@ -47,7 +47,7 @@ import redis.embedded.RedisServer;
 @DBRider
 @Slf4j
 @FairTest
-public class AuthControllerTest {
+public class AuthControllerIT {
 
   private static RedisServer redisServer;
   private static GreenMailBean greenMailBeanStatic;
