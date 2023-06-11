@@ -12,9 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.github.database.rider.junit5.api.DBRider;
 import com.icegreen.greenmail.spring.GreenMailBean;
-import de.kaliburg.morefair.MoreFairApplication;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountRepository;
 import de.kaliburg.morefair.security.SecurityUtils;
@@ -32,25 +30,18 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import redis.embedded.RedisServer;
 
-@SpringBootTest(webEnvironment = WebEnvironment.MOCK, classes =
-    MoreFairApplication.class)
-@AutoConfigureMockMvc
-@DBRider
+
 @Slf4j
 @FairTest
 public class AuthControllerIT {
 
   private static RedisServer redisServer;
-  private static GreenMailBean greenMailBeanStatic;
   @Autowired
   private GreenMailBean greenMailBean;
   @Autowired
@@ -69,13 +60,6 @@ public class AuthControllerIT {
   @AfterAll
   public static void afterAll() {
     redisServer.stop();
-    //greenMailBeanStatic.stop();
-  }
-
-  // Setter method for the static variable
-  @Autowired
-  public void setGreenMailBeanStatic(GreenMailBean greenMailBean) {
-    greenMailBeanStatic = greenMailBean;
   }
 
   @BeforeEach

@@ -2,8 +2,8 @@ package de.kaliburg.morefair.game;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.kaliburg.morefair.MoreFairApplication;
 import de.kaliburg.morefair.game.round.LadderType;
+import de.kaliburg.morefair.utils.FairTest;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -11,15 +11,15 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * Tests for {@link UpgradeUtils}. for specific values in the config look at <a
  * href="https://docs.google.com/spreadsheets/d/1BH1Y-hv_zIho8QIsdxCp8Rmld__zBuviu_wL7Hhtb7s ">this
  * sheet</a>
  */
-@SpringBootTest(classes = MoreFairApplication.class)
+
 @Slf4j
+@FairTest
 class UpgradeUtilsTest {
 
   @Autowired
