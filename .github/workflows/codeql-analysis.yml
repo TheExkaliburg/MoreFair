@@ -22,9 +22,10 @@ jobs:
       matrix:
         language: [ 'java', 'javascript' ]
     services:
-      image: mongo
-      ports:
-        - 27017
+      mongo:
+        image: mongo
+        ports:
+          - 27017
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
