@@ -203,7 +203,19 @@ function reset() {
 }
 
 function parseEvent(e: Event): string {
-  return JSON.stringify(e);
+  const serializableEvent = {
+    isTrusted: e.isTrusted,
+    // @ts-ignore
+    screenX: e.screenX ?? -1,
+    // @ts-ignore
+    screenY: e.screenY ?? -1,
+  };
+
+  if (!(e instanceof Event)) {
+    serializableEvent.isTrusted = false;
+  }
+
+  return JSON.stringify(serializableEvent);
 }
 
 const wsApi = (client: Client) => {

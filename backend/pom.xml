@@ -254,7 +254,7 @@
     <packaging>jar</packaging>
 
     <parent>
-        <artifactId>morefair</artifactId>
+        <artifactId>fairgame</artifactId>
         <groupId>de.kaliburg</groupId>
         <version>1.0</version>
     </parent>
