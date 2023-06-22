@@ -1,43 +1,54 @@
 package de.kaliburg.morefair.account;
 
 import de.kaliburg.morefair.api.websockets.UserPrincipal;
-import de.kaliburg.morefair.game.round.RoundEntity;
+import de.kaliburg.morefair.security.UserDetailsWithUuid;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-import javax.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * This Service handles all the accounts.
  */
 @Service
 @Log4j2
-@RequiredArgsConstructor
-public class AccountService {
+public class AccountService implements UserDetailsService {
 
   private final AccountRepository accountRepository;
   private final ApplicationEventPublisher eventPublisher;
   private final PasswordEncoder passwordEncoder;
+
   private AccountEntity broadcasterAccount;
+
+  public AccountService(AccountRepository accountRepository,
+      ApplicationEventPublisher eventPublisher, PasswordEncoder passwordEncoder) {
+    this.accountRepository = accountRepository;
+    this.eventPublisher = eventPublisher;
+    this.passwordEncoder = passwordEncoder;
+  }
 
   /**
    * Creates and saves a new account.
    *
    * @return the account
    */
-  public AccountEntity create(UserPrincipal principal, RoundEntity currentRound) {
+  public AccountEntity create(String email, String password, Integer ipAddress, boolean isGuest) {
     AccountEntity result = new AccountEntity();
-
-    if (principal != null) {
-      result.setLastIp(principal.getIpAddress());
-    }
-    result.setPassword(passwordEncoder.encode(result.getUuid().toString()));
+    result.setUsername(email);
+    result.setPassword(passwordEncoder.encode(password));
+    result.setLastIp(ipAddress);
+    result.setGuest(isGuest);
 
     result = save(result);
 
@@ -47,9 +58,6 @@ public class AccountService {
 
   @Transactional
   public AccountEntity save(AccountEntity account) {
-    if (account.getPassword() == null) {
-      account.setPassword(passwordEncoder.encode(account.getUuid().toString()));
-    }
     AccountEntity result = accountRepository.save(account);
     eventPublisher.publishEvent(new AccountServiceEvent(this, List.of(result)));
     return result;
@@ -81,8 +89,9 @@ public class AccountService {
     return find(account.getId());
   }
 
-  public List<AccountEntity> findByUsername(String username) {
-    return accountRepository.findTop100ByUsernameContainsIgnoreCaseOrderByLastLoginDesc(username);
+  public List<AccountEntity> findByDisplayName(String displayName) {
+    return accountRepository.findTop100ByDisplayNameContainsIgnoreCaseOrderByLastLoginDesc(
+        displayName);
   }
 
   public AccountEntity findBroadcaster() {
@@ -101,12 +110,6 @@ public class AccountService {
 
   @Transactional
   public List<AccountEntity> save(List<AccountEntity> accounts) {
-    accounts.forEach(account -> {
-      if (account.getPassword() == null) {
-        account.setPassword(passwordEncoder.encode(account.getUuid().toString()));
-      }
-    });
-
     List<AccountEntity> result = accountRepository.saveAll(accounts);
     eventPublisher.publishEvent(new AccountServiceEvent(this, result));
     return result;
@@ -114,5 +117,21 @@ public class AccountService {
 
   public List<AccountEntity> searchByIp(Integer ip) {
     return accountRepository.findTop100ByLastIpOrderByLastLoginDesc(ip);
+  }
+
+  @Override
+  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    AccountEntity account = accountRepository.findByUsername(username)
+        .orElseThrow(() -> new UsernameNotFoundException("Account not found"));
+
+    Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+    authorities.add(new SimpleGrantedAuthority(account.getAccessRole().name()));
+
+    return new UserDetailsWithUuid(account.getUsername(), account.getPassword(), authorities,
+        account.getUuid());
+  }
+
+  public AccountEntity findByUsername(String username) {
+    return accountRepository.findByUsername(username).orElse(null);
   }
 }

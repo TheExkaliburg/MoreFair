@@ -2,10 +2,10 @@ package de.kaliburg.morefair.game.round;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import de.kaliburg.morefair.utils.EnableLoggingPropertiesBeforeAll;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 @Slf4j
+@EnableLoggingPropertiesBeforeAll
 class LadderTypeBuilderTest {
 
   static List<Set<RoundType>> roundTypesList = new ArrayList<>();
@@ -20,7 +21,7 @@ class LadderTypeBuilderTest {
   static HashMap<Set<RoundType>, HashMap<Set<LadderType>, Integer>> countMapMap = new HashMap<>();
 
   @BeforeAll
-  static void init() {
+  public static void beforeAll() {
     roundTypesList.add(EnumSet.of(RoundType.DEFAULT));
     roundTypesList.add(EnumSet.of(RoundType.FAST));
     roundTypesList.add(EnumSet.of(RoundType.SLOW));
@@ -69,7 +70,6 @@ class LadderTypeBuilderTest {
         assertThat(ladderTypes).doesNotContain(LadderType.DEFAULT);
       }
     }));
-    log.info("{}", countMapMap);
   }
 
   @Test
@@ -79,25 +79,15 @@ class LadderTypeBuilderTest {
         assertThat(ladderTypes).doesNotContain(LadderType.DEFAULT);
       }
     });
-    log.info("FAST: {}", countMapMap.get(EnumSet.of(RoundType.FAST)));
   }
 
   @Test
-  void test() {
+  void build_FirstLadderOnFastRound_isDefault() {
+    Set<RoundType> roundTypes = EnumSet.of(RoundType.FAST);
+    Set<LadderType> build = LadderTypeBuilder.builder().setRoundTypes(roundTypes).setRoundNumber(1)
+        .setLadderNumber(1).setAssholeLadderNumber(25).build();
 
-    for (int i = 0; i < 10; i++) {
-      Set<LadderType> set = new HashSet<>();
-      set.add(LadderType.DEFAULT);
-      set.add(LadderType.SMALL);
-      set.add(LadderType.TINY);
-      set.add(LadderType.NO_AUTO);
-      set.add(LadderType.FREE_AUTO);
-      set.add(LadderType.BIG);
-      System.out.println("");
-      set.stream().sorted(new LadderTypeComparator()).forEach(ladderType -> {
-        System.out.print(ladderType + " " + ladderType.ordinal() + ", ");
-      });
-    }
+    assertThat(build).containsExactly(LadderType.DEFAULT);
   }
 
 }

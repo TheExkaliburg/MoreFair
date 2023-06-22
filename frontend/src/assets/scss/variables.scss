@@ -1,0 +1,189 @@
+// Palette
+// https://lospec.com/palette-list/apollo
+
+$color-midnight-express: #172038;
+$color-catalina-blue: #253a5e;
+$color-st-tropaz: #3c5e8b;
+$color-steel-blue: #4f8fba;
+$color-seagull: #73bed3;
+$color-sinbad: #a4dddb;
+
+$color-racing-green: #19332d;
+$color-parsley: #25562e;
+$color-la-palma: #468232;
+$color-asparagus: #75a743;
+$color-conifer: #a8ca58;
+$color-deco: #d0da91;
+
+$color-toledo-1: #4d2b32;
+$color-bole: #7a4841;
+$color-santa-fe: #ad7757;
+$color-pale-taupe: #c09473;
+$color-cashmere: #d7b594;
+$color-givry: #e7d5b3;
+
+$color-toledo-2: #341c27;
+$color-moccaccino: #602c2c;
+$color-korma: #884b2b;
+$color-pirate-gold: #be772b;
+$color-fire-bush: #de9e41;
+$color-chenin: #e8c170;
+
+$color-blackcurrant: #241527;
+$color-blackberry: #411d31;
+$color-claret: #752438;
+$color-milano-red: #a53030;
+$color-dark-coral: #cf573c;
+$color-tree-poppy: #da863e;
+
+$color-jaguar: #1e1d39;
+$color-jagger: #402751;
+$color-eminence: #7a367b;
+$color-medium-red-violet: #a23e8c;
+$color-mulberry: #c65197;
+$color-kobi: #df84a5;
+
+$color-black-russian-2: #090a14;
+$color-black-russian-1: #10141f;
+$color-black-pearl: #151d28;
+$color-tangaroa: #202e37;
+$color-atomic: #394a50;
+$color-pale-sky: #577277;
+$color-submarine: #819796;
+$color-conch: #a8b5b2;
+$color-jet-stream: #c7cfcc;
+$color-saltpan: #ebede9;
+
+$transparent: rgba(0, 0, 0, 0);
+
+
+:root {
+  // Colors
+  --main-color: #{$color-fire-bush};
+  --main-secondary-color: #{$color-pirate-gold};
+  --background-color: #{$color-black-russian-1};
+  --background-dark-color: #{$color-black-russian-2};
+  --background-light-color: #{$color-black-pearl};
+  --item-selected-color: #{$color-tangaroa};
+
+  // Text
+  --text-font-size: 16px;
+  --text-color: #{$color-givry};
+  --text-light-highlight-color: var(--main-color);
+  --text-dark-highlight-color: #{$color-dark-coral};
+  --text-placeholder-color: #{$color-claret};
+  --text-error-color: var(--placeholder-color);
+  --reader-width: 50em;
+  --reader-width-div-2: calc(var(--reader-width) / 2);
+  --font-size-xs: 0.75rem;
+  --line-height-xs: 1rem;
+  --font-size-sm: 0.875rem;
+  --line-height-sm: 1.25rem;
+
+  // Buttons
+  --button-bg-color: var(--background-color);
+  --button-bg-hover-color: var(--main-color);
+  --button-bg-selected-color: var(--main-color);
+  --button-text-color: var(--text-color);
+  --button-text-hover-color: var(--background-color);
+  --button-text-selected-color: var(--background-color);
+  --button-border-color: var(--main-color);
+  --button-border-hover-color: var(--background-color);
+  --button-border-selected-color: var(--background-color);
+
+  // Ladder
+  --ladder-bg-color: var(--background-color);
+  --ladder-bg-promoted-color: var(--background-dark-color);
+  --ladder-bg-you-color: var(--text-dark-highlight-color);
+  --ladder-text-color: var(--background-color);
+  --ladder-text-promoted-color: var(--main-secondary-color);
+  --ladder-text-you-color: var(--background-color);
+
+  //ETA
+  --eta-best-color: #{$color-la-palma};
+  --eta-mid-color: var(--main-color);
+  --eta-worst-color: #{$color-claret};
+
+  // Chat
+  --header-color: var(--main-color);
+  --header-font-size: var(--font-size-sm);
+  --header-line-height: var(--line-height-sm);
+  --mod-color: #{$color-medium-red-violet};
+
+  // navbar
+  --navbar-bg-color: var(--background-dark-color);
+  --navbar-text-color: var(--main-color);
+  --offcanvas-background-color: var(--background-light-color);
+
+  // Link
+  --link-hover-color: #{$color-st-tropaz};
+  --link-color: #{$color-steel-blue};
+
+  // Scrollbar
+  --scrollbar-bg-color: #{$transparent};
+  --scrollbar-thumb-color: var(--background-dark-color);
+  --scrollbar-width: 0.75rem;
+  --scrollbar-thumb-border: 1px solid var(--scrollbar-thumb-border-color);
+  --scrollbar-thumb-border-color: var(--main-secondary-color);
+  --scrollbar-thumb-border-radius: 0.4rem;
+
+  // Modal
+  --modal-bg-color: var(--background-color);
+  --modal-text-color: var(--text-color);
+  --modal-text-title-color: var(--text-light-highlight-color);
+
+  // Tooltips and Notifications
+  --tooltip-background: #{$color-st-tropaz};
+  --tooltip-text: var(--text-color);
+
+  // Overwrite Toastify defaults
+  --toastify-color-light: var(--tooltip-background) !important;
+  --toastify-text-color-light: var(--tooltip-text) !important;
+  --toastify-color-error: #{$color-claret} !important;
+  --toastify-text-color-error: var(--tooltip-text) !important;
+}
+
+:root.light {
+  // Colors
+  --main-color: #{$color-black-pearl};
+  --main-secondary-color: #{$color-black-russian-2};
+  --background-color: #{$color-saltpan};
+  --background-dark-color: #{$color-conch};
+  --background-light-color: #{$color-jet-stream};
+  --placeholder-color: #{$color-claret};
+  --item-selected-color: #{$color-submarine};
+
+  // Text
+  --text-font-size: 15px;
+  --text-color: #{$color-black-russian-1};
+  --text-light-highlight-color: var(--main-secondary-color);
+  --text-dark-highlight-color: #{$color-blackberry};
+
+  // Buttons
+  --button-color: var(--main-secondary-color);
+  --button-hover-color: var(--background-color);
+  --button-hover-background-color: var(--button-color);
+
+  // Ladder
+  --you-color: var(--background-dark-color);
+  --you-background-color: var(--text-dark-highlight-color);
+  --promoted-color: var(--text-light-highlight-color);
+  --promoted-background-color: var(--background-dark-color);
+
+  //ETA
+  --eta-best: #{$color-asparagus};
+  --eta-mid: #{$color-catalina-blue};
+  --eta-worst: #{$color-milano-red};
+
+  // Chat
+  --header-color: var(--main-color);
+  --header-font-size: 14px;
+
+  // navbar
+  --navbar-color: var(--background-dark-color);
+  --offcanvas-background-color: var(--background-light-color);
+
+  // Link
+  --link-hover-color: #{$color-st-tropaz};
+  --link-color: #{$color-steel-blue};
+}

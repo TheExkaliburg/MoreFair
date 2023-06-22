@@ -2,39 +2,23 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-
     <artifactId>frontend</artifactId>
-    <packaging>pom</packaging>
-
-    <parent>
-        <artifactId>morefair</artifactId>
-        <groupId>de.kaliburg</groupId>
-        <version>1.0</version>
-    </parent>
-
-    <properties>
-        <node.version>v16.16.0</node.version>
-        <npm.version>8.11.0</npm.version>
-    </properties>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
-                <version>1.12.1</version>
                 <executions>
                     <execution>
-                        <id>install-node-and-npm</id>
-                        <goals>
-                            <goal>install-node-and-npm</goal>
-                        </goals>
-                        <phase>generate-resources</phase>
                         <configuration>
                             <nodeVersion>${node.version}</nodeVersion>
-                            <npmVersion>${npm.version}</npmVersion>
+                            <pnpmVersion>${pnpm.version}</pnpmVersion>
                         </configuration>
+                        <goals>
+                            <goal>install-node-and-pnpm</goal>
+                        </goals>
+                        <id>install-node-and-pnpm</id>
+                        <phase>generate-resources</phase>
                     </execution>
                     <!--execution>
                         <id>npm clean workspace</id>
@@ -47,27 +31,43 @@
                         </configuration>
                     </execution-->
                     <execution>
-                        <id>npm-install</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <phase>generate-resources</phase>
                         <configuration>
-                            <arguments>clean-install</arguments>
+                            <arguments>install</arguments>
                         </configuration>
+                        <goals>
+                            <goal>pnpm</goal>
+                        </goals>
+                        <id>pnpm-install</id>
+                        <phase>generate-resources</phase>
                     </execution>
                     <execution>
-                        <id>npm-build</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <phase>generate-resources</phase>
                         <configuration>
-                            <arguments>run build</arguments>
+                            <arguments>run generate</arguments>
                         </configuration>
+                        <goals>
+                            <goal>pnpm</goal>
+                        </goals>
+                        <id>npm-generate</id>
+                        <phase>generate-resources</phase>
                     </execution>
                 </executions>
+                <groupId>com.github.eirslett</groupId>
+                <version>1.12.1</version>
             </plugin>
         </plugins>
     </build>
+    <modelVersion>4.0.0</modelVersion>
+
+    <packaging>pom</packaging>
+
+    <parent>
+        <artifactId>morefair</artifactId>
+        <groupId>de.kaliburg</groupId>
+        <version>1.0</version>
+    </parent>
+
+    <properties>
+        <node.version>v18.16.0</node.version>
+        <pnpm.version>8.5.0</pnpm.version>
+    </properties>
 </project>

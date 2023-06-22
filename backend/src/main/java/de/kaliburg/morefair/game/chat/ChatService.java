@@ -3,6 +3,7 @@ package de.kaliburg.morefair.game.chat;
 import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
+import de.kaliburg.morefair.account.AccountServiceEvent;
 import de.kaliburg.morefair.api.ChatController;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import java.util.HashMap;
@@ -10,10 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Semaphore;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Log4j2
-public class ChatService {
+public class ChatService implements ApplicationListener<AccountServiceEvent> {
 
   private final ChatRepository chatRepository;
   private final MessageService messageService;
@@ -42,6 +45,22 @@ public class ChatService {
     this.wsUtils = wsUtils;
     this.accountService = accountService;
     this.config = config;
+  }
+
+  @Override
+  public void onApplicationEvent(AccountServiceEvent event) {
+    // check each chat in currentChatMap and update the account of the messages if the uuid is equal
+    Map<UUID, AccountEntity> accounts = event.getAccounts().stream()
+        .collect(Collectors.toMap(AccountEntity::getUuid, Function.identity()));
+
+    for (ChatEntity chat : currentChatMap.values()) {
+      for (MessageEntity message : chat.getMessages()) {
+        AccountEntity newAccount = accounts.get(message.getAccount().getUuid());
+        if (newAccount != null) {
+          message.setAccount(newAccount);
+        }
+      }
+    }
   }
 
   @Transactional
@@ -144,8 +163,7 @@ public class ChatService {
         }
 
         result = messageService.save(result);
-        wsUtils.convertAndSendToTopic(
-            ChatController.TOPIC_EVENTS_DESTINATION.replace("{number}", number.toString()),
+        wsUtils.convertAndSendToTopicWithNumber(ChatController.TOPIC_EVENTS_DESTINATION, number,
             new MessageDto(result, config));
         return result;
       } finally {

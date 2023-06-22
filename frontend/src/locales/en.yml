@@ -1,0 +1,217 @@
+pages:
+  index:
+    title: test
+components:
+  navbar:
+    sidebar:
+      back: Back
+      ladder: Ladder
+      chat: Chat
+      options: Options
+      help: Help
+      discord: Discord
+      privacy: Privacy Policy
+      impressum: Impressum
+      account: Account
+      rules: Rules
+      information: Information
+    lockButtons: Lock Buttons
+    enableChat: Enable Chat
+    enableLadder: Enable Ladder
+  ladder:
+    table:
+      username: Username
+      power: Power
+      points: Points
+      eta: ETA
+      you: You
+      ladder_short: L
+      powerGain: Power-Gain
+    buttons:
+      multi: Multi
+      multi_short: M
+      bias: Bias
+      bias_short: B
+      autopromote: Buy Autopromote
+      vinegar: Throw all Vinegar
+      promote: Promote
+      asshole: Be Asshole
+      info:
+        grapes: Grapes
+        vinegar: Vinegar
+        active: Active
+        points: Points
+        power: Power
+        promoteAt: Promote at
+        multi_short: M
+        bias_short: B
+options:
+  section:
+    general: General
+    ladder: Ladder
+    chat: Chat
+    moderation: Moderation
+    sound: Sound
+  showAssholePoints: Show asshole-points subsection
+  showEta: Show ETA to top/ranker
+  followOwnRanker: Follow own ranker
+  etaColors: ETA Colors
+  showBiasAndMulti: Show bias/multi for ranker
+  showPowerGain: Show power-gain for ranker
+  hidePromotedPlayers: Hide promoted players
+  hideVinegarAndGrapes: Hide vinegar and grape count
+  enableSpectateAssholeLadder: Enable spectating asshole ladder
+  hideHelpText: Hide help text
+  subscribedMentions: Subscribed mentions
+  playSoundOnMention: Play sound on mention
+  playSoundOnGotFirst: Play sound on reaching first
+  playSoundOnPromotion: Play sound on promotion
+  notificationVolume: Notification volume
+  enableModPage: Enable mod page
+  enableChatFeatures: Enable chat features
+  enableLadderFeatures: Enable ladder features
+  unrestrictedAccess: Unrestricted ladder & chat access
+  lockButtons: Lock Buttons
+account:
+  account: Account
+  apply: Apply
+  edit: Edit
+  email: E-Mail
+  logout: Logout
+  changePassword:
+    title: Change Password
+    description: Please enter your current and new password below
+    currentPassword: Current Password
+    newPassword: New Password
+    repeatPassword: Repeat Password
+    submit: Submit
+  linkAccount:
+    title: Link Account to Email
+    description: Please enter your email and your password below to link your guest account to an email.
+    email: E-Mail
+    password: Password
+    repeatPassword: Repeat Password
+    submit: Submit
+  confirmEmail:
+    title: Confirm Email
+    description: Please go to your email-inbox and paste the token that was sent to you in the input below
+    submit: Submit
+  login:
+    title: Login
+    noAccount: Don't have an account?
+    email: E-Mail
+    password: Password
+    rememberMe: Remember me
+    submit: Submit
+  signup:
+    title: Signup
+    gotAccount: Already have an account?
+    email: E-Mail
+    password: Password
+    repeatPassword: Password
+    submit: Submit
+    agreeTo: By continuing, you are setting up a FairGame account and agree to our
+    rules: Rules
+    agreeTo2: and
+    privacy: Privacy Policy
+  forgotPassword:
+    title: Forgot Password
+    description1: Please enter your email below to receive a password reset token.
+    description1a: Got a token already?
+    email: E-Mail
+    submit: Submit
+    description2: Please look into your inbox and copy the token into the input below. Then choose a new password.
+    token: Token
+    newPassword: New Password
+    repeatPassword: Repeat Password
+zxcvbn:
+  strength: Strength
+tour:
+  tutorial:
+    welcome:
+      title: Welcome
+      intro: Welcome to the FairGame-Tutorial!
+    goal1:
+      title: Goal
+      intro: The game is separated into Ladders, the goal of each Ladder is to reach the top and promote to the next one.
+    goal2:
+      title: Goal
+      intro: The goal of the game is to reach the highest ladder in a round and promote before the game resets.
+    points:
+      title: Points
+      intro: Points define your Rank. \n\n You need to reach the most points to promote to the next Ladder.
+    power:
+      title: Power
+      intro: Power defines how many points you get each Second. \n\n The lower you are on the ladder, the more power/s you get.
+    bias:
+      title: Bias
+      intro: You can use Bias to gain a flat increase in power/s. This upgrade resets your points back to 0.
+    multi:
+      title: Multi
+      intro: Multi can be used to increase your power/s multiplicatively. This upgrade resets not only your points, but also your power.
+    vinegar:
+      title: Vinegar
+      intro: Vinegar is used to throw at active Ranker at the top of you Ladder. \n\n If you have more than them they get thrown down to the bottom of your Ladder. \n\n If not, then they lose the amount of vinegar that you threw and they stay at the top.
+    grapes:
+      title: Grapes
+      intro: Grapes define how much vinegar/s you get. \n\n You gain 2 Grapes for every second at the bottom of the Ladder and 1 Grape for every Ranker that passes you (if you are at x2 or above). \n\n You can also buy Autopromote with Grapes (cheapest at the bottom).
+    end:
+      title: That's it!
+      intro: You are now ready to play FairGame. If you ever need this tutorial again, just click this help button again.
+modifier:
+  DEFAULT:
+    title: Default
+    description: Nothing special at all.
+    identifier: DEF
+  FAST:
+    title: Fast
+    description: Smaller ladders, and fewer of them.
+    identifier: FAST
+  SLOW:
+    title: Slow
+    description: Larger ladders, and more of them.
+    identifier: SLOW
+  CHAOS:
+    title: Chaos
+    description: Anything can happen, with random ladder counts and sizes.
+    identifier: CHAOS
+  AUTO:
+    title: Auto
+    description: Free auto-promote is applied to almost all ladders. No auto is slightly more common.
+    identifier: AUTO
+  BIG:
+    title: Big
+    description: This ladder is longer than usual.
+    identifier: BIG
+  GIGANTIC:
+    title: Gigantic
+    description: This ladder is much longer than usual.
+    identifier: GIGA
+  SMALL:
+    title: Small
+    description: This ladder is shorter than usual.
+    identifier: SMALL
+  TINY:
+    title: Tiny
+    description: This ladder is much shorter than usual.
+    identifier: TINY
+  FREE_AUTO:
+    title: Free Auto
+    description: Auto-promote is automatically gifted to all rankers on this ladder.
+    identifier: FAUTO
+  NO_AUTO:
+    title: No-Auto
+    description: Auto-promote cannot be purchased on this ladder.
+    identifier: NAUTO
+  CHEAP:
+    title: Cheap
+    description: Multi and bias purchases are cheaper on this ladder.
+    identifier: CHEAP
+  EXPENSIVE:
+    title: Expensive
+    description: Multi and bias purchases are more expensive on this ladder.
+    identifier: EXPSV
+  ASSHOLE:
+    title: Asshole
+    description: The final ladder - promotion from here will grant entry to Chad's ritual.
+    identifier: AH

@@ -1,20 +1,20 @@
 package de.kaliburg.morefair.api.websockets.messages;
 
+import jakarta.annotation.Nullable;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class WsMessage extends WsEmptyMessage {
+public class WsMessage {
 
-  @NonNull
+  @Nullable
   private String content;
+  @Nullable
+  private String event;
+  @NonNull
+  private String metadata;
 
-  public WsMessage(@NonNull String uuid, @NonNull String content) {
-    super(uuid);
-    this.content = content;
-  }
+
 }

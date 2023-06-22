@@ -1,10 +1,16 @@
 package de.kaliburg.morefair.game.round;
 
+import static de.kaliburg.morefair.events.types.LadderEventTypes.BUY_AUTO_PROMOTE;
+import static de.kaliburg.morefair.events.types.LadderEventTypes.BUY_BIAS;
+import static de.kaliburg.morefair.events.types.LadderEventTypes.BUY_MULTI;
+import static de.kaliburg.morefair.events.types.LadderEventTypes.PROMOTE;
+import static de.kaliburg.morefair.events.types.LadderEventTypes.THROW_VINEGAR;
+
 import de.kaliburg.morefair.account.AccountService;
-import de.kaliburg.morefair.api.GameController;
+import de.kaliburg.morefair.api.FairController;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.events.Event;
-import de.kaliburg.morefair.events.types.EventType;
+import de.kaliburg.morefair.events.types.LadderEventTypes;
 import de.kaliburg.morefair.game.chat.MessageService;
 import de.kaliburg.morefair.game.round.dto.HeartbeatDto;
 import java.math.BigInteger;
@@ -68,7 +74,7 @@ public class LadderCalculator {
 
         // Otherwise, just send the default Heartbeat-Tick
         heartbeat.setDelta(deltaSec);
-        wsUtils.convertAndSendToTopic(GameController.TOPIC_TICK_DESTINATION, heartbeat);
+        wsUtils.convertAndSendToTopic(FairController.TOPIC_TICK_DESTINATION, heartbeat);
 
         // Calculate Ladder yourself
         Collection<LadderEntity> ladders = ladderService.getCurrentLadderMap().values();
@@ -97,42 +103,33 @@ public class LadderCalculator {
         for (int i = 1; i <= ladderService.getCurrentLadderMap().size(); i++) {
           // Handle the events since the last update
           LadderEntity ladder = ladderService.getCurrentLadderMap().get(i);
-          List<Event> events = ladderService.getEventMap().get(ladder.getNumber());
-          List<Event> eventsToBeRemoved = new ArrayList<>();
-          for (int j = 0; j < events.size(); j++) {
-            Event e = events.get(j);
-            switch (e.getEventType()) {
-              case BUY_BIAS -> {
-                if (!ladderService.buyBias(e, ladder)) {
-                  eventsToBeRemoved.add(e);
-                }
+          List<Event<LadderEventTypes>> events = ladderService.getEventMap()
+              .get(ladder.getNumber());
+          List<Event<LadderEventTypes>> eventsToBeRemoved = new ArrayList<>();
+          for (Event<LadderEventTypes> e : events) {
+            if (BUY_BIAS.equals(e.getEventType())) {
+              if (!ladderService.buyBias(e, ladder)) {
+                eventsToBeRemoved.add(e);
               }
-              case BUY_MULTI -> {
-                if (!ladderService.buyMulti(e, ladder)) {
-                  eventsToBeRemoved.add(e);
-                }
+            } else if (BUY_MULTI.equals(e.getEventType())) {
+              if (!ladderService.buyMulti(e, ladder)) {
+                eventsToBeRemoved.add(e);
               }
-              case PROMOTE -> {
-                if (!ladderService.promote(e, ladder)) {
-                  eventsToBeRemoved.add(e);
-                }
+            } else if (PROMOTE.equals(e.getEventType())) {
+              if (!ladderService.promote(e, ladder)) {
+                eventsToBeRemoved.add(e);
               }
-              case THROW_VINEGAR -> {
-                if (!ladderService.throwVinegar(e, ladder)) {
-                  eventsToBeRemoved.add(e);
-                }
+            } else if (THROW_VINEGAR.equals(e.getEventType())) {
+              if (!ladderService.throwVinegar(e, ladder)) {
+                eventsToBeRemoved.add(e);
               }
-              case BUY_AUTO_PROMOTE -> {
-                if (!ladderService.buyAutoPromote(e, ladder)) {
-                  eventsToBeRemoved.add(e);
-                }
-              }
-              default -> {
-
+            } else if (BUY_AUTO_PROMOTE.equals(e.getEventType())) {
+              if (!ladderService.buyAutoPromote(e, ladder)) {
+                eventsToBeRemoved.add(e);
               }
             }
           }
-          for (Event e : eventsToBeRemoved) {
+          for (Event<LadderEventTypes> e : eventsToBeRemoved) {
             events.remove(e);
           }
         }
@@ -213,7 +210,7 @@ public class LadderCalculator {
         .contains(LadderType.FREE_AUTO)) && rankers.get(0).isGrowing()
         && ladderUtils.isLadderPromotable(ladder)) {
       ladderService.addEvent(ladder.getNumber(),
-          new Event(EventType.PROMOTE, rankers.get(0).getAccount().getId()));
+          new Event<>(PROMOTE, rankers.get(0).getAccount().getId()));
     }
   }
 }

@@ -12,16 +12,18 @@ public class MessageDto {
   private final Long accountId;
   private final Long timestamp;
   private final String tag;
-  private final Integer ahPoints;
+  private final Integer assholePoints;
   private final String metadata;
+  private final Boolean isMod;
 
   public MessageDto(MessageEntity message, FairConfig config) {
     this.tag = config.getAssholeTag(message.getAccount().getAssholeCount());
-    this.ahPoints = message.getAccount().getAssholePoints();
+    this.assholePoints = message.getAccount().getAssholePoints();
     this.message = message.getMessage();
-    this.username = message.getAccount().getUsername();
+    this.username = message.getAccount().getDisplayName();
     this.accountId = message.getAccount().getId();
     this.timestamp = message.getCreatedOn().withOffsetSameInstant(ZoneOffset.UTC).toEpochSecond();
     this.metadata = message.getMetadata();
+    this.isMod = message.getAccount().isMod();
   }
 }

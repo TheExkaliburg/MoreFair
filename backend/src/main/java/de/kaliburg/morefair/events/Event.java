@@ -1,19 +1,27 @@
 package de.kaliburg.morefair.events;
 
-import de.kaliburg.morefair.events.types.EventType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @Data
-@RequiredArgsConstructor
 @AllArgsConstructor
-public class Event {
+@RequiredArgsConstructor
+public class Event<T extends Enum<T>> {
 
   @NonNull
-  private EventType eventType;
-  @NonNull
+  private Enum<T> eventType;
   private Long accountId;
   private Object data;
+
+  public Event(@NonNull Enum<T> eventType, Long accountId) {
+    this.eventType = eventType;
+    this.accountId = accountId;
+  }
+
+  public Event(@NonNull Enum<T> eventType, Object data) {
+    this.eventType = eventType;
+    this.data = data;
+  }
 }

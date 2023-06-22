@@ -1,21 +1,21 @@
 account:
   - id: 1
     uuid: ecc70b72-5d20-4199-b600-af82eaa78765
-    username: Mystery Guest 1
+    displayName: Mystery Guest 1
     isAsshole: false
     timesAsshole: 0
     lastLogin: null
     accessRole: OWNER
   - id: 2
     uuid: f392a1b9-1bbd-4e17-af19-58b0d8d307e5
-    username: Mystery Guest 2
+    displayName: Mystery Guest 2
     isAsshole: false
     timesAsshole: 0
     lastLogin: null
     accessRole: MODERATOR
   - id: 3
     uuid: 9698e009-3785-465b-bb7a-aa1dea7ee8dc
-    username: Mystery Guest 3
+    displayName: Mystery Guest 3
     isAsshole: false
     timesAsshole: 0
     lastLogin: null

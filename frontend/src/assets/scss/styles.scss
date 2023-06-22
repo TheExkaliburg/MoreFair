@@ -1,0 +1,110 @@
+@import "./variables";
+
+html {
+  font-size: var(--text-font-size);
+  background-color: var(--background-color);
+}
+
+::-webkit-scrollbar {
+  width: var(--scrollbar-width);
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-bg-color);
+  border-radius: var(--scrollbar-thumb-border-radius);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb-color);
+  border-radius: var(--scrollbar-thumb-border-radius);
+  border: var(--scrollbar-thumb-border);
+}
+
+div, ul {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb-border-color) var(--scrollbar-bg-color);
+}
+
+.md-content a {
+  color: var(--link-color);
+
+  &:hover {
+    color: var(--link-hover-color);
+  }
+}
+
+.md-content :is(h1, h2, h3, h4, h5, h6) > a {
+  color: var(--text-color);
+
+  &:hover {
+    color: var(--text-color);
+  }
+}
+
+.tippy-box {
+  background-color: var(--tooltip-background) !important;
+  color: var(--tooltip-text) !important;
+
+  &.tippy-suggestion {
+    background-color: transparent !important;
+
+    > .tippy-content {
+      padding: 0 0;
+    }
+  }
+
+  > .tippy-content {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  > .tippy-arrow {
+    color: var(--tooltip-background) !important;
+  }
+}
+
+.introjs-tooltip {
+  background-color: var(--tooltip-background) !important;
+  color: var(--tooltip-text);
+
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+
+
+  .introjs-tooltip-title {
+    color: var(--tooltip-text);
+  }
+
+  .introjs-skipbutton {
+    color: var(--tooltip-text);
+  }
+
+  .introjs-button {
+    background-color: var(--tooltip-background);
+    color: var(--tooltip-text);
+    text-shadow: none;
+
+    &:hover {
+      background-color: var(--tooltip-text);
+      color: var(--tooltip-background);
+    }
+  }
+
+  .introjs-arrow {
+    &.top {
+      border-bottom-color: var(--tooltip-text);
+    }
+
+    &.right {
+      border-left-color: var(--tooltip-text) !important;
+    }
+
+    &.bottom {
+      border-top-color: var(--tooltip-text);
+    }
+
+    &.left {
+      border-right-color: var(--tooltip-text) !important;
+    }
+  }
+}

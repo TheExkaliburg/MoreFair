@@ -1,6 +1,21 @@
 package de.kaliburg.morefair.game.round;
 
 import de.kaliburg.morefair.FairConfig;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.OffsetDateTime;
@@ -10,21 +25,6 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -121,15 +121,13 @@ public class RoundEntity {
     double lowerBound = 0.5f;
     double upperBound = 1.5f;
 
-    if(types.contains(RoundType.CHAOS)) {
+    if (types.contains(RoundType.CHAOS)) {
       lowerBound /= 2.0f;
       upperBound *= 1.25f;
-    }
-    else if (types.contains(RoundType.FAST)) {
+    } else if (types.contains(RoundType.FAST)) {
       lowerBound /= 2.0f;
       upperBound /= 2.0f;
-    }
-    else if (types.contains(RoundType.SLOW)) {
+    } else if (types.contains(RoundType.SLOW)) {
       lowerBound *= 1.25f;
       upperBound *= 1.25f;
     }

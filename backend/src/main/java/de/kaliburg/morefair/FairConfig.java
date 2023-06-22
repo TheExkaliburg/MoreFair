@@ -19,6 +19,8 @@ public class FairConfig {
   private Integer autoPromoteLadder = 1;
   private Integer manualPromoteWaitTime = 30;
   private Integer baseAssholeLadder = 10;
+  private Secrets secrets;
+
   private List<String> assholeTags = Arrays.asList("", "♠", "♣", "♥", "♦", "♤", "♧", "♡", "♢",
       "♟", "♙", "♞", "♘", "♝", "♗", "♖", "♛", "♕", "♚", "♔", "🂠", "🂡", "🂢", "🂣", "🂣", "🂥",
       "🂦", "🂧", "🂧", "🂩", "🂪", "🂫", "🂬", "🂭", "🂮");
@@ -41,5 +43,11 @@ public class FairConfig {
     int size = assholeTags.size() - 1;
     int result = (size * (size + 1)) / 2;
     return result * 10;
+  }
+
+  @Data
+  public static class Secrets {
+
+    private String rememberMe;
   }
 }

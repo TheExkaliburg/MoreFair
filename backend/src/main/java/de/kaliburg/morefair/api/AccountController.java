@@ -1,98 +1,57 @@
 package de.kaliburg.morefair.api;
 
-import de.kaliburg.morefair.account.AccountAccessRole;
 import de.kaliburg.morefair.account.AccountDetailsDto;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.account.AchievementsEntity;
-import de.kaliburg.morefair.api.utils.RequestThrottler;
+import de.kaliburg.morefair.api.utils.HttpUtils;
 import de.kaliburg.morefair.api.utils.WsUtils;
-import de.kaliburg.morefair.api.websockets.UserPrincipal;
-import de.kaliburg.morefair.api.websockets.messages.WsMessage;
 import de.kaliburg.morefair.events.Event;
-import de.kaliburg.morefair.events.types.EventType;
+import de.kaliburg.morefair.events.types.AccountEventTypes;
 import de.kaliburg.morefair.game.round.RankerService;
 import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
+import de.kaliburg.morefair.security.SecurityUtils;
 import de.kaliburg.morefair.statistics.StatisticsService;
-import java.util.UUID;
+import java.util.HashMap;
+import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @Controller
 @Log4j2
+@RequestMapping("/api/account")
+@RestController
+@RequiredArgsConstructor
 public class AccountController {
 
-  private static final String APP_LOGIN_DESTINATION = "/account/login";
+  public static final String TOPIC_EVENTS_DESTINATION = "/account/event";
+  public static final String PRIVATE_EVENTS_DESTINATION = "/account/event";
   private static final String APP_RENAME_DESTINATION = "/account/name";
-  private static final String QUEUE_LOGIN_DESTINATION = "/account/login";
-
   private final AccountService accountService;
-  private final RequestThrottler requestThrottler;
   private final WsUtils wsUtils;
   private final RoundService roundService;
   private final RankerService rankerService;
   private final StatisticsService statisticsService;
 
-  public AccountController(AccountService accountService,
-      RequestThrottler requestThrottler, WsUtils wsUtils,
-      RoundService roundService, RankerService rankerService, StatisticsService statisticsService) {
-    this.accountService = accountService;
-    this.requestThrottler = requestThrottler;
-    this.wsUtils = wsUtils;
-    this.roundService = roundService;
-    this.rankerService = rankerService;
-    this.statisticsService = statisticsService;
-  }
 
-  /**
-   * This websocket is used to
-   *
-   * @param sha
-   * @param wsMessage
-   */
-  @MessageMapping(APP_LOGIN_DESTINATION)
-  public void login(SimpMessageHeaderAccessor sha, WsMessage wsMessage) {
+  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> getAccount(Authentication authentication) {
     try {
-      UserPrincipal principal = wsUtils.convertMessageHeaderAccessorToUserPrincipal(sha);
-      String uuid = wsMessage.getUuid();
+      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
 
-      log.trace("/app/{} {}", QUEUE_LOGIN_DESTINATION, uuid);
-
-      RoundEntity currentRound = roundService.getCurrentRound();
-
-      // Empty UUID
-      if (uuid == null || uuid.isBlank()) {
-        if (requestThrottler.canCreateAccount(principal)) {
-          wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION,
-              new AccountDetailsDto(accountService.create(principal, currentRound), 1),
-              HttpStatus.CREATED);
-        } else {
-          wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
-        }
-        return;
-      }
-
-      AccountEntity account = accountService.find(UUID.fromString(uuid));
-      // Can't find account with valid UUID
       if (account == null) {
-        if (requestThrottler.canCreateAccount(principal)) {
-          wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION,
-              new AccountDetailsDto(accountService.create(principal, currentRound), 1),
-              HttpStatus.CREATED);
-        } else {
-          wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
-        }
-        return;
-      }
-
-      // BANNED Players
-      if (account.getAccessRole().equals(AccountAccessRole.BANNED_PLAYER)) {
-        wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, HttpStatus.FORBIDDEN);
-        return;
+        return ResponseEntity.notFound().build();
       }
 
       if (account.getAchievements() == null) {
@@ -100,54 +59,65 @@ public class AccountController {
         accountService.save(account);
       }
 
-      account = accountService.login(account, principal);
       statisticsService.recordLogin(account);
+      RoundEntity currentRound = roundService.getCurrentRound();
       int highestLadder = rankerService.findCurrentRankersOfAccount(account, currentRound).stream()
           .mapToInt(r -> r.getLadder().getNumber()).max().orElse(1);
 
-      wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, new AccountDetailsDto(account,
-          highestLadder));
-
-
-    } catch (IllegalArgumentException e) {
-      wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION, HttpStatus.BAD_REQUEST);
+      return ResponseEntity.ok(new AccountDetailsDto(account, highestLadder));
     } catch (Exception e) {
-      wsUtils.convertAndSendToUser(sha, QUEUE_LOGIN_DESTINATION,
-          HttpStatus.INTERNAL_SERVER_ERROR);
       log.error(e.getMessage());
       e.printStackTrace();
+      return ResponseEntity.internalServerError().body(e.getMessage());
     }
   }
 
-  @MessageMapping(APP_RENAME_DESTINATION)
-  public void changeUsername(SimpMessageHeaderAccessor sha, WsMessage wsMessage) {
+
+  @PatchMapping("/name")
+  public ResponseEntity<?> updateDisplayName(Authentication authentication,
+      @RequestParam("displayName") String displayName) {
     try {
-      String username = wsMessage.getContent();
-      username = username.trim();
-      if (username.length() > 32) {
-        username = username.substring(0, 32);
+      while (displayName.contains("[BANNED]") || displayName.contains("[MUTED]")) {
+        displayName = displayName.replace("[BANNED]", "");
+        displayName = displayName.replace("[MUTED]", "");
       }
 
-      String uuid = wsMessage.getUuid();
-
-      AccountEntity account = accountService.find(UUID.fromString(uuid));
-      if (account == null || account.isMuted()) {
-        return;
+      displayName = displayName.trim();
+      if (displayName.length() > 32) {
+        displayName = displayName.substring(0, 32);
       }
 
-      log.info("[G] RENAME: {} (#{}) -> {}", account.getUsername(), account.getId(), username);
+      if (displayName.isBlank()) {
+        return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST, "Display name cannot be blank");
+      }
 
-      account.setUsername(username);
+      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
+
+      if (displayName.equals(account.getDisplayName())) {
+        Map<String, String> result = new HashMap<>();
+        result.put("displayName", displayName);
+        return ResponseEntity.ok(result);
+      }
+
+      log.info("[G] RENAME: {} (#{}) -> {}", account.getDisplayName(), account.getId(),
+          displayName);
+
+      account.setDisplayName(displayName);
       accountService.save(account);
 
-      wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION,
-          new Event(EventType.NAME_CHANGE, account.getId(),
-              account.getUsername()));
+      wsUtils.convertAndSendToTopic(AccountController.TOPIC_EVENTS_DESTINATION,
+          new Event<>(AccountEventTypes.NAME_CHANGE, account.getId(),
+              account.getDisplayName()));
 
+      Map<String, String> result = new HashMap<>();
+      result.put("displayName", displayName);
+      return ResponseEntity.ok(result);
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
+      return ResponseEntity.internalServerError().body(e.getMessage());
     }
   }
+
 
 }

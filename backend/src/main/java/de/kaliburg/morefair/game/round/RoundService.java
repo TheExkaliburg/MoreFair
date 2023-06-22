@@ -4,10 +4,10 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountEntity;
-import de.kaliburg.morefair.api.GameController;
+import de.kaliburg.morefair.api.RoundController;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.events.Event;
-import de.kaliburg.morefair.events.types.EventType;
+import de.kaliburg.morefair.events.types.RoundEventTypes;
 import de.kaliburg.morefair.game.round.dto.RoundResultsDto;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -122,8 +122,8 @@ public class RoundService {
         && ladderService.findInCache(baseAssholeLadderNumber) == null) {
       getCurrentRound().setHighestAssholeCount(assholeCount);
       ladderService.setCurrentRound(save(getCurrentRound()));
-      wsUtils.convertAndSendToTopic(GameController.TOPIC_GLOBAL_EVENTS_DESTINATION, new Event(
-          EventType.INCREASE_ASSHOLE_LADDER, account.getId(),
+      wsUtils.convertAndSendToTopic(RoundController.TOPIC_EVENTS_DESTINATION, new Event<>(
+          RoundEventTypes.INCREASE_ASSHOLE_LADDER, account.getId(),
           roundUtils.getAssholeLadderNumber(getCurrentRound())));
     }
 

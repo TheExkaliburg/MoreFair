@@ -1,21 +1,21 @@
 package de.kaliburg.morefair.account;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.UUID;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -23,7 +23,15 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Entity
-@Table(name = "account", uniqueConstraints = @UniqueConstraint(name = "uk_uuid", columnNames = "uuid"))
+@Table(name = "account",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_uuid", columnNames = "uuid"),
+        @UniqueConstraint(name = "uk_username", columnNames = "username")
+    },
+    indexes = {
+        @Index(name = "idx_username", columnList = "username", unique = true)
+    }
+)
 @Getter
 @Setter
 @Accessors(chain = true)
@@ -39,9 +47,15 @@ public class AccountEntity {
   private UUID uuid = UUID.randomUUID();
   @NonNull
   @Column(nullable = false)
-  private String username = "Mystery Guest";
-  @Column(nullable = true)
+  private String displayName = "Mystery Guest";
+  @Column(nullable = false)
+  @NonNull
+  private String username;
+  @NonNull
+  @Column(nullable = false)
   private String password;
+  @Column(nullable = false)
+  private boolean guest = true;
   @NonNull
   @Column(nullable = false)
   private Integer assholePoints = 0;
@@ -52,7 +66,10 @@ public class AccountEntity {
   private Integer lastIp;
   @NonNull
   @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
-  private OffsetDateTime lastLogin = OffsetDateTime.now(ZoneOffset.UTC);
+  private OffsetDateTime lastLogin = OffsetDateTime.now();
+  @NonNull
+  @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
+  private OffsetDateTime createdOn = OffsetDateTime.now();
   @NonNull
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)

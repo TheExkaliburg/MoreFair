@@ -8,5 +8,4 @@ public class HeartbeatDto {
 
   @NonNull
   Double delta = 1d;
-
 }

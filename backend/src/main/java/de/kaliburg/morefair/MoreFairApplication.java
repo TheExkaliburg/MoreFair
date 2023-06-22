@@ -15,6 +15,8 @@ public class MoreFairApplication {
     SpringApplication.run(MoreFairApplication.class, args);
   }
 
+
+  // We can't do that in the securityConfig because of circular Dependencies
   @Bean
   public PasswordEncoder passwordEncoder() {
     return Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
