@@ -18,7 +18,7 @@ pipeline {
     stages {
         stage('Build/Test') {
             steps {
-                // git branch: 'feature/docker', credentialsId: 'github', url: 'https://github.com/TheExkaliburg/MoreFair.git'
+                // git branch: 'main', credentialsId: 'github', url: 'https://github.com/TheExkaliburg/MoreFair.git'
                 sh 'mvn -Dmaven.test.failure.ignore=true clean package'
             }
 
