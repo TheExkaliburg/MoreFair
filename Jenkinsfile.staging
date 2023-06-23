@@ -19,7 +19,7 @@ pipeline {
             steps {
                 sh "mvn -Dmaven.test.failure.ignore=true clean package"
 
-                sh "docker build -t kaliburg/fairgame ."
+                sh "sudo docker build -t kaliburg/fairgame ."
             }
         }
 
@@ -31,13 +31,13 @@ pipeline {
 
         stage('Push') {
             steps {
-                sh 'docker push kaliburg/fairgame:staging'
+                sh 'sudo docker push kaliburg/fairgame:staging'
             }
         }
     }
     post {
         always {
-            sh 'docker logout'
+            sh 'sudo docker logout'
         }
     }
 }
