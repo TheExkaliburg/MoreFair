@@ -6,8 +6,8 @@ services:
       SPRING_PROFILE: ${PROFILE}
       POSTGRES_URL: jdbc:postgresql://postgres:5432/FairGame
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      MONGO_URL: mongodb://mongo:27017/FairGame
-      REDIS_URL: redis://redis:6379
+      MONGO_URL: mongodb://root:${MONGO_PASSWORD}@mongo:27017/FairGame?authMechanism=DEFAULT
+      REDIS_URL: redis://root:${REDIS_PASSWORD}@redis:6379
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       REMEMBER_ME_SECRET: ${REMEMBER_ME_SECRET}
     ports:
