@@ -7,9 +7,9 @@ pipeline {
 
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
-        POSTGRES_PASSWORD = credentials('postgres')
-        MONGODB_PASSWORD = credentials('mongodb')
-        REDIS_PASSWORD = credentials('redis')
+        POSTGRES_CREDENTIALS = credentials('postgres')
+        MONGODB_CREDENTIALS = credentials('mongodb')
+        REDIS_CREDENTIALS = credentials('redis')
     }
 
     tools {
@@ -46,7 +46,10 @@ pipeline {
 
         stage('Docker Compose') {
             steps {
-                sh 'sudo docker compose up --detach --pull always --force-recreate'
+                sh 'ENV POSTGRES_PASSWORD=$POSTGRES_CREDENTIALS_PSW'
+                sh 'ENV MONGODB_PASSWORD=$MONGODB_CREDENTIALS_PSW'
+                sh 'ENV REDIS_PASSWORD=$REDIS_CREDENTIALS_PSW'
+                sh 'sudo docker compose -f docker-compose-staging.yml up --detach --pull always --force-recreate'
             }
         }
     }
