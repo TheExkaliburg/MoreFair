@@ -9,7 +9,7 @@ services:
       MONGO_URL: mongodb://mongo:27017/FairGame
       REDIS_URL: redis://redis:6379
     ports:
-      - "10000:11235"
+      - "10000:8080"
     depends_on:
       - postgres
       - redis
