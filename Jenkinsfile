@@ -7,6 +7,7 @@ pipeline {
 
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+        ENV_FILE = credentials('fairgame-env')
     }
 
     tools {
@@ -15,29 +16,36 @@ pipeline {
     }
 
     stages {
-        stage('Build') {
+        stage('Build/Test') {
             steps {
-                sh "mvn -Dmaven.test.failure.ignore=true clean package"
+                // git branch: 'feature/docker', credentialsId: 'github', url: 'https://github.com/TheExkaliburg/MoreFair.git'
+                sh 'mvn -Dmaven.test.failure.ignore=true clean package'
+            }
 
-                sh "docker build -t kaliburg/fairgame ."
+            post {
+                success {
+                    junit allowEmptyResults: true, skipOldReports: true, testResults: 'backend/target/surefire-reports/TEST-*.xml'
+                }
             }
         }
 
-        stage('Login') {
+        stage('Docker') {
             steps {
-                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+                sh 'sudo docker build -t kaliburg/fairgame:latest .'
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | sudo docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+                sh 'sudo docker push kaliburg/fairgame:latest'
+            }
+            post {
+                always {
+                    sh 'sudo docker logout'
+                }
             }
         }
 
-        stage('Push') {
+        stage('Compose/Startup') {
             steps {
-                sh 'docker push kaliburg/fairgame:staging'
+                sh 'sudo docker compose --env-file $ENV_FILE up --pull always --force-recreate --detach'
             }
-        }
-    }
-    post {
-        always {
-            sh 'docker logout'
         }
     }
 }
