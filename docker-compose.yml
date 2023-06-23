@@ -8,6 +8,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       MONGO_URL: mongodb://mongo:27017/FairGame
       REDIS_URL: redis://redis:6379
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      REMEMBER_ME_SECRET: ${REMEMBER_ME_SECRET}
     ports:
       - "10000:8080"
     depends_on:

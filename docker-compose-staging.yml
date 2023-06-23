@@ -8,8 +8,10 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       MONGO_URL: mongodb://mongo:27017/FairGame
       REDIS_URL: redis://redis:6379
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      REMEMBER_ME_SECRET: ${REMEMBER_ME_SECRET}
     ports:
-      - "10000:8080"
+      - "10100:8080"
     depends_on:
       - postgres
       - redis
@@ -23,7 +25,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: FairGame
     ports:
-      - "10001:5432"
+      - "10101:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -34,7 +36,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
     ports:
-      - "10002:27017"
+      - "10102:27017"
     volumes:
       - mongo_data:/data/db
       - mongo_config:/data/configdb
@@ -46,7 +48,7 @@ services:
     environment:
       REDIS_HOST_PASSWORD: ${REDIS_PASSWORD}
     ports:
-      - "10003:6379"
+      - "10103:6379"
     volumes:
       - redis_data:/data
     networks:
