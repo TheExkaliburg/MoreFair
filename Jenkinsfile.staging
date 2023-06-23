@@ -16,7 +16,7 @@ pipeline {
     }
 
     stages {
-        stage('Build') {
+        stage('Build/Test') {
             steps {
                 git branch: 'feature/docker', credentialsId: 'github', url: 'https://github.com/TheExkaliburg/MoreFair.git'
                 sh 'mvn -Dmaven.test.failure.ignore=true clean package'
@@ -42,7 +42,7 @@ pipeline {
             }
         }
 
-        stage('Docker Compose') {
+        stage('Compose/Startup') {
             steps {
                 sh 'sudo docker compose -f docker-compose-staging.yml --env-file $ENV_FILE up --pull always --force-recreate --detach'
             }

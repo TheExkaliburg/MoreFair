@@ -42,7 +42,7 @@ services:
       - fairgame
   redis:
     image: redis:latest
-    command: /bin/sh -c "redis-server --requirepass $REDIS_HOST_PASSWORD"
+    command: /bin/sh -c "redis-server --requirepass $REDIS_PASSWORD"
     environment:
       REDIS_HOST_PASSWORD: ${REDIS_PASSWORD}
     ports:
