@@ -73,7 +73,7 @@ let isPrivateConnectionEstablished = false;
 const isDevMode = process.env.NODE_ENV !== "production";
 const connection = isDevMode
   ? "ws://localhost:8080/socket/fair"
-  : `wss://${window.location.host}/socket/fair`;
+  : `ws://${window.location.host}/socket/fair`;
 const disconnectMessage =
   "You have been disconnected from the server, this could be because of a restart or an update. Please try reconnecting in a few minutes or try Discord if you cannot connect at all anymore.";
 const reconnectTimeout = 1 * 60 * 1000;

@@ -1,0 +1,38 @@
+# Use official Maven image as the build base
+FROM maven:3.8.4-openjdk-17-slim AS build
+
+MAINTAINER kaliburg.de
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the Maven project file to the container
+COPY pom.xml .
+COPY backend/pom.xml ./backend/
+COPY frontend/pom.xml ./frontend/
+COPY spark/pom.xml ./spark/
+
+# Download the project dependencies
+RUN mvn dependency:go-offline -B
+
+# Copy the project source code to the container
+COPY . .
+
+# Build the project and package the application as an executable JAR file
+RUN mvn package -DskipTests
+
+
+# Create new Stage for running the application
+FROM eclipse-temurin:17-jdk-alpine
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the executable JAR file to the container
+COPY --from=build /app/target/fairgame-1.0.jar .
+
+# Expose the port on which your application listens (assuming it's 8080)
+EXPOSE 8080
+
+# Set the entry point for running the application
+ENTRYPOINT ["java", "-jar", "/fairgame-1.0.jar"]
