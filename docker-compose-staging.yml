@@ -3,7 +3,7 @@ services:
   fairgame:
     image: kaliburg/fairgame:staging
     environment:
-      SPRING_PROFILE: staging
+      SPRING_PROFILE: ${PROFILE}
       POSTGRES_URL: jdbc:postgresql://postgres:5432/FairGame
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       MONGO_URL: mongodb://mongo:27017/FairGame
@@ -32,7 +32,7 @@ services:
     image: mongo:latest
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
     ports:
       - "10002:27017"
     volumes:
@@ -44,7 +44,7 @@ services:
     image: redis:latest
     command: /bin/sh -c "redis-server --requirepass $REDIS_HOST_PASSWORD"
     environment:
-      REDIS_HOST_PASSWORD: ${REDIS_HOST_PASSWORD}
+      REDIS_HOST_PASSWORD: ${REDIS_PASSWORD}
     ports:
       - "10003:6379"
     volumes:

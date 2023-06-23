@@ -7,9 +7,7 @@ pipeline {
 
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
-        POSTGRES_CREDENTIALS = credentials('postgres')
-        MONGODB_CREDENTIALS = credentials('mongodb')
-        REDIS_CREDENTIALS = credentials('redis')
+        ENV_FILE = credentials('fairgame-staging-env')
     }
 
     tools {
@@ -46,10 +44,7 @@ pipeline {
 
         stage('Docker Compose') {
             steps {
-                sh 'ENV POSTGRES_PASSWORD=$POSTGRES_CREDENTIALS_PSW'
-                sh 'ENV MONGODB_PASSWORD=$MONGODB_CREDENTIALS_PSW'
-                sh 'ENV REDIS_PASSWORD=$REDIS_CREDENTIALS_PSW'
-                sh 'sudo docker compose -f docker-compose-staging.yml up --detach --pull always --force-recreate'
+                sh 'sudo docker compose -f docker-compose-staging.yml --env-file $ENV_FILE up --pull always --force-recreate --detach'
             }
         }
     }
