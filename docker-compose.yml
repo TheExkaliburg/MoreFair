@@ -21,6 +21,7 @@ services:
       - mongo
     networks:
       - fairgame
+    restart: unless-stopped
   postgres:
     image: postgres:latest
     environment:
@@ -33,6 +34,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - fairgame
+    restart: always
   mongo:
     image: mongo:latest
     environment:
@@ -45,6 +47,7 @@ services:
       - mongo_config:/data/configdb
     networks:
       - fairgame
+    restart: always
   redis:
     image: redis:latest
     command: /bin/sh -c "redis-server --requirepass $REDIS_PASSWORD"
@@ -56,6 +59,7 @@ services:
       - redis_data:/data
     networks:
       - fairgame
+    restart: always
 
 volumes:
   postgres_data:
