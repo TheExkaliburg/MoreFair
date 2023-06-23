@@ -7,6 +7,9 @@ pipeline {
 
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+        POSTGRES_PASSWORD = credentials('postgres')
+        MONGODB_PASSWORD = credentials('mongodb')
+        REDIS_PASSWORD = credentials('redis')
     }
 
     tools {
@@ -17,27 +20,34 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh "mvn -Dmaven.test.failure.ignore=true clean package"
+                git branch: 'feature/docker', credentialsId: 'github', url: 'https://github.com/TheExkaliburg/MoreFair.git'
+                sh 'mvn -Dmaven.test.failure.ignore=true clean package'
+            }
 
-                sh "sudo docker build -t kaliburg/fairgame ."
+            post {
+                success {
+                    junit allowEmptyResults: true, skipOldReports: true, testResults: 'backend/target/surefire-reports/TEST-*.xml'
+                }
             }
         }
 
-        stage('Login') {
+        stage('Docker') {
             steps {
-                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-            }
-        }
-
-        stage('Push') {
-            steps {
+                sh 'sudo docker build -t kaliburg/fairgame:staging .'
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | sudo docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
                 sh 'sudo docker push kaliburg/fairgame:staging'
             }
+            post {
+                always {
+                    sh 'sudo docker logout'
+                }
+            }
         }
-    }
-    post {
-        always {
-            sh 'sudo docker logout'
+
+        stage('Docker Compose') {
+            steps {
+                sh 'sudo docker compose up --detach --pull always --force-recreate'
+            }
         }
     }
 }

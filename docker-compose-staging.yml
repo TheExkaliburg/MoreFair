@@ -1,9 +1,9 @@
 version: "3.9"
 services:
   fairgame:
-    image: kaliburg/fairgame:latest
+    image: kaliburg/fairgame:staging
     environment:
-      SPRING_PROFILE: prod
+      SPRING_PROFILE: staging
       POSTGRES_URL: jdbc:postgresql://postgres:5432/FairGame
       POSTGRES_PASSWORD: postgres_secret
       MONGO_URL: mongodb://mongo:27017/FairGame
