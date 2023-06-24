@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.kaliburg</groupId>
-    <artifactId>morefair</artifactId>
+    <artifactId>fairgame</artifactId>
     <version>1.0</version>
     <packaging>pom</packaging>
 
