@@ -19,8 +19,6 @@ services:
       - postgres
       - redis
       - mongo
-    networks:
-      - fairgame
     restart: unless-stopped
   postgres:
     image: postgres:latest
@@ -32,8 +30,6 @@ services:
       - "10001:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - fairgame
     restart: always
   mongo:
     image: mongo:latest
@@ -45,8 +41,6 @@ services:
     volumes:
       - mongo_data:/data/db
       - mongo_config:/data/configdb
-    networks:
-      - fairgame
     restart: always
   redis:
     image: redis:latest
@@ -57,8 +51,6 @@ services:
       - "10003:6379"
     volumes:
       - redis_data:/data
-    networks:
-      - fairgame
     restart: always
 
 volumes:
@@ -66,8 +58,3 @@ volumes:
   mongo_data:
   mongo_config:
   redis_data:
-
-networks:
-  fairgame:
-    name: fairgame
-    driver: bridge
