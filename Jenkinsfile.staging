@@ -44,6 +44,7 @@ pipeline {
 
         stage('Compose/Startup') {
             steps {
+                sh 'sudo docker compose down'
                 sh 'sudo docker compose -f docker-compose-staging.yml --env-file $ENV_FILE up --pull always --force-recreate --detach'
             }
         }
