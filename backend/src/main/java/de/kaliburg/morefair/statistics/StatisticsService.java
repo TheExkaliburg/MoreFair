@@ -7,7 +7,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import de.kaliburg.morefair.FairConfig;
-import de.kaliburg.morefair.MoreFairApplication;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.game.round.LadderEntity;
 import de.kaliburg.morefair.game.round.RankerEntity;
@@ -34,7 +33,6 @@ import de.kaliburg.morefair.statistics.results.ActivityAnalysisRepository;
 import de.kaliburg.morefair.statistics.results.RoundStatisticsEntity;
 import de.kaliburg.morefair.statistics.results.RoundStatisticsRepository;
 import jakarta.annotation.PostConstruct;
-import java.io.File;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -81,6 +79,9 @@ public class StatisticsService {
   private String sqlPassword;
   @Value("${spring.datasource.username}")
   private String sqlUsername;
+
+  @Value("${fair.spark.master-url}")
+  private String sparkMasterUrl = "";
 
   public void recordLogin(AccountEntity account) {
     loginRecordRepository.save(new LoginRecordEntity(account));
@@ -199,7 +200,7 @@ public class StatisticsService {
 
       // Add the "sparkProperties" property
       JsonObject sparkProperties = new JsonObject();
-      sparkProperties.addProperty("spark.master", "spark://85.214.71.14:7077");
+      sparkProperties.addProperty("spark.master", "spark://master:7077");
       sparkProperties.addProperty("spark.app.name", "Spark Live Test");
       sparkProperties.addProperty("spark.executor.memory", "8g");
       sparkProperties.addProperty("spark.driver.memory", "8g");
@@ -207,17 +208,15 @@ public class StatisticsService {
       jsonBody.add("sparkProperties", sparkProperties);
 
       // Add the other properties
-      String jarPath = MoreFairApplication.class.getProtectionDomain().getCodeSource().getLocation()
-          .getPath();
-      if (jarPath.contains("!")) {
-        jarPath = jarPath.substring(0, jarPath.lastIndexOf("!"));
-        jarPath = jarPath.substring(0, jarPath.lastIndexOf("/"));
+      String host = "";
+      if (activeProfile.equals("prod")) {
+        host = "https://fair.kaliburg.de";
+      } else if (activeProfile.equals("staging")) {
+        host = "https://fairtest.kaliburg.de";
       }
-      File jarFile = new File(jarPath);
-      String actualPath = jarFile.getParentFile().getParent();
 
-      jsonBody.addProperty("appResource", actualPath + "/spark.jar");
-      jsonBody.addProperty("clientSparkVersion", "3.3.1");
+      jsonBody.addProperty("appResource", host + "/spark.jar");
+      jsonBody.addProperty("clientSparkVersion", "3.4.1");
       jsonBody.addProperty("mainClass", mainClass);
 
       // Add the "environmentVariables" property
@@ -240,7 +239,7 @@ public class StatisticsService {
       String jsonString = gson.toJson(jsonBody);
 
       RestTemplate restTemplate = new RestTemplate();
-      String url = "http://85.214.71.14:6066/v1/submissions/create";
+      String url = sparkMasterUrl + "/api/v1/submissions/create";
 
       // Send the request and get the response
       CompletableFuture.runAsync(() -> {

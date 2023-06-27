@@ -4,7 +4,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>de.kaliburg</groupId>
     <artifactId>spark</artifactId>
     <version>1.0</version>
 
@@ -92,14 +91,14 @@
                     <execution>
                         <configuration>
                             <destinationFile>
-                                ${project.parent.basedir}/target/${project.artifactId}-${project.version}.jar
+                                ${project.basedir}/target/${project.artifactId}.jar
                             </destinationFile>
                             <sourceFile>
                                 ${project.basedir}/target/${project.artifactId}-${project.version}-jar-with-dependencies.jar
                             </sourceFile>
                         </configuration>
                         <goals>
-                            <goal>copy</goal>
+                            <goal>rename</goal>
                         </goals>
                         <id>copy-jar-after-package</id>
                         <phase>package</phase>

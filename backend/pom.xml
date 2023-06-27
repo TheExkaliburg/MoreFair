@@ -65,6 +65,25 @@
                         <id>copy-frontend-content</id>
                         <phase>process-resources</phase>
                     </execution>
+                    <execution>
+                        <configuration>
+                            <outputDirectory>target/classes/static</outputDirectory>
+                            <overwrite>false</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>${project.parent.basedir}/spark/target</directory>
+                                    <includes>
+                                        <include>spark.jar</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <id>copy-spark-jar</id>
+                        <phase>process-resources</phase>
+                    </execution>
                 </executions>
                 <groupId>org.apache.maven.plugins</groupId>
                 <version>3.2.0</version>
@@ -75,10 +94,10 @@
                     <execution>
                         <configuration>
                             <destinationFile>
-                                ${project.parent.basedir}/target/${project.parent.artifactId}-${project.parent.version}.jar
+                                ${project.parent.basedir}/target/${project.parent.artifactId}.jar
                             </destinationFile>
                             <sourceFile>
-                                ${project.basedir}/target/${project.artifactId}-${project.version}.jar
+                                ${project.basedir}/target/${project.artifactId}-${project.parent.version}.jar
                             </sourceFile>
                         </configuration>
                         <goals>
