@@ -11,9 +11,9 @@ public enum RoundType {
   SLOW,
   AUTO,
   CHAOS(1),
-  CHOO_CHOO,
+  RAILROAD,
   FARMER,
-  CLIMBER;
+  RACE;
 
   @Getter
   private int priority = 0;

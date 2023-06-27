@@ -27,6 +27,12 @@ export enum LadderType {
   ASSHOLE = "ASSHOLE",
   CHEAP = "CHEAP",
   EXPENSIVE = "EXPENSIVE",
+  BOUNTIFUL = "BOUNTIFUL",
+  DROUGHT = "DROUGHT",
+  CONSOLATION = "CONSOLATION",
+  NO_HANDOUTS = "NO_HANDOUTS",
+  GENEROUS = "GENEROUS",
+  STINGY = "STINGY",
 }
 
 export enum LadderEventType {
@@ -182,7 +188,7 @@ export const useLadderStore = defineStore("ladder", () => {
               state.rankers[j].multi > 1
             ) {
               state.rankers[j].grapes = Object.freeze(
-                state.rankers[j].grapes.add(1)
+                state.rankers[j].grapes.add(ladderUtils.getPassingGrapes())
               );
             }
             state.rankers[j + 1] = state.rankers[j];
@@ -217,7 +223,7 @@ export const useLadderStore = defineStore("ladder", () => {
         state.rankers.length > 1
       ) {
         yourRanker.grapes = Object.freeze(
-          yourRanker.grapes.add(new Decimal(2))
+          yourRanker.grapes.add(new Decimal(ladderUtils.getBottomGrapes()))
         );
       }
     }

@@ -125,4 +125,50 @@ public final class LadderEntity {
     builder.setPreviousLadderType(previousLadderTypes);
     types = builder.build();
   }
+
+  public int getPassingGrapes() {
+    if(types.contains(LadderType.CONSOLATION)) {
+      return 3;
+    } else if(types.contains(LadderType.NO_HANDOUTS)) {
+      return 0;
+    }
+    return 1;
+  }
+
+  public int getBottomGrapes() {
+    if(types.contains(LadderType.BOUNTIFUL)) {
+      return 5;
+    } else if(types.contains(LadderType.DROUGHT)) {
+      return 1;
+    }
+    return 2;
+  }
+
+  public int getWinningGrapes(int place, BigInteger baseGrapeCostForAuto) {
+    float multiplier = 1.f;
+    if(types.contains(LadderType.GENEROUS)) {
+      multiplier = 3.f;
+    } else if(types.contains(LadderType.STINGY)) {
+      multiplier = .5f;
+    }
+
+    if(place == 1) {
+      return (int) (baseGrapeCostForAuto.intValue() * multiplier);
+    } else if(place < 4) {
+      return (int)(baseGrapeCostForAuto.divide(BigInteger.TWO).intValue() * multiplier);
+    } else if(place < 11) {
+      return (int)(baseGrapeCostForAuto.divide(BigInteger.TEN).intValue() * multiplier);
+    }
+    return 0;
+  }
+
+  //This is the bonus vin multiplier, the ladder winner gets vin X (getWinningMultipler / 10)
+  public int getWinningMultiplier() {
+    if(types.contains(LadderType.GENEROUS)) {
+      return 14;
+    } else if(types.contains(LadderType.STINGY)) {
+      return 11;
+    }
+    return 12;
+  }
 }

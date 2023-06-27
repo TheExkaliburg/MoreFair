@@ -215,3 +215,27 @@ modifier:
     title: Asshole
     description: The final ladder - promotion from here will grant entry to Chad's ritual.
     identifier: AH
+  BOUNTIFUL:
+    title: Bountiful
+    description: Bottom grapes are increased.
+    indentifier: BOUNT
+  DROUGHT:
+    title: Drought
+    description: Bottom grapes are reduced.
+    indentifier: DRY
+  CONSOLATION:
+    title: Consolation
+    description: Passing grapes are increased.
+    identifier: CONSOL
+  NO_HANDOUTS:
+    title: No Handouts
+    description: No passing grapes.
+    identifier: NHAND
+  GENEROUS:
+    title: Generous
+    description: Ladder winnings are increased.
+    identifier: GEN
+  STINGY:
+    title: Stingy
+    description: Ladder winnings are decreased.
+    identifier: STINGY

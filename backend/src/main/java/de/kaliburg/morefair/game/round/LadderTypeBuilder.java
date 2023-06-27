@@ -18,7 +18,7 @@ public class LadderTypeBuilder {
   private final Map<LadderType, Float> ladderSizeTypeWeights = new HashMap<>();
   private final Map<LadderType, Float> ladderAutoTypeWeights = new HashMap<>();
   private final Map<LadderType, Float> ladderCostTypeWeights = new HashMap<>();
-
+  private final Map<LadderType, Float> ladderGrapesTypeWeights = new HashMap<>();
   @Setter
   @Accessors(chain = true)
   private Set<RoundType> roundTypes = EnumSet.noneOf(RoundType.class);
@@ -49,6 +49,13 @@ public class LadderTypeBuilder {
     ladderCostTypeWeights.put(LadderType.CHEAP, 10.f);
     ladderCostTypeWeights.put(LadderType.EXPENSIVE, 10.f);
     ladderCostTypeWeights.put(LadderType.DEFAULT, 100.f);
+
+    ladderGrapesTypeWeights.put(LadderType.BOUNTIFUL, 0f);
+    ladderGrapesTypeWeights.put(LadderType.DROUGHT, 0f);
+    ladderGrapesTypeWeights.put(LadderType.STINGY, 0f);
+    ladderGrapesTypeWeights.put(LadderType.CONSOLATION, 0f);
+    ladderGrapesTypeWeights.put(LadderType.NO_HANDOUTS, 0f);
+    ladderGrapesTypeWeights.put(LadderType.GENEROUS, 0f);
   }
 
   public static LadderTypeBuilder builder() {
@@ -66,6 +73,9 @@ public class LadderTypeBuilder {
       }
       if (ladderCostTypeWeights.containsKey(ladderType)) {
         ladderCostTypeWeights.put(ladderType, ladderCostTypeWeights.get(ladderType) / 2);
+      }
+      if(ladderGrapesTypeWeights.containsKey(ladderType)) {
+        ladderGrapesTypeWeights.put(ladderType,ladderGrapesTypeWeights.get(ladderType) / 2);
       }
 
       return;
@@ -115,6 +125,12 @@ public class LadderTypeBuilder {
         ladderCostTypeWeights.put(LadderType.CHEAP, 1.f);
         ladderCostTypeWeights.put(LadderType.EXPENSIVE, 1.f);
         ladderCostTypeWeights.put(LadderType.DEFAULT, 1.f);
+        ladderGrapesTypeWeights.put(LadderType.BOUNTIFUL, 1f);
+        ladderGrapesTypeWeights.put(LadderType.DROUGHT, 1f);
+        ladderGrapesTypeWeights.put(LadderType.STINGY, 1f);
+        ladderGrapesTypeWeights.put(LadderType.CONSOLATION, 1f);
+        ladderGrapesTypeWeights.put(LadderType.NO_HANDOUTS, 1f);
+        ladderGrapesTypeWeights.put(LadderType.GENEROUS, 1f);
       }
       case SLOW -> {
         ladderSizeTypeWeights.put(LadderType.TINY, 0.f);
@@ -130,6 +146,21 @@ public class LadderTypeBuilder {
             ladderCostTypeWeights.get(LadderType.CHEAP) / 2);
         ladderCostTypeWeights.put(LadderType.EXPENSIVE,
             ladderCostTypeWeights.get(LadderType.EXPENSIVE) * 2);
+      }
+      case RAILROAD -> {
+        ladderGrapesTypeWeights.put(LadderType.CONSOLATION,50.f);
+        ladderGrapesTypeWeights.put(LadderType.DROUGHT,20.f);
+        ladderGrapesTypeWeights.put(LadderType.STINGY,20.f);
+      }
+      case FARMER -> {
+        ladderGrapesTypeWeights.put(LadderType.BOUNTIFUL,50.f);
+        ladderGrapesTypeWeights.put(LadderType.STINGY,20.f);
+        ladderGrapesTypeWeights.put(LadderType.NO_HANDOUTS,20.f);
+      }
+      case RACE -> {
+        ladderGrapesTypeWeights.put(LadderType.GENEROUS,50.f);
+        ladderGrapesTypeWeights.put(LadderType.DROUGHT,20.f);
+        ladderGrapesTypeWeights.put(LadderType.NO_HANDOUTS,20.f);
       }
       default -> {
         // do nothing

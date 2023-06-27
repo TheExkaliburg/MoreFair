@@ -40,9 +40,9 @@ public class RoundTypeBuilder {
     roundChaosTypeWeights.put(RoundType.DEFAULT, 90.f);
 
     roundGrapesTypeWeights.put(RoundType.FARMER,10.f);
-    roundGrapesTypeWeights.put(RoundType.CHOO_CHOO,10.f);
-    roundAutoTypeWeights.put(RoundType.CLIMBER,10.f);
-    roundAutoTypeWeights.put(RoundType.DEFAULT,70.f);
+    roundGrapesTypeWeights.put(RoundType.RAILROAD,10.f);
+    roundGrapesTypeWeights.put(RoundType.RACE,10.f);
+    roundGrapesTypeWeights.put(RoundType.DEFAULT,70.f);
   }
 
   // TODO: add reference to last Round into this method

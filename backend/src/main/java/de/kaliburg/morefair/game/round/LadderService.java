@@ -543,20 +543,10 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         if (newLadder.getRankers().size() <= 1) {
           newRanker.setAutoPromote(true);
           newRanker.setVinegar(
-              newRanker.getVinegar().multiply(BigInteger.valueOf(12)).divide(BigInteger.TEN));
+              newRanker.getVinegar().multiply(BigInteger.valueOf(newLadder.getWinningMultiplier())).divide(BigInteger.TEN));
         }
 
-        BigInteger autoPromoteCostForReward = config.getBaseGrapesToBuyAutoPromote();
-        if(currentRound.getTypes().contains(RoundType.CLIMBER)) {
-          autoPromoteCostForReward = autoPromoteCostForReward.multiply(BigInteger.valueOf(3L));
-        }
-        if (newLadder.getRankers().size() <= 3) {
-          newRanker.setGrapes(newRanker.getGrapes().add(autoPromoteCostForReward));
-        } else if (newLadder.getRankers().size() <= 5) {
-          newRanker.setGrapes(newRanker.getGrapes().add(autoPromoteCostForReward.divide(BigInteger.TWO)));
-        } else if (newLadder.getRankers().size() <= currentRound.getBaseAssholeLadder()) {
-          newRanker.setGrapes(newRanker.getGrapes().add(autoPromoteCostForReward.divide(BigInteger.TEN)));
-        }
+        newRanker.setGrapes(newRanker.getGrapes().add(BigInteger.valueOf(newLadder.getWinningGrapes(newLadder.getRankers().size(),config.getBaseGrapesToBuyAutoPromote()))));
 
         // Create new Chat if it doesn't exist
         if (chatService.find(ladder.getNumber() + 1) == null) {
