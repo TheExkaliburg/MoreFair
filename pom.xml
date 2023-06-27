@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.kaliburg</groupId>
-    <artifactId>morefair</artifactId>
+    <artifactId>fairgame</artifactId>
     <version>1.0</version>
     <packaging>pom</packaging>
 
-    <name>MoreFairGame</name>
-    <description>Demo project for Spring Boot</description>
+    <name>FairGame</name>
+    <description>A competitive/cooperative Ladder Game</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>

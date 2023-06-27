@@ -1,0 +1,60 @@
+version: "3.9"
+services:
+  fairgame:
+    image: kaliburg/fairgame:latest
+    environment:
+      SPRING_PROFILE: ${PROFILE}
+      POSTGRES_URL: jdbc:postgresql://postgres:5432/FairGame
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      MONGO_URL: mongodb://root:${MONGO_PASSWORD}@mongo:27017/FairGame?authMechanism=DEFAULT
+      MONGO_HOST: mongo
+      MONGO_PASSWORD: ${MONGO_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      REMEMBER_ME_SECRET: ${REMEMBER_ME_SECRET}
+    ports:
+      - "10000:8080"
+    depends_on:
+      - postgres
+      - redis
+      - mongo
+    restart: unless-stopped
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: FairGame
+    ports:
+      - "10001:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+  mongo:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    ports:
+      - "10002:27017"
+    volumes:
+      - mongo_data:/data/db
+      - mongo_config:/data/configdb
+    restart: always
+  redis:
+    image: redis:latest
+    command: /bin/sh -c "redis-server --requirepass $REDIS_PASSWORD"
+    environment:
+      REDIS_HOST_PASSWORD: ${REDIS_PASSWORD}
+    ports:
+      - "10003:6379"
+    volumes:
+      - redis_data:/data
+    restart: always
+
+volumes:
+  postgres_data:
+  mongo_data:
+  mongo_config:
+  redis_data:

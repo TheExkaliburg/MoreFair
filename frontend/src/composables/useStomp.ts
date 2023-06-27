@@ -71,9 +71,11 @@ function addCallback<T>(
 
 let isPrivateConnectionEstablished = false;
 const isDevMode = process.env.NODE_ENV !== "production";
+const connectionType = window.location.protocol === "https:" ? "wss" : "ws";
 const connection = isDevMode
   ? "ws://localhost:8080/socket/fair"
-  : `wss://${window.location.host}/socket/fair`;
+  : `${connectionType}://${window.location.host}/socket/fair`;
+
 const disconnectMessage =
   "You have been disconnected from the server, this could be because of a restart or an update. Please try reconnecting in a few minutes or try Discord if you cannot connect at all anymore.";
 const reconnectTimeout = 1 * 60 * 1000;
@@ -203,7 +205,19 @@ function reset() {
 }
 
 function parseEvent(e: Event): string {
-  return JSON.stringify(e);
+  const serializableEvent = {
+    isTrusted: e.isTrusted,
+    // @ts-ignore
+    screenX: e.screenX ?? -1,
+    // @ts-ignore
+    screenY: e.screenY ?? -1,
+  };
+
+  if (!(e instanceof Event)) {
+    serializableEvent.isTrusted = false;
+  }
+
+  return JSON.stringify(serializableEvent);
 }
 
 const wsApi = (client: Client) => {
