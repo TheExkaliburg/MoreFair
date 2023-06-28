@@ -13,6 +13,7 @@ services:
       REDIS_PASSWORD: ${REDIS_PASSWORD}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       REMEMBER_ME_SECRET: ${REMEMBER_ME_SECRET}
+      SPARK_MASTER_URL: https://spark.kaliburg.de
     ports:
       - "10100:8080"
     depends_on:

@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.serivces;
+package de.kaliburg.morefair.services;
 
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
