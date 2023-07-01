@@ -136,14 +136,7 @@ public class LadderTypeBuilder {
     Set<LadderType> ladderTypes = EnumSet.noneOf(LadderType.class);
 
     if (ladderNumber == 1) {
-      ladderSizeTypeWeights.put(LadderType.TINY, 0.f);
-      ladderSizeTypeWeights.put(LadderType.GIGANTIC, 0.f);
-      ladderSizeTypeWeights.put(LadderType.SMALL, 0.f);
-      ladderSizeTypeWeights.put(LadderType.BIG, 0.f);
-      ladderAutoTypeWeights.put(LadderType.FREE_AUTO, 0.f);
-      ladderAutoTypeWeights.put(LadderType.NO_AUTO, 0.f);
-      ladderCostTypeWeights.put(LadderType.CHEAP, 0.f);
-      ladderCostTypeWeights.put(LadderType.EXPENSIVE, 0.f);
+      return EnumSet.of(LadderType.DEFAULT);
     }
 
     if (ladderNumber > 25) {
