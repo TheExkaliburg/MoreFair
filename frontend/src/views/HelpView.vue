@@ -50,8 +50,17 @@
                 <li>Don't use any malicious and/or automating scripts.</li>
                 <li>Don't use multiple accounts during the same round.</li>
                 <li>No posting of uuids and/or sensitive data.</li>
-                <li>Griefing is prohibited; repeatedly and intentionally making the game worse for everybody else can lead to a warning and ban.</li>
-                <li>All members of the community are expected to comply with official requests from moderators. If you think any mod is misusing their power please write @kaliburg a message on discord.</li>
+                <li>
+                  Griefing is prohibited; repeatedly and intentionally making
+                  the game worse for everybody else can lead to a warning and
+                  ban.
+                </li>
+                <li>
+                  All members of the community are expected to comply with
+                  official requests from moderators. If you think any mod is
+                  misusing their power please write @kaliburg a message on
+                  discord.
+                </li>
               </ol>
 
               If you have any questions, ideas, want to stay up to date to the

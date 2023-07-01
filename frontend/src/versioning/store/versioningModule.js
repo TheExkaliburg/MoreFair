@@ -5,6 +5,17 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "Changing the penalty for getting graped", {
+          balancing: [
+            "Normally you would either get forced to multi or loose half of your power and get set back to 0 points.",
+            "Now you will loose 1 of your multi. So if you have 4 multi, getting graped sets you back to x3 +0 as if you just multied from x2.",
+          ],
+          rules: [
+            "Adding 2 new rules, see discord for the reasoning for these rules.",
+            "Rule 10: Griefing is prohibited; repeatedly and intentionally making the game worse for everybody else can lead to a warning and ban.",
+            "Rule 11: All members of the community are expected to comply with official requests from moderators. If you think any mod is misusing their power please write @kaliburg a message on discord.",
+          ],
+        }),
         new Version("PATCH", "Hotfix for L1 not always rolling DEFAULT", {
           fixes: [
             "L1 is now always rolling DEFAULT, even if it's a CHAOS round",

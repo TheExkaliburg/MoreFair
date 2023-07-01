@@ -19,4 +19,5 @@ public enum EventType {
   CONFIRM,
   MOD,
   INCREASE_ASSHOLE_LADDER,
+  REMOVE_MULTI,
 }

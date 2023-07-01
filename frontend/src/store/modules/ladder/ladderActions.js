@@ -162,6 +162,9 @@ export default {
       case "SOFT_RESET_POINTS":
         commit({ type: "handleSoftResetPointsEvent", event: event });
         break;
+      case "REMOVE_MULTI":
+        commit({ type: "handleRemoveMultiEvent", event: event });
+        break;
       case "PROMOTE":
         commit({
           type: "handlePromoteEvent",

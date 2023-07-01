@@ -85,6 +85,16 @@ export default {
       }
     });
   },
+  handleRemoveMultiEvent(state, { event }) {
+    state.rankers.forEach((ranker) => {
+      if (event.accountId === ranker.accountId) {
+        ranker.multi = Math.max(1, ranker.multi - 1);
+        ranker.bias = 0;
+        ranker.points = new Decimal(0);
+        ranker.power = new Decimal(0);
+      }
+    });
+  },
   handleNameChangeEvent(state, { event }) {
     state.rankers.forEach((ranker) => {
       if (event.accountId === ranker.accountId) {
