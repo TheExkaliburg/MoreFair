@@ -5,6 +5,11 @@ const versioningModule = {
   state: () => {
     return {
       versions: [
+        new Version("PATCH", "Hotfix for L1 not always rolling DEFAULT", {
+          fixes: [
+            "L1 is now always rolling DEFAULT, even if it's a CHAOS round",
+          ],
+        }),
         new Version("PATCH", "FREE_AUTO formula change", {
           balancing: [
             "SLOW and FAST no longer impact how close the FREE_AUTO gets applied to ladders",
