@@ -174,6 +174,15 @@ function connectModeratorChannel() {
 }
 
 client.onStompError = (_) => {
+  // gets called when can't establish connection
+  isPrivateConnectionEstablished = false;
+  setTimeout(() => {
+    reset();
+  }, 5 * 1000);
+};
+
+client.onWebSocketClose = (_) => {
+  // gets called when the connection is lost/server is restarted or when the client disconnects by itself
   isPrivateConnectionEstablished = false;
   useToasts(disconnectMessage, { type: "error" });
   useChatStore().actions.addSystemMessage(disconnectMessage);
@@ -182,23 +191,15 @@ client.onStompError = (_) => {
   }, reconnectTimeout);
 };
 
-client.onWebSocketClose(() => {
+/* client.onDisconnect = (_) => {
+  // gets called when the client disconnects by itself through script, but before the onWebSocketClose
+  console.log("disconnected");
   isPrivateConnectionEstablished = false;
-  useToasts(disconnectMessage, { type: "error" });
   useChatStore().actions.addSystemMessage(disconnectMessage);
   setTimeout(() => {
     window.location.reload();
   }, reconnectTimeout);
-});
-
-client.onDisconnect = (_) => {
-  isPrivateConnectionEstablished = false;
-
-  useChatStore().actions.addSystemMessage(disconnectMessage);
-  setTimeout(() => {
-    window.location.reload();
-  }, reconnectTimeout);
-};
+}; */
 
 function reset() {
   client.deactivate().then();
@@ -315,6 +316,7 @@ const wsApi = (client: Client) => {
 };
 
 export const useStomp = () => {
+  console.log("Stomp active: ", client.active);
   // only activate the client if it is not already active
   if (!client.active) {
     client.activate();

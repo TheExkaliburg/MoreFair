@@ -594,6 +594,9 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
           // Is it time to reset the game
           if (assholeCount >= neededAssholesForReset) {
+            wsUtils.convertAndSendToTopic(RoundController.TOPIC_EVENTS_DESTINATION,
+                new Event<>(RoundEventTypes.RESET, account.getId()));
+
             LadderEntity firstLadder = findInCache(1);
             List<AccountEntity> accounts =
                 firstLadder.getRankers().stream().map(RankerEntity::getAccount).distinct().toList();
@@ -606,8 +609,6 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
             accountService.save(accounts);
             saveStateToDatabase(currentRound);
             eventPublisher.publishEvent(new GameResetEvent(this));
-            wsUtils.convertAndSendToTopic(RoundController.TOPIC_EVENTS_DESTINATION,
-                new Event<>(RoundEventTypes.RESET, account.getId()));
           }
         }
         return true;
