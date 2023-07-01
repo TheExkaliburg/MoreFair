@@ -667,10 +667,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
             LadderController.PRIVATE_EVENTS_DESTINATION, event);
 
         if (data.isSuccess()) {
-          if (!buyMulti(new Event<>(LadderEventTypes.BUY_MULTI, targetAccount.getId()), ladder)) {
-            softResetPoints(new Event<>(LadderEventTypes.SOFT_RESET_POINTS, targetAccount.getId()),
-                ladder);
-          }
+          removeMulti(new Event<>(LadderEventTypes.REMOVE_MULTI, targetAccount.getId()), ladder);
         }
 
         ranker.setVinegar(BigInteger.ZERO);
@@ -706,6 +703,31 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
       e.printStackTrace();
     }
 
+    return false;
+  }
+
+  /**
+   * Removes 1 Multi from the active ranker of an account on a specific ladder. This mainly happens
+   * after successfully thrown vinegar.
+   *
+   * @param event  the event that contains the information for the removal
+   * @param ladder the ladder the ranker is on
+   * @return if the ranker can be soft-reset
+   */
+  boolean removeMulti(Event event, LadderEntity ladder) {
+    try {
+      RankerEntity ranker = findActiveRankerOfAccountOnLadder(event.getAccountId(), ladder);
+      ranker.setMultiplier(Math.max(1, ranker.getMultiplier() - 1));
+      ranker.setBias(0);
+      ranker.setPower(BigInteger.ZERO);
+      ranker.setPoints(BigInteger.ZERO);
+      wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
+          ladder.getNumber(), event);
+      return true;
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      e.printStackTrace();
+    }
     return false;
   }
 
