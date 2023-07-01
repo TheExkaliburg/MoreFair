@@ -50,6 +50,7 @@
                 <li>Don't use any malicious and/or automating scripts.</li>
                 <li>Don't use multiple accounts during the same round.</li>
                 <li>No posting of uuids and/or sensitive data.</li>
+                <li>Griefing is prohibited; repeatedly and intentionally making the game worse for everybody else can lead to a warning and ban.</li>
               </ol>
 
               If you have any questions, ideas, want to stay up to date to the
