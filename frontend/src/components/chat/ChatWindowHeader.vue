@@ -22,7 +22,7 @@ const roundStore = useRoundStore();
 
 const maxChat = computed<number>(() =>
   accountStore.getters.isMod
-    ? roundStore.state.autoPromoteLadder + 1
+    ? roundStore.state.assholeLadder + 1
     : accountStore.state.highestCurrentLadder
 );
 </script>
