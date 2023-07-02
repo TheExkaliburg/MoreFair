@@ -55,6 +55,18 @@
             </SidebarButton>
           </NuxtLink>
           <NuxtLink
+            v-if="accountStore.getters.isMod"
+            v-tippy="{ content: lang('moderation'), placement: 'right' }"
+            aria-label="Goto Moderation Page"
+            to="/moderation"
+          >
+            <SidebarButton aria-label="Goto Moderation Page">
+              <template #icon>
+                <DocumentTextIcon />
+              </template>
+            </SidebarButton>
+          </NuxtLink>
+          <NuxtLink
             v-tippy="{ content: lang('discord'), placement: 'right' }"
             aria-label="Goto Community Discord"
             target="_blank"
@@ -83,6 +95,9 @@ import {
 import { useLang } from "~/composables/useLang";
 import SidebarButton from "~/components/navbar/SidebarButton.vue";
 import { useTutorialTour } from "~/composables/useTour";
+import { useAccountStore } from "~/store/account";
+
+const accountStore = useAccountStore();
 
 const classesForSize = "min-w-12 w-12 max-w-12 px-2 py-2";
 const lang = useLang("components.navbar.sidebar");

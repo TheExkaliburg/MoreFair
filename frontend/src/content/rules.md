@@ -15,6 +15,10 @@ Please follow the rules below to keep things fair and comfy:
 7. Don't use any malicious and/or automating scripts.
 8. Don't use multiple accounts during the same round.
 9. No posting of uuids, emails, passwords and/or sensitive data.
+10. Griefing is prohibited; repeatedly and intentionally making the game worse for everybody else can lead to a warning
+    and ban.
+11. All members of the community are expected to comply with official requests from moderators. If you think any mod is
+    misusing their power please write @kaliburg a message on discord.
 
 If you have any questions, ideas, want to stay up to date to the latest updates or simply just want to chat with your
 fellow rankers, without having Chad listening, you can join us on our
