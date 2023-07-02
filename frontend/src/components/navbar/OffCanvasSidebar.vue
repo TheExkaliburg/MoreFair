@@ -50,6 +50,16 @@
             </template>
           </SidebarButton>
         </NuxtLink>
+        <NuxtLink to="/changelog" @click="close">
+          <SidebarButton
+            :label="lang('changelog')"
+            aria-label="Goto Changelog Page"
+          >
+            <template #icon>
+              <NewspaperIcon />
+            </template>
+          </SidebarButton>
+        </NuxtLink>
         <NuxtLink to="/rules" @click="close">
           <SidebarButton :label="lang('rules')" aria-label="Goto Rules Page">
             <template #icon>
@@ -100,6 +110,7 @@ import {
   BookOpenIcon,
   Cog8ToothIcon,
   DocumentTextIcon,
+  NewspaperIcon,
   QuestionMarkCircleIcon,
   UserCircleIcon,
 } from "@heroicons/vue/24/outline";

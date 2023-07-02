@@ -17,6 +17,7 @@ components:
       moderation: Moderation
       wiki: FairWiki
       information: Information
+      changelog: Changelog
     lockButtons: Lock Buttons
     enableChat: Enable Chat
     enableLadder: Enable Ladder

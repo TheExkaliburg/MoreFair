@@ -55,6 +55,17 @@
             </SidebarButton>
           </NuxtLink>
           <NuxtLink
+            v-tippy="{ content: lang('changelog'), placement: 'right' }"
+            aria-label="Goto Changelog"
+            to="/rules"
+          >
+            <SidebarButton aria-label="Goto Changelog">
+              <template #icon>
+                <NewspaperIcon />
+              </template>
+            </SidebarButton>
+          </NuxtLink>
+          <NuxtLink
             v-tippy="{ content: lang('rules'), placement: 'right' }"
             aria-label="Goto Rules Page"
             to="/rules"
@@ -101,6 +112,7 @@ import {
   BookOpenIcon,
   Cog8ToothIcon,
   DocumentTextIcon,
+  NewspaperIcon,
   QuestionMarkCircleIcon,
   UserCircleIcon,
 } from "@heroicons/vue/24/outline";
