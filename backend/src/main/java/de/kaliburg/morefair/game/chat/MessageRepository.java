@@ -20,6 +20,5 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long> {
   @Query("select m from MessageEntity m where m.account = :account")
   List<MessageEntity> findByAccount(@Param("account") AccountEntity account);
 
-  List<MessageEntity> findTop50ByDeletedOnNullOrderByCreatedOnDesc();
-
+  List<MessageEntity> findTop50ByAccount_IdGreaterThanAndDeletedOnNullOrderByCreatedOnDesc(Long id);
 }
