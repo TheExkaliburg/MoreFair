@@ -26,5 +26,9 @@
 - TODO: play around with electron, maybe it will work maybe not
  */
 
+import Fair from "~/utils/hooks";
+
 useAPI();
+
+window.Fair = Fair;
 </script>

@@ -44,6 +44,17 @@
             </template>
           </SidebarButton>
           <NuxtLink
+            v-tippy="{ content: lang('wiki'), placement: 'right' }"
+            aria-label="Goto Fair Wiki"
+            to="https://fairwiki.kaliburg.de/"
+          >
+            <SidebarButton aria-label="Goto Fair Wiki">
+              <template #icon>
+                <BookOpenIcon />
+              </template>
+            </SidebarButton>
+          </NuxtLink>
+          <NuxtLink
             v-tippy="{ content: lang('rules'), placement: 'right' }"
             aria-label="Goto Rules Page"
             to="/rules"
@@ -62,7 +73,7 @@
           >
             <SidebarButton aria-label="Goto Moderation Page">
               <template #icon>
-                <DocumentTextIcon />
+                <font-awesome-icon icon="fa-solid fa-shield-halved" />
               </template>
             </SidebarButton>
           </NuxtLink>
@@ -87,6 +98,7 @@
 
 <script lang="ts" setup>
 import {
+  BookOpenIcon,
   Cog8ToothIcon,
   DocumentTextIcon,
   QuestionMarkCircleIcon,

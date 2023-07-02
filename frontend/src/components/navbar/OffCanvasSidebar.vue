@@ -43,6 +43,13 @@
             <QuestionMarkCircleIcon />
           </template>
         </SidebarButton>
+        <NuxtLink to="https://fairwiki.kaliburg.de/" @click="close">
+          <SidebarButton :label="lang('wiki')" aria-label="Goto Fair Wiki">
+            <template #icon>
+              <BookOpenIcon />
+            </template>
+          </SidebarButton>
+        </NuxtLink>
         <NuxtLink to="/rules" @click="close">
           <SidebarButton :label="lang('rules')" aria-label="Goto Rules Page">
             <template #icon>
@@ -60,7 +67,7 @@
             aria-label="Goto Moderation Page"
           >
             <template #icon>
-              <DocumentTextIcon />
+              <font-awesome-icon icon="fa-solid fa-shield-halved" />
             </template>
           </SidebarButton>
         </NuxtLink>
@@ -90,6 +97,7 @@
 
 <script lang="ts" setup>
 import {
+  BookOpenIcon,
   Cog8ToothIcon,
   DocumentTextIcon,
   QuestionMarkCircleIcon,

@@ -15,6 +15,7 @@ components:
       account: Account
       rules: Rules
       moderation: Moderation
+      wiki: FairWiki
       information: Information
     lockButtons: Lock Buttons
     enableChat: Enable Chat
