@@ -6,6 +6,7 @@
 
 <script lang="ts" setup>
 /*
+- TODO: Check that Reset Logic is actually working
 
 // Pages
 - TODO: Mod-Page, and options for mods

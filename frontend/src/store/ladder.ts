@@ -38,6 +38,7 @@ export enum LadderType {
 export enum LadderEventType {
   BUY_BIAS = "BUY_BIAS",
   BUY_MULTI = "BUY_MULTI",
+  REMOVE_MULTI = "REMOVE_MULTI",
   BUY_AUTO_PROMOTE = "BUY_AUTO_PROMOTE",
   THROW_VINEGAR = "THROW_VINEGAR",
   SOFT_RESET_POINTS = "SOFT_RESET_POINTS",
@@ -254,6 +255,12 @@ export const useLadderStore = defineStore("ladder", () => {
           ranker.points = Object.freeze(new Decimal(0));
           ranker.power = Object.freeze(new Decimal(0));
           break;
+        case LadderEventType.REMOVE_MULTI:
+          ranker.multi = Math.max(1, ranker.multi - 1);
+          ranker.bias = 0;
+          ranker.points = Object.freeze(new Decimal(0));
+          ranker.power = Object.freeze(new Decimal(0));
+          break;
         case LadderEventType.BUY_AUTO_PROMOTE:
           ranker.autoPromote = true;
           ranker.grapes = Object.freeze(
@@ -306,7 +313,10 @@ export const useLadderStore = defineStore("ladder", () => {
 
     if (event.data.targetId === getters.yourRanker.accountId) {
       getters.yourRanker.vinegar = Object.freeze(
-        getters.yourRanker.vinegar.sub(vinegarThrown)
+        Decimal.max(
+          getters.yourRanker.vinegar.sub(vinegarThrown),
+          new Decimal(0)
+        )
       );
       useToasts(
         `${ranker.username} (#${ranker.accountId}) ${

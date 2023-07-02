@@ -72,7 +72,7 @@ public class MessageService {
   }
 
   public List<MessageEntity> getNewestMessages() {
-    return messageRepository.findTop50ByDeletedOnNullOrderByCreatedOnDesc();
+    return messageRepository.findTop50ByAccount_IdGreaterThanAndDeletedOnNullOrderByCreatedOnDesc(1L);
   }
 
   public List<MessageEntity> loadMessages(ChatEntity chat) {

@@ -14,7 +14,7 @@ public class FairController {
 
 
   @RequestMapping(value = {"/login", "/account", "/changelog", "/options", "/impressum",
-      "/privacy", "/rules"})
+      "/privacy", "/rules", "/moderation"})
   public String fallback() {
     return "forward:/";
   }

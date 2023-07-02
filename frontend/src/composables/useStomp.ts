@@ -174,6 +174,15 @@ function connectModeratorChannel() {
 }
 
 client.onStompError = (_) => {
+  // gets called when can't establish connection
+  isPrivateConnectionEstablished = false;
+  setTimeout(() => {
+    reset();
+  }, 5 * 1000);
+};
+
+client.onWebSocketClose = (_) => {
+  // gets called when the connection is lost/server is restarted or when the client disconnects by itself
   isPrivateConnectionEstablished = false;
   useToasts(disconnectMessage, { type: "error" });
   useChatStore().actions.addSystemMessage(disconnectMessage);
@@ -182,23 +191,15 @@ client.onStompError = (_) => {
   }, reconnectTimeout);
 };
 
-client.onWebSocketClose(() => {
+/* client.onDisconnect = (_) => {
+  // gets called when the client disconnects by itself through script, but before the onWebSocketClose
+  console.log("disconnected");
   isPrivateConnectionEstablished = false;
-  useToasts(disconnectMessage, { type: "error" });
   useChatStore().actions.addSystemMessage(disconnectMessage);
   setTimeout(() => {
     window.location.reload();
   }, reconnectTimeout);
-});
-
-client.onDisconnect = (_) => {
-  isPrivateConnectionEstablished = false;
-
-  useChatStore().actions.addSystemMessage(disconnectMessage);
-  setTimeout(() => {
-    window.location.reload();
-  }, reconnectTimeout);
-};
+}; */
 
 function reset() {
   client.deactivate().then();
@@ -308,6 +309,34 @@ const wsApi = (client: Client) => {
           body: JSON.stringify({
             event: parseEvent(e),
           }),
+        });
+      },
+    },
+    moderation: {
+      ban: (accountId: number) => {
+        client.publish({
+          destination: `/app/moderation/ban/${accountId}`,
+        });
+      },
+      mute: (accountId: number) => {
+        client.publish({
+          destination: `/app/moderation/mute/${accountId}`,
+        });
+      },
+      rename: (accountId: number, username: string) => {
+        client.publish({
+          destination: `/app/moderation/rename/${accountId}`,
+          body: username,
+        });
+      },
+      free: (accountId: number) => {
+        client.publish({
+          destination: `/app/moderation/free/${accountId}`,
+        });
+      },
+      mod: (accountId: number) => {
+        client.publish({
+          destination: `/app/moderation/mod/${accountId}`,
         });
       },
     },

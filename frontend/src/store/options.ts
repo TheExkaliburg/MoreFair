@@ -53,6 +53,9 @@ const defaultValues = {
     }),
     notificationVolume: new RangeOption(50, 0, 100),
   }),
+  theme: new OptionsGroup({
+    themeSelector: new EnumOption("DEFAULT", ["DEFAULT", "LIGHT"]),
+  }),
 };
 
 const optionsStorage = useLocalStorage("options", defaultValues);

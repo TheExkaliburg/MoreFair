@@ -14,6 +14,7 @@ components:
       impressum: Impressum
       account: Account
       rules: Rules
+      moderation: Moderation
       information: Information
     lockButtons: Lock Buttons
     enableChat: Enable Chat
@@ -52,6 +53,7 @@ options:
     chat: Chat
     moderation: Moderation
     sound: Sound
+    theme: Themes
   showAssholePoints: Show asshole-points subsection
   showEta: Show ETA to top/ranker
   followOwnRanker: Follow own ranker
@@ -72,6 +74,7 @@ options:
   enableLadderFeatures: Enable ladder features
   unrestrictedAccess: Unrestricted ladder & chat access
   lockButtons: Lock Buttons
+  themeSelector: Select Theme
 account:
   account: Account
   apply: Apply

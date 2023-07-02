@@ -52,7 +52,7 @@
                     </execution>
                 </executions>
                 <groupId>com.github.eirslett</groupId>
-                <version>1.12.1</version>
+                <version>1.13.3</version>
             </plugin>
         </plugins>
     </build>
@@ -68,6 +68,6 @@
 
     <properties>
         <node.version>v18.16.0</node.version>
-        <pnpm.version>8.5.0</pnpm.version>
+        <pnpm.version>8.6.5</pnpm.version>
     </properties>
 </project>

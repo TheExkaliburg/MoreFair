@@ -51,6 +51,20 @@
           </SidebarButton>
         </NuxtLink>
         <NuxtLink
+          v-if="accountStore.getters.isMod"
+          to="/moderation"
+          @click="close"
+        >
+          <SidebarButton
+            :label="lang('moderation')"
+            aria-label="Goto Moderation Page"
+          >
+            <template #icon>
+              <DocumentTextIcon />
+            </template>
+          </SidebarButton>
+        </NuxtLink>
+        <NuxtLink
           aria-label="Goto Community Discord"
           target="_blank"
           to="https://discord.gg/ThKzCknfFr"
@@ -81,7 +95,6 @@ import {
   QuestionMarkCircleIcon,
   UserCircleIcon,
 } from "@heroicons/vue/24/outline";
-import { computed, ref } from "vue";
 import { MaybeElement, onClickOutside } from "@vueuse/core";
 import SidebarButton from "../../components/navbar/SidebarButton.vue";
 import BrandedSidebarToggle from "../../components/navbar/BrandedSidebarToggle.vue";
@@ -89,7 +102,9 @@ import { NuxtLink } from "#components";
 import { useUiStore } from "~/store/ui";
 import { useTutorialTour } from "~/composables/useTour";
 import { useLang } from "~/composables/useLang";
+import { useAccountStore } from "~/store/account";
 
+const accountStore = useAccountStore();
 const uiStore = useUiStore();
 const offCanvas = ref<MaybeElement>();
 
