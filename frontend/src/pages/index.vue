@@ -41,8 +41,8 @@ useSeoMeta({
 
 useStomp();
 
-onMounted(() => {
-  useAccountStore()
+onMounted(async () => {
+  await useAccountStore()
     .actions.init()
     .then(() => {
       useRoundStore().actions.init();
