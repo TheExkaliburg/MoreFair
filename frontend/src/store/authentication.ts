@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import Cookies from "js-cookie";
 import { computed, ref, watch } from "vue";
 import { navigateTo } from "nuxt/app";
+import { AxiosResponse } from "axios";
 import { useAPI } from "~/composables/useAPI";
 import { useZxcvbn } from "~/composables/useZxcvbn";
 import { useAccountStore } from "~/store/account";
@@ -47,9 +48,15 @@ export const useAuthStore = defineStore("auth", () => {
       });
   }
 
-  async function registerGuest() {
+  async function registerGuest(): Promise<AxiosResponse | undefined> {
     if (state.uuid !== "") {
-      return await login(state.uuid, state.uuid, true);
+      return await login(state.uuid, state.uuid, true).catch((err) => {
+        if (err.response.status === 401) {
+          localStorage.setItem("old_uuid", state.uuid);
+          state.uuid = "";
+          return registerGuest();
+        }
+      });
     }
 
     return await API.auth
