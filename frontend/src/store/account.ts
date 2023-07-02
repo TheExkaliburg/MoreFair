@@ -102,7 +102,7 @@ export const useAccountStore = defineStore("account", () => {
 
     switch (event) {
       case AccountEventType.NAME_CHANGE:
-        state.username = body.data;
+        if (isYou) state.username = body.data;
         if (ranker) ranker.username = body.data;
         useChatStore().actions.rename(body.accountId, body.data);
         break;
