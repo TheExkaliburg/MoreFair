@@ -81,7 +81,7 @@ export const useModerationStore = defineStore("moderation", () => {
     state.chatLog.push(msg);
     const isMentioned = msg.getMetadata().some((meta: MentionMeta) => {
       if (isGroupMentionMeta(meta)) {
-        return meta.g === "mod" || meta.g === "mods";
+        return meta.g === "mod" || meta.g === "mods" || meta.g === "help";
       } else {
         return meta.id === accountStore.state.accountId;
       }

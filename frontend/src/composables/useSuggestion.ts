@@ -123,6 +123,7 @@ export const useGroupSuggestion = () => {
     char: "$",
     items: ({ query }: { query: string }) => {
       const list = optionsStore.state.chat.subscribedMentions.get();
+      if (!list.includes("mods")) list.push("mods");
       const queryLower = query.toLowerCase();
       return [
         ...list.filter((item: string) =>
