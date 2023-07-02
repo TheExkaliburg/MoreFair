@@ -54,7 +54,11 @@ const defaultValues = {
     notificationVolume: new RangeOption(50, 0, 100),
   }),
   theme: new OptionsGroup({
-    themeSelector: new EnumOption("DEFAULT", ["DEFAULT", "LIGHT"]),
+    themeSelector: new EnumOption("Default", ["Default", "Light"]).setCallback(
+      (value) => {
+        changeTheme(value);
+      }
+    ),
   }),
 };
 
@@ -66,3 +70,12 @@ export const useOptionsStore = defineStore("options", () => {
     state,
   };
 });
+
+const root = document.querySelector(":root");
+
+function changeTheme(name: string) {
+  if (root === null) return;
+  root.className = name.toLowerCase();
+}
+
+changeTheme(optionsStorage.value.theme.themeSelector.value);
