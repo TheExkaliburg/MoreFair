@@ -170,6 +170,16 @@ const API = {
     getChatLog: () => {
       return axiosInstance.get("/api/moderation/chat");
     },
+    searchUsername(username: string) {
+      const params = new URLSearchParams();
+      params.append("username", username);
+      return axiosInstance.get("/api/moderation/search/user", { params });
+    },
+    searchAltAccouunts(accountId: number) {
+      const params = new URLSearchParams();
+      params.append("accountId", accountId.toString());
+      return axiosInstance.get("/api/moderation/search/alts", { params });
+    },
   },
 };
 

@@ -312,6 +312,34 @@ const wsApi = (client: Client) => {
         });
       },
     },
+    moderation: {
+      ban: (accountId: number) => {
+        client.publish({
+          destination: `/app/moderation/ban/${accountId}`,
+        });
+      },
+      mute: (accountId: number) => {
+        client.publish({
+          destination: `/app/moderation/mute/${accountId}`,
+        });
+      },
+      rename: (accountId: number, username: string) => {
+        client.publish({
+          destination: `/app/moderation/rename/${accountId}`,
+          body: username,
+        });
+      },
+      free: (accountId: number) => {
+        client.publish({
+          destination: `/app/moderation/free/${accountId}`,
+        });
+      },
+      mod: (accountId: number) => {
+        client.publish({
+          destination: `/app/moderation/mod/${accountId}`,
+        });
+      },
+    },
   };
 };
 

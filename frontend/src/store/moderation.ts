@@ -34,6 +34,8 @@ export const useModerationStore = defineStore("moderation", () => {
   const isInitialized = ref<boolean>(false);
   const state = reactive({
     chatLog: <ChatLogMessage[]>[],
+    searchResults: "",
+    altSearchResults: "",
   });
   const getters = reactive({});
 
@@ -85,10 +87,60 @@ export const useModerationStore = defineStore("moderation", () => {
       }
     });
 
-    console.log(isMentioned, msg, msg.getMetadata());
     if (isMentioned) {
       useSound(SOUNDS.MENTION).play();
     }
+  }
+
+  function searchUsername(username: string) {
+    return api.moderation
+      .searchUsername(username)
+      .then((res) => {
+        const data: { [key: number]: string } = res.data;
+        state.searchResults = JSON.stringify(data);
+        return Promise.resolve(res);
+      })
+      .catch((err) => {
+        console.error(err);
+        useToasts(err.message, { type: "error" });
+        return Promise.reject(err);
+      });
+  }
+
+  function searchAltAccounts(accountId: number) {
+    return api.moderation
+      .searchAltAccouunts(accountId)
+      .then((res) => {
+        const data: { [key: number]: string } = res.data;
+        state.altSearchResults = JSON.stringify(data);
+        return Promise.resolve(res);
+      })
+      .catch((err) => {
+        useToasts(err.message, {
+          type: "error",
+        });
+        return Promise.reject(err);
+      });
+  }
+
+  function ban(accountId: number) {
+    useStomp().wsApi.moderation.ban(accountId);
+  }
+
+  function mute(accountId: number) {
+    useStomp().wsApi.moderation.mute(accountId);
+  }
+
+  function rename(accountId: number, username: string) {
+    useStomp().wsApi.moderation.rename(accountId, username);
+  }
+
+  function free(accountId: number) {
+    useStomp().wsApi.moderation.free(accountId);
+  }
+
+  function mod(accountId: number) {
+    useStomp().wsApi.moderation.mod(accountId);
   }
 
   return {
@@ -96,6 +148,13 @@ export const useModerationStore = defineStore("moderation", () => {
     getters,
     actions: {
       init,
+      searchUsername,
+      searchAltAccounts,
+      ban,
+      mute,
+      rename,
+      free,
+      mod,
     },
   };
 });

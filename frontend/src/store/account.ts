@@ -107,16 +107,16 @@ export const useAccountStore = defineStore("account", () => {
         useChatStore().actions.rename(body.accountId, body.data);
         break;
       case AccountEventType.MOD:
-        state.accessRole = AccessRole.MODERATOR;
+        if (isYou) state.accessRole = AccessRole.MODERATOR;
         break;
       case AccountEventType.FREE:
-        state.accessRole = AccessRole.PLAYER;
+        if (isYou) state.accessRole = AccessRole.PLAYER;
         break;
       case AccountEventType.MUTE:
-        state.accessRole = AccessRole.MUTED_PLAYER;
+        if (isYou) state.accessRole = AccessRole.MUTED_PLAYER;
         break;
       case AccountEventType.BAN:
-        state.accessRole = AccessRole.BANNED_PLAYER;
+        if (isYou) state.accessRole = AccessRole.BANNED_PLAYER;
         break;
       case AccountEventType.INCREASE_HIGHEST_LADDER:
         useSound(SOUNDS.PROMOTION).play();
