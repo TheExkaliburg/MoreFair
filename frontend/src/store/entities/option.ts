@@ -1,6 +1,6 @@
 abstract class Option<T> {
   isActive: () => boolean;
-  callback: (value: T) => void;
+  callback: (value: T, oldValue: T) => void;
   value: T;
 
   constructor(value: T) {
@@ -14,11 +14,12 @@ abstract class Option<T> {
   }
 
   set(value: T): void {
+    const oldValue = this.value;
     this.value = value;
-    if (this.callback) this.callback(value);
+    if (this.callback) this.callback(value, oldValue);
   }
 
-  setCallback(callback: (value: T) => void): Option<T> {
+  setCallback(callback: (value: T, oldValue: T) => void): Option<T> {
     this.callback = callback;
     return this;
   }
@@ -68,5 +69,9 @@ export class EnumOption extends Option<string> {
 }
 
 export class EditableStringListOption extends Option<string[]> {}
+
+export class EditableMentionsOption extends EditableStringListOption {}
+
+export class EditableThemeURLOption extends EditableStringListOption {}
 
 export const ObjectFunctions = ["callback", "isActive"];

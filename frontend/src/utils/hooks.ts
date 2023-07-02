@@ -17,10 +17,10 @@ const api = {
   },
   getHooks: () => useStomp().callbacks,
   addCallback: (
-    event: StompCallback<unknown>[],
+    hook: StompCallback<unknown>[],
     identifier: string,
     callback: (body: unknown) => void
-  ) => useStomp().addCallback(event, identifier, callback),
+  ) => useStomp().addCallback(hook, identifier, callback),
 };
 
 function unpackStore(store: any) {

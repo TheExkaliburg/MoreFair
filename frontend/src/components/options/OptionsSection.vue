@@ -20,8 +20,14 @@
         :option="entry.value"
         @update="entry.value.set($event)"
       />
-      <OptionsEditableStringList
-        v-else-if="entry.value instanceof EditableStringListOption"
+      <OptionsEditableMentions
+        v-else-if="entry.value instanceof EditableMentionsOption"
+        :label="entry.key"
+        :option="entry.value"
+        @update="entry.value.set($event)"
+      />
+      <OptionsEditableThemeURL
+        v-else-if="entry.value instanceof EditableThemeURLOption"
         :label="entry.key"
         :option="entry.value"
         @update="entry.value.set($event)"
@@ -32,18 +38,19 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from "vue";
 import OptionsBoolean from "../../components/options/OptionsBoolean.vue";
 import OptionsStringEnum from "../../components/options/OptionsStringEnum.vue";
 import OptionsRange from "../../components/options/OptionsRange.vue";
-import OptionsEditableStringList from "../../components/options/OptionsEditableStringList.vue";
 import {
   BooleanOption,
-  EditableStringListOption,
+  EditableMentionsOption,
+  EditableThemeURLOption,
   EnumOption,
   RangeOption,
 } from "~/store/entities/option";
 import { useLang } from "~/composables/useLang";
+import OptionsEditableMentions from "~/components/options/OptionsEditableMentions.vue";
+import OptionsEditableThemeURL from "~/components/options/OptionsEditableThemeURL.vue";
 
 const props = defineProps({
   options: { type: Object, required: true },
