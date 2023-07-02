@@ -68,6 +68,6 @@
 
     <properties>
         <node.version>v18.16.0</node.version>
-        <pnpm.version>8.5.0</pnpm.version>
+        <pnpm.version>8.6.5</pnpm.version>
     </properties>
 </project>
