@@ -307,7 +307,10 @@ export const useLadderStore = defineStore("ladder", () => {
 
     if (event.data.targetId === getters.yourRanker.accountId) {
       getters.yourRanker.vinegar = Object.freeze(
-        getters.yourRanker.vinegar.sub(vinegarThrown)
+        Decimal.max(
+          getters.yourRanker.vinegar.sub(vinegarThrown),
+          new Decimal(0)
+        )
       );
       useToasts(
         `${ranker.username} (#${ranker.accountId}) ${

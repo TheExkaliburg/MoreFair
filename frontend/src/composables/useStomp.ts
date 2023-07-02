@@ -316,7 +316,6 @@ const wsApi = (client: Client) => {
 };
 
 export const useStomp = () => {
-  console.log("Stomp active: ", client.active);
   // only activate the client if it is not already active
   if (!client.active) {
     client.activate();
