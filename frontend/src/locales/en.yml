@@ -76,6 +76,7 @@ options:
   unrestrictedAccess: Unrestricted ladder & chat access
   lockButtons: Lock Buttons
   themeSelector: Select Theme
+  themeUploader: Upload Custom Theme
 account:
   account: Account
   apply: Apply
