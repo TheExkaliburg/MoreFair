@@ -9,7 +9,7 @@ public class JoinData {
   @NonNull
   private String username;
   @NonNull
-  private String tag;
+  private String assholeTag;
   @NonNull
   private Integer assholePoints;
 }
