@@ -76,13 +76,19 @@
         >[<span
           :class="{
             'text-eta-best': canBuyBias && showMultiBiasColor,
-            'text-eta-worst': !canBuyBias && showMultiBiasColor,
+            'text-eta-mid':
+              !canBuyBias && canAlmostBuyBias && showMultiBiasColor,
+            'text-eta-worst':
+              !canBuyBias && !canAlmostBuyBias && showMultiBiasColor,
           }"
           >+{{ formattedBias }}</span
         ><span
           :class="{
             'text-eta-best': canBuyMulti && showMultiBiasColor,
-            'text-eta-worst': !canBuyMulti && showMultiBiasColor,
+            'text-eta-mid':
+              !canBuyMulti && canAlmostBuyMulti && showMultiBiasColor,
+            'text-eta-worst':
+              !canBuyMulti && !canAlmostBuyMulti && showMultiBiasColor,
           }"
         >
           x{{ formattedMulti }}</span
@@ -93,7 +99,6 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, onUpdated } from "vue";
 import { useElementVisibility } from "@vueuse/core";
 import { Ranker } from "~/store/entities/ranker";
 import { useFormatter, useTimeFormatter } from "~/composables/useFormatter";
@@ -178,10 +183,22 @@ const canBuyBias = computed<boolean>(() => {
   return upgradeCost.cmp(props.ranker.points) <= 0;
 });
 
+const canAlmostBuyBias = computed<boolean>(() => {
+  if (!isVisible) return false;
+  const upgradeCost = ladderUtils.getNextUpgradeCost(props.ranker.bias);
+  return useEta(props.ranker).toPoints(upgradeCost) < 5 * 60;
+});
+
 const canBuyMulti = computed<boolean>(() => {
   if (!isVisible) return false;
   const upgradeCost = ladderUtils.getNextUpgradeCost(props.ranker.multi);
   return upgradeCost.cmp(props.ranker.power) <= 0;
+});
+
+const canAlmostBuyMulti = computed<boolean>(() => {
+  if (!isVisible) return false;
+  const upgradeCost = ladderUtils.getNextUpgradeCost(props.ranker.multi);
+  return useEta(props.ranker).toPower(upgradeCost) < 5 * 60;
 });
 
 const showMultiBiasColor = computed<boolean>(() => {

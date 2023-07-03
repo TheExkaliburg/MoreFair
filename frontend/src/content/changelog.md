@@ -11,6 +11,7 @@ description: 'A list of all changes made to the game'
 - Fixing that Enter after autocomplete doesn't send the message
 - Changelog Symbol in the sidebar actually sends you to the changelog instead of the rules
 - Group Mentions actually are playing a notification sound now
+- if you are less than 5 minutes away from the next bias/multi, the color in the table will be yellow instead of red
 
 <br><br><br><br><br><br><br>
 
