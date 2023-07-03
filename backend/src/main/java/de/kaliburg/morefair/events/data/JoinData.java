@@ -11,5 +11,5 @@ public class JoinData {
   @NonNull
   private String tag;
   @NonNull
-  private Integer ahPoints;
+  private Integer assholePoints;
 }
