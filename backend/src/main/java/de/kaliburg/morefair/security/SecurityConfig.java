@@ -98,6 +98,7 @@ public class SecurityConfig {
         .logoutSuccessHandler(logoutSuccessHandler())
         .deleteCookies("remember-me")
     );
+    http.headers().frameOptions().disable();
     http.exceptionHandling()
         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
 
