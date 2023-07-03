@@ -116,7 +116,7 @@ public class LadderController {
       Integer num = ladderService.findFirstActiveRankerOfAccountThisRound(account).getLadder()
           .getNumber();
       log.info("[L{}] MULTI: {} (#{}) {}", num, account.getDisplayName(), account.getId(),
-          wsMessage.getContent());
+          wsMessage.getEvent());
       ModServerMessageData data = new ModServerMessageData(account.getId(), sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
       wsUtils.convertAndSendToTopic(ModerationController.TOPIC_LOG_EVENTS_DESTINATION + num, data);
