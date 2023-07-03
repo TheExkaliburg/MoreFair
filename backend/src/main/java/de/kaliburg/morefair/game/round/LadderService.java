@@ -20,6 +20,7 @@ import de.kaliburg.morefair.game.GameResetEvent;
 import de.kaliburg.morefair.game.UpgradeUtils;
 import de.kaliburg.morefair.game.chat.ChatService;
 import de.kaliburg.morefair.game.chat.MessageService;
+import de.kaliburg.morefair.game.round.dto.RankerDto;
 import de.kaliburg.morefair.statistics.StatisticsService;
 import de.kaliburg.morefair.utils.FormattingUtils;
 import java.math.BigInteger;
@@ -142,7 +143,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
       currentLadderMap.put(ladderNumber, result);
       eventMap.put(ladderNumber, new ArrayList<>());
       wsUtils.convertAndSendToTopic(RoundController.TOPIC_EVENTS_DESTINATION,
-          new Event<>(RoundEventTypes.INCREASE_TOP_LADDER, round.getNumber()));
+          new Event<>(RoundEventTypes.INCREASE_TOP_LADDER, result.getNumber()));
     }
     return result;
   }
