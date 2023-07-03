@@ -57,7 +57,7 @@
           <NuxtLink
             v-tippy="{ content: lang('changelog'), placement: 'right' }"
             aria-label="Goto Changelog"
-            to="/rules"
+            to="/changelog"
           >
             <SidebarButton aria-label="Goto Changelog">
               <template #icon>

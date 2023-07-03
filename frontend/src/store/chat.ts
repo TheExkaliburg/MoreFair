@@ -11,6 +11,7 @@ import { OnChatEventBody, useStomp } from "~/composables/useStomp";
 import { useAPI } from "~/composables/useAPI";
 import { useAccountStore } from "~/store/account";
 import { SOUNDS, useSound } from "~/composables/useSound";
+import { useOptionsStore } from "~/store/options";
 
 export type ChatData = {
   messages: MessageData[];
@@ -92,7 +93,9 @@ export const useChatStore = defineStore("chat", () => {
     // Find if one isn't a groupMention and has the id of the currentUser
     const isMentioned = message.getMetadata().some((meta) => {
       if (isGroupMentionMeta(meta)) {
-        return false;
+        return useOptionsStore().state.chat.subscribedMentions.value.includes(
+          meta.g
+        );
       }
       return meta.id === accountStore.state.accountId;
     });

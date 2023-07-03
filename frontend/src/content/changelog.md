@@ -4,6 +4,16 @@ description: 'A list of all changes made to the game'
 
 # Changelog
 
+## 2.3.1 [PATCH]: Bugfixes
+
+### Bugfixes:
+
+- Fixing that Enter after autocomplete doesn't send the message
+- Changelog Symbol in the sidebar actually sends you to the changelog instead of the rules
+- Group Mentions actually are playing a notification sound now
+
+<br><br><br><br><br><br><br>
+
 ## 2.3.0 [MINOR]: Frontend Redesign
 
 ### Frontend Update
