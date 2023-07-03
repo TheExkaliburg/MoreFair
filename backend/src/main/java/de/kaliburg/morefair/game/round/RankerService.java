@@ -55,8 +55,7 @@ public class RankerService {
     return rankerRepository.findByAccountAndLadder_Round(account, round);
   }
 
-  public List<RankerEntity> findCurrentActiveRankersOfAccount(AccountEntity account,
-      RoundEntity round) {
+  public List<RankerEntity> findCurrentActiveRankersOfAccount(AccountEntity account, RoundEntity round) {
     return rankerRepository.findByAccountAndLadder_RoundAndGrowingIsTrue(account, round);
   }
 

@@ -60,6 +60,7 @@ public class LadderController {
       log.trace("/app/game/init/{} from {}#{}", number, account.getDisplayName(), account.getId());
       RankerEntity ranker = ladderService.findFirstActiveRankerOfAccountThisRound(account);
       if (ranker == null) {
+        log.info("Creating new ranker for {}#{}", account.getDisplayName(), account.getId());
         ranker = roundService.createNewRanker(account);
       }
 
