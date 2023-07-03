@@ -117,7 +117,7 @@ account:
     password: Password
     repeatPassword: Password
     submit: Submit
-    agreeTo: By continuing, you are setting up a FairGame account and agree to our
+    agreeTo: By continuing, you are setting up a FairGame account (or logging in to your current one) and agree to our
     rules: Rules
     agreeTo2: and
     privacy: Privacy Policy

@@ -35,9 +35,11 @@
         >
           <template #description>
             <p>
-              As a guest your account cannot access all the features a normal
-              account could. You are also more susceptible to malicious scripts
-              or losing your progress.
+              To enhance your account experience, we recommend linking your
+              existing UUID. By doing so, you can seamlessly continue using your
+              current account with all its features. As a guest, your access is
+              limited, and there is a higher risk of encountering malicious
+              scripts or losing your progress.
             </p>
             <br />
             <p>
@@ -61,7 +63,7 @@
               >Import UUID
             </FairButton>
             <FairButton :disabled="isWaiting" @click="registerGuest"
-              >Confirm
+              >Continue
             </FairButton>
           </div>
         </FairDialog>
@@ -80,7 +82,6 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
 import { navigateTo } from "nuxt/app";
 import FairButton from "../components/interactables/FairButton.vue";
 import TheAuthenticationDialog from "../components/auth/TheAuthenticationDialog.vue";
