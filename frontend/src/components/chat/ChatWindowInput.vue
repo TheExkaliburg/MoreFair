@@ -29,7 +29,6 @@
 
 <script lang="ts" setup>
 import { EditorContent, Node, useEditor } from "@tiptap/vue-3";
-import { onBeforeUnmount, watch } from "vue";
 import { Paragraph } from "@tiptap/extension-paragraph";
 import { Text } from "@tiptap/extension-text";
 import { Mention } from "@tiptap/extension-mention";
@@ -96,6 +95,9 @@ const editor = useEditor({
   },
 });
 
+// TODO: this is kinda hacky, there must be a better way to prevent the enter from autocompletion to also send the message
+let isSuggestionOpen = false;
+let wasSuggestionOpen = false;
 watch(
   () => chatStore.state.input,
   (newValue) => {
@@ -103,11 +105,21 @@ watch(
       editor.value?.state.selection.from ?? newValue.length;
     editor.value?.commands.setContent(newValue);
     editor.value?.commands.setTextSelection(caretStart);
+
+    // check if autocomplete is/was open
+    const suggestionElements =
+      document.getElementsByClassName("tippy-suggestion");
+    wasSuggestionOpen = isSuggestionOpen;
+    isSuggestionOpen = suggestionElements.length > 0;
   },
   { deep: true }
 );
 
-function sendMessage() {
+function sendMessage(e: KeyboardEvent | MouseEvent) {
+  if (e instanceof KeyboardEvent && e.key === "Enter") {
+    if (wasSuggestionOpen) return;
+  }
+
   if (!editor?.value) return;
   const messageJson = editor.value.getJSON();
   if (!messageJson?.content) return;
