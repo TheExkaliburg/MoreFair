@@ -16,6 +16,9 @@ description: 'A list of all changes made to the game'
 
 <br><br><br><br><br><br><br>
 
+<details>
+<summary>Expand for the 2.3.x changelog</summary>
+
 ## 2.3.0 [MINOR]: Frontend Redesign
 
 ### Frontend Update
@@ -30,6 +33,8 @@ description: 'A list of all changes made to the game'
 - Changed the eta formulas
 - Restructuring the code to make it more maintainable
 - Adding an impressum and a privacy policy
+
+</details>
 
 <details>
 <summary>Expand for the 2.2.x changelog</summary>
