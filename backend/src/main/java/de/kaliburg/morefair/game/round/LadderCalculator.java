@@ -8,9 +8,11 @@ import static de.kaliburg.morefair.events.types.LadderEventTypes.THROW_VINEGAR;
 
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.FairController;
+import de.kaliburg.morefair.api.RoundController;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.LadderEventTypes;
+import de.kaliburg.morefair.events.types.RoundEventTypes;
 import de.kaliburg.morefair.game.chat.MessageService;
 import de.kaliburg.morefair.game.round.dto.HeartbeatDto;
 import java.math.BigInteger;

@@ -27,6 +27,7 @@ const defaultValues = {
       EtaColorType.COLORS,
       EtaColorType.GRADIENT,
     ]),
+    biasMultiColors: new BooleanOption(true),
     showBiasAndMulti: new BooleanOption(true),
     showPowerGain: new BooleanOption(true),
     followOwnRanker: new BooleanOption(false),

@@ -60,6 +60,7 @@ options:
   showEta: Show ETA to top/ranker
   followOwnRanker: Follow own ranker
   etaColors: ETA Colors
+  biasMultiColors: Color the bias/multi
   showBiasAndMulti: Show bias/multi for ranker
   showPowerGain: Show power-gain for ranker
   hidePromotedPlayers: Hide promoted players

@@ -75,14 +75,14 @@
       ><span v-if="optionsStore.state.ladder.showBiasAndMulti.value"
         >[<span
           :class="{
-            'text-eta-best': canBuyBias,
-            'text-eta-worst': !canBuyBias,
+            'text-eta-best': canBuyBias && showMultiBiasColor,
+            'text-eta-worst': !canBuyBias && showMultiBiasColor,
           }"
           >+{{ formattedBias }}</span
         ><span
           :class="{
-            'text-eta-best': canBuyMulti,
-            'text-eta-worst': !canBuyMulti,
+            'text-eta-best': canBuyMulti && showMultiBiasColor,
+            'text-eta-worst': !canBuyMulti && showMultiBiasColor,
           }"
         >
           x{{ formattedMulti }}</span
@@ -182,6 +182,10 @@ const canBuyMulti = computed<boolean>(() => {
   if (!isVisible) return false;
   const upgradeCost = ladderUtils.getNextUpgradeCost(props.ranker.multi);
   return upgradeCost.cmp(props.ranker.power) <= 0;
+});
+
+const showMultiBiasColor = computed<boolean>(() => {
+  return optionsStore.state.ladder.biasMultiColors.value;
 });
 
 // should return the value from fastest (0%) to as long as it takes for the top (50%) to double as long (100%)

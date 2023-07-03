@@ -99,7 +99,10 @@ const editor = useEditor({
 watch(
   () => chatStore.state.input,
   (newValue) => {
+    const caretStart: number =
+      editor.value?.state.selection.from ?? newValue.length;
     editor.value?.commands.setContent(newValue);
+    editor.value?.commands.setTextSelection(caretStart);
   },
   { deep: true }
 );
