@@ -46,6 +46,7 @@
           <NuxtLink
             v-tippy="{ content: lang('wiki'), placement: 'right' }"
             aria-label="Goto Fair Wiki"
+            target="_blank"
             to="https://fairwiki.kaliburg.de/"
           >
             <SidebarButton aria-label="Goto Fair Wiki">
