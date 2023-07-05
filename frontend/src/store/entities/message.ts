@@ -61,14 +61,14 @@ const options: Intl.DateTimeFormatOptions = {
 const formatter = new Intl.DateTimeFormat(navigator.language, options);
 
 export class Message implements MessageData {
-  accountId: number = 0;
-  username: string = "";
-  message: string = "";
-  metadata: string = "[]";
-  timestamp: number = 0;
-  tag: string = "";
-  assholePoints: number = 0;
-  isMod: boolean = false;
+  accountId = 0;
+  username = "";
+  message = "";
+  metadata = "[]";
+  timestamp = 0;
+  tag = "";
+  assholePoints = 0;
+  isMod = false;
   private flags: string[] = [];
 
   constructor(data: any) {

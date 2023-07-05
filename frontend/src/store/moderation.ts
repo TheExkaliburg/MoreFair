@@ -17,8 +17,8 @@ export type ChatLogMessageData = MessageData & {
 };
 
 export class ChatLogMessage extends Message implements ChatLogMessageData {
-  chatNumber: number = 1;
-  deleted: boolean = false;
+  chatNumber = 1;
+  deleted = false;
 
   constructor(data: any) {
     super(data);
