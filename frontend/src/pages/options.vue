@@ -1,6 +1,8 @@
 <template>
-  <div class="flex flex-row w-full justify-evenly text-text mt-12">
-    <div class="flex flex-col w-full max-w-reader space-y-2 px-2 text-sm">
+  <div
+    class="flex flex-row w-full justify-evenly text-text pt-12 h-full overflow-y-scroll"
+  >
+    <div class="flex flex-col w-full max-w-reader space-y-2 px-2 text-sm h-fit">
       <template v-for="entry in currentOptionsArray" :key="entry.key">
         <OptionsSection
           v-if="entry.value instanceof OptionsGroup"
@@ -8,6 +10,7 @@
           :options="entry.value"
         />
       </template>
+      <div class="select-none pb-12"></div>
     </div>
   </div>
 </template>
