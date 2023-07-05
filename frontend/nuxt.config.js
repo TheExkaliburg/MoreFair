@@ -57,5 +57,6 @@ export default defineNuxtConfig({
     build: {
       // minify: false,
     },
+    test: {},
   },
 });
