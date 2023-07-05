@@ -100,7 +100,8 @@ public class SecurityConfig {
         .deleteCookies("remember-me")
     );
     http.headers().frameOptions().disable()
-        .addHeaderWriter(new StaticHeadersWriter("frame-ancestors", "'self' https://iframetester.com"));
+        .addHeaderWriter(new StaticHeadersWriter("frame-ancestors", "'self' https://iframetester.com"))
+        .defaultsDisabled();
     http.exceptionHandling()
         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
 
