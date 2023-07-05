@@ -120,7 +120,6 @@ watch(
 function sendMessage(e: KeyboardEvent | MouseEvent) {
   if (e instanceof KeyboardEvent && (e.key === "Enter" || e.key === "Tab")) {
     if (wasSuggestionOpen) {
-      console.log("caught enter/tab, suggestion was open, not sending message");
       wasSuggestionOpen = false;
       return;
     }

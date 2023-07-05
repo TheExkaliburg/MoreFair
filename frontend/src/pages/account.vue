@@ -10,7 +10,7 @@
           :model-value="shownUsername"
           :readonly="!isEditingUsername"
           class="rounded-r-none w-2/3"
-          @update:modelValue="newUsername = $event"
+          @update:model-value="newUsername = $event"
           @keydown.enter="changeUsername"
         />
         <FairButton class="w-1/3 rounded-l-none" @click="changeUsername"
@@ -46,7 +46,7 @@
             :type="isEditingEmail ? 'text' : 'password'"
             autocomplete="off"
             class="rounded-r-none w-2/3"
-            @update:modelValue="newEmail = $event"
+            @update:model-value="newEmail = $event"
           />
           <FairButton class="w-1/3 rounded-l-none" @click="changeEmail"
             >{{ isEditingEmail ? lang("apply") : lang("edit") }}
