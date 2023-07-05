@@ -89,6 +89,22 @@ export const useLadderStore = defineStore("ladder", () => {
           (r) => r.growing || r.accountId === getters.yourRanker?.accountId
         );
       }
+      if (!optionsStore.state.ladder.showAllRankers.value) {
+        const top = optionsStore.state.ladder.showTopRankers.value;
+        const above = optionsStore.state.ladder.showAboveRankers.value;
+        const below = optionsStore.state.ladder.showBelowRankers.value;
+
+        result = result.filter((r) => {
+          if (r.rank <= top) return true;
+          if (getters.yourRanker === undefined) return false;
+          if (getters.yourRanker.accountId === r.accountId) return true;
+          return (
+            r.rank >= getters.yourRanker?.rank - above &&
+            r.rank <= getters.yourRanker.rank + below
+          );
+        });
+      }
+
       return result;
     }),
   });

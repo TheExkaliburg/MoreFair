@@ -79,6 +79,10 @@ options:
   lockButtons: Lock Buttons
   themeSelector: Select Theme
   themeUploader: Upload Custom Theme
+  showAllRankers: Show All Ranker
+  showTopRankers: Show XX Top Ranker
+  showAboveRankers: Show XX Ranker Above
+  showBelowRankers: Show XX Ranker Below
 account:
   account: Account
   apply: Apply
