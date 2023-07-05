@@ -44,7 +44,7 @@ import {
   ListboxOptions,
 } from "@headlessui/vue";
 import { computed, ref, watch } from "vue";
-import { useLang } from "../../composables/useLang";
+import { useLang } from "~/composables/useLang";
 
 const props = defineProps({
   option: { type: Object, required: true },

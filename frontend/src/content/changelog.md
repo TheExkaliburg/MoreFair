@@ -4,6 +4,28 @@ description: 'A list of all changes made to the game'
 
 # Changelog
 
+## 2.3.2 [PATCH]: Show all Ranker option
+
+### Features:
+
+- Can now disable the option to show all rankers in the ladder
+- You can then choose 3 parameters to filter the rankers by
+    1. By their position relative to the top
+    2. By their position relative to you (above)
+    3. By their position relative to you (below)
+
+### Bugfixes:
+
+- UI now properly updates the grapes when you are alone on a ladder
+- Play sound on reaching first, if the option is set
+- Fixing the chat that moved out of the screen in a long message
+- Also mentioning something in a long message should not linewrap anymore
+
+<br><br><br><br><br><br><br>
+
+<details>
+<summary>Expand for the 2.3.x changelog</summary>
+
 ## 2.3.1 [PATCH]: Bugfixes
 
 ### Bugfixes:
@@ -13,11 +35,6 @@ description: 'A list of all changes made to the game'
 - Group Mentions actually are playing a notification sound now
 - a joining player will now show the correct asshole-points
 - if you are less than 5 minutes away from the next bias/multi, the color in the table will be yellow instead of red
-
-<br><br><br><br><br><br><br>
-
-<details>
-<summary>Expand for the 2.3.x changelog</summary>
 
 ## 2.3.0 [MINOR]: Frontend Redesign
 
