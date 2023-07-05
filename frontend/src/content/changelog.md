@@ -14,6 +14,10 @@ description: 'A list of all changes made to the game'
     2. By their position relative to you (above)
     3. By their position relative to you (below)
 
+### Bugfixes:
+
+- UI now properly updates the grapes when you are alone on a ladder
+
 <br><br><br><br><br><br><br>
 
 <details>

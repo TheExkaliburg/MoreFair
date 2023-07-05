@@ -231,7 +231,7 @@ export const useLadderStore = defineStore("ladder", () => {
 
       if (
         yourRanker.rank === state.rankers.length &&
-        state.rankers.length > 1
+        state.rankers.length >= 1
       ) {
         yourRanker.grapes = Object.freeze(
           yourRanker.grapes.add(new Decimal(2))
