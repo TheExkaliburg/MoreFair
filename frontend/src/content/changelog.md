@@ -18,6 +18,8 @@ description: 'A list of all changes made to the game'
 
 - UI now properly updates the grapes when you are alone on a ladder
 - Play sound on reaching first, if the option is set
+- Fixing the chat that moved out of the screen in a long message
+- Also mentioning something in a long message should not linewrap anymore
 
 <br><br><br><br><br><br><br>
 
