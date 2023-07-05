@@ -75,11 +75,7 @@ axiosInstance.interceptors.response.use(
 
 const API = {
   auth: {
-    login: (
-      username: string,
-      password: string,
-      rememberMe: boolean = false
-    ) => {
+    login: (username: string, password: string, rememberMe = false) => {
       username = username.toLowerCase();
       const params = new URLSearchParams();
       params.append("username", username);

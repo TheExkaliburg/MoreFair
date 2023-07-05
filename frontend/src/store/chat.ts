@@ -105,7 +105,7 @@ export const useChatStore = defineStore("chat", () => {
     }
   }
 
-  function addSystemMessage(message: string, metadata: string = "[]") {
+  function addSystemMessage(message: string, metadata = "[]") {
     addMessage({
       accountId: 1,
       username: "Chad",

@@ -118,11 +118,7 @@ export const useAuthStore = defineStore("auth", () => {
       });
   }
 
-  async function login(
-    username: string,
-    password: string,
-    rememberMe: boolean = false
-  ) {
+  async function login(username: string, password: string, rememberMe = false) {
     if (state.authenticationStatus) navigateTo("/");
     return await API.auth
       .login(username, password, rememberMe)
