@@ -101,7 +101,6 @@ public class SecurityConfig {
     );
     http.headers().frameOptions().disable()
         .addHeaderWriter(new StaticHeadersWriter("frame-ancestors", "'self' https://iframetester.com"))
-        .defaultsDisabled();
     http.exceptionHandling()
         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
 
@@ -162,7 +161,7 @@ public class SecurityConfig {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.setAllowedOrigins(
         Arrays.asList("http://localhost:3000", "http://localhost:8080", "https://fair.kaliburg.de",
-            "https://fairtest.kaliburg.de", "https://test2.kaliburg.de"));
+            "https://fairtest.kaliburg.de", "https://iframetester.com"));
     configuration.setAllowedMethods(
         Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
     configuration.setAllowedHeaders(List.of("*"));
