@@ -17,6 +17,7 @@ description: 'A list of all changes made to the game'
 ### Bugfixes:
 
 - UI now properly updates the grapes when you are alone on a ladder
+- Play sound on reaching first, if the option is set
 
 <br><br><br><br><br><br><br>
 

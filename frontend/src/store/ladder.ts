@@ -241,7 +241,7 @@ export const useLadderStore = defineStore("ladder", () => {
 
     const isFirst = getters.yourRanker?.rank === 1;
     if (isFirst && !wasFirst) {
-      useSound(SOUNDS.GOT_FIRST);
+      useSound(SOUNDS.GOT_FIRST).play();
     }
   }
 
