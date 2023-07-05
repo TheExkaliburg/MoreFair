@@ -4,7 +4,7 @@ description: 'A list of all changes made to the game'
 
 # Changelog
 
-## 2.3.1 [PATCH]: Show all Ranker option
+## 2.3.2 [PATCH]: Show all Ranker option
 
 ### Features:
 
