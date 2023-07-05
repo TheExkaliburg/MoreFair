@@ -6,9 +6,7 @@ module.exports = {
     node: true,
   },
   extends: [
-    "@nuxtjs/eslint-config-typescript",
-    "plugin:nuxt/recommended",
-    "plugin:prettier/recommended",
+    "plugin:vuejs-accessibility/recommended",
   ],
   plugins: ["vuejs-accessibility"],
   rules: {},
