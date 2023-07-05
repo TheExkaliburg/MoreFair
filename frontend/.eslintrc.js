@@ -10,7 +10,6 @@ module.exports = {
     "plugin:nuxt/recommended",
     "plugin:prettier/recommended",
   ],
-  plugins: ["vuejs-accessibility"],
   rules: {
     "prettier/prettier": "error",
   },
@@ -31,7 +30,6 @@ module.exports = {
     {
       files: ["src/**/*.vue", "src/**/*.ts", "src/**/*.js"],
       rules: {
-        "@typescript-eslint/no-inferrable-types": "off",
         "no-console": ["warn", { allow: ["warn", "error", "info"] }],
       },
     },
