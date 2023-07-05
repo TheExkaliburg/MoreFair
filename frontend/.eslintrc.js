@@ -13,7 +13,9 @@ module.exports = {
     // "plugin:vuejs-accessibility/recommended",
   ],
   plugins: ["vuejs-accessibility"],
-  rules: {},
+  rules: {
+    "prettier/prettier": "error",
+  },
   overrides: [
     {
       files: ["src/pages/**/*.vue", "src/layouts/**/*.vue"],
