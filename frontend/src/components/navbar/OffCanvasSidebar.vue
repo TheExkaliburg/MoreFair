@@ -43,7 +43,11 @@
             <QuestionMarkCircleIcon />
           </template>
         </SidebarButton>
-        <NuxtLink to="https://fairwiki.kaliburg.de/" @click="close">
+        <NuxtLink
+          to="https://fairwiki.kaliburg.de/"
+          target="_blank"
+          @click="close"
+        >
           <SidebarButton :label="lang('wiki')" aria-label="Goto Fair Wiki">
             <template #icon>
               <BookOpenIcon />
