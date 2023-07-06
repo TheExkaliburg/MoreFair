@@ -63,7 +63,7 @@ options:
   biasMultiColors: Color the bias/multi
   showBiasAndMulti: Show bias/multi for ranker
   showPowerGain: Show power-gain for ranker
-  hidePromotedPlayers: Hide promoted players
+  hidePromotedPlayers: Hide promoted rankers
   hideVinegarAndGrapes: Hide vinegar and grape count
   enableSpectateAssholeLadder: Enable spectating asshole ladder
   hideHelpText: Hide help text
@@ -84,6 +84,7 @@ options:
   showAboveRankers: Show XX Ranker Above
   showBelowRankers: Show XX Ranker Below
   showBottomRankers: Show XX Bottom Ranker
+  hideZombies: Hide inactive rankers
 account:
   account: Account
   apply: Apply
