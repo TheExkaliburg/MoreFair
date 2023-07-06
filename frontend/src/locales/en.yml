@@ -83,6 +83,7 @@ options:
   showTopRankers: Show XX Top Ranker
   showAboveRankers: Show XX Ranker Above
   showBelowRankers: Show XX Ranker Below
+  showBottomRankers: Show XX Bottom Ranker
 account:
   account: Account
   apply: Apply

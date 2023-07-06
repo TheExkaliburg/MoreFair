@@ -160,6 +160,7 @@ public class SecurityConfig {
   public CookieSerializer cookieSerializer() {
     DefaultCookieSerializer serializer = new CustomCookieSerializer();
     serializer.setSameSite(SameSiteCookies.STRICT.getValue());
+    serializer.setUseSecureCookie(true);
     return serializer;
   }
 
