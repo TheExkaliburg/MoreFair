@@ -264,6 +264,11 @@ public class AuthController {
           account.setLastIp(ip);
           account.setGuest(false);
           accountService.save(account);
+        } else if (account == null) {
+          account = accountService.create(username, password, ip, false);
+          account.setLastIp(ip);
+          account.setLastLogin(OffsetDateTime.now());
+          accountService.save(account);
         }
       } else {
         AccountEntity account = accountService.create(username, password, ip, false);

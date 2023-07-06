@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import Cookies from "js-cookie";
 import { computed, ref, watch } from "vue";
 import { navigateTo } from "nuxt/app";
+import { AxiosResponse } from "axios";
 import { useAPI } from "~/composables/useAPI";
 import { useZxcvbn } from "~/composables/useZxcvbn";
 import { useAccountStore } from "~/store/account";
@@ -47,9 +48,15 @@ export const useAuthStore = defineStore("auth", () => {
       });
   }
 
-  async function registerGuest() {
+  async function registerGuest(): Promise<AxiosResponse | undefined> {
     if (state.uuid !== "") {
-      return await login(state.uuid, state.uuid, true);
+      return await login(state.uuid, state.uuid, true).catch((err) => {
+        if (err.response.status === 401) {
+          localStorage.setItem("old_uuid", state.uuid);
+          state.uuid = "";
+          return registerGuest();
+        }
+      });
     }
 
     return await API.auth
@@ -111,11 +118,7 @@ export const useAuthStore = defineStore("auth", () => {
       });
   }
 
-  async function login(
-    username: string,
-    password: string,
-    rememberMe: boolean = false
-  ) {
+  async function login(username: string, password: string, rememberMe = false) {
     if (state.authenticationStatus) navigateTo("/");
     return await API.auth
       .login(username, password, rememberMe)
@@ -128,7 +131,7 @@ export const useAuthStore = defineStore("auth", () => {
             Cookies.set("_uuid", state.uuid, {
               expires: 365,
               secure: true,
-              sameSite: "strict",
+              sameSite: shouldSetSameSite() ? "strict" : "none",
             });
           } else {
             state.uuid = "";
@@ -241,7 +244,7 @@ export const useAuthStore = defineStore("auth", () => {
         Cookies.set("_uuid", value, {
           expires: 365,
           secure: true,
-          sameSite: "strict",
+          sameSite: shouldSetSameSite() ? "strict" : "none",
         });
       else Cookies.remove("_uuid");
     }
@@ -319,4 +322,9 @@ function checkEmail(email: string): boolean {
     return false;
   }
   return true;
+}
+
+function shouldSetSameSite(): boolean {
+  // if currently used as iframe return false
+  return window.self === window.top;
 }

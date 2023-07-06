@@ -1,5 +1,5 @@
 <template>
-  <div class="overflow-y-auto h-full" @scroll="onScroll">
+  <div ref="container" class="overflow-y-auto h-full" @scroll="onScroll">
     <!--DynamicScroller
       :buffer="200"
       :items="ladder.rankers"
@@ -84,6 +84,7 @@
       <LadderWindowTableRow
         v-for="(ranker, index) in ladder.getters.shownRankers"
         :key="ranker.accountId"
+        :container="container"
         :class="{
           'border-button-border border-b-1': isScrolled && index === 0,
         }"
@@ -108,6 +109,7 @@ const lang = useLang("components.ladder.table");
 const isScrolled = ref<boolean>(false);
 
 const tableSpaceClasses = useTableSpaceStyles();
+const container = ref<HTMLElement | null>(null);
 
 useStomp().addCallback(
   useStomp().callbacks.onTick,

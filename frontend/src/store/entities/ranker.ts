@@ -17,19 +17,19 @@ export type RankerData = {
 };
 
 export class Ranker implements RankerData {
-  accountId: number = 0;
-  username: string = "";
-  rank: number = 0;
+  accountId = 0;
+  username = "";
+  rank = 0;
   points: Decimal = new Decimal(0);
   power: Decimal = new Decimal(1);
-  bias: number = 0;
-  multi: number = 1;
-  growing: boolean = true;
-  assholeTag: string = "";
-  assholePoints: number = 0;
+  bias = 0;
+  multi = 1;
+  growing = true;
+  assholeTag = "";
+  assholePoints = 0;
   grapes: Decimal = new Decimal(0);
   vinegar: Decimal = new Decimal(0);
-  autoPromote: boolean = false;
+  autoPromote = false;
 
   constructor(data: any) {
     Object.assign(this, data);

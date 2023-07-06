@@ -22,7 +22,6 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted } from "vue";
 import { useUiStore } from "~/store/ui";
 import { useStomp } from "~/composables/useStomp";
 import { useChatStore } from "~/store/chat";
@@ -41,8 +40,8 @@ useSeoMeta({
 
 useStomp();
 
-onMounted(() => {
-  useAccountStore()
+onMounted(async () => {
+  await useAccountStore()
     .actions.init()
     .then(() => {
       useRoundStore().actions.init();

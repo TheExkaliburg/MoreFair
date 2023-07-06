@@ -1,5 +1,5 @@
-import { useNuxtApp } from "#app";
 import { ToastOptions } from "vue3-toastify";
+import { useNuxtApp } from "#app";
 
 export const useToasts = (msg: string, options?: ToastOptions) => {
   const nuxtApp = useNuxtApp();

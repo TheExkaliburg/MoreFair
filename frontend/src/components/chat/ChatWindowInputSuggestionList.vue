@@ -30,7 +30,6 @@
 </template>
 <script lang="ts" setup>
 import { Listbox, ListboxOption, ListboxOptions } from "@headlessui/vue";
-import { computed, ref, watch } from "vue";
 
 const props = defineProps({
   items: { type: Array, required: true },
@@ -51,8 +50,10 @@ const formattedItemsArray = computed(() => {
 const selectedIndex = ref<number>(0);
 const list = ref();
 
-watch(props.items, () => {
-  selectedIndex.value = 0;
+watch(formattedItemsArray, (value, oldValue) => {
+  if (value.length !== oldValue.length) {
+    selectedIndex.value = 0;
+  }
 });
 
 function onKeyDown(event: KeyboardEvent) {

@@ -44,6 +44,29 @@
             </template>
           </SidebarButton>
           <NuxtLink
+            v-tippy="{ content: lang('wiki'), placement: 'right' }"
+            aria-label="Goto Fair Wiki"
+            target="_blank"
+            to="https://fairwiki.kaliburg.de/"
+          >
+            <SidebarButton aria-label="Goto Fair Wiki">
+              <template #icon>
+                <BookOpenIcon />
+              </template>
+            </SidebarButton>
+          </NuxtLink>
+          <NuxtLink
+            v-tippy="{ content: lang('changelog'), placement: 'right' }"
+            aria-label="Goto Changelog"
+            to="/changelog"
+          >
+            <SidebarButton aria-label="Goto Changelog">
+              <template #icon>
+                <NewspaperIcon />
+              </template>
+            </SidebarButton>
+          </NuxtLink>
+          <NuxtLink
             v-tippy="{ content: lang('rules'), placement: 'right' }"
             aria-label="Goto Rules Page"
             to="/rules"
@@ -62,7 +85,7 @@
           >
             <SidebarButton aria-label="Goto Moderation Page">
               <template #icon>
-                <DocumentTextIcon />
+                <font-awesome-icon icon="fa-solid fa-shield-halved" />
               </template>
             </SidebarButton>
           </NuxtLink>
@@ -87,8 +110,10 @@
 
 <script lang="ts" setup>
 import {
+  BookOpenIcon,
   Cog8ToothIcon,
   DocumentTextIcon,
+  NewspaperIcon,
   QuestionMarkCircleIcon,
   UserCircleIcon,
 } from "@heroicons/vue/24/outline";

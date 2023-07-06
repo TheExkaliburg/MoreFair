@@ -26,7 +26,10 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Entity
-@Table(name = "ranker", uniqueConstraints = @UniqueConstraint(name = "uk_uuid", columnNames = "uuid"))
+@Table(name = "ranker", uniqueConstraints = {
+    @UniqueConstraint(name = "uk_uuid", columnNames = "uuid"),
+    @UniqueConstraint(name = "uk_account_ladder", columnNames = {"account_id", "ladder_id"})
+})
 @Getter
 @Setter
 @Accessors(chain = true)

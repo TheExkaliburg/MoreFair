@@ -95,6 +95,24 @@ export const useLadderStore = defineStore("ladder", () => {
           (r) => r.growing || r.accountId === getters.yourRanker?.accountId
         );
       }
+      if (!optionsStore.state.ladder.showAllRankers.value) {
+        const top = optionsStore.state.ladder.showTopRankers.value;
+        const above = optionsStore.state.ladder.showAboveRankers.value;
+        const below = optionsStore.state.ladder.showBelowRankers.value;
+        const bottom = optionsStore.state.ladder.showBottomRankers.value;
+
+        result = result.filter((r) => {
+          if (r.rank <= top) return true;
+          if (r.rank > state.rankers.length - bottom) return true;
+          if (getters.yourRanker === undefined) return false;
+          if (getters.yourRanker.accountId === r.accountId) return true;
+          return (
+            r.rank >= getters.yourRanker?.rank - above &&
+            r.rank <= getters.yourRanker.rank + below
+          );
+        });
+      }
+
       return result;
     }),
   });
@@ -221,7 +239,7 @@ export const useLadderStore = defineStore("ladder", () => {
 
       if (
         yourRanker.rank === state.rankers.length &&
-        state.rankers.length > 1
+        state.rankers.length >= 1
       ) {
         yourRanker.grapes = Object.freeze(
           yourRanker.grapes.add(new Decimal(ladderUtils.getBottomGrapes()))
@@ -231,7 +249,7 @@ export const useLadderStore = defineStore("ladder", () => {
 
     const isFirst = getters.yourRanker?.rank === 1;
     if (isFirst && !wasFirst) {
-      useSound(SOUNDS.GOT_FIRST);
+      useSound(SOUNDS.GOT_FIRST).play();
     }
   }
 

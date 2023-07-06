@@ -10,10 +10,10 @@ export type RoundSettingsData = {
 
 export class RoundSettings implements RoundSettingsData {
   basePointsForPromote: Decimal = new Decimal(1000);
-  minimumPeopleForPromote: number = 10;
+  minimumPeopleForPromote = 10;
   baseVinegarNeededToThrow: Decimal = new Decimal(1000);
   baseGrapesNeededToAutoPromote: Decimal = new Decimal(1000);
-  manualPromoteWaitTime: number = 30;
+  manualPromoteWaitTime = 30;
 
   constructor(data: any) {
     Object.assign(this, data);

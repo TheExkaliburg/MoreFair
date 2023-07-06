@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequiredArgsConstructor
 public class RoundController {
 
-  public static final String TOPIC_EVENTS_DESTINATION = "/round/event/";
+  public static final String TOPIC_EVENTS_DESTINATION = "/round/event";
 
   private final RoundService roundService;
   private final FairConfig fairConfig;

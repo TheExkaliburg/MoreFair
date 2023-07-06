@@ -22,12 +22,20 @@ axiosInstance.interceptors.request.use(
     const xsrfToken = Cookies.get("XSRF-TOKEN");
     lastXsrfToken = xsrfToken;
 
-    if (!xsrfToken) return config;
+    if (xsrfToken) {
+      config.headers = {
+        ...config.headers,
+        "X-XSRF-TOKEN": xsrfToken,
+      };
+    }
 
-    config.headers = {
-      ...config.headers,
-      "X-XSRF-TOKEN": xsrfToken,
-    };
+    if (window.self !== window.top) {
+      config.headers = {
+        ...config.headers,
+        // @ts-ignore
+        "is-iframed": true,
+      };
+    }
 
     return config;
   },
@@ -60,12 +68,12 @@ axiosInstance.interceptors.response.use(
       if (!isRetry) {
         const xsrfToken = Cookies.get("XSRF-TOKEN");
         if (xsrfToken) {
-          const config = error.config;
+          const config = error.config as AxiosRequestConfig;
           config.headers = {
             ...config.headers,
             "X-RETRY": true,
           };
-          return axiosInstance.request(config);
+          return axiosInstance.request(config as AxiosRequestConfig);
         }
       }
     }
@@ -75,11 +83,7 @@ axiosInstance.interceptors.response.use(
 
 const API = {
   auth: {
-    login: (
-      username: string,
-      password: string,
-      rememberMe: boolean = false
-    ) => {
+    login: (username: string, password: string, rememberMe = false) => {
       username = username.toLowerCase();
       const params = new URLSearchParams();
       params.append("username", username);
