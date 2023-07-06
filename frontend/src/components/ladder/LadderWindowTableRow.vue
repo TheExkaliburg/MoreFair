@@ -248,12 +248,12 @@ const etaPercentage = computed<number>(() => {
 
 onMounted(() => {
   if (isYou.value && optionsStore.state.ladder.followOwnRanker.value)
-    el.value?.scrollIntoView();
+    el.value?.parentElement?.scrollTo({ top: el.value.offsetTop });
 });
 
 onUpdated(() => {
   if (isYou.value && optionsStore.state.ladder.followOwnRanker.value)
-    el.value?.scrollIntoView();
+    el.value?.parentElement?.scrollTo({ top: el.value.offsetTop });
 });
 </script>
 

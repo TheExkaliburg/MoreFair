@@ -51,7 +51,7 @@ const isLastMessage = computed<boolean>(() => {
 
 onMounted(() => {
   if (isLastMessage.value) {
-    el.value?.scrollIntoView();
+    el.value?.parentElement?.scrollTo({ top: el.value.offsetTop });
   }
 });
 
