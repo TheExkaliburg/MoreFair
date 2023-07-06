@@ -106,7 +106,7 @@ public class SecurityConfig {
         .deleteCookies("remember-me")
     );
     http.headers().frameOptions().disable()
-        .contentSecurityPolicy("frame-ancestors 'self' https://iframetester.com");
+        .contentSecurityPolicy("frame-ancestors 'self' https://galaxy.click");
     http.addFilterAfter(cookieSameSiteFilter, RememberMeAuthenticationFilter.class);
     http.exceptionHandling()
         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
@@ -168,7 +168,7 @@ public class SecurityConfig {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.setAllowedOrigins(
         Arrays.asList("http://localhost:3000", "http://localhost:8080", "https://fair.kaliburg.de",
-            "https://fairtest.kaliburg.de"));
+            "https://fairtest.kaliburg.de", "https://galaxy.click"));
     configuration.setAllowedMethods(
         Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
     configuration.setAllowedHeaders(List.of("*"));
