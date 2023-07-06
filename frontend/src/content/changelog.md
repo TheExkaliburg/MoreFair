@@ -4,6 +4,18 @@ description: 'A list of all changes made to the game'
 
 # Changelog
 
+## 2.3.3 [PATCH]: Scroll Improvements and Iframes
+
+### Improvements:
+
+- follow Ranker should now try to center your Ranker
+- the game should now be iframe-able to allow for galaxy.click to embed it
+
+<br><br><br><br><br><br><br>
+
+<details>
+<summary>Expand for the 2.3.x changelog</summary>
+
 ## 2.3.2 [PATCH]: Show all Ranker option
 
 ### Features:
@@ -20,11 +32,6 @@ description: 'A list of all changes made to the game'
 - Play sound on reaching first, if the option is set
 - Fixing the chat that moved out of the screen in a long message
 - Also mentioning something in a long message should not linewrap anymore
-
-<br><br><br><br><br><br><br>
-
-<details>
-<summary>Expand for the 2.3.x changelog</summary>
 
 ## 2.3.1 [PATCH]: Bugfixes
 

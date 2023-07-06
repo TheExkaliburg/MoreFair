@@ -111,10 +111,17 @@ import {
   useTableSpaceStyles,
 } from "~/composables/useTableSpace";
 
-const props = defineProps({
-  ranker: { type: Ranker, required: true },
-  index: { type: Number, required: false, default: -1 },
-});
+const props = withDefaults(
+  defineProps<{
+    ranker: Ranker;
+    index: number;
+    container?: HTMLElement | null;
+  }>(),
+  {
+    index: -1,
+    container: null,
+  }
+);
 
 const ladderStore = useLadderStore();
 const optionsStore = useOptionsStore();
@@ -247,13 +254,25 @@ const etaPercentage = computed<number>(() => {
 });
 
 onMounted(() => {
-  if (isYou.value && optionsStore.state.ladder.followOwnRanker.value)
-    el.value?.parentElement?.scrollTo({ top: el.value.offsetTop });
+  if (
+    isYou.value &&
+    optionsStore.state.ladder.followOwnRanker.value &&
+    el.value &&
+    props.container
+  ) {
+    scrollToCenter(el.value, props.container);
+  }
 });
 
 onUpdated(() => {
-  if (isYou.value && optionsStore.state.ladder.followOwnRanker.value)
-    el.value?.parentElement?.scrollTo({ top: el.value.offsetTop });
+  if (
+    isYou.value &&
+    optionsStore.state.ladder.followOwnRanker.value &&
+    el.value &&
+    props.container
+  ) {
+    scrollToCenter(el.value, props.container);
+  }
 });
 </script>
 
