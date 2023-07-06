@@ -18,17 +18,21 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
 import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
+import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.session.web.http.CookieSerializer;
 import org.springframework.session.web.http.DefaultCookieSerializer;
+import org.springframework.session.web.http.SessionRepositoryFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -42,6 +46,8 @@ public class SecurityConfig {
   private final AccountService accountService;
   private final PasswordEncoder passwordEncoder;
   private final RedisTokenRepositoryImpl redisTokenRepository;
+
+  private final CookieSameSiteFilter cookieSameSiteFilter;
   private final FairConfig config;
 
   @Bean
@@ -101,6 +107,7 @@ public class SecurityConfig {
     );
     http.headers().frameOptions().disable()
         .addHeaderWriter(new StaticHeadersWriter("frame-ancestors", "'self' https://iframetester.com"));
+    http.addFilterAfter(cookieSameSiteFilter, RememberMeAuthenticationFilter.class);
     http.exceptionHandling()
         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
 
@@ -151,7 +158,7 @@ public class SecurityConfig {
 
   @Bean
   public CookieSerializer cookieSerializer() {
-    DefaultCookieSerializer serializer = new DefaultCookieSerializer();
+    DefaultCookieSerializer serializer = new CustomCookieSerializer();
     serializer.setSameSite(SameSiteCookies.STRICT.getValue());
     return serializer;
   }
