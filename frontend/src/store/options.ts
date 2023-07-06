@@ -44,6 +44,9 @@ const defaultValues = {
     showBelowRankers: new IntegerOption(10).setIsActive(() => {
       return !optionsStorage.value.ladder.showAllRankers.value;
     }),
+    showBottomRankers: new IntegerOption(5).setIsActive(() => {
+      return !optionsStorage.value.ladder.showAllRankers.value;
+    }),
     hidePromotedPlayers: new BooleanOption(false),
     hideVinegarAndGrapes: new BooleanOption(false),
     lockButtons: new BooleanOption(false),

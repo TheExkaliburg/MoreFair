@@ -6,6 +6,11 @@ description: 'A list of all changes made to the game'
 
 ## 2.3.3 [PATCH]: Scroll Improvements and Iframes
 
+### Features:
+
+- You can now choose a 4th parameters to filter the rankers by
+    4. By their position relative to the bottom
+
 ### Improvements:
 
 - follow Ranker should now try to center your Ranker

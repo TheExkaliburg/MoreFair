@@ -93,9 +93,11 @@ export const useLadderStore = defineStore("ladder", () => {
         const top = optionsStore.state.ladder.showTopRankers.value;
         const above = optionsStore.state.ladder.showAboveRankers.value;
         const below = optionsStore.state.ladder.showBelowRankers.value;
+        const bottom = optionsStore.state.ladder.showBottomRankers.value;
 
         result = result.filter((r) => {
           if (r.rank <= top) return true;
+          if (r.rank > state.rankers.length - bottom) return true;
           if (getters.yourRanker === undefined) return false;
           if (getters.yourRanker.accountId === r.accountId) return true;
           return (
