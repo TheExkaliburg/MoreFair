@@ -11,6 +11,7 @@ description: 'A list of all changes made to the game'
 - follow Ranker should now try to center your Ranker
 - the game should now be iframe-able to allow for galaxy.click to embed it
 - FairWiki now opens in a new tab
+- adding the new Mods to the rules
 
 <br><br><br><br><br><br><br>
 
