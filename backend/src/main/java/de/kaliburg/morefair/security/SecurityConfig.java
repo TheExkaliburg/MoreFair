@@ -77,6 +77,9 @@ public class SecurityConfig {
         .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/socket/fair"))
         .permitAll()
 
+        .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/api/stats/**"))
+        .permitAll()
+
         .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.OPTIONS, "/api/**"))
         .authenticated()
 
