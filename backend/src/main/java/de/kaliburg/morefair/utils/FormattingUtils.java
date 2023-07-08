@@ -1,5 +1,7 @@
 package de.kaliburg.morefair.utils;
 
+import org.slf4j.helpers.MessageFormatter;
+
 public class FormattingUtils {
 
   /**
@@ -21,5 +23,9 @@ public class FormattingUtils {
       case 11, 12, 13 -> i + "th";
       default -> i + suffixes[i % 10];
     };
+  }
+
+  public static String format(String string, Object... values) {
+    return MessageFormatter.arrayFormat(string, values).getMessage();
   }
 }

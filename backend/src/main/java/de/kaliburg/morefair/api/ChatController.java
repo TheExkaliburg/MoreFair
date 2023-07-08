@@ -6,12 +6,12 @@ import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.utils.RequestThrottler;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WsMessage;
-import de.kaliburg.morefair.data.ModMessageDto;
-import de.kaliburg.morefair.game.chat.ChatDto;
 import de.kaliburg.morefair.game.chat.ChatEntity;
 import de.kaliburg.morefair.game.chat.ChatService;
+import de.kaliburg.morefair.game.chat.ChatType;
 import de.kaliburg.morefair.game.chat.MessageEntity;
 import de.kaliburg.morefair.game.chat.MessageService;
+import de.kaliburg.morefair.game.chat.dto.ChatDto;
 import de.kaliburg.morefair.game.round.LadderService;
 import de.kaliburg.morefair.game.round.RankerEntity;
 import de.kaliburg.morefair.game.round.RankerService;
@@ -67,8 +67,8 @@ public class ChatController {
       }
 
       if (account.isMod() || number <= ranker.getLadder().getNumber()) {
-        ChatEntity chatEntity = chatService.find(number);
-        ChatDto c = new ChatDto(chatEntity, config);
+        ChatEntity chatEntity = chatService.find(ChatType.LADDER, number);
+        ChatDto c = chatService.convertToDto(chatEntity);
         return new ResponseEntity<>(c, HttpStatus.OK);
       } else {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -113,10 +113,10 @@ public class ChatController {
       RankerEntity ranker = ladderService.findFirstActiveRankerOfAccountThisRound(account);
       if (account.isMod()
           || (number <= ranker.getLadder().getNumber() && throttler.canPostMessage(account))) {
-        MessageEntity messageEntity = chatService.sendMessageToChat(account, number, message,
-            metadata);
-        wsUtils.convertAndSendToTopic(ModerationController.TOPIC_CHAT_EVENTS_DESTINATION,
-            new ModMessageDto(messageEntity, config));
+        ChatEntity chat = chatService.find(ChatType.LADDER, number);
+        MessageEntity messageEntity = messageService.create(account, chat, message, metadata);
+        //wsUtils.convertAndSendToTopic(ModerationController.TOPIC_CHAT_EVENTS_DESTINATION,
+        //    new ModMessageDto(messageEntity, config));
         log.info("[CHAT {}] {} (#{}): {}", number, account.getDisplayName(), account.getId(),
             message);
       }

@@ -6,14 +6,10 @@ import static de.kaliburg.morefair.events.types.LadderEventTypes.BUY_MULTI;
 import static de.kaliburg.morefair.events.types.LadderEventTypes.PROMOTE;
 import static de.kaliburg.morefair.events.types.LadderEventTypes.THROW_VINEGAR;
 
-import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.FairController;
-import de.kaliburg.morefair.api.RoundController;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.LadderEventTypes;
-import de.kaliburg.morefair.events.types.RoundEventTypes;
-import de.kaliburg.morefair.game.chat.MessageService;
 import de.kaliburg.morefair.game.round.dto.HeartbeatDto;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -23,6 +19,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -31,37 +28,19 @@ import org.springframework.stereotype.Component;
 @Log4j2
 @Component
 @EnableScheduling
+@RequiredArgsConstructor
 public class LadderCalculator {
 
   private static final double NANOS_IN_SECONDS = TimeUnit.SECONDS.toNanos(1);
   private final LadderService ladderService;
-  private final AccountService accountService;
-  private final MessageService messageService;
   private final WsUtils wsUtils;
   private final LadderUtils ladderUtils;
-  private final RoundService roundService;
-  private final RoundUtils roundUtils;
-  private HeartbeatDto heartbeat = new HeartbeatDto();
-  private boolean didPressAssholeButton = false;
+  private final HeartbeatDto heartbeat = new HeartbeatDto();
   private long lastTimeMeasured = System.nanoTime();
-
-  public LadderCalculator(LadderService ladderService, AccountService accountService,
-      WsUtils wsUtils,
-      MessageService messageService, LadderUtils ladderUtils, RoundService roundService,
-      RoundUtils roundUtils) {
-    this.ladderService = ladderService;
-    this.accountService = accountService;
-    this.wsUtils = wsUtils;
-    this.messageService = messageService;
-    this.ladderUtils = ladderUtils;
-    this.roundService = roundService;
-    this.roundUtils = roundUtils;
-  }
 
   @Scheduled(initialDelay = 1000, fixedRate = 1000)
   public void update() {
     // Reset the Heartbeat
-    didPressAssholeButton = false;
     try {
       ladderService.getLadderSemaphore().acquire();
       try {

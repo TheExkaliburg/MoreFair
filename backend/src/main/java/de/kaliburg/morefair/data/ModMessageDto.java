@@ -1,7 +1,7 @@
 package de.kaliburg.morefair.data;
 
 import de.kaliburg.morefair.FairConfig;
-import de.kaliburg.morefair.game.chat.MessageDto;
+import de.kaliburg.morefair.game.chat.dto.MessageDto;
 import de.kaliburg.morefair.game.chat.MessageEntity;
 import lombok.Getter;
 

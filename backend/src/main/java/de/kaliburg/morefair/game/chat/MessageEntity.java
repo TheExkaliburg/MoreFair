@@ -21,6 +21,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.jetbrains.annotations.NotNull;
 
 @Entity
 @Table(name = "message", uniqueConstraints = @UniqueConstraint(name = "uk_uuid", columnNames = "uuid"))
@@ -30,7 +31,7 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @SequenceGenerator(name = "seq_message", sequenceName = "seq_message", allocationSize = 1)
-public class MessageEntity {
+public class MessageEntity implements Comparable<MessageEntity> {
 
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_message")
@@ -59,5 +60,10 @@ public class MessageEntity {
 
   public boolean isDeleted() {
     return deletedOn != null;
+  }
+
+  @Override
+  public int compareTo(@NotNull MessageEntity o) {
+    return o.getCreatedOn().compareTo(this.getCreatedOn());
   }
 }

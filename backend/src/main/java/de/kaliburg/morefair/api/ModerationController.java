@@ -11,6 +11,7 @@ import de.kaliburg.morefair.data.ModChatDto;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.AccountEventTypes;
 import de.kaliburg.morefair.game.chat.ChatService;
+import de.kaliburg.morefair.game.chat.ChatType;
 import de.kaliburg.morefair.game.chat.MessageEntity;
 import de.kaliburg.morefair.game.chat.MessageService;
 import de.kaliburg.morefair.game.round.LadderService;
@@ -59,7 +60,7 @@ public class ModerationController {
       if (account == null || !account.isMod()) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       } else {
-        List<MessageEntity> messages = messageService.getNewestMessages();
+        List<MessageEntity> messages = messageService.findNewestMessagesByChatType(ChatType.LADDER);
         return new ResponseEntity<>(new ModChatDto(messages, config), HttpStatus.OK);
       }
     } catch (Exception e) {
@@ -85,7 +86,7 @@ public class ModerationController {
       target.setAccessRole(AccountAccessRole.BANNED_PLAYER);
       target.setDisplayName("[BANNED]");
       target = accountService.save(target);
-      chatService.deleteMessagesOfAccount(target);
+      messageService.deleteMessagesOfAccount(target);
       log.info("[MOD] {} (#{}) is banning the account {} (#{})", account.getDisplayName(),
           account.getId(),
           target.getDisplayName(), target.getId());
@@ -112,7 +113,7 @@ public class ModerationController {
       target.setAccessRole(AccountAccessRole.MUTED_PLAYER);
       target.setDisplayName("[MUTED]" + target.getDisplayName());
       target = accountService.save(target);
-      chatService.deleteMessagesOfAccount(target);
+      messageService.deleteMessagesOfAccount(target);
       log.info("[MOD] {} (#{}) is muting the account {} (#{})", account.getDisplayName(),
           account.getId(),
           target.getDisplayName(), target.getId());

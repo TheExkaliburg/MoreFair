@@ -1,10 +1,15 @@
-package de.kaliburg.morefair.game.chat;
+package de.kaliburg.morefair.game.chat.dto;
 
 import de.kaliburg.morefair.FairConfig;
+import de.kaliburg.morefair.game.chat.MessageEntity;
 import java.time.ZoneOffset;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
+@AllArgsConstructor
 public class MessageDto {
 
   private final String message;

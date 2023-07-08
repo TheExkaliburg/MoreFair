@@ -18,9 +18,11 @@ import de.kaliburg.morefair.events.types.LadderEventTypes;
 import de.kaliburg.morefair.events.types.RoundEventTypes;
 import de.kaliburg.morefair.game.GameResetEvent;
 import de.kaliburg.morefair.game.UpgradeUtils;
+import de.kaliburg.morefair.game.chat.ChatEntity;
 import de.kaliburg.morefair.game.chat.ChatService;
+import de.kaliburg.morefair.game.chat.ChatServiceImpl;
+import de.kaliburg.morefair.game.chat.ChatType;
 import de.kaliburg.morefair.game.chat.MessageService;
-import de.kaliburg.morefair.game.round.dto.RankerDto;
 import de.kaliburg.morefair.statistics.StatisticsService;
 import de.kaliburg.morefair.utils.FormattingUtils;
 import java.math.BigInteger;
@@ -50,8 +52,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Service only handles the matters that regard a specific ladders, like game logic and user input.
  *
  * <p>For global events look at {@link de.kaliburg.morefair.game.round.RoundService} or for
- * chats and message at {@link de.kaliburg.morefair.game.chat.ChatService} or
- * {@link MessageService}
+ * chats and message at {@link ChatServiceImpl} or {@link MessageService}
  */
 @Service
 @Log4j2
@@ -75,6 +76,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   private final WsUtils wsUtils;
   private final FairConfig config;
   private final Gson gson;
+  private final MessageService messageService;
   @Getter(AccessLevel.PACKAGE)
   @Setter(AccessLevel.PACKAGE)
   private RoundEntity currentRound;
@@ -85,7 +87,8 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
       LadderUtils ladderUtils, AccountService accountService,
       @Lazy StatisticsService statisticsService,
       RoundUtils roundUtils,
-      ChatService chatService, UpgradeUtils upgradeUtils, ApplicationEventPublisher eventPublisher,
+      ChatService chatService, UpgradeUtils upgradeUtils, MessageService messageService,
+      ApplicationEventPublisher eventPublisher,
       @Lazy WsUtils wsUtils, FairConfig config, Gson gson) {
     this.rankerService = rankerService;
     this.ladderRepository = ladderRepository;
@@ -99,6 +102,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
     this.wsUtils = wsUtils;
     this.config = config;
     this.gson = gson;
+    this.messageService = messageService;
   }
 
   @Transactional
@@ -557,11 +561,6 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
           newRanker.setGrapes(newRanker.getGrapes().add(autoPromoteCost.divide(BigInteger.TEN)));
         }
 
-        // Create new Chat if it doesn't exist
-        if (chatService.find(ladder.getNumber() + 1) == null) {
-          chatService.create(ladder.getNumber() + 1);
-        }
-
         wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
             ladder.getNumber(), event);
         wsUtils.convertAndSendToUser(account.getUuid(),
@@ -585,10 +584,13 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
           String metadataString = gson.toJson(new JsonObject[]{object1, object2});
 
-          chatService.sendGlobalMessage("{@} was welcomed by {@}. They are the "
-              + FormattingUtils.ordinal(newLadder.getRankers().size())
-              + " lucky initiate for the " + FormattingUtils.ordinal(
-              currentRound.getNumber()) + " big ritual.", metadataString);
+          ChatEntity chat = chatService.find(ChatType.ANNOUNCEMENT);
+
+          messageService.create(accountService.findBroadcaster(), chat, FormattingUtils.format(
+              "{@} was welcomed by {@}. They are the {} lucky initiate for the {} big ritual.",
+              FormattingUtils.ordinal(newLadder.getRankers().size()),
+              FormattingUtils.ordinal(currentRound.getNumber())
+          ), metadataString);
 
           int neededAssholesForReset = currentRound.getAssholesForReset();
           int assholeCount = newLadder.getRankers().size();
