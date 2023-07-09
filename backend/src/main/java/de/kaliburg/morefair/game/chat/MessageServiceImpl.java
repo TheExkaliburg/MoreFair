@@ -46,17 +46,17 @@ public class MessageServiceImpl extends AbstractCacheableService implements Mess
 
   @Override
   public MessageEntity find(@NonNull Long id) {
-    return getMessageEntityFromCache(messageIdCache, id);
+    return getValueFromCacheSync(messageIdCache, id);
   }
 
   @Override
   public MessageEntity find(@NonNull UUID uuid) {
-    return getMessageEntityFromCache(messageUuidCache, uuid);
+    return getValueFromCacheSync(messageUuidCache, uuid);
   }
 
   @Override
   public List<MessageEntity> find(@NonNull ChatEntity chat) {
-    return getMessageEntityFromCache(messagesChatIdCache, chat.getId());
+    return getValueFromCacheSync(messagesChatIdCache, chat.getId());
   }
 
   @Override
@@ -86,6 +86,7 @@ public class MessageServiceImpl extends AbstractCacheableService implements Mess
     return messageRepository.findNewestMessagesByChatTypes(chatTypes);
   }
 
+  @Override
   public void deleteMessagesOfAccount(AccountEntity account) {
     try {
       cacheSemaphore.acquire();

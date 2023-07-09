@@ -9,8 +9,7 @@ public class AbstractCacheableService {
   @Getter
   protected final Semaphore cacheSemaphore = new Semaphore(1);
 
-  protected <K, V> V getMessageEntityFromCache(LoadingCache<K, V> cache,
-      K key) {
+  protected <K, V> V getValueFromCacheSync(LoadingCache<K, V> cache, K key) {
     try {
       cacheSemaphore.acquire();
       try {

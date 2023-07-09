@@ -1,58 +1,54 @@
 package de.kaliburg.morefair.game.chat;
 
-import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
+import de.kaliburg.morefair.core.AbstractCacheableService;
 import de.kaliburg.morefair.game.chat.dto.ChatDto;
 import jakarta.annotation.Nullable;
 import java.util.UUID;
-import java.util.concurrent.Semaphore;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.javatuples.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Transactional
-@RequiredArgsConstructor
 @Service
-public class ChatServiceImpl implements ChatService {
+public class ChatServiceImpl extends AbstractCacheableService implements ChatService {
 
   private final ChatRepository chatRepository;
 
   private final MessageService messageService;
 
-  private final Semaphore chatSemaphore = new Semaphore(1);
+  private final LoadingCache<Pair<ChatType, Integer>, ChatEntity> chatTypeCache;
+  private final LoadingCache<UUID, ChatEntity> chatUuidCache;
+  private final LoadingCache<Long, ChatEntity> chatIdCache;
 
-  private final Cache<Pair<ChatType, Integer>, ChatEntity> chatTypeCache =
-      Caffeine.newBuilder().build();
-  private final Cache<UUID, ChatEntity> chatUuidCache =
-      Caffeine.newBuilder().build();
-  private final Cache<Long, ChatEntity> chatIdCache =
-      Caffeine.newBuilder().build();
+
+  public ChatServiceImpl(ChatRepository chatRepository, @Lazy MessageService messageService) {
+    this.chatRepository = chatRepository;
+    this.messageService = messageService;
+
+    chatTypeCache = Caffeine.newBuilder()
+        .build(pair -> chatRepository.findByTypeAndNumber(pair.getValue0(), pair.getValue1())
+            .orElse(null));
+    chatUuidCache = Caffeine.newBuilder()
+        .build(uuid -> chatRepository.findByUuid(uuid).orElse(null));
+    chatIdCache = Caffeine.newBuilder()
+        .build(id -> chatRepository.findById(id).orElse(null));
+  }
 
   @Override
   public ChatEntity find(@NotNull Long id) {
-    ChatEntity result = chatIdCache.getIfPresent(id);
-    if (result == null) {
-      result = chatRepository.findById(id).orElse(null);
-    }
-    loadIntoCache(result);
-
-    return result;
+    return getValueFromCacheSync(chatIdCache, id);
   }
 
   @Override
   public ChatEntity find(@NonNull UUID uuid) {
-    ChatEntity result = chatUuidCache.getIfPresent(uuid);
-    if (result == null) {
-      result = chatRepository.findByUuid(uuid).orElse(null);
-    }
-    loadIntoCache(result);
-
-    return result;
+    return getValueFromCacheSync(chatUuidCache, uuid);
   }
 
   @Override
@@ -63,20 +59,25 @@ public class ChatServiceImpl implements ChatService {
       number = null;
     }
 
-    Pair<ChatType, Integer> keyPair = new Pair<>(type, number);
-    ChatEntity result = chatTypeCache.getIfPresent(keyPair);
+    Pair<ChatType, Integer> pair = new Pair<>(type, number);
+    try {
+      cacheSemaphore.acquire();
+      try {
+        ChatEntity result = chatTypeCache.get(pair);
+        if (result == null) {
+          log.info("Chat with type {} and number {} not found", type, number);
+          result = create(type, number);
+          chatTypeCache.put(pair, result);
+        }
 
-    if (result == null) {
-      result = chatRepository.findByTypeAndNumber(type, number).orElse(null);
+        return result;
+      } finally {
+        cacheSemaphore.release();
+      }
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      return null;
     }
-
-    if (result == null) {
-      log.info("Chat with type {} and number {} not found", type, number);
-      result = createChat(type, number);
-    }
-    loadIntoCache(result);
-
-    return result;
   }
 
   @Override
@@ -91,36 +92,7 @@ public class ChatServiceImpl implements ChatService {
         .build();
   }
 
-
-  private ChatEntity save(ChatEntity chat) {
-    try {
-      chatSemaphore.acquire();
-      try {
-        ChatEntity result = chatRepository.save(chat);
-
-        loadIntoCache(result);
-
-        return result;
-      } finally {
-        chatSemaphore.release();
-      }
-    } catch (InterruptedException e) {
-      log.error("Failed to acquire chat semaphore", e);
-      return chat;
-    }
-  }
-
-  private void loadIntoCache(ChatEntity chat) {
-    if (chat == null) {
-      return;
-    }
-
-    chatTypeCache.put(new Pair<>(chat.getType(), chat.getNumber()), chat);
-    chatUuidCache.put(chat.getUuid(), chat);
-    chatIdCache.put(chat.getId(), chat);
-  }
-
-  private ChatEntity createChat(ChatType chatType, @Nullable Integer number) {
+  private ChatEntity create(ChatType chatType, @Nullable Integer number) {
     ChatEntity chat = new ChatEntity(chatType);
 
     if (number != null) {
@@ -129,6 +101,6 @@ public class ChatServiceImpl implements ChatService {
 
     log.info("Creating new Chat with the identifier: {}", chat.getIdentifier());
 
-    return save(chat);
+    return chatRepository.save(chat);
   }
 }
