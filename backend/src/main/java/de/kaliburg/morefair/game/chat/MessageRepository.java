@@ -21,19 +21,21 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long> {
   @Query("SELECT m FROM MessageEntity m WHERE m.uuid = :uuid")
   Optional<MessageEntity> findByUuid(UUID uuid);
 
-  @Query("SELECT m FROM MessageEntity m WHERE m.chat.id = :chatId ORDER BY m.createdOn DESC")
+  @Query("SELECT m FROM MessageEntity m WHERE m.chat.id = :chatId AND m.deletedOn IS NULL "
+      + "ORDER BY m.createdOn DESC")
   List<MessageEntity> findMessagesByChatId(@Param("chatId") Long chatId, Pageable pageable);
 
   default List<MessageEntity> findNewestMessagesByChatId(Long chatId) {
     return findMessagesByChatId(chatId, PageRequest.of(0, MESSAGES_PER_PAGE));
   }
 
-  @Query("SELECT m FROM MessageEntity m WHERE m.chat.type = :chatType ORDER BY m.createdOn DESC")
-  List<MessageEntity> findMessagesByChatType(@Param("chatType") ChatType chatType,
+  @Query("SELECT m FROM MessageEntity m WHERE m.chat.type IN :chatTypes "
+      + "ORDER BY m.createdOn DESC")
+  List<MessageEntity> findMessagesByChatType(@Param("chatTypes") List<ChatType> chatType,
       Pageable pageable);
 
-  default List<MessageEntity> findNewestMessagesByChatType(ChatType chatType) {
-    return findMessagesByChatType(chatType, PageRequest.of(0, MESSAGES_PER_PAGE));
+  default List<MessageEntity> findNewestMessagesByChatTypes(List<ChatType> chatTypes) {
+    return findMessagesByChatType(chatTypes, PageRequest.of(0, MESSAGES_PER_PAGE));
   }
 
   @Modifying

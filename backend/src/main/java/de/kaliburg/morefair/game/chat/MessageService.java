@@ -24,7 +24,11 @@ public interface MessageService {
     return create(account, chat, message, "[]");
   }
 
-  List<MessageEntity> findNewestMessagesByChatType(ChatType chatType);
+  List<MessageEntity> findNewestMessagesByChatType(List<ChatType> chatTypes);
+
+  default List<MessageEntity> findNewestMessagesByChatType(ChatType chatType) {
+    return findNewestMessagesByChatType(List.of(chatType));
+  }
 
   void deleteMessagesOfAccount(AccountEntity account);
 
