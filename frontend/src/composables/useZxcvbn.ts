@@ -5,8 +5,8 @@ const lang = useLang("zxcvbn");
 let isInitialized = false;
 
 async function setOptions() {
-  const common = (await import("@zxcvbn-ts/language-common")).default;
-  const en = (await import("@zxcvbn-ts/language-en")).default;
+  const common = await import("@zxcvbn-ts/language-common");
+  const en = await import("@zxcvbn-ts/language-en");
   const options: OptionsType = {
     dictionary: {
       ...common.dictionary,
