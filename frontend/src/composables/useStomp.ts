@@ -1,7 +1,7 @@
 import { Client, StompSubscription } from "@stomp/stompjs";
 import { MentionMeta, MessageData } from "~/store/entities/message";
 import { AccountEventType, useAccountStore } from "~/store/account";
-import { useChatStore } from "~/store/chat";
+import { ChatType, useChatStore } from "~/store/chat";
 import { RoundEventType } from "~/store/round";
 import { LadderEventType } from "~/store/ladder";
 import { ChatLogMessageData } from "~/store/moderation";
@@ -246,10 +246,16 @@ const wsApi = (client: Client) => {
       sendMessage: (
         message: string,
         metadata: MentionMeta[],
-        chatNumber: number
+        chatType: ChatType,
+        chatNumber?: number
       ) => {
+        let destination = `/app/chat/${chatType.toLowerCase()}`;
+        if (chatNumber !== undefined) {
+          destination += `/${chatNumber}`;
+        }
+
         client.publish({
-          destination: `/app/chat/${chatNumber}`,
+          destination,
           body: JSON.stringify({
             content: message,
             metadata: JSON.stringify(metadata),

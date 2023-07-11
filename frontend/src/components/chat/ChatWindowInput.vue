@@ -36,7 +36,7 @@ import { Text } from "@tiptap/extension-text";
 import { Mention } from "@tiptap/extension-mention";
 import { CharacterCount } from "@tiptap/extension-character-count";
 import { Placeholder } from "@tiptap/extension-placeholder";
-import { useChatStore } from "~/store/chat";
+import { ChatType, useChatStore } from "~/store/chat";
 import {
   useEmojiSuggestion,
   useGroupSuggestion,
@@ -161,7 +161,7 @@ function sendMessage(e: KeyboardEvent | MouseEvent) {
 
     if (result.startsWith(" ")) result = result.trimStart();
   }
-  chatStore.actions.sendMessage(result, metadata);
+  chatStore.actions.sendMessage(result, metadata, ChatType.LADDER);
   editor.value.commands.clearContent(true);
 }
 

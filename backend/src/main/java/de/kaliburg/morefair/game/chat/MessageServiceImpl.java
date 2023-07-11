@@ -75,7 +75,9 @@ public class MessageServiceImpl extends AbstractCacheableService implements Mess
 
     result = save(result);
 
-    wsUtils.convertAndSendToTopic("/chat/" + chat.getIdentifier(), convertToDto(result));
+    if (result != null) {
+      wsUtils.convertAndSendToTopic("/chat/events/" + chat.getDestination(), convertToDto(result));
+    }
 
     return result;
   }

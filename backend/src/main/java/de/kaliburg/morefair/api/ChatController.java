@@ -40,7 +40,6 @@ public class ChatController {
 
   public static final String PRIVATE_EVENTS_DESTINATION = "/chat/event";
   public static final String TOPIC_EVENTS_DESTINATION = "/chat/event/{number}";
-  private static final String APP_CHAT_DESTINATION = "/chat/{number}";
   private final AccountService accountService;
   private final RankerService rankerService;
   private final WsUtils wsUtils;
@@ -83,18 +82,28 @@ public class ChatController {
     }
   }
 
-  @MessageMapping(APP_CHAT_DESTINATION)
+  @MessageMapping("/chat/{type}")
+  public void postChat(@DestinationVariable("type") String typeString,
+      @Payload WsMessage wsMessage, Authentication authentication) {
+    postChat(typeString, null, wsMessage, authentication);
+  }
+
+  @MessageMapping("/chat/{type}/{number}")
   public void postChat(
+      @DestinationVariable("type") String typeString,
       @DestinationVariable("number") Integer number,
       @Payload WsMessage wsMessage,
       Authentication authentication
   ) {
     try {
+      ChatType type = ChatType.valueOf(typeString.toUpperCase());
+
       String message = wsMessage.getContent();
       String metadata = wsMessage.getMetadata();
 
       if (ObjectUtils.anyNull(message, metadata)) {
-        throw new IllegalArgumentException("message or metadata is null");
+        log.error("message or metadata is null");
+        return;
       }
 
       message = message.trim();
@@ -107,20 +116,21 @@ public class ChatController {
       }
 
       AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
-      if (account == null || account.isMuted()) {
+      if (account == null || account.isMuted() || !throttler.canPostMessage(account)) {
         return;
       }
-      RankerEntity ranker = ladderService.findFirstActiveRankerOfAccountThisRound(account);
-      if (account.isMod()
-          || (number <= ranker.getLadder().getNumber() && throttler.canPostMessage(account))) {
-        ChatEntity chat = chatService.find(ChatType.LADDER, number);
-        MessageEntity messageEntity = messageService.create(account, chat, message, metadata);
-        //wsUtils.convertAndSendToTopic(ModerationController.TOPIC_CHAT_EVENTS_DESTINATION,
-        //    new ModMessageDto(messageEntity, config));
-        log.info("[CHAT {}] {} (#{}): {}", number, account.getDisplayName(), account.getId(),
-            message);
+
+      ChatEntity chat = chatService.find(type, number);
+      if (type == ChatType.LADDER && number != null) {
+        RankerEntity ranker = ladderService.findFirstActiveRankerOfAccountThisRound(account);
+        if (!account.isMod() && number > ranker.getLadder().getNumber()) {
+          return;
+        }
       }
 
+      MessageEntity messageEntity = messageService.create(account, chat, message, metadata);
+      log.info("[CHAT '{}'] {} (#{}): {}", chat.getIdentifier(), account.getDisplayName(),
+          account.getId(), messageEntity.getMessage());
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();

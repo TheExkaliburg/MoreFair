@@ -13,6 +13,12 @@ import { useAccountStore } from "~/store/account";
 import { SOUNDS, useSound } from "~/composables/useSound";
 import { useOptionsStore } from "~/store/options";
 
+export enum ChatType {
+  GENERAL = "GENERAL",
+  LADDER = "LADDER",
+  ANNOUNCEMENT = "ANNOUNCEMENT",
+}
+
 export type ChatData = {
   messages: MessageData[];
   number: number;
@@ -74,8 +80,14 @@ export const useChatStore = defineStore("chat", () => {
       });
   }
 
-  function sendMessage(message: string, metadata: MentionMeta[]) {
-    stomp.wsApi.chat.sendMessage(message, metadata, state.number);
+  function sendMessage(
+    message: string,
+    metadata: MentionMeta[],
+    chatType: ChatType
+  ) {
+    if (chatType === ChatType.LADDER)
+      stomp.wsApi.chat.sendMessage(message, metadata, chatType, state.number);
+    else stomp.wsApi.chat.sendMessage(message, metadata, chatType);
   }
 
   function changeChat(newNumber: number) {

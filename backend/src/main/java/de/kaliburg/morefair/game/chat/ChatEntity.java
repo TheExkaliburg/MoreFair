@@ -40,11 +40,19 @@ public class ChatEntity {
   @Column
   private Integer number;
 
-  public String getIdentifier() {
+  public String getDestination() {
     if (number == null) {
       return getType().toString().toLowerCase();
     }
 
     return getType().toString().toLowerCase() + "/" + getNumber();
+  }
+
+  public String getIdentifier() {
+    if (number == null) {
+      return getType().toString().toLowerCase();
+    }
+
+    return getType().toString().toLowerCase() + "-" + getNumber();
   }
 }
