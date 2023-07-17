@@ -14,6 +14,9 @@ export enum RoundType {
   SLOW = "SLOW",
   AUTO = "AUTO",
   CHAOS = "CHAOS",
+  RAILROAD = "RAILROAD",
+  FARMER = "FARMER",
+  RACE = "RACE",
 }
 
 export enum RoundEventType {
