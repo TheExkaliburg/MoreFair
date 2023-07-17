@@ -10,6 +10,7 @@ description: 'A list of all changes made to the game'
 
 - You can now choose a 4th parameters to filter the rankers by
     4. By their position relative to the bottom
+- Adding another option to hide the zombies (+0x1 rankers)
 
 ### Improvements:
 

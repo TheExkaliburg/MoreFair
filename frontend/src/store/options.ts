@@ -34,20 +34,21 @@ const defaultValues = {
     showBiasAndMulti: new BooleanOption(true),
     showPowerGain: new BooleanOption(true),
     followOwnRanker: new BooleanOption(false),
-    showAllRankers: new BooleanOption(true),
-    showTopRankers: new IntegerOption(5).setIsActive(() => {
+    showAllRankers: new BooleanOption(false),
+    showTopRankers: new IntegerOption(10).setIsActive(() => {
       return !optionsStorage.value.ladder.showAllRankers.value;
     }),
-    showAboveRankers: new IntegerOption(10).setIsActive(() => {
+    showAboveRankers: new IntegerOption(25).setIsActive(() => {
       return !optionsStorage.value.ladder.showAllRankers.value;
     }),
-    showBelowRankers: new IntegerOption(10).setIsActive(() => {
+    showBelowRankers: new IntegerOption(25).setIsActive(() => {
       return !optionsStorage.value.ladder.showAllRankers.value;
     }),
-    showBottomRankers: new IntegerOption(5).setIsActive(() => {
+    showBottomRankers: new IntegerOption(10).setIsActive(() => {
       return !optionsStorage.value.ladder.showAllRankers.value;
     }),
     hidePromotedPlayers: new BooleanOption(false),
+    hideZombies: new BooleanOption(false),
     hideVinegarAndGrapes: new BooleanOption(false),
     lockButtons: new BooleanOption(false),
   }),

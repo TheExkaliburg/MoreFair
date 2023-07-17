@@ -95,6 +95,16 @@ export const useLadderStore = defineStore("ladder", () => {
           (r) => r.growing || r.accountId === getters.yourRanker?.accountId
         );
       }
+
+      if (optionsStore.state.ladder.hideZombies.value) {
+        result = result.filter(
+          (r) =>
+            r.bias !== 0 ||
+            r.multi !== 1 ||
+            r.accountId === getters.yourRanker?.accountId
+        );
+      }
+
       if (!optionsStore.state.ladder.showAllRankers.value) {
         const top = optionsStore.state.ladder.showTopRankers.value;
         const above = optionsStore.state.ladder.showAboveRankers.value;

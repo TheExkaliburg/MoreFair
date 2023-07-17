@@ -34,6 +34,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j2;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Log4j2
 @Entity
@@ -67,6 +69,7 @@ public final class LadderEntity {
   @CollectionTable(name = "ladder_type", foreignKey = @ForeignKey(name = "fk_ladder_type_ladder"))
   @ElementCollection(targetClass = LadderType.class, fetch = FetchType.EAGER)
   @Enumerated(EnumType.STRING)
+  @Fetch(FetchMode.SELECT)
   private Set<LadderType> types = EnumSet.noneOf(LadderType.class);
   @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
   private OffsetDateTime createdOn = OffsetDateTime.now(ZoneOffset.UTC);

@@ -40,7 +40,7 @@ public class CookieSameSiteFilter implements Filter {
         for (int i = 1; i < newCookies.size(); i++) {
           httpServletResponse.addHeader("Set-Cookie", newCookies.get(i));
         }
-        log.info("Set-Cookie header changed to: " + newCookies.toString());
+        log.trace("Set-Cookie header changed to: " + newCookies.toString());
       }
     }
 
