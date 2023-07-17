@@ -131,6 +131,7 @@ public class LadderTypeBuilder {
         ladderGrapesTypeWeights.put(LadderType.CONSOLATION, 1.f);
         ladderGrapesTypeWeights.put(LadderType.NO_HANDOUTS, 1.f);
         ladderGrapesTypeWeights.put(LadderType.GENEROUS, 1.f);
+        ladderGrapesTypeWeights.put(LadderType.DEFAULT,1.f);
       }
       case SLOW -> {
         ladderSizeTypeWeights.put(LadderType.TINY, 0.f);
@@ -147,6 +148,7 @@ public class LadderTypeBuilder {
         ladderCostTypeWeights.put(LadderType.EXPENSIVE,
             ladderCostTypeWeights.get(LadderType.EXPENSIVE) * 2);
       }
+      //The main ladder type becomes the default ladder type for ladderGrapesType rounds.
       case RAILROAD -> {
         ladderGrapesTypeWeights.put(LadderType.CONSOLATION,50.f);
         ladderGrapesTypeWeights.put(LadderType.DROUGHT,20.f);
