@@ -75,14 +75,20 @@
       ><span v-if="optionsStore.state.ladder.showBiasAndMulti.value"
         >[<span
           :class="{
-            'text-eta-best': canBuyBias,
-            'text-eta-worst': !canBuyBias,
+            'text-eta-best': canBuyBias && showMultiBiasColor,
+            'text-eta-mid':
+              !canBuyBias && canAlmostBuyBias && showMultiBiasColor,
+            'text-eta-worst':
+              !canBuyBias && !canAlmostBuyBias && showMultiBiasColor,
           }"
           >+{{ formattedBias }}</span
         ><span
           :class="{
-            'text-eta-best': canBuyMulti,
-            'text-eta-worst': !canBuyMulti,
+            'text-eta-best': canBuyMulti && showMultiBiasColor,
+            'text-eta-mid':
+              !canBuyMulti && canAlmostBuyMulti && showMultiBiasColor,
+            'text-eta-worst':
+              !canBuyMulti && !canAlmostBuyMulti && showMultiBiasColor,
           }"
         >
           x{{ formattedMulti }}</span
@@ -93,7 +99,6 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, onUpdated } from "vue";
 import { useElementVisibility } from "@vueuse/core";
 import { Ranker } from "~/store/entities/ranker";
 import { useFormatter, useTimeFormatter } from "~/composables/useFormatter";
@@ -106,10 +111,17 @@ import {
   useTableSpaceStyles,
 } from "~/composables/useTableSpace";
 
-const props = defineProps({
-  ranker: { type: Ranker, required: true },
-  index: { type: Number, required: false, default: -1 },
-});
+const props = withDefaults(
+  defineProps<{
+    ranker: Ranker;
+    index: number;
+    container?: HTMLElement | null;
+  }>(),
+  {
+    index: -1,
+    container: null,
+  }
+);
 
 const ladderStore = useLadderStore();
 const optionsStore = useOptionsStore();
@@ -178,10 +190,26 @@ const canBuyBias = computed<boolean>(() => {
   return upgradeCost.cmp(props.ranker.points) <= 0;
 });
 
+const canAlmostBuyBias = computed<boolean>(() => {
+  if (!isVisible) return false;
+  const upgradeCost = ladderUtils.getNextUpgradeCost(props.ranker.bias);
+  return useEta(props.ranker).toPoints(upgradeCost) < 5 * 60;
+});
+
 const canBuyMulti = computed<boolean>(() => {
   if (!isVisible) return false;
   const upgradeCost = ladderUtils.getNextUpgradeCost(props.ranker.multi);
   return upgradeCost.cmp(props.ranker.power) <= 0;
+});
+
+const canAlmostBuyMulti = computed<boolean>(() => {
+  if (!isVisible) return false;
+  const upgradeCost = ladderUtils.getNextUpgradeCost(props.ranker.multi);
+  return useEta(props.ranker).toPower(upgradeCost) < 5 * 60;
+});
+
+const showMultiBiasColor = computed<boolean>(() => {
+  return optionsStore.state.ladder.biasMultiColors.value;
 });
 
 // should return the value from fastest (0%) to as long as it takes for the top (50%) to double as long (100%)
@@ -226,13 +254,25 @@ const etaPercentage = computed<number>(() => {
 });
 
 onMounted(() => {
-  if (isYou.value && optionsStore.state.ladder.followOwnRanker.value)
-    el.value?.scrollIntoView();
+  if (
+    isYou.value &&
+    optionsStore.state.ladder.followOwnRanker.value &&
+    el.value &&
+    props.container
+  ) {
+    scrollToCenter(el.value, props.container);
+  }
 });
 
 onUpdated(() => {
-  if (isYou.value && optionsStore.state.ladder.followOwnRanker.value)
-    el.value?.scrollIntoView();
+  if (
+    isYou.value &&
+    optionsStore.state.ladder.followOwnRanker.value &&
+    el.value &&
+    props.container
+  ) {
+    scrollToCenter(el.value, props.container);
+  }
 });
 </script>
 

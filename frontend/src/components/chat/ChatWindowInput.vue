@@ -5,9 +5,11 @@
     >
       <EditorContent
         :editor="editor"
-        class="w-full rounded-l-md border-1 h-8 border-button-border p-1 outline-0 overflow-x-hidden text-text caret-text whitespace-nowrap overflow-x-auto overflow-y-hidden"
+        class="w-full rounded-l-md border-1 h-8 border-button-border p-1 outline-0 overflow-x-hidden text-text caret-text whitespace-nowrap overflow-y-hidden"
         spellcheck="false"
         @keydown.enter.prevent="sendMessage"
+        @keydown.tab="wasSuggestionOpen = false"
+        @keydown.ctrl.space="wasSuggestionOpen = false"
       ></EditorContent>
       <button
         class="w-1/4 max-w-xs rounded-r-md h-8 border-l-0 border-1 border-button-border py-1 text-button-text hover:text-button-text-hover hover:bg-button-bg-hover"
@@ -29,7 +31,6 @@
 
 <script lang="ts" setup>
 import { EditorContent, Node, useEditor } from "@tiptap/vue-3";
-import { onBeforeUnmount, watch } from "vue";
 import { Paragraph } from "@tiptap/extension-paragraph";
 import { Text } from "@tiptap/extension-text";
 import { Mention } from "@tiptap/extension-mention";
@@ -96,15 +97,34 @@ const editor = useEditor({
   },
 });
 
+// TODO: this is kinda hacky, there must be a better way to prevent the enter from autocompletion to also send the message
+let isSuggestionOpen = false;
+let wasSuggestionOpen = false;
 watch(
   () => chatStore.state.input,
   (newValue) => {
+    const caretStart: number =
+      editor.value?.state.selection.from ?? newValue.length;
     editor.value?.commands.setContent(newValue);
+    editor.value?.commands.setTextSelection(caretStart);
+
+    // check if autocomplete is/was open
+    const suggestionElements =
+      document.getElementsByClassName("tippy-suggestion");
+    wasSuggestionOpen = isSuggestionOpen;
+    isSuggestionOpen = suggestionElements.length > 0;
   },
   { deep: true }
 );
 
-function sendMessage() {
+function sendMessage(e: KeyboardEvent | MouseEvent) {
+  if (e instanceof KeyboardEvent && (e.key === "Enter" || e.key === "Tab")) {
+    if (wasSuggestionOpen) {
+      wasSuggestionOpen = false;
+      return;
+    }
+  }
+
   if (!editor?.value) return;
   const messageJson = editor.value.getJSON();
   if (!messageJson?.content) return;
@@ -156,5 +176,13 @@ onBeforeUnmount(() => {
   color: var(--text-placeholder-color);
   pointer-events: none;
   height: 0;
+}
+
+:deep(.ProseMirror p) {
+  max-width: 30vw;
+
+  span {
+    white-space: nowrap;
+  }
 }
 </style>

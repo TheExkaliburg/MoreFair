@@ -8,4 +8,4 @@ Stuttgarter Str. 106
 
 70736 Fellbach
 
-email: [kaliburg@pm.me](email:kaliburg@pm.me)
+email: [kalifair@pm.me](email:kalifair@pm.me)

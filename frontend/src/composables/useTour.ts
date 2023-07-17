@@ -105,6 +105,9 @@ export const useTutorialTour = () => {
     tour.oncomplete(() => {
       flags.value.showHelp = true;
     });
+    tour.onexit(() => {
+      flags.value.showHelp = true;
+    });
     tour.start();
   }
 

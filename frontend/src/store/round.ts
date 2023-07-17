@@ -35,6 +35,7 @@ export type RoundData = {
 
 export const useRoundStore = defineStore("round", () => {
   const api = useAPI();
+  const stomp = useStomp();
 
   const isInitialized = ref<boolean>(false);
   const state = reactive({
@@ -73,7 +74,6 @@ export const useRoundStore = defineStore("round", () => {
         state.settings = new RoundSettings(data.settings);
         state.topLadder = data.topLadder;
 
-        const stomp = useStomp();
         stomp.addCallback(
           stomp.callbacks.onRoundEvent,
           "fair_round_events",

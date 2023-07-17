@@ -66,8 +66,6 @@ public class AuthController {
           .expireAfterWrite(1, TimeUnit.HOURS)
           .build(key -> null);
 
-  // TODO: _uuid cookie automatisch setzen (registerGuest) und löschen (upgradeAccount)
-
   @GetMapping
   public ResponseEntity<?> getAuthenticationStatus(Authentication authentication) {
     return ResponseEntity.ok(authentication != null && authentication.isAuthenticated());
@@ -263,6 +261,11 @@ public class AuthController {
           account.setLastLogin(OffsetDateTime.now());
           account.setLastIp(ip);
           account.setGuest(false);
+          accountService.save(account);
+        } else if (account == null) {
+          account = accountService.create(username, password, ip, false);
+          account.setLastIp(ip);
+          account.setLastLogin(OffsetDateTime.now());
           accountService.save(account);
         }
       } else {

@@ -15,7 +15,9 @@ components:
       account: Account
       rules: Rules
       moderation: Moderation
+      wiki: FairWiki
       information: Information
+      changelog: Changelog
     lockButtons: Lock Buttons
     enableChat: Enable Chat
     enableLadder: Enable Ladder
@@ -58,9 +60,10 @@ options:
   showEta: Show ETA to top/ranker
   followOwnRanker: Follow own ranker
   etaColors: ETA Colors
+  biasMultiColors: Color the bias/multi
   showBiasAndMulti: Show bias/multi for ranker
   showPowerGain: Show power-gain for ranker
-  hidePromotedPlayers: Hide promoted players
+  hidePromotedPlayers: Hide promoted rankers
   hideVinegarAndGrapes: Hide vinegar and grape count
   enableSpectateAssholeLadder: Enable spectating asshole ladder
   hideHelpText: Hide help text
@@ -75,6 +78,13 @@ options:
   unrestrictedAccess: Unrestricted ladder & chat access
   lockButtons: Lock Buttons
   themeSelector: Select Theme
+  themeUploader: Upload Custom Theme
+  showAllRankers: Show All Ranker
+  showTopRankers: Show XX Top Ranker
+  showAboveRankers: Show XX Ranker Above
+  showBelowRankers: Show XX Ranker Below
+  showBottomRankers: Show XX Bottom Ranker
+  hideZombies: Hide inactive rankers
 account:
   account: Account
   apply: Apply
@@ -113,7 +123,7 @@ account:
     password: Password
     repeatPassword: Password
     submit: Submit
-    agreeTo: By continuing, you are setting up a FairGame account and agree to our
+    agreeTo: By continuing, you are setting up a FairGame account (or logging in to your current one) and agree to our
     rules: Rules
     agreeTo2: and
     privacy: Privacy Policy

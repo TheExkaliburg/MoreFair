@@ -14,6 +14,10 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
   @Override
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
       Authentication authentication) {
-
+    try {
+      new CookieSameSiteFilter().doFilter(request, response, null);
+    } catch (Exception e) {
+      log.error("Error while handling authentication success", e);
+    }
   }
 }
