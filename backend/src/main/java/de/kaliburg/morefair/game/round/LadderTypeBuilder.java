@@ -125,12 +125,12 @@ public class LadderTypeBuilder {
         ladderCostTypeWeights.put(LadderType.CHEAP, 1.f);
         ladderCostTypeWeights.put(LadderType.EXPENSIVE, 1.f);
         ladderCostTypeWeights.put(LadderType.DEFAULT, 1.f);
-        ladderGrapesTypeWeights.put(LadderType.BOUNTIFUL, 1f);
-        ladderGrapesTypeWeights.put(LadderType.DROUGHT, 1f);
-        ladderGrapesTypeWeights.put(LadderType.STINGY, 1f);
-        ladderGrapesTypeWeights.put(LadderType.CONSOLATION, 1f);
-        ladderGrapesTypeWeights.put(LadderType.NO_HANDOUTS, 1f);
-        ladderGrapesTypeWeights.put(LadderType.GENEROUS, 1f);
+        ladderGrapesTypeWeights.put(LadderType.BOUNTIFUL, 1.f);
+        ladderGrapesTypeWeights.put(LadderType.DROUGHT, 1.f);
+        ladderGrapesTypeWeights.put(LadderType.STINGY, 1.f);
+        ladderGrapesTypeWeights.put(LadderType.CONSOLATION, 1.f);
+        ladderGrapesTypeWeights.put(LadderType.NO_HANDOUTS, 1.f);
+        ladderGrapesTypeWeights.put(LadderType.GENEROUS, 1.f);
       }
       case SLOW -> {
         ladderSizeTypeWeights.put(LadderType.TINY, 0.f);
