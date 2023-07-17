@@ -192,6 +192,17 @@ modifier:
     title: Auto
     description: Free auto-promote is applied to almost all ladders. No auto is slightly more common.
     identifier: AUTO
+  RAILROAD:
+    title: Railroad
+    description: Ladders more likely to encourage passing grapes.
+    identifier: RR
+  FARMER:
+    title: Farmer
+    description: Ladders more likely to encourage bottom grapes.
+    identifier: FARM
+  RACE:
+    title: Race
+    description: Ladders more likely to encourage first promoters.
   BIG:
     title: Big
     description: This ladder is longer than usual.
