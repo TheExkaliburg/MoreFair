@@ -34,7 +34,7 @@ export const useAuthStore = defineStore("auth", () => {
 
   // actions
   async function getAuthenticationStatus() {
-    await API.auth
+    return await API.auth
       .authenticationStatus()
       .then((response) => {
         state.authenticationStatus = Boolean(response.data);
