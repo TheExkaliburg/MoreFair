@@ -1,5 +1,6 @@
 import introJs from "intro.js";
 import { useStorage } from "@vueuse/core";
+// @ts-ignore
 import { deepMerge } from "@antfu/utils";
 import { navigateTo } from "nuxt/app";
 import { useUiStore } from "~/store/ui";
