@@ -13,7 +13,4 @@ export default defineVitestConfig({
     includeSource: ["src/**/*.{vue,ts}"],
     globals: true,
   },
-  define: {
-    window: {},
-  },
 });

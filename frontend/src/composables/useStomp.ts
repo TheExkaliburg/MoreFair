@@ -70,8 +70,10 @@ function addCallback<T>(
   }
 }
 
-if (global !== undefined && global.WebSocket === undefined) {
-  Object.assign(global, { WebSocket: (await import("ws")).WebSocket });
+if (typeof global !== "undefined" && global.WebSocket === undefined) {
+  import("ws").then((res) => {
+    Object.assign(global, { WebSocket: res.WebSocket });
+  });
 }
 
 let isPrivateConnectionEstablished = false;
