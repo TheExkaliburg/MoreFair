@@ -1,4 +1,5 @@
 import { Client, StompSubscription } from "@stomp/stompjs";
+import { createPinia, getActivePinia, setActivePinia } from "pinia";
 import { MentionMeta, MessageData } from "~/store/entities/message";
 import { AccountEventType, useAccountStore } from "~/store/account";
 import { useChatStore } from "~/store/chat";
@@ -69,6 +70,10 @@ function addCallback<T>(
   }
 }
 
+if (global !== undefined && global.WebSocket === undefined) {
+  Object.assign(global, { WebSocket: (await import("ws")).WebSocket });
+}
+
 let isPrivateConnectionEstablished = false;
 const isDevMode = process.env.NODE_ENV !== "production";
 const connectionType = window.location.protocol === "https:" ? "wss" : "ws";
@@ -96,7 +101,6 @@ const client = new Client({
 });
 
 client.onConnect = (_) => {
-  const accountStore = useAccountStore();
   client.subscribe("/topic/game/tick", (message) => {
     const body: OnTickBody = JSON.parse(message.body);
     callbacks.onTick.forEach(({ callback }) => callback(body));
@@ -112,6 +116,11 @@ client.onConnect = (_) => {
     callbacks.onRoundEvent.forEach(({ callback }) => callback(body));
   });
 
+  if (getActivePinia() === undefined) {
+    setActivePinia(createPinia());
+  }
+
+  const accountStore = useAccountStore();
   const privateUuid = accountStore.state.uuid;
   if (privateUuid !== "") {
     connectPrivateChannel(privateUuid);
