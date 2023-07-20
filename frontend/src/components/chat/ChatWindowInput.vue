@@ -5,7 +5,7 @@
     >
       <EditorContent
         :editor="editor"
-        class="w-full rounded-l-md border-1 h-8 border-button-border p-1 outline-0 overflow-x-hidden text-text caret-text whitespace-nowrap overflow-x-auto overflow-y-hidden"
+        class="w-full rounded-l-md border-1 h-8 border-button-border p-1 outline-0 overflow-x-hidden text-text caret-text whitespace-nowrap overflow-y-hidden"
         spellcheck="false"
         @keydown.enter.prevent="sendMessage"
         @keydown.tab="wasSuggestionOpen = false"
@@ -120,7 +120,6 @@ watch(
 function sendMessage(e: KeyboardEvent | MouseEvent) {
   if (e instanceof KeyboardEvent && (e.key === "Enter" || e.key === "Tab")) {
     if (wasSuggestionOpen) {
-      console.log("caught enter/tab, suggestion was open, not sending message");
       wasSuggestionOpen = false;
       return;
     }
@@ -177,5 +176,13 @@ onBeforeUnmount(() => {
   color: var(--text-placeholder-color);
   pointer-events: none;
   height: 0;
+}
+
+:deep(.ProseMirror p) {
+  max-width: 30vw;
+
+  span {
+    white-space: nowrap;
+  }
 }
 </style>

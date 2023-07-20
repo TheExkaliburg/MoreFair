@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col h-screen">
+  <div class="flex flex-col h-screen overflow-hidden">
     <TheBrandedNavBarWithOffCanvas />
     <TheSidebar class="restOfVerticalScreen">
       <div
@@ -28,6 +28,7 @@ const uiStore = useUiStore();
 .restOfHorizontalScreen {
   @media (min-width: 640px) {
     width: calc(100vw - 2.5rem);
+    max-width: calc(100vw - 2.5rem);
   }
 }
 </style>

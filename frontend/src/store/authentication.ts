@@ -118,11 +118,7 @@ export const useAuthStore = defineStore("auth", () => {
       });
   }
 
-  async function login(
-    username: string,
-    password: string,
-    rememberMe: boolean = false
-  ) {
+  async function login(username: string, password: string, rememberMe = false) {
     if (state.authenticationStatus) navigateTo("/");
     return await API.auth
       .login(username, password, rememberMe)
@@ -135,7 +131,7 @@ export const useAuthStore = defineStore("auth", () => {
             Cookies.set("_uuid", state.uuid, {
               expires: 365,
               secure: true,
-              sameSite: "strict",
+              sameSite: shouldSetSameSite() ? "strict" : "none",
             });
           } else {
             state.uuid = "";
@@ -248,7 +244,7 @@ export const useAuthStore = defineStore("auth", () => {
         Cookies.set("_uuid", value, {
           expires: 365,
           secure: true,
-          sameSite: "strict",
+          sameSite: shouldSetSameSite() ? "strict" : "none",
         });
       else Cookies.remove("_uuid");
     }
@@ -326,4 +322,9 @@ function checkEmail(email: string): boolean {
     return false;
   }
   return true;
+}
+
+function shouldSetSameSite(): boolean {
+  // if currently used as iframe return false
+  return window.self === window.top;
 }

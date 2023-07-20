@@ -20,10 +20,7 @@ function resetCache() {
   computedTrigger.value = 1 - computedTrigger.value;
 }
 
-function getPowerGainDifferenceToRank(
-  ranker: Ranker,
-  targetRank: number = 1
-): Decimal {
+function getPowerGainDifferenceToRank(ranker: Ranker, targetRank = 1): Decimal {
   const rank = ranker.rank;
   if (rank < 1 || !isFinite(rank)) return new Decimal(0);
 

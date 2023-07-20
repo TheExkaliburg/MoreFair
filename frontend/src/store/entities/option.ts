@@ -44,6 +44,8 @@ export class OptionsGroup {
 
 export class BooleanOption extends Option<boolean> {}
 
+export class IntegerOption extends Option<number> {}
+
 export class RangeOption extends Option<number> {
   transient: {
     min: number;

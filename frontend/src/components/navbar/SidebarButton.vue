@@ -7,7 +7,7 @@
     <ToggleIconButton
       v-if="isToggleSwitch"
       :model-value="modelValue"
-      @update:modelValue="emit('update:modelValue', $event)"
+      @update:model-value="emit('update:modelValue', $event)"
     >
       <template #icon>
         <slot name="icon" />

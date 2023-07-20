@@ -192,7 +192,7 @@ public class LadderCalculator {
         }
       }
     }
-    // Ranker on Last Place gains 1 Grape, only if he isn't in the top group
+    // Ranker on Last Place gains 1 Grape, even if hes also in first at the same time (ladder of 1)
     if (rankers.size() >= 1) {
       RankerEntity lastRanker = rankers.get(rankers.size() - 1);
       if (lastRanker.isGrowing()) {

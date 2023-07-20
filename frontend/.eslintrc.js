@@ -9,11 +9,10 @@ module.exports = {
     "@nuxtjs/eslint-config-typescript",
     "plugin:nuxt/recommended",
     "plugin:prettier/recommended",
-    // Only enable if you like errors everywhere
-    // "plugin:vuejs-accessibility/recommended",
   ],
-  plugins: ["vuejs-accessibility"],
-  rules: {},
+  rules: {
+    "prettier/prettier": "error",
+  },
   overrides: [
     {
       files: ["src/pages/**/*.vue", "src/layouts/**/*.vue"],

@@ -5,6 +5,7 @@ import {
   EditableMentionsOption,
   EditableThemeURLOption,
   EnumOption,
+  IntegerOption,
   OptionsGroup,
   RangeOption,
 } from "./entities/option";
@@ -26,12 +27,28 @@ const defaultValues = {
       EtaColorType.OFF,
       EtaColorType.COLORS,
       EtaColorType.GRADIENT,
-    ]),
+    ]).setIsActive(() => {
+      return optionsStorage.value.ladder.showEta.value;
+    }),
     biasMultiColors: new BooleanOption(true),
     showBiasAndMulti: new BooleanOption(true),
     showPowerGain: new BooleanOption(true),
     followOwnRanker: new BooleanOption(false),
+    showAllRankers: new BooleanOption(false),
+    showTopRankers: new IntegerOption(10).setIsActive(() => {
+      return !optionsStorage.value.ladder.showAllRankers.value;
+    }),
+    showAboveRankers: new IntegerOption(25).setIsActive(() => {
+      return !optionsStorage.value.ladder.showAllRankers.value;
+    }),
+    showBelowRankers: new IntegerOption(25).setIsActive(() => {
+      return !optionsStorage.value.ladder.showAllRankers.value;
+    }),
+    showBottomRankers: new IntegerOption(10).setIsActive(() => {
+      return !optionsStorage.value.ladder.showAllRankers.value;
+    }),
     hidePromotedPlayers: new BooleanOption(false),
+    hideZombies: new BooleanOption(false),
     hideVinegarAndGrapes: new BooleanOption(false),
     lockButtons: new BooleanOption(false),
   }),

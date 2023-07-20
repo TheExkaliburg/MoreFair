@@ -66,8 +66,6 @@ public class AuthController {
           .expireAfterWrite(1, TimeUnit.HOURS)
           .build(key -> null);
 
-  // TODO: _uuid cookie automatisch setzen (registerGuest) und löschen (upgradeAccount)
-
   @GetMapping
   public ResponseEntity<?> getAuthenticationStatus(Authentication authentication) {
     return ResponseEntity.ok(authentication != null && authentication.isAuthenticated());

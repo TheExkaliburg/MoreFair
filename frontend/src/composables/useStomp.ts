@@ -88,7 +88,6 @@ const subscribedChannel = {
 const client = new Client({
   brokerURL: connection,
   debug: (_) => {
-    // eslint-disable-next-line no-console
     // if (isDevMode) console.debug(str);
   },
   reconnectDelay: 0,
