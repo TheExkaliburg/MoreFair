@@ -29,7 +29,7 @@ function unpackStore(store: any) {
 }
 
 function register(func: (api: any) => void) {
-  return func(api);
+  func(api);
 }
 
 const Fair = {

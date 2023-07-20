@@ -9,7 +9,9 @@ import { ChatLogMessageData } from "~/store/moderation";
 export type OnTickBody = {
   delta: number;
 };
-export type OnChatEventBody = MessageData;
+export type OnChatEventBody = MessageData & {
+  chatType: ChatType;
+};
 export type OnLadderEventBody = {
   eventType: LadderEventType;
   accountId: number;
@@ -82,7 +84,7 @@ const reconnectTimeout = 1 * 60 * 1000;
 
 const subscribedChannel = {
   ladder: {} as StompSubscription,
-  chat: {} as StompSubscription,
+  ladderChat: {} as StompSubscription,
 };
 
 const client = new Client({
@@ -112,6 +114,16 @@ client.onConnect = (_) => {
     callbacks.onRoundEvent.forEach(({ callback }) => callback(body));
   });
 
+  client.subscribe("/topic/chat/event/global", (message) => {
+    const body: OnChatEventBody = JSON.parse(message.body);
+    callbacks.onChatEvent.forEach(({ callback }) => callback(body));
+  });
+
+  client.subscribe("/topic/chat/event/system", (message) => {
+    const body: OnChatEventBody = JSON.parse(message.body);
+    callbacks.onChatEvent.forEach(({ callback }) => callback(body));
+  });
+
   const privateUuid = accountStore.state.uuid;
   if (privateUuid !== "") {
     connectPrivateChannel(privateUuid);
@@ -133,8 +145,8 @@ function connectPrivateChannel(uuid: string) {
     }
   );
 
-  subscribedChannel.chat = client.subscribe(
-    "/topic/chat/event/" + highestLadder,
+  subscribedChannel.ladderChat = client.subscribe(
+    "/topic/chat/event/ladder/" + highestLadder,
     (message) => {
       const body: OnChatEventBody = JSON.parse(message.body);
       callbacks.onChatEvent.forEach(({ callback }) => callback(body));
@@ -231,12 +243,12 @@ const wsApi = (client: Client) => {
       },
     },
     chat: {
-      changeChat: (newNumber: number) => {
-        if (subscribedChannel?.chat) {
-          subscribedChannel.chat.unsubscribe();
+      changeLadderChat: (newNumber: number) => {
+        if (subscribedChannel?.ladderChat) {
+          subscribedChannel.ladderChat.unsubscribe();
         }
-        subscribedChannel.chat = client.subscribe(
-          `/topic/chat/event/${newNumber}`,
+        subscribedChannel.ladderChat = client.subscribe(
+          `/topic/chat/event/ladder/${newNumber}`,
           (message) => {
             const body: OnChatEventBody = JSON.parse(message.body);
             callbacks.onChatEvent.forEach(({ callback }) => callback(body));

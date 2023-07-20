@@ -2,6 +2,8 @@ package de.kaliburg.morefair.game.chat;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,7 +21,7 @@ import lombok.experimental.Accessors;
 @Entity
 @Table(name = "chat", uniqueConstraints = {
     @UniqueConstraint(name = "uk_uuid", columnNames = "uuid"),
-    @UniqueConstraint(name = "uk_number", columnNames = "number")})
+    @UniqueConstraint(name = "uk_type_number", columnNames = {"type", "number"})})
 @Getter
 @Setter
 @Accessors(chain = true)
@@ -35,6 +37,7 @@ public class ChatEntity {
   @Column(nullable = false)
   private UUID uuid = UUID.randomUUID();
   @NonNull
+  @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private ChatType type;
   @Column

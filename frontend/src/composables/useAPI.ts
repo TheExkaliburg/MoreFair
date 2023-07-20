@@ -3,6 +3,7 @@ import { navigateTo } from "nuxt/app";
 import Cookies from "js-cookie";
 import { useAuthStore } from "~/store/authentication";
 import { useToasts } from "~/composables/useToasts";
+import { ChatType } from "~/store/chat";
 
 const isDevMode = process.env.NODE_ENV !== "production";
 let lastXsrfToken = Cookies.get("XSRF-TOKEN");
@@ -159,10 +160,14 @@ const API = {
     },
   },
   chat: {
-    getChat: (number: number) => {
+    getChat: (chatType: ChatType, number?: number) => {
       const params = new URLSearchParams();
-      params.append("number", number.toString());
-      return axiosInstance.get("/api/chat", { params });
+      if (number !== undefined) {
+        params.append("number", number.toString());
+      }
+      return axiosInstance.get(`/api/chat/${chatType.toLowerCase()}`, {
+        params,
+      });
     },
   },
   round: {

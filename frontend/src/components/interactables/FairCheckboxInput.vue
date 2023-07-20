@@ -11,7 +11,7 @@ const emit = defineEmits<{
   (event: "update:modelValue", value: boolean): void;
 }>();
 
-function change(e) {
+function change(e: any) {
   emit("update:modelValue", e.target.checked);
 }
 </script>

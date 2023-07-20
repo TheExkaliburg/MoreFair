@@ -1,5 +1,6 @@
 import { zxcvbnAsync, zxcvbnOptions } from "@zxcvbn-ts/core";
 import { OptionsType } from "@zxcvbn-ts/core/dist/types";
+import { useLang } from "~/composables/useLang";
 
 const lang = useLang("zxcvbn");
 let isInitialized = false;

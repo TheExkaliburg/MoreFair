@@ -7,12 +7,12 @@ import lombok.NoArgsConstructor;
 public enum ChatType {
   GLOBAL,
   LADDER(true),
-  ANNOUNCEMENT;
+  SYSTEM;
 
   @Getter
-  private boolean parameterized = true;
+  private boolean parameterized = false;
 
-  private ChatType(boolean parameterized) {
+  ChatType(boolean parameterized) {
     this.parameterized = parameterized;
   }
 }

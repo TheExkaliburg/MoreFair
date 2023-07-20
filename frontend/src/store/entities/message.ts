@@ -1,3 +1,5 @@
+import { ChatType } from "~/store/chat";
+
 export enum MessagePartType {
   plain,
   mentionUser,
@@ -47,6 +49,7 @@ export type MessageData = {
   tag: string;
   assholePoints: number;
   isMod: boolean;
+  chatType: ChatType;
 };
 
 // Set the options for the Intl.DateTimeFormat object
@@ -69,6 +72,7 @@ export class Message implements MessageData {
   tag = "";
   assholePoints = 0;
   isMod = false;
+  chatType = ChatType.GLOBAL;
   private flags: string[] = [];
 
   constructor(data: any) {

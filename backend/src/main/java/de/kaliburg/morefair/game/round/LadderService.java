@@ -584,7 +584,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
           String metadataString = gson.toJson(new JsonObject[]{object1, object2});
 
-          ChatEntity chat = chatService.find(ChatType.ANNOUNCEMENT);
+          ChatEntity chat = chatService.find(ChatType.SYSTEM);
 
           messageService.create(accountService.findBroadcaster(), chat, FormattingUtils.format(
               "{@} was welcomed by {@}. They are the {} lucky initiate for the {} big ritual.",
