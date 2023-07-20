@@ -178,6 +178,18 @@ export const useEta = (ranker: Ranker) => {
     return Math.max(etaRequirement, toFirst() + 30);
   }
 
+  function toVinegarThrow(): number {
+    if (!ranker.growing) return 0;
+    const secondsToVinegar =
+      ladderUtils.getVinegarThrowCost.value.cmp(ranker.vinegar) >= 0
+        ? ladderUtils.getVinegarThrowCost.value
+            .sub(ranker.vinegar)
+            .div(ranker.grapes)
+        : new Decimal(0);
+
+    return secondsToVinegar.toNumber();
+  }
+
   return {
     toRanker,
     toPoints,
@@ -186,6 +198,7 @@ export const useEta = (ranker: Ranker) => {
     toFirst,
     toPromotionRequirement,
     toPromote,
+    toVinegarThrow,
   };
 };
 
