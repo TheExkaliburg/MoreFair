@@ -4,6 +4,7 @@ import {
   useStorage,
   UseStorageOptions,
 } from "@vueuse/core";
+// @ts-ignore
 import { deepMerge } from "@antfu/utils";
 import { ObjectFunctions } from "~/store/entities/option";
 
