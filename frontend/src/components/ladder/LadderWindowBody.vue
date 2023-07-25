@@ -170,7 +170,7 @@ const multiButtonLabel = computed<string>(() => {
 
 const vinegarButtonLabel = computed<string>(() => {
   const eta = useEta(yourRanker.value).toVinegarThrow();
-  if (eta === 0) return `${lang("vinegar")}`;
+  if (eta === 0 || eta === Infinity) return `${lang("vinegar")}`;
   return `${lang("vinegar")} (${useTimeFormatter(eta)})`;
 });
 

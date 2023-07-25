@@ -180,12 +180,28 @@ export const useEta = (ranker: Ranker) => {
 
   function toVinegarThrow(): number {
     if (!ranker.growing) return 0;
-    const secondsToVinegar =
-      ladderUtils.getVinegarThrowCost.value.cmp(ranker.vinegar) >= 0
-        ? ladderUtils.getVinegarThrowCost.value
-            .sub(ranker.vinegar)
-            .div(ranker.grapes)
-        : new Decimal(0);
+
+    let secondsToVinegar: Decimal;
+
+    if (
+      ranker.rank === ladder.state.rankers.length &&
+      ladder.state.rankers.length >= 1
+    ) {
+      // TODO: When grape modifiers are implemented, acceleration can be changed.
+      const acceleration = 2;
+      const a = new Decimal(acceleration).div(2);
+      const b = ranker.grapes.sub(1);
+      const c = ranker.vinegar.sub(ladderUtils.getVinegarThrowCost.value);
+
+      secondsToVinegar = solveQuadratic(a, b, c);
+    } else {
+      secondsToVinegar =
+        ladderUtils.getVinegarThrowCost.value.cmp(ranker.vinegar) >= 0
+          ? ladderUtils.getVinegarThrowCost.value
+              .sub(ranker.vinegar)
+              .div(ranker.grapes)
+          : new Decimal(0);
+    }
 
     return secondsToVinegar.toNumber();
   }
