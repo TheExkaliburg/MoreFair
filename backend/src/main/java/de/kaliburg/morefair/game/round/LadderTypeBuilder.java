@@ -56,6 +56,7 @@ public class LadderTypeBuilder {
     ladderGrapesTypeWeights.put(LadderType.CONSOLATION, 0f);
     ladderGrapesTypeWeights.put(LadderType.NO_HANDOUTS, 0f);
     ladderGrapesTypeWeights.put(LadderType.GENEROUS, 0f);
+    ladderGrapesTypeWeights.put(LadderType.DEFAULT, 0f);
   }
 
   public static LadderTypeBuilder builder() {
@@ -153,16 +154,19 @@ public class LadderTypeBuilder {
         ladderGrapesTypeWeights.put(LadderType.CONSOLATION, 50.f);
         ladderGrapesTypeWeights.put(LadderType.DROUGHT, 20.f);
         ladderGrapesTypeWeights.put(LadderType.STINGY, 20.f);
+        ladderGrapesTypeWeights.put(LadderType.DEFAULT, 0f);
       }
       case FARMER -> {
         ladderGrapesTypeWeights.put(LadderType.BOUNTIFUL, 50.f);
         ladderGrapesTypeWeights.put(LadderType.STINGY, 20.f);
         ladderGrapesTypeWeights.put(LadderType.NO_HANDOUTS, 20.f);
+        ladderGrapesTypeWeights.put(LadderType.DEFAULT, 0f);
       }
       case RACE -> {
         ladderGrapesTypeWeights.put(LadderType.GENEROUS, 50.f);
         ladderGrapesTypeWeights.put(LadderType.DROUGHT, 20.f);
         ladderGrapesTypeWeights.put(LadderType.NO_HANDOUTS, 20.f);
+        ladderGrapesTypeWeights.put(LadderType.DEFAULT, 0f);
       }
       default -> {
         // do nothing
