@@ -50,13 +50,13 @@ public class LadderTypeBuilder {
     ladderCostTypeWeights.put(LadderType.EXPENSIVE, 10.f);
     ladderCostTypeWeights.put(LadderType.DEFAULT, 100.f);
 
-    ladderGrapesTypeWeights.put(LadderType.BOUNTIFUL, 0f);
-    ladderGrapesTypeWeights.put(LadderType.DROUGHT, 0f);
-    ladderGrapesTypeWeights.put(LadderType.STINGY, 0f);
-    ladderGrapesTypeWeights.put(LadderType.CONSOLATION, 0f);
-    ladderGrapesTypeWeights.put(LadderType.NO_HANDOUTS, 0f);
-    ladderGrapesTypeWeights.put(LadderType.GENEROUS, 0f);
-    ladderGrapesTypeWeights.put(LadderType.DEFAULT, 0f);
+    ladderGrapesTypeWeights.put(LadderType.BOUNTIFUL, 0.f);
+    ladderGrapesTypeWeights.put(LadderType.DROUGHT, 0.f);
+    ladderGrapesTypeWeights.put(LadderType.STINGY, 0.f);
+    ladderGrapesTypeWeights.put(LadderType.CONSOLATION, 0.f);
+    ladderGrapesTypeWeights.put(LadderType.NO_HANDOUTS, 0.f);
+    ladderGrapesTypeWeights.put(LadderType.GENEROUS, 0.f);
+    ladderGrapesTypeWeights.put(LadderType.DEFAULT, 100.f);
   }
 
   public static LadderTypeBuilder builder() {
@@ -154,19 +154,19 @@ public class LadderTypeBuilder {
         ladderGrapesTypeWeights.put(LadderType.CONSOLATION, 50.f);
         ladderGrapesTypeWeights.put(LadderType.DROUGHT, 20.f);
         ladderGrapesTypeWeights.put(LadderType.STINGY, 20.f);
-        ladderGrapesTypeWeights.put(LadderType.DEFAULT, 0f);
+        ladderGrapesTypeWeights.put(LadderType.DEFAULT, 0.f);
       }
       case FARMER -> {
         ladderGrapesTypeWeights.put(LadderType.BOUNTIFUL, 50.f);
         ladderGrapesTypeWeights.put(LadderType.STINGY, 20.f);
         ladderGrapesTypeWeights.put(LadderType.NO_HANDOUTS, 20.f);
-        ladderGrapesTypeWeights.put(LadderType.DEFAULT, 0f);
+        ladderGrapesTypeWeights.put(LadderType.DEFAULT, 0.f);
       }
       case RACE -> {
         ladderGrapesTypeWeights.put(LadderType.GENEROUS, 50.f);
         ladderGrapesTypeWeights.put(LadderType.DROUGHT, 20.f);
         ladderGrapesTypeWeights.put(LadderType.NO_HANDOUTS, 20.f);
-        ladderGrapesTypeWeights.put(LadderType.DEFAULT, 0f);
+        ladderGrapesTypeWeights.put(LadderType.DEFAULT, 0.f);
       }
       default -> {
         // do nothing
@@ -212,6 +212,7 @@ public class LadderTypeBuilder {
     ladderTypes.add(getRandomLadderType(ladderSizeTypeWeights, "Size"));
     ladderTypes.add(getRandomLadderType(ladderAutoTypeWeights, "Auto"));
     ladderTypes.add(getRandomLadderType(ladderCostTypeWeights, "Cost"));
+    ladderTypes.add(getRandomLadderType(ladderGrapesTypeWeights, "Grapes"));
     if (ladderTypes.size() > 1) {
       ladderTypes.remove(LadderType.DEFAULT);
     }
