@@ -44,18 +44,19 @@ public class ChatEntity {
   private Integer number;
 
   public String getDestination() {
-    if (number == null) {
-      return getType().toString().toLowerCase();
+    if (!type.isParameterized()) {
+      return getType().toString().toLowerCase() + "/" + getNumber();
     }
 
-    return getType().toString().toLowerCase() + "/" + getNumber();
+    return getType().toString().toLowerCase();
   }
 
   public String getIdentifier() {
-    if (number == null) {
-      return getType().toString().toLowerCase();
+    if (type.isParameterized()) {
+      return getType().toString().toLowerCase() + "-" + getNumber();
     }
 
-    return getType().toString().toLowerCase() + "-" + getNumber();
+    return getType().toString().toLowerCase();
+
   }
 }
