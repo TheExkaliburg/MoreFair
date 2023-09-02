@@ -72,8 +72,9 @@ export const useChatStore = defineStore("chat", () => {
           : getters.systemMessages),
       ];
 
-      result.sort((a, b) => a.timestamp - b.timestamp);
+      result.sort((a, b) => b.timestamp - a.timestamp);
       result.length = Math.min(result.length, 50);
+      result.reverse();
 
       return result;
     }),

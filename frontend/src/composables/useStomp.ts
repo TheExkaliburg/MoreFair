@@ -73,6 +73,7 @@ function addCallback<T>(
 }
 
 if (typeof global !== "undefined" && global.WebSocket === undefined) {
+  // @ts-ignore
   import("ws").then((res) => {
     Object.assign(global, { WebSocket: res.WebSocket });
   });
