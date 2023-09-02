@@ -91,7 +91,9 @@ export const useChatStore = defineStore("chat", () => {
           addMessage(msg);
         });
 
-        state.ladderChatNumber = data.number;
+        if (data.type === ChatType.LADDER && data.number) {
+          state.ladderChatNumber = data.number;
+        }
 
         stomp.addCallback(
           stomp.callbacks.onChatEvent,
@@ -104,19 +106,18 @@ export const useChatStore = defineStore("chat", () => {
       });
   }
 
-  function sendMessage(
-    message: string,
-    metadata: MentionMeta[],
-    chatType: ChatType
-  ) {
-    if (chatType === ChatType.LADDER)
+  function sendMessage(message: string, metadata: MentionMeta[]) {
+    if (state.selectedChatType === ChatType.LADDER) {
+      console.log(state.ladderChatNumber);
       stomp.wsApi.chat.sendMessage(
         message,
         metadata,
-        chatType,
+        state.selectedChatType,
         state.ladderChatNumber
       );
-    else stomp.wsApi.chat.sendMessage(message, metadata, chatType);
+    } else {
+      stomp.wsApi.chat.sendMessage(message, metadata, state.selectedChatType);
+    }
   }
 
   function changeChat(newNumber: number) {
