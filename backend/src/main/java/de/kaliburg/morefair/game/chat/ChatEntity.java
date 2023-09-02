@@ -44,7 +44,7 @@ public class ChatEntity {
   private Integer number;
 
   public String getDestination() {
-    if (!type.isParameterized()) {
+    if (type.isParameterized()) {
       return getType().toString().toLowerCase() + "/" + getNumber();
     }
 
