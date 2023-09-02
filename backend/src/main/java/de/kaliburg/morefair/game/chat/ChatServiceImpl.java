@@ -56,7 +56,7 @@ public class ChatServiceImpl extends AbstractCacheableService implements ChatSer
     if (type.isParameterized() && number == null) {
       throw new NullPointerException("ChatType is parameterized but number is null");
     } else if (!type.isParameterized()) {
-      number = null;
+      number = 0;
     }
 
     Pair<ChatType, Integer> pair = new Pair<>(type, number);
