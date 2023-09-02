@@ -60,18 +60,18 @@ export const useAccountStore = defineStore("account", () => {
     }),
   });
 
-  function init() {
+  async function init() {
     if (isInitialized.value) return Promise.resolve();
-    return getAccountDetails();
+    return await getAccountDetails();
   }
 
-  function reset() {
+  async function reset() {
     isInitialized.value = false;
-    return init();
+    return await init();
   }
 
-  function getAccountDetails() {
-    return api.account.getAccountDetails().then((res) => {
+  async function getAccountDetails() {
+    return await api.account.getAccountDetails().then((res) => {
       const data: AccountData = res.data;
       state.accessRole = data.accessRole;
       state.accountId = data.accountId;
@@ -85,6 +85,7 @@ export const useAccountStore = defineStore("account", () => {
         "fair_account_events",
         handleAccountEvents
       );
+      return Promise.resolve(res);
     });
   }
 

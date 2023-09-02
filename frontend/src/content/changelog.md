@@ -19,6 +19,10 @@ description: 'A list of all changes made to the game'
 - FairWiki now opens in a new tab
 - adding the new Mods to the rules
 
+### Hotfixes:
+
+- Fixing the submit button in the signup form to not work
+
 <br><br><br><br><br><br><br>
 
 <details>

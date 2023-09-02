@@ -2,8 +2,6 @@ import { defineNuxtConfig } from "nuxt/config";
 
 export default defineNuxtConfig({
   css: [
-    "virtual:windi.css",
-    "virtual:windi-devtools",
     "~/assets/scss/styles.scss",
     "@fortawesome/fontawesome-svg-core/styles.css",
     "vue-virtual-scroller/dist/vue-virtual-scroller.css",
@@ -12,11 +10,12 @@ export default defineNuxtConfig({
     "tippy.js/dist/tippy.css",
   ],
   modules: [
-    "@pinia/nuxt",
     "nuxt-windicss",
+    "@pinia/nuxt",
     "@vueuse/nuxt",
     "@nuxt/content",
     "@nuxtjs/i18n",
+    "nuxt-vitest",
   ],
   srcDir: "src/",
   content: {
@@ -57,5 +56,6 @@ export default defineNuxtConfig({
     build: {
       // minify: false,
     },
+    test: {},
   },
 });

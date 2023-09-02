@@ -82,7 +82,7 @@
         class="w-full rounded-l-none border-l-0 whitespace-nowrap"
         @click="throwVinegar"
       >
-        {{ lang("vinegar") }}
+        {{ vinegarButtonLabel }}
       </FairButton>
       <FairButton
         v-else
@@ -166,6 +166,12 @@ const multiButtonLabel = computed<string>(() => {
     ladderUtils.getYourMultiCost.value
   );
   return `+${lang("multi_short")} (${useTimeFormatter(eta)})`;
+});
+
+const vinegarButtonLabel = computed<string>(() => {
+  const eta = useEta(yourRanker.value).toVinegarThrow();
+  if (eta === 0 || eta === Infinity) return `${lang("vinegar")}`;
+  return `${lang("vinegar")} (${useTimeFormatter(eta)})`;
 });
 
 const yourFormattedMulti = computed<string>(() => {

@@ -14,28 +14,52 @@ public class RequestThrottler {
 
   private static final Integer MAX_MESSAGES = 3;
 
-  private final LoadingCache<Integer, Boolean> hasCreatedAccountRecently;
+  private final LoadingCache<Integer, Integer> hasCreatedAccountInTheLastMinute =
+      Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES)
+          .build(integer -> 0);
+
+  private final LoadingCache<Integer, Integer> hasCreatedAccountInTheLastHour =
+      Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.HOURS)
+          .build(integer -> 0);
+
+  private final LoadingCache<Integer, Integer> hasCreatedAccountInTheLastDay =
+      Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.DAYS)
+          .build(integer -> 0);
+
   private final LoadingCache<UUID, Integer> hasPostedMessageRecently;
 
   public RequestThrottler() {
-    this.hasCreatedAccountRecently = Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES)
-        .build(integer -> false);
     this.hasPostedMessageRecently = Caffeine.newBuilder().expireAfterWrite(5, TimeUnit.SECONDS)
         .build(integer -> 0);
   }
 
   public boolean canCreateAccount(Integer ipAddress) {
-    Boolean request;
-    request = hasCreatedAccountRecently.get(ipAddress);
-    if (request != null) {
-      if (request) {
-        hasCreatedAccountRecently.asMap().remove(ipAddress);
-        hasCreatedAccountRecently.put(ipAddress, true);
-        return false;
-      }
+
+    boolean result = true;
+    Integer number = hasCreatedAccountInTheLastMinute.get(ipAddress);
+
+    if (number > 0) {
+      result = false;
     }
-    hasCreatedAccountRecently.put(ipAddress, true);
-    return true;
+    hasCreatedAccountInTheLastMinute.asMap().remove(ipAddress);
+    hasCreatedAccountInTheLastMinute.put(ipAddress, number + 1);
+
+    number = hasCreatedAccountInTheLastHour.get(ipAddress);
+    if (number > 3) {
+      result = false;
+    }
+    hasCreatedAccountInTheLastHour.asMap().remove(ipAddress);
+    hasCreatedAccountInTheLastHour.put(ipAddress, number + 1);
+
+    number = hasCreatedAccountInTheLastDay.get(ipAddress);
+    if (number > 5) {
+      result = false;
+    }
+
+    hasCreatedAccountInTheLastDay.asMap().remove(ipAddress);
+    hasCreatedAccountInTheLastDay.put(ipAddress, number + 1);
+
+    return result;
   }
 
   public boolean canPostMessage(AccountEntity account) {
