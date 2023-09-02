@@ -260,7 +260,7 @@ const wsApi = (client: Client) => {
           subscribedChannel.ladderChat.unsubscribe();
         }
         subscribedChannel.ladderChat = client.subscribe(
-          `/topic/chat/event/ladder/${newNumber}`,
+          `/topic/chat/events/ladder/${newNumber}`,
           (message) => {
             const body: OnChatEventBody = JSON.parse(message.body);
             callbacks.onChatEvent.forEach(({ callback }) => callback(body));
@@ -293,7 +293,7 @@ const wsApi = (client: Client) => {
           subscribedChannel.ladder.unsubscribe();
         }
         subscribedChannel.ladder = client.subscribe(
-          `/topic/ladder/event/${newNumber}`,
+          `/topic/ladder/events/${newNumber}`,
           (message) => {
             const body: OnLadderEventBody = JSON.parse(message.body);
             callbacks.onLadderEvent.forEach(({ callback }) => callback(body));
