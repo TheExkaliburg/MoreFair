@@ -25,19 +25,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequiredArgsConstructor
 public class RoundController {
 
-  public static final String TOPIC_EVENTS_DESTINATION = "/round/event";
+  public static final String TOPIC_EVENTS_DESTINATION = "/round/events";
 
   private final RoundService roundService;
   private final FairConfig fairConfig;
   private final AccountService accountService;
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> getCurrentRound(Authentication authentication, HttpServletRequest request) {
+  public ResponseEntity<?> getCurrentRound(Authentication authentication,
+      HttpServletRequest request) {
     try {
-      if(authentication != null) {
+      if (authentication != null) {
         Integer ip = SecurityUtils.getIp(request);
         AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
-        if(account != null) {
+        if (account != null) {
           account.setLastLogin(OffsetDateTime.now());
           account.setLastIp(ip);
           accountService.save(account);

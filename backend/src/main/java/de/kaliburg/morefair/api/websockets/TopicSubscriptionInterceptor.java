@@ -82,9 +82,10 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
 
     RoundEntity currentRound = roundService.getCurrentRound();
 
-    if (topicDestination.contains("/topic/chat/events/")) {
+    if (topicDestination.contains("/topic/chat/events/ladder/")) {
+
       int chatDestination = Integer.parseInt(
-          topicDestination.substring("/topic/chat/events/".length()));
+          topicDestination.substring("/topic/chat/events/ladder/".length()));
       int highestLadder = rankerService.findCurrentRankersOfAccount(account, currentRound).stream()
           .mapToInt(v -> v.getLadder().getNumber()).max().orElse(1);
       if (chatDestination > highestLadder) {
@@ -106,10 +107,6 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
       }
     }
 
-    if (topicDestination.contains("/topic/moderation/")) {
-      return false;
-    }
-
-    return true;
+    return !topicDestination.contains("/topic/moderation/");
   }
 }

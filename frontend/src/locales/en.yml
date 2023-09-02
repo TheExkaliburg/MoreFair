@@ -228,3 +228,10 @@ modifier:
     title: Asshole
     description: The final ladder - promotion from here will grant entry to Chad's ritual.
     identifier: AH
+chat:
+  GLOBAL:
+    identifier: G
+  SYSTEM:
+    identifier: S
+  LADDER:
+    identifier: L

@@ -90,7 +90,7 @@ const subscribedChannel = {
 const client = new Client({
   brokerURL: connection,
   debug: (_) => {
-    // if (isDevMode) console.debug(str);
+    // if (isDevMode) console.debug(_);
   },
   reconnectDelay: 0,
   heartbeatIncoming: 4000,
@@ -104,22 +104,22 @@ client.onConnect = (_) => {
     callbacks.onTick.forEach(({ callback }) => callback(body));
   });
 
-  client.subscribe("/topic/account/event", (message) => {
+  client.subscribe("/topic/account/events", (message) => {
     const body: OnAccountEventBody = JSON.parse(message.body);
     callbacks.onAccountEvent.forEach(({ callback }) => callback(body));
   });
 
-  client.subscribe("/topic/round/event", (message) => {
+  client.subscribe("/topic/round/events", (message) => {
     const body: OnRoundEventBody = JSON.parse(message.body);
     callbacks.onRoundEvent.forEach(({ callback }) => callback(body));
   });
 
-  client.subscribe("/topic/chat/event/global", (message) => {
+  client.subscribe("/topic/chat/events/global", (message) => {
     const body: OnChatEventBody = JSON.parse(message.body);
     callbacks.onChatEvent.forEach(({ callback }) => callback(body));
   });
 
-  client.subscribe("/topic/chat/event/system", (message) => {
+  client.subscribe("/topic/chat/events/system", (message) => {
     const body: OnChatEventBody = JSON.parse(message.body);
     callbacks.onChatEvent.forEach(({ callback }) => callback(body));
   });
@@ -138,7 +138,7 @@ function connectPrivateChannel(uuid: string) {
   const highestLadder = useAccountStore().state.highestCurrentLadder;
 
   subscribedChannel.ladder = client.subscribe(
-    "/topic/ladder/event/" + highestLadder,
+    "/topic/ladder/events/" + highestLadder,
     (message) => {
       const body: OnLadderEventBody = JSON.parse(message.body);
       callbacks.onLadderEvent.forEach(({ callback }) => callback(body));
@@ -146,22 +146,22 @@ function connectPrivateChannel(uuid: string) {
   );
 
   subscribedChannel.ladderChat = client.subscribe(
-    "/topic/chat/event/ladder/" + highestLadder,
+    "/topic/chat/events/ladder/" + highestLadder,
     (message) => {
       const body: OnChatEventBody = JSON.parse(message.body);
       callbacks.onChatEvent.forEach(({ callback }) => callback(body));
     }
   );
 
-  client.subscribe(`/private/${uuid}/ladder/event`, (message) => {
+  client.subscribe(`/private/${uuid}/ladder/events`, (message) => {
     const body: OnLadderEventBody = JSON.parse(message.body);
     callbacks.onLadderEvent.forEach(({ callback }) => callback(body));
   });
-  client.subscribe(`/private/${uuid}/chat/event`, (message) => {
+  client.subscribe(`/private/${uuid}/chat/events`, (message) => {
     const body: OnChatEventBody = JSON.parse(message.body);
     callbacks.onChatEvent.forEach(({ callback }) => callback(body));
   });
-  client.subscribe(`/private/${uuid}/account/event`, (message) => {
+  client.subscribe(`/private/${uuid}/account/events`, (message) => {
     const body: OnAccountEventBody = JSON.parse(message.body);
     callbacks.onAccountEvent.forEach(({ callback }) => callback(body));
   });
@@ -173,12 +173,12 @@ function connectModeratorChannel() {
   if (!client.connected) return;
   if (!useAccountStore().getters.isMod) return;
 
-  client.subscribe("/topic/moderation/chat/event", (message) => {
+  client.subscribe("/topic/moderation/chat/events", (message) => {
     const body: OnModChatEventBody = JSON.parse(message.body);
     callbacks.onModChatEvent.forEach(({ callback }) => callback(body));
   });
 
-  client.subscribe("/topic/moderation/log/event", (message) => {
+  client.subscribe("/topic/moderation/log/events", (message) => {
     const body: OnModLogEventBody = JSON.parse(message.body);
     callbacks.onModLogEvent.forEach(({ callback }) => callback(body));
   });

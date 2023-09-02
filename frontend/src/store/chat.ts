@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { reactive, ref } from "vue";
+import { computed, reactive, ref } from "vue";
 import { JSONContent } from "@tiptap/core";
 import {
   isGroupMentionMeta,
@@ -26,10 +26,7 @@ export type ChatData = {
 };
 
 export type ChatState = {
-  ladderMessages: Message[];
-  globalMessages: Message[];
-  systemMessages: Message[];
-  ladderChatNumber: number;
+  messages: Map<ChatType, Message[]>;
   input: JSONContent;
   selectedChatType: ChatType;
   ignoredChatTypes: Set<ChatType>;
@@ -43,15 +40,44 @@ export const useChatStore = defineStore("chat", () => {
 
   const isInitialized = ref<boolean>(false);
   const state = reactive<ChatState>({
-    ladderMessages: <Message[]>[],
-    globalMessages: <Message[]>[],
-    systemMessages: <Message[]>[],
-    ladderChatNumber: 1,
+    messages: new Map<ChatType, Message[]>(),
     input: { type: "doc", content: [{ type: "paragraph" }] },
     selectedChatType: ChatType.GLOBAL,
     ignoredChatTypes: new Set(),
   });
-  const getters = reactive({});
+  state.messages.set(ChatType.GLOBAL, []);
+  state.messages.set(ChatType.LADDER, []);
+  state.messages.set(ChatType.SYSTEM, []);
+
+  const getters = reactive({
+    ladderMessages: computed<Message[]>(
+      () => state.messages.get(ChatType.LADDER) ?? []
+    ),
+    globalMessages: computed<Message[]>(
+      () => state.messages.get(ChatType.GLOBAL) ?? []
+    ),
+    systemMessages: computed<Message[]>(
+      () => state.messages.get(ChatType.SYSTEM) ?? []
+    ),
+    allMessages: computed<Message[]>(() => {
+      const result: Message[] = [
+        ...(state.ignoredChatTypes.has(ChatType.LADDER)
+          ? []
+          : getters.ladderMessages),
+        ...(state.ignoredChatTypes.has(ChatType.GLOBAL)
+          ? []
+          : getters.globalMessages),
+        ...(state.ignoredChatTypes.has(ChatType.SYSTEM)
+          ? []
+          : getters.systemMessages),
+      ];
+
+      result.sort((a, b) => a.timestamp - b.timestamp);
+      result.length = Math.min(result.length, 50);
+
+      return result;
+    }),
+  });
 
   function init() {
     if (isInitialized.value) return;
@@ -72,28 +98,18 @@ export const useChatStore = defineStore("chat", () => {
       .then((response) => {
         const data: ChatData = response.data;
 
-        switch (data.type) {
-          case ChatType.GLOBAL:
-            state.globalMessages.length = 0;
-            break;
-          case ChatType.LADDER:
-            state.ladderMessages.length = 0;
-            state.ladderChatNumber = data.number;
-            break;
-          case ChatType.SYSTEM:
-            state.systemMessages.length = 0;
-            break;
+        const messages = state.messages.get(data.type);
+        if (messages === undefined) {
+          return;
         }
+
+        messages.length = 0;
 
         data.messages.forEach((message) => {
           const msg = new Message(message);
           msg.setFlag("old");
           addMessage(msg);
         });
-
-        if (data.type === ChatType.LADDER && data.number) {
-          state.ladderChatNumber = data.number;
-        }
 
         stomp.addCallback(
           stomp.callbacks.onChatEvent,
@@ -108,12 +124,11 @@ export const useChatStore = defineStore("chat", () => {
 
   function sendMessage(message: string, metadata: MentionMeta[]) {
     if (state.selectedChatType === ChatType.LADDER) {
-      console.log(state.ladderChatNumber);
       stomp.wsApi.chat.sendMessage(
         message,
         metadata,
         state.selectedChatType,
-        state.ladderChatNumber
+        useAccountStore().state.highestCurrentLadder
       );
     } else {
       stomp.wsApi.chat.sendMessage(message, metadata, state.selectedChatType);
@@ -127,10 +142,15 @@ export const useChatStore = defineStore("chat", () => {
 
   function addMessage(body: OnChatEventBody): void {
     const message = new Message(body);
-    if (state.ladderMessages.length > 50) {
-      state.ladderMessages.shift();
+    const messages = state.messages.get(message.chatType);
+    if (messages === undefined) {
+      return;
     }
-    state.ladderMessages.push(message);
+
+    if (messages.length > 50) {
+      messages.shift();
+    }
+    messages.push(message);
 
     // Find if one isn't a groupMention and has the id of the currentUser
     const isMentioned = message.getMetadata().some((meta) => {
@@ -162,19 +182,20 @@ export const useChatStore = defineStore("chat", () => {
   }
 
   function rename(accountId: number, username: string) {
-    state.ladderMessages.forEach((message) => {
-      if (message.accountId === accountId) {
-        message.username = username;
-      }
-      /* Since we don't update in the backend, mentions stay the way they are, but this would be how we update them in the frontend
-      const metadata = message.getMetadata();
-      metadata.forEach((meta) => {
-        if (!isGroupMentionMeta(meta) && meta.id === accountId) {
-          meta.u = username;
+    state.messages.forEach((messages) => {
+      messages.forEach((message) => {
+        if (message.accountId === accountId) {
+          message.username = username;
         }
+        // Since we don't update in the backend, mentions stay the way they are, but this would be how we update them in the frontend
+        /* const metadata = message.getMetadata();
+        metadata.forEach((meta) => {
+          if (!isGroupMentionMeta(meta) && meta.id === accountId) {
+            meta.u = username;
+          }
+        });
+        message.metadata = JSON.stringify(metadata); */
       });
-      message.metadata = JSON.stringify(metadata);
-       */
     });
   }
 

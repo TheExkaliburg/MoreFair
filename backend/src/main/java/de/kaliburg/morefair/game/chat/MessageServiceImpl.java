@@ -116,6 +116,7 @@ public class MessageServiceImpl extends AbstractCacheableService implements Mess
         .tag(config.getAssholeTag(message.getAccount().getAssholeCount()))
         .isMod(message.getAccount().isMod())
         .timestamp(message.getCreatedOn().withOffsetSameInstant(ZoneOffset.UTC).toEpochSecond())
+        .chatType(message.getChat().getType())
         .build();
   }
 

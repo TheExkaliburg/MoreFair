@@ -1,6 +1,7 @@
 package de.kaliburg.morefair.game.chat.dto;
 
 import de.kaliburg.morefair.FairConfig;
+import de.kaliburg.morefair.game.chat.ChatType;
 import de.kaliburg.morefair.game.chat.MessageEntity;
 import java.time.ZoneOffset;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,7 @@ public class MessageDto {
   private final Integer assholePoints;
   private final String metadata;
   private final Boolean isMod;
+  private final ChatType chatType;
 
   public MessageDto(MessageEntity message, FairConfig config) {
     this.tag = config.getAssholeTag(message.getAccount().getAssholeCount());
@@ -30,5 +32,6 @@ public class MessageDto {
     this.timestamp = message.getCreatedOn().withOffsetSameInstant(ZoneOffset.UTC).toEpochSecond();
     this.metadata = message.getMetadata();
     this.isMod = message.getAccount().isMod();
+    this.chatType = message.getChat().getType();
   }
 }

@@ -121,6 +121,7 @@ export const useAccountStore = defineStore("account", () => {
       case AccountEventType.INCREASE_HIGHEST_LADDER:
         useSound(SOUNDS.PROMOTION).play();
         state.highestCurrentLadder = body.data;
+        useChatStore().actions.changeChat(state.highestCurrentLadder);
         break;
       default:
         console.error("Unknown account event type: " + event);

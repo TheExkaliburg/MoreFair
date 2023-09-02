@@ -3,6 +3,10 @@
     <div class="flex flex-row text-sm justify-between pr-3">
       <span class="text-text-light truncate basis-5/8">
         <span class="cursor-pointer" @click="mention">
+          <span v-tippy="{ content: message.chatType }">{{
+            message.getChatTypeIdentifier()
+          }}</span
+          >:
           <font-awesome-icon
             v-if="message.isMod"
             v-tippy="{ content: 'MOD', placement: 'right' }"
@@ -46,7 +50,7 @@ const props = defineProps<{ message: Message; index: number }>();
 const el = ref<null | HTMLElement>(null);
 
 const isLastMessage = computed<boolean>(() => {
-  return props.index === chatStore.state.messages.length - 1;
+  return props.index === chatStore.getters.allMessages.length - 1;
 });
 
 onMounted(() => {

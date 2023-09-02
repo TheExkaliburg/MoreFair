@@ -1,5 +1,4 @@
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
-import { navigateTo } from "nuxt/app";
 import Cookies from "js-cookie";
 import { useAuthStore } from "~/store/authentication";
 import { useToasts } from "~/composables/useToasts";
@@ -49,7 +48,7 @@ axiosInstance.interceptors.response.use(
     if (error.response?.status === 401) {
       useAuthStore().state.authenticationStatus = false;
       useAuthStore().state.uuid = Cookies.get("_uuid") || "";
-      navigateTo("/login");
+      window.location.href = "/login";
     }
 
     // if status is 502, the server is down

@@ -25,6 +25,7 @@
               :class="{ invisible: !ignorableChatTypes.includes(type) }"
               type="checkbox"
               :checked="!chatStore.state.ignoredChatTypes.has(type)"
+              :disabled="!ignorableChatTypes.includes(type)"
               @click.stop
               @input="setIgnoredChatType(type, $event.target.checked)"
             />
@@ -53,7 +54,7 @@ import FairButton from "~/components/interactables/FairButton.vue";
 import { ChatType, useChatStore } from "~/store/chat";
 
 const selectableChatTypes = ref<ChatType[]>([ChatType.GLOBAL, ChatType.LADDER]);
-const ignorableChatTypes = ref<ChatType[]>([ChatType.LADDER, ChatType.SYSTEM]);
+const ignorableChatTypes = ref<ChatType[]>([ChatType.LADDER]);
 
 // combine all selectableChatTypes and ignorableChatTypes into one array, without duplicates
 const chatTypes = computed<ChatType[]>(() => {
@@ -75,6 +76,9 @@ function setIgnoredChatType(type: ChatType, value: boolean) {
     chatStore.state.ignoredChatTypes.delete(type);
   } else {
     chatStore.state.ignoredChatTypes.add(type);
+    if (chatStore.state.selectedChatType === type) {
+      chatStore.state.selectedChatType = ChatType.GLOBAL;
+    }
   }
 }
 

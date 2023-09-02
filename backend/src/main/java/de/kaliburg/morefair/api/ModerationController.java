@@ -38,8 +38,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequiredArgsConstructor
 public class ModerationController {
 
-  public static final String TOPIC_LOG_EVENTS_DESTINATION = "/moderation/log/event";
-  public static final String TOPIC_CHAT_EVENTS_DESTINATION = "/moderation/chat/event";
+  public static final String TOPIC_LOG_EVENTS_DESTINATION = "/moderation/log/events";
+  public static final String TOPIC_CHAT_EVENTS_DESTINATION = "/moderation/chat/events";
   private static final String APP_BAN_DESTINATION = "/moderation/ban/{id}";
   private static final String APP_MUTE_DESTINATION = "/moderation/mute/{id}";
   private static final String APP_FREE_DESTINATION = "/moderation/free/{id}";

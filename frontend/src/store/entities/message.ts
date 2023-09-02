@@ -1,4 +1,6 @@
 import { ChatType } from "~/store/chat";
+import { useLang } from "~/composables/useLang";
+import { useAccountStore } from "~/store/account";
 
 export enum MessagePartType {
   plain,
@@ -106,6 +108,15 @@ export class Message implements MessageData {
 
     // Format the date using the formatter object
     return formatter.format(date);
+  }
+
+  getChatTypeIdentifier(): string {
+    const lang = useLang("chat");
+    let result = lang(this.chatType.toUpperCase() + ".identifier");
+    if (this.chatType === ChatType.LADDER) {
+      result += useAccountStore().state.highestCurrentLadder;
+    }
+    return result;
   }
 
   getMessageParts(): MessagePart[] {
