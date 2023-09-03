@@ -17,6 +17,7 @@ export enum ChatType {
   GLOBAL = "GLOBAL",
   LADDER = "LADDER",
   SYSTEM = "SYSTEM",
+  MOD = "MOD",
 }
 
 export type ChatData = {
@@ -45,32 +46,22 @@ export const useChatStore = defineStore("chat", () => {
     selectedChatType: ChatType.GLOBAL,
     ignoredChatTypes: new Set(),
   });
-  state.messages.set(ChatType.GLOBAL, []);
-  state.messages.set(ChatType.LADDER, []);
-  state.messages.set(ChatType.SYSTEM, []);
+  const keys = Object.keys(ChatType) as ChatType[];
+  keys.forEach((key) => {
+    state.messages.set(key, []);
+  });
 
   const getters = reactive({
-    ladderMessages: computed<Message[]>(
-      () => state.messages.get(ChatType.LADDER) ?? []
-    ),
-    globalMessages: computed<Message[]>(
-      () => state.messages.get(ChatType.GLOBAL) ?? []
-    ),
-    systemMessages: computed<Message[]>(
-      () => state.messages.get(ChatType.SYSTEM) ?? []
-    ),
     allMessages: computed<Message[]>(() => {
-      const result: Message[] = [
-        ...(state.ignoredChatTypes.has(ChatType.LADDER)
-          ? []
-          : getters.ladderMessages),
-        ...(state.ignoredChatTypes.has(ChatType.GLOBAL)
-          ? []
-          : getters.globalMessages),
-        ...(state.ignoredChatTypes.has(ChatType.SYSTEM)
-          ? []
-          : getters.systemMessages),
-      ];
+      const keys = Object.keys(ChatType) as ChatType[];
+      const result: Message[] = [];
+
+      keys.forEach((key) => {
+        const messages = state.messages.get(key) ?? [];
+        if (!state.ignoredChatTypes.has(key)) {
+          result.push(...messages);
+        }
+      });
 
       result.sort((a, b) => b.timestamp - a.timestamp);
       result.length = Math.min(result.length, 50);
@@ -82,9 +73,10 @@ export const useChatStore = defineStore("chat", () => {
 
   function init() {
     if (isInitialized.value) return;
-    getChat(ChatType.GLOBAL);
     getChat(ChatType.LADDER, accountStore.state.highestCurrentLadder);
+    getChat(ChatType.GLOBAL);
     getChat(ChatType.SYSTEM);
+    getChat(ChatType.MOD);
   }
 
   function reset() {
@@ -115,7 +107,7 @@ export const useChatStore = defineStore("chat", () => {
         stomp.addCallback(
           stomp.callbacks.onChatEvent,
           "fair_chat_event",
-          (body) => addMessage(body)
+          (body) => addMessage(body),
         );
       })
       .catch((_) => {
@@ -129,7 +121,7 @@ export const useChatStore = defineStore("chat", () => {
         message,
         metadata,
         state.selectedChatType,
-        useAccountStore().state.highestCurrentLadder
+        useAccountStore().state.highestCurrentLadder,
       );
     } else {
       stomp.wsApi.chat.sendMessage(message, metadata, state.selectedChatType);
@@ -157,7 +149,7 @@ export const useChatStore = defineStore("chat", () => {
     const isMentioned = message.getMetadata().some((meta) => {
       if (isGroupMentionMeta(meta)) {
         return useOptionsStore().state.chat.subscribedMentions.value.includes(
-          meta.g
+          meta.g,
         );
       }
       return meta.id === accountStore.state.accountId;

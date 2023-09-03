@@ -14,13 +14,13 @@ const getMinimumPointsForPromote = computed<Decimal>(() => {
 const getMinimumPeopleForPromote = computed<number>(() => {
   return Math.max(
     round.state.settings.minimumPeopleForPromote,
-    ladder.state.number
+    ladder.state.number,
   );
 });
 
 const getVinegarThrowCost = computed<Decimal>(() => {
   return round.state.settings.baseVinegarNeededToThrow.mul(
-    new Decimal(ladder.state.number)
+    new Decimal(ladder.state.number),
   );
 });
 
@@ -78,7 +78,7 @@ const canBuyAutoPromote = computed<boolean>(() => {
 
   return (
     ladder.getters.yourRanker.grapes.cmp(
-      getAutoPromoteCost(ladder.getters.yourRanker.rank)
+      getAutoPromoteCost(ladder.getters.yourRanker.rank),
     ) >= 0 && ladder.state.number >= round.state.autoPromoteLadder
   );
 });
@@ -128,9 +128,9 @@ function getPointsNeededToPromote(ranker: Ranker) {
 
   return Decimal.max(
     (ranker.rank === 1 ? pursuingRanker : leadingRanker).points.add(
-      neededPointDiff
+      neededPointDiff,
     ),
-    getMinimumPointsForPromote.value
+    getMinimumPointsForPromote.value,
   );
 }
 

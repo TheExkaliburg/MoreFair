@@ -1,7 +1,7 @@
 export function scrollToCenter(
   element: HTMLElement,
   container: HTMLElement,
-  options?: ScrollToOptions
+  options?: ScrollToOptions,
 ): void {
   const containerRect = container.getBoundingClientRect();
   const elementRect = element.getBoundingClientRect();

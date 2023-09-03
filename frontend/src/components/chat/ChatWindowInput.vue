@@ -114,7 +114,7 @@ watch(
     wasSuggestionOpen = isSuggestionOpen;
     isSuggestionOpen = suggestionElements.length > 0;
   },
-  { deep: true }
+  { deep: true },
 );
 
 function sendMessage(e: KeyboardEvent | MouseEvent) {

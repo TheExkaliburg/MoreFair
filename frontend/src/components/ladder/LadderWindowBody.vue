@@ -146,7 +146,7 @@ const yourPercentageToPromotion = computed<string>(() => {
   return useFormatter(
     yourRanker.value.points
       .mul(100)
-      .div(ladderUtils.getYourPointsNeededToPromote.value)
+      .div(ladderUtils.getYourPointsNeededToPromote.value),
   );
 });
 
@@ -154,7 +154,7 @@ const biasButtonLabel = computed<string>(() => {
   if (canBuyBias.value) return `+1 ${lang("bias")}`;
 
   const eta = useEta(yourRanker.value).toPoints(
-    ladderUtils.getYourBiasCost.value
+    ladderUtils.getYourBiasCost.value,
   );
   return `+${lang("bias_short")} (${useTimeFormatter(eta)})`;
 });
@@ -163,7 +163,7 @@ const multiButtonLabel = computed<string>(() => {
   if (canBuyMulti.value) return `+1 ${lang("multi")}`;
 
   const eta = useEta(yourRanker.value).toPower(
-    ladderUtils.getYourMultiCost.value
+    ladderUtils.getYourMultiCost.value,
   );
   return `+${lang("multi_short")} (${useTimeFormatter(eta)})`;
 });
@@ -236,7 +236,7 @@ const canThrowVinegar = computed<boolean>(() => {
 const canPromote = computed<boolean>(() => {
   return (
     ladderUtils.getYourPointsNeededToPromote.value.cmp(
-      yourRanker.value.points
+      yourRanker.value.points,
     ) <= 0 &&
     yourRanker.value.growing &&
     ladderUtils.isLadderPromotable.value
@@ -330,7 +330,7 @@ onMounted(() => {
   useStomp().addCallback(
     useStomp().callbacks.onTick,
     "fair_ladder_buttons",
-    handleTick
+    handleTick,
   );
 });
 </script>

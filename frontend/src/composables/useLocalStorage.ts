@@ -11,7 +11,7 @@ import { ObjectFunctions } from "~/store/entities/option";
 export const useLocalStorage = (
   key: string,
   defaultValue: any,
-  options?: UseStorageOptions<any> | undefined
+  options?: UseStorageOptions<any> | undefined,
 ): RemovableRef<any> => {
   const result = useStorage(key, deepCopy(defaultValue), localStorage, {
     serializer: {
@@ -27,7 +27,7 @@ export const useLocalStorage = (
   function read(value: any) {
     return deepMerge(
       deepCopy(defaultValue),
-      StorageSerializers.object.read(value)
+      StorageSerializers.object.read(value),
     );
   }
 
@@ -66,14 +66,17 @@ function deepCopy<T>(source: T): T {
     : source instanceof Date
     ? new Date(source.getTime())
     : source && typeof source === "object"
-    ? Object.getOwnPropertyNames(source).reduce((o, prop) => {
-        Object.defineProperty(
-          o,
-          prop,
-          Object.getOwnPropertyDescriptor(source, prop)!
-        );
-        o[prop] = deepCopy((source as { [key: string]: any })[prop]);
-        return o;
-      }, Object.create(Object.getPrototypeOf(source)))
+    ? Object.getOwnPropertyNames(source).reduce(
+        (o, prop) => {
+          Object.defineProperty(
+            o,
+            prop,
+            Object.getOwnPropertyDescriptor(source, prop)!,
+          );
+          o[prop] = deepCopy((source as { [key: string]: any })[prop]);
+          return o;
+        },
+        Object.create(Object.getPrototypeOf(source)),
+      )
     : (source as T);
 }

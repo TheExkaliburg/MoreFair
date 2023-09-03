@@ -89,7 +89,7 @@ function confirmAction(actionName: string) {
   if (input.value === "") return false;
 
   return confirm(
-    `Are you sure you want to ${actionName} the user with the account-id #${input.value}?`
+    `Are you sure you want to ${actionName} the user with the account-id #${input.value}?`,
   );
 }
 </script>

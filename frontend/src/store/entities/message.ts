@@ -23,7 +23,7 @@ export type GroupMentionMeta = {
 export type MentionMeta = GroupMentionMeta | UserMentionMeta;
 
 export function isGroupMentionMeta(
-  meta: MentionMeta
+  meta: MentionMeta,
 ): meta is GroupMentionMeta {
   return "g" in meta && "i" in meta;
 }
@@ -141,8 +141,8 @@ export class Message implements MessageData {
         result.push(
           new MessagePart(
             MessagePartType.plain,
-            message.slice(lastIndex, index)
-          )
+            message.slice(lastIndex, index),
+          ),
         );
         result.push(new MessagePart(MessagePartType.mentionGroup, name));
         lastIndex = index + 3;
@@ -154,8 +154,8 @@ export class Message implements MessageData {
         result.push(
           new MessagePart(
             MessagePartType.plain,
-            message.slice(lastIndex, index)
-          )
+            message.slice(lastIndex, index),
+          ),
         );
         result.push(new MessagePart(MessagePartType.mentionUser, name));
         result.push(new MessagePart(MessagePartType.mentionUserId, String(id)));
@@ -165,7 +165,7 @@ export class Message implements MessageData {
 
     // Take the last part and add it as Plain text
     result.push(
-      new MessagePart(MessagePartType.plain, message.slice(lastIndex))
+      new MessagePart(MessagePartType.plain, message.slice(lastIndex)),
     );
 
     return result;

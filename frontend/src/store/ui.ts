@@ -21,7 +21,7 @@ export const useUiStore = defineStore("ui", () => {
       if (!value && !state.chatEnabled) {
         state.chatEnabled = true;
       }
-    }
+    },
   );
   watch(
     () => state.chatEnabled,
@@ -29,7 +29,7 @@ export const useUiStore = defineStore("ui", () => {
       if (!value && !state.ladderEnabled) {
         state.ladderEnabled = true;
       }
-    }
+    },
   );
 
   return {

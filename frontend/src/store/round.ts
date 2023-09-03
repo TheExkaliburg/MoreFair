@@ -74,7 +74,7 @@ export const useRoundStore = defineStore("round", () => {
         stomp.addCallback(
           stomp.callbacks.onRoundEvent,
           "fair_round_events",
-          handleRoundEvent
+          handleRoundEvent,
         );
       })
       .catch((_) => {
@@ -95,7 +95,7 @@ export const useRoundStore = defineStore("round", () => {
         isInitialized.value = false;
         useToasts(
           "Chad was successful in turning back the time, the only thing left from this future is a mark on the initiates that helped in the final ritual.",
-          { autoClose: false }
+          { autoClose: false },
         );
         useStomp().reset();
         break;

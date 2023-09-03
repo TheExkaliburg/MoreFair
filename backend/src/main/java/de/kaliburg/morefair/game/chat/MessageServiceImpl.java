@@ -68,6 +68,14 @@ public class MessageServiceImpl extends AbstractCacheableService implements Mess
               account.getDisplayName(), account.getId(), chat.getIdentifier()));
     }
 
+    if ((chat.getType() == ChatType.MOD && !account.isMod())
+        || (chat.getType() == ChatType.SYSTEM && !account.isBroadcaster())
+        || account.isMuted()) {
+      throw new IllegalArgumentException(FormattingUtils.format("Account {} (#{}): Tried to send "
+              + "message to chat '{}' without the necessary permissions.",
+          account.getDisplayName(), account.getId(), chat.getIdentifier()));
+    }
+
     MessageEntity result = new MessageEntity(account, message, chat);
     if (metadata != null && !metadata.isBlank()) {
       result.setMetadata(metadata);

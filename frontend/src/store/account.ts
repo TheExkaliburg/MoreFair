@@ -83,7 +83,7 @@ export const useAccountStore = defineStore("account", () => {
       stomp.addCallback(
         stomp.callbacks.onAccountEvent,
         "fair_account_events",
-        handleAccountEvents
+        handleAccountEvents,
       );
       return Promise.resolve(res);
     });
@@ -97,7 +97,7 @@ export const useAccountStore = defineStore("account", () => {
       ranker = ladderStore.getters.yourRanker;
     } else {
       ranker = ladderStore.state.rankers.find(
-        (r) => r.accountId === body.accountId
+        (r) => r.accountId === body.accountId,
       );
     }
 

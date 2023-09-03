@@ -82,12 +82,12 @@ export const useUserSuggestion = () => {
       if (queryLower.startsWith("#")) {
         if (queryLower.length < 2) return [];
         return list.filter((item) =>
-          String(item.accountId).includes(queryLower.substring(1))
+          String(item.accountId).includes(queryLower.substring(1)),
         );
       } else {
         if (queryLower.length < 1) return [];
         return list.filter((item) =>
-          item.username.toLowerCase().startsWith(queryLower)
+          item.username.toLowerCase().startsWith(queryLower),
         );
       }
     },
@@ -112,7 +112,7 @@ export const useEmojiSuggestion = () => {
     },
     pluginKey: new PluginKey("emojiSuggestion"),
     render: render(
-      (item: EmojiDataEntry) => `${item.emoji}: ${item.aliases[0]}`
+      (item: EmojiDataEntry) => `${item.emoji}: ${item.aliases[0]}`,
     ),
   };
 };
@@ -127,7 +127,7 @@ export const useGroupSuggestion = () => {
       const queryLower = query.toLowerCase();
       return [
         ...list.filter((item: string) =>
-          item.toLowerCase().startsWith(queryLower)
+          item.toLowerCase().startsWith(queryLower),
         ),
         queryLower,
       ];

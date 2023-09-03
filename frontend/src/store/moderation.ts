@@ -61,7 +61,7 @@ export const useModerationStore = defineStore("moderation", () => {
           "fair_chat_event",
           (body) => {
             addMessage(body);
-          }
+          },
         );
 
         return Promise.resolve(res);

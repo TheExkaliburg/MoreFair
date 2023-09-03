@@ -39,7 +39,7 @@ axiosInstance.interceptors.request.use(
 
     return config;
   },
-  (error: AxiosError) => Promise.reject(error)
+  (error: AxiosError) => Promise.reject(error),
 );
 
 axiosInstance.interceptors.response.use(
@@ -78,7 +78,7 @@ axiosInstance.interceptors.response.use(
       }
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 const API = {

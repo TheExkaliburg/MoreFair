@@ -52,9 +52,14 @@ import { ChevronDownIcon } from "@heroicons/vue/24/solid";
 import { computed } from "vue";
 import FairButton from "~/components/interactables/FairButton.vue";
 import { ChatType, useChatStore } from "~/store/chat";
+import { useAccountStore } from "~/store/account";
 
 const selectableChatTypes = ref<ChatType[]>([ChatType.GLOBAL, ChatType.LADDER]);
 const ignorableChatTypes = ref<ChatType[]>([ChatType.LADDER]);
+
+if (useAccountStore().getters.isMod) {
+  selectableChatTypes.value.push(ChatType.MOD);
+}
 
 // combine all selectableChatTypes and ignorableChatTypes into one array, without duplicates
 const chatTypes = computed<ChatType[]>(() => {

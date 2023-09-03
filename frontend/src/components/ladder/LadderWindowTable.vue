@@ -114,7 +114,7 @@ const container = ref<HTMLElement | null>(null);
 useStomp().addCallback(
   useStomp().callbacks.onTick,
   "fair_ladder_follow",
-  followRanker
+  followRanker,
 );
 
 function onScroll(e: any) {

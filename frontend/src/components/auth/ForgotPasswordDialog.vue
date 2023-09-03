@@ -105,8 +105,8 @@ watch(
       strength.value = (await useZxcvbn(value)).toString;
     },
     200,
-    false
-  )
+    false,
+  ),
 );
 
 const canSubmitPasswords = computed(() => {

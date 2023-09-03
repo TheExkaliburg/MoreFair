@@ -19,7 +19,7 @@ const api = {
   addCallback: (
     hook: StompCallback<unknown>[],
     identifier: string,
-    callback: (body: unknown) => void
+    callback: (body: unknown) => void,
   ) => useStomp().addCallback(hook, identifier, callback),
 };
 

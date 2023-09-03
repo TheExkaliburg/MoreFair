@@ -247,7 +247,7 @@ export const useAuthStore = defineStore("auth", () => {
           sameSite: shouldSetSameSite() ? "strict" : "none",
         });
       else Cookies.remove("_uuid");
-    }
+    },
   );
 
   setInterval(() => {
@@ -298,7 +298,7 @@ async function checkPassword(password: string): Promise<boolean> {
       `Password is too weak.\n\n${
         zxcvbn.feedback.warning
       }\n\n${zxcvbn.feedback.suggestions.join("\n")}`,
-      { type: "error" }
+      { type: "error" },
     );
     return false;
   }
