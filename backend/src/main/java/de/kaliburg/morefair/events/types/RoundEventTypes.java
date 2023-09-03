@@ -5,4 +5,5 @@ public enum RoundEventTypes {
   INCREASE_ASSHOLE_LADDER,
   RESET,
   INCREASE_TOP_LADDER,
+  JOIN,
 }

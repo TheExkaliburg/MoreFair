@@ -168,6 +168,9 @@ const API = {
         params,
       });
     },
+    getSuggestions() {
+      return axiosInstance.get(`/api/chat/suggestions`);
+    },
   },
   round: {
     getCurrentRound: () => {

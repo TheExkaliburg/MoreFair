@@ -7,6 +7,7 @@ import {
 } from "~/store/entities/roundSettings";
 import { OnRoundEventBody, useStomp } from "~/composables/useStomp";
 import { useToasts } from "~/composables/useToasts";
+import { useChatStore } from "~/store/chat";
 
 export enum RoundType {
   DEFAULT = "DEFAULT",
@@ -20,6 +21,7 @@ export enum RoundEventType {
   RESET = "RESET",
   INCREASE_ASSHOLE_LADDER = "INCREASE_ASSHOLE_LADDER",
   INCREASE_TOP_LADDER = "INCREASE_TOP_LADDER",
+  JOIN = "JOIN",
 }
 
 export type RoundData = {
@@ -98,6 +100,9 @@ export const useRoundStore = defineStore("round", () => {
           { autoClose: false },
         );
         useStomp().reset();
+        break;
+      case RoundEventType.JOIN:
+        useChatStore().state.suggestions.push(body.data);
         break;
       default:
         console.error("Unknown event type", event);

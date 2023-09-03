@@ -3,6 +3,7 @@ package de.kaliburg.morefair.api;
 import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
+import de.kaliburg.morefair.account.SuggestionDto;
 import de.kaliburg.morefair.api.utils.RequestThrottler;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WsMessage;
@@ -12,11 +13,15 @@ import de.kaliburg.morefair.game.chat.ChatType;
 import de.kaliburg.morefair.game.chat.MessageEntity;
 import de.kaliburg.morefair.game.chat.MessageService;
 import de.kaliburg.morefair.game.chat.dto.ChatDto;
+import de.kaliburg.morefair.game.round.LadderEntity;
 import de.kaliburg.morefair.game.round.LadderService;
 import de.kaliburg.morefair.game.round.RankerEntity;
 import de.kaliburg.morefair.game.round.RankerService;
+import de.kaliburg.morefair.game.round.RoundEntity;
 import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.security.SecurityUtils;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.ObjectUtils;
@@ -82,6 +87,25 @@ public class ChatController {
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GetMapping(value = "/suggestions")
+  public ResponseEntity<?> getSuggestions() {
+    try {
+      RoundEntity currentRound = roundService.getCurrentRound();
+      LadderEntity ladder = ladderService.find(currentRound, 1);
+
+      List<RankerEntity> rankers = ladder.getRankers();
+      var allSuggestions = rankers.stream()
+          .map(RankerEntity::getAccount)
+          .map(a -> new SuggestionDto(a.getId(), a.getDisplayName()))
+          .collect(Collectors.toList());
+
+      return ResponseEntity.ok(allSuggestions);
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }

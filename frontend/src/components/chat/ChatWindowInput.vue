@@ -78,7 +78,7 @@ const editor = useEditor({
       },
       suggestion: useUserSuggestion(),
       renderLabel: ({ node }) => {
-        return `@${node.attrs.id.username}#${node.attrs.id.accountId}`;
+        return `@${node.attrs.id.displayName}#${node.attrs.id.accountId}`;
       },
     }),
     Mention.extend({ name: "emojiMention" }).configure({
@@ -128,11 +128,13 @@ watch(
           break;
         case ChatType.LADDER:
         case lang(ChatType.LADDER + ".identifier"):
+        case "LOCAL":
           useChatStore().state.selectedChatType = ChatType.LADDER;
           editor.value.commands.clearContent(true);
           break;
         case ChatType.GLOBAL:
         case lang(ChatType.GLOBAL + ".identifier"):
+        case "GENERAL":
           useChatStore().state.selectedChatType = ChatType.GLOBAL;
           editor.value.commands.clearContent(true);
           break;
@@ -183,7 +185,7 @@ function sendMessage(e: KeyboardEvent | MouseEvent) {
     if (node.type === "userMention") {
       result += "{@}";
       metadata.push({
-        u: node.attrs.id.username,
+        u: node.attrs.id.displayName,
         i: result.length - 3,
         id: node.attrs.id.accountId,
       });

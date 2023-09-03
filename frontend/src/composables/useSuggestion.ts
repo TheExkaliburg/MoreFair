@@ -2,9 +2,8 @@ import { VueRenderer } from "@tiptap/vue-3";
 import { tippy } from "vue-tippy";
 import { PluginKey } from "prosemirror-state";
 import ChatWindowInputUserMentionList from "../components/chat/ChatWindowInputSuggestionList.vue";
-import { useLadderStore } from "~/store/ladder";
 import { useOptionsStore } from "~/store/options";
-import { Ranker } from "~/store/entities/ranker";
+import { Suggestion, useChatStore } from "~/store/chat";
 
 const emojiJson = () => import("../assets/emoji.json");
 
@@ -72,10 +71,9 @@ const render = (format: Function) => () => {
 };
 
 export const useUserSuggestion = () => {
-  const ladderStore = useLadderStore();
   return {
     items: ({ query }: { query: string }) => {
-      const list = ladderStore.state.rankers;
+      const list = useChatStore().state.suggestions;
       const queryLower = query.toLowerCase();
       if (queryLower.length < 1) return list;
 
@@ -87,12 +85,14 @@ export const useUserSuggestion = () => {
       } else {
         if (queryLower.length < 1) return [];
         return list.filter((item) =>
-          item.username.toLowerCase().startsWith(queryLower),
+          item.displayName.toLowerCase().startsWith(queryLower),
         );
       }
     },
     pluginKey: new PluginKey("userSuggestion"),
-    render: render((item: Ranker) => `${item.username}#${item.accountId}`),
+    render: render(
+      (item: Suggestion) => `${item.displayName}#${item.accountId}`,
+    ),
   };
 };
 

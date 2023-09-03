@@ -20,6 +20,8 @@ export enum ChatType {
   MOD = "MOD",
 }
 
+export type Suggestion = { accountId: number; displayName: string };
+
 export type ChatData = {
   type: ChatType;
   messages: MessageData[];
@@ -31,6 +33,7 @@ export type ChatState = {
   input: JSONContent;
   selectedChatType: ChatType;
   ignoredChatTypes: Set<ChatType>;
+  suggestions: Suggestion[];
 };
 
 export const useChatStore = defineStore("chat", () => {
@@ -45,6 +48,7 @@ export const useChatStore = defineStore("chat", () => {
     input: { type: "doc", content: [{ type: "paragraph" }] },
     selectedChatType: ChatType.GLOBAL,
     ignoredChatTypes: new Set(),
+    suggestions: [],
   });
   const keys = Object.keys(ChatType) as ChatType[];
   keys.forEach((key) => {
@@ -77,6 +81,7 @@ export const useChatStore = defineStore("chat", () => {
     getChat(ChatType.GLOBAL);
     getChat(ChatType.SYSTEM);
     getChat(ChatType.MOD);
+    getSuggestions();
   }
 
   function reset() {
@@ -113,6 +118,14 @@ export const useChatStore = defineStore("chat", () => {
       .catch((_) => {
         isInitialized.value = false;
       });
+  }
+
+  function getSuggestions() {
+    api.chat.getSuggestions().then((response) => {
+      if (response.status === 200) {
+        state.suggestions = response.data;
+      }
+    });
   }
 
   function sendMessage(message: string, metadata: MentionMeta[]) {

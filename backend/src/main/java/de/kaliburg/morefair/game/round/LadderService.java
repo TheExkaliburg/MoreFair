@@ -6,6 +6,7 @@ import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.account.AccountServiceEvent;
+import de.kaliburg.morefair.account.SuggestionDto;
 import de.kaliburg.morefair.api.AccountController;
 import de.kaliburg.morefair.api.LadderController;
 import de.kaliburg.morefair.api.RoundController;
@@ -364,6 +365,12 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
     RankerEntity result = rankerService.create(account, ladder,
         ladder.getRankers().size() + 1);
     ladder.getRankers().add(result);
+
+    if (ladder.getNumber() == 1) {
+      Event<RoundEventTypes> joinEvent = new Event<>(RoundEventTypes.JOIN, account.getId());
+      joinEvent.setData(new SuggestionDto(account.getId(), account.getDisplayName()));
+      wsUtils.convertAndSendToTopic(RoundController.TOPIC_EVENTS_DESTINATION, joinEvent);
+    }
 
     Event<LadderEventTypes> joinEvent = new Event<>(LadderEventTypes.JOIN, account.getId());
     joinEvent.setData(
