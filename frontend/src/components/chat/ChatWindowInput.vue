@@ -4,7 +4,7 @@
       class="flex flex-row justify-center items-center w-full bg-background z-10"
     >
       <div
-        class="flex flex-row rounded-l-md justify-center items-center relative w-full border-1 h-8 border-button-border p-1"
+        class="flex flex-row rounded-l-md justify-center items-center relative w-full border-1 h-8 border-button-border p-1 overflow-hidden"
       >
         <ChatWindowChannelSelector class="z-20 w-8 h-8 px-1" />
         <EditorContent
