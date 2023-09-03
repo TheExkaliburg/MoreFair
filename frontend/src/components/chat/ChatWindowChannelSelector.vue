@@ -1,12 +1,22 @@
 <template>
   <Listbox as="div" class="relative">
     <ListboxButton aria-label="dropdown-menu" as="template">
-      <FairButton class="w-full">
+      <button class="w-full border-0">
         <div class="flex w-full flex-row justify-between gap-4">
-          <ChevronDownIcon class="h-7 w-4 justify-self-start" />
-          <span class="align-text-bottom">{{ formattedChatType }}</span>
+          <!--ChevronDownIcon class="h-7 w-4 justify-self-start" /-->
+          <span
+            class="pt-1 align-text-bottom text-text"
+            :class="{
+              'text-teal-600':
+                chatStore.state.selectedChatType === ChatType.LADDER,
+              'text-violet-600':
+                chatStore.state.selectedChatType === ChatType.MOD,
+              'text-text': chatStore.state.selectedChatType === ChatType.GLOBAL,
+            }"
+            >/{{ formattedChatType }}</span
+          >
         </div>
-      </FairButton>
+      </button>
     </ListboxButton>
     <transition
       leave-active-class="transition ease-in duration-100"
@@ -14,26 +24,31 @@
       leave-to-class="opacity-0"
     >
       <ListboxOptions
-        class="z-1 border-1 absolute right-0 top-5 max-h-32 w-full overflow-auto rounded-md border-button-border bg-background pl-0"
+        class="z-1 border-1 absolute left-0 bottom-5 max-h-32 w-full overflow-auto rounded-md border-button-border bg-background pl-0 min-w-min"
       >
         <ListboxOption v-for="type in chatTypes" :key="type" as="template">
           <li
-            class="flex w-full cursor-pointer flex-row justify-between px-2 hover:bg-button-bg-hover hover:text-button-text-hover"
+            class="flex w-full cursor-pointer flex-row gap-2 justify-between px-2 hover:bg-button-bg-hover hover:text-button-text-hover"
             @click="select($event, type)"
           >
+            <a
+              class="select-none whitespace-nowrap text-text"
+              :class="{
+                'text-teal-600': type === ChatType.LADDER,
+                'text-violet-600': type === ChatType.MOD,
+                'text-text': type === ChatType.GLOBAL,
+              }"
+              >/{{ lang(type + ".identifier").toLowerCase() }}, /{{
+                type.toLowerCase()
+              }}</a
+            >
             <input
-              :class="{ invisible: !ignorableChatTypes.includes(type) }"
+              :class="{ invisible: ignorableChatTypes.includes(type) }"
               type="checkbox"
               :checked="!chatStore.state.ignoredChatTypes.has(type)"
-              :disabled="!ignorableChatTypes.includes(type)"
               @click.stop
               @input="setIgnoredChatType(type, $event.target.checked)"
             />
-            <a class="select-none">{{
-              type
-                .toLowerCase()
-                .replace(/(?:^|\s|-)\S/g, (x) => x.toUpperCase())
-            }}</a>
           </li>
         </ListboxOption>
       </ListboxOptions>
@@ -48,11 +63,12 @@ import {
   ListboxOption,
   ListboxOptions,
 } from "@headlessui/vue";
-import { ChevronDownIcon } from "@heroicons/vue/24/solid";
 import { computed } from "vue";
-import FairButton from "~/components/interactables/FairButton.vue";
 import { ChatType, useChatStore } from "~/store/chat";
 import { useAccountStore } from "~/store/account";
+import { useLang } from "~/composables/useLang";
+
+const chatStore = useChatStore();
 
 const selectableChatTypes = computed<ChatType[]>(() => {
   const result = [ChatType.GLOBAL, ChatType.LADDER];
@@ -66,6 +82,7 @@ const ignorableChatTypes = ref<ChatType[]>([ChatType.LADDER]);
 if (useAccountStore().getters.isMod) {
   selectableChatTypes.value.push(ChatType.MOD);
 }
+const lang = useLang("chat");
 
 // combine all selectableChatTypes and ignorableChatTypes into one array, without duplicates
 const chatTypes = computed<ChatType[]>(() => {
@@ -75,12 +92,9 @@ const chatTypes = computed<ChatType[]>(() => {
 });
 
 const formattedChatType = computed<string>(() => {
-  return chatStore.state.selectedChatType
-    .toLowerCase()
-    .replace(/(?:^|\s|-)\S/g, (x) => x.toUpperCase());
+  const s = lang(chatStore.state.selectedChatType + ".identifier");
+  return s.toLowerCase();
 });
-
-const chatStore = useChatStore();
 
 function setIgnoredChatType(type: ChatType, value: boolean) {
   if (value) {

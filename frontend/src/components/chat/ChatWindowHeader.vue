@@ -7,13 +7,11 @@
       class="h-8 w-42 self-end bg-background z-2"
       @change="(number) => chatStore.actions.changeChat(number)"
     /-->
-    <ChatWindowHeaderSelector class="z-20 h-8 w-32 self-end bg-background" />
+    <!--ChatWindowHeaderSelector class="z-20 h-8 w-32 self-end bg-background" /-->
   </div>
 </template>
 
 <script lang="ts" setup>
-import ChatWindowHeaderSelector from "~/components/chat/ChatWindowHeaderSelector.vue";
-
 // const chatStore = useChatStore();
 // const accountStore = useAccountStore();
 // const roundStore = useRoundStore();

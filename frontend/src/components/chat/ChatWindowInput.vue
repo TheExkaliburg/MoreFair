@@ -1,16 +1,21 @@
 <template>
   <div class="flex flex-col justify-around">
     <div
-      class="flex flex-row justify-center items-center relative w-full bg-background z-10"
+      class="flex flex-row justify-center items-center w-full bg-background z-10"
     >
-      <EditorContent
-        :editor="editor"
-        class="w-full rounded-l-md border-1 h-8 border-button-border p-1 outline-0 overflow-x-hidden text-text caret-text whitespace-nowrap overflow-y-hidden"
-        spellcheck="false"
-        @keydown.enter.prevent="sendMessage"
-        @keydown.tab="wasSuggestionOpen = false"
-        @keydown.ctrl.space="wasSuggestionOpen = false"
-      ></EditorContent>
+      <div
+        class="flex flex-row rounded-l-md justify-center items-center relative w-full border-1 h-8 border-button-border p-1"
+      >
+        <ChatWindowChannelSelector class="z-20 w-8 h-8 px-1" />
+        <EditorContent
+          :editor="editor"
+          class="w-full outline-0 overflow-x-hidden text-text caret-text whitespace-nowrap overflow-y-hidden"
+          spellcheck="false"
+          @keydown.enter.prevent="sendMessage"
+          @keydown.tab="wasSuggestionOpen = false"
+          @keydown.ctrl.space="wasSuggestionOpen = false"
+        ></EditorContent>
+      </div>
       <button
         class="w-1/4 max-w-xs rounded-r-md h-8 border-l-0 border-1 border-button-border py-1 text-button-text hover:text-button-text-hover hover:bg-button-bg-hover"
         @click="sendMessage"
@@ -36,12 +41,15 @@ import { Text } from "@tiptap/extension-text";
 import { Mention } from "@tiptap/extension-mention";
 import { CharacterCount } from "@tiptap/extension-character-count";
 import { Placeholder } from "@tiptap/extension-placeholder";
-import { useChatStore } from "~/store/chat";
+import ChatWindowChannelSelector from "./ChatWindowChannelSelector.vue";
+import { ChatType, useChatStore } from "~/store/chat";
 import {
   useEmojiSuggestion,
   useGroupSuggestion,
   useUserSuggestion,
 } from "~/composables/useSuggestion";
+import { useLang } from "~/composables/useLang";
+import { useAccountStore } from "~/store/account";
 
 const chatStore = useChatStore();
 
@@ -97,12 +105,42 @@ const editor = useEditor({
   },
 });
 
+const lang = useLang("chat");
+
 // TODO: this is kinda hacky, there must be a better way to prevent the enter from autocompletion to also send the message
 let isSuggestionOpen = false;
 let wasSuggestionOpen = false;
 watch(
   () => chatStore.state.input,
   (newValue) => {
+    if (
+      editor.value?.getText().trimStart().startsWith("/") &&
+      editor.value?.getText().endsWith(" ")
+    ) {
+      const channel = editor.value?.getText().trim().slice(1).toUpperCase();
+      switch (channel) {
+        case ChatType.MOD:
+        case lang(ChatType.MOD + ".identifier"):
+          if (useAccountStore().getters.isMod) {
+            useChatStore().state.selectedChatType = ChatType.MOD;
+            editor.value.commands.clearContent(true);
+          }
+          break;
+        case ChatType.LADDER:
+        case lang(ChatType.LADDER + ".identifier"):
+          useChatStore().state.selectedChatType = ChatType.LADDER;
+          editor.value.commands.clearContent(true);
+          break;
+        case ChatType.GLOBAL:
+        case lang(ChatType.GLOBAL + ".identifier"):
+          useChatStore().state.selectedChatType = ChatType.GLOBAL;
+          editor.value.commands.clearContent(true);
+          break;
+        default:
+          break;
+      }
+    }
+
     const caretStart: number =
       editor.value?.state.selection.from ?? newValue.length;
     editor.value?.commands.setContent(newValue);
