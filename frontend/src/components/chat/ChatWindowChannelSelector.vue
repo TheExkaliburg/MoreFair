@@ -64,7 +64,7 @@ import {
   ListboxOption,
   ListboxOptions,
 } from "@headlessui/vue";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { ChatType, useChatStore } from "~/store/chat";
 import { useAccountStore } from "~/store/account";
 import { useLang } from "~/composables/useLang";
