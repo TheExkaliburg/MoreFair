@@ -76,7 +76,7 @@ function mention() {
       type: "userMention",
       attrs: {
         id: {
-          username: props.message.username,
+          displayName: props.message.username,
           accountId: props.message.accountId,
         },
         label: null,
