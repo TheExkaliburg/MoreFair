@@ -103,6 +103,7 @@ export const useChatStore = defineStore("chat", () => {
 
         messages.length = 0;
 
+        data.messages.sort((a, b) => a.timestamp - b.timestamp);
         data.messages.forEach((message) => {
           const msg = new Message(message);
           msg.setFlag("old");
