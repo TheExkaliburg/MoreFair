@@ -33,7 +33,7 @@ export const useModerationStore = defineStore("moderation", () => {
 
   const isInitialized = ref<boolean>(false);
   const state = reactive({
-    chatLog: <ChatLogMessage[]>[],
+    chatLog: <Message[]>[],
     searchResults: "",
     altSearchResults: "",
   });
@@ -53,7 +53,7 @@ export const useModerationStore = defineStore("moderation", () => {
         data.forEach((message) => {
           const msg = new ChatLogMessage(message);
           msg.setFlag("old");
-          state.chatLog.unshift(msg);
+          addMessage(msg);
         });
 
         stomp.addCallback(
@@ -74,7 +74,7 @@ export const useModerationStore = defineStore("moderation", () => {
   }
 
   function addMessage(body: ChatLogMessageData) {
-    const msg = new ChatLogMessage(body);
+    const msg = new Message(body);
     if (state.chatLog.length > 50) {
       state.chatLog.shift();
     }
@@ -87,7 +87,7 @@ export const useModerationStore = defineStore("moderation", () => {
       }
     });
 
-    if (isMentioned) {
+    if (isMentioned && !msg.hasFlag("old")) {
       useSound(SOUNDS.MENTION).play();
     }
   }

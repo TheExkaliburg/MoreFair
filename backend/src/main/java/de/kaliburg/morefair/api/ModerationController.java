@@ -60,7 +60,9 @@ public class ModerationController {
       if (account == null || !account.isMod()) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       } else {
-        List<MessageEntity> messages = messageService.findNewestMessagesByChatType(ChatType.LADDER);
+        List<MessageEntity> messages =
+            messageService.findNewestMessagesByChatType(List.of(ChatType.LADDER, ChatType.GLOBAL,
+                ChatType.SYSTEM, ChatType.MOD));
         return new ResponseEntity<>(new ModChatDto(messages, config), HttpStatus.OK);
       }
     } catch (Exception e) {
