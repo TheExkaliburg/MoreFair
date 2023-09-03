@@ -8,7 +8,7 @@
       :key="m"
       :index="i"
       :message="m"
-      class="py-1"
+      class="py-0.5"
     />
   </div>
 </template>

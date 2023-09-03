@@ -8,7 +8,7 @@
         'from-violet-600': message.chatType === ChatType.MOD,
       }"
     >
-      <div class="rounded-tl bg-background p-1">
+      <div class="rounded-tl bg-background pl-1 pt-0.5">
         <div class="flex flex-row text-sm justify-between pr-3">
           <span class="text-text-light truncate basis-5/8">
             <span class="cursor-pointer" @click="mention">
