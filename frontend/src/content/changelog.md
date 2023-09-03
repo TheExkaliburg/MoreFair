@@ -4,6 +4,30 @@ description: 'A list of all changes made to the game'
 
 # Changelog
 
+## 2.4.0 [MINOR]: Global Chat and Channels
+
+### Features:
+
+- The Chat is broken down in Channels now
+- These Channels are currently GLOBAL, LADDER, SYSTEM, MOD
+    - GLOBAL is a single default chat for everyone, since some ladder-chats are rather dead
+    - LADDER is what you know from before, 1 Chat for each Ladder, but you can only participate in the Ladder you are
+      currently climbing
+    - SYSTEM messages are announcements, like the Messages from Chad
+    - MOD is a channel where mods can highlight their messages for moderation purposes
+- you can toggle the LADDER Chat regarding whether you want to see local messages
+
+### Improvements:
+
+- Suggestions are now based of L1 accounts
+- Messages that are not from global chat get highlighted
+- Vinegar eta is back thanks to Raldec
+
+<br><br><br><br><br><br><br>
+
+<details>
+<summary>Expand for the 2.3.x changelog</summary>
+
 ## 2.3.3 [PATCH]: Scroll Improvements and Iframes
 
 ### Features:
@@ -22,11 +46,6 @@ description: 'A list of all changes made to the game'
 ### Hotfixes:
 
 - Fixing the submit button in the signup form to not work
-
-<br><br><br><br><br><br><br>
-
-<details>
-<summary>Expand for the 2.3.x changelog</summary>
 
 ## 2.3.2 [PATCH]: Show all Ranker option
 
