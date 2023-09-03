@@ -43,7 +43,8 @@
               }}</a
             >
             <input
-              :class="{ invisible: ignorableChatTypes.includes(type) }"
+              :class="{ invisible: !ignorableChatTypes.includes(type) }"
+              :disabled="!ignorableChatTypes.includes(type)"
               type="checkbox"
               :checked="!chatStore.state.ignoredChatTypes.has(type)"
               @click.stop
