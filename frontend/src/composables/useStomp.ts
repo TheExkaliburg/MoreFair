@@ -59,7 +59,7 @@ const callbacks: StompCallbacks = {
 function addCallback<T>(
   event: StompCallback<T>[],
   identifier: string,
-  callback: (body: T) => void
+  callback: (body: T) => void,
 ) {
   const eventCallback = event.find((e) => e.identifier === identifier);
   if (eventCallback === undefined) {
@@ -131,6 +131,11 @@ client.onConnect = (_) => {
     callbacks.onChatEvent.forEach(({ callback }) => callback(body));
   });
 
+  client.subscribe("/topic/chat/events/mod", (message) => {
+    const body: OnChatEventBody = JSON.parse(message.body);
+    callbacks.onChatEvent.forEach(({ callback }) => callback(body));
+  });
+
   if (getActivePinia() === undefined) {
     setActivePinia(createPinia());
   }
@@ -154,7 +159,7 @@ function connectPrivateChannel(uuid: string) {
     (message) => {
       const body: OnLadderEventBody = JSON.parse(message.body);
       callbacks.onLadderEvent.forEach(({ callback }) => callback(body));
-    }
+    },
   );
 
   subscribedChannel.ladderChat = client.subscribe(
@@ -162,7 +167,7 @@ function connectPrivateChannel(uuid: string) {
     (message) => {
       const body: OnChatEventBody = JSON.parse(message.body);
       callbacks.onChatEvent.forEach(({ callback }) => callback(body));
-    }
+    },
   );
 
   client.subscribe(`/private/${uuid}/ladder/events`, (message) => {
@@ -264,14 +269,14 @@ const wsApi = (client: Client) => {
           (message) => {
             const body: OnChatEventBody = JSON.parse(message.body);
             callbacks.onChatEvent.forEach(({ callback }) => callback(body));
-          }
+          },
         );
       },
       sendMessage: (
         message: string,
         metadata: MentionMeta[],
         chatType: ChatType,
-        chatNumber?: number
+        chatNumber?: number,
       ) => {
         let destination = `/app/chat/${chatType.toLowerCase()}`;
         if (chatNumber !== undefined) {
@@ -297,7 +302,7 @@ const wsApi = (client: Client) => {
           (message) => {
             const body: OnLadderEventBody = JSON.parse(message.body);
             callbacks.onLadderEvent.forEach(({ callback }) => callback(body));
-          }
+          },
         );
       },
       buyBias: (e: Event) => {

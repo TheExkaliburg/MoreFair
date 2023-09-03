@@ -1,10 +1,11 @@
 <template>
   <div ref="el" class="flex flex-col w-full">
     <div
-      class="rounded-tl pl-1px pt-1px bg-gradient-to-br to-75%"
+      class="rounded-tl bg-gradient-to-br to-75% pl-px pt-px"
       :class="{
         'from-teal-600': message.chatType === ChatType.LADDER,
         'from-orange-700': message.chatType === ChatType.SYSTEM,
+        'from-violet-600': message.chatType === ChatType.MOD,
       }"
     >
       <div class="rounded-tl bg-background p-1">

@@ -235,3 +235,5 @@ chat:
     identifier: S
   LADDER:
     identifier: L
+  MOD:
+    identifier: M

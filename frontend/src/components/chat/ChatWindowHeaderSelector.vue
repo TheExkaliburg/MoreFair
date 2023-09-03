@@ -54,7 +54,13 @@ import FairButton from "~/components/interactables/FairButton.vue";
 import { ChatType, useChatStore } from "~/store/chat";
 import { useAccountStore } from "~/store/account";
 
-const selectableChatTypes = ref<ChatType[]>([ChatType.GLOBAL, ChatType.LADDER]);
+const selectableChatTypes = computed<ChatType[]>(() => {
+  const result = [ChatType.GLOBAL, ChatType.LADDER];
+  if (useAccountStore().getters.isMod) {
+    result.push(ChatType.MOD);
+  }
+  return result;
+});
 const ignorableChatTypes = ref<ChatType[]>([ChatType.LADDER]);
 
 if (useAccountStore().getters.isMod) {
