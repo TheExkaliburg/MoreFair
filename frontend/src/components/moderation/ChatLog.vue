@@ -4,7 +4,7 @@
   >
     <div class="h-4 w-full lg:hidden">&nbsp;</div>
     <ChatWindowContentMessage
-      v-for="(m, i) in moderationStore.state.chatLog"
+      v-for="(m, i) in moderationStore.getters.allMessages"
       :key="m"
       :index="i"
       :message="m"

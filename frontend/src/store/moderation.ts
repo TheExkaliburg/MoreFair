@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { computed, reactive } from "vue";
 import { useAPI } from "~/composables/useAPI";
 import { useStomp } from "~/composables/useStomp";
 import { useToasts } from "~/composables/useToasts";
@@ -26,18 +27,34 @@ export class ChatLogMessage extends Message implements ChatLogMessageData {
   }
 }
 
+export type ModerationState = {
+  chatLog: Message[];
+  searchResults: string;
+  altSearchResults: string;
+};
+
 export const useModerationStore = defineStore("moderation", () => {
   const api = useAPI();
   const stomp = useStomp();
   const accountStore = useAccountStore();
 
   const isInitialized = ref<boolean>(false);
-  const state = reactive({
+  const state = reactive<ModerationState>({
     chatLog: <Message[]>[],
     searchResults: "",
     altSearchResults: "",
   });
-  const getters = reactive({});
+  const getters = reactive({
+    allMessages: computed<Message[]>(() => {
+      const result = [] as Message[];
+      result.push(...(state.chatLog as Message[]));
+      result.sort((a, b) => b.timestamp - a.timestamp);
+      result.length = Math.min(result.length, 100);
+      result.reverse();
+
+      return result;
+    }),
+  });
 
   async function init() {
     if (isInitialized.value) return Promise.resolve();
