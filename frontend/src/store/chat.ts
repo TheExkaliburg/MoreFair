@@ -155,7 +155,7 @@ export const useChatStore = defineStore("chat", () => {
       return meta.id === accountStore.state.accountId;
     });
 
-    if (isMentioned) {
+    if (isMentioned && !message.hasFlag("old")) {
       useSound(SOUNDS.MENTION).play();
     }
   }
