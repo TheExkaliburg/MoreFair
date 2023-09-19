@@ -147,10 +147,27 @@ export const useChatStore = defineStore("chat", () => {
     getChat(ChatType.LADDER, newNumber);
   }
 
+  function ignorable(msg: Message): boolean {
+    return (
+      msg.chatType !== ChatType.MOD &&
+      msg.chatType !== ChatType.SYSTEM &&
+      msg.accountId !== useAccountStore().state.accountId
+    );
+  }
+
   function addMessage(body: OnChatEventBody): void {
     const message = new Message(body);
     const messages = state.messages.get(message.chatType);
     if (messages === undefined) {
+      return;
+    }
+
+    if (
+      ignorable(message) &&
+      useOptionsStore().state.chat.ignoredPlayers.value.includes(
+        message.accountId.toString(),
+      )
+    ) {
       return;
     }
 
