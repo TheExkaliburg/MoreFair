@@ -165,7 +165,7 @@ export const useChatStore = defineStore("chat", () => {
     if (
       ignorable(message) &&
       useOptionsStore().state.chat.ignoredPlayers.value.includes(
-        message.accountId.toString(),
+        message.accountId.toString()
       )
     ) {
       return;
