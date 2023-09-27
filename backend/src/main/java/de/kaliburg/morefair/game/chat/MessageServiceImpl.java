@@ -12,6 +12,8 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
@@ -141,7 +143,7 @@ public class MessageServiceImpl extends AbstractCacheableService implements Mess
         if (chatMessages.stream().anyMatch(m -> m.getId().equals(result.getId()))) {
           //Replace old message with new one
           chatMessages = chatMessages.stream()
-              .map(m -> m.getId().equals(result.getId()) ? result : m).toList();
+              .map(m -> m.getId().equals(result.getId()) ? result : m).collect(Collectors.toList());
         } else {
           //Add new message to cache and delete last one if over limit
           chatMessages.add(0, result);
