@@ -32,6 +32,12 @@
         :option="entry.value"
         @update="entry.value.set($event)"
       />
+      <OptionsEditableIgnore
+        v-else-if="entry.value instanceof EditableIgnoreOption"
+        :label="entry.key"
+        :option="entry.value"
+        @update="entry.value.set($event)"
+      />
       <OptionsEditableThemeURL
         v-else-if="entry.value instanceof EditableThemeURLOption"
         :label="entry.key"
@@ -50,6 +56,7 @@ import OptionsRange from "../../components/options/OptionsRange.vue";
 import {
   BooleanOption,
   EditableMentionsOption,
+  EditableIgnoreOption,
   EditableThemeURLOption,
   EnumOption,
   IntegerOption,
@@ -57,6 +64,7 @@ import {
 } from "~/store/entities/option";
 import { useLang } from "~/composables/useLang";
 import OptionsEditableMentions from "~/components/options/OptionsEditableMentions.vue";
+import OptionsEditableIgnore from "~/components/options/OptionsEditableIgnore.vue";
 import OptionsEditableThemeURL from "~/components/options/OptionsEditableThemeURL.vue";
 import OptionsInteger from "~/components/options/OptionsInteger.vue";
 

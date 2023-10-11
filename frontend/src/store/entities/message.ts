@@ -1,6 +1,5 @@
 import { ChatType } from "~/store/chat";
 import { useLang } from "~/composables/useLang";
-import { useAccountStore } from "~/store/account";
 
 export enum MessagePartType {
   plain,
@@ -50,6 +49,7 @@ export type MessageData = {
   timestamp: number;
   tag: string;
   assholePoints: number;
+  ladderNumber: number;
   isMod: boolean;
   chatType: ChatType;
 };
@@ -69,6 +69,7 @@ export class Message implements MessageData {
   accountId = 0;
   username = "";
   message = "";
+  ladderNumber = 0;
   metadata = "[]";
   timestamp = 0;
   tag = "";
@@ -114,7 +115,7 @@ export class Message implements MessageData {
     const lang = useLang("chat");
     let result = lang(this.chatType.toUpperCase() + ".identifier");
     if (this.chatType === ChatType.LADDER) {
-      result += useAccountStore().state.highestCurrentLadder;
+      result += this.ladderNumber;
     }
     return result;
   }

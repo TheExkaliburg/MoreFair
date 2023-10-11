@@ -74,6 +74,8 @@ export class EditableStringListOption extends Option<string[]> {}
 
 export class EditableMentionsOption extends EditableStringListOption {}
 
+export class EditableIgnoreOption extends EditableStringListOption {}
+
 export class EditableThemeURLOption extends EditableStringListOption {}
 
 export const ObjectFunctions = ["callback", "isActive"];

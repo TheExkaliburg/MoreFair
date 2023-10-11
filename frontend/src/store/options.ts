@@ -3,6 +3,7 @@ import axios from "axios";
 import {
   BooleanOption,
   EditableMentionsOption,
+  EditableIgnoreOption,
   EditableThemeURLOption,
   EnumOption,
   IntegerOption,
@@ -54,6 +55,7 @@ const defaultValues = {
   }),
   chat: new OptionsGroup({
     subscribedMentions: new EditableMentionsOption(["here"]),
+    ignoredPlayers: new EditableIgnoreOption([]),
   }),
   sound: new OptionsGroup({
     playSoundOnPromotion: new BooleanOption(false).setCallback((value) => {

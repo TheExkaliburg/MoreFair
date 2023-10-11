@@ -22,6 +22,7 @@ public class MessageDto {
   private final String metadata;
   private final Boolean isMod;
   private final ChatType chatType;
+  private final Integer ladderNumber;
 
   public MessageDto(MessageEntity message, FairConfig config) {
     this.tag = config.getAssholeTag(message.getAccount().getAssholeCount());
@@ -33,5 +34,6 @@ public class MessageDto {
     this.metadata = message.getMetadata();
     this.isMod = message.getAccount().isMod();
     this.chatType = message.getChat().getType();
+    this.ladderNumber = message.getChat().getNumber();
   }
 }

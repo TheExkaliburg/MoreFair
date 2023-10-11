@@ -68,6 +68,7 @@ options:
   enableSpectateAssholeLadder: Enable spectating asshole ladder
   hideHelpText: Hide help text
   subscribedMentions: Subscribed mentions
+  ignoredPlayers: Ignored rankers (by ranker id)
   playSoundOnMention: Play sound on mention
   playSoundOnGotFirst: Play sound on reaching first
   playSoundOnPromotion: Play sound on promotion

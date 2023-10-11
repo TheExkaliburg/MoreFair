@@ -129,6 +129,7 @@ public class MessageServiceImpl extends AbstractCacheableService implements Mess
         .isMod(message.getAccount().isMod())
         .timestamp(message.getCreatedOn().withOffsetSameInstant(ZoneOffset.UTC).toEpochSecond())
         .chatType(message.getChat().getType())
+        .ladderNumber(message.getChat().getNumber())
         .build();
   }
 
