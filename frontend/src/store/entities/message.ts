@@ -69,6 +69,7 @@ export class Message implements MessageData {
   accountId = 0;
   username = "";
   message = "";
+  ladderNumber = 0;
   metadata = "[]";
   timestamp = 0;
   tag = "";

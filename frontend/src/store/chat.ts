@@ -165,7 +165,7 @@ export const useChatStore = defineStore("chat", () => {
     if (
       ignorable(message) &&
       useOptionsStore().state.chat.ignoredPlayers.value.includes(
-        message.accountId.toString()
+        message.accountId.toString(),
       )
     ) {
       return;
@@ -195,6 +195,7 @@ export const useChatStore = defineStore("chat", () => {
     addMessage({
       accountId: 1,
       username: "Chad",
+      ladderNumber: 0,
       message,
       metadata,
       timestamp: Math.floor(Date.now() / 1000),
