@@ -153,7 +153,7 @@ public class LadderTypeBuilder {
       ladderSizeTypeWeights.put(LadderType.GIGANTIC, 0.f);
     }
 
-    this.roundTypes.stream().sorted(new RoundTypeComparator()).forEach(this::handleRoundTypes);
+    this.roundTypes.stream().sorted(new RoundType.Comparator()).forEach(this::handleRoundTypes);
     this.previousLadderType.stream().sorted(new LadderTypeComparator())
         .forEach(this::handlePreviousLadderType);
 

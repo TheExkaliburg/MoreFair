@@ -67,7 +67,7 @@ public class RoundTypeBuilder {
     int iterations = 0;
     do {
       roundTypes = EnumSet.noneOf(RoundType.class);
-      roundTypes.stream().sorted(new RoundTypeComparator()).forEach(this::handlePreviousRoundType);
+      roundTypes.stream().sorted(new RoundType.Comparator()).forEach(this::handlePreviousRoundType);
       roundTypes.add(getRandomLadderType(roundSpeedTypeWeights, "Speed"));
       roundTypes.add(getRandomLadderType(roundAutoTypeWeights, "Auto"));
       roundTypes.add(getRandomLadderType(roundChaosTypeWeights, "Chaos"));
