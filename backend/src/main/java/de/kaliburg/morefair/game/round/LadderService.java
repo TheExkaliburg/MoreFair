@@ -19,24 +19,9 @@ import de.kaliburg.morefair.events.types.LadderEventTypes;
 import de.kaliburg.morefair.events.types.RoundEventTypes;
 import de.kaliburg.morefair.game.GameResetEvent;
 import de.kaliburg.morefair.game.UpgradeUtils;
-import de.kaliburg.morefair.game.chat.ChatEntity;
-import de.kaliburg.morefair.game.chat.ChatService;
-import de.kaliburg.morefair.game.chat.ChatServiceImpl;
-import de.kaliburg.morefair.game.chat.ChatType;
-import de.kaliburg.morefair.game.chat.MessageService;
+import de.kaliburg.morefair.game.chat.*;
 import de.kaliburg.morefair.statistics.StatisticsService;
 import de.kaliburg.morefair.utils.FormattingUtils;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.Semaphore;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -47,6 +32,12 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigInteger;
+import java.util.*;
+import java.util.concurrent.Semaphore;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * The LadderService that setups and manages the LadderEntities contained in a RoundEntity. This
@@ -416,8 +407,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   boolean buyBias(Event<LadderEventTypes> event, LadderEntity ladder) {
     try {
       RankerEntity ranker = findActiveRankerOfAccountOnLadder(event.getAccountId(), ladder);
-      BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getNumber(), ranker.getBias(),
-          ladder.getTypes());
+      BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getScaling(), ranker.getBias(), ladder.getTypes());
       if (ranker.getPoints().compareTo(cost) >= 0) {
         statisticsService.recordBias(ranker, ladder, currentRound);
         ranker.setPoints(BigInteger.ZERO);
@@ -443,7 +433,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   boolean buyMulti(Event<LadderEventTypes> event, LadderEntity ladder) {
     try {
       RankerEntity ranker = findActiveRankerOfAccountOnLadder(event.getAccountId(), ladder);
-      BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getNumber(), ranker.getMultiplier(),
+      BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getScaling(), ranker.getMultiplier(),
           ladder.getTypes());
       if (ranker.getPower().compareTo(cost) >= 0) {
         statisticsService.recordMulti(ranker, ladder, currentRound);
@@ -476,7 +466,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         return false;
       }
 
-      BigInteger cost = upgradeUtils.buyAutoPromoteCost(ranker.getRank(), ladder.getNumber());
+      BigInteger cost = upgradeUtils.buyAutoPromoteCost(ranker.getRank(), ladder.getScaling());
 
       if (ladder.getTypes().contains(LadderType.FREE_AUTO)) {
         ranker.setAutoPromote(true);
@@ -514,8 +504,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
       if (ladderUtils.canPromote(ladder, ranker)) {
         statisticsService.recordPromote(ranker, ladder, currentRound);
         AccountEntity account = accountService.find(ranker.getAccount());
-        log.info("[L{}] Promotion for {} (#{})", ladder.getNumber(), account.getDisplayName(),
-            account.getId());
+        log.info("[L{}] Promotion for {} (#{})", ladder.getNumber(), account.getDisplayName(), account.getId());
         ranker.setGrowing(false);
 
         RankerEntity newRanker = createRanker(account, ladder.getNumber() + 1);
@@ -568,8 +557,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
           newRanker.setGrapes(newRanker.getGrapes().add(autoPromoteCost.divide(BigInteger.TEN)));
         }
 
-        wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
-            ladder.getNumber(), event);
+        wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION, ladder.getNumber(), event);
         wsUtils.convertAndSendToUser(account.getUuid(),
             AccountController.PRIVATE_EVENTS_DESTINATION, new Event<>(
                 AccountEventTypes.INCREASE_HIGHEST_LADDER, account.getId(), newLadder.getNumber()

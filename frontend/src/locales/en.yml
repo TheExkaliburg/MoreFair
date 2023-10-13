@@ -229,6 +229,10 @@ modifier:
     title: Asshole
     description: The final ladder - promotion from here will grant entry to Chad's ritual.
     identifier: AH
+  REVERSE_SCALING:
+    title: Reverse Scaling
+    description: Cost and Requirements behave on the first ladder as if you are on the last
+    identifier: REVSC
 chat:
   GLOBAL:
     identifier: G

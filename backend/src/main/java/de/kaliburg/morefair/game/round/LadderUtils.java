@@ -66,7 +66,7 @@ public class LadderUtils {
   }
 
   public Integer getRequiredRankerCountToUnlock(LadderEntity ladder) {
-    return Math.max(config.getBaseAssholeLadder(), ladder.getNumber());
+    return Math.max(config.getBaseAssholeLadder(), ladder.getScaling());
   }
 
   /**
@@ -130,7 +130,7 @@ public class LadderUtils {
 
     return target.getRank() == 1 && !ranker.getUuid().equals(target.getUuid()) && target.isGrowing()
         && !target.isAutoPromote()
-        && ranker.getVinegar().compareTo(upgradeUtils.throwVinegarCost(ladder.getNumber())) >= 0;
+        && ranker.getVinegar().compareTo(upgradeUtils.throwVinegarCost(ladder.getScaling())) >= 0;
   }
 
 
@@ -150,7 +150,7 @@ public class LadderUtils {
    */
   public boolean canBuyAutoPromote(LadderEntity ladder, RankerEntity ranker, RoundEntity round) {
     return !ranker.isAutoPromote() && ranker.getGrapes()
-        .compareTo(upgradeUtils.buyAutoPromoteCost(ranker.getRank(), ladder.getNumber())) >= 0
+        .compareTo(upgradeUtils.buyAutoPromoteCost(ranker.getRank(), ladder.getScaling())) >= 0
         && ladder.getNumber() >= config.getAutoPromoteLadder()
         && ladder.getNumber() < round.getAssholeLadderNumber()
         && !ladder.getTypes().contains(LadderType.NO_AUTO);

@@ -154,7 +154,7 @@ public class RoundEntity {
   }
 
   public Integer getModifiedBaseAssholeLadder() {
-    int result = getBaseAssholeLadder();
+    int result = baseAssholeLadder;
     if (types.contains(RoundType.FAST)) {
       result = getBaseAssholeLadder() / 2;
     } else if (types.contains(RoundType.SLOW)) {

@@ -14,13 +14,13 @@ const getMinimumPointsForPromote = computed<Decimal>(() => {
 const getMinimumPeopleForPromote = computed<number>(() => {
   return Math.max(
     round.state.settings.minimumPeopleForPromote,
-    ladder.state.number,
+    ladder.state.scaling,
   );
 });
 
 const getVinegarThrowCost = computed<Decimal>(() => {
   return round.state.settings.baseVinegarNeededToThrow.mul(
-    new Decimal(ladder.state.number),
+    new Decimal(ladder.state.scaling),
   );
 });
 
@@ -156,7 +156,7 @@ function getNextUpgradeCost(currentUpgrade: number): Decimal {
     flatMulti = 1.5;
   }
 
-  let ladderDec = new Decimal(ladder.state.number);
+  let ladderDec = new Decimal(ladder.state.scaling);
   ladderDec = ladderDec.mul(ladderMulti).add(new Decimal(1));
   const result = ladderDec.pow(currentUpgrade + 1).mul(flatMulti);
   return result.round().max(new Decimal(1));

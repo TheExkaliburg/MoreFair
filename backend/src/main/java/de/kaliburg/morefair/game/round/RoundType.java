@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public enum RoundType {
-  DEFAULT, FAST, SLOW, AUTO, CHAOS(1), SPECIAL_100;
+  DEFAULT, FAST, SLOW, AUTO, CHAOS(1), SPECIAL_100(-1), REVERSE_SCALING;
 
   private int priority = 0;
 

@@ -164,9 +164,8 @@ public class LadderTypeBuilder {
       ladderAutoTypeWeights.put(LadderType.NO_AUTO, 100.f);
     }
 
-    if (ladderNumber >= assholeLadderNumber) {
-      ladderAutoTypeWeights.put(LadderType.NO_AUTO,
-          Math.max(1.f, ladderAutoTypeWeights.get(LadderType.NO_AUTO)));
+    if (ladderNumber.equals(assholeLadderNumber)) {
+      ladderAutoTypeWeights.put(LadderType.NO_AUTO, Math.max(1.f, ladderAutoTypeWeights.get(LadderType.NO_AUTO)));
       ladderAutoTypeWeights.put(LadderType.FREE_AUTO, 0.f);
       ladderAutoTypeWeights.put(LadderType.DEFAULT, 0.f);
       ladderTypes.add(LadderType.ASSHOLE);

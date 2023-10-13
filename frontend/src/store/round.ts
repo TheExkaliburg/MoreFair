@@ -15,6 +15,7 @@ export enum RoundType {
   SLOW = "SLOW",
   AUTO = "AUTO",
   CHAOS = "CHAOS",
+  REVERSE_SCALING = "REVERSE_SCALING",
 }
 
 export enum RoundEventType {

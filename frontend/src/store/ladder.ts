@@ -44,6 +44,7 @@ export enum LadderEventType {
 export type LadderData = {
   rankers: RankerData[];
   number: number;
+  scaling: number;
   types: LadderType[];
   basePointsToPromote: string;
 };
@@ -51,6 +52,7 @@ export type LadderData = {
 export type LadderState = {
   rankers: Ranker[];
   number: number;
+  scaling: number;
   types: Set<LadderType>;
   basePointsToPromote: Decimal;
 };
@@ -67,6 +69,7 @@ export const useLadderStore = defineStore("ladder", () => {
   const state = reactive<LadderState>({
     rankers: <Ranker[]>[],
     number: 1,
+    scaling: 1,
     types: new Set<LadderType>([LadderType.DEFAULT]),
     basePointsToPromote: new Decimal(0),
   });
@@ -146,6 +149,7 @@ export const useLadderStore = defineStore("ladder", () => {
           state.types.add(s);
         });
         state.number = data.number;
+        state.scaling = data.scaling;
         state.basePointsToPromote = new Decimal(data.basePointsToPromote);
 
         stomp.addCallback(
