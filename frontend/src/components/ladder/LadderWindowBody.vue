@@ -243,9 +243,9 @@ const canPromote = computed<boolean>(() => {
   );
 });
 const promoteLabel = computed<string>(() => {
-  return ladderStore.state.number < roundStore.state.assholeLadder
-    ? lang("promote")
-    : lang("asshole");
+  if (ladderStore.state.types.has(LadderType.END)) return lang("wait");
+  if (ladderStore.state.types.has(LadderType.ASSHOLE)) return lang("asshole");
+  return lang("promote");
 });
 
 const pressedBiasRecently = ref<boolean>(false);

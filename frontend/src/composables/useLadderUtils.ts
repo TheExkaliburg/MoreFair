@@ -45,6 +45,8 @@ const getYourPointsNeededToPromote = computed<Decimal>(() => {
 });
 
 const isLadderUnlocked = computed<boolean>(() => {
+  if (ladder.state.types.has(LadderType.END)) return false;
+
   return ladder.state.rankers.length >= getMinimumPeopleForPromote.value;
 });
 
@@ -56,7 +58,8 @@ const isLadderPromotable = computed<boolean>(() => {
 });
 
 const canPromote = computed<boolean>(() => {
-  if (ladder.getters.yourRanker === undefined) return false;
+  if (ladder.getters.yourRanker === undefined || !isLadderPromotable.value)
+    return false;
   if (
     ladder.getters.yourRanker.points.cmp(getYourPointsNeededToPromote.value) < 0
   ) {

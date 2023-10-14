@@ -27,6 +27,7 @@ export enum LadderType {
   ASSHOLE = "ASSHOLE",
   CHEAP = "CHEAP",
   EXPENSIVE = "EXPENSIVE",
+  END = "END",
 }
 
 export enum LadderEventType {

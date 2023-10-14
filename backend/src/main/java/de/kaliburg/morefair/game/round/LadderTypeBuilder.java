@@ -232,6 +232,10 @@ public class LadderTypeBuilder {
   private Set<LadderType> specialRoundBuilder() {
     Set<LadderType> result = EnumSet.noneOf(LadderType.class);
 
+    if(ladderNumber > 100) {
+      return EnumSet.of(LadderType.END);
+    }
+
     if(ladderNumber == 1 || ladderNumber == 50 || ladderNumber == 100) {
       result.add(LadderType.NO_AUTO);
     }

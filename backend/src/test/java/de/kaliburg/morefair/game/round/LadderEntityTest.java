@@ -77,6 +77,7 @@ public class LadderEntityTest {
         assertThat(new LadderEntity(80, round).getTypes()).containsExactlyInAnyOrder(LadderType.GIGANTIC, LadderType.CHEAP);
         assertThat(new LadderEntity(50, round).getTypes()).containsExactlyInAnyOrder(LadderType.GIGANTIC, LadderType.CHEAP, LadderType.NO_AUTO);
         assertThat(new LadderEntity(100, round).getTypes()).containsExactlyInAnyOrder(LadderType.GIGANTIC, LadderType.CHEAP, LadderType.NO_AUTO, LadderType.ASSHOLE);
+        assertThat(new LadderEntity(101, round).getTypes()).containsExactlyInAnyOrder(LadderType.END);
     }
 
 

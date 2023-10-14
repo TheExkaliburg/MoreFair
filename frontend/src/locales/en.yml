@@ -237,6 +237,10 @@ modifier:
     title: "100"
     description: ???
     identifier: "100"
+  END:
+    title: The End
+    description: There is no more else to go.
+    identifier: END
 chat:
   GLOBAL:
     identifier: G

@@ -102,6 +102,7 @@ public class LadderUtils {
   }
 
   public boolean isLadderUnlocked(@NonNull LadderEntity ladder) {
+    if(ladder.getTypes().contains(LadderType.END)) return false;
     return ladder.getRankers().size() >= getRequiredRankerCountToUnlock(ladder);
   }
 
