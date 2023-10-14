@@ -153,6 +153,10 @@ public class LadderTypeBuilder {
       return EnumSet.of(LadderType.DEFAULT);
     }
 
+    if (ladderNumber > assholeLadderNumber) {
+      return EnumSet.of(LadderType.END);
+    }
+
     if (ladderNumber > 25) {
       ladderSizeTypeWeights.put(LadderType.GIGANTIC, 0.f);
     }
@@ -161,19 +165,14 @@ public class LadderTypeBuilder {
     this.previousLadderType.stream().sorted(new LadderTypeComparator())
         .forEach(this::handlePreviousLadderType);
 
-    if (roundNumber == 100 && ladderNumber % 10 == 0) {
-      // make it no Auto for sure
-      ladderAutoTypeWeights.put(LadderType.DEFAULT, 0.f);
-      ladderAutoTypeWeights.put(LadderType.FREE_AUTO, 0.f);
-      ladderAutoTypeWeights.put(LadderType.NO_AUTO, 100.f);
-    }
-
     if (ladderNumber.equals(assholeLadderNumber)) {
       ladderAutoTypeWeights.put(LadderType.NO_AUTO, Math.max(1.f, ladderAutoTypeWeights.get(LadderType.NO_AUTO)));
       ladderAutoTypeWeights.put(LadderType.FREE_AUTO, 0.f);
       ladderAutoTypeWeights.put(LadderType.DEFAULT, 0.f);
       ladderTypes.add(LadderType.ASSHOLE);
     }
+
+
 
     ladderTypes.add(getRandomLadderType(ladderSizeTypeWeights, "Size"));
     ladderTypes.add(getRandomLadderType(ladderAutoTypeWeights, "Auto"));
