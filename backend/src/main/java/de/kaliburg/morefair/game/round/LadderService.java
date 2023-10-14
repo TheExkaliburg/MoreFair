@@ -22,6 +22,7 @@ import de.kaliburg.morefair.game.UpgradeUtils;
 import de.kaliburg.morefair.game.chat.*;
 import de.kaliburg.morefair.statistics.StatisticsService;
 import de.kaliburg.morefair.utils.FormattingUtils;
+import it.unibo.tuprolog.solve.stdlib.function.Round;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -532,8 +533,10 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
           assholeLadder.getRankers().forEach(r -> {
             if(!r.isGrowing()) {
-              r.getUnlocks().setPressedAssholeButton(true);
-              r.getAccount().getAchievements().setPressedAssholeButton(true);
+              AccountEntity a = r.getAccount();
+              a.getAchievements().setPressedAssholeButton(true);
+              RankerEntity highestRanker = findFirstActiveRankerOfAccountThisRound(a);
+              highestRanker.getUnlocks().setPressedAssholeButton(true);
             }
           });
 
@@ -585,7 +588,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         account = accountService.save(account);
 
         // Logic for the Asshole-Ladder
-        if (newRanker.getUnlocks().getPressedAssholeButton()) {
+        if (ladder.getTypes().contains(LadderType.ASSHOLE) && newRanker.getUnlocks().getPressedAssholeButton()) {
           JsonObject object1 = new JsonObject();
           object1.addProperty("u", account.getDisplayName());
           object1.addProperty("id", account.getId());
@@ -611,7 +614,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
           int assholeCount = newLadder.getRankers().size();
 
           // Is it time to reset the game
-          if (assholeCount >= neededAssholesForReset) {
+          if (assholeCount >= neededAssholesForReset || round.getTypes().contains(RoundType.SPECIAL_100)) {
             wsUtils.convertAndSendToTopic(RoundController.TOPIC_EVENTS_DESTINATION,
                 new Event<>(RoundEventTypes.RESET, account.getId()));
 
