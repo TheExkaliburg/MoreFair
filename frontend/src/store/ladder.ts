@@ -328,7 +328,7 @@ export const useLadderStore = defineStore("ladder", () => {
           break;
         case LadderEventType.UPDATE_TYPES:
           state.types.clear();
-          event.data.types.forEach((s: LadderType) => {
+          event.data.forEach((s: LadderType) => {
             state.types.add(s);
           });
           break;

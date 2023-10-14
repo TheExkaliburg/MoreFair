@@ -521,7 +521,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         if (autoLadder != null && !autoLadder.getTypes().contains(LadderType.FREE_AUTO)
             && !autoLadder.getTypes().contains(LadderType.NO_AUTO)) {
           autoLadder.getTypes().add(LadderType.FREE_AUTO);
-          Event<LadderEventTypes> e = new Event<>(LadderEventTypes.UPDATE_TYPES, autoLadder.getTypes());
+          Event<LadderEventTypes> e = new Event<>(LadderEventTypes.UPDATE_TYPES, account.getId(), autoLadder.getTypes());
           wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION, autoLadder.getNumber(), e);
         }
 
@@ -532,15 +532,16 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
           assholeLadder.getTypes().add(LadderType.ASSHOLE);
 
           assholeLadder.getRankers().forEach(r -> {
+            AccountEntity a = r.getAccount();
+            RankerEntity highestRanker = findFirstActiveRankerOfAccountThisRound(a);
             if(!r.isGrowing()) {
-              AccountEntity a = r.getAccount();
               a.getAchievements().setPressedAssholeButton(true);
-              RankerEntity highestRanker = findFirstActiveRankerOfAccountThisRound(a);
               highestRanker.getUnlocks().setPressedAssholeButton(true);
             }
+            highestRanker.getUnlocks().setReachedAssholeLadder(true);
           });
 
-          Event<LadderEventTypes> e = new Event<>(LadderEventTypes.UPDATE_TYPES, assholeLadder.getTypes());
+          Event<LadderEventTypes> e = new Event<>(LadderEventTypes.UPDATE_TYPES, account.getId(), assholeLadder.getTypes());
           wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION, assholeLadder.getNumber(), e);
         }
 
@@ -554,7 +555,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
           newRanker.getUnlocks().setReachedBaseAssholeLadder(true);
         }
         if (!newRanker.getUnlocks().getReachedAssholeLadder()
-            && newLadder.getNumber() >= currentRound.getAssholeLadderNumber()) {
+            && newLadder.getTypes().contains(LadderType.ASSHOLE)) {
           newRanker.getUnlocks().setReachedAssholeLadder(true);
         }
         if (!newRanker.getUnlocks().getPressedAssholeButton()

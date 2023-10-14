@@ -246,10 +246,6 @@ public class LadderTypeBuilder {
       result.add(LadderType.TINY);
     }
 
-    if(ladderNumber == 100) {
-      result.add(LadderType.ASSHOLE);
-    }
-
     return result;
   }
 }

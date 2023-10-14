@@ -31,6 +31,7 @@ components:
       ladder_short: L
       powerGain: Power-Gain
     buttons:
+      wait: Waiting...
       multi: Multi
       multi_short: M
       bias: Bias
