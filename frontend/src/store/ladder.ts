@@ -40,6 +40,7 @@ export enum LadderEventType {
   PROMOTE = "PROMOTE",
   JOIN = "JOIN",
   ADD_FREE_AUTO = "ADD_FREE_AUTO",
+  UPDATE_TYPES = "UPDATE_TYPES",
 }
 
 export type LadderData = {
@@ -324,6 +325,12 @@ export const useLadderStore = defineStore("ladder", () => {
             `Since other rankers breached another Ladder, everyone on this ladder got gifted a free auto promote! (No Refunds)`,
             { autoClose: 60 },
           );
+          break;
+        case LadderEventType.UPDATE_TYPES:
+          state.types.clear();
+          event.data.types.forEach((s: LadderType) => {
+            state.types.add(s);
+          });
           break;
         default:
           console.error("Unknown event type", event);

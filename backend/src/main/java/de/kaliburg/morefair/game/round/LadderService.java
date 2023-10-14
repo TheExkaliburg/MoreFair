@@ -484,8 +484,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         return true;
       }
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
 
     return false;
@@ -507,6 +506,8 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         log.info("[L{}] Promotion for {} (#{})", ladder.getNumber(), account.getDisplayName(), account.getId());
         ranker.setGrowing(false);
 
+        RoundEntity round = ladder.getRound();
+
         RankerEntity newRanker = createRanker(account, ladder.getNumber() + 1);
         newRanker.setVinegar(ranker.getVinegar());
         newRanker.setGrapes(ranker.getGrapes());
@@ -519,6 +520,25 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         if (autoLadder != null && !autoLadder.getTypes().contains(LadderType.FREE_AUTO)
             && !autoLadder.getTypes().contains(LadderType.NO_AUTO)) {
           autoLadder.getTypes().add(LadderType.FREE_AUTO);
+          Event<LadderEventTypes> e = new Event<>(LadderEventTypes.UPDATE_TYPES, autoLadder.getTypes());
+          wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION, autoLadder.getNumber(), e);
+        }
+
+        // Special_100 Logic
+        if (round.getTypes().contains(RoundType.SPECIAL_100) && newLadder.getTypes().contains(LadderType.END)) {
+          LadderEntity assholeLadder = findInCache(round.getModifiedBaseAssholeLadder());
+          assholeLadder.getTypes().remove(LadderType.DEFAULT);
+          assholeLadder.getTypes().add(LadderType.ASSHOLE);
+
+          assholeLadder.getRankers().forEach(r -> {
+            if(!r.isGrowing()) {
+              r.getUnlocks().setPressedAssholeButton(true);
+              r.getAccount().getAchievements().setPressedAssholeButton(true);
+            }
+          });
+
+          Event<LadderEventTypes> e = new Event<>(LadderEventTypes.UPDATE_TYPES, assholeLadder.getTypes());
+          wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION, assholeLadder.getNumber(), e);
         }
 
         // Unlocks
@@ -612,8 +632,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         return true;
       }
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
 
     return false;
@@ -674,8 +693,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         return true;
       }
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
 
     return false;

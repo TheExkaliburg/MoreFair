@@ -13,4 +13,5 @@ public enum LadderEventTypes {
   SOFT_RESET_POINTS,
   PROMOTE,
   JOIN,
+  UPDATE_TYPES,
 }
