@@ -14,6 +14,8 @@ import java.math.BigInteger;
 import java.util.EnumSet;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.*;
+
 @Slf4j
 @EnableLoggingPropertiesBeforeAll
 public class LadderEntityTest {
@@ -28,12 +30,12 @@ public class LadderEntityTest {
         round.setBaseAssholeLadder(10);
         round.setHighestAssholeCount(0);
 
-        Assertions.assertThat(new LadderEntity(1, round).getScaling()).isEqualTo(10);
-        Assertions.assertThat(new LadderEntity(3, round).getScaling()).isEqualTo(8);
-        Assertions.assertThat(new LadderEntity(5, round).getScaling()).isEqualTo(6);
-        Assertions.assertThat(new LadderEntity(7, round).getScaling()).isEqualTo(4);
-        Assertions.assertThat(new LadderEntity(10, round).getScaling()).isEqualTo(1);
-        Assertions.assertThat(new LadderEntity(100, round).getScaling()).isEqualTo(1);
+        assertThat(new LadderEntity(1, round).getScaling()).isEqualTo(10);
+        assertThat(new LadderEntity(3, round).getScaling()).isEqualTo(8);
+        assertThat(new LadderEntity(5, round).getScaling()).isEqualTo(6);
+        assertThat(new LadderEntity(7, round).getScaling()).isEqualTo(4);
+        assertThat(new LadderEntity(10, round).getScaling()).isEqualTo(1);
+        assertThat(new LadderEntity(100, round).getScaling()).isEqualTo(1);
     }
 
     public static Stream<Arguments> constructor_WithReverseScalingRound_ExpectingExpensiveVinegarCost() {
@@ -58,6 +60,42 @@ public class LadderEntityTest {
         out.setTypes(EnumSet.of(LadderType.DEFAULT));
 
         BigInteger vinegarCost = upgradeUtils.throwVinegarCost(out.getScaling());
-        Assertions.assertThat(vinegarCost).isEqualTo(expected);
+        assertThat(vinegarCost).isEqualTo(expected);
+    }
+
+    @Test
+    void constructor_WithRound100_ExpectingCorrectLadderTypes() {
+        FairConfig fairConfig = new FairConfig();
+        RoundEntity round = new RoundEntity(100, fairConfig);
+
+        assertThat(new LadderEntity(1, round).getTypes()).containsExactlyInAnyOrder(LadderType.NO_AUTO, LadderType.TINY);
+        assertThat(new LadderEntity(2, round).getTypes()).containsExactlyInAnyOrder(LadderType.TINY);
+        assertThat(new LadderEntity(53, round).getTypes()).containsExactlyInAnyOrder(LadderType.TINY);
+        assertThat(new LadderEntity(77, round).getTypes()).containsExactlyInAnyOrder(LadderType.TINY);
+        assertThat(new LadderEntity(10, round).getTypes()).containsExactlyInAnyOrder(LadderType.GIGANTIC, LadderType.CHEAP);
+        assertThat(new LadderEntity(30, round).getTypes()).containsExactlyInAnyOrder(LadderType.GIGANTIC, LadderType.CHEAP);
+        assertThat(new LadderEntity(80, round).getTypes()).containsExactlyInAnyOrder(LadderType.GIGANTIC, LadderType.CHEAP);
+        assertThat(new LadderEntity(50, round).getTypes()).containsExactlyInAnyOrder(LadderType.GIGANTIC, LadderType.CHEAP, LadderType.NO_AUTO);
+        assertThat(new LadderEntity(100, round).getTypes()).containsExactlyInAnyOrder(LadderType.GIGANTIC, LadderType.CHEAP, LadderType.NO_AUTO, LadderType.ASSHOLE);
+    }
+
+
+    @Test
+    void constructor_WithRound100_Expecting10PeopleRequirementEachLadder() {
+        FairConfig fairConfig = new FairConfig();
+        RoundEntity round = new RoundEntity(100, fairConfig);
+
+        UpgradeUtils upgradeUtils = new UpgradeUtils(fairConfig);
+        RoundUtils roundUtils = new RoundUtils(fairConfig);
+        LadderUtils ladderUtils = new LadderUtils(upgradeUtils, roundUtils, fairConfig);
+
+        assertThat(ladderUtils.getRequiredRankerCountToUnlock(new LadderEntity(1, round))).isEqualTo(10);
+        assertThat(ladderUtils.getRequiredRankerCountToUnlock(new LadderEntity(5, round))).isEqualTo(10);
+        assertThat(ladderUtils.getRequiredRankerCountToUnlock(new LadderEntity(10, round))).isEqualTo(10);
+        assertThat(ladderUtils.getRequiredRankerCountToUnlock(new LadderEntity(20, round))).isEqualTo(10);
+        assertThat(ladderUtils.getRequiredRankerCountToUnlock(new LadderEntity(34, round))).isEqualTo(10);
+        assertThat(ladderUtils.getRequiredRankerCountToUnlock(new LadderEntity(50, round))).isEqualTo(10);
+        assertThat(ladderUtils.getRequiredRankerCountToUnlock(new LadderEntity(76, round))).isEqualTo(10);
+        assertThat(ladderUtils.getRequiredRankerCountToUnlock(new LadderEntity(100, round))).isEqualTo(10);
     }
 }

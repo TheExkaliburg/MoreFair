@@ -145,6 +145,10 @@ public class LadderTypeBuilder {
   public Set<LadderType> build() {
     Set<LadderType> ladderTypes = EnumSet.noneOf(LadderType.class);
 
+    if(roundTypes.contains(RoundType.SPECIAL_100)) {
+      return specialRoundBuilder();
+    }
+
     if (ladderNumber == 1) {
       return EnumSet.of(LadderType.DEFAULT);
     }
@@ -223,5 +227,26 @@ public class LadderTypeBuilder {
           e);
     }
     return LadderType.DEFAULT;
+  }
+
+  private Set<LadderType> specialRoundBuilder() {
+    Set<LadderType> result = EnumSet.noneOf(LadderType.class);
+
+    if(ladderNumber == 1 || ladderNumber == 50 || ladderNumber == 100) {
+      result.add(LadderType.NO_AUTO);
+    }
+
+    if(ladderNumber % 10 == 0) {
+      result.add(LadderType.GIGANTIC);
+      result.add(LadderType.CHEAP);
+    } else {
+      result.add(LadderType.TINY);
+    }
+
+    if(ladderNumber == 100) {
+      result.add(LadderType.ASSHOLE);
+    }
+
+    return result;
   }
 }

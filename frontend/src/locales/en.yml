@@ -233,6 +233,10 @@ modifier:
     title: Reverse Scaling
     description: Cost and Requirements behave on the first ladder as if you are on the last
     identifier: REVSC
+  SPECIAL_100:
+    title: "100"
+    description: ???
+    identifier: "100"
 chat:
   GLOBAL:
     identifier: G

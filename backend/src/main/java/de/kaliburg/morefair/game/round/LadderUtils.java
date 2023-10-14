@@ -66,6 +66,10 @@ public class LadderUtils {
   }
 
   public Integer getRequiredRankerCountToUnlock(LadderEntity ladder) {
+    if(ladder.getRound().getTypes().contains(RoundType.SPECIAL_100)) {
+      return config.getBaseAssholeLadder();
+    }
+
     return Math.max(config.getBaseAssholeLadder(), ladder.getScaling());
   }
 

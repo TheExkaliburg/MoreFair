@@ -1,7 +1,7 @@
 import Decimal from "break_infinity.js";
 import { computed } from "vue";
 import { LadderType, useLadderStore } from "~/store/ladder";
-import { useRoundStore } from "~/store/round";
+import { RoundType, useRoundStore } from "~/store/round";
 import { Ranker } from "~/store/entities/ranker";
 
 let ladder: any;
@@ -12,6 +12,10 @@ const getMinimumPointsForPromote = computed<Decimal>(() => {
 });
 
 const getMinimumPeopleForPromote = computed<number>(() => {
+  if (round.state.types.has(RoundType.SPECIAL_100)) {
+    return round.state.settings.minimumPeopleForPromote;
+  }
+
   return Math.max(
     round.state.settings.minimumPeopleForPromote,
     ladder.state.scaling,
