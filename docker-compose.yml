@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   fairgame:
-    image: kaliburg/fairgame:latest
+    image: kaliburg/fairgame:spec
     environment:
       SPRING_PROFILE: ${PROFILE}
       POSTGRES_URL: jdbc:postgresql://postgres:5432/FairGame
