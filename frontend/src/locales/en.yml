@@ -232,7 +232,7 @@ modifier:
     identifier: AH
   REVERSE_SCALING:
     title: Reverse Scaling
-    description: Cost and Requirements behave on the first ladder as if you are on the last
+    description: Costs and promotion requirements start high, and decrease as the round progresses.
     identifier: REVSC
   SPECIAL_100:
     title: "100"
@@ -240,7 +240,7 @@ modifier:
     identifier: "100"
   END:
     title: The End
-    description: There is no more else to go.
+    description: There is nowhere else to go.
     identifier: END
 chat:
   GLOBAL:
