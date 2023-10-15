@@ -84,8 +84,10 @@ export const useUserSuggestion = () => {
         );
       } else {
         if (queryLower.length < 1) return [];
-        return list.filter((item) =>
-          item.displayName.toLowerCase().startsWith(queryLower),
+        return list.filter(
+          (item) =>
+            item.displayName.toLowerCase().startsWith(queryLower) &&
+            item.displayName !== "Mystery Guest",
         );
       }
     },

@@ -222,6 +222,11 @@ export const useChatStore = defineStore("chat", () => {
         message.metadata = JSON.stringify(metadata); */
       });
     });
+    state.suggestions.forEach((suggestion) => {
+      if (suggestion.accountId === accountId) {
+        suggestion.displayName = username;
+      }
+    });
   }
 
   return {
