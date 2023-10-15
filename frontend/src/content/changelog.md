@@ -4,17 +4,43 @@ description: 'A list of all changes made to the game'
 
 # Changelog
 
+## 2.5.0 [PATCH]: 
+
+### Features:
+
+- An ignore list has been added to the Settings menu, above the theme selector.
+  - Adding a player ID (the subscript number following their name) to the list suppresses all messages from that player
+    in GLOBAL and LADDER chats.
+  - A page reload is required to clear existing messages from ignored players.
+  - Messages in the SYSTEM and MOD chats cannot be ignored.
+- Adding the END Ladder Type after the AH Ladder as preparation for an updated S3 Logic.
+- ?̷̩̒?̶̰̎?̴̜́
+
+### Improvements:
+
+- The combined mod chat view now shows the correct ladder number for messages originating from LADDER chats.
+- When filtering by Name, it doesn't show all the Mystery Guests in the suggestion anymore.
+
+### Bugfixes:
+
+- Renaming now also changes the name displayed in the suggestions
+
+<br><br><br><br><br><br><br>
+
+<details>
+<summary>Expand for the 2.4.x changelog</summary>
+
 ## 2.4.0 [MINOR]: Global Chat and Channels
 
 ### Features:
 
 - The Chat is broken down in Channels now
 - These Channels are currently GLOBAL, LADDER, SYSTEM, MOD
-    - GLOBAL is a single default chat for everyone, since some ladder-chats are rather dead
-    - LADDER is what you know from before, 1 Chat for each Ladder, but you can only participate in the Ladder you are
-      currently climbing
-    - SYSTEM messages are announcements, like the Messages from Chad
-    - MOD is a channel where mods can highlight their messages for moderation purposes
+  - GLOBAL is a single default chat for everyone, since some ladder-chats are rather dead
+  - LADDER is what you know from before, 1 Chat for each Ladder, but you can only participate in the Ladder you are
+    currently climbing
+  - SYSTEM messages are announcements, like the Messages from Chad
+  - MOD is a channel where mods can highlight their messages for moderation purposes
 - you can toggle the LADDER Chat regarding whether you want to see local messages
 
 ### Improvements:
@@ -23,7 +49,7 @@ description: 'A list of all changes made to the game'
 - Messages that are not from global chat get highlighted
 - Vinegar eta is back thanks to Raldec
 
-<br><br><br><br><br><br><br>
+</details>
 
 <details>
 <summary>Expand for the 2.3.x changelog</summary>
