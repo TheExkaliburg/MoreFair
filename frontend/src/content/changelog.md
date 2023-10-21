@@ -14,12 +14,13 @@ description: 'A list of all changes made to the game'
   - A page reload is required to clear existing messages from ignored players.
   - Messages in the SYSTEM and MOD chats cannot be ignored.
 - Adding the END Ladder Type after the AH Ladder as preparation for an updated S3 Logic.
-<!-- - ?̷̩̒?̶̰̎?̴̜́ -->
+- ?̷̩̒?̶̰̎?̴̜́ 
 
 ### Improvements:
 
 - The combined mod chat view now shows the correct ladder number for messages originating from LADDER chats.
 - When filtering by Name, it doesn't show all the Mystery Guests in the suggestion anymore.
+- Changing some internal logic regarding the resets of the round.
 
 ### Bugfixes:
 
