@@ -84,7 +84,7 @@ public class SecurityConfig {
         ).authenticated()
 
         .anyRequest()
-        .authenticated()
+        .permitAll()
     );
     http.rememberMe().rememberMeServices(rememberMeServices());
     http.logout(logout -> logout
