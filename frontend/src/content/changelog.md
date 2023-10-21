@@ -14,7 +14,7 @@ description: 'A list of all changes made to the game'
   - A page reload is required to clear existing messages from ignored players.
   - Messages in the SYSTEM and MOD chats cannot be ignored.
 - Adding the END Ladder Type after the AH Ladder as preparation for an updated S3 Logic.
-- ?̷̩̒?̶̰̎?̴̜́
+<!-- - ?̷̩̒?̶̰̎?̴̜́ -->
 
 ### Improvements:
 

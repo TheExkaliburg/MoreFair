@@ -1,6 +1,5 @@
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import Cookies from "js-cookie";
-import { useAuthStore } from "~/store/authentication";
 import { useToasts } from "~/composables/useToasts";
 import { ChatType } from "~/store/chat";
 
@@ -45,10 +44,13 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    if (error.response?.status === 401) {
-      useAuthStore().state.authenticationStatus = false;
-      useAuthStore().state.uuid = Cookies.get("_uuid") || "";
+    // if 401 unauthorized -> redirect to login
+    if (
+      error.response?.status === 401 &&
+      error.config.url !== "/api/auth/login"
+    ) {
       window.location.href = "/login";
+      return Promise.reject(error);
     }
 
     // if status is 502, the server is down
