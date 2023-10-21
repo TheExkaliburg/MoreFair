@@ -4,7 +4,7 @@ description: 'A list of all changes made to the game'
 
 # Changelog
 
-## 2.5.0 [PATCH]: 
+## 2.5.0 [MINOR]: Ignore-List and END ladder modifier 
 
 ### Features:
 

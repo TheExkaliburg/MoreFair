@@ -136,7 +136,7 @@ public class RoundEntity {
   }
 
   public Integer getAssholeLadderNumber() {
-    if(types.contains(RoundType.SPECIAL_100)) {
+    if (types.contains(RoundType.SPECIAL_100)) {
       return 100;
     }
 
@@ -158,7 +158,7 @@ public class RoundEntity {
   }
 
   public Integer getModifiedBaseAssholeLadder() {
-    if(types.contains(RoundType.SPECIAL_100)) {
+    if (types.contains(RoundType.SPECIAL_100)) {
       return 50;
     }
 

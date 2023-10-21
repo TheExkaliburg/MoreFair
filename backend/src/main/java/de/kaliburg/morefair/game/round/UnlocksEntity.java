@@ -50,6 +50,9 @@ public class UnlocksEntity {
 
   public void copy(UnlocksEntity entity) {
     this.setAutoPromote(entity.getAutoPromote());
+    this.setReachedBaseAssholeLadder(entity.getReachedBaseAssholeLadder());
+    this.setPressedAssholeButton(entity.getPressedAssholeButton());
+    this.setReachedAssholeLadder(entity.getReachedAssholeLadder());
   }
 
   public Integer calculateAssholePoints() {
