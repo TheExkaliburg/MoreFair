@@ -31,6 +31,7 @@ components:
       ladder_short: L
       powerGain: Power-Gain
     buttons:
+      wait: Waiting...
       multi: Multi
       multi_short: M
       bias: Bias
@@ -229,6 +230,18 @@ modifier:
     title: Asshole
     description: The final ladder - promotion from here will grant entry to Chad's ritual.
     identifier: AH
+  REVERSE_SCALING:
+    title: Reverse Scaling
+    description: Costs and promotion requirements start high, and decrease as the round progresses.
+    identifier: REVSC
+  SPECIAL_100:
+    title: "100"
+    description: ???
+    identifier: "100"
+  END:
+    title: The End
+    description: There is nowhere else to go.
+    identifier: END
 chat:
   GLOBAL:
     identifier: G

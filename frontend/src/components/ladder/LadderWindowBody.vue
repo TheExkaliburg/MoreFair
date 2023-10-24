@@ -118,14 +118,12 @@ import { LadderType, useLadderStore } from "~/store/ladder";
 import { Ranker } from "~/store/entities/ranker";
 import { useFormatter, useTimeFormatter } from "~/composables/useFormatter";
 import { useLadderUtils } from "~/composables/useLadderUtils";
-import { useRoundStore } from "~/store/round";
 import { useStomp } from "~/composables/useStomp";
 import { useEta } from "~/composables/useEta";
 
 const lang = useLang("components.ladder.buttons");
 const optionsStore = useOptionsStore();
 const ladderStore = useLadderStore();
-const roundStore = useRoundStore();
 const ladderUtils = useLadderUtils();
 const isButtonLocked = computed<boolean>(() => {
   return (
@@ -243,9 +241,9 @@ const canPromote = computed<boolean>(() => {
   );
 });
 const promoteLabel = computed<string>(() => {
-  return ladderStore.state.number < roundStore.state.assholeLadder
-    ? lang("promote")
-    : lang("asshole");
+  if (ladderStore.state.types.has(LadderType.END)) return lang("wait");
+  if (ladderStore.state.types.has(LadderType.ASSHOLE)) return lang("asshole");
+  return lang("promote");
 });
 
 const pressedBiasRecently = ref<boolean>(false);
@@ -317,7 +315,7 @@ function throwVinegar(e: Event) {
 function promote(e: Event) {
   if (pressedPromoteRecently.value || !canPromote.value) return;
   pressedPromoteRecently.value = true;
-  if (ladderStore.state.number >= roundStore.state.assholeLadder) {
+  if (ladderStore.state.types.has(LadderType.ASSHOLE)) {
     if (confirm("Do you really wanna be an Asshole?!")) {
       useStomp().wsApi.ladder.promote(e);
     }

@@ -212,15 +212,13 @@ export const useChatStore = defineStore("chat", () => {
         if (message.accountId === accountId) {
           message.username = username;
         }
-        // Since we don't update in the backend, mentions stay the way they are, but this would be how we update them in the frontend
-        /* const metadata = message.getMetadata();
-        metadata.forEach((meta) => {
-          if (!isGroupMentionMeta(meta) && meta.id === accountId) {
-            meta.u = username;
-          }
-        });
-        message.metadata = JSON.stringify(metadata); */
+        // Since we don't update mentions in the backend, they stay the way they are
       });
+    });
+    state.suggestions.forEach((suggestion) => {
+      if (suggestion.accountId === accountId) {
+        suggestion.displayName = username;
+      }
     });
   }
 

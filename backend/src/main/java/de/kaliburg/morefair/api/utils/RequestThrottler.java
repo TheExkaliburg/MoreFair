@@ -34,32 +34,24 @@ public class RequestThrottler {
   }
 
   public boolean canCreateAccount(Integer ipAddress) {
-
-    boolean result = true;
     Integer number = hasCreatedAccountInTheLastMinute.get(ipAddress);
-
-    if (number > 0) {
-      result = false;
-    }
     hasCreatedAccountInTheLastMinute.asMap().remove(ipAddress);
     hasCreatedAccountInTheLastMinute.put(ipAddress, number + 1);
+    if (number > 0) {
+      return false;
+    }
 
     number = hasCreatedAccountInTheLastHour.get(ipAddress);
-    if (number > 3) {
-      result = false;
-    }
     hasCreatedAccountInTheLastHour.asMap().remove(ipAddress);
     hasCreatedAccountInTheLastHour.put(ipAddress, number + 1);
-
-    number = hasCreatedAccountInTheLastDay.get(ipAddress);
-    if (number > 5) {
-      result = false;
+    if (number > 3) {
+      return false;
     }
 
     hasCreatedAccountInTheLastDay.asMap().remove(ipAddress);
     hasCreatedAccountInTheLastDay.put(ipAddress, number + 1);
-
-    return result;
+    number = hasCreatedAccountInTheLastDay.get(ipAddress);
+    return number <= 5;
   }
 
   public boolean canPostMessage(AccountEntity account) {
