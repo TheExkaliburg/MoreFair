@@ -31,6 +31,7 @@ components:
       ladder_short: L
       powerGain: Power-Gain
     buttons:
+      wait: Waiting...
       multi: Multi
       multi_short: M
       bias: Bias
@@ -68,6 +69,7 @@ options:
   enableSpectateAssholeLadder: Enable spectating asshole ladder
   hideHelpText: Hide help text
   subscribedMentions: Subscribed mentions
+  ignoredPlayers: Ignored rankers (by ranker id)
   playSoundOnMention: Play sound on mention
   playSoundOnGotFirst: Play sound on reaching first
   playSoundOnPromotion: Play sound on promotion
@@ -263,3 +265,24 @@ modifier:
     title: Stingy
     description: Ladder winnings are decreased.
     identifier: STINGY
+  REVERSE_SCALING:
+    title: Reverse Scaling
+    description: Costs and promotion requirements start high, and decrease as the round progresses.
+    identifier: REVSC
+  SPECIAL_100:
+    title: "100"
+    description: ???
+    identifier: "100"
+  END:
+    title: The End
+    description: There is nowhere else to go.
+    identifier: END
+chat:
+  GLOBAL:
+    identifier: G
+  SYSTEM:
+    identifier: S
+  LADDER:
+    identifier: L
+  MOD:
+    identifier: M

@@ -33,6 +33,7 @@ export enum LadderType {
   NO_HANDOUTS = "NO_HANDOUTS",
   GENEROUS = "GENEROUS",
   STINGY = "STINGY",
+  END = "END",
 }
 
 export enum LadderEventType {
@@ -45,11 +46,13 @@ export enum LadderEventType {
   PROMOTE = "PROMOTE",
   JOIN = "JOIN",
   ADD_FREE_AUTO = "ADD_FREE_AUTO",
+  UPDATE_TYPES = "UPDATE_TYPES",
 }
 
 export type LadderData = {
   rankers: RankerData[];
   number: number;
+  scaling: number;
   types: LadderType[];
   basePointsToPromote: string;
 };
@@ -57,6 +60,7 @@ export type LadderData = {
 export type LadderState = {
   rankers: Ranker[];
   number: number;
+  scaling: number;
   types: Set<LadderType>;
   basePointsToPromote: Decimal;
 };
@@ -73,6 +77,7 @@ export const useLadderStore = defineStore("ladder", () => {
   const state = reactive<LadderState>({
     rankers: <Ranker[]>[],
     number: 1,
+    scaling: 1,
     types: new Set<LadderType>([LadderType.DEFAULT]),
     basePointsToPromote: new Decimal(0),
   });
@@ -80,10 +85,10 @@ export const useLadderStore = defineStore("ladder", () => {
 
   const getters = reactive({
     yourRanker: computed<Ranker | undefined>(() =>
-      state.rankers.find((r) => r.accountId === accountStore.state.accountId)
+      state.rankers.find((r) => r.accountId === accountStore.state.accountId),
     ),
     activeRankers: computed<number>(
-      () => state.rankers.filter((r) => r.growing).length
+      () => state.rankers.filter((r) => r.growing).length,
     ),
     formattedTypes: computed(() => {
       return Array.from(state.types).join(",");
@@ -92,7 +97,7 @@ export const useLadderStore = defineStore("ladder", () => {
       let result = state.rankers;
       if (optionsStore.state.ladder.hidePromotedPlayers.value) {
         result = result.filter(
-          (r) => r.growing || r.accountId === getters.yourRanker?.accountId
+          (r) => r.growing || r.accountId === getters.yourRanker?.accountId,
         );
       }
 
@@ -101,7 +106,7 @@ export const useLadderStore = defineStore("ladder", () => {
           (r) =>
             r.bias !== 0 ||
             r.multi !== 1 ||
-            r.accountId === getters.yourRanker?.accountId
+            r.accountId === getters.yourRanker?.accountId,
         );
       }
 
@@ -152,6 +157,7 @@ export const useLadderStore = defineStore("ladder", () => {
           state.types.add(s);
         });
         state.number = data.number;
+        state.scaling = data.scaling;
         state.basePointsToPromote = new Decimal(data.basePointsToPromote);
 
         stomp.addCallback(
@@ -159,13 +165,13 @@ export const useLadderStore = defineStore("ladder", () => {
           "fair_ladder_events",
           (body) => {
             ladderEvents.push(body);
-          }
+          },
         );
 
         stomp.addCallback(
           stomp.callbacks.onTick,
           "fair_ladder_calculateTick",
-          (body: OnTickBody) => calculateTick(body.delta)
+          (body: OnTickBody) => calculateTick(body.delta),
         );
       })
       .catch((_) => {
@@ -197,11 +203,13 @@ export const useLadderStore = defineStore("ladder", () => {
           state.rankers[i].power = Object.freeze(
             state.rankers[i].power
               .add(state.rankers[i].getPowerPerSecond().mul(delta))
-              .floor()
+              .floor(),
           );
         }
         state.rankers[i].points = Object.freeze(
-          state.rankers[i].points.add(state.rankers[i].power.mul(delta).floor())
+          state.rankers[i].points.add(
+            state.rankers[i].power.mul(delta).floor(),
+          ),
         );
 
         for (let j = i - 1; j >= 0; j--) {
@@ -217,7 +225,7 @@ export const useLadderStore = defineStore("ladder", () => {
               state.rankers[j].multi > 1
             ) {
               state.rankers[j].grapes = Object.freeze(
-                state.rankers[j].grapes.add(ladderUtils.getPassingGrapes())
+                state.rankers[j].grapes.add(ladderUtils.getPassingGrapes()),
               );
             }
             state.rankers[j + 1] = state.rankers[j];
@@ -236,14 +244,14 @@ export const useLadderStore = defineStore("ladder", () => {
     if (yourRanker !== undefined && yourRanker.growing) {
       if (yourRanker.rank !== 1) {
         yourRanker.vinegar = Object.freeze(
-          yourRanker.vinegar.add(yourRanker.grapes.mul(deltaSeconds).floor())
+          yourRanker.vinegar.add(yourRanker.grapes.mul(deltaSeconds).floor()),
         );
       }
       if (yourRanker.rank === 1 && ladderUtils.isLadderPromotable.value) {
         yourRanker.vinegar = Object.freeze(
           yourRanker.vinegar
             .mul(Decimal.pow(new Decimal(0.9975), deltaSeconds))
-            .floor()
+            .floor(),
         );
       }
 
@@ -252,7 +260,7 @@ export const useLadderStore = defineStore("ladder", () => {
         state.rankers.length >= 1
       ) {
         yourRanker.grapes = Object.freeze(
-          yourRanker.grapes.add(new Decimal(ladderUtils.getBottomGrapes()))
+          yourRanker.grapes.add(new Decimal(ladderUtils.getBottomGrapes())),
         );
       }
     }
@@ -293,8 +301,8 @@ export const useLadderStore = defineStore("ladder", () => {
           ranker.autoPromote = true;
           ranker.grapes = Object.freeze(
             ranker.grapes.sub(
-              new Decimal(ladderUtils.getAutoPromoteCost(ranker.rank))
-            )
+              new Decimal(ladderUtils.getAutoPromoteCost(ranker.rank)),
+            ),
           );
           break;
         case LadderEventType.THROW_VINEGAR:
@@ -303,7 +311,7 @@ export const useLadderStore = defineStore("ladder", () => {
         case LadderEventType.SOFT_RESET_POINTS:
           ranker.points = Object.freeze(new Decimal(0));
           ranker.power = Object.freeze(
-            ranker.power.div(new Decimal(2)).floor()
+            ranker.power.div(new Decimal(2)).floor(),
           );
           break;
         case LadderEventType.PROMOTE:
@@ -321,8 +329,14 @@ export const useLadderStore = defineStore("ladder", () => {
           state.types.add(LadderType.FREE_AUTO);
           useToasts(
             `Since other rankers breached another Ladder, everyone on this ladder got gifted a free auto promote! (No Refunds)`,
-            { autoClose: 60 }
+            { autoClose: 60 },
           );
+          break;
+        case LadderEventType.UPDATE_TYPES:
+          state.types.clear();
+          event.data.forEach((s: LadderType) => {
+            state.types.add(s);
+          });
           break;
         default:
           console.error("Unknown event type", event);
@@ -343,13 +357,13 @@ export const useLadderStore = defineStore("ladder", () => {
       getters.yourRanker.vinegar = Object.freeze(
         Decimal.max(
           getters.yourRanker.vinegar.sub(vinegarThrown),
-          new Decimal(0)
-        )
+          new Decimal(0),
+        ),
       );
       useToasts(
         `${ranker.username} (#${ranker.accountId}) ${
           event.data.success ? "successfully" : ""
-        } threw  ${useFormatter(vinegarThrown)} vinegar at you!`
+        } threw  ${useFormatter(vinegarThrown)} vinegar at you!`,
       );
       chatStore.actions.addSystemMessage(
         `{@} saw {@} throwing vinegar at {@}. They've ${
@@ -363,7 +377,7 @@ export const useLadderStore = defineStore("ladder", () => {
             i: 32,
             id: getters.yourRanker.accountId,
           },
-        ])
+        ]),
       );
     }
   }

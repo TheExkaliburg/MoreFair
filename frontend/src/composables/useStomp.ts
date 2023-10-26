@@ -2,7 +2,7 @@ import { Client, StompSubscription } from "@stomp/stompjs";
 import { createPinia, getActivePinia, setActivePinia } from "pinia";
 import { MentionMeta, MessageData } from "~/store/entities/message";
 import { AccountEventType, useAccountStore } from "~/store/account";
-import { useChatStore } from "~/store/chat";
+import { ChatType, useChatStore } from "~/store/chat";
 import { RoundEventType } from "~/store/round";
 import { LadderEventType } from "~/store/ladder";
 import { ChatLogMessageData } from "~/store/moderation";
@@ -10,7 +10,9 @@ import { ChatLogMessageData } from "~/store/moderation";
 export type OnTickBody = {
   delta: number;
 };
-export type OnChatEventBody = MessageData;
+export type OnChatEventBody = MessageData & {
+  chatType: ChatType;
+};
 export type OnLadderEventBody = {
   eventType: LadderEventType;
   accountId: number;
@@ -57,7 +59,7 @@ const callbacks: StompCallbacks = {
 function addCallback<T>(
   event: StompCallback<T>[],
   identifier: string,
-  callback: (body: T) => void
+  callback: (body: T) => void,
 ) {
   const eventCallback = event.find((e) => e.identifier === identifier);
   if (eventCallback === undefined) {
@@ -71,6 +73,7 @@ function addCallback<T>(
 }
 
 if (typeof global !== "undefined" && global.WebSocket === undefined) {
+  // @ts-ignore
   import("ws").then((res) => {
     Object.assign(global, { WebSocket: res.WebSocket });
   });
@@ -89,13 +92,13 @@ const reconnectTimeout = 1 * 60 * 1000;
 
 const subscribedChannel = {
   ladder: {} as StompSubscription,
-  chat: {} as StompSubscription,
+  ladderChat: {} as StompSubscription,
 };
 
 const client = new Client({
   brokerURL: connection,
   debug: (_) => {
-    // if (isDevMode) console.debug(str);
+    // if (isDevMode) console.debug(_);
   },
   reconnectDelay: 0,
   heartbeatIncoming: 4000,
@@ -108,14 +111,29 @@ client.onConnect = (_) => {
     callbacks.onTick.forEach(({ callback }) => callback(body));
   });
 
-  client.subscribe("/topic/account/event", (message) => {
+  client.subscribe("/topic/account/events", (message) => {
     const body: OnAccountEventBody = JSON.parse(message.body);
     callbacks.onAccountEvent.forEach(({ callback }) => callback(body));
   });
 
-  client.subscribe("/topic/round/event", (message) => {
+  client.subscribe("/topic/round/events", (message) => {
     const body: OnRoundEventBody = JSON.parse(message.body);
     callbacks.onRoundEvent.forEach(({ callback }) => callback(body));
+  });
+
+  client.subscribe("/topic/chat/events/global", (message) => {
+    const body: OnChatEventBody = JSON.parse(message.body);
+    callbacks.onChatEvent.forEach(({ callback }) => callback(body));
+  });
+
+  client.subscribe("/topic/chat/events/system", (message) => {
+    const body: OnChatEventBody = JSON.parse(message.body);
+    callbacks.onChatEvent.forEach(({ callback }) => callback(body));
+  });
+
+  client.subscribe("/topic/chat/events/mod", (message) => {
+    const body: OnChatEventBody = JSON.parse(message.body);
+    callbacks.onChatEvent.forEach(({ callback }) => callback(body));
   });
 
   if (getActivePinia() === undefined) {
@@ -137,30 +155,30 @@ function connectPrivateChannel(uuid: string) {
   const highestLadder = useAccountStore().state.highestCurrentLadder;
 
   subscribedChannel.ladder = client.subscribe(
-    "/topic/ladder/event/" + highestLadder,
+    "/topic/ladder/events/" + highestLadder,
     (message) => {
       const body: OnLadderEventBody = JSON.parse(message.body);
       callbacks.onLadderEvent.forEach(({ callback }) => callback(body));
-    }
+    },
   );
 
-  subscribedChannel.chat = client.subscribe(
-    "/topic/chat/event/" + highestLadder,
+  subscribedChannel.ladderChat = client.subscribe(
+    "/topic/chat/events/ladder/" + highestLadder,
     (message) => {
       const body: OnChatEventBody = JSON.parse(message.body);
       callbacks.onChatEvent.forEach(({ callback }) => callback(body));
-    }
+    },
   );
 
-  client.subscribe(`/private/${uuid}/ladder/event`, (message) => {
+  client.subscribe(`/private/${uuid}/ladder/events`, (message) => {
     const body: OnLadderEventBody = JSON.parse(message.body);
     callbacks.onLadderEvent.forEach(({ callback }) => callback(body));
   });
-  client.subscribe(`/private/${uuid}/chat/event`, (message) => {
+  client.subscribe(`/private/${uuid}/chat/events`, (message) => {
     const body: OnChatEventBody = JSON.parse(message.body);
     callbacks.onChatEvent.forEach(({ callback }) => callback(body));
   });
-  client.subscribe(`/private/${uuid}/account/event`, (message) => {
+  client.subscribe(`/private/${uuid}/account/events`, (message) => {
     const body: OnAccountEventBody = JSON.parse(message.body);
     callbacks.onAccountEvent.forEach(({ callback }) => callback(body));
   });
@@ -172,12 +190,12 @@ function connectModeratorChannel() {
   if (!client.connected) return;
   if (!useAccountStore().getters.isMod) return;
 
-  client.subscribe("/topic/moderation/chat/event", (message) => {
+  client.subscribe("/topic/moderation/chat/events", (message) => {
     const body: OnModChatEventBody = JSON.parse(message.body);
     callbacks.onModChatEvent.forEach(({ callback }) => callback(body));
   });
 
-  client.subscribe("/topic/moderation/log/event", (message) => {
+  client.subscribe("/topic/moderation/log/events", (message) => {
     const body: OnModLogEventBody = JSON.parse(message.body);
     callbacks.onModLogEvent.forEach(({ callback }) => callback(body));
   });
@@ -242,25 +260,31 @@ const wsApi = (client: Client) => {
       },
     },
     chat: {
-      changeChat: (newNumber: number) => {
-        if (subscribedChannel?.chat) {
-          subscribedChannel.chat.unsubscribe();
+      changeLadderChat: (newNumber: number) => {
+        if (subscribedChannel?.ladderChat) {
+          subscribedChannel.ladderChat.unsubscribe();
         }
-        subscribedChannel.chat = client.subscribe(
-          `/topic/chat/event/${newNumber}`,
+        subscribedChannel.ladderChat = client.subscribe(
+          `/topic/chat/events/ladder/${newNumber}`,
           (message) => {
             const body: OnChatEventBody = JSON.parse(message.body);
             callbacks.onChatEvent.forEach(({ callback }) => callback(body));
-          }
+          },
         );
       },
       sendMessage: (
         message: string,
         metadata: MentionMeta[],
-        chatNumber: number
+        chatType: ChatType,
+        chatNumber?: number,
       ) => {
+        let destination = `/app/chat/${chatType.toLowerCase()}`;
+        if (chatNumber !== undefined) {
+          destination += `/${chatNumber}`;
+        }
+
         client.publish({
-          destination: `/app/chat/${chatNumber}`,
+          destination,
           body: JSON.stringify({
             content: message,
             metadata: JSON.stringify(metadata),
@@ -274,11 +298,11 @@ const wsApi = (client: Client) => {
           subscribedChannel.ladder.unsubscribe();
         }
         subscribedChannel.ladder = client.subscribe(
-          `/topic/ladder/event/${newNumber}`,
+          `/topic/ladder/events/${newNumber}`,
           (message) => {
             const body: OnLadderEventBody = JSON.parse(message.body);
             callbacks.onLadderEvent.forEach(({ callback }) => callback(body));
-          }
+          },
         );
       },
       buyBias: (e: Event) => {

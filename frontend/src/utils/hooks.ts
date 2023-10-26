@@ -19,7 +19,7 @@ const api = {
   addCallback: (
     hook: StompCallback<unknown>[],
     identifier: string,
-    callback: (body: unknown) => void
+    callback: (body: unknown) => void,
   ) => useStomp().addCallback(hook, identifier, callback),
 };
 
@@ -29,7 +29,7 @@ function unpackStore(store: any) {
 }
 
 function register(func: (api: any) => void) {
-  return func(api);
+  func(api);
 }
 
 const Fair = {

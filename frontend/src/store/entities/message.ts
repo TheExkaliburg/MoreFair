@@ -1,3 +1,6 @@
+import { ChatType } from "~/store/chat";
+import { useLang } from "~/composables/useLang";
+
 export enum MessagePartType {
   plain,
   mentionUser,
@@ -19,7 +22,7 @@ export type GroupMentionMeta = {
 export type MentionMeta = GroupMentionMeta | UserMentionMeta;
 
 export function isGroupMentionMeta(
-  meta: MentionMeta
+  meta: MentionMeta,
 ): meta is GroupMentionMeta {
   return "g" in meta && "i" in meta;
 }
@@ -46,7 +49,9 @@ export type MessageData = {
   timestamp: number;
   tag: string;
   assholePoints: number;
+  ladderNumber: number;
   isMod: boolean;
+  chatType: ChatType;
 };
 
 // Set the options for the Intl.DateTimeFormat object
@@ -64,11 +69,13 @@ export class Message implements MessageData {
   accountId = 0;
   username = "";
   message = "";
+  ladderNumber = 0;
   metadata = "[]";
   timestamp = 0;
   tag = "";
   assholePoints = 0;
   isMod = false;
+  chatType = ChatType.GLOBAL;
   private flags: string[] = [];
 
   constructor(data: any) {
@@ -104,6 +111,15 @@ export class Message implements MessageData {
     return formatter.format(date);
   }
 
+  getChatTypeIdentifier(): string {
+    const lang = useLang("chat");
+    let result = lang(this.chatType.toUpperCase() + ".identifier");
+    if (this.chatType === ChatType.LADDER) {
+      result += this.ladderNumber;
+    }
+    return result;
+  }
+
   getMessageParts(): MessagePart[] {
     const message = this.message;
     const metadata = this.getMetadata();
@@ -126,8 +142,8 @@ export class Message implements MessageData {
         result.push(
           new MessagePart(
             MessagePartType.plain,
-            message.slice(lastIndex, index)
-          )
+            message.slice(lastIndex, index),
+          ),
         );
         result.push(new MessagePart(MessagePartType.mentionGroup, name));
         lastIndex = index + 3;
@@ -139,8 +155,8 @@ export class Message implements MessageData {
         result.push(
           new MessagePart(
             MessagePartType.plain,
-            message.slice(lastIndex, index)
-          )
+            message.slice(lastIndex, index),
+          ),
         );
         result.push(new MessagePart(MessagePartType.mentionUser, name));
         result.push(new MessagePart(MessagePartType.mentionUserId, String(id)));
@@ -150,7 +166,7 @@ export class Message implements MessageData {
 
     // Take the last part and add it as Plain text
     result.push(
-      new MessagePart(MessagePartType.plain, message.slice(lastIndex))
+      new MessagePart(MessagePartType.plain, message.slice(lastIndex)),
     );
 
     return result;

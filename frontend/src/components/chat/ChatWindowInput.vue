@@ -1,11 +1,14 @@
 <template>
   <div class="flex flex-col justify-around">
     <div
-      class="flex flex-row justify-center items-center relative w-full bg-background z-10"
+      class="flex flex-row relative justify-center items-center w-full bg-background z-10"
     >
+      <ChatWindowChannelSelector
+        class="z-20 w-8 h-8 pl-2 px-1 overflow-visible border-button-border border-1 border-r-0 rounded-l-md"
+      />
       <EditorContent
         :editor="editor"
-        class="w-full rounded-l-md border-1 h-8 border-button-border p-1 outline-0 overflow-x-hidden text-text caret-text whitespace-nowrap overflow-y-hidden"
+        class="justify-center items-center w-full border-1 border-l-0 h-8 border-button-border p-1 w-full max-w-full outline-0 overflow-x-hidden text-text caret-text whitespace-nowrap overflow-y-hidden"
         spellcheck="false"
         @keydown.enter.prevent="sendMessage"
         @keydown.tab="wasSuggestionOpen = false"
@@ -36,12 +39,15 @@ import { Text } from "@tiptap/extension-text";
 import { Mention } from "@tiptap/extension-mention";
 import { CharacterCount } from "@tiptap/extension-character-count";
 import { Placeholder } from "@tiptap/extension-placeholder";
-import { useChatStore } from "~/store/chat";
+import ChatWindowChannelSelector from "./ChatWindowChannelSelector.vue";
+import { ChatType, useChatStore } from "~/store/chat";
 import {
   useEmojiSuggestion,
   useGroupSuggestion,
   useUserSuggestion,
 } from "~/composables/useSuggestion";
+import { useLang } from "~/composables/useLang";
+import { useAccountStore } from "~/store/account";
 
 const chatStore = useChatStore();
 
@@ -70,7 +76,7 @@ const editor = useEditor({
       },
       suggestion: useUserSuggestion(),
       renderLabel: ({ node }) => {
-        return `@${node.attrs.id.username}#${node.attrs.id.accountId}`;
+        return `@${node.attrs.id.displayName}#${node.attrs.id.accountId}`;
       },
     }),
     Mention.extend({ name: "emojiMention" }).configure({
@@ -97,12 +103,44 @@ const editor = useEditor({
   },
 });
 
+const lang = useLang("chat");
+
 // TODO: this is kinda hacky, there must be a better way to prevent the enter from autocompletion to also send the message
 let isSuggestionOpen = false;
 let wasSuggestionOpen = false;
 watch(
   () => chatStore.state.input,
   (newValue) => {
+    if (
+      editor.value?.getText().trimStart().startsWith("/") &&
+      editor.value?.getText().endsWith(" ")
+    ) {
+      const channel = editor.value?.getText().trim().slice(1).toUpperCase();
+      switch (channel) {
+        case ChatType.MOD:
+        case lang(ChatType.MOD + ".identifier"):
+          if (useAccountStore().getters.isMod) {
+            useChatStore().state.selectedChatType = ChatType.MOD;
+            editor.value.commands.clearContent(true);
+          }
+          break;
+        case ChatType.LADDER:
+        case lang(ChatType.LADDER + ".identifier"):
+        case "LOCAL":
+          useChatStore().state.selectedChatType = ChatType.LADDER;
+          editor.value.commands.clearContent(true);
+          break;
+        case ChatType.GLOBAL:
+        case lang(ChatType.GLOBAL + ".identifier"):
+        case "GENERAL":
+          useChatStore().state.selectedChatType = ChatType.GLOBAL;
+          editor.value.commands.clearContent(true);
+          break;
+        default:
+          break;
+      }
+    }
+
     const caretStart: number =
       editor.value?.state.selection.from ?? newValue.length;
     editor.value?.commands.setContent(newValue);
@@ -114,7 +152,7 @@ watch(
     wasSuggestionOpen = isSuggestionOpen;
     isSuggestionOpen = suggestionElements.length > 0;
   },
-  { deep: true }
+  { deep: true },
 );
 
 function sendMessage(e: KeyboardEvent | MouseEvent) {
@@ -145,7 +183,7 @@ function sendMessage(e: KeyboardEvent | MouseEvent) {
     if (node.type === "userMention") {
       result += "{@}";
       metadata.push({
-        u: node.attrs.id.username,
+        u: node.attrs.id.displayName,
         i: result.length - 3,
         id: node.attrs.id.accountId,
       });

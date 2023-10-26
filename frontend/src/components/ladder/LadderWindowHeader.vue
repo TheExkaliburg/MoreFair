@@ -121,6 +121,6 @@ const formattedPointsForPromotion = computed<string>(() => {
 });
 
 const isAssholeLadderOpen = computed<boolean>(
-  () => roundStore.state.topLadder >= roundStore.state.assholeLadder
+  () => roundStore.state.topLadder >= roundStore.state.assholeLadder,
 );
 </script>

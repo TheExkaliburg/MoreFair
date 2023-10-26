@@ -6,6 +6,7 @@ import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.account.AccountServiceEvent;
+import de.kaliburg.morefair.account.SuggestionDto;
 import de.kaliburg.morefair.api.AccountController;
 import de.kaliburg.morefair.api.LadderController;
 import de.kaliburg.morefair.api.RoundController;
@@ -18,22 +19,10 @@ import de.kaliburg.morefair.events.types.LadderEventTypes;
 import de.kaliburg.morefair.events.types.RoundEventTypes;
 import de.kaliburg.morefair.game.GameResetEvent;
 import de.kaliburg.morefair.game.UpgradeUtils;
-import de.kaliburg.morefair.game.chat.ChatService;
-import de.kaliburg.morefair.game.chat.MessageService;
-import de.kaliburg.morefair.game.round.dto.RankerDto;
+import de.kaliburg.morefair.game.chat.*;
 import de.kaliburg.morefair.statistics.StatisticsService;
 import de.kaliburg.morefair.utils.FormattingUtils;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.Semaphore;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import it.unibo.tuprolog.solve.stdlib.function.Round;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -45,13 +34,18 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
+import java.util.*;
+import java.util.concurrent.Semaphore;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 /**
  * The LadderService that setups and manages the LadderEntities contained in a RoundEntity. This
  * Service only handles the matters that regard a specific ladders, like game logic and user input.
  *
  * <p>For global events look at {@link de.kaliburg.morefair.game.round.RoundService} or for
- * chats and message at {@link de.kaliburg.morefair.game.chat.ChatService} or
- * {@link MessageService}
+ * chats and message at {@link ChatServiceImpl} or {@link MessageService}
  */
 @Service
 @Log4j2
@@ -75,6 +69,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   private final WsUtils wsUtils;
   private final FairConfig config;
   private final Gson gson;
+  private final MessageService messageService;
   @Getter(AccessLevel.PACKAGE)
   @Setter(AccessLevel.PACKAGE)
   private RoundEntity currentRound;
@@ -85,7 +80,8 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
       LadderUtils ladderUtils, AccountService accountService,
       @Lazy StatisticsService statisticsService,
       RoundUtils roundUtils,
-      ChatService chatService, UpgradeUtils upgradeUtils, ApplicationEventPublisher eventPublisher,
+      ChatService chatService, UpgradeUtils upgradeUtils, MessageService messageService,
+      ApplicationEventPublisher eventPublisher,
       @Lazy WsUtils wsUtils, FairConfig config, Gson gson) {
     this.rankerService = rankerService;
     this.ladderRepository = ladderRepository;
@@ -99,6 +95,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
     this.wsUtils = wsUtils;
     this.config = config;
     this.gson = gson;
+    this.messageService = messageService;
   }
 
   @Transactional
@@ -361,6 +358,12 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         ladder.getRankers().size() + 1);
     ladder.getRankers().add(result);
 
+    if (ladder.getNumber() == 1) {
+      Event<RoundEventTypes> joinEvent = new Event<>(RoundEventTypes.JOIN, account.getId());
+      joinEvent.setData(new SuggestionDto(account.getId(), account.getDisplayName()));
+      wsUtils.convertAndSendToTopic(RoundController.TOPIC_EVENTS_DESTINATION, joinEvent);
+    }
+
     Event<LadderEventTypes> joinEvent = new Event<>(LadderEventTypes.JOIN, account.getId());
     joinEvent.setData(
         new JoinData(account.getDisplayName(), config.getAssholeTag(account.getAssholeCount()),
@@ -405,8 +408,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   boolean buyBias(Event<LadderEventTypes> event, LadderEntity ladder) {
     try {
       RankerEntity ranker = findActiveRankerOfAccountOnLadder(event.getAccountId(), ladder);
-      BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getNumber(), ranker.getBias(),
-          ladder.getTypes());
+      BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getScaling(), ranker.getBias(), ladder.getTypes());
       if (ranker.getPoints().compareTo(cost) >= 0) {
         statisticsService.recordBias(ranker, ladder, currentRound);
         ranker.setPoints(BigInteger.ZERO);
@@ -432,7 +434,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
   boolean buyMulti(Event<LadderEventTypes> event, LadderEntity ladder) {
     try {
       RankerEntity ranker = findActiveRankerOfAccountOnLadder(event.getAccountId(), ladder);
-      BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getNumber(), ranker.getMultiplier(),
+      BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getScaling(), ranker.getMultiplier(),
           ladder.getTypes());
       if (ranker.getPower().compareTo(cost) >= 0) {
         statisticsService.recordMulti(ranker, ladder, currentRound);
@@ -465,7 +467,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         return false;
       }
 
-      BigInteger cost = upgradeUtils.buyAutoPromoteCost(ranker.getRank(), ladder.getNumber());
+      BigInteger cost = upgradeUtils.buyAutoPromoteCost(ranker.getRank(), ladder.getScaling());
 
       if (ladder.getTypes().contains(LadderType.FREE_AUTO)) {
         ranker.setAutoPromote(true);
@@ -483,8 +485,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         return true;
       }
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
 
     return false;
@@ -503,9 +504,10 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
       if (ladderUtils.canPromote(ladder, ranker)) {
         statisticsService.recordPromote(ranker, ladder, currentRound);
         AccountEntity account = accountService.find(ranker.getAccount());
-        log.info("[L{}] Promotion for {} (#{})", ladder.getNumber(), account.getDisplayName(),
-            account.getId());
+        log.info("[L{}] Promotion for {} (#{})", ladder.getNumber(), account.getDisplayName(), account.getId());
         ranker.setGrowing(false);
+
+        RoundEntity round = ladder.getRound();
 
         RankerEntity newRanker = createRanker(account, ladder.getNumber() + 1);
         newRanker.setVinegar(ranker.getVinegar());
@@ -519,6 +521,28 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         if (autoLadder != null && !autoLadder.getTypes().contains(LadderType.FREE_AUTO)
             && !autoLadder.getTypes().contains(LadderType.NO_AUTO)) {
           autoLadder.getTypes().add(LadderType.FREE_AUTO);
+          Event<LadderEventTypes> e = new Event<>(LadderEventTypes.UPDATE_TYPES, account.getId(), autoLadder.getTypes());
+          wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION, autoLadder.getNumber(), e);
+        }
+
+        // Special_100 Logic
+        if (round.getTypes().contains(RoundType.SPECIAL_100) && newLadder.getTypes().contains(LadderType.END)) {
+          LadderEntity assholeLadder = findInCache(round.getModifiedBaseAssholeLadder());
+          assholeLadder.getTypes().remove(LadderType.DEFAULT);
+          assholeLadder.getTypes().add(LadderType.ASSHOLE);
+
+          assholeLadder.getRankers().forEach(r -> {
+            AccountEntity a = r.getAccount();
+            RankerEntity highestRanker = findFirstActiveRankerOfAccountThisRound(a);
+            if(!r.isGrowing()) {
+              a.getAchievements().setPressedAssholeButton(true);
+              highestRanker.getUnlocks().setPressedAssholeButton(true);
+            }
+            highestRanker.getUnlocks().setReachedAssholeLadder(true);
+          });
+
+          Event<LadderEventTypes> e = new Event<>(LadderEventTypes.UPDATE_TYPES, account.getId(), assholeLadder.getTypes());
+          wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION, assholeLadder.getNumber(), e);
         }
 
         // Unlocks
@@ -531,7 +555,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
           newRanker.getUnlocks().setReachedBaseAssholeLadder(true);
         }
         if (!newRanker.getUnlocks().getReachedAssholeLadder()
-            && newLadder.getNumber() >= currentRound.getAssholeLadderNumber()) {
+            && newLadder.getTypes().contains(LadderType.ASSHOLE)) {
           newRanker.getUnlocks().setReachedAssholeLadder(true);
         }
         if (!newRanker.getUnlocks().getPressedAssholeButton()
@@ -549,13 +573,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
         newRanker.setGrapes(newRanker.getGrapes().add(BigInteger.valueOf(newLadder.getWinningGrapes(newLadder.getRankers().size(),config.getBaseGrapesToBuyAutoPromote()))));
 
-        // Create new Chat if it doesn't exist
-        if (chatService.find(ladder.getNumber() + 1) == null) {
-          chatService.create(ladder.getNumber() + 1);
-        }
-
-        wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
-            ladder.getNumber(), event);
+        wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION, ladder.getNumber(), event);
         wsUtils.convertAndSendToUser(account.getUuid(),
             AccountController.PRIVATE_EVENTS_DESTINATION, new Event<>(
                 AccountEventTypes.INCREASE_HIGHEST_LADDER, account.getId(), newLadder.getNumber()
@@ -563,7 +581,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         account = accountService.save(account);
 
         // Logic for the Asshole-Ladder
-        if (newRanker.getUnlocks().getPressedAssholeButton()) {
+        if (ladder.getTypes().contains(LadderType.ASSHOLE) && newRanker.getUnlocks().getPressedAssholeButton()) {
           JsonObject object1 = new JsonObject();
           object1.addProperty("u", account.getDisplayName());
           object1.addProperty("id", account.getId());
@@ -577,16 +595,19 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
 
           String metadataString = gson.toJson(new JsonObject[]{object1, object2});
 
-          chatService.sendGlobalMessage("{@} was welcomed by {@}. They are the "
-              + FormattingUtils.ordinal(newLadder.getRankers().size())
-              + " lucky initiate for the " + FormattingUtils.ordinal(
-              currentRound.getNumber()) + " big ritual.", metadataString);
+          ChatEntity chat = chatService.find(ChatType.SYSTEM);
+
+          messageService.create(accountService.findBroadcaster(), chat, FormattingUtils.format(
+              "{@} was welcomed by {@}. They are the {} lucky initiate for the {} big ritual.",
+              FormattingUtils.ordinal(newLadder.getRankers().size()),
+              FormattingUtils.ordinal(currentRound.getNumber())
+          ), metadataString);
 
           int neededAssholesForReset = currentRound.getAssholesForReset();
           int assholeCount = newLadder.getRankers().size();
 
           // Is it time to reset the game
-          if (assholeCount >= neededAssholesForReset) {
+          if (assholeCount >= neededAssholesForReset || round.getTypes().contains(RoundType.SPECIAL_100)) {
             wsUtils.convertAndSendToTopic(RoundController.TOPIC_EVENTS_DESTINATION,
                 new Event<>(RoundEventTypes.RESET, account.getId()));
 
@@ -607,8 +628,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         return true;
       }
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
 
     return false;
@@ -669,8 +689,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         return true;
       }
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
 
     return false;

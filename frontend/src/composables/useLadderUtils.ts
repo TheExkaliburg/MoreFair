@@ -1,7 +1,7 @@
 import Decimal from "break_infinity.js";
 import { computed } from "vue";
 import { LadderType, useLadderStore } from "~/store/ladder";
-import { useRoundStore } from "~/store/round";
+import { RoundType, useRoundStore } from "~/store/round";
 import { Ranker } from "~/store/entities/ranker";
 
 let ladder: any;
@@ -12,15 +12,19 @@ const getMinimumPointsForPromote = computed<Decimal>(() => {
 });
 
 const getMinimumPeopleForPromote = computed<number>(() => {
+  if (round.state.types.has(RoundType.SPECIAL_100)) {
+    return round.state.settings.minimumPeopleForPromote;
+  }
+
   return Math.max(
     round.state.settings.minimumPeopleForPromote,
-    ladder.state.number
+    ladder.state.scaling,
   );
 });
 
 const getVinegarThrowCost = computed<Decimal>(() => {
   return round.state.settings.baseVinegarNeededToThrow.mul(
-    new Decimal(ladder.state.number)
+    new Decimal(ladder.state.scaling),
   );
 });
 
@@ -41,6 +45,8 @@ const getYourPointsNeededToPromote = computed<Decimal>(() => {
 });
 
 const isLadderUnlocked = computed<boolean>(() => {
+  if (ladder.state.types.has(LadderType.END)) return false;
+
   return ladder.state.rankers.length >= getMinimumPeopleForPromote.value;
 });
 
@@ -52,7 +58,8 @@ const isLadderPromotable = computed<boolean>(() => {
 });
 
 const canPromote = computed<boolean>(() => {
-  if (ladder.getters.yourRanker === undefined) return false;
+  if (ladder.getters.yourRanker === undefined || !isLadderPromotable.value)
+    return false;
   if (
     ladder.getters.yourRanker.points.cmp(getYourPointsNeededToPromote.value) < 0
   ) {
@@ -78,7 +85,7 @@ const canBuyAutoPromote = computed<boolean>(() => {
 
   return (
     ladder.getters.yourRanker.grapes.cmp(
-      getAutoPromoteCost(ladder.getters.yourRanker.rank)
+      getAutoPromoteCost(ladder.getters.yourRanker.rank),
     ) >= 0 && ladder.state.number >= round.state.autoPromoteLadder
   );
 });
@@ -128,9 +135,9 @@ function getPointsNeededToPromote(ranker: Ranker) {
 
   return Decimal.max(
     (ranker.rank === 1 ? pursuingRanker : leadingRanker).points.add(
-      neededPointDiff
+      neededPointDiff,
     ),
-    getMinimumPointsForPromote.value
+    getMinimumPointsForPromote.value,
   );
 }
 
@@ -156,7 +163,7 @@ function getNextUpgradeCost(currentUpgrade: number): Decimal {
     flatMulti = 1.5;
   }
 
-  let ladderDec = new Decimal(ladder.state.number);
+  let ladderDec = new Decimal(ladder.state.scaling);
   ladderDec = ladderDec.mul(ladderMulti).add(new Decimal(1));
   const result = ladderDec.pow(currentUpgrade + 1).mul(flatMulti);
   return result.round().max(new Decimal(1));

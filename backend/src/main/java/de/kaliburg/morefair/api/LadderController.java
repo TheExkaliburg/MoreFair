@@ -34,8 +34,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequiredArgsConstructor
 public class LadderController {
 
-  public static final String TOPIC_EVENTS_DESTINATION = "/ladder/event/{number}";
-  public static final String PRIVATE_EVENTS_DESTINATION = "/ladder/event";
+  public static final String TOPIC_EVENTS_DESTINATION = "/ladder/events/{number}";
+  public static final String PRIVATE_EVENTS_DESTINATION = "/ladder/events";
   private static final String APP_BIAS_DESTINATION = "/ladder/bias";
   private static final String APP_MULTI_DESTINATION = "/ladder/multi";
   private static final String APP_VINEGAR_DESTINATION = "/ladder/vinegar";

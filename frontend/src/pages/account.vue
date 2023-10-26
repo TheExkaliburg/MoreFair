@@ -171,7 +171,7 @@ async function exportUuid() {
 
 function importUuid() {
   const uuid = prompt(
-    "Paste your ID into here (your old uuid will be copied into your clipboard):"
+    "Paste your ID into here (your old uuid will be copied into your clipboard):",
   );
   if (uuid === null || undefined) return;
   authStore.actions

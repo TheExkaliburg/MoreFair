@@ -3,8 +3,8 @@
     class="flex flex-col h-full w-full items-center text-button-text overflow-y-auto overflow-x-hidden py-2 z-1"
   >
     <div class="h-4 w-full lg:hidden">&nbsp;</div>
-    <ChatLogMessage
-      v-for="(m, i) in moderationStore.state.chatLog"
+    <ChatWindowContentMessage
+      v-for="(m, i) in moderationStore.getters.allMessages"
       :key="m"
       :index="i"
       :message="m"
@@ -14,8 +14,8 @@
 </template>
 
 <script lang="ts" setup>
-import ChatLogMessage from "~/components/moderation/ChatLogMessage.vue";
 import { useModerationStore } from "~/store/moderation";
+import ChatWindowContentMessage from "~/components/chat/ChatWindowContentMessage.vue";
 
 const moderationStore = useModerationStore();
 </script>

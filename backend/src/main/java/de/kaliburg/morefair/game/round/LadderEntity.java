@@ -71,11 +71,15 @@ public final class LadderEntity {
   @Enumerated(EnumType.STRING)
   @Fetch(FetchMode.SELECT)
   private Set<LadderType> types = EnumSet.noneOf(LadderType.class);
+
   @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
   private OffsetDateTime createdOn = OffsetDateTime.now(ZoneOffset.UTC);
   @NonNull
   @Column(nullable = false, precision = 1000)
   private BigInteger basePointsToPromote;
+  @NonNull
+  @Column(nullable = false)
+  private Integer scaling;
 
   public LadderEntity(@NonNull Integer number, @NonNull RoundEntity round) {
     this.number = number;
@@ -83,8 +87,15 @@ public final class LadderEntity {
 
     determineLadderType(round);
 
+    if(round.getTypes().contains(RoundType.REVERSE_SCALING)) {
+      // Makes Ladder 1 be Asshole Ladder etc.
+      this.scaling = Math.max(round.getAssholeLadderNumber() + 1 - number, 1);
+    } else {
+      this.scaling = number;
+    }
+
     // getting the pointRequirement based on the type
-    BigInteger base = round.getBasePointsRequirement().multiply(BigInteger.valueOf(number));
+    BigInteger base = round.getBasePointsRequirement().multiply(BigInteger.valueOf(scaling));
     if (types.contains(LadderType.TINY)) {
       base = BigInteger.ZERO;
     } else if (types.contains(LadderType.SMALL)) {

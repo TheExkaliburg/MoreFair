@@ -18,13 +18,13 @@ export class RoundSettings implements RoundSettingsData {
   constructor(data: any) {
     Object.assign(this, data);
     this.basePointsForPromote = Object.freeze(
-      new Decimal(this.basePointsForPromote)
+      new Decimal(this.basePointsForPromote),
     );
     this.baseVinegarNeededToThrow = Object.freeze(
-      new Decimal(this.baseVinegarNeededToThrow)
+      new Decimal(this.baseVinegarNeededToThrow),
     );
     this.baseGrapesNeededToAutoPromote = Object.freeze(
-      new Decimal(this.baseGrapesNeededToAutoPromote)
+      new Decimal(this.baseGrapesNeededToAutoPromote),
     );
   }
 }

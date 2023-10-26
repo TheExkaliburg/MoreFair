@@ -4,11 +4,11 @@
   >
     <div class="h-4 w-full lg:hidden">&nbsp;</div>
     <ChatWindowContentMessage
-      v-for="(m, i) in chatStore.state.messages"
+      v-for="(m, i) in chatStore.getters.allMessages"
       :key="m"
       :index="i"
       :message="m"
-      class="py-1"
+      class="py-0.5"
     />
   </div>
 </template>

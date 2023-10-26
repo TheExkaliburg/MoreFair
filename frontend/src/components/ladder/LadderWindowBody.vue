@@ -82,7 +82,7 @@
         class="w-full rounded-l-none border-l-0 whitespace-nowrap"
         @click="throwVinegar"
       >
-        {{ lang("vinegar") }}
+        {{ vinegarButtonLabel }}
       </FairButton>
       <FairButton
         v-else
@@ -118,14 +118,12 @@ import { LadderType, useLadderStore } from "~/store/ladder";
 import { Ranker } from "~/store/entities/ranker";
 import { useFormatter, useTimeFormatter } from "~/composables/useFormatter";
 import { useLadderUtils } from "~/composables/useLadderUtils";
-import { useRoundStore } from "~/store/round";
 import { useStomp } from "~/composables/useStomp";
 import { useEta } from "~/composables/useEta";
 
 const lang = useLang("components.ladder.buttons");
 const optionsStore = useOptionsStore();
 const ladderStore = useLadderStore();
-const roundStore = useRoundStore();
 const ladderUtils = useLadderUtils();
 const isButtonLocked = computed<boolean>(() => {
   return (
@@ -146,7 +144,7 @@ const yourPercentageToPromotion = computed<string>(() => {
   return useFormatter(
     yourRanker.value.points
       .mul(100)
-      .div(ladderUtils.getYourPointsNeededToPromote.value)
+      .div(ladderUtils.getYourPointsNeededToPromote.value),
   );
 });
 
@@ -154,7 +152,7 @@ const biasButtonLabel = computed<string>(() => {
   if (canBuyBias.value) return `+1 ${lang("bias")}`;
 
   const eta = useEta(yourRanker.value).toPoints(
-    ladderUtils.getYourBiasCost.value
+    ladderUtils.getYourBiasCost.value,
   );
   return `+${lang("bias_short")} (${useTimeFormatter(eta)})`;
 });
@@ -163,9 +161,15 @@ const multiButtonLabel = computed<string>(() => {
   if (canBuyMulti.value) return `+1 ${lang("multi")}`;
 
   const eta = useEta(yourRanker.value).toPower(
-    ladderUtils.getYourMultiCost.value
+    ladderUtils.getYourMultiCost.value,
   );
   return `+${lang("multi_short")} (${useTimeFormatter(eta)})`;
+});
+
+const vinegarButtonLabel = computed<string>(() => {
+  const eta = useEta(yourRanker.value).toVinegarThrow();
+  if (eta === 0 || eta === Infinity) return `${lang("vinegar")}`;
+  return `${lang("vinegar")} (${useTimeFormatter(eta)})`;
 });
 
 const yourFormattedMulti = computed<string>(() => {
@@ -230,16 +234,16 @@ const canThrowVinegar = computed<boolean>(() => {
 const canPromote = computed<boolean>(() => {
   return (
     ladderUtils.getYourPointsNeededToPromote.value.cmp(
-      yourRanker.value.points
+      yourRanker.value.points,
     ) <= 0 &&
     yourRanker.value.growing &&
     ladderUtils.isLadderPromotable.value
   );
 });
 const promoteLabel = computed<string>(() => {
-  return ladderStore.state.number < roundStore.state.assholeLadder
-    ? lang("promote")
-    : lang("asshole");
+  if (ladderStore.state.types.has(LadderType.END)) return lang("wait");
+  if (ladderStore.state.types.has(LadderType.ASSHOLE)) return lang("asshole");
+  return lang("promote");
 });
 
 const pressedBiasRecently = ref<boolean>(false);
@@ -311,7 +315,7 @@ function throwVinegar(e: Event) {
 function promote(e: Event) {
   if (pressedPromoteRecently.value || !canPromote.value) return;
   pressedPromoteRecently.value = true;
-  if (ladderStore.state.number >= roundStore.state.assholeLadder) {
+  if (ladderStore.state.types.has(LadderType.ASSHOLE)) {
     if (confirm("Do you really wanna be an Asshole?!")) {
       useStomp().wsApi.ladder.promote(e);
     }
@@ -324,7 +328,7 @@ onMounted(() => {
   useStomp().addCallback(
     useStomp().callbacks.onTick,
     "fair_ladder_buttons",
-    handleTick
+    handleTick,
   );
 });
 </script>

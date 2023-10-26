@@ -136,6 +136,10 @@ public class RoundEntity {
   }
 
   public Integer getAssholeLadderNumber() {
+    if (types.contains(RoundType.SPECIAL_100)) {
+      return 100;
+    }
+
     int result = baseAssholeLadder + highestAssholeCount;
     result = Math.min(25, result);
     if (types.contains(RoundType.FAST)) {
@@ -154,7 +158,11 @@ public class RoundEntity {
   }
 
   public Integer getModifiedBaseAssholeLadder() {
-    int result = getBaseAssholeLadder();
+    if (types.contains(RoundType.SPECIAL_100)) {
+      return 50;
+    }
+
+    int result = baseAssholeLadder;
     if (types.contains(RoundType.FAST)) {
       result = getBaseAssholeLadder() / 2;
     } else if (types.contains(RoundType.SLOW)) {

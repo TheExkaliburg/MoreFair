@@ -182,32 +182,34 @@ public class LadderTypeBuilder {
   public Set<LadderType> build() {
     Set<LadderType> ladderTypes = EnumSet.noneOf(LadderType.class);
 
+    if(roundTypes.contains(RoundType.SPECIAL_100)) {
+      return specialRoundBuilder();
+    }
+
     if (ladderNumber == 1) {
       return EnumSet.of(LadderType.DEFAULT);
+    }
+
+    if (ladderNumber > assholeLadderNumber) {
+      return EnumSet.of(LadderType.END);
     }
 
     if (ladderNumber > 25) {
       ladderSizeTypeWeights.put(LadderType.GIGANTIC, 0.f);
     }
 
-    this.roundTypes.stream().sorted(new RoundTypeComparator()).forEach(this::handleRoundTypes);
+    this.roundTypes.stream().sorted(new RoundType.Comparator()).forEach(this::handleRoundTypes);
     this.previousLadderType.stream().sorted(new LadderTypeComparator())
         .forEach(this::handlePreviousLadderType);
 
-    if (roundNumber == 100 && ladderNumber % 10 == 0) {
-      // make it no Auto for sure
-      ladderAutoTypeWeights.put(LadderType.DEFAULT, 0.f);
-      ladderAutoTypeWeights.put(LadderType.FREE_AUTO, 0.f);
-      ladderAutoTypeWeights.put(LadderType.NO_AUTO, 100.f);
-    }
-
-    if (ladderNumber >= assholeLadderNumber) {
-      ladderAutoTypeWeights.put(LadderType.NO_AUTO,
-          Math.max(1.f, ladderAutoTypeWeights.get(LadderType.NO_AUTO)));
+    if (ladderNumber.equals(assholeLadderNumber)) {
+      ladderAutoTypeWeights.put(LadderType.NO_AUTO, Math.max(1.f, ladderAutoTypeWeights.get(LadderType.NO_AUTO)));
       ladderAutoTypeWeights.put(LadderType.FREE_AUTO, 0.f);
       ladderAutoTypeWeights.put(LadderType.DEFAULT, 0.f);
       ladderTypes.add(LadderType.ASSHOLE);
     }
+
+
 
     ladderTypes.add(getRandomLadderType(ladderSizeTypeWeights, "Size"));
     ladderTypes.add(getRandomLadderType(ladderAutoTypeWeights, "Auto"));
@@ -262,5 +264,26 @@ public class LadderTypeBuilder {
           e);
     }
     return LadderType.DEFAULT;
+  }
+
+  private Set<LadderType> specialRoundBuilder() {
+    Set<LadderType> result = EnumSet.noneOf(LadderType.class);
+
+    if(ladderNumber > 100) {
+      return EnumSet.of(LadderType.END);
+    }
+
+    if(ladderNumber == 1 || ladderNumber == 50 || ladderNumber == 100) {
+      result.add(LadderType.NO_AUTO);
+    }
+
+    if(ladderNumber % 10 == 0) {
+      result.add(LadderType.GIGANTIC);
+      result.add(LadderType.CHEAP);
+    } else {
+      result.add(LadderType.TINY);
+    }
+
+    return result;
   }
 }

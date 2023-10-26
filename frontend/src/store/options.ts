@@ -3,6 +3,7 @@ import axios from "axios";
 import {
   BooleanOption,
   EditableMentionsOption,
+  EditableIgnoreOption,
   EditableThemeURLOption,
   EnumOption,
   IntegerOption,
@@ -54,6 +55,7 @@ const defaultValues = {
   }),
   chat: new OptionsGroup({
     subscribedMentions: new EditableMentionsOption(["here"]),
+    ignoredPlayers: new EditableIgnoreOption([]),
   }),
   sound: new OptionsGroup({
     playSoundOnPromotion: new BooleanOption(false).setCallback((value) => {
@@ -77,7 +79,7 @@ const defaultValues = {
     themeSelector: new EnumOption("Default", ["Default", "Light"]).setCallback(
       (value) => {
         changeTheme(value);
-      }
+      },
     ),
     themeUploader: new EditableThemeURLOption([]).setCallback(
       (value, oldValue) => {
@@ -90,7 +92,7 @@ const defaultValues = {
           optionsStorage.value.theme.themeSelector.transient.options =
             optionsStorage.value.theme.themeSelector.transient.options.splice(
               index,
-              1
+              1,
             );
           if (defaultValues.theme.themeSelector instanceof EnumOption)
             defaultValues.theme.themeSelector.transient.options =
@@ -99,7 +101,7 @@ const defaultValues = {
           // If that was the selected theme, change it to default
           if (
             !optionsStorage.value.theme.themeSelector.transient.options.includes(
-              optionsStorage.value.theme.themeSelector.value
+              optionsStorage.value.theme.themeSelector.value,
             )
           ) {
             optionsStorage.value.theme.themeSelector.value = "Default";
@@ -110,7 +112,7 @@ const defaultValues = {
           const last = value[value.length - 1];
           loadTheme(last);
         }
-      }
+      },
     ),
   }),
 };

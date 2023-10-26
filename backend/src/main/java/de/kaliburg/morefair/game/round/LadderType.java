@@ -25,7 +25,8 @@ public enum LadderType implements Comparable<LadderType> {
   CONSOLATION,
   NO_HANDOUTS,
   GENEROUS,
-  STINGY;
+  STINGY,
+  END;
 
   /**
    * The order of the ladder types when sorted (ordinal is originally used if the priority is the

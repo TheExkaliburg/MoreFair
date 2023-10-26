@@ -35,8 +35,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AccountController {
 
-  public static final String TOPIC_EVENTS_DESTINATION = "/account/event";
-  public static final String PRIVATE_EVENTS_DESTINATION = "/account/event";
+  public static final String TOPIC_EVENTS_DESTINATION = "/account/events";
+  public static final String PRIVATE_EVENTS_DESTINATION = "/account/events";
   private static final String APP_RENAME_DESTINATION = "/account/name";
   private final AccountService accountService;
   private final WsUtils wsUtils;

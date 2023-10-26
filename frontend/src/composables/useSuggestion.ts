@@ -2,9 +2,8 @@ import { VueRenderer } from "@tiptap/vue-3";
 import { tippy } from "vue-tippy";
 import { PluginKey } from "prosemirror-state";
 import ChatWindowInputUserMentionList from "../components/chat/ChatWindowInputSuggestionList.vue";
-import { useLadderStore } from "~/store/ladder";
 import { useOptionsStore } from "~/store/options";
-import { Ranker } from "~/store/entities/ranker";
+import { Suggestion, useChatStore } from "~/store/chat";
 
 const emojiJson = () => import("../assets/emoji.json");
 
@@ -72,27 +71,30 @@ const render = (format: Function) => () => {
 };
 
 export const useUserSuggestion = () => {
-  const ladderStore = useLadderStore();
   return {
     items: ({ query }: { query: string }) => {
-      const list = ladderStore.state.rankers;
+      const list = useChatStore().state.suggestions;
       const queryLower = query.toLowerCase();
       if (queryLower.length < 1) return list;
 
       if (queryLower.startsWith("#")) {
         if (queryLower.length < 2) return [];
         return list.filter((item) =>
-          String(item.accountId).includes(queryLower.substring(1))
+          String(item.accountId).includes(queryLower.substring(1)),
         );
       } else {
         if (queryLower.length < 1) return [];
-        return list.filter((item) =>
-          item.username.toLowerCase().startsWith(queryLower)
+        return list.filter(
+          (item) =>
+            item.displayName.toLowerCase().startsWith(queryLower) &&
+            item.displayName !== "Mystery Guest",
         );
       }
     },
     pluginKey: new PluginKey("userSuggestion"),
-    render: render((item: Ranker) => `${item.username}#${item.accountId}`),
+    render: render(
+      (item: Suggestion) => `${item.displayName}#${item.accountId}`,
+    ),
   };
 };
 
@@ -112,7 +114,7 @@ export const useEmojiSuggestion = () => {
     },
     pluginKey: new PluginKey("emojiSuggestion"),
     render: render(
-      (item: EmojiDataEntry) => `${item.emoji}: ${item.aliases[0]}`
+      (item: EmojiDataEntry) => `${item.emoji}: ${item.aliases[0]}`,
     ),
   };
 };
@@ -127,7 +129,7 @@ export const useGroupSuggestion = () => {
       const queryLower = query.toLowerCase();
       return [
         ...list.filter((item: string) =>
-          item.toLowerCase().startsWith(queryLower)
+          item.toLowerCase().startsWith(queryLower),
         ),
         queryLower,
       ];

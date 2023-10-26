@@ -55,11 +55,11 @@ export const useEta = (ranker: Ranker) => {
     // Calculating the relative acceleration of the two players
     const rankerAcc = getPowerGainDifferenceToRank(
       ranker,
-      target.rank < ranker.rank && !target.growing ? target.rank : 1
+      target.rank < ranker.rank && !target.growing ? target.rank : 1,
     );
     const targetAcc = getPowerGainDifferenceToRank(
       target,
-      ranker.rank < target.rank && !ranker.growing ? ranker.rank : 1
+      ranker.rank < target.rank && !ranker.growing ? ranker.rank : 1,
     );
     const accDiff = targetAcc.sub(rankerAcc);
     // Calculating the relative current speed of the two players
@@ -103,7 +103,7 @@ export const useEta = (ranker: Ranker) => {
     let targetRank = 1;
     if (ladder.state.rankers.length > 0) {
       const pseudoRanker = ladder.state.rankers.find(
-        (r) => r.points.cmp(target) < 0
+        (r) => r.points.cmp(target) < 0,
       );
 
       if (pseudoRanker === undefined || pseudoRanker.rank >= ranker.rank) {
@@ -178,6 +178,34 @@ export const useEta = (ranker: Ranker) => {
     return Math.max(etaRequirement, toFirst() + 30);
   }
 
+  function toVinegarThrow(): number {
+    if (!ranker.growing) return 0;
+
+    let secondsToVinegar: Decimal;
+
+    if (
+      ranker.rank === ladder.state.rankers.length &&
+      ladder.state.rankers.length >= 1
+    ) {
+      // TODO: When grape modifiers are implemented, acceleration can be changed.
+      const acceleration = 2;
+      const a = new Decimal(acceleration).div(2);
+      const b = ranker.grapes.sub(1);
+      const c = ranker.vinegar.sub(ladderUtils.getVinegarThrowCost.value);
+
+      secondsToVinegar = solveQuadratic(a, b, c);
+    } else {
+      secondsToVinegar =
+        ladderUtils.getVinegarThrowCost.value.cmp(ranker.vinegar) >= 0
+          ? ladderUtils.getVinegarThrowCost.value
+              .sub(ranker.vinegar)
+              .div(ranker.grapes)
+          : new Decimal(0);
+    }
+
+    return secondsToVinegar.toNumber();
+  }
+
   return {
     toRanker,
     toPoints,
@@ -186,13 +214,14 @@ export const useEta = (ranker: Ranker) => {
     toFirst,
     toPromotionRequirement,
     toPromote,
+    toVinegarThrow,
   };
 };
 
 function solveQuadratic(
   accelerationDiff: Decimal,
   speedDiff: Decimal,
-  pointDiff: Decimal
+  pointDiff: Decimal,
 ): Decimal {
   // IF Acceleration is equal, only check speed
   if (accelerationDiff.eq_tolerance(new Decimal(0), Number.EPSILON)) {

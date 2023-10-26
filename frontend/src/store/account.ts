@@ -37,7 +37,6 @@ export type AccountData = {
 
 export const useAccountStore = defineStore("account", () => {
   const api = useAPI();
-
   const ladderStore = useLadderStore();
   const stomp = useStomp();
 
@@ -71,22 +70,27 @@ export const useAccountStore = defineStore("account", () => {
   }
 
   async function getAccountDetails() {
-    return await api.account.getAccountDetails().then((res) => {
-      const data: AccountData = res.data;
-      state.accessRole = data.accessRole;
-      state.accountId = data.accountId;
-      state.highestCurrentLadder = data.highestCurrentLadder;
-      state.uuid = data.uuid;
-      state.username = data.username;
-      state.email = data.email;
-      stomp.connectPrivateChannel(state.uuid);
-      stomp.addCallback(
-        stomp.callbacks.onAccountEvent,
-        "fair_account_events",
-        handleAccountEvents
-      );
-      return Promise.resolve(res);
-    });
+    return await api.account
+      .getAccountDetails()
+      .then((res) => {
+        const data: AccountData = res.data;
+        state.accessRole = data.accessRole;
+        state.accountId = data.accountId;
+        state.highestCurrentLadder = data.highestCurrentLadder;
+        state.uuid = data.uuid;
+        state.username = data.username;
+        state.email = data.email;
+        stomp.connectPrivateChannel(state.uuid);
+        stomp.addCallback(
+          stomp.callbacks.onAccountEvent,
+          "fair_account_events",
+          handleAccountEvents,
+        );
+        return Promise.resolve(res);
+      })
+      .catch((_) => {
+        isInitialized.value = false;
+      });
   }
 
   function handleAccountEvents(body: OnAccountEventBody) {
@@ -97,7 +101,7 @@ export const useAccountStore = defineStore("account", () => {
       ranker = ladderStore.getters.yourRanker;
     } else {
       ranker = ladderStore.state.rankers.find(
-        (r) => r.accountId === body.accountId
+        (r) => r.accountId === body.accountId,
       );
     }
 
@@ -122,6 +126,7 @@ export const useAccountStore = defineStore("account", () => {
       case AccountEventType.INCREASE_HIGHEST_LADDER:
         useSound(SOUNDS.PROMOTION).play();
         state.highestCurrentLadder = body.data;
+        useChatStore().actions.changeChat(state.highestCurrentLadder);
         break;
       default:
         console.error("Unknown account event type: " + event);

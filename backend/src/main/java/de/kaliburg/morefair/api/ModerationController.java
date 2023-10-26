@@ -11,6 +11,7 @@ import de.kaliburg.morefair.data.ModChatDto;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.AccountEventTypes;
 import de.kaliburg.morefair.game.chat.ChatService;
+import de.kaliburg.morefair.game.chat.ChatType;
 import de.kaliburg.morefair.game.chat.MessageEntity;
 import de.kaliburg.morefair.game.chat.MessageService;
 import de.kaliburg.morefair.game.round.LadderService;
@@ -37,8 +38,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequiredArgsConstructor
 public class ModerationController {
 
-  public static final String TOPIC_LOG_EVENTS_DESTINATION = "/moderation/log/event";
-  public static final String TOPIC_CHAT_EVENTS_DESTINATION = "/moderation/chat/event";
+  public static final String TOPIC_LOG_EVENTS_DESTINATION = "/moderation/log/events";
+  public static final String TOPIC_CHAT_EVENTS_DESTINATION = "/moderation/chat/events";
   private static final String APP_BAN_DESTINATION = "/moderation/ban/{id}";
   private static final String APP_MUTE_DESTINATION = "/moderation/mute/{id}";
   private static final String APP_FREE_DESTINATION = "/moderation/free/{id}";
@@ -59,7 +60,9 @@ public class ModerationController {
       if (account == null || !account.isMod()) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       } else {
-        List<MessageEntity> messages = messageService.getNewestMessages();
+        List<MessageEntity> messages =
+            messageService.findNewestMessagesByChatType(List.of(ChatType.LADDER, ChatType.GLOBAL,
+                ChatType.SYSTEM, ChatType.MOD));
         return new ResponseEntity<>(new ModChatDto(messages, config), HttpStatus.OK);
       }
     } catch (Exception e) {
@@ -85,7 +88,7 @@ public class ModerationController {
       target.setAccessRole(AccountAccessRole.BANNED_PLAYER);
       target.setDisplayName("[BANNED]");
       target = accountService.save(target);
-      chatService.deleteMessagesOfAccount(target);
+      messageService.deleteMessagesOfAccount(target);
       log.info("[MOD] {} (#{}) is banning the account {} (#{})", account.getDisplayName(),
           account.getId(),
           target.getDisplayName(), target.getId());
@@ -112,7 +115,7 @@ public class ModerationController {
       target.setAccessRole(AccountAccessRole.MUTED_PLAYER);
       target.setDisplayName("[MUTED]" + target.getDisplayName());
       target = accountService.save(target);
-      chatService.deleteMessagesOfAccount(target);
+      messageService.deleteMessagesOfAccount(target);
       log.info("[MOD] {} (#{}) is muting the account {} (#{})", account.getDisplayName(),
           account.getId(),
           target.getDisplayName(), target.getId());

@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { computed, reactive } from "vue";
 import { useAPI } from "~/composables/useAPI";
 import { useStomp } from "~/composables/useStomp";
 import { useToasts } from "~/composables/useToasts";
@@ -26,18 +27,34 @@ export class ChatLogMessage extends Message implements ChatLogMessageData {
   }
 }
 
+export type ModerationState = {
+  chatLog: Message[];
+  searchResults: string;
+  altSearchResults: string;
+};
+
 export const useModerationStore = defineStore("moderation", () => {
   const api = useAPI();
   const stomp = useStomp();
   const accountStore = useAccountStore();
 
   const isInitialized = ref<boolean>(false);
-  const state = reactive({
-    chatLog: <ChatLogMessage[]>[],
+  const state = reactive<ModerationState>({
+    chatLog: <Message[]>[],
     searchResults: "",
     altSearchResults: "",
   });
-  const getters = reactive({});
+  const getters = reactive({
+    allMessages: computed<Message[]>(() => {
+      const result = [] as Message[];
+      result.push(...(state.chatLog as Message[]));
+      result.sort((a, b) => b.timestamp - a.timestamp);
+      result.length = Math.min(result.length, 100);
+      result.reverse();
+
+      return result;
+    }),
+  });
 
   async function init() {
     if (isInitialized.value) return Promise.resolve();
@@ -53,7 +70,7 @@ export const useModerationStore = defineStore("moderation", () => {
         data.forEach((message) => {
           const msg = new ChatLogMessage(message);
           msg.setFlag("old");
-          state.chatLog.unshift(msg);
+          addMessage(msg);
         });
 
         stomp.addCallback(
@@ -61,7 +78,7 @@ export const useModerationStore = defineStore("moderation", () => {
           "fair_chat_event",
           (body) => {
             addMessage(body);
-          }
+          },
         );
 
         return Promise.resolve(res);
@@ -74,7 +91,7 @@ export const useModerationStore = defineStore("moderation", () => {
   }
 
   function addMessage(body: ChatLogMessageData) {
-    const msg = new ChatLogMessage(body);
+    const msg = new Message(body);
     if (state.chatLog.length > 50) {
       state.chatLog.shift();
     }
@@ -87,7 +104,7 @@ export const useModerationStore = defineStore("moderation", () => {
       }
     });
 
-    if (isMentioned) {
+    if (isMentioned && !msg.hasFlag("old")) {
       useSound(SOUNDS.MENTION).play();
     }
   }

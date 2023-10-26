@@ -110,4 +110,8 @@ public class AccountEntity {
 
     return (int) Math.round(Math.floor(solution));
   }
+
+  public boolean isBroadcaster() {
+    return accessRole.equals(AccountAccessRole.BROADCASTER) || isOwner();
+  }
 }

@@ -48,15 +48,11 @@ public class RoundTypeBuilder {
   // TODO: add reference to last Round into this method
   private void handlePreviousRoundType(RoundType roundType) {
     // Logic goes here
-
   }
 
   public Set<RoundType> build() {
-    if (roundNumber == 100) {
-      roundSpeedTypeWeights.put(RoundType.DEFAULT, 0.f);
-      roundSpeedTypeWeights.put(RoundType.FAST, 0.f);
-      roundAutoTypeWeights.put(RoundType.DEFAULT, 0.f);
-      roundChaosTypeWeights.put(RoundType.DEFAULT, 0.f);
+    if (roundNumber % 100 == 0) {
+      return EnumSet.of(RoundType.SPECIAL_100, RoundType.REVERSE_SCALING);
     } else if (roundNumber % 10 == 0) {
       roundSpeedTypeWeights.put(RoundType.FAST, 1.f);
       roundSpeedTypeWeights.put(RoundType.SLOW, 1.f);
@@ -73,7 +69,7 @@ public class RoundTypeBuilder {
     int iterations = 0;
     do {
       roundTypes = EnumSet.noneOf(RoundType.class);
-      roundTypes.stream().sorted(new RoundTypeComparator()).forEach(this::handlePreviousRoundType);
+      roundTypes.stream().sorted(new RoundType.Comparator()).forEach(this::handlePreviousRoundType);
       roundTypes.add(getRandomLadderType(roundSpeedTypeWeights, "Speed"));
       roundTypes.add(getRandomLadderType(roundAutoTypeWeights, "Auto"));
       roundTypes.add(getRandomLadderType(roundChaosTypeWeights, "Chaos"));

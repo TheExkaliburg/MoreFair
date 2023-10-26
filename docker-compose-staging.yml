@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   fairgame:
-    image: kaliburg/fairgame:staging
+    image: kaliburg/fairgame:spec
     environment:
       SPRING_PROFILE: ${PROFILE}
       POSTGRES_URL: jdbc:postgresql://postgres:5432/FairGameStaging
@@ -22,7 +22,7 @@ services:
       - mongo
     restart: unless-stopped
   postgres:
-    image: postgres:latest
+    image: postgres:15
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}

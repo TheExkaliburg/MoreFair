@@ -120,7 +120,7 @@ const props = withDefaults(
   {
     index: -1,
     container: null,
-  }
+  },
 );
 
 const ladderStore = useLadderStore();
@@ -131,7 +131,7 @@ const el = ref<HTMLElement | null>();
 const isVisible = useElementVisibility(el.value);
 
 const isYou = computed(
-  () => props.ranker.accountId === ladderStore.getters.yourRanker?.accountId
+  () => props.ranker.accountId === ladderStore.getters.yourRanker?.accountId,
 );
 const isFirst = computed(() => {
   return props.index === 0;
