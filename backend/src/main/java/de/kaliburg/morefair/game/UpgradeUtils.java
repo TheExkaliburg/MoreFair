@@ -1,12 +1,17 @@
 package de.kaliburg.morefair.game;
 
 import de.kaliburg.morefair.FairConfig;
+import de.kaliburg.morefair.game.round.LadderEntity;
 import de.kaliburg.morefair.game.round.LadderType;
+import de.kaliburg.morefair.game.round.LadderUtils;
+import de.kaliburg.morefair.game.round.RoundEntity;
+import de.kaliburg.morefair.game.round.RoundType;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.EnumSet;
 import java.util.Set;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -17,8 +22,11 @@ public class UpgradeUtils {
 
   private final FairConfig config;
 
-  public UpgradeUtils(FairConfig config) {
+  private final LadderUtils ladderUtils;
+
+  public UpgradeUtils(FairConfig config, @Lazy LadderUtils ladderUtils) {
     this.config = config;
+    this.ladderUtils = ladderUtils;
   }
 
   /**
@@ -76,8 +84,9 @@ public class UpgradeUtils {
     return config.getBaseVinegarToThrow().multiply(BigInteger.valueOf(ladderNum));
   }
 
-  public BigInteger buyAutoPromoteCost(Integer rank, Integer ladderNum) {
-    Integer minPeople = Math.max(config.getBaseAssholeLadder(), ladderNum);
+  public BigInteger buyAutoPromoteCost(RoundEntity round, LadderEntity ladder, Integer rank) {
+    Integer minPeople = ladderUtils.getRequiredRankerCountToUnlock(ladder);
+
     Integer divisor = Math.max(rank - minPeople + 1, 1);
 
     BigDecimal decGrapes = new BigDecimal(config.getBaseGrapesToBuyAutoPromote());

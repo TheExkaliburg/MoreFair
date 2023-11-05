@@ -66,7 +66,7 @@ public class LadderUtils {
   }
 
   public Integer getRequiredRankerCountToUnlock(LadderEntity ladder) {
-    if(ladder.getRound().getTypes().contains(RoundType.SPECIAL_100)) {
+    if (ladder.getRound().getTypes().contains(RoundType.SPECIAL_100)) {
       return config.getBaseAssholeLadder();
     }
 
@@ -154,8 +154,10 @@ public class LadderUtils {
    * @return if the ranker can buy auto-promote
    */
   public boolean canBuyAutoPromote(LadderEntity ladder, RankerEntity ranker, RoundEntity round) {
-    return !ranker.isAutoPromote() && ranker.getGrapes()
-        .compareTo(upgradeUtils.buyAutoPromoteCost(ranker.getRank(), ladder.getScaling())) >= 0
+    BigInteger autoPromoteCost = upgradeUtils.buyAutoPromoteCost(round, ladder, ranker.getRank());
+
+    return !ranker.isAutoPromote()
+        && ranker.getGrapes().compareTo(autoPromoteCost) >= 0
         && ladder.getNumber() >= config.getAutoPromoteLadder()
         && ladder.getNumber() < round.getAssholeLadderNumber()
         && !ladder.getTypes().contains(LadderType.NO_AUTO);

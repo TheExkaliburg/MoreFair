@@ -467,7 +467,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         return false;
       }
 
-      BigInteger cost = upgradeUtils.buyAutoPromoteCost(ranker.getRank(), ladder.getScaling());
+      BigInteger cost = upgradeUtils.buyAutoPromoteCost(currentRound, ladder, ranker.getRank());
 
       if (ladder.getTypes().contains(LadderType.FREE_AUTO)) {
         ranker.setAutoPromote(true);
