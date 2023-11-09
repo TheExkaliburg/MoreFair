@@ -135,8 +135,7 @@ export class Message implements MessageData {
     combinedMentions.forEach((m) => {
       const index = m.i;
       if (isGroupMentionMeta(m)) {
-        let name = m.g;
-        name = name.trim();
+        const name = m.g?.trim();
         if (message.slice(index, index + 3) !== "{$}") return;
 
         result.push(
@@ -148,7 +147,7 @@ export class Message implements MessageData {
         result.push(new MessagePart(MessagePartType.mentionGroup, name));
         lastIndex = index + 3;
       } else {
-        const name = m.u.trim();
+        const name = m.u?.trim();
         const id = m.id;
         if (message.slice(index, index + 3) !== "{@}") return;
 
