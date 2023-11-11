@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.game;
+package de.kaliburg.morefair.game.round;
 
 import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.game.round.LadderEntity;
@@ -22,10 +22,14 @@ public class UpgradeUtils {
 
   private final FairConfig config;
 
-  private final LadderUtils ladderUtils;
+  private LadderUtils ladderUtils;
 
   public UpgradeUtils(FairConfig config, @Lazy LadderUtils ladderUtils) {
     this.config = config;
+    this.ladderUtils = ladderUtils;
+  }
+
+  void setLadderUtils(LadderUtils ladderUtils) {
     this.ladderUtils = ladderUtils;
   }
 

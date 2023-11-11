@@ -17,7 +17,7 @@
           </div>
           <div class="whitespace-nowrap">
             Ladders: {{ accountStore.state.highestCurrentLadder }}/{{
-              roundStore.state.assholeLadder
+              formattedAssholeLadder
             }}
             ({{ roundStore.state.topLadder }})
           </div>
@@ -49,7 +49,7 @@
         <div class="flex flex-col">
           <div class="whitespace-nowrap" data-tutorial="info">
             Ladders: {{ accountStore.state.highestCurrentLadder }}/{{
-              roundStore.state.assholeLadder
+              formattedAssholeLadder
             }}
             ({{ roundStore.state.topLadder }})
           </div>
@@ -111,6 +111,12 @@ import TypeInformation from "~/components/ladder/TypeInformation.vue";
 const ladderStore = useLadderStore();
 const roundStore = useRoundStore();
 const accountStore = useAccountStore();
+
+const formattedAssholeLadder = computed(() => {
+  return roundStore.state.topLadder > 100
+    ? 200
+    : roundStore.state.assholeLadder;
+});
 
 const formattedRoundPointsForPromotion = computed<string>(() => {
   return useFormatter(roundStore.state.settings.basePointsForPromote);

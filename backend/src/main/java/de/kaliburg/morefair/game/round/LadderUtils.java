@@ -1,7 +1,6 @@
 package de.kaliburg.morefair.game.round;
 
 import de.kaliburg.morefair.FairConfig;
-import de.kaliburg.morefair.game.UpgradeUtils;
 import java.math.BigInteger;
 import java.util.Random;
 import org.springframework.lang.NonNull;

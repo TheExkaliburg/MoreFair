@@ -179,54 +179,55 @@ export const useLadderStore = defineStore("ladder", () => {
   }
 
   function calculateTick(deltaSeconds: number) {
-    const wasFirst = getters.yourRanker?.rank === 1;
-
     handleEvents();
     ladderEvents.length = 0;
 
-    const delta = new Decimal(deltaSeconds);
-    state.rankers.sort((a, b) => b.points.cmp(a.points));
+    const rankers = state.rankers.map((ranker) => new Ranker({ ...ranker }));
+    const yourRanker = rankers.find(
+      (r) => r.accountId === accountStore.state.accountId,
+    );
 
-    for (let i = 0; i < state.rankers.length; i++) {
-      state.rankers[i].rank = i + 1;
+    const wasFirst = yourRanker?.rank === 1;
+
+    const delta = new Decimal(deltaSeconds);
+    rankers.sort((a, b) => b.points.cmp(a.points));
+
+    for (let i = 0; i < rankers.length; i++) {
+      rankers[i].rank = i + 1;
 
       // If ranker still on ladder
-      if (state.rankers[i].growing) {
+      if (rankers[i].growing) {
         // Power & Points
-        if (state.rankers[i].rank !== 1) {
-          state.rankers[i].power = Object.freeze(
-            state.rankers[i].power
-              .add(state.rankers[i].getPowerPerSecond().mul(delta))
+        if (rankers[i].rank !== 1) {
+          rankers[i].power = Object.freeze(
+            rankers[i].power
+              .add(rankers[i].getPowerPerSecond().mul(delta))
               .floor(),
           );
         }
-        state.rankers[i].points = Object.freeze(
-          state.rankers[i].points.add(
-            state.rankers[i].power.mul(delta).floor(),
-          ),
+        rankers[i].points = Object.freeze(
+          rankers[i].points.add(rankers[i].power.mul(delta).floor()),
         );
 
         for (let j = i - 1; j >= 0; j--) {
-          const currentRanker = state.rankers[j + 1];
-          if (currentRanker.points.cmp(state.rankers[j].points) > 0) {
+          const currentRanker = rankers[j + 1];
+          if (currentRanker.points.cmp(rankers[j].points) > 0) {
             // Move 1 position up and move the ranker there 1 Position down
 
             // Move other Ranker 1 Place down
-            state.rankers[j].rank = j + 2;
+            rankers[j].rank = j + 2;
             if (
-              state.rankers[j].growing &&
-              state.rankers[j].accountId === getters.yourRanker?.accountId &&
-              state.rankers[j].multi > 1
+              rankers[j].growing &&
+              rankers[j].accountId === yourRanker?.accountId &&
+              rankers[j].multi > 1
             ) {
-              state.rankers[j].grapes = Object.freeze(
-                state.rankers[j].grapes.add(1),
-              );
+              rankers[j].grapes = Object.freeze(rankers[j].grapes.add(1));
             }
-            state.rankers[j + 1] = state.rankers[j];
+            rankers[j + 1] = rankers[j];
 
             // Move current Ranker 1 Place up
             currentRanker.rank = j + 1;
-            state.rankers[j] = currentRanker;
+            rankers[j] = currentRanker;
           } else {
             break;
           }
@@ -234,7 +235,6 @@ export const useLadderStore = defineStore("ladder", () => {
       }
     }
 
-    const yourRanker = getters.yourRanker;
     if (yourRanker !== undefined && yourRanker.growing) {
       if (yourRanker.rank !== 1) {
         yourRanker.vinegar = Object.freeze(
@@ -249,17 +249,16 @@ export const useLadderStore = defineStore("ladder", () => {
         );
       }
 
-      if (
-        yourRanker.rank === state.rankers.length &&
-        state.rankers.length >= 1
-      ) {
+      if (yourRanker.rank === rankers.length && rankers.length >= 1) {
         yourRanker.grapes = Object.freeze(
           yourRanker.grapes.add(new Decimal(2)),
         );
       }
     }
 
-    const isFirst = getters.yourRanker?.rank === 1;
+    state.rankers = rankers;
+
+    const isFirst = yourRanker?.rank === 1;
     if (isFirst && !wasFirst) {
       useSound(SOUNDS.GOT_FIRST).play();
     }

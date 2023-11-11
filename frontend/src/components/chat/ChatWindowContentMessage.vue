@@ -66,7 +66,9 @@ const isLastMessage = computed<boolean>(() => {
 
 onMounted(() => {
   if (isLastMessage.value) {
-    el.value?.parentElement?.scrollTo({ top: el.value.offsetTop });
+    requestAnimationFrame(() => {
+      el.value?.parentElement?.scrollTo({ top: el.value.offsetTop });
+    });
   }
 });
 

@@ -238,11 +238,36 @@ public class LadderTypeBuilder {
       result.add(LadderType.NO_AUTO);
     }
 
-    if (ladderNumber % 10 == 0 || ladderNumber == 1) {
+    if ((ladderNumber % 10 == 0 && ladderNumber != 90) || ladderNumber == 1) {
       result.add(LadderType.GIGANTIC);
       result.add(LadderType.CHEAP);
     } else {
-      result.add(LadderType.TINY);
+      if (ladderNumber > 60 && ladderNumber < 70) {
+        result.add(LadderType.SMALL);
+      } else if (ladderNumber >= 90 ) {
+        int modulo = ladderNumber % 5;
+        switch (modulo) {
+          case 1:
+            result.add(LadderType.SMALL);
+            break;
+          case 2:
+            result.add(LadderType.DEFAULT);
+            break;
+          case 3:
+            result.add(LadderType.BIG);
+            break;
+          case 4:
+            result.add(LadderType.GIGANTIC);
+            break;
+          case 0:
+          default:
+            result.add(LadderType.TINY);
+            break;
+        }
+      } else {
+        result.add(LadderType.TINY);
+      }
+
     }
 
     return result;
