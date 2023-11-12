@@ -90,16 +90,17 @@ public class LadderEntityTest {
         assertThat(new LadderEntity(70, round).getTypes()).containsExactlyInAnyOrder(LadderType.GIGANTIC, LadderType.CHEAP);
         assertThat(new LadderEntity(77, round).getTypes()).containsExactlyInAnyOrder(LadderType.TINY);
         assertThat(new LadderEntity(80, round).getTypes()).containsExactlyInAnyOrder(LadderType.GIGANTIC, LadderType.CHEAP);
+        assertThat(new LadderEntity(89, round).getTypes()).containsExactlyInAnyOrder(LadderType.TINY);
         assertThat(new LadderEntity(90, round).getTypes()).containsExactlyInAnyOrder(LadderType.TINY);
-        assertThat(new LadderEntity(91, round).getTypes()).containsExactlyInAnyOrder(LadderType.SMALL);
-        assertThat(new LadderEntity(92, round).getTypes()).containsExactlyInAnyOrder(LadderType.DEFAULT);
-        assertThat(new LadderEntity(93, round).getTypes()).containsExactlyInAnyOrder(LadderType.BIG);
-        assertThat(new LadderEntity(94, round).getTypes()).containsExactlyInAnyOrder(LadderType.GIGANTIC);
-        assertThat(new LadderEntity(95, round).getTypes()).containsExactlyInAnyOrder(LadderType.TINY);
-        assertThat(new LadderEntity(96, round).getTypes()).containsExactlyInAnyOrder(LadderType.SMALL);
-        assertThat(new LadderEntity(97, round).getTypes()).containsExactlyInAnyOrder(LadderType.DEFAULT);
-        assertThat(new LadderEntity(98, round).getTypes()).containsExactlyInAnyOrder(LadderType.BIG);
-        assertThat(new LadderEntity(99, round).getTypes()).containsExactlyInAnyOrder(LadderType.GIGANTIC);
+        assertThat(new LadderEntity(91, round).getTypes()).containsExactlyInAnyOrder(LadderType.TINY);
+        assertThat(new LadderEntity(92, round).getTypes()).containsExactlyInAnyOrder(LadderType.SMALL);
+        assertThat(new LadderEntity(93, round).getTypes()).containsExactlyInAnyOrder(LadderType.DEFAULT);
+        assertThat(new LadderEntity(94, round).getTypes()).containsExactlyInAnyOrder(LadderType.BIG);
+        assertThat(new LadderEntity(95, round).getTypes()).containsExactlyInAnyOrder(LadderType.GIGANTIC);
+        assertThat(new LadderEntity(96, round).getTypes()).containsExactlyInAnyOrder(LadderType.TINY);
+        assertThat(new LadderEntity(97, round).getTypes()).containsExactlyInAnyOrder(LadderType.SMALL);
+        assertThat(new LadderEntity(98, round).getTypes()).containsExactlyInAnyOrder(LadderType.DEFAULT);
+        assertThat(new LadderEntity(99, round).getTypes()).containsExactlyInAnyOrder(LadderType.BIG);
         assertThat(new LadderEntity(100, round).getTypes()).containsExactlyInAnyOrder(LadderType.GIGANTIC, LadderType.CHEAP, LadderType.NO_AUTO);
         assertThat(new LadderEntity(101, round).getTypes()).containsExactlyInAnyOrder(LadderType.END);
     }
