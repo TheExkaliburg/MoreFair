@@ -14,7 +14,8 @@ description: 'A list of all changes made to the game'
   - A page reload is required to clear existing messages from ignored players.
   - Messages in the SYSTEM and MOD chats cannot be ignored.
 - Adding the END Ladder Type after the AH Ladder as preparation for an updated S3 Logic.
-- ?̷̩̒?̶̰̎?̴̜́ 
+- Adding Logic and Modifier for Round 200
+- Adding an internal modifier for ladder scaling and adding the REVSC round modifier, that can't appear in the game, besides for round 200
 
 ### Improvements:
 
@@ -25,6 +26,7 @@ description: 'A list of all changes made to the game'
 ### Bugfixes:
 
 - Renaming now also changes the name displayed in the suggestions
+- - Clearing Messages of Banned/Muted Players from Chat
 
 <br><br><br><br><br><br><br>
 

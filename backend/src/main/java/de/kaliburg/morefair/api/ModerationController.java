@@ -94,6 +94,8 @@ public class ModerationController {
           target.getDisplayName(), target.getId());
       wsUtils.convertAndSendToTopic(AccountController.TOPIC_EVENTS_DESTINATION, new Event<>(
           AccountEventTypes.BAN, target.getId()));
+      wsUtils.convertAndSendToTopic(AccountController.TOPIC_EVENTS_DESTINATION, new Event<>(
+          AccountEventTypes.NAME_CHANGE, target.getId(), target.getDisplayName()));
     } catch (Exception e) {
       log.error(e.getMessage());
       e.printStackTrace();

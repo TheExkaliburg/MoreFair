@@ -244,7 +244,7 @@ public class LadderTypeBuilder {
     } else {
       if (ladderNumber > 60 && ladderNumber < 70) {
         result.add(LadderType.SMALL);
-      } else if (ladderNumber >= 91 ) {
+      } else if (ladderNumber >= 91) {
         int modulo = (ladderNumber - 1) % 5;
         switch (modulo) {
           case 1:
