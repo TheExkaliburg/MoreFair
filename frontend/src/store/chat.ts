@@ -206,6 +206,13 @@ export const useChatStore = defineStore("chat", () => {
     });
   }
 
+  function clearMessages(accountId: number) {
+    state.messages.forEach((messages, type) => {
+      const clearedMessages = messages.filter((m) => m.accountId !== accountId);
+      state.messages.set(type, clearedMessages);
+    });
+  }
+
   function rename(accountId: number, username: string) {
     state.messages.forEach((messages) => {
       messages.forEach((message) => {
@@ -233,6 +240,7 @@ export const useChatStore = defineStore("chat", () => {
       addLocalMessage: addMessage,
       addSystemMessage,
       rename,
+      clearMessages,
     },
   };
 });

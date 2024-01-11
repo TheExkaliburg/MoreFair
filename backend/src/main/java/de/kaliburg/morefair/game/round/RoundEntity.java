@@ -121,6 +121,10 @@ public class RoundEntity {
     double lowerBound = 0.5f;
     double upperBound = 1.5f;
 
+    if (types.contains(RoundType.SPECIAL_100)) {
+      return upperBound;
+    }
+
     if (types.contains(RoundType.CHAOS)) {
       lowerBound /= 2.0f;
       upperBound *= 1.25f;

@@ -75,20 +75,22 @@ export const useUserSuggestion = () => {
     items: ({ query }: { query: string }) => {
       const list = useChatStore().state.suggestions;
       const queryLower = query.toLowerCase();
-      if (queryLower.length < 1) return list;
 
       if (queryLower.startsWith("#")) {
-        if (queryLower.length < 2) return [];
-        return list.filter((item) =>
-          String(item.accountId).includes(queryLower.substring(1)),
-        );
+        if (queryLower.length < 2) return list.slice(0, 10);
+        return list
+          .filter((item) =>
+            String(item.accountId).startsWith(queryLower.substring(1)),
+          )
+          .slice(0, 10);
       } else {
-        if (queryLower.length < 1) return [];
-        return list.filter(
-          (item) =>
-            item.displayName.toLowerCase().startsWith(queryLower) &&
-            item.displayName !== "Mystery Guest",
+        const filteredList = list.filter(
+          (item) => item.displayName !== "Mystery Guest",
         );
+        if (queryLower.length < 1) return filteredList.slice(0, 10);
+        return filteredList
+          .filter((item) => item.displayName.toLowerCase().includes(queryLower))
+          .slice(0, 10);
       }
     },
     pluginKey: new PluginKey("userSuggestion"),
@@ -124,7 +126,7 @@ export const useGroupSuggestion = () => {
   return {
     char: "$",
     items: ({ query }: { query: string }) => {
-      const list = optionsStore.state.chat.subscribedMentions.get();
+      const list = [...optionsStore.state.chat.subscribedMentions.get()];
       if (!list.includes("mods")) list.push("mods");
       const queryLower = query.toLowerCase();
       return [

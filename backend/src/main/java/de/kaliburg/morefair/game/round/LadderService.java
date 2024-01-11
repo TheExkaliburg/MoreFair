@@ -18,11 +18,9 @@ import de.kaliburg.morefair.events.types.AccountEventTypes;
 import de.kaliburg.morefair.events.types.LadderEventTypes;
 import de.kaliburg.morefair.events.types.RoundEventTypes;
 import de.kaliburg.morefair.game.GameResetEvent;
-import de.kaliburg.morefair.game.UpgradeUtils;
 import de.kaliburg.morefair.game.chat.*;
 import de.kaliburg.morefair.statistics.StatisticsService;
 import de.kaliburg.morefair.utils.FormattingUtils;
-import it.unibo.tuprolog.solve.stdlib.function.Round;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -467,7 +465,7 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         return false;
       }
 
-      BigInteger cost = upgradeUtils.buyAutoPromoteCost(ranker.getRank(), ladder.getScaling());
+      BigInteger cost = upgradeUtils.buyAutoPromoteCost(currentRound, ladder, ranker.getRank());
 
       if (ladder.getTypes().contains(LadderType.FREE_AUTO)) {
         ranker.setAutoPromote(true);

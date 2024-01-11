@@ -260,7 +260,9 @@ onMounted(() => {
     el.value &&
     props.container
   ) {
-    scrollToCenter(el.value, props.container);
+    requestAnimationFrame(() => {
+      scrollToCenter(el.value, props.container);
+    });
   }
 });
 
@@ -271,7 +273,9 @@ onUpdated(() => {
     el.value &&
     props.container
   ) {
-    scrollToCenter(el.value, props.container);
+    requestAnimationFrame(() => {
+      scrollToCenter(el.value, props.container);
+    });
   }
 });
 </script>

@@ -119,9 +119,11 @@ export const useAccountStore = defineStore("account", () => {
         break;
       case AccountEventType.MUTE:
         if (isYou) state.accessRole = AccessRole.MUTED_PLAYER;
+        useChatStore().actions.clearMessages(body.accountId);
         break;
       case AccountEventType.BAN:
         if (isYou) state.accessRole = AccessRole.BANNED_PLAYER;
+        useChatStore().actions.clearMessages(body.accountId);
         break;
       case AccountEventType.INCREASE_HIGHEST_LADDER:
         useSound(SOUNDS.PROMOTION).play();

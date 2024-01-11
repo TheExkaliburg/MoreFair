@@ -118,7 +118,9 @@ useStomp().addCallback(
 );
 
 function onScroll(e: any) {
-  isScrolled.value = e.target?.scrollTop > 0;
+  requestAnimationFrame(() => {
+    isScrolled.value = e.target?.scrollTop > 0;
+  });
 }
 
 function followRanker() {}
