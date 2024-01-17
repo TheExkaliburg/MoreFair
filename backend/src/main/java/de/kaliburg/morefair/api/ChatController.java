@@ -7,18 +7,18 @@ import de.kaliburg.morefair.account.SuggestionDto;
 import de.kaliburg.morefair.api.utils.RequestThrottler;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WsMessage;
-import de.kaliburg.morefair.game.chat.ChatEntity;
-import de.kaliburg.morefair.game.chat.ChatService;
-import de.kaliburg.morefair.game.chat.ChatType;
-import de.kaliburg.morefair.game.chat.MessageEntity;
-import de.kaliburg.morefair.game.chat.MessageService;
-import de.kaliburg.morefair.game.chat.dto.ChatDto;
-import de.kaliburg.morefair.game.round.LadderEntity;
-import de.kaliburg.morefair.game.round.LadderService;
-import de.kaliburg.morefair.game.round.RankerEntity;
-import de.kaliburg.morefair.game.round.RankerService;
-import de.kaliburg.morefair.game.round.RoundEntity;
-import de.kaliburg.morefair.game.round.RoundService;
+import de.kaliburg.morefair.chat.model.ChatEntity;
+import de.kaliburg.morefair.chat.model.ChatType;
+import de.kaliburg.morefair.chat.model.MessageEntity;
+import de.kaliburg.morefair.chat.model.dto.ChatDto;
+import de.kaliburg.morefair.chat.services.ChatService;
+import de.kaliburg.morefair.chat.services.MessageService;
+import de.kaliburg.morefair.game.ladder.model.LadderEntity;
+import de.kaliburg.morefair.game.ladder.services.LadderService;
+import de.kaliburg.morefair.game.ranker.model.RankerEntity;
+import de.kaliburg.morefair.game.ranker.services.RankerService;
+import de.kaliburg.morefair.game.round.model.RoundEntity;
+import de.kaliburg.morefair.game.round.services.RoundService;
 import de.kaliburg.morefair.security.SecurityUtils;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -71,7 +71,7 @@ public class ChatController {
 
       if (type == ChatType.LADDER && number != null) {
         RankerEntity ranker = ladderService.findFirstActiveRankerOfAccountThisRound(account);
-        int highestLadderNumber = ranker == null ? 1 : ranker.getLadder().getNumber();
+        int highestLadderNumber = ranker == null ? 1 : ranker.getLadderId().getNumber();
 
         if (!account.isMod() && number > highestLadderNumber) {
           return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -99,7 +99,7 @@ public class ChatController {
 
       List<RankerEntity> rankers = ladder.getRankers();
       var allSuggestions = rankers.stream()
-          .map(RankerEntity::getAccount)
+          .map(RankerEntity::getAccountId)
           .map(a -> new SuggestionDto(a.getId(), a.getDisplayName()))
           .collect(Collectors.toList());
 
@@ -151,7 +151,7 @@ public class ChatController {
       ChatEntity chat = chatService.find(type, number);
       if (type == ChatType.LADDER && number != null) {
         RankerEntity ranker = ladderService.findFirstActiveRankerOfAccountThisRound(account);
-        if (!account.isMod() && number > ranker.getLadder().getNumber()) {
+        if (!account.isMod() && number > ranker.getLadderId().getNumber()) {
           return;
         }
       }

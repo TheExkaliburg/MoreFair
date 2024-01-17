@@ -8,12 +8,12 @@ import de.kaliburg.morefair.api.websockets.messages.WsMessage;
 import de.kaliburg.morefair.data.ModServerMessageData;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.LadderEventTypes;
-import de.kaliburg.morefair.game.round.LadderService;
-import de.kaliburg.morefair.game.round.RankerEntity;
-import de.kaliburg.morefair.game.round.RoundEntity;
-import de.kaliburg.morefair.game.round.RoundService;
-import de.kaliburg.morefair.game.round.RoundUtils;
-import de.kaliburg.morefair.game.round.dto.LadderDto;
+import de.kaliburg.morefair.game.ladder.model.dto.LadderDto;
+import de.kaliburg.morefair.game.ladder.services.LadderService;
+import de.kaliburg.morefair.game.ranker.model.RankerEntity;
+import de.kaliburg.morefair.game.round.model.RoundEntity;
+import de.kaliburg.morefair.game.round.services.RoundService;
+import de.kaliburg.morefair.game.round.services.RoundUtils;
 import de.kaliburg.morefair.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -66,7 +66,7 @@ public class LadderController {
 
       if (account.isMod()
           || number.equals(roundUtils.getAssholeLadderNumber(roundService.getCurrentRound()))
-          || number <= ranker.getLadder().getNumber()) {
+          || number <= ranker.getLadderId().getNumber()) {
         LadderDto l = new LadderDto(ladderService.findInCache(number), account, config);
         return ResponseEntity.ok(l);
       } else {
@@ -89,7 +89,7 @@ public class LadderController {
       if (account == null || account.isBanned()) {
         return;
       }
-      Integer num = ladderService.findFirstActiveRankerOfAccountThisRound(account).getLadder()
+      Integer num = ladderService.findFirstActiveRankerOfAccountThisRound(account).getLadderId()
           .getNumber();
       log.info("[L{}] BIAS: {} (#{}) {}", num, account.getDisplayName(), account.getId(),
           wsMessage.getEvent());
@@ -113,7 +113,7 @@ public class LadderController {
         return;
       }
       RoundEntity currentRound = roundService.getCurrentRound();
-      Integer num = ladderService.findFirstActiveRankerOfAccountThisRound(account).getLadder()
+      Integer num = ladderService.findFirstActiveRankerOfAccountThisRound(account).getLadderId()
           .getNumber();
       log.info("[L{}] MULTI: {} (#{}) {}", num, account.getDisplayName(), account.getId(),
           wsMessage.getEvent());
@@ -136,7 +136,7 @@ public class LadderController {
         return;
       }
       RoundEntity currentRound = roundService.getCurrentRound();
-      Integer num = ladderService.findFirstActiveRankerOfAccountThisRound(account).getLadder()
+      Integer num = ladderService.findFirstActiveRankerOfAccountThisRound(account).getLadderId()
           .getNumber();
       log.info("[L{}] VINEGAR: {} (#{}) {}", num, account.getDisplayName(), account.getId(),
           wsMessage.getEvent());
@@ -161,7 +161,7 @@ public class LadderController {
         return;
       }
       RoundEntity currentRound = roundService.getCurrentRound();
-      Integer num = ladderService.findFirstActiveRankerOfAccountThisRound(account).getLadder()
+      Integer num = ladderService.findFirstActiveRankerOfAccountThisRound(account).getLadderId()
           .getNumber();
       log.info("[L{}] PROMOTE: {} (#{}) {}", num, account.getDisplayName(), account.getId(),
           wsMessage.getEvent());
@@ -185,7 +185,7 @@ public class LadderController {
         return;
       }
       RoundEntity currentRound = roundService.getCurrentRound();
-      Integer num = ladderService.findFirstActiveRankerOfAccountThisRound(account).getLadder()
+      Integer num = ladderService.findFirstActiveRankerOfAccountThisRound(account).getLadderId()
           .getNumber();
       log.info("[L{}] AUTOPROMOTE: {} (#{}) {}", num, account.getDisplayName(), account.getId(),
           wsMessage.getEvent());

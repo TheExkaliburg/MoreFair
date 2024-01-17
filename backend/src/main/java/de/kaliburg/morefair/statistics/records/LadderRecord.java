@@ -1,7 +1,7 @@
 package de.kaliburg.morefair.statistics.records;
 
-import de.kaliburg.morefair.game.round.LadderEntity;
-import de.kaliburg.morefair.game.round.RankerEntity;
+import de.kaliburg.morefair.game.ladder.model.LadderEntity;
+import de.kaliburg.morefair.game.ranker.model.RankerEntity;
 import lombok.NonNull;
 
 public class LadderRecord {

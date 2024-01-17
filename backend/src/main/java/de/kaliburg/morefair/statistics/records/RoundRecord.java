@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.statistics.records;
 
-import de.kaliburg.morefair.game.round.RoundEntity;
+import de.kaliburg.morefair.game.round.model.RoundEntity;
 import lombok.NonNull;
 
 public class RoundRecord {

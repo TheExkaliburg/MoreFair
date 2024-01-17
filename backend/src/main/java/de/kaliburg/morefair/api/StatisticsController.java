@@ -1,7 +1,8 @@
 package de.kaliburg.morefair.api;
 
-import de.kaliburg.morefair.game.round.RoundService;
-import de.kaliburg.morefair.game.round.dto.RoundResultsDto;
+import de.kaliburg.morefair.game.round.model.dto.RoundResultsDto;
+import de.kaliburg.morefair.game.round.services.RoundResultService;
+import de.kaliburg.morefair.game.round.services.RoundService;
 import de.kaliburg.morefair.statistics.StatisticsService;
 import de.kaliburg.morefair.statistics.results.ActivityAnalysisEntity;
 import de.kaliburg.morefair.statistics.results.RoundStatisticsEntity;
@@ -22,6 +23,7 @@ public class StatisticsController {
 
   private final RoundService roundService;
   private final StatisticsService statisticsService;
+  private final RoundResultService roundResultService;
 
   @GetMapping(value = "/round/raw", produces = "application/json")
   public ResponseEntity<?> getRoundResults(
@@ -35,7 +37,7 @@ public class StatisticsController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
       }
 
-      RoundResultsDto results = statisticsService.getRoundResults(roundNumber);
+      RoundResultsDto results = roundResultService.getRoundResults(roundNumber);
       if (results == null) {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
       }

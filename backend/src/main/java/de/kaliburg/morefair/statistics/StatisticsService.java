@@ -8,11 +8,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountEntity;
-import de.kaliburg.morefair.game.round.LadderEntity;
-import de.kaliburg.morefair.game.round.RankerEntity;
-import de.kaliburg.morefair.game.round.RoundEntity;
-import de.kaliburg.morefair.game.round.RoundService;
-import de.kaliburg.morefair.game.round.dto.RoundResultsDto;
+import de.kaliburg.morefair.game.ladder.model.LadderEntity;
+import de.kaliburg.morefair.game.ranker.model.RankerEntity;
+import de.kaliburg.morefair.game.round.model.RoundEntity;
+import de.kaliburg.morefair.game.round.model.dto.RoundResultsDto;
+import de.kaliburg.morefair.game.round.services.RoundResultService;
+import de.kaliburg.morefair.game.round.services.RoundService;
 import de.kaliburg.morefair.statistics.records.AutoPromoteRecordEntity;
 import de.kaliburg.morefair.statistics.records.AutoPromoteRecordRepository;
 import de.kaliburg.morefair.statistics.records.BiasRecordEntity;
@@ -66,6 +67,8 @@ public class StatisticsService {
   @Autowired
   @Lazy
   private final RoundService roundService;
+
+  private final RoundResultService roundResultService;
 
   private final FairConfig config;
   private final Cache<Integer, RoundResultsDto> roundResultsCache =
@@ -255,29 +258,16 @@ public class StatisticsService {
     }
   }
 
-  public RoundResultsDto getRoundResults(Integer number) {
-    RoundResultsDto result = roundResultsCache.getIfPresent(number);
-    if (result == null) {
-      RoundEntity round = roundService.find(number);
-      if (round == null) {
-        return null;
-      }
-      result = new RoundResultsDto(round, config);
-      roundResultsCache.put(number, result);
-    }
-    return result;
-  }
-
   public RoundStatisticsEntity getRoundStatistics(Integer number) {
-    RoundEntity round = roundService.find(number);
-    if (round == null) {
+    Optional<RoundEntity> round = roundService.find(number);
+    if (round.isEmpty()) {
       return null;
     }
 
     Optional<RoundStatisticsEntity> statistics = roundStatisticsRepository.findByRoundId(
-        round.getId());
+        round.get().getId());
     if (statistics.isEmpty()) {
-      startRoundStatistics(round.getId());
+      startRoundStatistics(round.get().getId());
     }
 
     return statistics.orElse(null);

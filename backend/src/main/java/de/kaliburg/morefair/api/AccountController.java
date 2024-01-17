@@ -8,15 +8,14 @@ import de.kaliburg.morefair.api.utils.HttpUtils;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.AccountEventTypes;
-import de.kaliburg.morefair.game.round.RankerService;
-import de.kaliburg.morefair.game.round.RoundEntity;
-import de.kaliburg.morefair.game.round.RoundService;
+import de.kaliburg.morefair.game.ranker.services.RankerService;
+import de.kaliburg.morefair.game.round.model.RoundEntity;
+import de.kaliburg.morefair.game.round.services.RoundService;
 import de.kaliburg.morefair.security.SecurityUtils;
 import de.kaliburg.morefair.statistics.StatisticsService;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -63,7 +62,7 @@ public class AccountController {
       statisticsService.recordLogin(account);
       RoundEntity currentRound = roundService.getCurrentRound();
       int highestLadder = rankerService.findCurrentRankersOfAccount(account, currentRound).stream()
-          .mapToInt(r -> r.getLadder().getNumber()).max().orElse(1);
+          .mapToInt(r -> r.getLadderId().getNumber()).max().orElse(1);
 
       return ResponseEntity.ok(new AccountDetailsDto(account, highestLadder));
     } catch (Exception e) {
