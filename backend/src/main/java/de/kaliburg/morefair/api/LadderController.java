@@ -9,6 +9,7 @@ import de.kaliburg.morefair.data.ModServerMessageData;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.LadderEventTypes;
 import de.kaliburg.morefair.game.ladder.model.dto.LadderDto;
+import de.kaliburg.morefair.game.ladder.services.LadderEventService;
 import de.kaliburg.morefair.game.ladder.services.LadderService;
 import de.kaliburg.morefair.game.ranker.model.RankerEntity;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
@@ -45,6 +46,7 @@ public class LadderController {
   private final WsUtils wsUtils;
   private final RoundService roundService;
   private final LadderService ladderService;
+  private final LadderEventService ladderService;
   private final RoundUtils roundUtils;
   private final FairConfig config;
 

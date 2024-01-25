@@ -24,9 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ChatServiceImpl extends AbstractCacheableService implements ChatService {
 
   private final ChatRepository chatRepository;
-
   private final MessageService messageService;
-
   private final LoadingCache<Pair<ChatType, Integer>, ChatEntity> chatTypeCache;
   private final LoadingCache<UUID, ChatEntity> chatUuidCache;
   private final LoadingCache<Long, ChatEntity> chatIdCache;

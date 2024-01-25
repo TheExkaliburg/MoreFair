@@ -28,7 +28,6 @@ public class AccountService implements UserDetailsService {
   private final AccountRepository accountRepository;
   private final ApplicationEventPublisher eventPublisher;
   private final PasswordEncoder passwordEncoder;
-
   private AccountEntity broadcasterAccount;
 
   public AccountService(AccountRepository accountRepository,

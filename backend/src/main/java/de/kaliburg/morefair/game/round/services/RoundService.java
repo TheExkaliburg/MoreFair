@@ -110,7 +110,7 @@ public class RoundService {
    * @return the ranker
    */
   public RankerEntity createNewRanker(AccountEntity account) {
-    RankerEntity result = ladderService.createRanker(account);
+    RankerEntity result = ladderService.createRankerOnLadder(account);
 
     Integer assholeCount = result.getAccountId().getAssholeCount();
     int baseAssholeLadderNumber = getCurrentRound().getTypes().contains(RoundType.FAST)

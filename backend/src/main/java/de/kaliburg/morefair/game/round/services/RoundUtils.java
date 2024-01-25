@@ -1,18 +1,12 @@
 package de.kaliburg.morefair.game.round.services;
 
-import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
-import java.util.Random;
 import org.springframework.stereotype.Component;
 
 @Component
 public class RoundUtils {
 
-  private final Random random = new Random();
-  private final FairConfig config;
-
-  public RoundUtils(FairConfig config) {
-    this.config = config;
+  public RoundUtils() {
   }
 
   public Integer getAssholeLadderNumber(RoundEntity currentRound) {

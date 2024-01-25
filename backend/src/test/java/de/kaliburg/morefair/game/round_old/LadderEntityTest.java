@@ -59,8 +59,8 @@ public class LadderEntityTest {
     round.setHighestAssholeCount(0);
 
     UpgradeUtils upgradeUtils = new UpgradeUtils(fairConfig, null);
-    RoundUtils roundUtils = new RoundUtils(fairConfig);
-    LadderUtils ladderUtils = new LadderUtils(upgradeUtils, roundUtils, fairConfig);
+    RoundUtils roundUtils = new RoundUtils();
+    LadderUtils ladderUtils = new LadderUtils(upgradeUtils, fairConfig);
     upgradeUtils.setLadderUtils(ladderUtils);
 
     var out = new LadderEntity(ladderNumber, round);
@@ -128,8 +128,8 @@ public class LadderEntityTest {
     RoundEntity round = new RoundEntity(100, fairConfig);
 
     UpgradeUtils upgradeUtils = new UpgradeUtils(fairConfig, null);
-    RoundUtils roundUtils = new RoundUtils(fairConfig);
-    LadderUtils ladderUtils = new LadderUtils(upgradeUtils, roundUtils, fairConfig);
+    RoundUtils roundUtils = new RoundUtils();
+    LadderUtils ladderUtils = new LadderUtils(upgradeUtils, fairConfig);
     upgradeUtils.setLadderUtils(ladderUtils);
 
     assertThat(ladderUtils.getRequiredRankerCountToUnlock(new LadderEntity(1, round))).isEqualTo(

@@ -7,23 +7,18 @@ import de.kaliburg.morefair.game.ladder.model.LadderType;
 import de.kaliburg.morefair.game.ranker.model.RankerEntity;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
 import de.kaliburg.morefair.game.round.model.RoundType;
-import de.kaliburg.morefair.game.round.services.RoundUtils;
 import java.math.BigInteger;
-import java.util.Random;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 @Component
 public class LadderUtils {
 
-  private final Random random = new Random();
   private final UpgradeUtils upgradeUtils;
-  private final RoundUtils roundUtils;
   private final FairConfig config;
 
-  public LadderUtils(UpgradeUtils upgradeUtils, RoundUtils roundUtils, FairConfig config) {
+  public LadderUtils(UpgradeUtils upgradeUtils, FairConfig config) {
     this.upgradeUtils = upgradeUtils;
-    this.roundUtils = roundUtils;
     this.config = config;
   }
 
