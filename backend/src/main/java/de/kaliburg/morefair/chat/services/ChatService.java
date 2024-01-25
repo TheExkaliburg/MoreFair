@@ -1,9 +1,11 @@
 package de.kaliburg.morefair.chat.services;
 
 import de.kaliburg.morefair.chat.model.ChatEntity;
-import de.kaliburg.morefair.chat.model.ChatType;
+import de.kaliburg.morefair.chat.model.MessageEntity;
 import de.kaliburg.morefair.chat.model.dto.ChatDto;
-import java.util.UUID;
+import de.kaliburg.morefair.chat.model.types.ChatType;
+import de.kaliburg.morefair.data.ModChatDto;
+import java.util.List;
 import lombok.NonNull;
 
 /**
@@ -13,11 +15,7 @@ public interface ChatService {
 
   ChatEntity find(@NonNull Long id);
 
-  ChatEntity find(@NonNull UUID uuid);
-
   ChatEntity find(@NonNull ChatType type, Integer number);
-
-  ChatDto convertToDto(@NonNull ChatEntity chat);
 
   default ChatEntity find(@NonNull ChatType chatType) {
     if (chatType.isParameterized()) {
@@ -26,4 +24,8 @@ public interface ChatService {
     }
     return find(chatType, null);
   }
+
+  ChatDto convertToChatDto(@NonNull ChatEntity chat);
+
+  ModChatDto convertToModChatDto(List<MessageEntity> messages);
 }

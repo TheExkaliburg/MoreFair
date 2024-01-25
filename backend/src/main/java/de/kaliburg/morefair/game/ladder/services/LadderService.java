@@ -27,6 +27,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
@@ -336,17 +337,17 @@ public class LadderService implements ApplicationListener<AccountServiceEvent> {
         .orElse(null);
   }
 
-  public RankerEntity findFirstActiveRankerOfAccountThisRound(AccountEntity account) {
+  public Optional<RankerEntity> findFirstActiveRankerOfAccountThisRound(AccountEntity account) {
     for (int i = currentRound.getAssholeLadderNumber() + 1; i > 0; i--) {
       LadderEntity ladder = currentLadderMap.get(i);
       if (ladder != null) {
         RankerEntity ranker = findActiveRankerOfAccountOnLadder(account.getId(), ladder);
         if (ranker != null) {
-          return ranker;
+          return Optional.of(ranker);
         }
       }
     }
-    return null;
+    return Optional.empty();
   }
 
   public LadderEntity getHighestLadder() {

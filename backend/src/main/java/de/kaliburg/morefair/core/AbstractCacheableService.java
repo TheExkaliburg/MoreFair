@@ -1,22 +1,17 @@
 package de.kaliburg.morefair.core;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import java.util.concurrent.Semaphore;
+import de.kaliburg.morefair.core.concurrency.CriticalRegion;
 import lombok.Getter;
 
 public class AbstractCacheableService {
 
   @Getter
-  protected final Semaphore cacheSemaphore = new Semaphore(1);
+  protected final CriticalRegion cacheSemaphore = new CriticalRegion(1);
 
   protected <K, V> V getValueFromCacheSync(LoadingCache<K, V> cache, K key) {
-    try {
-      cacheSemaphore.acquire();
-      try {
-        return cache.get(key);
-      } finally {
-        cacheSemaphore.release();
-      }
+    try (var ignored = cacheSemaphore.enter()) {
+      return cache.get(key);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
     }

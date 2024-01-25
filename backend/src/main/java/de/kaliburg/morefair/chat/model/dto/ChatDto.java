@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.chat.model.dto;
 
-import de.kaliburg.morefair.chat.model.ChatType;
+import de.kaliburg.morefair.chat.model.types.ChatType;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;

@@ -4,18 +4,18 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountEntity;
+import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.chat.model.ChatEntity;
-import de.kaliburg.morefair.chat.model.ChatType;
 import de.kaliburg.morefair.chat.model.MessageEntity;
 import de.kaliburg.morefair.chat.model.dto.MessageDto;
+import de.kaliburg.morefair.chat.model.types.ChatType;
 import de.kaliburg.morefair.chat.services.repositories.MessageRepository;
 import de.kaliburg.morefair.core.AbstractCacheableService;
 import de.kaliburg.morefair.utils.FormattingUtils;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -30,33 +30,21 @@ public class MessageServiceImpl extends AbstractCacheableService implements Mess
 
   private final FairConfig config;
   private final MessageRepository messageRepository;
+  private final AccountService accountService;
+  private final ChatService chatService;
   private final WsUtils wsUtils;
   private final LoadingCache<Long, List<MessageEntity>> messagesChatIdCache;
-  private final LoadingCache<UUID, MessageEntity> messageUuidCache;
-  private final LoadingCache<Long, MessageEntity> messageIdCache;
 
   public MessageServiceImpl(MessageRepository messageRepository, @Lazy FairConfig config,
-      @Lazy WsUtils wsUtils) {
+      AccountService accountService, @Lazy ChatService chatService, @Lazy WsUtils wsUtils) {
     this.config = config;
     this.messageRepository = messageRepository;
+    this.accountService = accountService;
+    this.chatService = chatService;
     this.wsUtils = wsUtils;
 
     messagesChatIdCache =
         Caffeine.newBuilder().build(messageRepository::findNewestMessagesByChatId);
-    messageUuidCache = Caffeine.newBuilder().maximumSize(1024)
-        .build(uuid -> messageRepository.findByUuid(uuid).orElse(null));
-    messageIdCache = Caffeine.newBuilder().maximumSize(1024)
-        .build(id -> messageRepository.findById(id).orElse(null));
-  }
-
-  @Override
-  public MessageEntity find(@NonNull Long id) {
-    return getValueFromCacheSync(messageIdCache, id);
-  }
-
-  @Override
-  public MessageEntity find(@NonNull UUID uuid) {
-    return getValueFromCacheSync(messageUuidCache, uuid);
   }
 
   @Override
@@ -81,7 +69,7 @@ public class MessageServiceImpl extends AbstractCacheableService implements Mess
           account.getDisplayName(), account.getId(), chat.getIdentifier()));
     }
 
-    MessageEntity result = new MessageEntity(account, message, chat);
+    MessageEntity result = new MessageEntity(account.getId(), message, chat.getId());
     if (metadata != null && !metadata.isBlank()) {
       result.setMetadata(metadata);
     }
@@ -89,7 +77,7 @@ public class MessageServiceImpl extends AbstractCacheableService implements Mess
     result = save(result);
 
     if (result != null) {
-      MessageDto dto = convertToDto(result);
+      MessageDto dto = convertToMessageDto(result, chat);
       wsUtils.convertAndSendToTopic("/chat/events/" + chat.getDestination(), dto);
       wsUtils.convertAndSendToTopic("/moderation/chat/events", dto);
     }
@@ -105,70 +93,54 @@ public class MessageServiceImpl extends AbstractCacheableService implements Mess
 
   @Override
   public void deleteMessagesOfAccount(AccountEntity account) {
-    try {
-      cacheSemaphore.acquire();
-      try {
-        messageRepository.setDeletedOnForAccount(account, OffsetDateTime.now());
-        messageIdCache.invalidateAll();
-        messageUuidCache.invalidateAll();
-        messagesChatIdCache.invalidateAll();
-      } finally {
-        cacheSemaphore.release();
-      }
+    try (var ignored = cacheSemaphore.enter()) {
+      messageRepository.setDeletedOnForAccount(account.getId(), OffsetDateTime.now());
+      messagesChatIdCache.invalidateAll();
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
     }
   }
 
   @Override
-  public MessageDto convertToDto(MessageEntity message) {
+  public MessageDto convertToMessageDto(MessageEntity message, ChatEntity chat) {
+    AccountEntity accountEntity = accountService.find(message.getAccountId());
+
     return MessageDto.builder()
         .message(message.getMessage())
         .metadata(message.getMetadata())
-        .username(message.getAccount().getDisplayName())
-        .accountId(message.getAccount().getId())
-        .assholePoints(message.getAccount().getAssholePoints())
-        .tag(config.getAssholeTag(message.getAccount().getAssholeCount()))
-        .isMod(message.getAccount().isMod())
+        .username(accountEntity.getDisplayName())
+        .accountId(accountEntity.getId())
+        .assholePoints(accountEntity.getAssholePoints())
+        .tag(config.getAssholeTag(accountEntity.getAssholeCount()))
+        .isMod(accountEntity.isMod())
         .timestamp(message.getCreatedOn().withOffsetSameInstant(ZoneOffset.UTC).toEpochSecond())
-        .chatType(message.getChat().getType())
-        .ladderNumber(message.getChat().getNumber())
+        .chatType(chat.getType())
+        .ladderNumber(chat.getNumber())
         .build();
   }
 
 
   private MessageEntity save(MessageEntity message) {
-    try {
-      cacheSemaphore.acquire();
-      try {
-        MessageEntity result = messageRepository.save(message);
+    try (var ignored = cacheSemaphore.enter()) {
+      MessageEntity result = messageRepository.save(message);
+      ChatEntity chat = chatService.find(result.getChatId());
 
-        List<MessageEntity> chatMessages = messagesChatIdCache.get(result.getChat().getId());
-        if (chatMessages.stream().anyMatch(m -> m.getId().equals(result.getId()))) {
-          //Replace old message with new one
-          chatMessages = chatMessages.stream()
-              .map(m -> m.getId().equals(result.getId()) ? result : m).collect(Collectors.toList());
-        } else {
-          //Add new message to cache and delete last one if over limit
-          chatMessages.add(0, result);
-          chatMessages.sort(MessageEntity::compareTo);
-          if (chatMessages.size() > MessageRepository.MESSAGES_PER_PAGE) {
-            chatMessages.remove(chatMessages.size() - 1);
-          }
+      List<MessageEntity> chatMessages = messagesChatIdCache.get(chat.getId());
+      if (chatMessages.stream().anyMatch(m -> m.getId().equals(result.getId()))) {
+        //Replace old message with new one
+        chatMessages = chatMessages.stream()
+            .map(m -> m.getId().equals(result.getId()) ? result : m).collect(Collectors.toList());
+      } else {
+        //Add new message to cache and delete last one if over limit
+        chatMessages.add(0, result);
+        chatMessages.sort(MessageEntity::compareTo);
+        if (chatMessages.size() > MessageRepository.MESSAGES_PER_PAGE) {
+          chatMessages.remove(chatMessages.size() - 1);
         }
-        messagesChatIdCache.put(result.getChat().getId(), chatMessages);
-
-        if (messageIdCache.getIfPresent(result.getId()) != null) {
-          messageIdCache.put(result.getId(), result);
-        }
-        if (messageUuidCache.getIfPresent(result.getUuid()) != null) {
-          messageUuidCache.put(result.getUuid(), result);
-        }
-
-        return result;
-      } finally {
-        cacheSemaphore.release();
       }
+      messagesChatIdCache.put(chat.getId(), chatMessages);
+
+      return result;
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       return null;

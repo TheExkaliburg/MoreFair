@@ -2,21 +2,18 @@ package de.kaliburg.morefair.chat.services;
 
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.chat.model.ChatEntity;
-import de.kaliburg.morefair.chat.model.ChatType;
 import de.kaliburg.morefair.chat.model.MessageEntity;
 import de.kaliburg.morefair.chat.model.dto.MessageDto;
+import de.kaliburg.morefair.chat.model.types.ChatType;
 import jakarta.annotation.Nullable;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Service that manages the {@link MessageEntity} entities.
  */
 public interface MessageService {
 
-  MessageEntity find(Long id);
-
-  MessageEntity find(UUID uuid);
+  String EMPTY_METADATA = "[]";
 
   List<MessageEntity> find(ChatEntity chat);
 
@@ -24,16 +21,12 @@ public interface MessageService {
       @Nullable String metadata);
 
   default MessageEntity create(AccountEntity account, ChatEntity chat, String message) {
-    return create(account, chat, message, "[]");
+    return create(account, chat, message, EMPTY_METADATA);
   }
 
   List<MessageEntity> findNewestMessagesByChatType(List<ChatType> chatTypes);
 
-  default List<MessageEntity> findNewestMessagesByChatType(ChatType chatType) {
-    return findNewestMessagesByChatType(List.of(chatType));
-  }
-
   void deleteMessagesOfAccount(AccountEntity account);
 
-  MessageDto convertToDto(MessageEntity message);
+  MessageDto convertToMessageDto(MessageEntity message, ChatEntity chat);
 }

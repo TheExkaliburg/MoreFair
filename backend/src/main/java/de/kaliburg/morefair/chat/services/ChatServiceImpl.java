@@ -1,15 +1,16 @@
 package de.kaliburg.morefair.chat.services;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import de.kaliburg.morefair.chat.model.ChatEntity;
-import de.kaliburg.morefair.chat.model.ChatType;
 import de.kaliburg.morefair.chat.model.MessageEntity;
 import de.kaliburg.morefair.chat.model.dto.ChatDto;
+import de.kaliburg.morefair.chat.model.types.ChatType;
 import de.kaliburg.morefair.chat.services.repositories.ChatRepository;
-import de.kaliburg.morefair.core.AbstractCacheableService;
+import de.kaliburg.morefair.core.caching.MultiIndexedLoadingCache;
+import de.kaliburg.morefair.data.ModChatDto;
 import jakarta.annotation.Nullable;
-import java.util.UUID;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.javatuples.Pair;
@@ -21,36 +22,36 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Transactional
 @Service
-public class ChatServiceImpl extends AbstractCacheableService implements ChatService {
+public class ChatServiceImpl implements ChatService {
 
   private final ChatRepository chatRepository;
   private final MessageService messageService;
-  private final LoadingCache<Pair<ChatType, Integer>, ChatEntity> chatTypeCache;
-  private final LoadingCache<UUID, ChatEntity> chatUuidCache;
-  private final LoadingCache<Long, ChatEntity> chatIdCache;
+  private MultiIndexedLoadingCache<Long, ChatEntity> chatCache;
 
 
   public ChatServiceImpl(ChatRepository chatRepository, @Lazy MessageService messageService) {
     this.chatRepository = chatRepository;
     this.messageService = messageService;
 
-    chatTypeCache = Caffeine.newBuilder()
-        .build(pair -> chatRepository.findByTypeAndNumber(pair.getValue0(), pair.getValue1())
-            .orElse(null));
-    chatUuidCache = Caffeine.newBuilder()
-        .build(uuid -> chatRepository.findByUuid(uuid).orElse(null));
-    chatIdCache = Caffeine.newBuilder()
-        .build(id -> chatRepository.findById(id).orElse(null));
+    chatCache = MultiIndexedLoadingCache.builder(
+        Caffeine.newBuilder(),
+        ChatEntity::getId,
+        id -> chatRepository.findById(id).orElse(null)
+    ).addLookupWithOptional(Pair.class,
+        chatEntity -> Pair.with(chatEntity.getType(), chatEntity.getNumber()),
+        pair -> {
+          Pair<ChatType, Integer> typedPair = (Pair<ChatType, Integer>) pair;
+          return chatRepository.findByTypeAndNumber(
+              typedPair.getValue0(),
+              typedPair.getValue1()
+          );
+        }
+    ).build();
   }
 
   @Override
   public ChatEntity find(@NotNull Long id) {
-    return getValueFromCacheSync(chatIdCache, id);
-  }
-
-  @Override
-  public ChatEntity find(@NonNull UUID uuid) {
-    return getValueFromCacheSync(chatUuidCache, uuid);
+    return chatCache.get(id);
   }
 
   @Override
@@ -61,35 +62,39 @@ public class ChatServiceImpl extends AbstractCacheableService implements ChatSer
       number = 0;
     }
 
-    Pair<ChatType, Integer> pair = new Pair<>(type, number);
-    try {
-      cacheSemaphore.acquire();
-      try {
-        ChatEntity result = chatTypeCache.get(pair);
-        if (result == null) {
-          log.info("Chat with type {} and number {} not found", type, number);
-          result = create(type, number);
-          chatTypeCache.put(pair, result);
-        }
+    final int finalNumber = number;
+    final Pair<ChatType, Integer> pair = new Pair<>(type, number);
 
-        return result;
-      } finally {
-        cacheSemaphore.release();
+    return chatCache.put(() -> {
+      ChatEntity temp = chatCache.lookup(pair);
+      if (temp == null) {
+        log.info("Chat with type {} and number {} not found", type, finalNumber);
+        return create(type, finalNumber);
       }
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      return null;
-    }
+      return temp;
+    });
+
   }
 
   @Override
-  public ChatDto convertToDto(@NonNull ChatEntity chat) {
+  public ChatDto convertToChatDto(@NonNull ChatEntity chat) {
     return ChatDto.builder()
         .type(chat.getType())
         .number(chat.getNumber())
         .messages(
             messageService.find(chat).stream().sorted(MessageEntity::compareTo)
-                .map(messageService::convertToDto).toList()
+                .map((m) -> messageService.convertToMessageDto(m, chat)).toList()
+        )
+        .build();
+  }
+
+  @Override
+  public ModChatDto convertToModChatDto(List<MessageEntity> messages) {
+    return ModChatDto.builder()
+        .messages(
+            messages.stream()
+                .map((m) -> messageService.convertToMessageDto(m, find(m.getChatId())))
+                .collect(Collectors.toList())
         )
         .build();
   }

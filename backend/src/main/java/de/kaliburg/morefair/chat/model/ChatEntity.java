@@ -1,5 +1,6 @@
 package de.kaliburg.morefair.chat.model;
 
+import de.kaliburg.morefair.chat.model.types.ChatType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

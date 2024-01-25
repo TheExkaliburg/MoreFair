@@ -1,12 +1,9 @@
 package de.kaliburg.morefair.chat.services.repositories;
 
-import de.kaliburg.morefair.account.AccountEntity;
-import de.kaliburg.morefair.chat.model.ChatType;
 import de.kaliburg.morefair.chat.model.MessageEntity;
+import de.kaliburg.morefair.chat.model.types.ChatType;
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,19 +17,19 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long> {
 
   int MESSAGES_PER_PAGE = 50;
 
-  @Query("SELECT m FROM MessageEntity m WHERE m.uuid = :uuid")
-  Optional<MessageEntity> findByUuid(UUID uuid);
-
-  @Query("SELECT m FROM MessageEntity m WHERE m.chat.id = :chatId AND m.deletedOn IS NULL "
-      + "ORDER BY m.createdOn DESC")
+  @Query(value = "SELECT * FROM message m "
+      + "WHERE m.chat_id = :chatId AND m.deleted_on IS NULL "
+      + "ORDER BY m.created_on DESC", nativeQuery = true)
   List<MessageEntity> findMessagesByChatId(@Param("chatId") Long chatId, Pageable pageable);
 
   default List<MessageEntity> findNewestMessagesByChatId(Long chatId) {
     return findMessagesByChatId(chatId, PageRequest.of(0, MESSAGES_PER_PAGE));
   }
 
-  @Query("SELECT m FROM MessageEntity m WHERE m.chat.type IN :chatTypes "
-      + "ORDER BY m.createdOn DESC")
+  @Query(value = "SELECT * FROM message m "
+      + "JOIN chat c ON m.chat_id = c.id "
+      + "WHERE c.type IN :chatTypes "
+      + "ORDER BY m.created_on DESC", nativeQuery = true)
   List<MessageEntity> findMessagesByChatType(@Param("chatTypes") List<ChatType> chatType,
       Pageable pageable);
 
@@ -41,8 +38,10 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long> {
   }
 
   @Modifying
-  @Query("update MessageEntity m set m.deletedOn = :deletedOn where m.account = :account")
-  void setDeletedOnForAccount(@Param("account") AccountEntity account,
+  @Query(value = "UPDATE MessageEntity m "
+      + "SET m.deletedOn = :deletedOn "
+      + "WHERE m.accountId = :account")
+  void setDeletedOnForAccount(@Param("account") Long accountId,
       @Param("deletedOn") OffsetDateTime deletedOn);
 
 

@@ -64,6 +64,11 @@ public class MultiIndexedLoadingCache<K, V> {
   public V put(Supplier<V> supplier) {
     try (var ignored = criticalRegion.enter()) {
       V value = supplier.get();
+      
+      if (value == null) {
+        return null;
+      }
+
       K key = getPrimaryKeyFunction.apply(value);
 
       cache.put(key, value);

@@ -1,9 +1,6 @@
 package de.kaliburg.morefair.chat.model.dto;
 
-import de.kaliburg.morefair.FairConfig;
-import de.kaliburg.morefair.chat.model.ChatType;
-import de.kaliburg.morefair.chat.model.MessageEntity;
-import java.time.ZoneOffset;
+import de.kaliburg.morefair.chat.model.types.ChatType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,17 +20,4 @@ public class MessageDto {
   private final Boolean isMod;
   private final ChatType chatType;
   private final Integer ladderNumber;
-
-  public MessageDto(MessageEntity message, FairConfig config) {
-    this.tag = config.getAssholeTag(message.getAccount().getAssholeCount());
-    this.assholePoints = message.getAccount().getAssholePoints();
-    this.message = message.getMessage();
-    this.username = message.getAccount().getDisplayName();
-    this.accountId = message.getAccount().getId();
-    this.timestamp = message.getCreatedOn().withOffsetSameInstant(ZoneOffset.UTC).toEpochSecond();
-    this.metadata = message.getMetadata();
-    this.isMod = message.getAccount().isMod();
-    this.chatType = message.getChat().getType();
-    this.ladderNumber = message.getChat().getNumber();
-  }
 }

@@ -7,8 +7,8 @@ import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.utils.HttpUtils;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WsMessage;
-import de.kaliburg.morefair.chat.model.ChatType;
 import de.kaliburg.morefair.chat.model.MessageEntity;
+import de.kaliburg.morefair.chat.model.types.ChatType;
 import de.kaliburg.morefair.chat.services.ChatService;
 import de.kaliburg.morefair.chat.services.MessageService;
 import de.kaliburg.morefair.data.ModChatDto;
@@ -63,7 +63,9 @@ public class ModerationController {
         List<MessageEntity> messages =
             messageService.findNewestMessagesByChatType(List.of(ChatType.LADDER, ChatType.GLOBAL,
                 ChatType.SYSTEM, ChatType.MOD));
-        return new ResponseEntity<>(new ModChatDto(messages, config), HttpStatus.OK);
+
+        ModChatDto modChatDto = chatService.convertToModChatDto(messages);
+        return new ResponseEntity<>(modChatDto, HttpStatus.OK);
       }
     } catch (Exception e) {
       log.error(e.getMessage());

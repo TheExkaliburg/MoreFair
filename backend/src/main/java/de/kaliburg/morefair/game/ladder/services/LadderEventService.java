@@ -17,7 +17,7 @@ import de.kaliburg.morefair.api.LadderController;
 import de.kaliburg.morefair.api.RoundController;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.chat.model.ChatEntity;
-import de.kaliburg.morefair.chat.model.ChatType;
+import de.kaliburg.morefair.chat.model.types.ChatType;
 import de.kaliburg.morefair.chat.services.ChatService;
 import de.kaliburg.morefair.chat.services.MessageService;
 import de.kaliburg.morefair.core.concurrency.CriticalRegion;

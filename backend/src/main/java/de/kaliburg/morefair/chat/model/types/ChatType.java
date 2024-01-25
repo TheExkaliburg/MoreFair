@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.chat.model;
+package de.kaliburg.morefair.chat.model.types;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
