@@ -11,6 +11,7 @@ import de.kaliburg.morefair.chat.model.MessageEntity;
 import de.kaliburg.morefair.chat.model.types.ChatType;
 import de.kaliburg.morefair.chat.services.ChatService;
 import de.kaliburg.morefair.chat.services.MessageService;
+import de.kaliburg.morefair.chat.services.mapper.ChatMapper;
 import de.kaliburg.morefair.data.ModChatDto;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.AccountEventTypes;
@@ -52,6 +53,7 @@ public class ModerationController {
   private final MessageService messageService;
   private final ChatService chatService;
   private final FairConfig config;
+  private final ChatMapper chatMapper;
 
   @GetMapping("/chat")
   public ResponseEntity<?> getChat(Authentication authentication) {
@@ -64,7 +66,7 @@ public class ModerationController {
             messageService.findNewestMessagesByChatType(List.of(ChatType.LADDER, ChatType.GLOBAL,
                 ChatType.SYSTEM, ChatType.MOD));
 
-        ModChatDto modChatDto = chatService.convertToModChatDto(messages);
+        ModChatDto modChatDto = chatMapper.mapToModChatDto(messages);
         return new ResponseEntity<>(modChatDto, HttpStatus.OK);
       }
     } catch (Exception e) {

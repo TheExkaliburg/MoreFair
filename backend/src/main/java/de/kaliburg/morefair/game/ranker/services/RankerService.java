@@ -2,7 +2,9 @@ package de.kaliburg.morefair.game.ranker.services;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountEntity;
+import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ranker.model.RankerEntity;
 import de.kaliburg.morefair.game.ranker.services.repositories.RankerRepository;
@@ -22,18 +24,28 @@ public class RankerService {
 
   private final RankerRepository rankerRepository;
 
+  private final AccountService accountService;
+  private final FairConfig fairConfig;
 
-  public RankerService(RankerRepository rankerRepository) {
-    this.rankerRepository = rankerRepository;
-
-    rankerCache = Caffeine.newBuilder()
+  public RankerService(RankerRepository rankerRepository, AccountService accountService,
+      FairConfig fairConfig) {
+    this.rankerCache = Caffeine.newBuilder()
         .expireAfterAccess(10, TimeUnit.MINUTES)
         .build(id -> rankerRepository.findById(id).orElse(null));
+
+    this.rankerRepository = rankerRepository;
+    this.accountService = accountService;
+    this.fairConfig = fairConfig;
   }
 
   @Transactional
   public RankerEntity createNewRanker(AccountEntity account, LadderEntity ladder, Integer rank) {
-    RankerEntity result = new RankerEntity(ladder, account, rank);
+    RankerEntity result = RankerEntity.builder()
+        .ladderId(ladder.getId())
+        .accountId(account.getId())
+        .rank(rank)
+        .build();
+
     return save(result);
   }
 

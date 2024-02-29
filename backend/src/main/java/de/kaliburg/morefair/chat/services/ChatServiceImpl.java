@@ -2,15 +2,10 @@ package de.kaliburg.morefair.chat.services;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import de.kaliburg.morefair.chat.model.ChatEntity;
-import de.kaliburg.morefair.chat.model.MessageEntity;
-import de.kaliburg.morefair.chat.model.dto.ChatDto;
 import de.kaliburg.morefair.chat.model.types.ChatType;
 import de.kaliburg.morefair.chat.services.repositories.ChatRepository;
 import de.kaliburg.morefair.core.caching.MultiIndexedLoadingCache;
-import de.kaliburg.morefair.data.ModChatDto;
 import jakarta.annotation.Nullable;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.javatuples.Pair;
@@ -74,29 +69,6 @@ public class ChatServiceImpl implements ChatService {
       return temp;
     });
 
-  }
-
-  @Override
-  public ChatDto convertToChatDto(@NonNull ChatEntity chat) {
-    return ChatDto.builder()
-        .type(chat.getType())
-        .number(chat.getNumber())
-        .messages(
-            messageService.find(chat).stream().sorted(MessageEntity::compareTo)
-                .map((m) -> messageService.convertToMessageDto(m, chat)).toList()
-        )
-        .build();
-  }
-
-  @Override
-  public ModChatDto convertToModChatDto(List<MessageEntity> messages) {
-    return ModChatDto.builder()
-        .messages(
-            messages.stream()
-                .map((m) -> messageService.convertToMessageDto(m, find(m.getChatId())))
-                .collect(Collectors.toList())
-        )
-        .build();
   }
 
   private ChatEntity create(ChatType chatType, @Nullable Integer number) {

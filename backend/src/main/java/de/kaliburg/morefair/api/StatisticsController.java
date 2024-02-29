@@ -1,9 +1,9 @@
 package de.kaliburg.morefair.api;
 
-import de.kaliburg.morefair.game.round.model.dto.RoundResultsDto;
-import de.kaliburg.morefair.game.round.services.RoundResultService;
 import de.kaliburg.morefair.game.round.services.RoundService;
+import de.kaliburg.morefair.statistics.RoundResultService;
 import de.kaliburg.morefair.statistics.StatisticsService;
+import de.kaliburg.morefair.statistics.model.dto.RoundResultsDto;
 import de.kaliburg.morefair.statistics.results.ActivityAnalysisEntity;
 import de.kaliburg.morefair.statistics.results.RoundStatisticsEntity;
 import lombok.RequiredArgsConstructor;

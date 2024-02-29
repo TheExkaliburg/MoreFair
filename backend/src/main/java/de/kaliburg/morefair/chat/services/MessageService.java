@@ -3,7 +3,6 @@ package de.kaliburg.morefair.chat.services;
 import de.kaliburg.morefair.account.AccountEntity;
 import de.kaliburg.morefair.chat.model.ChatEntity;
 import de.kaliburg.morefair.chat.model.MessageEntity;
-import de.kaliburg.morefair.chat.model.dto.MessageDto;
 import de.kaliburg.morefair.chat.model.types.ChatType;
 import jakarta.annotation.Nullable;
 import java.util.List;
@@ -27,6 +26,4 @@ public interface MessageService {
   List<MessageEntity> findNewestMessagesByChatType(List<ChatType> chatTypes);
 
   void deleteMessagesOfAccount(AccountEntity account);
-
-  MessageDto convertToMessageDto(MessageEntity message, ChatEntity chat);
 }

@@ -2,19 +2,17 @@ package de.kaliburg.morefair.chat.services;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.AccountEntity;
-import de.kaliburg.morefair.account.AccountService;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.chat.model.ChatEntity;
 import de.kaliburg.morefair.chat.model.MessageEntity;
 import de.kaliburg.morefair.chat.model.dto.MessageDto;
 import de.kaliburg.morefair.chat.model.types.ChatType;
+import de.kaliburg.morefair.chat.services.mapper.MessageMapper;
 import de.kaliburg.morefair.chat.services.repositories.MessageRepository;
 import de.kaliburg.morefair.core.AbstractCacheableService;
 import de.kaliburg.morefair.utils.FormattingUtils;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.NonNull;
@@ -28,20 +26,18 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class MessageServiceImpl extends AbstractCacheableService implements MessageService {
 
-  private final FairConfig config;
   private final MessageRepository messageRepository;
-  private final AccountService accountService;
   private final ChatService chatService;
   private final WsUtils wsUtils;
   private final LoadingCache<Long, List<MessageEntity>> messagesChatIdCache;
+  private final MessageMapper messageMapper;
 
-  public MessageServiceImpl(MessageRepository messageRepository, @Lazy FairConfig config,
-      AccountService accountService, @Lazy ChatService chatService, @Lazy WsUtils wsUtils) {
-    this.config = config;
+  public MessageServiceImpl(MessageRepository messageRepository, @Lazy ChatService chatService,
+      @Lazy WsUtils wsUtils, MessageMapper messageMapper) {
     this.messageRepository = messageRepository;
-    this.accountService = accountService;
     this.chatService = chatService;
     this.wsUtils = wsUtils;
+    this.messageMapper = messageMapper;
 
     messagesChatIdCache =
         Caffeine.newBuilder().build(messageRepository::findNewestMessagesByChatId);
@@ -77,7 +73,7 @@ public class MessageServiceImpl extends AbstractCacheableService implements Mess
     result = save(result);
 
     if (result != null) {
-      MessageDto dto = convertToMessageDto(result, chat);
+      MessageDto dto = messageMapper.convertToMessageDto(result, chat);
       wsUtils.convertAndSendToTopic("/chat/events/" + chat.getDestination(), dto);
       wsUtils.convertAndSendToTopic("/moderation/chat/events", dto);
     }
@@ -99,24 +95,6 @@ public class MessageServiceImpl extends AbstractCacheableService implements Mess
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
     }
-  }
-
-  @Override
-  public MessageDto convertToMessageDto(MessageEntity message, ChatEntity chat) {
-    AccountEntity accountEntity = accountService.find(message.getAccountId());
-
-    return MessageDto.builder()
-        .message(message.getMessage())
-        .metadata(message.getMetadata())
-        .username(accountEntity.getDisplayName())
-        .accountId(accountEntity.getId())
-        .assholePoints(accountEntity.getAssholePoints())
-        .tag(config.getAssholeTag(accountEntity.getAssholeCount()))
-        .isMod(accountEntity.isMod())
-        .timestamp(message.getCreatedOn().withOffsetSameInstant(ZoneOffset.UTC).toEpochSecond())
-        .chatType(chat.getType())
-        .ladderNumber(chat.getNumber())
-        .build();
   }
 
 

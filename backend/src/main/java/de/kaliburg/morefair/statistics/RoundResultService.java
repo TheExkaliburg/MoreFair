@@ -1,13 +1,15 @@
-package de.kaliburg.morefair.game.round.services;
+package de.kaliburg.morefair.statistics;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
-import de.kaliburg.morefair.game.ladder.model.dto.LadderResultsDto;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
-import de.kaliburg.morefair.game.round.model.dto.RoundResultsDto;
-import de.kaliburg.morefair.game.round.model.dto.RoundResultsDto.RoundResultsDtoBuilder;
+import de.kaliburg.morefair.game.round.services.RoundService;
+import de.kaliburg.morefair.statistics.model.dto.LadderResultsDto;
+import de.kaliburg.morefair.statistics.model.dto.LadderResultsDto.LadderResultsDtoBuilder;
+import de.kaliburg.morefair.statistics.model.dto.RoundResultsDto;
+import de.kaliburg.morefair.statistics.model.dto.RoundResultsDto.RoundResultsDtoBuilder;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -60,8 +62,7 @@ public class RoundResultService {
     Map<Integer, LadderResultsDto> ladderResultsDtoMap = new HashMap<>();
 
     ladders.forEach((integer, ladder) -> {
-      LadderResultsDto ladderResults = new LadderResultsDto(ladder, config);
-      ladderResultsDtoMap.put(integer, ladderResults);
+      ladderResultsDtoMap.put(integer, convertToDto(ladder));
     });
 
     RoundResultsDtoBuilder builder = RoundResultsDto.builder()
@@ -77,6 +78,23 @@ public class RoundResultService {
           .format(DateTimeFormatter.ISO_DATE_TIME));
     }
 
+    return builder.build();
+  }
+
+  private LadderResultsDto convertToDto(LadderEntity ladder) {
+    LadderResultsDtoBuilder builder = LadderResultsDto.builder()
+        .basePointsToPromote(ladder.getBasePointsToPromote().toString())
+        .ladderTypes(ladder.getTypes())
+        .createdOn(ladder.getCreatedOn().atZoneSameInstant(ZoneOffset.UTC)
+            .format(DateTimeFormatter.ISO_DATE_TIME)
+        );
+
+    // FIXME: Need to populate Rankers in this part
+    //    ladder.getRankers().forEach(ranker -> {
+    //      RankerPrivateDto dto = new RankerPrivateDto(ranker, config);
+    //      rankers.add(dto);
+    //    });
+    //    rankers.sort(Comparator.comparing(RankerPrivateDto::getRank));
     return builder.build();
   }
 }

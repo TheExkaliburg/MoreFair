@@ -36,7 +36,7 @@ public class MessageEntity implements Comparable<MessageEntity> {
   @Column(nullable = false)
   private UUID uuid = UUID.randomUUID();
   @NonNull
-  @Column
+  @Column(nullable = false)
   private Long accountId;
   @NonNull
   @Column(nullable = false, length = 512)

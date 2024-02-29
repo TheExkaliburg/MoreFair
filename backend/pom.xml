@@ -2,7 +2,200 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns="http://maven.apache.org/POM/4.0.0"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <artifactId>fairgame</artifactId>
+    <groupId>de.kaliburg</groupId>
+    <version>1.0</version>
+  </parent>
+
   <artifactId>backend</artifactId>
+  <packaging>jar</packaging>
+
+  <properties>
+    <java.version>17</java.version>
+    <log4j2.version>2.17.1</log4j2.version>
+    <version.org.mapstruct>1.5.5.Final</version.org.mapstruct>
+  </properties>
+
+  <dependencies>
+    <!-- ### SPRING ### -->
+    <dependency>
+      <artifactId>spring-core</artifactId>
+      <groupId>org.springframework</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>spring-boot-starter-web</artifactId>
+      <groupId>org.springframework.boot</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>spring-boot-devtools</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Websockets -->
+    <dependency>
+      <artifactId>spring-boot-starter-websocket</artifactId>
+      <groupId>org.springframework.boot</groupId>
+    </dependency>
+    <!-- Security -->
+    <dependency>
+      <artifactId>spring-boot-starter-security</artifactId>
+      <groupId>org.springframework.boot</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>spring-session-core</artifactId>
+      <groupId>org.springframework.session</groupId>
+      <version>3.0.1</version>
+    </dependency>
+    <dependency>
+      <artifactId>bcpkix-jdk15on</artifactId>
+      <groupId>org.bouncycastle</groupId>
+      <version>1.70</version>
+    </dependency>
+    <!-- Caching -->
+    <dependency>
+      <artifactId>spring-boot-starter-cache</artifactId>
+      <groupId>org.springframework.boot</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>caffeine</artifactId>
+      <groupId>com.github.ben-manes.caffeine</groupId>
+    </dependency>
+    <!-- Emails -->
+    <dependency>
+      <artifactId>spring-boot-starter-mail</artifactId>
+      <groupId>org.springframework.boot</groupId>
+    </dependency>
+    <!-- Annotation Processing-->
+    <dependency>
+      <artifactId>spring-boot-configuration-processor</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <optional>true</optional>
+      <version>3.1.1</version>
+    </dependency>
+
+
+
+    <!-- ### DATABASE ### -->
+    <dependency>
+      <artifactId>h2</artifactId>
+      <groupId>com.h2database</groupId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+      <groupId>org.springframework.boot</groupId>
+    </dependency>
+    <!--PostgreSQL -->
+    <dependency>
+      <artifactId>spring-boot-starter-jdbc</artifactId>
+      <groupId>org.springframework.boot</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>postgresql</artifactId>
+      <groupId>org.postgresql</groupId>
+    </dependency>
+    <!-- MongoDB -->
+    <dependency>
+      <artifactId>spring-boot-starter-data-mongodb</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <version>3.0.4</version>
+    </dependency>
+    <dependency>
+      <artifactId>reactor-core</artifactId>
+      <groupId>io.projectreactor</groupId>
+    </dependency>
+    <!-- Redis -->
+    <dependency>
+      <artifactId>spring-boot-starter-data-redis</artifactId>
+      <groupId>org.springframework.boot</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>spring-session-data-redis</artifactId>
+      <groupId>org.springframework.session</groupId>
+    </dependency>
+
+    <!-- ### UTILITIES ### -->
+    <dependency>
+      <artifactId>javatuples</artifactId>
+      <groupId>org.javatuples</groupId>
+      <version>1.2</version>
+    </dependency>
+    <dependency>
+      <artifactId>gson</artifactId>
+      <groupId>com.google.code.gson</groupId>
+      <version>2.10.1</version>
+    </dependency>
+    <!-- Lombok -->
+    <dependency>
+      <artifactId>lombok</artifactId>
+      <groupId>org.projectlombok</groupId>
+      <scope>provided</scope>
+    </dependency>
+    <!-- Mapstruct -->
+    <dependency>
+      <groupId>org.mapstruct</groupId>
+      <artifactId>mapstruct</artifactId>
+      <version>${version.org.mapstruct}</version>
+    </dependency>
+    <!-- Commons -->
+    <dependency>
+      <artifactId>commons-validator</artifactId>
+      <groupId>commons-validator</groupId>
+      <version>1.7</version>
+    </dependency>
+    <dependency>
+      <artifactId>commons-text</artifactId>
+      <groupId>org.apache.commons</groupId>
+      <version>1.10.0</version>
+    </dependency>
+
+    <!-- ### TESTING ### -->
+    <dependency>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <artifactId>spring-security-test</artifactId>
+      <groupId>org.springframework.security</groupId>
+      <scope>test</scope>
+    </dependency>
+    <!-- Database Mocks -->
+    <dependency>
+      <artifactId>rider-core</artifactId>
+      <groupId>com.github.database-rider</groupId>
+      <scope>compile</scope>
+      <version>1.36.0</version>
+    </dependency>
+    <dependency>
+      <artifactId>rider-junit5</artifactId>
+      <groupId>com.github.database-rider</groupId>
+      <scope>test</scope>
+      <version>1.36.0</version>
+    </dependency>
+    <dependency>
+      <artifactId>rider-spring</artifactId>
+      <groupId>com.github.database-rider</groupId>
+      <scope>test</scope>
+      <version>1.36.0</version>
+    </dependency>
+    <dependency>
+      <artifactId>embedded-redis</artifactId>
+      <groupId>it.ozimov</groupId>
+      <scope>test</scope>
+      <version>0.7.3</version>
+    </dependency>
+    <!-- Email Mocks -->
+    <dependency>
+      <artifactId>greenmail-spring</artifactId>
+      <groupId>com.icegreen</groupId>
+      <scope>test</scope>
+      <version>2.0.0</version>
+    </dependency>
+  </dependencies>
 
   <build>
     <plugins>
@@ -21,12 +214,17 @@
               <groupId>org.projectlombok</groupId>
               <version>1.18.24</version>
             </path>
+            <path>
+              <artifactId>mapstruct-processor</artifactId>
+              <groupId>org.mapstruct</groupId>
+              <version>${version.org.mapstruct}</version>
+            </path>
           </annotationProcessorPaths>
         </configuration>
         <groupId>org.apache.maven.plugins</groupId>
         <version>3.10.1</version>
       </plugin>
-      <!--Build Process-->
+      <!-- ### Build Process ### -->
       <plugin>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <executions>
@@ -46,6 +244,7 @@
         </executions>
         <groupId>org.springframework.boot</groupId>
       </plugin>
+      <!-- Copy Frontend Resources to the Static Backend Folder-->
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
@@ -88,6 +287,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <version>3.2.0</version>
       </plugin>
+      <!-- Copy Artifact to Parent Target Folder -->
       <plugin>
         <artifactId>copy-rename-maven-plugin</artifactId>
         <executions>
@@ -112,182 +312,6 @@
       </plugin>
     </plugins>
   </build>
-
-  <dependencies>
-    <dependency>
-      <artifactId>spring-boot-starter-data-jpa</artifactId>
-      <groupId>org.springframework.boot</groupId>
-    </dependency>
-    <dependency>
-      <artifactId>spring-boot-starter-web</artifactId>
-      <groupId>org.springframework.boot</groupId>
-    </dependency>
-    <dependency>
-      <artifactId>spring-boot-devtools</artifactId>
-      <groupId>org.springframework.boot</groupId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <artifactId>h2</artifactId>
-      <groupId>com.h2database</groupId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <artifactId>lombok</artifactId>
-      <groupId>org.projectlombok</groupId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <artifactId>commons-validator</artifactId>
-      <groupId>commons-validator</groupId>
-      <version>1.7</version>
-    </dependency>
-    <dependency>
-      <artifactId>javatuples</artifactId>
-      <groupId>org.javatuples</groupId>
-      <version>1.2</version>
-    </dependency>
-
-    <dependency>
-      <artifactId>commons-text</artifactId>
-      <groupId>org.apache.commons</groupId>
-      <version>1.10.0</version>
-    </dependency>
-    <!--PostgreSQL -->
-    <dependency>
-      <artifactId>spring-boot-starter-jdbc</artifactId>
-      <groupId>org.springframework.boot</groupId>
-    </dependency>
-    <dependency>
-      <artifactId>postgresql</artifactId>
-      <groupId>org.postgresql</groupId>
-    </dependency>
-    <dependency>
-      <artifactId>spring-core</artifactId>
-      <groupId>org.springframework</groupId>
-    </dependency>
-    <!-- Websockets -->
-    <dependency>
-      <artifactId>spring-boot-starter-websocket</artifactId>
-      <groupId>org.springframework.boot</groupId>
-    </dependency>
-    <!-- MongoDB -->
-    <dependency>
-      <artifactId>spring-boot-starter-data-mongodb</artifactId>
-      <groupId>org.springframework.boot</groupId>
-      <version>3.0.4</version>
-    </dependency>
-    <dependency>
-      <artifactId>reactor-core</artifactId>
-      <groupId>io.projectreactor</groupId>
-    </dependency>
-    <dependency>
-      <artifactId>gson</artifactId>
-      <groupId>com.google.code.gson</groupId>
-      <version>2.10.1</version>
-    </dependency>
-    <!-- Emails -->
-    <dependency>
-      <artifactId>spring-boot-starter-mail</artifactId>
-      <groupId>org.springframework.boot</groupId>
-    </dependency>
-    <!--Security-->
-    <dependency>
-      <artifactId>spring-boot-starter-security</artifactId>
-      <groupId>org.springframework.boot</groupId>
-    </dependency>
-    <dependency>
-      <artifactId>bcpkix-jdk15on</artifactId>
-      <groupId>org.bouncycastle</groupId>
-      <version>1.70</version>
-    </dependency>
-
-    <!-- Caching -->
-    <dependency>
-      <artifactId>caffeine</artifactId>
-      <groupId>com.github.ben-manes.caffeine</groupId>
-    </dependency>
-    <dependency>
-      <artifactId>spring-boot-starter-cache</artifactId>
-      <groupId>org.springframework.boot</groupId>
-    </dependency>
-    <!-- Annotation Processing-->
-    <dependency>
-      <artifactId>spring-boot-configuration-processor</artifactId>
-      <groupId>org.springframework.boot</groupId>
-      <optional>true</optional>
-      <version>3.1.1</version>
-    </dependency>
-    <!-- Testing-->
-    <dependency>
-      <artifactId>spring-boot-starter-test</artifactId>
-      <groupId>org.springframework.boot</groupId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <artifactId>rider-core</artifactId>
-      <groupId>com.github.database-rider</groupId>
-      <scope>compile</scope>
-      <version>1.36.0</version>
-    </dependency>
-    <dependency>
-      <artifactId>rider-junit5</artifactId>
-      <groupId>com.github.database-rider</groupId>
-      <scope>test</scope>
-      <version>1.36.0</version>
-    </dependency>
-    <dependency>
-      <artifactId>rider-spring</artifactId>
-      <groupId>com.github.database-rider</groupId>
-      <scope>test</scope>
-      <version>1.36.0</version>
-    </dependency>
-    <dependency>
-      <artifactId>spring-security-test</artifactId>
-      <groupId>org.springframework.security</groupId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <artifactId>greenmail-spring</artifactId>
-      <groupId>com.icegreen</groupId>
-      <scope>test</scope>
-      <version>2.0.0</version>
-    </dependency>
-    <dependency>
-      <artifactId>spring-session-data-redis</artifactId>
-      <groupId>org.springframework.session</groupId>
-    </dependency>
-    <dependency>
-      <artifactId>spring-boot-starter-data-redis</artifactId>
-      <groupId>org.springframework.boot</groupId>
-    </dependency>
-    <dependency>
-      <artifactId>spring-session-core</artifactId>
-      <groupId>org.springframework.session</groupId>
-      <version>3.0.1</version>
-    </dependency>
-    <dependency>
-      <artifactId>embedded-redis</artifactId>
-      <groupId>it.ozimov</groupId>
-      <scope>test</scope>
-      <version>0.7.3</version>
-    </dependency>
-  </dependencies>
-
-  <modelVersion>4.0.0</modelVersion>
-
-  <packaging>jar</packaging>
-
-  <parent>
-    <artifactId>fairgame</artifactId>
-    <groupId>de.kaliburg</groupId>
-    <version>1.0</version>
-  </parent>
-
-  <properties>
-    <java.version>17</java.version>
-    <log4j2.version>2.17.1</log4j2.version>
-  </properties>
 </project>
 
 

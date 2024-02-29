@@ -11,6 +11,7 @@ import de.kaliburg.morefair.chat.model.dto.ChatDto;
 import de.kaliburg.morefair.chat.model.types.ChatType;
 import de.kaliburg.morefair.chat.services.ChatService;
 import de.kaliburg.morefair.chat.services.MessageService;
+import de.kaliburg.morefair.chat.services.mapper.ChatMapper;
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.services.LadderService;
 import de.kaliburg.morefair.game.ranker.model.RankerEntity;
@@ -50,6 +51,7 @@ public class ChatController {
   private final ChatService chatService;
   private final LadderService ladderService;
   private final MessageService messageService;
+  private final ChatMapper chatMapper;
 
   @GetMapping(value = "/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> getChat(
@@ -77,7 +79,7 @@ public class ChatController {
 
       ChatEntity chatEntity = type.isParameterized() ? chatService.find(type, number) :
           chatService.find(type);
-      ChatDto c = chatService.convertToChatDto(chatEntity);
+      ChatDto c = chatMapper.convertToChatDto(chatEntity);
       return new ResponseEntity<>(c, HttpStatus.OK);
     } catch (IllegalArgumentException e) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

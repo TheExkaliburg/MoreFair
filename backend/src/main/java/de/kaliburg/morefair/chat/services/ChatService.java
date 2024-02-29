@@ -1,11 +1,7 @@
 package de.kaliburg.morefair.chat.services;
 
 import de.kaliburg.morefair.chat.model.ChatEntity;
-import de.kaliburg.morefair.chat.model.MessageEntity;
-import de.kaliburg.morefair.chat.model.dto.ChatDto;
 import de.kaliburg.morefair.chat.model.types.ChatType;
-import de.kaliburg.morefair.data.ModChatDto;
-import java.util.List;
 import lombok.NonNull;
 
 /**
@@ -25,7 +21,4 @@ public interface ChatService {
     return find(chatType, null);
   }
 
-  ChatDto convertToChatDto(@NonNull ChatEntity chat);
-
-  ModChatDto convertToModChatDto(List<MessageEntity> messages);
 }

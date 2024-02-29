@@ -6,7 +6,6 @@ import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.model.LadderType;
 import de.kaliburg.morefair.game.ranker.model.RankerEntity;
 import de.kaliburg.morefair.game.ranker.model.dto.RankerDto;
-import de.kaliburg.morefair.game.ranker.model.dto.RankerPrivateDto;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -27,9 +26,9 @@ public class LadderDto {
     scaling = ladder.getScaling();
     types = ladder.getTypes();
     for (RankerEntity ranker : ladder.getRankers()) {
-      RankerDto rankerDto = new RankerDto(ranker, config);
+      // FIXME: RankerDto rankerDto = new RankerDto(ranker, config);
       if (ranker.getAccountId().getUuid().equals(account.getUuid())) {
-        rankerDto = new RankerPrivateDto(ranker, config);
+        // FIXME: rankerDto = new RankerPrivateDto(ranker, config);
       }
       this.rankers.add(rankerDto);
     }

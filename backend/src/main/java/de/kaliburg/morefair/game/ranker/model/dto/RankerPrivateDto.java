@@ -1,22 +1,15 @@
 package de.kaliburg.morefair.game.ranker.model.dto;
 
-import de.kaliburg.morefair.FairConfig;
-import de.kaliburg.morefair.game.ranker.model.RankerEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
 
-@Data
 @EqualsAndHashCode(callSuper = true)
+@Data
+@SuperBuilder
 public class RankerPrivateDto extends RankerDto {
 
   private String grapes;
   private String vinegar;
-  private boolean autoPromote = false;
-
-  public RankerPrivateDto(RankerEntity ranker, FairConfig config) {
-    super(ranker, config);
-    this.grapes = ranker.getGrapes().toString();
-    this.vinegar = ranker.getVinegar().toString();
-    this.autoPromote = ranker.isAutoPromote();
-  }
+  private boolean autoPromote;
 }

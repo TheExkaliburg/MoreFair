@@ -1,7 +1,6 @@
 package de.kaliburg.morefair.game.ladder.model;
 
 import de.kaliburg.morefair.game.ladder.LadderTypeBuilder;
-import de.kaliburg.morefair.game.ranker.model.RankerEntity;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
 import de.kaliburg.morefair.game.round.model.RoundType;
 import jakarta.persistence.CollectionTable;
@@ -15,9 +14,6 @@ import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -25,9 +21,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
@@ -45,7 +39,8 @@ import org.hibernate.annotations.FetchMode;
 @Entity
 @Table(name = "ladder", uniqueConstraints = {
     @UniqueConstraint(name = "uk_uuid", columnNames = "uuid"),
-    @UniqueConstraint(name = "uk_number_round", columnNames = {"number", "round_id"})})
+    @UniqueConstraint(name = "uk_number_round", columnNames = {"number", "round_id"})
+})
 @Getter
 @Setter
 @Accessors(chain = true)
@@ -65,11 +60,8 @@ public final class LadderEntity {
   @Column(nullable = false)
   private Integer number;
   @NonNull
-  @ManyToOne
-  @JoinColumn(name = "round_id", nullable = false, foreignKey = @ForeignKey(name = "fk_ladder_round"))
-  private RoundEntity round;
-  @OneToMany(mappedBy = "ladderId", fetch = FetchType.EAGER)
-  private List<RankerEntity> rankers = new ArrayList<>();
+  @Column(nullable = false)
+  private Long roundId;
   @CollectionTable(name = "ladder_type", foreignKey = @ForeignKey(name = "fk_ladder_type_ladder"))
   @ElementCollection(targetClass = LadderType.class, fetch = FetchType.EAGER)
   @Enumerated(EnumType.STRING)
@@ -87,7 +79,7 @@ public final class LadderEntity {
 
   public LadderEntity(@NonNull Integer number, @NonNull RoundEntity round) {
     this.number = number;
-    this.round = round;
+    this.roundId = round.getId();
 
     determineLadderType(round);
 
