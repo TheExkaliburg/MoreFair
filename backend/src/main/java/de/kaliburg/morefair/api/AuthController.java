@@ -2,12 +2,12 @@ package de.kaliburg.morefair.api;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import de.kaliburg.morefair.account.AccountEntity;
-import de.kaliburg.morefair.account.AccountService;
+import de.kaliburg.morefair.account.model.AccountEntity;
+import de.kaliburg.morefair.account.services.AccountService;
 import de.kaliburg.morefair.api.utils.HttpUtils;
 import de.kaliburg.morefair.api.utils.RequestThrottler;
+import de.kaliburg.morefair.mail.services.EmailService;
 import de.kaliburg.morefair.security.SecurityUtils;
-import de.kaliburg.morefair.services.EmailService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

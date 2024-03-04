@@ -1,8 +1,9 @@
-package de.kaliburg.morefair.chat.services;
+package de.kaliburg.morefair.chat.services.impl;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import de.kaliburg.morefair.chat.model.ChatEntity;
 import de.kaliburg.morefair.chat.model.types.ChatType;
+import de.kaliburg.morefair.chat.services.ChatService;
 import de.kaliburg.morefair.chat.services.repositories.ChatRepository;
 import de.kaliburg.morefair.core.caching.MultiIndexedLoadingCache;
 import jakarta.annotation.Nullable;
@@ -10,7 +11,6 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.javatuples.Pair;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,13 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class ChatServiceImpl implements ChatService {
 
   private final ChatRepository chatRepository;
-  private final MessageService messageService;
-  private MultiIndexedLoadingCache<Long, ChatEntity> chatCache;
+  private final MultiIndexedLoadingCache<Long, ChatEntity> chatCache;
 
-
-  public ChatServiceImpl(ChatRepository chatRepository, @Lazy MessageService messageService) {
+  public ChatServiceImpl(ChatRepository chatRepository) {
     this.chatRepository = chatRepository;
-    this.messageService = messageService;
 
     chatCache = MultiIndexedLoadingCache.builder(
         Caffeine.newBuilder(),

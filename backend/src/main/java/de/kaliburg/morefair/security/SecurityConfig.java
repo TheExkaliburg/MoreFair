@@ -1,7 +1,7 @@
 package de.kaliburg.morefair.security;
 
 import de.kaliburg.morefair.FairConfig;
-import de.kaliburg.morefair.account.AccountService;
+import de.kaliburg.morefair.account.services.AccountService;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

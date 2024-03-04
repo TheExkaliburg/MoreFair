@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.data;
 
-import de.kaliburg.morefair.account.AccountAccessRole;
+import de.kaliburg.morefair.account.model.types.AccountAccessType;
 import lombok.Data;
 import lombok.NonNull;
 
@@ -10,5 +10,5 @@ public class ModerationInfoData {
   @NonNull
   private Integer highestLadder;
   @NonNull
-  private AccountAccessRole yourAccessRole;
+  private AccountAccessType yourAccessRole;
 }

@@ -1,18 +1,18 @@
-package de.kaliburg.morefair.statistics;
+package de.kaliburg.morefair.statistics.services.impl;
 
-import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import de.kaliburg.morefair.FairConfig;
-import de.kaliburg.morefair.account.AccountEntity;
+import de.kaliburg.morefair.account.model.AccountEntity;
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ranker.model.RankerEntity;
+import de.kaliburg.morefair.game.ranker.services.RankerService;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
 import de.kaliburg.morefair.game.round.services.RoundService;
-import de.kaliburg.morefair.statistics.model.dto.RoundResultsDto;
+import de.kaliburg.morefair.game.season.model.SeasonEntity;
+import de.kaliburg.morefair.game.season.services.SeasonService;
 import de.kaliburg.morefair.statistics.records.AutoPromoteRecordEntity;
 import de.kaliburg.morefair.statistics.records.AutoPromoteRecordRepository;
 import de.kaliburg.morefair.statistics.records.BiasRecordEntity;
@@ -32,6 +32,7 @@ import de.kaliburg.morefair.statistics.results.ActivityAnalysisEntity;
 import de.kaliburg.morefair.statistics.results.ActivityAnalysisRepository;
 import de.kaliburg.morefair.statistics.results.RoundStatisticsEntity;
 import de.kaliburg.morefair.statistics.results.RoundStatisticsRepository;
+import de.kaliburg.morefair.statistics.services.StatisticsService;
 import jakarta.annotation.PostConstruct;
 import java.util.List;
 import java.util.Optional;
@@ -52,7 +53,7 @@ import org.springframework.web.client.RestTemplate;
 @Service
 @Slf4j
 @Transactional
-public class StatisticsService {
+public class StatisticsServiceImpl implements StatisticsService {
 
   private final LoginRecordRepository loginRecordRepository;
   private final BiasRecordRepository biasRecordRepository;
@@ -67,11 +68,12 @@ public class StatisticsService {
   @Lazy
   private final RoundService roundService;
 
-  private final RoundResultService roundResultService;
+  @Autowired
+  private final RankerService rankerService;
 
-  private final FairConfig config;
-  private final Cache<Integer, RoundResultsDto> roundResultsCache =
-      Caffeine.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).maximumSize(10).build();
+  @Autowired
+  private final SeasonService seasonService;
+
   private final LoadingCache<Long, Boolean> hasStartedStatisticsJobRecently =
       Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build(number -> false);
 
@@ -158,7 +160,7 @@ public class StatisticsService {
       RoundEntity round) {
     RankerRecord rankerRecord = new RankerRecord(ranker);
     RankerRecord targetRecord = new RankerRecord(target);
-    List<RankerEntity> rankers = ladder.getRankers();
+    List<RankerEntity> rankers = rankerService.findAllByCurrentLadderNumber(ladder.getNumber());
     RankerRecord secondRecord = new RankerRecord(rankers.get(1));
     LadderRecord ladderRecord = new LadderRecord(ladder);
     RoundRecord roundRecord = new RoundRecord(round);
@@ -258,7 +260,8 @@ public class StatisticsService {
   }
 
   public RoundStatisticsEntity getRoundStatistics(Integer number) {
-    Optional<RoundEntity> round = roundService.find(number);
+    SeasonEntity currentSeason = seasonService.getCurrentSeason();
+    Optional<RoundEntity> round = roundService.findBySeasonAndNumber(currentSeason, number);
     if (round.isEmpty()) {
       return null;
     }

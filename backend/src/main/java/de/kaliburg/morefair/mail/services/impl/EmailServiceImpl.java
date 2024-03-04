@@ -1,5 +1,6 @@
-package de.kaliburg.morefair.services;
+package de.kaliburg.morefair.mail.services.impl;
 
+import de.kaliburg.morefair.mail.services.EmailService;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +15,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public class EmailServiceImpl implements EmailService {
 
   private final JavaMailSender emailSender;
-
 
   @Override
   public void sendEmail(String to, String subject, String text) {

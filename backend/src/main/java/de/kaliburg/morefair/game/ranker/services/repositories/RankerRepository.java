@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.game.ranker.services.repositories;
 
-import de.kaliburg.morefair.account.AccountEntity;
+import de.kaliburg.morefair.account.model.AccountEntity;
 import de.kaliburg.morefair.game.ranker.model.RankerEntity;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
 import java.util.List;

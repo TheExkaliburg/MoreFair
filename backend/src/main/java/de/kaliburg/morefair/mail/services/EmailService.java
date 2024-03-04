@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.services;
+package de.kaliburg.morefair.mail.services;
 
 public interface EmailService {
 

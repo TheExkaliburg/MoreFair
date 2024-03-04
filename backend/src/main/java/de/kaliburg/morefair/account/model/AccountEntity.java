@@ -1,5 +1,6 @@
-package de.kaliburg.morefair.account;
+package de.kaliburg.morefair.account.model;
 
+import de.kaliburg.morefair.account.model.types.AccountAccessType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -73,24 +74,24 @@ public class AccountEntity {
   @NonNull
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)
-  private AccountAccessRole accessRole = AccountAccessRole.PLAYER;
+  private AccountAccessType accessRole = AccountAccessType.PLAYER;
   @OneToOne(mappedBy = "account", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   private AchievementsEntity achievements = new AchievementsEntity(this);
 
   public boolean isOwner() {
-    return accessRole.equals(AccountAccessRole.OWNER);
+    return accessRole.equals(AccountAccessType.OWNER);
   }
 
   public boolean isMod() {
-    return accessRole.equals(AccountAccessRole.MODERATOR) || isOwner();
+    return accessRole.equals(AccountAccessType.MODERATOR) || isOwner();
   }
 
   public boolean isBanned() {
-    return accessRole.equals(AccountAccessRole.BANNED_PLAYER);
+    return accessRole.equals(AccountAccessType.BANNED_PLAYER);
   }
 
   public boolean isMuted() {
-    return accessRole.equals(AccountAccessRole.MUTED_PLAYER) || isBanned();
+    return accessRole.equals(AccountAccessType.MUTED_PLAYER) || isBanned();
   }
 
   /**
@@ -112,6 +113,6 @@ public class AccountEntity {
   }
 
   public boolean isBroadcaster() {
-    return accessRole.equals(AccountAccessRole.BROADCASTER) || isOwner();
+    return accessRole.equals(AccountAccessType.BROADCASTER) || isOwner();
   }
 }

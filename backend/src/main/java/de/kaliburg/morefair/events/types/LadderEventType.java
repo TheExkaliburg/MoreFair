@@ -3,7 +3,7 @@ package de.kaliburg.morefair.events.types;
 /**
  * All the different types of events a user or the server can create.
  */
-public enum LadderEventTypes {
+public enum LadderEventType {
   // Ladder Events
   BUY_BIAS,
   BUY_MULTI,

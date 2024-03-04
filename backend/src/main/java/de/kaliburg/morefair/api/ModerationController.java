@@ -1,21 +1,18 @@
 package de.kaliburg.morefair.api;
 
-import de.kaliburg.morefair.FairConfig;
-import de.kaliburg.morefair.account.AccountAccessRole;
-import de.kaliburg.morefair.account.AccountEntity;
-import de.kaliburg.morefair.account.AccountService;
+import de.kaliburg.morefair.account.model.AccountEntity;
+import de.kaliburg.morefair.account.model.types.AccountAccessType;
+import de.kaliburg.morefair.account.services.AccountService;
 import de.kaliburg.morefair.api.utils.HttpUtils;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WsMessage;
 import de.kaliburg.morefair.chat.model.MessageEntity;
 import de.kaliburg.morefair.chat.model.types.ChatType;
-import de.kaliburg.morefair.chat.services.ChatService;
 import de.kaliburg.morefair.chat.services.MessageService;
 import de.kaliburg.morefair.chat.services.mapper.ChatMapper;
 import de.kaliburg.morefair.data.ModChatDto;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.AccountEventTypes;
-import de.kaliburg.morefair.game.ladder.services.LadderService;
 import de.kaliburg.morefair.security.SecurityUtils;
 import java.util.HashMap;
 import java.util.List;
@@ -49,10 +46,7 @@ public class ModerationController {
   private static final String APP_MOD_DESTINATION = "/moderation/mod/{id}";
   private final AccountService accountService;
   private final WsUtils wsUtils;
-  private final LadderService ladderService;
   private final MessageService messageService;
-  private final ChatService chatService;
-  private final FairConfig config;
   private final ChatMapper chatMapper;
 
   @GetMapping("/chat")
@@ -70,8 +64,7 @@ public class ModerationController {
         return new ResponseEntity<>(modChatDto, HttpStatus.OK);
       }
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
       return HttpUtils.buildErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }
@@ -89,7 +82,7 @@ public class ModerationController {
       if (target.isOwner()) {
         return;
       }
-      target.setAccessRole(AccountAccessRole.BANNED_PLAYER);
+      target.setAccessRole(AccountAccessType.BANNED_PLAYER);
       target.setDisplayName("[BANNED]");
       target = accountService.save(target);
       messageService.deleteMessagesOfAccount(target);
@@ -101,8 +94,7 @@ public class ModerationController {
       wsUtils.convertAndSendToTopic(AccountController.TOPIC_EVENTS_DESTINATION, new Event<>(
           AccountEventTypes.NAME_CHANGE, target.getId(), target.getDisplayName()));
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
   }
 
@@ -118,7 +110,7 @@ public class ModerationController {
       if (target.isOwner()) {
         return;
       }
-      target.setAccessRole(AccountAccessRole.MUTED_PLAYER);
+      target.setAccessRole(AccountAccessType.MUTED_PLAYER);
       target.setDisplayName("[MUTED]" + target.getDisplayName());
       target = accountService.save(target);
       messageService.deleteMessagesOfAccount(target);
@@ -130,8 +122,7 @@ public class ModerationController {
       wsUtils.convertAndSendToTopic(AccountController.TOPIC_EVENTS_DESTINATION, new Event<>(
           AccountEventTypes.NAME_CHANGE, target.getId(), target.getDisplayName()));
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
   }
 
@@ -147,7 +138,7 @@ public class ModerationController {
       if (target.isOwner()) {
         return;
       }
-      target.setAccessRole(AccountAccessRole.PLAYER);
+      target.setAccessRole(AccountAccessType.PLAYER);
       target = accountService.save(target);
       log.info("[MOD] {} (#{}) is freeing the account {} (#{})", account.getDisplayName(),
           account.getId(),
@@ -155,8 +146,7 @@ public class ModerationController {
       wsUtils.convertAndSendToTopic(AccountController.TOPIC_EVENTS_DESTINATION, new Event<>(
           AccountEventTypes.FREE, target.getId()));
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
   }
 
@@ -189,8 +179,7 @@ public class ModerationController {
       wsUtils.convertAndSendToTopic(AccountController.TOPIC_EVENTS_DESTINATION, new Event<>(
           AccountEventTypes.NAME_CHANGE, target.getId(), displayName));
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
   }
 
@@ -215,8 +204,7 @@ public class ModerationController {
       log.info("[MOD] {} (#{}) is prompting the account {} (#{}) with {}", account.getDisplayName(),
           account.getId(), target.getDisplayName(), target.getId(), text);
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
   }
 
@@ -233,15 +221,14 @@ public class ModerationController {
       if (target.isOwner()) {
         return;
       }
-      target.setAccessRole(AccountAccessRole.MODERATOR);
+      target.setAccessRole(AccountAccessType.MODERATOR);
       target = accountService.save(target);
       log.info("[MOD] {} (#{}) is modding the account {} (#{})", account.getDisplayName(),
           account.getId(), target.getDisplayName(), target.getId());
       wsUtils.convertAndSendToTopic(AccountController.TOPIC_EVENTS_DESTINATION, new Event<>(
           AccountEventTypes.MOD, target.getId(), account.getId()));
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
   }
 
@@ -261,8 +248,7 @@ public class ModerationController {
           .collect(Collectors.toMap(AccountEntity::getId, AccountEntity::getDisplayName));
       return new ResponseEntity<>(result, HttpStatus.OK);
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -286,8 +272,7 @@ public class ModerationController {
 
       return new ResponseEntity<>(result, HttpStatus.OK);
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
       return ResponseEntity.internalServerError().body(e.getMessage());
     }
   }

@@ -1,5 +1,7 @@
-package de.kaliburg.morefair.account;
+package de.kaliburg.morefair.account.services.repositories;
 
+import de.kaliburg.morefair.account.model.AccountEntity;
+import de.kaliburg.morefair.account.model.types.AccountAccessType;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,7 +26,7 @@ public interface AccountRepository extends JpaRepository<AccountEntity, Long> {
 
   @Query("select a from AccountEntity a where a.accessRole = :accessRole order by a.id")
   List<AccountEntity> findByAccessRoleOrderByIdAsc(
-      @Param("accessRole") AccountAccessRole accessRole);
+      @Param("accessRole") AccountAccessType accessRole);
 
   List<AccountEntity> findTop100ByDisplayNameContainsIgnoreCaseOrderByLastLoginDesc(
       @Param("displayName") @NonNull String displayName);

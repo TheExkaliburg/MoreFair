@@ -1,6 +1,5 @@
-package de.kaliburg.morefair.game.ladder;
+package de.kaliburg.morefair.game.ladder.model;
 
-import de.kaliburg.morefair.game.ladder.model.LadderType;
 import de.kaliburg.morefair.game.round.model.RoundType;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -201,7 +200,7 @@ public class LadderTypeBuilder {
     }
 
     this.roundTypes.stream().sorted(new RoundType.Comparator()).forEach(this::handleRoundTypes);
-    this.previousLadderType.stream().sorted(new LadderTypeComparator())
+    this.previousLadderType.stream().sorted(new LadderType.Comparator())
         .forEach(this::handlePreviousLadderType);
 
     if (ladderNumber.equals(assholeLadderNumber)) {

@@ -1,28 +1,22 @@
 package de.kaliburg.morefair.api;
 
-import de.kaliburg.morefair.account.AccountEntity;
-import de.kaliburg.morefair.account.AccountService;
-import de.kaliburg.morefair.account.SuggestionDto;
+import de.kaliburg.morefair.account.model.AccountEntity;
+import de.kaliburg.morefair.account.services.AccountService;
 import de.kaliburg.morefair.api.utils.RequestThrottler;
 import de.kaliburg.morefair.api.websockets.messages.WsMessage;
 import de.kaliburg.morefair.chat.model.ChatEntity;
 import de.kaliburg.morefair.chat.model.MessageEntity;
-import de.kaliburg.morefair.chat.model.dto.ChatDto;
 import de.kaliburg.morefair.chat.model.types.ChatType;
 import de.kaliburg.morefair.chat.services.ChatService;
 import de.kaliburg.morefair.chat.services.MessageService;
+import de.kaliburg.morefair.chat.services.SuggestionsService;
 import de.kaliburg.morefair.chat.services.mapper.ChatMapper;
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.services.LadderService;
-import de.kaliburg.morefair.game.ranker.model.RankerEntity;
-import de.kaliburg.morefair.game.round.model.RoundEntity;
-import de.kaliburg.morefair.game.round.services.RoundService;
+import de.kaliburg.morefair.game.ranker.services.RankerService;
 import de.kaliburg.morefair.security.SecurityUtils;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -47,11 +41,12 @@ public class ChatController {
 
   private final AccountService accountService;
   private final RequestThrottler throttler;
-  private final RoundService roundService;
   private final ChatService chatService;
   private final LadderService ladderService;
   private final MessageService messageService;
   private final ChatMapper chatMapper;
+  private final SuggestionsService suggestionsService;
+  private final RankerService rankerService;
 
   @GetMapping(value = "/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> getChat(
@@ -67,25 +62,23 @@ public class ChatController {
       }
 
       if (type == ChatType.LADDER && number != null) {
-        int highestLadderNumber = ladderService.findFirstActiveRankerOfAccountThisRound(account)
-            .map(ranker -> ladderService.find(ranker.getLadderId()))
+        int ladderNumber = rankerService.findHighestCurrentRankerOfAccount(account)
+            .map(r -> ladderService.findCurrentLadderById(r.getLadderId()).orElseThrow())
             .map(LadderEntity::getNumber)
             .orElse(1);
 
-        if (!account.isMod() && number > highestLadderNumber) {
+        if (!account.isMod() && number > ladderNumber) {
           return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
       }
 
       ChatEntity chatEntity = type.isParameterized() ? chatService.find(type, number) :
           chatService.find(type);
-      ChatDto c = chatMapper.convertToChatDto(chatEntity);
-      return new ResponseEntity<>(c, HttpStatus.OK);
+      return new ResponseEntity<>(chatMapper.convertToChatDto(chatEntity), HttpStatus.OK);
     } catch (IllegalArgumentException e) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -93,16 +86,7 @@ public class ChatController {
   @GetMapping(value = "/suggestions")
   public ResponseEntity<?> getSuggestions() {
     try {
-      RoundEntity currentRound = roundService.getCurrentRound();
-      LadderEntity ladder = ladderService.find(currentRound, 1);
-
-      List<RankerEntity> rankers = ladder.getRankers();
-      var allSuggestions = rankers.stream()
-          .map(RankerEntity::getAccountId)
-          .map(accId -> new SuggestionDto(accId, accountService.find(accId).getDisplayName()))
-          .collect(Collectors.toList());
-
-      return ResponseEntity.ok(allSuggestions);
+      return ResponseEntity.ok(suggestionsService.getAllSuggestions());
     } catch (Exception e) {
       log.error(e.getMessage(), e);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -125,9 +109,8 @@ public class ChatController {
     try {
 
       String message = wsMessage.getContent();
-      String metadata = wsMessage.getMetadata();
 
-      if (ObjectUtils.anyNull(message, metadata)) {
+      if (message == null) {
         log.error("message or metadata is null");
         return;
       }
@@ -150,16 +133,18 @@ public class ChatController {
       ChatType type = ChatType.valueOf(typeString.toUpperCase());
       ChatEntity chat = chatService.find(type, number);
       if (type == ChatType.LADDER && number != null) {
-        int highestLadderNumber = ladderService.findFirstActiveRankerOfAccountThisRound(account)
-            .map(ranker -> ladderService.find(ranker.getLadderId()))
+        int ladderNumber = rankerService.findHighestCurrentRankerOfAccount(account)
+            .map(r -> ladderService.findCurrentLadderById(r.getLadderId()).orElseThrow())
             .map(LadderEntity::getNumber)
             .orElse(1);
-        if (!account.isMod() && number > highestLadderNumber) {
+
+        if (!account.isMod() && number > ladderNumber) {
           return;
         }
       }
 
-      MessageEntity messageEntity = messageService.create(account, chat, message, metadata);
+      MessageEntity messageEntity = messageService.create(account, chat, message,
+          wsMessage.getMetadata());
       log.info("[CHAT '{}'] {} (#{}): {}", chat.getIdentifier(), account.getDisplayName(),
           account.getId(), messageEntity.getMessage());
     } catch (Exception e) {

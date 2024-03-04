@@ -3,10 +3,10 @@ package de.kaliburg.morefair.game.round_old;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import de.kaliburg.morefair.game.ladder.LadderTypeBuilder;
 import de.kaliburg.morefair.game.ladder.model.LadderType;
+import de.kaliburg.morefair.game.ladder.model.LadderTypeBuilder;
 import de.kaliburg.morefair.game.round.model.RoundType;
-import de.kaliburg.morefair.game.round.services.RoundTypeSetBuilder;
+import de.kaliburg.morefair.game.round.model.RoundTypeSetBuilder;
 import de.kaliburg.morefair.utils.EnableLoggingPropertiesBeforeAll;
 import java.util.ArrayList;
 import java.util.HashMap;

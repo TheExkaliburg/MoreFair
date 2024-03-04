@@ -2,7 +2,6 @@ package de.kaliburg.morefair.game.round.model;
 
 import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
-import de.kaliburg.morefair.game.round.services.RoundTypeSetBuilder;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;

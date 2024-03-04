@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.statistics.records;
 
-import de.kaliburg.morefair.account.AccountEntity;
+import de.kaliburg.morefair.account.model.AccountEntity;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Data;

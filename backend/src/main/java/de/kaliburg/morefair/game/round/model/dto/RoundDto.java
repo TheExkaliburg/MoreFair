@@ -1,12 +1,14 @@
 package de.kaliburg.morefair.game.round.model.dto;
 
-import de.kaliburg.morefair.FairConfig;
-import de.kaliburg.morefair.game.round.model.RoundEntity;
 import de.kaliburg.morefair.game.round.model.RoundType;
 import java.util.Set;
+import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 @Data
+@Builder
+@RequiredArgsConstructor
 public class RoundDto {
 
   private RoundSettingsDto settings;
@@ -15,16 +17,10 @@ public class RoundDto {
   private Integer autoPromoteLadder;
   private Set<RoundType> types;
 
-  public RoundDto(RoundEntity currentRound, FairConfig config) {
-    settings = new RoundSettingsDto(currentRound, config);
-    autoPromoteLadder = config.getAutoPromoteLadder();
-    topLadder = currentRound.getLadders().size();
-    assholeLadder = currentRound.getAssholeLadderNumber();
-    types = currentRound.getTypes();
-  }
-
   @Data
-  public class RoundSettingsDto {
+  @Builder
+  @RequiredArgsConstructor
+  public static class RoundSettingsDto {
 
     private String basePointsForPromote;
     private Integer minimumPeopleForPromote;
@@ -32,12 +28,5 @@ public class RoundDto {
     private String baseGrapesNeededToAutoPromote;
     private Integer manualPromoteWaitTime;
 
-    public RoundSettingsDto(RoundEntity currentRound, FairConfig config) {
-      basePointsForPromote = currentRound.getBasePointsRequirement().toString();
-      minimumPeopleForPromote = config.getBaseAssholeLadder();
-      baseVinegarNeededToThrow = config.getBaseVinegarToThrow().toString();
-      manualPromoteWaitTime = config.getManualPromoteWaitTime();
-      baseGrapesNeededToAutoPromote = config.getBaseGrapesToBuyAutoPromote().toString();
-    }
   }
 }

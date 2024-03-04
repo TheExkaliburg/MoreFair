@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.account;
+package de.kaliburg.morefair.account.model;
 
 import java.util.List;
 import lombok.Getter;

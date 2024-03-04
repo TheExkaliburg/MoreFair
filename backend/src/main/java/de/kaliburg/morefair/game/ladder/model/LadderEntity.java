@@ -1,6 +1,5 @@
 package de.kaliburg.morefair.game.ladder.model;
 
-import de.kaliburg.morefair.game.ladder.LadderTypeBuilder;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
 import de.kaliburg.morefair.game.round.model.RoundType;
 import jakarta.persistence.CollectionTable;

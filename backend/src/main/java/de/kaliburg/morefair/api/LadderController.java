@@ -1,17 +1,17 @@
 package de.kaliburg.morefair.api;
 
-import de.kaliburg.morefair.FairConfig;
-import de.kaliburg.morefair.account.AccountEntity;
-import de.kaliburg.morefair.account.AccountService;
+import de.kaliburg.morefair.account.model.AccountEntity;
+import de.kaliburg.morefair.account.services.AccountService;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WsMessage;
 import de.kaliburg.morefair.data.ModServerMessageData;
 import de.kaliburg.morefair.events.Event;
-import de.kaliburg.morefair.events.types.LadderEventTypes;
-import de.kaliburg.morefair.game.ladder.model.dto.LadderDto;
+import de.kaliburg.morefair.events.types.LadderEventType;
+import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.services.LadderEventService;
 import de.kaliburg.morefair.game.ladder.services.LadderService;
-import de.kaliburg.morefair.game.ranker.model.RankerEntity;
+import de.kaliburg.morefair.game.ladder.services.mapper.LadderMapper;
+import de.kaliburg.morefair.game.ranker.services.RankerService;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
 import de.kaliburg.morefair.game.round.services.RoundService;
 import de.kaliburg.morefair.game.round.services.RoundUtils;
@@ -46,9 +46,10 @@ public class LadderController {
   private final WsUtils wsUtils;
   private final RoundService roundService;
   private final LadderService ladderService;
-  private final LadderEventService ladderService;
+  private final LadderEventService ladderEventService;
   private final RoundUtils roundUtils;
-  private final FairConfig config;
+  private final LadderMapper ladderMapper;
+  private final RankerService rankerService;
 
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -60,25 +61,34 @@ public class LadderController {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       }
       log.trace("/app/game/init/{} from {}#{}", number, account.getDisplayName(), account.getId());
-      RankerEntity ranker = ladderService.findFirstActiveRankerOfAccountThisRound(account);
-      if (ranker == null) {
+
+      RoundEntity currentRound = roundService.getCurrentRound();
+      var highestLadder = rankerService.findHighestCurrentRankerOfAccount(account)
+          .map(r -> ladderService.findCurrentLadderById(r.getLadderId()).orElseThrow());
+
+      if (highestLadder.isEmpty()) {
         log.info("Creating new ranker for {}#{}", account.getDisplayName(), account.getId());
-        ranker = roundService.createNewRanker(account);
+
+        // FIXME roundService.enterRound(account) vs rankerService.createNewRanker(account)
+        rankerService.enterNewRanker(account);
       }
 
-      if (account.isMod()
-          || number.equals(roundUtils.getAssholeLadderNumber(roundService.getCurrentRound()))
-          || number <= ranker.getLadderId().getNumber()) {
-        LadderDto l = new LadderDto(ladderService.findInCache(number), account, config);
-        return ResponseEntity.ok(l);
-      } else {
+      int ladderNumber = highestLadder.map(LadderEntity::getNumber).orElse(1);
+      if (!account.isMod()
+          && !number.equals(roundUtils.getAssholeLadderNumber(currentRound))
+          && number > ladderNumber) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       }
+
+      LadderEntity result = ladderService.findCurrentLadderWithNumber(number)
+          .orElseThrow();
+      return ResponseEntity.ok(
+          ladderMapper.mapToLadderDto(result, account)
+      );
     } catch (IllegalArgumentException e) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -91,18 +101,20 @@ public class LadderController {
       if (account == null || account.isBanned()) {
         return;
       }
-      Integer num = ladderService.findFirstActiveRankerOfAccountThisRound(account).getLadderId()
-          .getNumber();
+
+      Integer num = rankerService.findHighestCurrentRankerOfAccount(account)
+          .map(r -> ladderService.findCurrentLadderById(r.getLadderId()).orElseThrow())
+          .map(LadderEntity::getNumber)
+          .orElseThrow();
+
       log.info("[L{}] BIAS: {} (#{}) {}", num, account.getDisplayName(), account.getId(),
           wsMessage.getEvent());
-      ModServerMessageData data = new ModServerMessageData(account.getId(),
-          sha.getDestination(),
+      ModServerMessageData data = new ModServerMessageData(account.getId(), sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
       wsUtils.convertAndSendToTopic(ModerationController.TOPIC_LOG_EVENTS_DESTINATION + num, data);
-      ladderService.addEvent(num, new Event<>(LadderEventTypes.BUY_BIAS, account.getId()));
+      ladderEventService.addEvent(num, new Event<>(LadderEventType.BUY_BIAS, account.getId()));
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
   }
 
@@ -114,18 +126,23 @@ public class LadderController {
       if (account == null || account.isBanned()) {
         return;
       }
-      RoundEntity currentRound = roundService.getCurrentRound();
-      Integer num = ladderService.findFirstActiveRankerOfAccountThisRound(account).getLadderId()
-          .getNumber();
+
+      Integer num = rankerService.findHighestCurrentRankerOfAccount(account)
+          .map(r -> ladderService.findCurrentLadderById(r.getLadderId()).orElseThrow())
+          .map(LadderEntity::getNumber)
+          .orElseThrow();
+
       log.info("[L{}] MULTI: {} (#{}) {}", num, account.getDisplayName(), account.getId(),
           wsMessage.getEvent());
+
       ModServerMessageData data = new ModServerMessageData(account.getId(), sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
       wsUtils.convertAndSendToTopic(ModerationController.TOPIC_LOG_EVENTS_DESTINATION + num, data);
-      ladderService.addEvent(num, new Event<>(LadderEventTypes.BUY_MULTI, account.getId()));
+
+      ladderEventService.addEvent(num,
+          new Event<>(LadderEventType.BUY_MULTI, account.getId()));
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
   }
 
@@ -137,19 +154,23 @@ public class LadderController {
       if (account == null || account.isBanned()) {
         return;
       }
-      RoundEntity currentRound = roundService.getCurrentRound();
-      Integer num = ladderService.findFirstActiveRankerOfAccountThisRound(account).getLadderId()
-          .getNumber();
+
+      Integer num = rankerService.findHighestCurrentRankerOfAccount(account)
+          .map(r -> ladderService.findCurrentLadderById(r.getLadderId()).orElseThrow())
+          .map(LadderEntity::getNumber)
+          .orElseThrow();
+
       log.info("[L{}] VINEGAR: {} (#{}) {}", num, account.getDisplayName(), account.getId(),
           wsMessage.getEvent());
-      ModServerMessageData data = new ModServerMessageData(account.getId(),
-          sha.getDestination(),
+
+      ModServerMessageData data = new ModServerMessageData(account.getId(), sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
       wsUtils.convertAndSendToTopic(ModerationController.TOPIC_LOG_EVENTS_DESTINATION + num, data);
-      ladderService.addEvent(num, new Event<>(LadderEventTypes.THROW_VINEGAR, account.getId()));
+
+      ladderEventService.addEvent(num,
+          new Event<>(LadderEventType.THROW_VINEGAR, account.getId()));
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
   }
 
@@ -162,19 +183,23 @@ public class LadderController {
       if (account == null || account.isBanned()) {
         return;
       }
-      RoundEntity currentRound = roundService.getCurrentRound();
-      Integer num = ladderService.findFirstActiveRankerOfAccountThisRound(account).getLadderId()
-          .getNumber();
+
+      Integer num = rankerService.findHighestCurrentRankerOfAccount(account)
+          .map(r -> ladderService.findCurrentLadderById(r.getLadderId()).orElseThrow())
+          .map(LadderEntity::getNumber)
+          .orElseThrow();
+
       log.info("[L{}] PROMOTE: {} (#{}) {}", num, account.getDisplayName(), account.getId(),
           wsMessage.getEvent());
+
       ModServerMessageData data = new ModServerMessageData(account.getId(),
           sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
       wsUtils.convertAndSendToTopic(ModerationController.TOPIC_LOG_EVENTS_DESTINATION + num, data);
-      ladderService.addEvent(num, new Event<>(LadderEventTypes.PROMOTE, account.getId()));
+
+      ladderEventService.addEvent(num, new Event<>(LadderEventType.PROMOTE, account.getId()));
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
   }
 
@@ -186,19 +211,24 @@ public class LadderController {
       if (account == null || account.isBanned()) {
         return;
       }
-      RoundEntity currentRound = roundService.getCurrentRound();
-      Integer num = ladderService.findFirstActiveRankerOfAccountThisRound(account).getLadderId()
-          .getNumber();
+
+      Integer num = rankerService.findHighestCurrentRankerOfAccount(account)
+          .map(r -> ladderService.findCurrentLadderById(r.getLadderId()).orElseThrow())
+          .map(LadderEntity::getNumber)
+          .orElse(1);
+
       log.info("[L{}] AUTOPROMOTE: {} (#{}) {}", num, account.getDisplayName(), account.getId(),
           wsMessage.getEvent());
+
       ModServerMessageData data = new ModServerMessageData(account.getId(),
           sha.getDestination(),
           wsMessage.getContent(), wsMessage.getEvent());
       wsUtils.convertAndSendToTopic(ModerationController.TOPIC_LOG_EVENTS_DESTINATION + num, data);
-      ladderService.addEvent(num, new Event<>(LadderEventTypes.BUY_AUTO_PROMOTE, account.getId()));
+
+      ladderEventService.addEvent(num,
+          new Event<>(LadderEventType.BUY_AUTO_PROMOTE, account.getId()));
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
   }
 }

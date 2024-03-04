@@ -1,5 +1,10 @@
-package de.kaliburg.morefair.account;
+package de.kaliburg.morefair.account.services.impl;
 
+import de.kaliburg.morefair.account.model.AccountEntity;
+import de.kaliburg.morefair.account.model.AccountServiceEvent;
+import de.kaliburg.morefair.account.model.types.AccountAccessType;
+import de.kaliburg.morefair.account.services.AccountService;
+import de.kaliburg.morefair.account.services.repositories.AccountRepository;
 import de.kaliburg.morefair.api.websockets.UserPrincipal;
 import de.kaliburg.morefair.security.UserDetailsWithUuid;
 import java.time.OffsetDateTime;
@@ -12,7 +17,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,14 +27,14 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Log4j2
-public class AccountService implements UserDetailsService {
+public class AccountServiceImpl implements AccountService {
 
   private final AccountRepository accountRepository;
   private final ApplicationEventPublisher eventPublisher;
   private final PasswordEncoder passwordEncoder;
   private AccountEntity broadcasterAccount;
 
-  public AccountService(AccountRepository accountRepository,
+  public AccountServiceImpl(AccountRepository accountRepository,
       ApplicationEventPublisher eventPublisher, PasswordEncoder passwordEncoder) {
     this.accountRepository = accountRepository;
     this.eventPublisher = eventPublisher;
@@ -96,7 +100,7 @@ public class AccountService implements UserDetailsService {
   public AccountEntity findBroadcaster() {
     if (broadcasterAccount == null) {
       List<AccountEntity> result =
-          accountRepository.findByAccessRoleOrderByIdAsc(AccountAccessRole.BROADCASTER);
+          accountRepository.findByAccessRoleOrderByIdAsc(AccountAccessType.BROADCASTER);
       if (result.isEmpty()) {
         return null;
       }

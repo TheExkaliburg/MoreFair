@@ -1,12 +1,12 @@
-package de.kaliburg.morefair.account;
+package de.kaliburg.morefair.chat.model.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class SuggestionDto {
 
   private Long accountId;

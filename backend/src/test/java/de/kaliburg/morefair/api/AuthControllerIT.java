@@ -13,8 +13,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.icegreen.greenmail.spring.GreenMailBean;
-import de.kaliburg.morefair.account.AccountEntity;
-import de.kaliburg.morefair.account.AccountRepository;
+import de.kaliburg.morefair.account.model.AccountEntity;
+import de.kaliburg.morefair.account.services.repositories.AccountRepository;
 import de.kaliburg.morefair.security.SecurityUtils;
 import de.kaliburg.morefair.utils.FairTest;
 import de.kaliburg.morefair.utils.ITUtils;

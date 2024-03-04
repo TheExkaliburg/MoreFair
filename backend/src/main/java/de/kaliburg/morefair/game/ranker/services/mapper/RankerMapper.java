@@ -1,26 +1,23 @@
 package de.kaliburg.morefair.game.ranker.services.mapper;
 
 import de.kaliburg.morefair.FairConfig;
-import de.kaliburg.morefair.account.AccountEntity;
-import de.kaliburg.morefair.account.AccountService;
+import de.kaliburg.morefair.account.model.AccountEntity;
+import de.kaliburg.morefair.account.services.AccountService;
 import de.kaliburg.morefair.game.ranker.model.RankerEntity;
 import de.kaliburg.morefair.game.ranker.model.dto.RankerDto;
 import de.kaliburg.morefair.game.ranker.model.dto.RankerPrivateDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
  * The Mapper that can convert the {@link RankerEntity RankerEntities} to DTOs.
  */
 @Component
+@RequiredArgsConstructor
 public class RankerMapper {
 
   private final AccountService accountService;
   private final FairConfig fairConfig;
-
-  public RankerMapper(AccountService accountService, FairConfig fairConfig) {
-    this.accountService = accountService;
-    this.fairConfig = fairConfig;
-  }
 
   /**
    * Mapping a {@link RankerEntity} to a {@link RankerDto}.

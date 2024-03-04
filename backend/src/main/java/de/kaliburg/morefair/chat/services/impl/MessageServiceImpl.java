@@ -1,13 +1,15 @@
-package de.kaliburg.morefair.chat.services;
+package de.kaliburg.morefair.chat.services.impl;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import de.kaliburg.morefair.account.AccountEntity;
+import de.kaliburg.morefair.account.model.AccountEntity;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.chat.model.ChatEntity;
 import de.kaliburg.morefair.chat.model.MessageEntity;
 import de.kaliburg.morefair.chat.model.dto.MessageDto;
 import de.kaliburg.morefair.chat.model.types.ChatType;
+import de.kaliburg.morefair.chat.services.ChatService;
+import de.kaliburg.morefair.chat.services.MessageService;
 import de.kaliburg.morefair.chat.services.mapper.MessageMapper;
 import de.kaliburg.morefair.chat.services.repositories.MessageRepository;
 import de.kaliburg.morefair.core.AbstractCacheableService;
