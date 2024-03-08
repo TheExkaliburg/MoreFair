@@ -88,7 +88,7 @@ public class RoundServiceImpl implements RoundService {
    * @return the ranker
    */
   public RankerEntity enterRound(AccountEntity account) {
-    RankerEntity result = ladderService.createRankerOnLadder(account);
+    // FIXME turn into update RoundStats
 
     Integer assholeCount = result.getAccountId().getAssholeCount();
     int baseAssholeLadderNumber = getCurrentRound().getTypes().contains(RoundType.FAST)

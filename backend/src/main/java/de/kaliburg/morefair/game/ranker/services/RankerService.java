@@ -7,11 +7,13 @@ import java.util.Optional;
 
 public interface RankerService {
 
-  Optional<RankerEntity> findHighestCurrentRankerOfAccount(AccountEntity account);
+  Optional<RankerEntity> findHighestActiveRankerOfAccount(AccountEntity account);
 
-  List<RankerEntity> findAllByCurrentLadderNumber(int number);
+  List<RankerEntity> findAllByCurrentLadderNumber(int ladderNumber);
 
   List<RankerEntity> findAllByLadderId(Long id);
 
   void enterNewRanker(AccountEntity account);
+
+  Optional<RankerEntity> createRankerOnLadder(AccountEntity account, int ladderNumber);
 }

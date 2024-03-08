@@ -17,9 +17,11 @@ public interface AccountService extends UserDetailsService {
 
   AccountEntity create(String username, String password, Integer ip, boolean isGuest);
 
-  AccountEntity save(AccountEntity account);
-
   List<AccountEntity> findByDisplayName(String name);
 
   List<AccountEntity> searchByIp(Integer lastIp);
+
+  AccountEntity save(AccountEntity account);
+
+  void saveAll(List<AccountEntity> accounts);
 }

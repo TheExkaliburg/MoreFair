@@ -248,33 +248,6 @@ public class LadderServiceImpl implements ApplicationListener<AccountServiceEven
     return ladder;
   }
 
-  /**
-   * Creates a new Ranker on ladder 1.
-   *
-   * <p>Blocks the ladderSemaphore and eventSemaphore for the duration of the time
-   *
-   * @param account The Account that gets a new Ranker
-   * @return The created Ranker, can be null if one of the acquires gets interrupted
-   */
-  public RankerEntity createRankerOnLadder(AccountEntity account) {
-    try {
-      ladderSemaphore.acquire();
-      try {
-        eventSemaphore.acquire();
-        try {
-          return createRankerOnLadder(account, 1);
-        } finally {
-          eventSemaphore.release();
-        }
-      } finally {
-        ladderSemaphore.release();
-      }
-    } catch (InterruptedException e) {
-      log.error(e.getMessage(), e);
-    }
-    return null;
-  }
-
   RankerEntity findActiveRankerOfAccountOnLadder(Long accountId, LadderEntity ladder) {
     return find(ladder).getRankers().stream()
         .filter(r -> r.getAccountId().getId().equals(accountId) && r.isGrowing()).findFirst()

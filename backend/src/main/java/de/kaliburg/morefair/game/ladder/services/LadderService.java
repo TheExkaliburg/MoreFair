@@ -18,4 +18,6 @@ public interface LadderService {
   LadderEntity createCurrentLadder(int ladderNumber);
 
   Optional<LadderEntity> findCurrentLadderById(long ladderId);
+
+  Optional<LadderEntity> findLadderById(long ladderId);
 }

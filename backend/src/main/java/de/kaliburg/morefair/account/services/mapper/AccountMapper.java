@@ -25,7 +25,7 @@ public class AccountMapper {
    * @return the {@link AccountDetailsDto}
    */
   public AccountDetailsDto mapToAccountDetailsDto(AccountEntity account) {
-    int ladderNumber = rankerService.findHighestCurrentRankerOfAccount(account)
+    int ladderNumber = rankerService.findHighestActiveRankerOfAccount(account)
         .map(r -> ladderService.findCurrentLadderById(r.getLadderId()))
         .map(r -> r.orElseThrow().getNumber())
         .orElse(1);
