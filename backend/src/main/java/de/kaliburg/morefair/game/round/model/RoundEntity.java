@@ -1,7 +1,6 @@
 package de.kaliburg.morefair.game.round.model;
 
 import de.kaliburg.morefair.FairConfig;
-import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -13,7 +12,6 @@ import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -22,7 +20,6 @@ import java.math.BigInteger;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
@@ -55,8 +52,6 @@ public class RoundEntity {
   @NonNull
   @Column(nullable = false)
   private Integer number;
-  @OneToMany(mappedBy = "round", fetch = FetchType.EAGER)
-  private Set<LadderEntity> ladders = new HashSet<>();
   @CollectionTable(name = "round_type", foreignKey = @ForeignKey(name = "fk_round_type_round"))
   @ElementCollection(targetClass = RoundType.class, fetch = FetchType.EAGER)
   @Enumerated(EnumType.STRING)

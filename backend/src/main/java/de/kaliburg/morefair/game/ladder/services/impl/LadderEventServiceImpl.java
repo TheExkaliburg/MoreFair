@@ -12,7 +12,6 @@ import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.model.AccountEntity;
 import de.kaliburg.morefair.account.services.AccountService;
 import de.kaliburg.morefair.api.AccountController;
-import de.kaliburg.morefair.api.FairController;
 import de.kaliburg.morefair.api.LadderController;
 import de.kaliburg.morefair.api.RoundController;
 import de.kaliburg.morefair.api.utils.WsUtils;
@@ -31,7 +30,6 @@ import de.kaliburg.morefair.game.UpgradeUtils;
 import de.kaliburg.morefair.game.ladder.LadderUtils;
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.model.LadderType;
-import de.kaliburg.morefair.game.ladder.model.dto.LadderTickDto;
 import de.kaliburg.morefair.game.ladder.services.LadderEventService;
 import de.kaliburg.morefair.game.ladder.services.LadderService;
 import de.kaliburg.morefair.game.ranker.model.RankerEntity;
@@ -43,18 +41,12 @@ import de.kaliburg.morefair.statistics.services.StatisticsService;
 import de.kaliburg.morefair.utils.FormattingUtils;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -63,7 +55,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class LadderEventServiceImpl implements LadderEventService {
 
-  private static final double NANOS_IN_SECONDS = TimeUnit.SECONDS.toNanos(1);
+
   private final AccountService accountService;
   private final ChatService chatService;
   private final MessageService messageService;
@@ -78,49 +70,17 @@ public class LadderEventServiceImpl implements LadderEventService {
   private final Gson gson;
   private final CriticalRegion semaphore = new CriticalRegion(1);
   private final Map<Integer, List<Event<LadderEventType>>> eventMap = new HashMap<>();
-  private long lastTickInNanos = System.nanoTime();
 
-  @Scheduled(initialDelay = 1000, fixedRate = 1000)
-  public void update() {
-    // FIXME, can't call the ladderService Semaphore twice so need to seperate between LadderService fetches and Logic.
-    //  Could go through "default" modifiers and injecting the LadderServiceImpl here, since both are in the same package.
-    try (var ignored = ladderService.getSemaphore().enter()) {
-      handlePlayerEvents();
 
-      // Calculate Time passed
-      long currentTimeInNanos = System.nanoTime();
-      double deltaInSeconds = Math.max(
-          (currentTimeInNanos - lastTickInNanos) / NANOS_IN_SECONDS,
-          1.0d
-      );
-      lastTickInNanos = currentTimeInNanos;
-
-      // Send the tick for everyone
-      LadderTickDto tickDto = LadderTickDto.builder()
-          .delta(deltaInSeconds)
-          .build();
-      wsUtils.convertAndSendToTopic(FairController.TOPIC_TICK_DESTINATION, tickDto);
-
-      // Calculate the tick yourself
-      RoundEntity currentRound = roundService.getCurrentRound();
-      Collection<LadderEntity> ladders = ladderService.findAllByRound(currentRound);
-      List<CompletableFuture<Void>> futures = ladders.stream()
-          .map(ladder -> CompletableFuture.runAsync(
-              () -> calculateLadder(ladder, deltaInSeconds))).toList();
-      CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get();
-
-    } catch (ExecutionException | InterruptedException e) {
-      log.error(e.getMessage(), e);
-    }
-  }
-
-  private void handlePlayerEvents() throws InterruptedException {
+  @Override
+  public void handleEvents() throws InterruptedException {
     try (var ignored = semaphore.enter()) {
       RoundEntity currentRound = roundService.getCurrentRound();
 
       for (int i = 1; i <= ladderService.findAllByRound(currentRound).size(); i++) {
         LadderEntity ladder = ladderService.findCurrentLadderWithNumber(i).orElseThrow();
-        List<Event<LadderEventType>> events = eventMap.get(ladder.getNumber());
+        List<Event<LadderEventType>> events =
+            eventMap.computeIfAbsent(ladder.getNumber(), k -> new ArrayList<>());
         List<Event<LadderEventType>> eventsToBeRemoved = new ArrayList<>();
         for (Event<LadderEventType> e : events) {
           if (BUY_BIAS.equals(e.getEventType())) {
@@ -153,68 +113,6 @@ public class LadderEventServiceImpl implements LadderEventService {
     }
   }
 
-  private void calculateLadder(LadderEntity ladder, double delta) {
-    List<RankerEntity> rankers = rankerService.findAllByCurrentLadderNumber(ladder.getNumber());
-    rankers.sort(Comparator.comparing(RankerEntity::getPoints).reversed());
-
-    for (int i = 0; i < rankers.size(); i++) {
-      RankerEntity currentRanker = rankers.get(i);
-      currentRanker.setRank(i + 1);
-      // if the ranker is currently still on the ladder
-      if (currentRanker.isGrowing()) {
-        // Calculating points & Power
-        if (currentRanker.getRank() != 1) {
-          currentRanker.addPower(
-              (i + currentRanker.getBias()) * currentRanker.getMultiplier(), delta);
-        }
-        currentRanker.addPoints(currentRanker.getPower(), delta);
-
-        // Calculating Vinegar based on Grapes count
-        if (currentRanker.getRank() != 1) {
-          currentRanker.addVinegar(currentRanker.getGrapes(), delta);
-        }
-        if (currentRanker.getRank() == 1 && ladderUtils.isLadderPromotable(ladder)) {
-          currentRanker.mulVinegar(0.9975, delta);
-        }
-
-        for (int j = i - 1; j >= 0; j--) {
-          // If one of the already calculated Rankers have less points than this ranker
-          // swap these in the list... This way we keep the list sorted, theoretically
-          if (currentRanker.getPoints().compareTo(rankers.get(j).getPoints()) > 0) {
-            // Move 1 Position up and move the ranker there 1 Position down
-
-            // Move other Ranker 1 Place down
-            RankerEntity temp = rankers.get(j);
-            temp.setRank(j + 2);
-            if (temp.isGrowing() && temp.getMultiplier() > 1) {
-              temp.setGrapes(temp.getGrapes().add(BigInteger.valueOf(ladder.getPassingGrapes())));
-            }
-            rankers.set(j + 1, temp);
-
-            // Move this Ranker 1 Place up
-            currentRanker.setRank(j + 1);
-            rankers.set(j, currentRanker);
-          } else {
-            break;
-          }
-        }
-      }
-    }
-    // Ranker on Last Place gains 1 Grape, even if hes also in first at the same time (ladder of 1)
-    if (!rankers.isEmpty()) {
-      RankerEntity lastRanker = rankers.get(rankers.size() - 1);
-      if (lastRanker.isGrowing()) {
-        lastRanker.addGrapes(BigInteger.valueOf(ladder.getBottomGrapes()), delta);
-      }
-    }
-
-    if (!rankers.isEmpty() && (rankers.get(0).isAutoPromote() || ladder.getTypes()
-        .contains(LadderType.FREE_AUTO)) && rankers.get(0).isGrowing()
-        && ladderUtils.isLadderPromotable(ladder)) {
-      addEvent(ladder.getNumber(), new Event<>(PROMOTE, rankers.get(0).getAccountId()));
-    }
-  }
-
   /**
    * Adds an event to the list of events inside the eventMap. This calls a semaphore and should
    * thereby only be done by the Controllers/API.
@@ -223,8 +121,9 @@ public class LadderEventServiceImpl implements LadderEventService {
    */
   public void addEvent(int ladderNumber, Event<LadderEventType> event) {
     try (var ignored = semaphore.enter()) {
-
-      eventMap.get(ladderNumber).add(event);
+      List<Event<LadderEventType>> events =
+          eventMap.computeIfAbsent(ladderNumber, k -> new ArrayList<>());
+      events.add(event);
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }

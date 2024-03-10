@@ -65,8 +65,9 @@ public class RankerServiceImpl implements RankerService {
 
   @Override
   public List<RankerEntity> findAllByLadderId(Long ladderId) {
-    // Semaphore start here
     try (var ignored = semaphore.enter()) {
+      // Needing to check the ladder id, to check if that ladder already exists,
+      // because otherwise we can skip the cache and the database query
       return ladderService.findLadderById(ladderId)
           .map(l -> rankerCache.get(l.getId()))
           .orElse(List.of());
@@ -77,7 +78,6 @@ public class RankerServiceImpl implements RankerService {
 
   @Override
   public List<RankerEntity> findAllByCurrentLadderNumber(int ladderNumber) {
-    // Semaphore start here
     try (var ignored = semaphore.enter()) {
       return ladderService.findCurrentLadderWithNumber(ladderNumber)
           .map(l -> rankerCache.get(l.getId()))
@@ -98,13 +98,11 @@ public class RankerServiceImpl implements RankerService {
    */
   @Override
   public Optional<RankerEntity> findHighestActiveRankerOfAccount(AccountEntity account) {
+    RoundEntity currentRound = roundService.getCurrentRound();
+    List<Long> allLadderIdsInCurrentRound = ladderService.findAllByRound(currentRound).stream()
+        .map(LadderEntity::getId)
+        .toList();
     try (var ignored = semaphore.enter()) {
-      RoundEntity currentRound = roundService.getCurrentRound();
-
-      List<Long> allLadderIdsInCurrentRound = ladderService.findAllByRound(currentRound).stream()
-          .map(LadderEntity::getId)
-          .toList();
-
       return rankerCache.getAll(allLadderIdsInCurrentRound).values().stream()
           // map each ladder to the ranker, owned by the account
           .map(
@@ -128,10 +126,9 @@ public class RankerServiceImpl implements RankerService {
 
   @Override
   public Optional<RankerEntity> createRankerOnLadder(AccountEntity account, int ladderNumber) {
+    LadderEntity ladder = ladderService.findCurrentLadderWithNumber(ladderNumber)
+        .orElse(ladderService.createCurrentLadder(ladderNumber));
     try (var ignored = semaphore.enter()) {
-      LadderEntity ladder = ladderService.findCurrentLadderWithNumber(ladderNumber)
-          .orElse(ladderService.createCurrentLadder(ladderNumber));
-
       List<RankerEntity> rankers = rankerCache.get(ladder.getId());
       Optional<RankerEntity> optionalRanker = rankers.stream()
           .filter(r -> r.getAccountId().equals(account.getId()))

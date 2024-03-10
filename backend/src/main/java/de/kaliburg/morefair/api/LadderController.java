@@ -64,7 +64,7 @@ public class LadderController {
 
       RoundEntity currentRound = roundService.getCurrentRound();
       var highestLadder = rankerService.findHighestActiveRankerOfAccount(account)
-          .map(r -> ladderService.findCurrentLadderById(r.getLadderId()).orElseThrow());
+          .map(r -> ladderService.findLadderById(r.getLadderId()).orElseThrow());
 
       if (highestLadder.isEmpty()) {
         log.info("Creating new ranker for {}#{}", account.getDisplayName(), account.getId());
@@ -103,7 +103,7 @@ public class LadderController {
       }
 
       Integer num = rankerService.findHighestActiveRankerOfAccount(account)
-          .map(r -> ladderService.findCurrentLadderById(r.getLadderId()).orElseThrow())
+          .map(r -> ladderService.findLadderById(r.getLadderId()).orElseThrow())
           .map(LadderEntity::getNumber)
           .orElseThrow();
 
@@ -128,7 +128,7 @@ public class LadderController {
       }
 
       Integer num = rankerService.findHighestActiveRankerOfAccount(account)
-          .map(r -> ladderService.findCurrentLadderById(r.getLadderId()).orElseThrow())
+          .map(r -> ladderService.findLadderById(r.getLadderId()).orElseThrow())
           .map(LadderEntity::getNumber)
           .orElseThrow();
 
@@ -156,7 +156,7 @@ public class LadderController {
       }
 
       Integer num = rankerService.findHighestActiveRankerOfAccount(account)
-          .map(r -> ladderService.findCurrentLadderById(r.getLadderId()).orElseThrow())
+          .map(r -> ladderService.findLadderById(r.getLadderId()).orElseThrow())
           .map(LadderEntity::getNumber)
           .orElseThrow();
 
@@ -185,7 +185,7 @@ public class LadderController {
       }
 
       Integer num = rankerService.findHighestActiveRankerOfAccount(account)
-          .map(r -> ladderService.findCurrentLadderById(r.getLadderId()).orElseThrow())
+          .map(r -> ladderService.findLadderById(r.getLadderId()).orElseThrow())
           .map(LadderEntity::getNumber)
           .orElseThrow();
 
@@ -213,7 +213,7 @@ public class LadderController {
       }
 
       Integer num = rankerService.findHighestActiveRankerOfAccount(account)
-          .map(r -> ladderService.findCurrentLadderById(r.getLadderId()).orElseThrow())
+          .map(r -> ladderService.findLadderById(r.getLadderId()).orElseThrow())
           .map(LadderEntity::getNumber)
           .orElse(1);
 

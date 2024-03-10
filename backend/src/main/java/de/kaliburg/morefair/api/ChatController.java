@@ -63,7 +63,7 @@ public class ChatController {
 
       if (type == ChatType.LADDER && number != null) {
         int ladderNumber = rankerService.findHighestActiveRankerOfAccount(account)
-            .map(r -> ladderService.findCurrentLadderById(r.getLadderId()).orElseThrow())
+            .map(r -> ladderService.findLadderById(r.getLadderId()).orElseThrow())
             .map(LadderEntity::getNumber)
             .orElse(1);
 
@@ -134,7 +134,7 @@ public class ChatController {
       ChatEntity chat = chatService.find(type, number);
       if (type == ChatType.LADDER && number != null) {
         int ladderNumber = rankerService.findHighestActiveRankerOfAccount(account)
-            .map(r -> ladderService.findCurrentLadderById(r.getLadderId()).orElseThrow())
+            .map(r -> ladderService.findLadderById(r.getLadderId()).orElseThrow())
             .map(LadderEntity::getNumber)
             .orElse(1);
 

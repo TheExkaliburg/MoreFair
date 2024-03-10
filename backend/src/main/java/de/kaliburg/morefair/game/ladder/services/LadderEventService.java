@@ -7,4 +7,5 @@ public interface LadderEventService {
 
   void addEvent(int ladderNumber, Event<LadderEventType> type);
 
+  void handleEvents() throws InterruptedException;
 }

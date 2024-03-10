@@ -21,7 +21,6 @@ import java.math.BigInteger;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.EnumSet;
-import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
@@ -30,11 +29,11 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
-@Log4j2
+@Slf4j
 @Entity
 @Table(name = "ladder", uniqueConstraints = {
     @UniqueConstraint(name = "uk_uuid", columnNames = "uuid"),
@@ -46,7 +45,6 @@ import org.hibernate.annotations.FetchMode;
 @NoArgsConstructor
 @SequenceGenerator(name = "seq_ladder", sequenceName = "seq_ladder", allocationSize = 1)
 public final class LadderEntity {
-
 
   private static final Random random = new Random();
   @Id
@@ -66,7 +64,6 @@ public final class LadderEntity {
   @Enumerated(EnumType.STRING)
   @Fetch(FetchMode.SELECT)
   private Set<LadderType> types = EnumSet.noneOf(LadderType.class);
-
   @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
   private OffsetDateTime createdOn = OffsetDateTime.now(ZoneOffset.UTC);
   @NonNull
@@ -76,11 +73,12 @@ public final class LadderEntity {
   @Column(nullable = false)
   private Integer scaling;
 
-  public LadderEntity(@NonNull Integer number, @NonNull RoundEntity round) {
+  public LadderEntity(@NonNull Integer number, @NonNull RoundEntity round,
+      LadderEntity previousLadder) {
     this.number = number;
     this.roundId = round.getId();
 
-    determineLadderType(round);
+    determineLadderType(round, previousLadder);
 
     if (round.getTypes().contains(RoundType.REVERSE_SCALING)) {
       // Makes Ladder 1 be Asshole Ladder etc.
@@ -108,24 +106,12 @@ public final class LadderEntity {
     this.basePointsToPromote = baseDec.toBigInteger();
   }
 
-  private void determineLadderType(RoundEntity round) {
-    Set<LadderEntity> ladders = round.getLadders();
-    LadderEntity ladder =
-        ladders.stream().filter(l -> l.getNumber().equals(number)).findFirst().orElse(null);
-
+  private void determineLadderType(RoundEntity round, LadderEntity previousLadder) {
     types.clear();
 
-    if (ladder != null) {
-      log.warn("Ladder already exists, copying LadderTypes.");
-      types = ladder.getTypes();
-      return;
-    }
-
-    Optional<LadderEntity> ladderOptional = ladders.stream()
-        .filter(l -> l.getNumber().equals(number - 1)).findFirst();
-    Set<LadderType> previousLadderTypes = ladderOptional.map(LadderEntity::getTypes)
-        .orElse(EnumSet.noneOf(LadderType.class));
-
+    Set<LadderType> previousLadderTypes = previousLadder != null
+        ? previousLadder.getTypes()
+        : EnumSet.noneOf(LadderType.class);
     LadderTypeBuilder builder = new LadderTypeBuilder();
     builder.setLadderNumber(number);
     builder.setRoundNumber(round.getNumber());
