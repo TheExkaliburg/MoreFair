@@ -9,4 +9,5 @@ public interface RoundService {
   RoundEntity getCurrentRound();
 
   Optional<RoundEntity> findBySeasonAndNumber(SeasonEntity currentSeason, int number);
+
 }

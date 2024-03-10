@@ -47,14 +47,14 @@ public class RankerServiceImpl implements RankerService {
    */
   public RankerServiceImpl(RankerRepository rankerRepository, LadderService ladderService,
       RoundService roundService, WsUtils wsUtils, FairConfig fairConfig) {
-    this.rankerCache = Caffeine.newBuilder()
-        .build(rankerRepository::findByLadderId);
-
     this.rankerRepository = rankerRepository;
     this.ladderService = ladderService;
     this.roundService = roundService;
     this.wsUtils = wsUtils;
     this.fairConfig = fairConfig;
+
+    this.rankerCache = Caffeine.newBuilder()
+        .build(this.rankerRepository::findByLadderId);
   }
 
 

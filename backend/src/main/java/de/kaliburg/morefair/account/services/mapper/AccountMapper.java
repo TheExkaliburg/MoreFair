@@ -2,6 +2,7 @@ package de.kaliburg.morefair.account.services.mapper;
 
 import de.kaliburg.morefair.account.model.AccountEntity;
 import de.kaliburg.morefair.account.model.dto.AccountDetailsDto;
+import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.services.LadderService;
 import de.kaliburg.morefair.game.ranker.services.RankerService;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +27,8 @@ public class AccountMapper {
    */
   public AccountDetailsDto mapToAccountDetailsDto(AccountEntity account) {
     int ladderNumber = rankerService.findHighestActiveRankerOfAccount(account)
-        .map(r -> ladderService.findLadderById(r.getLadderId()))
-        .map(r -> r.orElseThrow().getNumber())
+        .map(r -> ladderService.findLadderById(r.getLadderId()).orElseThrow())
+        .map(LadderEntity::getNumber)
         .orElse(1);
 
     return AccountDetailsDto.builder()

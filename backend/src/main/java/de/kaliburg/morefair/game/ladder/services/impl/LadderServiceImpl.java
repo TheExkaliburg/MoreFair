@@ -108,15 +108,13 @@ public class LadderServiceImpl implements LadderService {
               .map(ladderCache::get)
               .orElse(null);
 
-      // FIXME Do appropriate Logic here
-      LadderEntity ladder = new LadderEntity(ladderNumber, roundService.getCurrentRound(),
-          previousLadder);
-      ladder = ladderRepository.save(ladder);
+      LadderEntity result =
+          new LadderEntity(ladderNumber, roundService.getCurrentRound(), previousLadder);
+      result = ladderRepository.save(result);
 
-      currentLadderNumberLookup.put(ladder.getNumber(), ladder.getId());
-      ladderCache.put(ladder.getId(), ladder);
-
-      return ladder;
+      currentLadderNumberLookup.put(result.getNumber(), result.getId());
+      ladderCache.put(result.getId(), result);
+      return result;
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
     }
