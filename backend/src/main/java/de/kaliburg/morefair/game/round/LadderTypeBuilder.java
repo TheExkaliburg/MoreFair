@@ -149,10 +149,6 @@ public class LadderTypeBuilder {
       return specialRoundBuilder();
     }
 
-    if (ladderNumber == 1) {
-      return EnumSet.of(LadderType.DEFAULT);
-    }
-
     if (ladderNumber > assholeLadderNumber) {
       return EnumSet.of(LadderType.END);
     }
@@ -164,6 +160,12 @@ public class LadderTypeBuilder {
     this.roundTypes.stream().sorted(new RoundType.Comparator()).forEach(this::handleRoundTypes);
     this.previousLadderType.stream().sorted(new LadderTypeComparator())
         .forEach(this::handlePreviousLadderType);
+
+    if (ladderNumber == 1) {
+      ladderSizeTypeWeights.put(LadderType.TINY, 0.f);
+      ladderAutoTypeWeights.put(LadderType.FREE_AUTO, 0.f);
+      ladderAutoTypeWeights.put(LadderType.NO_AUTO, 0.f);
+    }
 
     if (ladderNumber.equals(assholeLadderNumber)) {
       ladderAutoTypeWeights.put(LadderType.NO_AUTO,
