@@ -4,7 +4,21 @@ description: 'A list of all changes made to the game'
 
 # Changelog
 
-## 2.5.0 [MINOR]: Ignore-List and END ladder modifier 
+## 2.5.1 [PATCH]: Some smaller community-improvements
+
+### Improvements:
+- L1 can now roll all the modifiers besides NO_AUTO, FREE_AUTO and TINY
+- Improving the timestamp on messages for some localizations
+
+### Bugfixes:
+- Manually sending empty metadata won't cause an error for clients anymore
+
+<br><br><br><br><br><br><br>
+
+<details>
+<summary>Expand for the 2.5.x changelog</summary>
+
+## 2.5.0 [MINOR]: Ignore-List and END ladder modifier
 
 ### Features:
 
@@ -28,7 +42,7 @@ description: 'A list of all changes made to the game'
 - Renaming now also changes the name displayed in the suggestions
 - - Clearing Messages of Banned/Muted Players from Chat
 
-<br><br><br><br><br><br><br>
+</details>
 
 <details>
 <summary>Expand for the 2.4.x changelog</summary>
