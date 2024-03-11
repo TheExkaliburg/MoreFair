@@ -27,8 +27,8 @@ fellow rankers, without having Chad listening, you can join us on our
 <br/>
 You can also talk to a moderator about it:
 
-- Grapes #100000
 - Kali #4
+- MMG #47683
 - MobileChecker #43978
 - Psychemaster #53741
 - SolarEclipse #55913
