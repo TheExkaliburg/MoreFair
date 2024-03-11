@@ -59,7 +59,7 @@ const options: Intl.DateTimeFormatOptions = {
   weekday: "short",
   hour: "numeric",
   minute: "numeric",
-  hour12: false,
+  hourCycle: "h23",
 };
 
 // Create the Intl.DateTimeFormat object with the client's default locale
