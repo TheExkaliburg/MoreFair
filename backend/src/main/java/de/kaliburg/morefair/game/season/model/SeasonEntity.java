@@ -22,7 +22,7 @@ import lombok.NonNull;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @Entity
-@Table(name = "seasons",
+@Table(name = "season",
     uniqueConstraints = {
         @UniqueConstraint(name = "uk_uuid", columnNames = "uuid")
     }

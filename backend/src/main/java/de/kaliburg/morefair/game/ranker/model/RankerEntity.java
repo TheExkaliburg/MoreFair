@@ -69,14 +69,18 @@ public class RankerEntity {
   @Column(nullable = false)
   private Integer rank;
   @Column(nullable = false, precision = 1000, scale = 0)
+  @Builder.Default
   private BigInteger grapes = BigInteger.ZERO;
   @NonNull
   @Column(nullable = false, precision = 1000, scale = 0)
+  @Builder.Default
   private BigInteger vinegar = BigInteger.ZERO;
   @Column
+  @Builder.Default
   private boolean autoPromote = false;
   @NonNull
   @OneToOne(mappedBy = "ranker", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @Builder.Default
   private UnlocksEntity unlocks = new UnlocksEntity(this);
 
 

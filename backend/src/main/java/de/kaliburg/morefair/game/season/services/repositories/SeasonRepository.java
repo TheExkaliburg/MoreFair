@@ -11,11 +11,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SeasonRepository extends JpaRepository<SeasonEntity, Long> {
 
-  default Optional<SeasonEntity> findNewestSeason() {
-    List<SeasonEntity> allSeasons = findAllOpenSeasonsOrderedByNewestFirst();
-    return allSeasons.isEmpty() ? Optional.empty() : Optional.of(allSeasons.get(0));
-  }
 
   @Query(value = "SELECT s FROM SeasonEntity s WHERE s.closedOn = null ORDER BY s.createdOn DESC ")
   List<SeasonEntity> findAllOpenSeasonsOrderedByNewestFirst();
+
+  @Query(value = "SELECT * FROM season WHERE closed_on IS NULL ORDER BY created_on LIMIT 1",
+      nativeQuery = true)
+  Optional<SeasonEntity> findOldestOpenSeason();
 }

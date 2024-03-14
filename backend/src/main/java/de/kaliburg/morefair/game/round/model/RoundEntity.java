@@ -1,6 +1,7 @@
 package de.kaliburg.morefair.game.round.model;
 
 import de.kaliburg.morefair.FairConfig;
+import de.kaliburg.morefair.game.season.model.SeasonEntity;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -23,22 +24,20 @@ import java.util.EnumSet;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "round", uniqueConstraints = {
     @UniqueConstraint(name = "uk_uuid", columnNames = "uuid"),
     @UniqueConstraint(name = "uk_number", columnNames = "number")})
-@Getter
-@Setter
-@Accessors(chain = true)
-@NoArgsConstructor
 @SequenceGenerator(name = "seq_round", sequenceName = "seq_round", allocationSize = 1)
 public class RoundEntity {
 
@@ -49,6 +48,9 @@ public class RoundEntity {
   @NonNull
   @Column(nullable = false)
   private UUID uuid = UUID.randomUUID();
+  @NonNull
+  @Column(nullable = false)
+  private Long seasonId;
   @NonNull
   @Column(nullable = false)
   private Integer number;
@@ -73,7 +75,7 @@ public class RoundEntity {
   @Column(nullable = false)
   private Float percentageOfAdditionalAssholes;
 
-  public RoundEntity(@NonNull Integer number, FairConfig config,
+  public RoundEntity(SeasonEntity season, @NonNull Integer number, FairConfig config,
       @Nullable RoundEntity previousRound) {
     this.number = number;
     this.baseAssholeLadder = config.getBaseAssholeLadder();
@@ -96,8 +98,8 @@ public class RoundEntity {
     this.percentageOfAdditionalAssholes = random.nextFloat(100);
   }
 
-  public RoundEntity(@NonNull Integer number, FairConfig config) {
-    this(number, config, null);
+  public RoundEntity(SeasonEntity season, @NonNull Integer number, FairConfig config) {
+    this(season, number, config, null);
   }
 
   private void determineRoundTypes(RoundEntity previousRound) {

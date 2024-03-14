@@ -4,108 +4,104 @@ import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.model.AccountEntity;
 import de.kaliburg.morefair.api.RoundController;
 import de.kaliburg.morefair.api.utils.WsUtils;
+import de.kaliburg.morefair.core.concurrency.CriticalRegion;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.RoundEventTypes;
-import de.kaliburg.morefair.game.ladder.model.LadderEntity;
-import de.kaliburg.morefair.game.ladder.services.LadderService;
-import de.kaliburg.morefair.game.ranker.model.RankerEntity;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
 import de.kaliburg.morefair.game.round.model.RoundType;
 import de.kaliburg.morefair.game.round.services.RoundService;
 import de.kaliburg.morefair.game.round.services.RoundUtils;
 import de.kaliburg.morefair.game.round.services.repositories.RoundRepository;
-import java.util.List;
+import de.kaliburg.morefair.game.season.model.SeasonEntity;
+import de.kaliburg.morefair.game.season.services.SeasonService;
 import java.util.Optional;
-import lombok.extern.log4j.Log4j2;
-import org.springframework.context.annotation.Lazy;
+import java.util.Random;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * The RoundService that setups and manages the RoundEntities contained in the GameEntity.
  */
 @Service
-@Log4j2
+@Slf4j
+@RequiredArgsConstructor
 public class RoundServiceImpl implements RoundService {
 
+  private static final Random random = new Random();
+  private final CriticalRegion semaphore = new CriticalRegion(1);
   private final RoundRepository roundRepository;
-  private final LadderService ladderService;
+  private final SeasonService seasonService;
   private final WsUtils wsUtils;
   private final RoundUtils roundUtils;
-  private final FairConfig config;
+  private final FairConfig fairConfig;
+  private RoundEntity currentRound;
 
-  public RoundServiceImpl(RoundRepository roundRepository, LadderService ladderService,
-      @Lazy WsUtils wsUtils, RoundUtils roundUtils, FairConfig config) {
-    this.roundRepository = roundRepository;
-    this.ladderService = ladderService;
-    this.wsUtils = wsUtils;
-    this.roundUtils = roundUtils;
-    this.config = config;
+
+  @Override
+  public void updateHighestAssholeCountOfCurrentRound(AccountEntity account) {
+    Integer assholeCount = account.getAssholeCount();
+    try (var ignored = semaphore.enter()) {
+      if (account.getAssholeCount() > currentRound.getHighestAssholeCount()
+          && currentRound.getTypes().contains(RoundType.CHAOS)) {
+        currentRound.setHighestAssholeCount(assholeCount);
+        currentRound = roundRepository.save(currentRound);
+        wsUtils.convertAndSendToTopic(RoundController.TOPIC_EVENTS_DESTINATION, new Event<>(
+            RoundEventTypes.INCREASE_ASSHOLE_LADDER, account.getId(),
+            roundUtils.getAssholeLadderNumber(getCurrentRound())));
+      }
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
   }
 
-  /**
-   * Creates a new RoundEntity for the parent GameEntity, filled with an initial LadderEntity and
-   * saves it.
-   *
-   * @return the newly created and saved RoundEntity with 1 Ladder
-   */
-  @Transactional
-  public RoundEntity create(Integer number) {
-    RoundEntity previousRound = find(number - 1).orElse(null);
-    RoundEntity result = new RoundEntity(number, config, previousRound);
-    result = roundRepository.save(result);
-    LadderEntity ladder = ladderService.createCurrentLadder(1);
-    result.getLadders().add(ladder);
-    return result;
-  }
-
-  @Transactional
-  public List<RoundEntity> save(List<RoundEntity> rounds) {
-    return roundRepository.saveAll(rounds);
-  }
-
-  @Transactional
-  public RoundEntity save(RoundEntity round) {
-    return roundRepository.save(round);
-  }
-
+  @Override
   public RoundEntity getCurrentRound() {
-    return ladderService.getCurrentRound();
+    try (var ignored = semaphore.enter()) {
+      if (currentRound == null) {
+        SeasonEntity currentSeason = seasonService.getCurrentSeason();
+        // Find newest Round of that Season
+        RoundEntity round = roundRepository.findNewestRoundOfSeason(currentSeason)
+            .orElse(null);
+
+        // if null -> create first Round of that Season
+        // if closed -> create next Round of that Season -> check Season for Season End
+        if (round == null || round.isClosed()) {
+          round = create(round).orElseThrow();
+        }
+        currentRound = round;
+      }
+      return currentRound;
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
   }
 
-  public Optional<RoundEntity> find(Integer number) {
-    if (getCurrentRound() != null && getCurrentRound().getNumber().equals(number)) {
-      return Optional.of(getCurrentRound());
+  @Override
+  public Optional<RoundEntity> findBySeasonAndNumber(SeasonEntity season, int number) {
+    return roundRepository.findBySeasonAndNumber(season.getId(), number);
+  }
+
+  private Optional<RoundEntity> create(@Nullable RoundEntity previousRound) {
+    SeasonEntity currentSeason = seasonService.getCurrentSeason();
+    SeasonEntity newestSeason = seasonService.findNewestSeason();
+
+    if (currentSeason.getId() != newestSeason.getId()) {
+      // There is not a previousRound if it's a new Season
+      previousRound = null;
+      currentSeason = seasonService.getCurrentSeason();
     }
 
-    return roundRepository.findByNumber(number);
-  }
+    int newRoundNumber = previousRound != null ? previousRound.getNumber() + 1 : 1;
 
-  /**
-   * Create a new Ranker and updates the highestAssholeCount if necessary.
-   *
-   * @param account the account that the ranker is part of
-   * @return the ranker
-   */
-  public RankerEntity enterRound(AccountEntity account) {
-    // FIXME turn into update RoundStats
-
-    Integer assholeCount = result.getAccountId().getAssholeCount();
-    int baseAssholeLadderNumber = getCurrentRound().getTypes().contains(RoundType.FAST)
-        ? getCurrentRound().getBaseAssholeLadder() / 2
-        : getCurrentRound().getBaseAssholeLadder();
-
-    if (assholeCount > getCurrentRound().getHighestAssholeCount()
-        && !getCurrentRound().getTypes().contains(RoundType.CHAOS)
-        && ladderService.findInCache(baseAssholeLadderNumber) == null) {
-      getCurrentRound().setHighestAssholeCount(assholeCount);
-      ladderService.setCurrentRound(save(getCurrentRound()));
-      wsUtils.convertAndSendToTopic(RoundController.TOPIC_EVENTS_DESTINATION, new Event<>(
-          RoundEventTypes.INCREASE_ASSHOLE_LADDER, account.getId(),
-          roundUtils.getAssholeLadderNumber(getCurrentRound())));
+    // If already exists, can't create
+    if (roundRepository.findBySeasonAndNumber(currentSeason.getId(), newRoundNumber).isPresent()) {
+      return Optional.empty();
     }
 
-    return result;
-  }
+    RoundEntity result = new RoundEntity(currentSeason, newRoundNumber, fairConfig, previousRound);
 
+    return Optional.of(roundRepository.save(result));
+  }
 }

@@ -10,8 +10,8 @@ import lombok.NonNull;
 @AllArgsConstructor
 public class RankerRecord {
 
-  @NonNull
-  private Long account;
+
+  private long account;
   @NonNull
   private Integer rank;
   @NonNull
@@ -26,13 +26,12 @@ public class RankerRecord {
   private BigInteger grapes;
   @NonNull
   private BigInteger vinegar;
-  @NonNull
   private boolean autoPromote;
   @NonNull
   private Integer round;
 
   public RankerRecord(RankerEntity ranker) {
-    this.account = ranker.getAccountId().getId();
+    this.account = ranker.getAccountId();
     this.rank = ranker.getRank();
     this.bias = ranker.getBias();
     this.multi = ranker.getMultiplier();
@@ -41,6 +40,6 @@ public class RankerRecord {
     this.grapes = ranker.getGrapes();
     this.vinegar = ranker.getVinegar();
     this.autoPromote = ranker.isAutoPromote();
-    this.round = ranker.getLadderId().getRound().getNumber();
+    // FIXME: this.round = ranker.getLadderId().getRound().getNumber();
   }
 }

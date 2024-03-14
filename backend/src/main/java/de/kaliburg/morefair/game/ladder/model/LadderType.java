@@ -1,6 +1,5 @@
 package de.kaliburg.morefair.game.ladder.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,24 +8,30 @@ import lombok.NoArgsConstructor;
  */
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public enum LadderType implements Comparable<LadderType> {
   DEFAULT,
+  // Point Requirements
   TINY,
   SMALL,
   BIG,
   GIGANTIC,
+  // Auto-promote
   FREE_AUTO,
   NO_AUTO,
-  ASSHOLE,
+  // Cost of Upgrade
   CHEAP,
   EXPENSIVE,
+  // FARMING Grapes
   BOUNTIFUL,
   DROUGHT,
+  // Bottom Grapes
   CONSOLATION,
   NO_HANDOUTS,
+  // Winning Prices
   GENEROUS,
   STINGY,
+  // End of the Game
+  ASSHOLE,
   END;
 
   /**

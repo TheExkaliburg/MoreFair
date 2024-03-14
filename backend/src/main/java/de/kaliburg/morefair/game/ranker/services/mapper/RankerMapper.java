@@ -53,7 +53,7 @@ public class RankerMapper {
   public RankerPrivateDto mapToPrivateDto(RankerEntity ranker) {
     AccountEntity account = accountService.find(ranker.getAccountId());
 
-    return (RankerPrivateDto) RankerPrivateDto.builder()
+    return RankerPrivateDto.builder()
         .grapes(ranker.getGrapes().toString())
         .vinegar(ranker.getVinegar().toString())
         .autoPromote(ranker.isAutoPromote())

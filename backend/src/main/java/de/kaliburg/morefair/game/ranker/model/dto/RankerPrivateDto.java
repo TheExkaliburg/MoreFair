@@ -4,9 +4,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 
-@EqualsAndHashCode(callSuper = true)
+
 @Data
 @SuperBuilder
+@EqualsAndHashCode(callSuper = false)
 public class RankerPrivateDto extends RankerDto {
 
   private String grapes;

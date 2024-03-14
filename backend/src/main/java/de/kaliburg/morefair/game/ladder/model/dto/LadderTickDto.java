@@ -11,5 +11,6 @@ import lombok.RequiredArgsConstructor;
 public class LadderTickDto {
 
   @NonNull
+  @Builder.Default
   Double delta = 1d;
 }
