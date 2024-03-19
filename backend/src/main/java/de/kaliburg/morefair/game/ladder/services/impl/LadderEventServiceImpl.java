@@ -27,16 +27,16 @@ import de.kaliburg.morefair.events.types.LadderEventType;
 import de.kaliburg.morefair.events.types.RoundEventTypes;
 import de.kaliburg.morefair.game.UnlocksEntity;
 import de.kaliburg.morefair.game.UpgradeUtils;
-import de.kaliburg.morefair.game.ladder.LadderUtils;
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.model.LadderType;
 import de.kaliburg.morefair.game.ladder.services.LadderEventService;
 import de.kaliburg.morefair.game.ladder.services.LadderService;
 import de.kaliburg.morefair.game.ranker.model.RankerEntity;
 import de.kaliburg.morefair.game.ranker.services.RankerService;
+import de.kaliburg.morefair.game.ranker.services.utils.RankerUtilsService;
+import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
 import de.kaliburg.morefair.game.round.model.RoundType;
-import de.kaliburg.morefair.game.round.services.RoundService;
 import de.kaliburg.morefair.statistics.services.StatisticsService;
 import de.kaliburg.morefair.utils.FormattingUtils;
 import java.math.BigInteger;
@@ -61,16 +61,15 @@ public class LadderEventServiceImpl implements LadderEventService {
   private final MessageService messageService;
   private final RankerService rankerService;
   private final LadderService ladderService;
+  private final RankerUtilsService ladderUtilsService;
   private final RoundService roundService;
   private final StatisticsService statisticsService;
   private final WsUtils wsUtils;
-  private final LadderUtils ladderUtils;
   private final UpgradeUtils upgradeUtils;
   private final FairConfig fairConfig;
   private final Gson gson;
   private final CriticalRegion semaphore = new CriticalRegion(1);
   private final Map<Integer, List<Event<LadderEventType>>> eventMap = new HashMap<>();
-
 
   @Override
   public void handleEvents() throws InterruptedException {
@@ -139,7 +138,8 @@ public class LadderEventServiceImpl implements LadderEventService {
    */
   private boolean buyBias(Event<LadderEventType> event, LadderEntity ladder) {
     try {
-      AccountEntity account = accountService.find(event.getAccountId());
+      AccountEntity account = accountService.findById(event.getAccountId())
+          .orElseThrow();
       RankerEntity ranker = rankerService.findHighestActiveRankerOfAccount(account)
           .orElseThrow();
 
@@ -172,7 +172,8 @@ public class LadderEventServiceImpl implements LadderEventService {
    */
   private boolean buyMulti(Event<LadderEventType> event, LadderEntity ladder) {
     try {
-      AccountEntity account = accountService.find(event.getAccountId());
+      AccountEntity account = accountService.findById(event.getAccountId())
+          .orElseThrow();
       RankerEntity ranker = rankerService.findHighestActiveRankerOfAccount(account)
           .orElseThrow();
 
@@ -207,7 +208,8 @@ public class LadderEventServiceImpl implements LadderEventService {
    */
   boolean buyAutoPromote(Event<LadderEventType> event, LadderEntity ladder) {
     try {
-      AccountEntity account = accountService.find(event.getAccountId());
+      AccountEntity account = accountService.findById(event.getAccountId())
+          .orElseThrow();
       RankerEntity ranker = rankerService.findHighestActiveRankerOfAccount(account)
           .orElseThrow();
 
@@ -226,7 +228,7 @@ public class LadderEventServiceImpl implements LadderEventService {
         return true;
       }
 
-      if (ladderUtils.canBuyAutoPromote(ladder, ranker, roundService.getCurrentRound())) {
+      if (ladderUtilsService.canBuyAutoPromote(ranker)) {
         // TODO: statisticsService.recordAutoPromote(ranker, ladder, currentRound);
         ranker.setGrapes(ranker.getGrapes().subtract(cost));
         ranker.setAutoPromote(true);
@@ -249,7 +251,8 @@ public class LadderEventServiceImpl implements LadderEventService {
    */
   boolean promote(Event<LadderEventType> event, LadderEntity ladder) {
     try {
-      AccountEntity account = accountService.find(event.getAccountId());
+      AccountEntity account = accountService.findById(event.getAccountId())
+          .orElseThrow();
       RankerEntity ranker = rankerService.findHighestActiveRankerOfAccount(account)
           .orElseThrow();
 
@@ -257,7 +260,7 @@ public class LadderEventServiceImpl implements LadderEventService {
         return false;
       }
 
-      if (ladderUtils.canPromote(ladder, ranker)) {
+      if (ladderUtilsService.canPromote(ranker)) {
         // TODO: statisticsService.recordPromote(ranker, ladder, currentRound);
         log.info("[L{}] Promotion for {} (#{})", ladder.getNumber(), account.getDisplayName(),
             account.getId());
@@ -298,7 +301,7 @@ public class LadderEventServiceImpl implements LadderEventService {
           List<RankerEntity> assholeRankers = rankerService.findAllByLadderId(
               assholeLadder.getId());
           assholeRankers.forEach(r -> {
-            AccountEntity a = accountService.find(r.getAccountId());
+            AccountEntity a = accountService.findById(r.getAccountId()).orElseThrow();
             RankerEntity highestRanker = rankerService.findHighestActiveRankerOfAccount(a)
                 .orElseThrow();
             if (!r.isGrowing()) {
@@ -369,7 +372,7 @@ public class LadderEventServiceImpl implements LadderEventService {
           object1.addProperty("id", account.getId());
           object1.addProperty("i", 0);
 
-          AccountEntity broadCaster = accountService.findBroadcaster();
+          AccountEntity broadCaster = accountService.findBroadcaster().orElseThrow();
           JsonObject object2 = new JsonObject();
           object2.addProperty("u", broadCaster.getDisplayName());
           object2.addProperty("id", broadCaster.getId());
@@ -379,7 +382,7 @@ public class LadderEventServiceImpl implements LadderEventService {
 
           ChatEntity chat = chatService.find(ChatType.SYSTEM);
 
-          messageService.create(accountService.findBroadcaster(), chat, FormattingUtils.format(
+          messageService.create(broadCaster, chat, FormattingUtils.format(
               "{@} was welcomed by {@}. They are the {} lucky initiate for the {} big ritual.",
               FormattingUtils.ordinal(newRankers.size()),
               FormattingUtils.ordinal(roundService.getCurrentRound().getNumber())
@@ -398,7 +401,7 @@ public class LadderEventServiceImpl implements LadderEventService {
                 .orElseThrow();
             List<RankerEntity> firstRankers = rankerService.findAllByLadderId(firstLadder.getId());
             List<AccountEntity> accounts = firstRankers.stream()
-                .map((r) -> accountService.find(r.getAccountId()))
+                .map((r) -> accountService.findById(r.getAccountId()).orElseThrow())
                 .distinct().toList();
             for (AccountEntity a : accounts) {
               RankerEntity highestRanker = rankerService.findHighestActiveRankerOfAccount(a)
@@ -429,8 +432,8 @@ public class LadderEventServiceImpl implements LadderEventService {
    */
   boolean throwVinegar(Event<LadderEventType> event, LadderEntity ladder) {
     try {
-      AccountEntity account = accountService.find(event.getAccountId());
-      RankerEntity ranker = rankerService.findHighestActiveRankerOfAccount(account)
+      AccountEntity rankerAccount = accountService.findById(event.getAccountId()).orElseThrow();
+      RankerEntity ranker = rankerService.findHighestActiveRankerOfAccount(rankerAccount)
           .orElseThrow();
 
       if (!ladder.getId().equals(ranker.getLadderId())) {
@@ -440,8 +443,7 @@ public class LadderEventServiceImpl implements LadderEventService {
       List<RankerEntity> rankers = rankerService.findAllByLadderId(ladder.getId());
 
       RankerEntity target = rankers.get(0);
-      AccountEntity rankerAccount = accountService.find(ranker.getAccountId());
-      AccountEntity targetAccount = accountService.find(target.getAccountId());
+      AccountEntity targetAccount = accountService.findById(target.getAccountId()).orElseThrow();
 
       if (target.isAutoPromote() || ladder.getTypes().contains(LadderType.FREE_AUTO)) {
         log.info("[L{}] {} (#{}) tried to throw Vinegar at {} (#{}), but they had Auto-Promote!",
@@ -450,7 +452,7 @@ public class LadderEventServiceImpl implements LadderEventService {
         return false;
       }
 
-      if (ladderUtils.canThrowVinegarAt(ladder, ranker, target)) {
+      if (ladderUtilsService.canThrowVinegarAt(ranker, target)) {
         // TODO: statisticsService.recordVinegarThrow(ranker, target, ladder, currentRound);
         BigInteger rankerVinegar = ranker.getVinegar();
         BigInteger targetVinegar = target.getVinegar();
@@ -469,9 +471,11 @@ public class LadderEventServiceImpl implements LadderEventService {
         }
 
         event.setData(data);
-        wsUtils.convertAndSendToUser(accountService.find(ranker.getAccountId()).getUuid(),
+        wsUtils.convertAndSendToUser(
+            accountService.findById(ranker.getAccountId()).orElseThrow().getUuid(),
             LadderController.PRIVATE_EVENTS_DESTINATION, event);
-        wsUtils.convertAndSendToUser(accountService.find(target.getAccountId()).getUuid(),
+        wsUtils.convertAndSendToUser(
+            accountService.findById(target.getAccountId()).orElseThrow().getUuid(),
             LadderController.PRIVATE_EVENTS_DESTINATION, event);
 
         if (data.isSuccess()) {
@@ -498,7 +502,7 @@ public class LadderEventServiceImpl implements LadderEventService {
    */
   void removeMulti(Event<LadderEventType> event, LadderEntity ladder) {
     try {
-      AccountEntity account = accountService.find(event.getAccountId());
+      AccountEntity account = accountService.findById(event.getAccountId()).orElseThrow();
       RankerEntity ranker = rankerService.findHighestActiveRankerOfAccount(account)
           .orElseThrow();
 

@@ -2,20 +2,21 @@ package de.kaliburg.morefair.account.services;
 
 import de.kaliburg.morefair.account.model.AccountEntity;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 public interface AccountService extends UserDetailsService {
 
-  AccountEntity find(UUID uuid);
+  Optional<AccountEntity> findByUuid(UUID uuid);
 
-  AccountEntity find(Long id);
+  Optional<AccountEntity> findById(Long id);
 
-  AccountEntity findBroadcaster();
+  Optional<AccountEntity> findBroadcaster();
 
-  AccountEntity findByUsername(String username);
+  Optional<AccountEntity> findByUsername(String username);
 
-  AccountEntity create(String username, String password, Integer ip, boolean isGuest);
+  Optional<AccountEntity> create(String username, String password, Integer ip, boolean isGuest);
 
   List<AccountEntity> findByDisplayName(String name);
 
@@ -23,5 +24,5 @@ public interface AccountService extends UserDetailsService {
 
   AccountEntity save(AccountEntity account);
 
-  void saveAll(List<AccountEntity> accounts);
+  List<AccountEntity> saveAll(List<AccountEntity> accounts);
 }

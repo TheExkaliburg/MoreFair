@@ -1,59 +1,66 @@
-package de.kaliburg.morefair.game.ladder;
+package de.kaliburg.morefair.game.ranker.services.utils;
 
 import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.game.UpgradeUtils;
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.model.LadderType;
+import de.kaliburg.morefair.game.ladder.services.LadderService;
+import de.kaliburg.morefair.game.ladder.services.utils.LadderUtilsServiceImpl;
 import de.kaliburg.morefair.game.ranker.model.RankerEntity;
+import de.kaliburg.morefair.game.ranker.services.RankerService;
+import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
-import de.kaliburg.morefair.game.round.model.RoundType;
 import java.math.BigInteger;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
-public class LadderUtils {
+@Service
+@RequiredArgsConstructor
+public class RankerUtilsServiceImpl implements RankerUtilsService {
 
+  private final LadderService ladderService;
+  private final RankerService rankerService;
   private final UpgradeUtils upgradeUtils;
+  private final RoundService roundService;
+  private final LadderUtilsServiceImpl ladderUtilsService;
   private final FairConfig config;
-
-  public LadderUtils(UpgradeUtils upgradeUtils, FairConfig config) {
-    this.upgradeUtils = upgradeUtils;
-    this.config = config;
-  }
 
   /**
    * Return the points the ranker needs on a specific ladder to promote. (including the short wait
    * time in the lead at Rank 1)
    *
-   * @param ladder the ladder the ranker is on (and all the other rankers too)
    * @param ranker the ranker from which perspective, these required points are calculated
    * @return the required amount of points
    */
-  public BigInteger getPointsForPromoteWithLead(@NonNull LadderEntity ladder,
-      @NonNull RankerEntity ranker) {
-    if (ladder.getRankers().size() <= 1) {
+  @Override
+  public BigInteger getPointsForPromoteWithLead(@NonNull RankerEntity ranker) {
+    LadderEntity ladder = ladderService.findLadderById(ranker.getLadderId()).orElseThrow();
+    List<RankerEntity> rankers = rankerService.findAllByLadderId(ladder.getId());
+
+    if (rankers.size() <= 1) {
       // Should always be above the points of the ranker
       return ranker.getPoints().multiply(BigInteger.TWO).max(ladder.getBasePointsToPromote());
     }
 
     // If not enough points -> minimum required points
-    if (ladder.getRankers().get(0).getPoints().compareTo(ladder.getBasePointsToPromote()) < 0) {
+    if (rankers.get(0).getPoints().compareTo(ladder.getBasePointsToPromote()) < 0) {
       return ladder.getBasePointsToPromote();
     }
 
     boolean isRankerEqualsToFirstRanker =
-        ladder.getRankers().get(0).getUuid().equals(ranker.getUuid());
+        rankers.get(0).getUuid().equals(ranker.getUuid());
 
     // If ladder is before AUTO_PROMOTE_LADDER -> 1st place + 1 points
     if (ladder.getNumber() < config.getAutoPromoteLadder() || ranker.isAutoPromote()) {
       return isRankerEqualsToFirstRanker
-          ? ladder.getRankers().get(1).getPoints().add(BigInteger.ONE)
-          : ladder.getRankers().get(0).getPoints().add(BigInteger.ONE);
+          ? rankers.get(1).getPoints().add(BigInteger.ONE)
+          : rankers.get(0).getPoints().add(BigInteger.ONE);
     }
 
-    RankerEntity leadingRanker = isRankerEqualsToFirstRanker ? ranker : ladder.getRankers().get(0);
-    RankerEntity pursuingRanker = isRankerEqualsToFirstRanker ? ladder.getRankers().get(1) : ranker;
+    RankerEntity leadingRanker = isRankerEqualsToFirstRanker ? ranker : rankers.get(0);
+    RankerEntity pursuingRanker = isRankerEqualsToFirstRanker ? rankers.get(1) : ranker;
 
     BigInteger powerDifference =
         (leadingRanker.isGrowing() ? leadingRanker.getPower() : BigInteger.ZERO)
@@ -64,14 +71,6 @@ public class LadderUtils {
 
     return (leadingRanker.getUuid().equals(ranker.getUuid()) ? pursuingRanker : leadingRanker)
         .getPoints().add(neededPointDifference).max(ladder.getBasePointsToPromote());
-  }
-
-  public Integer getRequiredRankerCountToUnlock(LadderEntity ladder) {
-    if (ladder.getRound().getTypes().contains(RoundType.SPECIAL_100)) {
-      return config.getBaseAssholeLadder();
-    }
-
-    return Math.max(config.getBaseAssholeLadder(), ladder.getScaling());
   }
 
   /**
@@ -87,31 +86,23 @@ public class LadderUtils {
    * </li>
    * </ul>
    *
-   * @param ladder the ladder the ranker is on
    * @param ranker the ranker that gets checked
    * @return if the ranker can promote
    */
-  public boolean canPromote(@NonNull LadderEntity ladder, @NonNull RankerEntity ranker) {
-    if (!isLadderPromotable(ladder)) {
+  @Override
+  public boolean canPromote(@NonNull RankerEntity ranker) {
+    LadderEntity ladder = ladderService.findLadderById(ranker.getLadderId()).orElseThrow();
+
+    if (!ladderUtilsService.isLadderPromotable(ladder)) {
       return false;
     }
 
-    return ranker.getRank() == 1 && ladder.getRankers().get(0).getUuid().equals(ranker.getUuid())
+    List<RankerEntity> rankers = rankerService.findAllByLadderId(ladder.getId());
+
+    return ranker.getRank() == 1 && rankers.get(0).getUuid().equals(ranker.getUuid())
         && ranker.isGrowing()
         && (ranker.isAutoPromote() || ladder.getTypes().contains(LadderType.FREE_AUTO)
-        || ranker.getPoints().compareTo(getPointsForPromoteWithLead(ladder, ranker)) >= 0);
-  }
-
-  public boolean isLadderUnlocked(@NonNull LadderEntity ladder) {
-    if (ladder.getTypes().contains(LadderType.END)) {
-      return false;
-    }
-    return ladder.getRankers().size() >= getRequiredRankerCountToUnlock(ladder);
-  }
-
-  public boolean isLadderPromotable(@NonNull LadderEntity ladder) {
-    return isLadderUnlocked(ladder)
-        && ladder.getRankers().get(0).getPoints().compareTo(ladder.getBasePointsToPromote()) >= 0;
+        || ranker.getPoints().compareTo(getPointsForPromoteWithLead(ranker)) >= 0);
   }
 
   /**
@@ -126,13 +117,15 @@ public class LadderUtils {
    *  <li>Ranker got enough Vinegar to throw</li>
    * </ul>
    *
-   * @param ladder the ladder the vinegar would get thrown on
    * @param ranker the ranker that want to throw vinegar
    * @param target the target of the rankers vinegar-throw
    * @return if the ranker can throw the vinegar
    */
-  public boolean canThrowVinegarAt(LadderEntity ladder, RankerEntity ranker, RankerEntity target) {
-    if (!isLadderPromotable(ladder)) {
+  @Override
+  public boolean canThrowVinegarAt(RankerEntity ranker, RankerEntity target) {
+    LadderEntity ladder = ladderService.findLadderById(ranker.getLadderId()).orElseThrow();
+
+    if (!ladderUtilsService.isLadderPromotable(ladder)) {
       return false;
     }
 
@@ -140,7 +133,6 @@ public class LadderUtils {
         && !target.isAutoPromote()
         && ranker.getVinegar().compareTo(upgradeUtils.throwVinegarCost(ladder.getScaling())) >= 0;
   }
-
 
   /**
    * If following conditions are given the ranker can buy auto-promote.
@@ -151,12 +143,13 @@ public class LadderUtils {
    *  <li>The ladder is not the asshole-ladder</li>
    * </ul>
    *
-   * @param ladder the ladder the ranker wants to buy auto-promote on
    * @param ranker the ranker that wants to buy auto-promote
-   * @param round  the current round, so we can find out if this ladder is an asshole-ladder
    * @return if the ranker can buy auto-promote
    */
-  public boolean canBuyAutoPromote(LadderEntity ladder, RankerEntity ranker, RoundEntity round) {
+  @Override
+  public boolean canBuyAutoPromote(RankerEntity ranker) {
+    LadderEntity ladder = ladderService.findLadderById(ranker.getLadderId()).orElseThrow();
+    RoundEntity round = roundService.findById(ladder.getRoundId()).orElseThrow();
     BigInteger autoPromoteCost = upgradeUtils.buyAutoPromoteCost(round, ladder, ranker.getRank());
 
     return !ranker.isAutoPromote()

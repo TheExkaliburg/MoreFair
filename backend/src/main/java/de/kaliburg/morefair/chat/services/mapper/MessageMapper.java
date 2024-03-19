@@ -35,7 +35,7 @@ public class MessageMapper {
    * @return The {@link MessageDto}
    */
   public MessageDto convertToMessageDto(MessageEntity message, ChatEntity chat) {
-    AccountEntity accountEntity = accountService.find(message.getAccountId());
+    AccountEntity accountEntity = accountService.findById(message.getAccountId()).orElseThrow();
 
     return MessageDto.builder()
         .message(message.getMessage())

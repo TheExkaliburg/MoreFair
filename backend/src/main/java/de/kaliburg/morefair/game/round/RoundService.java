@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.game.round.services;
+package de.kaliburg.morefair.game.round;
 
 import de.kaliburg.morefair.account.model.AccountEntity;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
@@ -12,4 +12,6 @@ public interface RoundService {
   Optional<RoundEntity> findBySeasonAndNumber(SeasonEntity currentSeason, int number);
 
   void updateHighestAssholeCountOfCurrentRound(AccountEntity account);
+
+  Optional<RoundEntity> findById(long roundId);
 }

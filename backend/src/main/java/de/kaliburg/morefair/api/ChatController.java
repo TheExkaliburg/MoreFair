@@ -56,7 +56,8 @@ public class ChatController {
     try {
       ChatType type = ChatType.valueOf(typeString.toUpperCase());
 
-      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
+      AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
+          .orElse(null);
       if (account == null || account.isBanned()) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       }
@@ -125,7 +126,8 @@ public class ChatController {
         return;
       }
 
-      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
+      AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
+          .orElse(null);
       if (account == null || account.isMuted() || !throttler.canPostMessage(account)) {
         return;
       }

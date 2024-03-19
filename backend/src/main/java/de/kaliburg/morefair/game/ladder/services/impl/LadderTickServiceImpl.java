@@ -6,17 +6,17 @@ import de.kaliburg.morefair.api.FairController;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.core.concurrency.CriticalRegion;
 import de.kaliburg.morefair.events.Event;
-import de.kaliburg.morefair.game.ladder.LadderUtils;
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.model.LadderType;
 import de.kaliburg.morefair.game.ladder.model.dto.LadderTickDto;
 import de.kaliburg.morefair.game.ladder.services.LadderEventService;
 import de.kaliburg.morefair.game.ladder.services.LadderService;
 import de.kaliburg.morefair.game.ladder.services.LadderTickService;
+import de.kaliburg.morefair.game.ladder.services.utils.LadderUtilsService;
 import de.kaliburg.morefair.game.ranker.model.RankerEntity;
 import de.kaliburg.morefair.game.ranker.services.RankerService;
+import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
-import de.kaliburg.morefair.game.round.services.RoundService;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Comparator;
@@ -41,7 +41,7 @@ public class LadderTickServiceImpl implements LadderTickService {
   private final LadderService ladderService;
   private final RoundService roundService;
   private final WsUtils wsUtils;
-  private final LadderUtils ladderUtils;
+  private final LadderUtilsService ladderUtilsService;
   private long lastTickInNanos = System.nanoTime();
 
   @Scheduled(initialDelay = 1000, fixedRate = 1000)
@@ -96,7 +96,7 @@ public class LadderTickServiceImpl implements LadderTickService {
         if (currentRanker.getRank() != 1) {
           currentRanker.addVinegar(currentRanker.getGrapes(), delta);
         }
-        if (currentRanker.getRank() == 1 && ladderUtils.isLadderPromotable(ladder)) {
+        if (currentRanker.getRank() == 1 && ladderUtilsService.isLadderPromotable(ladder)) {
           currentRanker.mulVinegar(0.9975, delta);
         }
 
@@ -133,7 +133,7 @@ public class LadderTickServiceImpl implements LadderTickService {
 
     if (!rankers.isEmpty() && (rankers.get(0).isAutoPromote() || ladder.getTypes()
         .contains(LadderType.FREE_AUTO)) && rankers.get(0).isGrowing()
-        && ladderUtils.isLadderPromotable(ladder)) {
+        && ladderUtilsService.isLadderPromotable(ladder)) {
       ladderEventService.addEvent(ladder.getNumber(),
           new Event<>(PROMOTE, rankers.get(0).getAccountId()));
     }

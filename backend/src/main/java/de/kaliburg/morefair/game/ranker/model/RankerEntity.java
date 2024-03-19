@@ -80,7 +80,6 @@ public class RankerEntity {
   private boolean autoPromote = false;
   @NonNull
   @OneToOne(mappedBy = "ranker", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-  @Builder.Default
   private UnlocksEntity unlocks = new UnlocksEntity(this);
 
 

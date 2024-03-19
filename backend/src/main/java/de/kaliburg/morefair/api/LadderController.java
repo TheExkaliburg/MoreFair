@@ -12,9 +12,9 @@ import de.kaliburg.morefair.game.ladder.services.LadderEventService;
 import de.kaliburg.morefair.game.ladder.services.LadderService;
 import de.kaliburg.morefair.game.ladder.services.mapper.LadderMapper;
 import de.kaliburg.morefair.game.ranker.services.RankerService;
+import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
-import de.kaliburg.morefair.game.round.services.RoundService;
-import de.kaliburg.morefair.game.round.services.RoundUtils;
+import de.kaliburg.morefair.game.round.services.utils.RoundUtilsService;
 import de.kaliburg.morefair.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -47,7 +47,7 @@ public class LadderController {
   private final RoundService roundService;
   private final LadderService ladderService;
   private final LadderEventService ladderEventService;
-  private final RoundUtils roundUtils;
+  private final RoundUtilsService roundUtilsService;
   private final LadderMapper ladderMapper;
   private final RankerService rankerService;
 
@@ -56,7 +56,8 @@ public class LadderController {
   public ResponseEntity<?> initLadder(@RequestParam(value = "number") Integer number,
       Authentication authentication) {
     try {
-      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
+      AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
+          .orElse(null);
       if (account == null || account.isBanned()) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       }
@@ -75,7 +76,7 @@ public class LadderController {
 
       int ladderNumber = highestLadder.map(LadderEntity::getNumber).orElse(1);
       if (!account.isMod()
-          && !number.equals(roundUtils.getAssholeLadderNumber(currentRound))
+          && !number.equals(roundUtilsService.getAssholeLadderNumber(currentRound))
           && number > ladderNumber) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       }
@@ -97,7 +98,8 @@ public class LadderController {
   public void buyBias(SimpMessageHeaderAccessor sha, Authentication authentication,
       WsMessage wsMessage) {
     try {
-      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
+      AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
+          .orElse(null);
       if (account == null || account.isBanned()) {
         return;
       }
@@ -122,7 +124,8 @@ public class LadderController {
   public void buyMulti(SimpMessageHeaderAccessor sha, Authentication authentication,
       WsMessage wsMessage) {
     try {
-      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
+      AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
+          .orElse(null);
       if (account == null || account.isBanned()) {
         return;
       }
@@ -150,7 +153,8 @@ public class LadderController {
   public void throwVinegar(SimpMessageHeaderAccessor sha, Authentication authentication,
       WsMessage wsMessage) {
     try {
-      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
+      AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
+          .orElse(null);
       if (account == null || account.isBanned()) {
         return;
       }
@@ -179,7 +183,8 @@ public class LadderController {
       WsMessage wsMessage) {
     try {
 
-      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
+      AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
+          .orElse(null);
       if (account == null || account.isBanned()) {
         return;
       }
@@ -207,7 +212,8 @@ public class LadderController {
   public void buyAutoPromote(SimpMessageHeaderAccessor sha, Authentication authentication,
       WsMessage wsMessage) {
     try {
-      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
+      AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
+          .orElse(null);
       if (account == null || account.isBanned()) {
         return;
       }

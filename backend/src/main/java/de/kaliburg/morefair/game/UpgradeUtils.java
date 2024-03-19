@@ -1,36 +1,27 @@
 package de.kaliburg.morefair.game;
 
 import de.kaliburg.morefair.FairConfig;
-import de.kaliburg.morefair.game.ladder.LadderUtils;
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.model.LadderType;
+import de.kaliburg.morefair.game.ladder.services.utils.LadderUtilsService;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.EnumSet;
 import java.util.Set;
-import org.springframework.context.annotation.Lazy;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class UpgradeUtils {
 
   private static final BigDecimal LADDER_UPGRADE_MULTIPLIER = BigDecimal.valueOf(0.5);
   private static final BigDecimal FLAT_UPGRADE_MULTIPLIER = BigDecimal.valueOf(0.5);
 
   private final FairConfig config;
-
-  private LadderUtils ladderUtils;
-
-  public UpgradeUtils(FairConfig config, @Lazy LadderUtils ladderUtils) {
-    this.config = config;
-    this.ladderUtils = ladderUtils;
-  }
-
-  public void setLadderUtils(LadderUtils ladderUtils) {
-    this.ladderUtils = ladderUtils;
-  }
+  private final LadderUtilsService ladderUtils;
 
   /**
    * Calculates the default cost of the next bias/multi upgrade.
@@ -90,7 +81,7 @@ public class UpgradeUtils {
   public BigInteger buyAutoPromoteCost(RoundEntity round, LadderEntity ladder, Integer rank) {
     Integer minPeople = ladderUtils.getRequiredRankerCountToUnlock(ladder);
 
-    Integer divisor = Math.max(rank - minPeople + 1, 1);
+    int divisor = Math.max(rank - minPeople + 1, 1);
 
     BigDecimal decGrapes = new BigDecimal(config.getBaseGrapesToBuyAutoPromote());
     return decGrapes.divide(BigDecimal.valueOf(divisor), RoundingMode.FLOOR).toBigInteger();

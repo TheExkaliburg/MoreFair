@@ -24,7 +24,7 @@ public class SuggestionsServiceImpl implements SuggestionsService {
     List<RankerEntity> rankers = rankerService.findAllByCurrentLadderNumber(1);
 
     return rankers.stream()
-        .map(ranker -> accountService.find(ranker.getAccountId()))
+        .map(ranker -> accountService.findById(ranker.getAccountId()).orElseThrow())
         .map(account -> SuggestionDto.builder()
             .accountId(account.getId())
             .displayName(account.getDisplayName())

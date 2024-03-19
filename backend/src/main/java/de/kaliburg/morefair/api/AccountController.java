@@ -49,11 +49,8 @@ public class AccountController {
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> getAccount(Authentication authentication) {
     try {
-      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
-
-      if (account == null) {
-        return ResponseEntity.notFound().build();
-      }
+      AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
+          .orElseThrow();
 
       // In case the Account doesn't have an AchievementsEntity yet
       if (account.getAchievements() == null) {
@@ -96,7 +93,8 @@ public class AccountController {
         return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST, "Display name cannot be blank");
       }
 
-      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
+      AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
+          .orElseThrow();
 
       if (displayName.equals(account.getDisplayName())) {
         Map<String, String> result = new HashMap<>();

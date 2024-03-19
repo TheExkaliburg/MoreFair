@@ -5,8 +5,8 @@ import de.kaliburg.morefair.account.services.AccountService;
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.services.LadderService;
 import de.kaliburg.morefair.game.ranker.services.RankerService;
-import de.kaliburg.morefair.game.round.services.RoundService;
-import de.kaliburg.morefair.game.round.services.RoundUtils;
+import de.kaliburg.morefair.game.round.RoundService;
+import de.kaliburg.morefair.game.round.services.utils.RoundUtilsService;
 import de.kaliburg.morefair.security.SecurityUtils;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
@@ -31,7 +31,7 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
   private final RoundService roundService;
   private final LadderService ladderService;
   private final RankerService rankerService;
-  private final RoundUtils roundUtils;
+  private final RoundUtilsService roundUtilsService;
 
   @Override
   public Message<?> preSend(@NonNull Message<?> message, @NonNull MessageChannel channel) {
@@ -62,7 +62,7 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
       return true;
     }
 
-    AccountEntity account = accountService.find(uuid);
+    AccountEntity account = accountService.findByUuid(uuid).orElse(null);
 
     if (account == null) {
       return false;
@@ -91,7 +91,7 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
     if (topicDestination.contains("/topic/game/events/")) {
       int ladderDestination = Integer.parseInt(
           topicDestination.substring("/topic/game/events/".length()));
-      if (ladderDestination == roundUtils.getAssholeLadderNumber(
+      if (ladderDestination == roundUtilsService.getAssholeLadderNumber(
           roundService.getCurrentRound())) {
         return true;
       }

@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.statistics.records;
+package de.kaliburg.morefair.statistics.records.model;
 
 import java.time.Instant;
 import lombok.Data;

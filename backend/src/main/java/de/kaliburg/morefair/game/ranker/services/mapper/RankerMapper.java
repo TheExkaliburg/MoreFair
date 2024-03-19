@@ -26,7 +26,7 @@ public class RankerMapper {
    * @return The {@link RankerDto}.
    */
   public RankerDto mapToRankerDto(RankerEntity ranker) {
-    AccountEntity account = accountService.find(ranker.getAccountId());
+    AccountEntity account = accountService.findById(ranker.getAccountId()).orElseThrow();
 
     return RankerDto.builder()
         .accountId(ranker.getAccountId())
@@ -51,7 +51,7 @@ public class RankerMapper {
    * @return The {@link RankerPrivateDto}.
    */
   public RankerPrivateDto mapToPrivateDto(RankerEntity ranker) {
-    AccountEntity account = accountService.find(ranker.getAccountId());
+    AccountEntity account = accountService.findById(ranker.getAccountId()).orElseThrow();
 
     return RankerPrivateDto.builder()
         .grapes(ranker.getGrapes().toString())

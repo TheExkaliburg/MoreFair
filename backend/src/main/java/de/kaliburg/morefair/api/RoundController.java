@@ -3,7 +3,7 @@ package de.kaliburg.morefair.api;
 import de.kaliburg.morefair.account.model.AccountEntity;
 import de.kaliburg.morefair.account.services.AccountService;
 import de.kaliburg.morefair.exceptions.ErrorDto;
-import de.kaliburg.morefair.game.round.services.RoundService;
+import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.game.round.services.mapper.RoundMapper;
 import de.kaliburg.morefair.security.SecurityUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,7 +34,8 @@ public class RoundController {
       HttpServletRequest request) {
     try {
       if (authentication != null) {
-        AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
+        AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
+            .orElse(null);
         if (account != null) {
           Integer ip = SecurityUtils.getIp(request);
           account.setLastLogin(OffsetDateTime.now());

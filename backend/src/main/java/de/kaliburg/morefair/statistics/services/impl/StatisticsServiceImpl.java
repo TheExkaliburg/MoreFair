@@ -7,27 +7,28 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import de.kaliburg.morefair.account.model.AccountEntity;
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
+import de.kaliburg.morefair.game.ladder.services.LadderService;
 import de.kaliburg.morefair.game.ranker.model.RankerEntity;
 import de.kaliburg.morefair.game.ranker.services.RankerService;
+import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
-import de.kaliburg.morefair.game.round.services.RoundService;
 import de.kaliburg.morefair.game.season.model.SeasonEntity;
 import de.kaliburg.morefair.game.season.services.SeasonService;
-import de.kaliburg.morefair.statistics.records.AutoPromoteRecordEntity;
-import de.kaliburg.morefair.statistics.records.AutoPromoteRecordRepository;
-import de.kaliburg.morefair.statistics.records.BiasRecordEntity;
-import de.kaliburg.morefair.statistics.records.BiasRecordRepository;
-import de.kaliburg.morefair.statistics.records.LadderRecord;
-import de.kaliburg.morefair.statistics.records.LoginRecordEntity;
-import de.kaliburg.morefair.statistics.records.LoginRecordRepository;
-import de.kaliburg.morefair.statistics.records.MultiRecordEntity;
-import de.kaliburg.morefair.statistics.records.MultiRecordRepository;
-import de.kaliburg.morefair.statistics.records.PromoteRecordEntity;
-import de.kaliburg.morefair.statistics.records.PromoteRecordRepository;
-import de.kaliburg.morefair.statistics.records.RankerRecord;
-import de.kaliburg.morefair.statistics.records.RoundRecord;
-import de.kaliburg.morefair.statistics.records.ThrowVinegarRecordEntity;
-import de.kaliburg.morefair.statistics.records.ThrowVinegarRecordRepository;
+import de.kaliburg.morefair.statistics.records.model.AutoPromoteRecordEntity;
+import de.kaliburg.morefair.statistics.records.model.BiasRecordEntity;
+import de.kaliburg.morefair.statistics.records.model.LadderRecord;
+import de.kaliburg.morefair.statistics.records.model.LoginRecordEntity;
+import de.kaliburg.morefair.statistics.records.model.MultiRecordEntity;
+import de.kaliburg.morefair.statistics.records.model.PromoteRecordEntity;
+import de.kaliburg.morefair.statistics.records.model.RankerRecord;
+import de.kaliburg.morefair.statistics.records.model.RoundRecord;
+import de.kaliburg.morefair.statistics.records.model.ThrowVinegarRecordEntity;
+import de.kaliburg.morefair.statistics.records.services.repositories.AutoPromoteRecordRepository;
+import de.kaliburg.morefair.statistics.records.services.repositories.BiasRecordRepository;
+import de.kaliburg.morefair.statistics.records.services.repositories.LoginRecordRepository;
+import de.kaliburg.morefair.statistics.records.services.repositories.MultiRecordRepository;
+import de.kaliburg.morefair.statistics.records.services.repositories.PromoteRecordRepository;
+import de.kaliburg.morefair.statistics.records.services.repositories.ThrowVinegarRecordRepository;
 import de.kaliburg.morefair.statistics.results.ActivityAnalysisEntity;
 import de.kaliburg.morefair.statistics.results.ActivityAnalysisRepository;
 import de.kaliburg.morefair.statistics.results.RoundStatisticsEntity;
@@ -35,9 +36,11 @@ import de.kaliburg.morefair.statistics.results.RoundStatisticsRepository;
 import de.kaliburg.morefair.statistics.services.StatisticsService;
 import jakarta.annotation.PostConstruct;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -72,6 +75,9 @@ public class StatisticsServiceImpl implements StatisticsService {
   private final RankerService rankerService;
 
   @Autowired
+  private final LadderService ladderService;
+
+  @Autowired
   private final SeasonService seasonService;
 
   private final LoadingCache<Long, Boolean> hasStartedStatisticsJobRecently =
@@ -100,8 +106,12 @@ public class StatisticsServiceImpl implements StatisticsService {
    */
   public void recordBias(RankerEntity ranker, LadderEntity ladder, RoundEntity round) {
     RankerRecord rankerRecord = new RankerRecord(ranker);
-    LadderRecord ladderRecord = new LadderRecord(ladder);
-    RoundRecord roundRecord = new RoundRecord(round);
+    LadderRecord ladderRecord = new LadderRecord(ladder,
+        rankerService.findAllByLadderId(ladder.getId()));
+
+    Map<LadderEntity, List<RankerEntity>> roundState = ladderService.findAllByRound(round).stream()
+        .collect(Collectors.toMap(l -> l, l -> rankerService.findAllByLadderId(l.getId())));
+    RoundRecord roundRecord = new RoundRecord(round, roundState);
     biasRecordRepository.save(new BiasRecordEntity(rankerRecord, ladderRecord, roundRecord));
   }
 
@@ -114,8 +124,13 @@ public class StatisticsServiceImpl implements StatisticsService {
    */
   public void recordMulti(RankerEntity ranker, LadderEntity ladder, RoundEntity round) {
     RankerRecord rankerRecord = new RankerRecord(ranker);
-    LadderRecord ladderRecord = new LadderRecord(ladder);
-    RoundRecord roundRecord = new RoundRecord(round);
+    LadderRecord ladderRecord = new LadderRecord(ladder,
+        rankerService.findAllByLadderId(ladder.getId()));
+
+    Map<LadderEntity, List<RankerEntity>> roundState = ladderService.findAllByRound(round).stream()
+        .collect(Collectors.toMap(l -> l, l -> rankerService.findAllByLadderId(l.getId())));
+
+    RoundRecord roundRecord = new RoundRecord(round, roundState);
     multiRecordRepository.save(new MultiRecordEntity(rankerRecord, ladderRecord, roundRecord));
   }
 
@@ -128,8 +143,12 @@ public class StatisticsServiceImpl implements StatisticsService {
    */
   public void recordAutoPromote(RankerEntity ranker, LadderEntity ladder, RoundEntity round) {
     RankerRecord rankerRecord = new RankerRecord(ranker);
-    LadderRecord ladderRecord = new LadderRecord(ladder);
-    RoundRecord roundRecord = new RoundRecord(round);
+    LadderRecord ladderRecord = new LadderRecord(ladder,
+        rankerService.findAllByLadderId(ladder.getId()));
+
+    Map<LadderEntity, List<RankerEntity>> roundState = ladderService.findAllByRound(round).stream()
+        .collect(Collectors.toMap(l -> l, l -> rankerService.findAllByLadderId(l.getId())));
+    RoundRecord roundRecord = new RoundRecord(round, roundState);
     autoPromoteRecordRepository.save(
         new AutoPromoteRecordEntity(rankerRecord, ladderRecord, roundRecord));
   }
@@ -143,8 +162,12 @@ public class StatisticsServiceImpl implements StatisticsService {
    */
   public void recordPromote(RankerEntity ranker, LadderEntity ladder, RoundEntity round) {
     RankerRecord rankerRecord = new RankerRecord(ranker);
-    LadderRecord ladderRecord = new LadderRecord(ladder);
-    RoundRecord roundRecord = new RoundRecord(round);
+    LadderRecord ladderRecord = new LadderRecord(ladder,
+        rankerService.findAllByLadderId(ladder.getId()));
+
+    Map<LadderEntity, List<RankerEntity>> roundState = ladderService.findAllByRound(round).stream()
+        .collect(Collectors.toMap(l -> l, l -> rankerService.findAllByLadderId(l.getId())));
+    RoundRecord roundRecord = new RoundRecord(round, roundState);
     promoteRecordRepository.save(
         new PromoteRecordEntity(rankerRecord, ladderRecord, roundRecord));
   }
@@ -162,8 +185,12 @@ public class StatisticsServiceImpl implements StatisticsService {
     RankerRecord targetRecord = new RankerRecord(target);
     List<RankerEntity> rankers = rankerService.findAllByCurrentLadderNumber(ladder.getNumber());
     RankerRecord secondRecord = new RankerRecord(rankers.get(1));
-    LadderRecord ladderRecord = new LadderRecord(ladder);
-    RoundRecord roundRecord = new RoundRecord(round);
+    LadderRecord ladderRecord = new LadderRecord(ladder,
+        rankerService.findAllByLadderId(ladder.getId()));
+
+    Map<LadderEntity, List<RankerEntity>> roundState = ladderService.findAllByRound(round).stream()
+        .collect(Collectors.toMap(l -> l, l -> rankerService.findAllByLadderId(l.getId())));
+    RoundRecord roundRecord = new RoundRecord(round, roundState);
     throwVinegarRecordRepository.save(
         new ThrowVinegarRecordEntity(rankerRecord, targetRecord, secondRecord, ladderRecord,
             roundRecord));
@@ -254,8 +281,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         }
       });
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
   }
 

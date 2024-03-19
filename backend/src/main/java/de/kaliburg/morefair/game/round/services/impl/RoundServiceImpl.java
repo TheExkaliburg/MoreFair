@@ -1,5 +1,7 @@
 package de.kaliburg.morefair.game.round.services.impl;
 
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.model.AccountEntity;
 import de.kaliburg.morefair.api.RoundController;
@@ -7,16 +9,17 @@ import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.core.concurrency.CriticalRegion;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.RoundEventTypes;
+import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
 import de.kaliburg.morefair.game.round.model.RoundType;
-import de.kaliburg.morefair.game.round.services.RoundService;
-import de.kaliburg.morefair.game.round.services.RoundUtils;
 import de.kaliburg.morefair.game.round.services.repositories.RoundRepository;
+import de.kaliburg.morefair.game.round.services.utils.RoundUtilsServiceImpl;
 import de.kaliburg.morefair.game.season.model.SeasonEntity;
 import de.kaliburg.morefair.game.season.services.SeasonService;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.Random;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -26,7 +29,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class RoundServiceImpl implements RoundService {
 
   private static final Random random = new Random();
@@ -34,22 +36,39 @@ public class RoundServiceImpl implements RoundService {
   private final RoundRepository roundRepository;
   private final SeasonService seasonService;
   private final WsUtils wsUtils;
-  private final RoundUtils roundUtils;
+  private final RoundUtilsServiceImpl roundUtilsService;
   private final FairConfig fairConfig;
-  private RoundEntity currentRound;
+  private final LoadingCache<Long, RoundEntity> roundCache;
+  private Long currentRoundId;
+
+  public RoundServiceImpl(RoundRepository roundRepository, SeasonService seasonService,
+      WsUtils wsUtils, RoundUtilsServiceImpl roundUtilsService, FairConfig fairConfig) {
+    this.roundRepository = roundRepository;
+    this.seasonService = seasonService;
+    this.wsUtils = wsUtils;
+    this.roundUtilsService = roundUtilsService;
+    this.fairConfig = fairConfig;
+
+    this.roundCache = Caffeine.newBuilder()
+        .expireAfterWrite(Duration.of(30, ChronoUnit.MINUTES))
+        .build(id -> this.roundRepository.findById(id).orElse(null));
+  }
 
 
   @Override
   public void updateHighestAssholeCountOfCurrentRound(AccountEntity account) {
     Integer assholeCount = account.getAssholeCount();
     try (var ignored = semaphore.enter()) {
+      RoundEntity currentRound = roundCache.get(currentRoundId);
+
       if (account.getAssholeCount() > currentRound.getHighestAssholeCount()
           && currentRound.getTypes().contains(RoundType.CHAOS)) {
         currentRound.setHighestAssholeCount(assholeCount);
         currentRound = roundRepository.save(currentRound);
+        roundCache.put(currentRoundId, currentRound);
         wsUtils.convertAndSendToTopic(RoundController.TOPIC_EVENTS_DESTINATION, new Event<>(
             RoundEventTypes.INCREASE_ASSHOLE_LADDER, account.getId(),
-            roundUtils.getAssholeLadderNumber(getCurrentRound())));
+            roundUtilsService.getAssholeLadderNumber(roundCache.get(currentRoundId))));
       }
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
@@ -59,23 +78,28 @@ public class RoundServiceImpl implements RoundService {
   @Override
   public RoundEntity getCurrentRound() {
     try (var ignored = semaphore.enter()) {
-      if (currentRound == null) {
+      if (currentRoundId == null) {
         SeasonEntity currentSeason = seasonService.getCurrentSeason();
         // Find newest Round of that Season
         RoundEntity round = roundRepository.findNewestRoundOfSeason(currentSeason)
             .orElse(null);
 
         // if null -> create first Round of that Season
-        // if closed -> create next Round of that Season -> check Season for Season End
+        // if closed -> create next Round of that Season
         if (round == null || round.isClosed()) {
           round = create(round).orElseThrow();
         }
-        currentRound = round;
+        currentRoundId = round.getId();
       }
-      return currentRound;
+      return roundCache.get(currentRoundId);
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @Override
+  public Optional<RoundEntity> findById(long id) {
+    return Optional.of(roundCache.get(id));
   }
 
   @Override

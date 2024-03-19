@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.statistics.records;
+package de.kaliburg.morefair.statistics.records.model;
 
 import lombok.NonNull;
 import org.springframework.data.mongodb.core.mapping.Document;

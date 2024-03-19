@@ -2,13 +2,13 @@ package de.kaliburg.morefair.game.round.model.dto;
 
 import de.kaliburg.morefair.game.round.model.RoundType;
 import java.util.Set;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 @Data
 @Builder
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class RoundDto {
 
   private RoundSettingsDto settings;
@@ -19,7 +19,7 @@ public class RoundDto {
 
   @Data
   @Builder
-  @RequiredArgsConstructor
+  @AllArgsConstructor
   public static class RoundSettingsDto {
 
     private String basePointsForPromote;
