@@ -79,6 +79,7 @@ public class RoundEntity {
       @Nullable RoundEntity previousRound) {
     this.number = number;
     this.baseAssholeLadder = config.getBaseAssholeLadder();
+    this.seasonId = season.getId();
 
     determineRoundTypes(previousRound);
 

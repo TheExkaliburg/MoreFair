@@ -8,7 +8,6 @@ import java.util.Optional;
  */
 public interface SeasonService {
 
-
   SeasonEntity findNewestSeason();
 
   Optional<SeasonEntity> findById(long id);

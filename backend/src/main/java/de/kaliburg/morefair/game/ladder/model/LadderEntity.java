@@ -57,7 +57,7 @@ public final class LadderEntity {
   @Column(nullable = false)
   private Integer number;
   @NonNull
-  @Column(nullable = false)
+  @Column(nullable = false, name = "round_id")
   private Long roundId;
   @CollectionTable(name = "ladder_type", foreignKey = @ForeignKey(name = "fk_ladder_type_ladder"))
   @ElementCollection(targetClass = LadderType.class, fetch = FetchType.EAGER)

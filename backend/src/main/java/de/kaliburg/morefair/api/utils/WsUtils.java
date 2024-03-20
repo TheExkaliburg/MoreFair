@@ -3,6 +3,7 @@ package de.kaliburg.morefair.api.utils;
 import de.kaliburg.morefair.api.websockets.messages.WsAnswer;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -23,7 +24,7 @@ public class WsUtils {
 
   private final SimpMessagingTemplate simpMessagingTemplate;
 
-  public WsUtils(SimpMessagingTemplate simpMessagingTemplate) {
+  public WsUtils(@Lazy SimpMessagingTemplate simpMessagingTemplate) {
     this.simpMessagingTemplate = simpMessagingTemplate;
   }
 

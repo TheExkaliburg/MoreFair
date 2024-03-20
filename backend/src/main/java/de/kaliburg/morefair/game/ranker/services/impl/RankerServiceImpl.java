@@ -128,7 +128,7 @@ public class RankerServiceImpl implements RankerService {
   @Override
   public Optional<RankerEntity> createRankerOnLadder(AccountEntity account, int ladderNumber) {
     LadderEntity ladder = ladderService.findCurrentLadderWithNumber(ladderNumber)
-        .orElse(ladderService.createCurrentLadder(ladderNumber));
+        .orElseGet(() -> ladderService.createCurrentLadder(ladderNumber));
     try (var ignored = semaphore.enter()) {
       List<RankerEntity> rankers = rankerCache.get(ladder.getId());
       Optional<RankerEntity> optionalRanker = rankers.stream()

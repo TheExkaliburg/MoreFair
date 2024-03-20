@@ -63,6 +63,8 @@ public class AccountServiceImpl implements AccountService {
                 .map(AccountEntity::getId)
                 .orElse(null)
         );
+
+    findBroadcaster();
   }
 
 
@@ -99,8 +101,21 @@ public class AccountServiceImpl implements AccountService {
       if (broadcasterAccountId == null) {
         List<AccountEntity> broadcasterAccounts =
             accountRepository.findByAccessRoleOrderByIdAsc(AccountAccessType.BROADCASTER);
+
+        // Create new Broadcaster Account
         if (broadcasterAccounts.isEmpty()) {
-          return Optional.empty();
+          AccountEntity result = new AccountEntity();
+          UUID uuid = UUID.randomUUID();
+          result.setUsername(uuid.toString());
+          result.setPassword(passwordEncoder.encode(uuid.toString()));
+          result.setLastIp(0);
+          result.setGuest(true);
+          result.setDisplayName("Chad");
+          result.setAssholePoints(5950);
+          result.setAccessRole(AccountAccessType.BROADCASTER);
+          result = accountRepository.save(result);
+          this.broadcasterAccountId = result.getId();
+          return Optional.of(result);
         }
 
         this.broadcasterAccountId = broadcasterAccounts.get(0).getId();

@@ -81,7 +81,7 @@ public class RoundServiceImpl implements RoundService {
       if (currentRoundId == null) {
         SeasonEntity currentSeason = seasonService.getCurrentSeason();
         // Find newest Round of that Season
-        RoundEntity round = roundRepository.findNewestRoundOfSeason(currentSeason)
+        RoundEntity round = roundRepository.findNewestRoundOfSeason(currentSeason.getId())
             .orElse(null);
 
         // if null -> create first Round of that Season
@@ -99,12 +99,21 @@ public class RoundServiceImpl implements RoundService {
 
   @Override
   public Optional<RoundEntity> findById(long id) {
-    return Optional.of(roundCache.get(id));
+    try (var ignored = semaphore.enter()) {
+      return Optional.of(roundCache.get(id));
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override
   public Optional<RoundEntity> findBySeasonAndNumber(SeasonEntity season, int number) {
-    return roundRepository.findBySeasonAndNumber(season.getId(), number);
+    RoundEntity currentRound = roundCache.get(currentRoundId);
+    if (number != currentRound.getNumber()) {
+      return roundRepository.findBySeasonAndNumber(season.getId(), number);
+    } else {
+      return Optional.of(currentRound);
+    }
   }
 
   private Optional<RoundEntity> create(@Nullable RoundEntity previousRound) {

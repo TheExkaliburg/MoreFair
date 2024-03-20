@@ -9,7 +9,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,11 +21,7 @@ import lombok.NonNull;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @Entity
-@Table(name = "season",
-    uniqueConstraints = {
-        @UniqueConstraint(name = "uk_uuid", columnNames = "uuid")
-    }
-)
+@Table(name = "season")
 @SequenceGenerator(name = "seq_season", sequenceName = "seq_season", allocationSize = 1)
 public class SeasonEntity {
 

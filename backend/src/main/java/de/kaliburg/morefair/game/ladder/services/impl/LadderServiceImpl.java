@@ -50,7 +50,8 @@ public class LadderServiceImpl implements LadderService {
     this.currentLadderNumberLookup = Caffeine.newBuilder()
         .expireAfterAccess(Duration.of(10, ChronoUnit.MINUTES))
         .build(
-            number -> this.ladderRepository.findByRoundAndNumber(roundService.getCurrentRound(),
+            number -> this.ladderRepository.findByRoundAndNumber(
+                    roundService.getCurrentRound().getId(),
                     number)
                 .map(LadderEntity::getId)
                 .orElse(null)
@@ -88,8 +89,8 @@ public class LadderServiceImpl implements LadderService {
             .collect(Collectors.toList());
       }
 
-      // TODO: Maybe turn into caching; only really used for LadderResults
-      return ladderRepository.findByRound(round).stream().toList();
+      // FIXME: Turn into caching;
+      return ladderRepository.findByRound(round.getId()).stream().toList();
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
     }

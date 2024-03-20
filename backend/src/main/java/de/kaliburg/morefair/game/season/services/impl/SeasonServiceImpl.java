@@ -62,7 +62,7 @@ public class SeasonServiceImpl implements SeasonService {
   public SeasonEntity getCurrentSeason() {
     try (var ignored = semaphore.enter()) {
       if (currentSeason == null) {
-        currentSeason = seasonRepository.findOldestOpenSeason().orElse(createNewSeason());
+        currentSeason = seasonRepository.findOldestOpenSeason().orElseGet(this::createNewSeason);
       }
 
       return currentSeason;
