@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.game;
+package de.kaliburg.morefair.game.unlocks.model;
 
 import de.kaliburg.morefair.game.ranker.model.RankerEntity;
 import jakarta.persistence.Column;

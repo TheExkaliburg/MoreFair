@@ -1,12 +1,15 @@
 package de.kaliburg.morefair.chat.services.impl;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import de.kaliburg.morefair.chat.model.ChatEntity;
 import de.kaliburg.morefair.chat.model.types.ChatType;
 import de.kaliburg.morefair.chat.services.ChatService;
 import de.kaliburg.morefair.chat.services.repositories.ChatRepository;
-import de.kaliburg.morefair.core.caching.MultiIndexedLoadingCache;
 import jakarta.annotation.Nullable;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.javatuples.Pair;
@@ -20,25 +23,21 @@ import org.springframework.transaction.annotation.Transactional;
 public class ChatServiceImpl implements ChatService {
 
   private final ChatRepository chatRepository;
-  private final MultiIndexedLoadingCache<Long, ChatEntity> chatCache;
+  private final LoadingCache<Long, ChatEntity> chatCache;
+  private final LoadingCache<Pair<ChatType, Integer>, Long> chatLookup;
 
   public ChatServiceImpl(ChatRepository chatRepository) {
     this.chatRepository = chatRepository;
 
-    chatCache = MultiIndexedLoadingCache.builder(
-        Caffeine.newBuilder(),
-        ChatEntity::getId,
-        id -> chatRepository.findById(id).orElse(null)
-    ).addLookupWithOptional(Pair.class,
-        chatEntity -> Pair.with(chatEntity.getType(), chatEntity.getNumber()),
-        pair -> {
-          Pair<ChatType, Integer> typedPair = (Pair<ChatType, Integer>) pair;
-          return chatRepository.findByTypeAndNumber(
-              typedPair.getValue0(),
-              typedPair.getValue1()
-          );
-        }
-    ).build();
+    this.chatCache = Caffeine.newBuilder()
+        .expireAfterAccess(Duration.of(30, ChronoUnit.MINUTES))
+        .build(id -> this.chatRepository.findById(id).orElse(null));
+    this.chatLookup = Caffeine.newBuilder()
+        .expireAfterAccess(Duration.of(30, ChronoUnit.MINUTES))
+        .build(pair -> this.chatRepository.findByTypeAndNumber(pair.getValue0(), pair.getValue1())
+            .map(ChatEntity::getId)
+            .orElse(null)
+        );
   }
 
   @Override
@@ -57,15 +56,9 @@ public class ChatServiceImpl implements ChatService {
     final int finalNumber = number;
     final Pair<ChatType, Integer> pair = new Pair<>(type, number);
 
-    return chatCache.put(() -> {
-      ChatEntity temp = chatCache.lookup(pair);
-      if (temp == null) {
-        log.info("Chat with type {} and number {} not found", type, finalNumber);
-        return create(type, finalNumber);
-      }
-      return temp;
-    });
-
+    return Optional.ofNullable(chatLookup.get(pair))
+        .map(chatCache::get)
+        .orElseGet(() -> create(type, finalNumber));
   }
 
   private ChatEntity create(ChatType chatType, @Nullable Integer number) {

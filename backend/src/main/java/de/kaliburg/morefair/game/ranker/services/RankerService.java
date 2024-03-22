@@ -1,6 +1,7 @@
 package de.kaliburg.morefair.game.ranker.services;
 
 import de.kaliburg.morefair.account.model.AccountEntity;
+import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ranker.model.RankerEntity;
 import java.util.List;
 import java.util.Optional;
@@ -16,4 +17,6 @@ public interface RankerService {
   void enterNewRanker(AccountEntity account);
 
   Optional<RankerEntity> createRankerOnLadder(AccountEntity account, int ladderNumber);
+
+  List<RankerEntity> updateRankersOfLadder(LadderEntity ladder, List<RankerEntity> rankers);
 }

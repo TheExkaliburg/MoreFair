@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface ChatRepository extends JpaRepository<ChatEntity, Long> {
 
-  @Query(value = "SELECT * FROM chat c "
-      + "WHERE c.type = :chatType AND c.number = :number", nativeQuery = true)
+  @Query(value = "SELECT c FROM ChatEntity c "
+      + "WHERE c.type = :chatType AND c.number = :number")
   Optional<ChatEntity> findByTypeAndNumber(ChatType chatType, Integer number);
 }

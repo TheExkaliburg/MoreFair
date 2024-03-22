@@ -22,9 +22,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 /**
- * FIXME
- * The LadderService that setups and manages the LadderEntities contained in a RoundEntity. This
- * Service only handles the matters that regard a specific ladders, like game logic and user input.
+ * The LadderService that setups and manages the LadderEntities contained in a Round. This Service
+ * only handles the matters like fetching/caching ladders.
  *
  * <p>For global events look at {@link RoundService} or for
  * chats and message at {@link ChatServiceImpl} or {@link MessageService}
@@ -89,7 +88,7 @@ public class LadderServiceImpl implements LadderService {
             .collect(Collectors.toList());
       }
 
-      // FIXME: Turn into caching;
+      // The Reason we don't cache this, is because it's not the stuff of the current Round
       return ladderRepository.findByRound(round.getId()).stream().toList();
     } catch (InterruptedException e) {
       throw new RuntimeException(e);

@@ -25,7 +25,6 @@ import de.kaliburg.morefair.events.data.VinegarData;
 import de.kaliburg.morefair.events.types.AccountEventTypes;
 import de.kaliburg.morefair.events.types.LadderEventType;
 import de.kaliburg.morefair.events.types.RoundEventTypes;
-import de.kaliburg.morefair.game.UnlocksEntity;
 import de.kaliburg.morefair.game.UpgradeUtils;
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.model.LadderType;
@@ -37,6 +36,7 @@ import de.kaliburg.morefair.game.ranker.services.utils.RankerUtilsService;
 import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
 import de.kaliburg.morefair.game.round.model.RoundType;
+import de.kaliburg.morefair.game.unlocks.model.UnlocksEntity;
 import de.kaliburg.morefair.statistics.services.StatisticsService;
 import de.kaliburg.morefair.utils.FormattingUtils;
 import java.math.BigInteger;
@@ -150,7 +150,7 @@ public class LadderEventServiceImpl implements LadderEventService {
       BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getScaling(), ranker.getBias(),
           ladder.getTypes());
       if (ranker.getPoints().compareTo(cost) >= 0) {
-        // TODO: statisticsService.recordBias(ranker, ladder, currentRound);
+        statisticsService.recordBias(ranker, ladder, roundService.getCurrentRound());
         ranker.setPoints(BigInteger.ZERO);
         ranker.setBias(ranker.getBias() + 1);
         wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
@@ -184,7 +184,7 @@ public class LadderEventServiceImpl implements LadderEventService {
       BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getScaling(), ranker.getMultiplier(),
           ladder.getTypes());
       if (ranker.getPower().compareTo(cost) >= 0) {
-        // TODO: statisticsService.recordMulti(ranker, ladder, currentRound);
+        statisticsService.recordMulti(ranker, ladder, roundService.getCurrentRound());
         ranker.setPoints(BigInteger.ZERO);
         ranker.setPower(BigInteger.ZERO);
         ranker.setBias(0);
@@ -229,7 +229,7 @@ public class LadderEventServiceImpl implements LadderEventService {
       }
 
       if (ladderUtilsService.canBuyAutoPromote(ranker)) {
-        // TODO: statisticsService.recordAutoPromote(ranker, ladder, currentRound);
+        statisticsService.recordAutoPromote(ranker, ladder, roundService.getCurrentRound());
         ranker.setGrapes(ranker.getGrapes().subtract(cost));
         ranker.setAutoPromote(true);
         wsUtils.convertAndSendToUser(account.getUuid(), LadderController.PRIVATE_EVENTS_DESTINATION,
@@ -261,7 +261,7 @@ public class LadderEventServiceImpl implements LadderEventService {
       }
 
       if (ladderUtilsService.canPromote(ranker)) {
-        // TODO: statisticsService.recordPromote(ranker, ladder, currentRound);
+        statisticsService.recordPromote(ranker, ladder, roundService.getCurrentRound());
         log.info("[L{}] Promotion for {} (#{})", ladder.getNumber(), account.getDisplayName(),
             account.getId());
         ranker.setGrowing(false);
@@ -453,7 +453,8 @@ public class LadderEventServiceImpl implements LadderEventService {
       }
 
       if (ladderUtilsService.canThrowVinegarAt(ranker, target)) {
-        // TODO: statisticsService.recordVinegarThrow(ranker, target, ladder, currentRound);
+        statisticsService.recordVinegarThrow(ranker, target, ladder,
+            roundService.getCurrentRound());
         BigInteger rankerVinegar = ranker.getVinegar();
         BigInteger targetVinegar = target.getVinegar();
 

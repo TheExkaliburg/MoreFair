@@ -44,9 +44,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,17 +65,10 @@ public class StatisticsServiceImpl implements StatisticsService {
   private final RoundStatisticsRepository roundStatisticsRepository;
   private final ActivityAnalysisRepository activityAnalysisRepository;
 
-  @Autowired
-  @Lazy
+
   private final RoundService roundService;
-
-  @Autowired
   private final RankerService rankerService;
-
-  @Autowired
   private final LadderService ladderService;
-
-  @Autowired
   private final SeasonService seasonService;
 
   private final LoadingCache<Long, Boolean> hasStartedStatisticsJobRecently =
@@ -105,7 +96,7 @@ public class StatisticsServiceImpl implements StatisticsService {
    * @param round  the round with all ladders before they multiply
    */
   public void recordBias(RankerEntity ranker, LadderEntity ladder, RoundEntity round) {
-    RankerRecord rankerRecord = new RankerRecord(ranker);
+    RankerRecord rankerRecord = new RankerRecord(ranker, round);
     LadderRecord ladderRecord = new LadderRecord(ladder,
         rankerService.findAllByLadderId(ladder.getId()));
 
@@ -123,7 +114,7 @@ public class StatisticsServiceImpl implements StatisticsService {
    * @param round  the round with all ladders before they multiply
    */
   public void recordMulti(RankerEntity ranker, LadderEntity ladder, RoundEntity round) {
-    RankerRecord rankerRecord = new RankerRecord(ranker);
+    RankerRecord rankerRecord = new RankerRecord(ranker, round);
     LadderRecord ladderRecord = new LadderRecord(ladder,
         rankerService.findAllByLadderId(ladder.getId()));
 
@@ -142,7 +133,7 @@ public class StatisticsServiceImpl implements StatisticsService {
    * @param round  the round with all ladders before they buy auto-promote
    */
   public void recordAutoPromote(RankerEntity ranker, LadderEntity ladder, RoundEntity round) {
-    RankerRecord rankerRecord = new RankerRecord(ranker);
+    RankerRecord rankerRecord = new RankerRecord(ranker, round);
     LadderRecord ladderRecord = new LadderRecord(ladder,
         rankerService.findAllByLadderId(ladder.getId()));
 
@@ -161,7 +152,7 @@ public class StatisticsServiceImpl implements StatisticsService {
    * @param round  the round with all ladders before they promote to the next ladder
    */
   public void recordPromote(RankerEntity ranker, LadderEntity ladder, RoundEntity round) {
-    RankerRecord rankerRecord = new RankerRecord(ranker);
+    RankerRecord rankerRecord = new RankerRecord(ranker, round);
     LadderRecord ladderRecord = new LadderRecord(ladder,
         rankerService.findAllByLadderId(ladder.getId()));
 
@@ -181,10 +172,10 @@ public class StatisticsServiceImpl implements StatisticsService {
    */
   public void recordVinegarThrow(RankerEntity ranker, RankerEntity target, LadderEntity ladder,
       RoundEntity round) {
-    RankerRecord rankerRecord = new RankerRecord(ranker);
-    RankerRecord targetRecord = new RankerRecord(target);
+    RankerRecord rankerRecord = new RankerRecord(ranker, round);
+    RankerRecord targetRecord = new RankerRecord(target, round);
     List<RankerEntity> rankers = rankerService.findAllByCurrentLadderNumber(ladder.getNumber());
-    RankerRecord secondRecord = new RankerRecord(rankers.get(1));
+    RankerRecord secondRecord = new RankerRecord(rankers.get(1), round);
     LadderRecord ladderRecord = new LadderRecord(ladder,
         rankerService.findAllByLadderId(ladder.getId()));
 

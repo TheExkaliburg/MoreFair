@@ -69,8 +69,6 @@ public class LadderController {
 
       if (highestLadder.isEmpty()) {
         log.info("Creating new ranker for {}#{}", account.getDisplayName(), account.getId());
-
-        // FIXME roundService.enterRound(account) vs rankerService.createNewRanker(account)
         rankerService.enterNewRanker(account);
       }
 

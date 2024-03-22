@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.game.ranker.model;
 
-import de.kaliburg.morefair.game.UnlocksEntity;
+import de.kaliburg.morefair.game.unlocks.model.UnlocksEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -78,7 +78,6 @@ public class RankerEntity {
   @Column
   @Builder.Default
   private boolean autoPromote = false;
-  @NonNull
   @OneToOne(mappedBy = "ranker", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   private UnlocksEntity unlocks = new UnlocksEntity(this);
 

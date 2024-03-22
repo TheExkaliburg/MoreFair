@@ -12,42 +12,46 @@ import de.kaliburg.morefair.chat.services.ChatService;
 import de.kaliburg.morefair.chat.services.MessageService;
 import de.kaliburg.morefair.chat.services.mapper.MessageMapper;
 import de.kaliburg.morefair.chat.services.repositories.MessageRepository;
-import de.kaliburg.morefair.core.AbstractCacheableService;
+import de.kaliburg.morefair.core.concurrency.CriticalRegion;
 import de.kaliburg.morefair.utils.FormattingUtils;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Transactional
 @Service
-public class MessageServiceImpl extends AbstractCacheableService implements MessageService {
+public class MessageServiceImpl implements MessageService {
 
+  private final CriticalRegion semaphore = new CriticalRegion(1);
   private final MessageRepository messageRepository;
   private final ChatService chatService;
   private final WsUtils wsUtils;
   private final LoadingCache<Long, List<MessageEntity>> messagesChatIdCache;
   private final MessageMapper messageMapper;
 
-  public MessageServiceImpl(MessageRepository messageRepository, @Lazy ChatService chatService,
-      @Lazy WsUtils wsUtils, MessageMapper messageMapper) {
+  public MessageServiceImpl(MessageRepository messageRepository, ChatService chatService,
+      WsUtils wsUtils, MessageMapper messageMapper) {
     this.messageRepository = messageRepository;
     this.chatService = chatService;
     this.wsUtils = wsUtils;
     this.messageMapper = messageMapper;
 
-    messagesChatIdCache =
-        Caffeine.newBuilder().build(messageRepository::findNewestMessagesByChatId);
+    messagesChatIdCache = Caffeine.newBuilder()
+        .build(this.messageRepository::findNewestMessagesByChatId);
   }
 
   @Override
   public List<MessageEntity> find(@NonNull ChatEntity chat) {
-    return getValueFromCacheSync(messagesChatIdCache, chat.getId());
+    try (var ignored = semaphore.enter()) {
+      return messagesChatIdCache.get(chat.getId());
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override
@@ -72,13 +76,15 @@ public class MessageServiceImpl extends AbstractCacheableService implements Mess
       result.setMetadata(metadata);
     }
 
-    result = save(result);
-
-    if (result != null) {
-      MessageDto dto = messageMapper.convertToMessageDto(result, chat);
-      wsUtils.convertAndSendToTopic("/chat/events/" + chat.getDestination(), dto);
-      wsUtils.convertAndSendToTopic("/moderation/chat/events", dto);
+    try (var ignored = semaphore.enter()) {
+      result = save(result);
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
     }
+
+    MessageDto dto = messageMapper.convertToMessageDto(result, chat);
+    wsUtils.convertAndSendToTopic("/chat/events/" + chat.getDestination(), dto);
+    wsUtils.convertAndSendToTopic("/moderation/chat/events", dto);
 
     return result;
   }
@@ -91,7 +97,7 @@ public class MessageServiceImpl extends AbstractCacheableService implements Mess
 
   @Override
   public void deleteMessagesOfAccount(AccountEntity account) {
-    try (var ignored = cacheSemaphore.enter()) {
+    try (var ignored = semaphore.enter()) {
       messageRepository.setDeletedOnForAccount(account.getId(), OffsetDateTime.now());
       messagesChatIdCache.invalidateAll();
     } catch (InterruptedException e) {
@@ -101,29 +107,25 @@ public class MessageServiceImpl extends AbstractCacheableService implements Mess
 
 
   private MessageEntity save(MessageEntity message) {
-    try (var ignored = cacheSemaphore.enter()) {
-      MessageEntity result = messageRepository.save(message);
-      ChatEntity chat = chatService.find(result.getChatId());
+    MessageEntity result = messageRepository.save(message);
+    ChatEntity chat = chatService.find(result.getChatId());
 
-      List<MessageEntity> chatMessages = messagesChatIdCache.get(chat.getId());
-      if (chatMessages.stream().anyMatch(m -> m.getId().equals(result.getId()))) {
-        //Replace old message with new one
-        chatMessages = chatMessages.stream()
-            .map(m -> m.getId().equals(result.getId()) ? result : m).collect(Collectors.toList());
-      } else {
-        //Add new message to cache and delete last one if over limit
-        chatMessages.add(0, result);
-        chatMessages.sort(MessageEntity::compareTo);
-        if (chatMessages.size() > MessageRepository.MESSAGES_PER_PAGE) {
-          chatMessages.remove(chatMessages.size() - 1);
-        }
+    List<MessageEntity> chatMessages = messagesChatIdCache.get(chat.getId());
+    if (chatMessages.stream().anyMatch(m -> m.getId().equals(result.getId()))) {
+      //Replace old message with new one
+      chatMessages = chatMessages.stream()
+          .map(m -> m.getId().equals(result.getId()) ? result : m).collect(Collectors.toList());
+    } else {
+      //Add new message to cache and delete last one if over limit
+      chatMessages.add(0, result);
+      chatMessages.sort(MessageEntity::compareTo);
+      if (chatMessages.size() > MessageRepository.MESSAGES_PER_PAGE) {
+        chatMessages.remove(chatMessages.size() - 1);
       }
-      messagesChatIdCache.put(chat.getId(), chatMessages);
-
-      return result;
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      return null;
     }
+    messagesChatIdCache.put(chat.getId(), chatMessages);
+
+    return result;
+
   }
 }

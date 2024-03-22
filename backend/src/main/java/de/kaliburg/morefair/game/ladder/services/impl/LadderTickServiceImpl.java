@@ -137,6 +137,8 @@ public class LadderTickServiceImpl implements LadderTickService {
       ladderEventService.addEvent(ladder.getNumber(),
           new Event<>(PROMOTE, rankers.get(0).getAccountId()));
     }
+
+    rankerService.updateRankersOfLadder(ladder, rankers);
   }
 
   @Override

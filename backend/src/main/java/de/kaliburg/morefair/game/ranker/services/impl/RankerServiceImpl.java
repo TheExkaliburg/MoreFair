@@ -21,6 +21,10 @@ import de.kaliburg.morefair.game.ranker.services.repositories.RankerRepository;
 import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
 import de.kaliburg.morefair.game.round.model.RoundType;
+import de.kaliburg.morefair.game.unlocks.model.UnlocksEntity;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -36,6 +40,7 @@ import org.springframework.stereotype.Service;
 public class RankerServiceImpl implements RankerService {
 
   private final LoadingCache<Long, List<RankerEntity>> rankerCache;
+  private final LoadingCache<Long, RankerEntity> highestRankerCache;
   private final CriticalRegion semaphore = new CriticalRegion(1);
   private final RankerRepository rankerRepository;
   private final LadderService ladderService;
@@ -55,7 +60,36 @@ public class RankerServiceImpl implements RankerService {
     this.fairConfig = fairConfig;
 
     this.rankerCache = Caffeine.newBuilder()
+        .expireAfterAccess(Duration.of(30, ChronoUnit.MINUTES))
         .build(this.rankerRepository::findByLadderId);
+
+    this.highestRankerCache = Caffeine.newBuilder()
+        .expireAfterAccess(Duration.of(30, ChronoUnit.MINUTES))
+        .build(id -> {
+          RoundEntity currentRound = roundService.getCurrentRound();
+          List<Long> allLadderIdsInCurrentRound = ladderService.findAllByRound(currentRound)
+              .stream()
+              .map(LadderEntity::getId)
+              .toList();
+
+          return rankerCache.getAll(allLadderIdsInCurrentRound).values().stream()
+              // map each ladder to the active ranker, owned by the account
+              .map(
+                  list -> list.stream()
+                      .filter(RankerEntity::isGrowing)
+                      .filter(r -> r.getAccountId().equals(id))
+                      .findAny().orElse(null)
+              )
+              // filter only the ladders that actually have a ranker of that account
+              .filter(Objects::nonNull)
+              // finding the highest Ranker in these Rounds
+              .max(Comparator.comparing(
+                  r -> ladderService.findLadderById(r.getLadderId())
+                      .map(LadderEntity::getNumber)
+                      .orElseThrow()
+              ))
+              .orElse(null);
+        });
   }
 
 
@@ -69,9 +103,9 @@ public class RankerServiceImpl implements RankerService {
     try (var ignored = semaphore.enter()) {
       // Needing to check the ladder id, to check if that ladder already exists,
       // because otherwise we can skip the cache and the database query
-      return ladderService.findLadderById(ladderId)
+      return new ArrayList<>(ladderService.findLadderById(ladderId)
           .map(l -> rankerCache.get(l.getId()))
-          .orElse(List.of());
+          .orElse(List.of()));
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
     }
@@ -80,9 +114,9 @@ public class RankerServiceImpl implements RankerService {
   @Override
   public List<RankerEntity> findAllByCurrentLadderNumber(int ladderNumber) {
     try (var ignored = semaphore.enter()) {
-      return ladderService.findCurrentLadderWithNumber(ladderNumber)
+      return new ArrayList<>(ladderService.findCurrentLadderWithNumber(ladderNumber)
           .map(l -> rankerCache.get(l.getId()))
-          .orElse(List.of());
+          .orElse(List.of()));
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
     }
@@ -92,34 +126,15 @@ public class RankerServiceImpl implements RankerService {
    * Finds the highest Ranker in the current Set of Ladders, that is being owned by the account.
    *
    * <p>This is a high performance function, which is basically called in every interaction the
-   * player has with the Server. <p/>TODO: Use a LoadingCache for AccountId -> RankerEntity
+   * player has with the Server.
    *
    * @param account The account, that the highest Ranker is searched of.
    * @return The highest Ranker of the account, if any exists.
    */
   @Override
   public Optional<RankerEntity> findHighestActiveRankerOfAccount(AccountEntity account) {
-    RoundEntity currentRound = roundService.getCurrentRound();
-    List<Long> allLadderIdsInCurrentRound = ladderService.findAllByRound(currentRound).stream()
-        .map(LadderEntity::getId)
-        .toList();
     try (var ignored = semaphore.enter()) {
-      return rankerCache.getAll(allLadderIdsInCurrentRound).values().stream()
-          // map each ladder to the ranker, owned by the account
-          .map(
-              list -> list.stream()
-                  .filter(RankerEntity::isGrowing)
-                  .filter(r -> r.getAccountId().equals(account.getId()))
-                  .findAny().orElse(null)
-          )
-          // filter only the ladders that actually have a ranker of that account
-          .filter(Objects::nonNull)
-          // finding the highest Ranker in these Rounds
-          .max(Comparator.comparing(
-              r -> ladderService.findLadderById(r.getLadderId())
-                  .map(LadderEntity::getNumber)
-                  .orElseThrow()
-          ));
+      return Optional.ofNullable(highestRankerCache.get(account.getId()));
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
     }
@@ -174,13 +189,30 @@ public class RankerServiceImpl implements RankerService {
     }
   }
 
+  @Override
+  public List<RankerEntity> updateRankersOfLadder(LadderEntity ladder, List<RankerEntity> rankers) {
+    try (var ignored = semaphore.enter()) {
+      rankers = rankers.stream().filter(r -> r.getLadderId().equals(ladder.getId())).toList();
+      rankers = rankerRepository.saveAll(rankers);
+      rankerCache.put(ladder.getId(), rankers);
+      return rankers;
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   private RankerEntity create(AccountEntity account, LadderEntity ladder, Integer rank) {
     RankerEntity result = RankerEntity.builder()
         .ladderId(ladder.getId())
         .accountId(account.getId())
         .rank(rank)
         .build();
+    result.setUnlocks(new UnlocksEntity(result));
 
-    return rankerRepository.save(result);
+    result = rankerRepository.save(result);
+
+    highestRankerCache.put(account.getId(), result);
+
+    return result;
   }
 }

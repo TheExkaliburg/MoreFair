@@ -1,6 +1,7 @@
 package de.kaliburg.morefair.statistics.records.model;
 
 import de.kaliburg.morefair.game.ranker.model.RankerEntity;
+import de.kaliburg.morefair.game.round.model.RoundEntity;
 import java.math.BigInteger;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,7 +31,7 @@ public class RankerRecord {
   @NonNull
   private Integer round;
 
-  public RankerRecord(RankerEntity ranker) {
+  public RankerRecord(RankerEntity ranker, RoundEntity round) {
     this.account = ranker.getAccountId();
     this.rank = ranker.getRank();
     this.bias = ranker.getBias();
@@ -40,6 +41,6 @@ public class RankerRecord {
     this.grapes = ranker.getGrapes();
     this.vinegar = ranker.getVinegar();
     this.autoPromote = ranker.isAutoPromote();
-    // FIXME: this.round = ranker.getLadderId().getRound().getNumber();
+    this.round = round.getNumber();
   }
 }
