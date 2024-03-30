@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.game.ladder.model;
 
-import de.kaliburg.morefair.game.round.model.RoundType;
+import de.kaliburg.morefair.game.round.model.type.RoundType;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;

@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.game.round;
+package de.kaliburg.morefair.game.round.services;
 
 import de.kaliburg.morefair.account.model.AccountEntity;
 import de.kaliburg.morefair.game.round.model.RoundEntity;

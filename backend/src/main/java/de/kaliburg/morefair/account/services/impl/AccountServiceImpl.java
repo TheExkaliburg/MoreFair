@@ -7,6 +7,7 @@ import de.kaliburg.morefair.account.model.types.AccountAccessType;
 import de.kaliburg.morefair.account.services.AccountService;
 import de.kaliburg.morefair.account.services.repositories.AccountRepository;
 import de.kaliburg.morefair.core.concurrency.CriticalRegion;
+import de.kaliburg.morefair.game.season.services.AchievementsService;
 import de.kaliburg.morefair.security.UserDetailsWithUuid;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -22,6 +23,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * This Service handles all the accounts.
@@ -34,6 +36,7 @@ public class AccountServiceImpl implements AccountService {
       Duration.of(30, ChronoUnit.MINUTES);
 
   private final CriticalRegion semaphore = new CriticalRegion(1);
+  private final AchievementsService achievementsService;
   private final AccountRepository accountRepository;
   private final PasswordEncoder passwordEncoder;
 
@@ -42,7 +45,9 @@ public class AccountServiceImpl implements AccountService {
   private final LoadingCache<UUID, Long> uuidLookupCache;
   private Long broadcasterAccountId;
 
-  public AccountServiceImpl(AccountRepository accountRepository, PasswordEncoder passwordEncoder) {
+  public AccountServiceImpl(AchievementsService achievementsService,
+      AccountRepository accountRepository, PasswordEncoder passwordEncoder) {
+    this.achievementsService = achievementsService;
     this.accountRepository = accountRepository;
     this.passwordEncoder = passwordEncoder;
 
@@ -96,6 +101,7 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
+  @Transactional
   public Optional<AccountEntity> findBroadcaster() {
     try (var ignored = semaphore.enter()) {
       if (broadcasterAccountId == null) {
@@ -111,9 +117,13 @@ public class AccountServiceImpl implements AccountService {
           result.setLastIp(0);
           result.setGuest(true);
           result.setDisplayName("Chad");
-          result.setAssholePoints(5950);
           result.setAccessRole(AccountAccessType.BROADCASTER);
           result = accountRepository.save(result);
+
+          var achievements = achievementsService.createForAccountInCurrentSeason(result.getId());
+          achievements.setAssholePoints(5950);
+          achievementsService.save(achievements);
+
           this.broadcasterAccountId = result.getId();
           return Optional.of(result);
         }
@@ -129,6 +139,7 @@ public class AccountServiceImpl implements AccountService {
 
 
   @Override
+  @Transactional
   public Optional<AccountEntity> create(String username, String password, Integer ip,
       boolean isGuest) {
     AccountEntity result = new AccountEntity();
@@ -139,6 +150,7 @@ public class AccountServiceImpl implements AccountService {
 
     try (var ignored = semaphore.enter()) {
       result = accountRepository.save(result);
+      achievementsService.createForAccountInCurrentSeason(result.getId());
       log.debug("Created Mystery Guest (#{})", result.getId());
       return Optional.of(result);
     } catch (InterruptedException e) {

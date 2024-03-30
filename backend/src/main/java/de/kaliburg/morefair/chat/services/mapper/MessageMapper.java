@@ -6,22 +6,22 @@ import de.kaliburg.morefair.account.services.AccountService;
 import de.kaliburg.morefair.chat.model.ChatEntity;
 import de.kaliburg.morefair.chat.model.MessageEntity;
 import de.kaliburg.morefair.chat.model.dto.MessageDto;
+import de.kaliburg.morefair.game.season.model.AchievementsEntity;
+import de.kaliburg.morefair.game.season.services.AchievementsService;
 import java.time.ZoneOffset;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
  * The Mapper that can convert the {@link MessageEntity MessageEntities} to DTOs.
  */
 @Component
+@RequiredArgsConstructor
 public class MessageMapper {
 
   private final AccountService accountService;
+  private final AchievementsService achievementsService;
   private final FairConfig fairConfig;
-
-  public MessageMapper(AccountService accountService, FairConfig fairConfig) {
-    this.accountService = accountService;
-    this.fairConfig = fairConfig;
-  }
 
   /**
    * Mapping the {@link MessageEntity} to a {@link MessageDto}.
@@ -35,16 +35,18 @@ public class MessageMapper {
    * @return The {@link MessageDto}
    */
   public MessageDto convertToMessageDto(MessageEntity message, ChatEntity chat) {
-    AccountEntity accountEntity = accountService.findById(message.getAccountId()).orElseThrow();
+    AccountEntity account = accountService.findById(message.getAccountId()).orElseThrow();
+    AchievementsEntity achievements =
+        achievementsService.findOrCreateByAccountInCurrentSeason(account.getId());
 
     return MessageDto.builder()
         .message(message.getMessage())
         .metadata(message.getMetadata())
-        .username(accountEntity.getDisplayName())
-        .accountId(accountEntity.getId())
-        .assholePoints(accountEntity.getAssholePoints())
-        .tag(fairConfig.getAssholeTag(accountEntity.getAssholeCount()))
-        .isMod(accountEntity.isMod())
+        .username(account.getDisplayName())
+        .accountId(account.getId())
+        .assholePoints(achievements.getAssholePoints())
+        .tag(fairConfig.getAssholeTag(achievements.getAssholeCount()))
+        .isMod(account.isMod())
         .timestamp(message.getCreatedOn().withOffsetSameInstant(ZoneOffset.UTC).toEpochSecond())
         .chatType(chat.getType())
         .ladderNumber(chat.getNumber())

@@ -21,8 +21,8 @@ import lombok.experimental.Accessors;
 
 @Entity
 @Table(name = "chat", uniqueConstraints = {
-    @UniqueConstraint(name = "uk_uuid", columnNames = "uuid"),
-    @UniqueConstraint(name = "uk_type_number", columnNames = {"type", "number"})})
+    @UniqueConstraint(name = "chat_uk_uuid", columnNames = "uuid"),
+    @UniqueConstraint(name = "chat_uk_type_number", columnNames = {"type", "number"})})
 @Getter
 @Setter
 @Accessors(chain = true)

@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.statistics.model.dto;
 
-import de.kaliburg.morefair.game.round.model.RoundType;
+import de.kaliburg.morefair.game.round.model.type.RoundType;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;

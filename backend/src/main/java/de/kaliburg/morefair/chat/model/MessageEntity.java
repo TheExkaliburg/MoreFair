@@ -20,7 +20,7 @@ import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 
 @Entity
-@Table(name = "message", uniqueConstraints = @UniqueConstraint(name = "uk_uuid", columnNames = "uuid"))
+@Table(name = "message", uniqueConstraints = @UniqueConstraint(name = "message_uk_uuid", columnNames = "uuid"))
 @Getter
 @Setter
 @Accessors(chain = true)

@@ -33,10 +33,13 @@ import de.kaliburg.morefair.game.ladder.services.LadderService;
 import de.kaliburg.morefair.game.ranker.model.RankerEntity;
 import de.kaliburg.morefair.game.ranker.services.RankerService;
 import de.kaliburg.morefair.game.ranker.services.utils.RankerUtilsService;
-import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
-import de.kaliburg.morefair.game.round.model.RoundType;
-import de.kaliburg.morefair.game.unlocks.model.UnlocksEntity;
+import de.kaliburg.morefair.game.round.model.UnlocksEntity;
+import de.kaliburg.morefair.game.round.model.type.RoundType;
+import de.kaliburg.morefair.game.round.services.RoundService;
+import de.kaliburg.morefair.game.round.services.UnlocksService;
+import de.kaliburg.morefair.game.season.model.AchievementsEntity;
+import de.kaliburg.morefair.game.season.services.AchievementsService;
 import de.kaliburg.morefair.statistics.services.StatisticsService;
 import de.kaliburg.morefair.utils.FormattingUtils;
 import java.math.BigInteger;
@@ -63,6 +66,8 @@ public class LadderEventServiceImpl implements LadderEventService {
   private final LadderService ladderService;
   private final RankerUtilsService ladderUtilsService;
   private final RoundService roundService;
+  private final UnlocksService unlocksService;
+  private final AchievementsService achievementsService;
   private final StatisticsService statisticsService;
   private final WsUtils wsUtils;
   private final UpgradeUtils upgradeUtils;
@@ -270,7 +275,6 @@ public class LadderEventServiceImpl implements LadderEventService {
             .orElseThrow();
         newRanker.setVinegar(ranker.getVinegar());
         newRanker.setGrapes(ranker.getGrapes());
-        newRanker.getUnlocks().copy(ranker.getUnlocks());
         LadderEntity newLadder = ladderService.findLadderById(newRanker.getLadderId())
             .orElseThrow();
 
@@ -287,6 +291,10 @@ public class LadderEventServiceImpl implements LadderEventService {
               autoLadder.getNumber(), e);
         }
 
+        UnlocksEntity unlocks = unlocksService.findOrCreateByAccountInCurrentRound(account.getId());
+        AchievementsEntity achievements =
+            achievementsService.findOrCreateByAccountInCurrentSeason(account.getId());
+
         // Special_100 Logic for moving the Ladder to 50 after finishing Ladder 100
         RoundEntity round = roundService.getCurrentRound();
         if (round.getTypes().contains(RoundType.SPECIAL_100)
@@ -302,13 +310,11 @@ public class LadderEventServiceImpl implements LadderEventService {
               assholeLadder.getId());
           assholeRankers.forEach(r -> {
             AccountEntity a = accountService.findById(r.getAccountId()).orElseThrow();
-            RankerEntity highestRanker = rankerService.findHighestActiveRankerOfAccount(a)
-                .orElseThrow();
             if (!r.isGrowing()) {
-              a.getAchievements().setPressedAssholeButton(true);
-              highestRanker.getUnlocks().setPressedAssholeButton(true);
+              achievements.setPressedAssholeButtons(achievements.getPressedAssholeButtons() + 1);
+              unlocks.setPressedAssholeButton(true);
             }
-            highestRanker.getUnlocks().setReachedAssholeLadder(true);
+            unlocks.setReachedAssholeLadder(true);
           });
 
           Event<LadderEventType> e = new Event<>(LadderEventType.UPDATE_TYPES, account.getId(),
@@ -318,23 +324,23 @@ public class LadderEventServiceImpl implements LadderEventService {
         }
 
         // Unlocks
-        if (!newRanker.getUnlocks().getAutoPromote()
+        if (!unlocks.getUnlockedAutoPromote()
             && newLadder.getNumber() >= fairConfig.getAutoPromoteLadder()) {
-          newRanker.getUnlocks().setAutoPromote(true);
+          unlocks.setUnlockedAutoPromote(true);
         }
-        if (!newRanker.getUnlocks().getReachedBaseAssholeLadder()
+        if (!unlocks.getReachedBaseAssholeLadder()
             && newLadder.getNumber() >= roundService.getCurrentRound()
             .getModifiedBaseAssholeLadder()) {
-          newRanker.getUnlocks().setReachedBaseAssholeLadder(true);
+          unlocks.setReachedBaseAssholeLadder(true);
         }
-        if (!newRanker.getUnlocks().getReachedAssholeLadder()
+        if (!unlocks.getReachedAssholeLadder()
             && newLadder.getTypes().contains(LadderType.ASSHOLE)) {
-          newRanker.getUnlocks().setReachedAssholeLadder(true);
+          unlocks.setReachedAssholeLadder(true);
         }
-        if (!newRanker.getUnlocks().getPressedAssholeButton()
+        if (!unlocks.getPressedAssholeButton()
             && ladder.getTypes().contains(LadderType.ASSHOLE)) {
-          newRanker.getUnlocks().setPressedAssholeButton(true);
-          account.getAchievements().setPressedAssholeButton(true);
+          unlocks.setPressedAssholeButton(true);
+          achievements.setPressedAssholeButtons(achievements.getPressedAssholeButtons() + 1);
         }
 
         // Rewards for finishing first / at the top
@@ -364,9 +370,11 @@ public class LadderEventServiceImpl implements LadderEventService {
             ));
         account = accountService.save(account);
 
+        unlocksService.save(unlocks);
+        achievementsService.save(achievements);
+
         // Logic for the Asshole-Ladder
-        if (ladder.getTypes().contains(LadderType.ASSHOLE) && newRanker.getUnlocks()
-            .getPressedAssholeButton()) {
+        if (ladder.getTypes().contains(LadderType.ASSHOLE) && unlocks.getPressedAssholeButton()) {
           JsonObject object1 = new JsonObject();
           object1.addProperty("u", account.getDisplayName());
           object1.addProperty("id", account.getId());
@@ -400,17 +408,14 @@ public class LadderEventServiceImpl implements LadderEventService {
             LadderEntity firstLadder = ladderService.findCurrentLadderWithNumber(1)
                 .orElseThrow();
             List<RankerEntity> firstRankers = rankerService.findAllByLadderId(firstLadder.getId());
-            List<AccountEntity> accounts = firstRankers.stream()
-                .map((r) -> accountService.findById(r.getAccountId()).orElseThrow())
-                .distinct().toList();
-            for (AccountEntity a : accounts) {
-              RankerEntity highestRanker = rankerService.findHighestActiveRankerOfAccount(a)
-                  .orElseThrow();
-              UnlocksEntity unlocks = highestRanker.getUnlocks();
-              a.setAssholePoints(a.getAssholePoints() + unlocks.calculateAssholePoints());
-            }
+            for (RankerEntity r : firstRankers) {
+              var u = unlocksService.findOrCreateByAccountInCurrentRound(r.getAccountId());
+              var a = achievementsService.findOrCreateByAccountInCurrentSeason(r.getAccountId());
+              a.setAssholePoints(a.getAssholePoints() + u.calculateAssholePoints());
 
-            accountService.saveAll(accounts);
+              unlocksService.save(u);
+              achievementsService.save(a);
+            }
           }
         }
         return true;

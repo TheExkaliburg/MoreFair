@@ -1,7 +1,6 @@
 package de.kaliburg.morefair.api;
 
 import de.kaliburg.morefair.account.model.AccountEntity;
-import de.kaliburg.morefair.account.model.AchievementsEntity;
 import de.kaliburg.morefair.account.services.AccountService;
 import de.kaliburg.morefair.account.services.mapper.AccountMapper;
 import de.kaliburg.morefair.api.utils.HttpUtils;
@@ -52,11 +51,7 @@ public class AccountController {
       AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
           .orElseThrow();
 
-      // In case the Account doesn't have an AchievementsEntity yet
-      if (account.getAchievements() == null) {
-        account.setAchievements(new AchievementsEntity(account));
-        accountService.save(account);
-      }
+      // FIXME In case the Account doesn't have an AchievementsEntity yet
 
       statisticsService.recordLogin(account);
 

@@ -1,7 +1,7 @@
 package de.kaliburg.morefair.game.ladder.model;
 
 import de.kaliburg.morefair.game.round.model.RoundEntity;
-import de.kaliburg.morefair.game.round.model.RoundType;
+import de.kaliburg.morefair.game.round.model.type.RoundType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -36,8 +36,8 @@ import org.hibernate.annotations.FetchMode;
 @Slf4j
 @Entity
 @Table(name = "ladder", uniqueConstraints = {
-    @UniqueConstraint(name = "uk_uuid", columnNames = "uuid"),
-    @UniqueConstraint(name = "uk_number_round", columnNames = {"number", "round_id"})
+    @UniqueConstraint(name = "ladder_uk_uuid", columnNames = "uuid"),
+    @UniqueConstraint(name = "ladder_uk_number_round", columnNames = {"number", "round_id"})
 })
 @Getter
 @Setter
@@ -59,7 +59,7 @@ public final class LadderEntity {
   @NonNull
   @Column(nullable = false, name = "round_id")
   private Long roundId;
-  @CollectionTable(name = "ladder_type", foreignKey = @ForeignKey(name = "fk_ladder_type_ladder"))
+  @CollectionTable(name = "ladder_type", foreignKey = @ForeignKey(name = "ladder_type_fk_ladder"))
   @ElementCollection(targetClass = LadderType.class, fetch = FetchType.EAGER)
   @Enumerated(EnumType.STRING)
   @Fetch(FetchMode.SELECT)

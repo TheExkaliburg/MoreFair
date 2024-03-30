@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.game.round.model;
+package de.kaliburg.morefair.game.round.model.type;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

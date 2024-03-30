@@ -3,7 +3,7 @@ package de.kaliburg.morefair.api;
 import de.kaliburg.morefair.account.model.AccountEntity;
 import de.kaliburg.morefair.account.services.AccountService;
 import de.kaliburg.morefair.exceptions.ErrorDto;
-import de.kaliburg.morefair.game.round.RoundService;
+import de.kaliburg.morefair.game.round.services.RoundService;
 import de.kaliburg.morefair.game.round.services.mapper.RoundMapper;
 import de.kaliburg.morefair.security.SecurityUtils;
 import jakarta.servlet.http.HttpServletRequest;

@@ -18,10 +18,11 @@ import de.kaliburg.morefair.game.ladder.services.LadderService;
 import de.kaliburg.morefair.game.ranker.model.RankerEntity;
 import de.kaliburg.morefair.game.ranker.services.RankerService;
 import de.kaliburg.morefair.game.ranker.services.repositories.RankerRepository;
-import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
-import de.kaliburg.morefair.game.round.model.RoundType;
-import de.kaliburg.morefair.game.unlocks.model.UnlocksEntity;
+import de.kaliburg.morefair.game.round.model.type.RoundType;
+import de.kaliburg.morefair.game.round.services.RoundService;
+import de.kaliburg.morefair.game.round.services.UnlocksService;
+import de.kaliburg.morefair.game.season.services.AchievementsService;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -45,6 +46,8 @@ public class RankerServiceImpl implements RankerService {
   private final RankerRepository rankerRepository;
   private final LadderService ladderService;
   private final RoundService roundService;
+  private final UnlocksService unlocksService;
+  private final AchievementsService achievementsService;
   private final WsUtils wsUtils;
   private final FairConfig fairConfig;
 
@@ -52,10 +55,14 @@ public class RankerServiceImpl implements RankerService {
    * Default Constructor.
    */
   public RankerServiceImpl(RankerRepository rankerRepository, LadderService ladderService,
-      RoundService roundService, WsUtils wsUtils, FairConfig fairConfig) {
+      RoundService roundService, UnlocksService unlocksService,
+      AchievementsService achievementsService, WsUtils wsUtils,
+      FairConfig fairConfig) {
     this.rankerRepository = rankerRepository;
     this.ladderService = ladderService;
     this.roundService = roundService;
+    this.unlocksService = unlocksService;
+    this.achievementsService = achievementsService;
     this.wsUtils = wsUtils;
     this.fairConfig = fairConfig;
 
@@ -175,10 +182,12 @@ public class RankerServiceImpl implements RankerService {
       }
 
       Event<LadderEventType> joinEvent = new Event<>(LadderEventType.JOIN, account.getId());
+      var achievements = achievementsService.findOrCreateByAccountInCurrentSeason(account.getId());
+
       joinEvent.setData(
           new JoinData(account.getDisplayName(),
-              fairConfig.getAssholeTag(account.getAssholeCount()),
-              account.getAssholePoints()));
+              fairConfig.getAssholeTag(achievements.getAssholeCount()),
+              achievements.getAssholePoints()));
       wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
           ladderNumber,
           joinEvent);
@@ -207,9 +216,9 @@ public class RankerServiceImpl implements RankerService {
         .accountId(account.getId())
         .rank(rank)
         .build();
-    result.setUnlocks(new UnlocksEntity(result));
 
     result = rankerRepository.save(result);
+    unlocksService.createForAccountInCurrentRound(result.getAccountId());
 
     highestRankerCache.put(account.getId(), result);
 

@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.game.season.model;
+package de.kaliburg.morefair.game.season.model.types;
 
 /**
  * How the end of a season is decided.

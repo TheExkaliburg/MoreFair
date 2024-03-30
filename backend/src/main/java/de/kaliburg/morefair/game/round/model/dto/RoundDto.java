@@ -1,6 +1,6 @@
 package de.kaliburg.morefair.game.round.model.dto;
 
-import de.kaliburg.morefair.game.round.model.RoundType;
+import de.kaliburg.morefair.game.round.model.type.RoundType;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

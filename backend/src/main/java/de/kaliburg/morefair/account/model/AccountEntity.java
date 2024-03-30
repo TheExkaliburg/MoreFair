@@ -1,17 +1,13 @@
 package de.kaliburg.morefair.account.model;
 
 import de.kaliburg.morefair.account.model.types.AccountAccessType;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -26,11 +22,8 @@ import lombok.experimental.Accessors;
 @Entity
 @Table(name = "account",
     uniqueConstraints = {
-        @UniqueConstraint(name = "uk_uuid", columnNames = "uuid"),
-        @UniqueConstraint(name = "uk_username", columnNames = "username")
-    },
-    indexes = {
-        @Index(name = "idx_username", columnList = "username", unique = true)
+        @UniqueConstraint(name = "account_uk_uuid", columnNames = "uuid"),
+        @UniqueConstraint(name = "account_uk_username", columnNames = "username")
     }
 )
 @Getter
@@ -57,9 +50,7 @@ public class AccountEntity {
   private String password;
   @Column(nullable = false)
   private boolean guest = true;
-  @NonNull
-  @Column(nullable = false)
-  private Integer assholePoints = 0;
+
   @NonNull
   @Column(nullable = false)
   private Integer legacyAssholePoints = 0;
@@ -75,8 +66,6 @@ public class AccountEntity {
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)
   private AccountAccessType accessRole = AccountAccessType.PLAYER;
-  @OneToOne(mappedBy = "account", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-  private AchievementsEntity achievements = new AchievementsEntity(this);
 
   public boolean isOwner() {
     return accessRole.equals(AccountAccessType.OWNER);
@@ -92,24 +81,6 @@ public class AccountEntity {
 
   public boolean isMuted() {
     return accessRole.equals(AccountAccessType.MUTED_PLAYER) || isBanned();
-  }
-
-  /**
-   * Maps the saved assholePoints to the asshole Count that determines the asshole tag. The function
-   * used is the inverse gauss sum formula.
-   *
-   * @return the asshole count
-   */
-  public @NonNull Integer getAssholeCount() {
-    if (assholePoints <= 0) {
-      return 0;
-    }
-
-    double tenth = (double) assholePoints / 10;
-    double sqrt = Math.sqrt(1 + 8 * tenth);
-    double solution = (-1 + sqrt) / 2;
-
-    return (int) Math.round(Math.floor(solution));
   }
 
   public boolean isBroadcaster() {

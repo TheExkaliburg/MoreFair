@@ -6,6 +6,8 @@ import de.kaliburg.morefair.account.services.AccountService;
 import de.kaliburg.morefair.game.ranker.model.RankerEntity;
 import de.kaliburg.morefair.game.ranker.model.dto.RankerDto;
 import de.kaliburg.morefair.game.ranker.model.dto.RankerPrivateDto;
+import de.kaliburg.morefair.game.season.model.AchievementsEntity;
+import de.kaliburg.morefair.game.season.services.AchievementsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Component;
 public class RankerMapper {
 
   private final AccountService accountService;
+  private final AchievementsService achievementsService;
   private final FairConfig fairConfig;
 
   /**
@@ -27,6 +30,8 @@ public class RankerMapper {
    */
   public RankerDto mapToRankerDto(RankerEntity ranker) {
     AccountEntity account = accountService.findById(ranker.getAccountId()).orElseThrow();
+    AchievementsEntity achievements =
+        achievementsService.findOrCreateByAccountInCurrentSeason(account.getId());
 
     return RankerDto.builder()
         .accountId(ranker.getAccountId())
@@ -37,8 +42,8 @@ public class RankerMapper {
         .bias(ranker.getBias())
         .multi(ranker.getMultiplier())
         .isGrowing(ranker.isGrowing())
-        .assholeTag(fairConfig.getAssholeTag(account.getAssholeCount()))
-        .assholePoints(account.getAssholePoints())
+        .assholeTag(fairConfig.getAssholeTag(achievements.getAssholeCount()))
+        .assholePoints(achievements.getAssholePoints())
         .build();
   }
 
@@ -52,6 +57,8 @@ public class RankerMapper {
    */
   public RankerPrivateDto mapToPrivateDto(RankerEntity ranker) {
     AccountEntity account = accountService.findById(ranker.getAccountId()).orElseThrow();
+    AchievementsEntity achievements =
+        achievementsService.findOrCreateByAccountInCurrentSeason(account.getId());
 
     return RankerPrivateDto.builder()
         .grapes(ranker.getGrapes().toString())
@@ -65,8 +72,8 @@ public class RankerMapper {
         .bias(ranker.getBias())
         .multi(ranker.getMultiplier())
         .isGrowing(ranker.isGrowing())
-        .assholeTag(fairConfig.getAssholeTag(account.getAssholeCount()))
-        .assholePoints(account.getAssholePoints())
+        .assholeTag(fairConfig.getAssholeTag(achievements.getAssholeCount()))
+        .assholePoints(achievements.getAssholePoints())
         .build();
   }
 

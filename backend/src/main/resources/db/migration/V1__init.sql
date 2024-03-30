@@ -3,8 +3,8 @@ CREATE SEQUENCE IF NOT EXISTS public.seq_account;
 CREATE TABLE IF NOT EXISTS public.account
 (
     id                    bigint                   NOT NULL,
+    uuid                  uuid                     NOT NULL,
     access_role           character varying(255)   NOT NULL,
-    asshole_points        integer                  NOT NULL,
     created_on            timestamp with time zone NOT NULL,
     display_name          character varying(255)   NOT NULL,
     guest                 boolean                  NOT NULL,
@@ -13,21 +13,9 @@ CREATE TABLE IF NOT EXISTS public.account
     legacy_asshole_points integer                  NOT NULL,
     password              character varying(255)   NOT NULL,
     username              character varying(255)   NOT NULL,
-    uuid                  uuid                     NOT NULL,
     CONSTRAINT account_pkey PRIMARY KEY (id),
-    CONSTRAINT idx_username UNIQUE (username),
-    CONSTRAINT uk_uuid UNIQUE (uuid)
-);
-
-CREATE TABLE IF NOT EXISTS public.account_achievements
-(
-    id                     bigint  NOT NULL,
-    pressed_asshole_button boolean NOT NULL,
-    CONSTRAINT account_achievements_pkey PRIMARY KEY (id),
-    CONSTRAINT fk_achievements_account FOREIGN KEY (id)
-        REFERENCES public.account (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
+    CONSTRAINT account_uk_uuid UNIQUE (uuid),
+    CONSTRAINT account_uk_username UNIQUE (username)
 );
 
 -- Chat
@@ -35,11 +23,12 @@ CREATE SEQUENCE IF NOT EXISTS public.seq_chat;
 CREATE TABLE IF NOT EXISTS public.chat
 (
     id       bigint                 NOT NULL,
+    uuid     uuid                   NOT NULL,
     "number" integer,
     type     character varying(255) NOT NULL,
-    uuid     uuid                   NOT NULL,
     CONSTRAINT chat_pkey PRIMARY KEY (id),
-    CONSTRAINT uk_type_number UNIQUE (type, "number")
+    CONSTRAINT chat_uk_uuid UNIQUE (uuid),
+    CONSTRAINT chat_uk_type_number UNIQUE (type, "number")
 );
 
 -- Message
@@ -47,14 +36,17 @@ CREATE SEQUENCE IF NOT EXISTS public.seq_message;
 CREATE TABLE IF NOT EXISTS public.message
 (
     id         bigint                                              NOT NULL,
+    uuid       uuid                                                NOT NULL,
     account_id bigint                                              NOT NULL,
     chat_id    bigint                                              NOT NULL,
     created_on timestamp with time zone                            NOT NULL,
     deleted_on timestamp with time zone,
     message    character varying(512) COLLATE pg_catalog."default" NOT NULL,
     metadata   character varying(512) COLLATE pg_catalog."default",
-    uuid       uuid                                                NOT NULL,
-    CONSTRAINT message_pkey PRIMARY KEY (id)
+    CONSTRAINT message_pkey PRIMARY KEY (id),
+    CONSTRAINT message_uk_uuid UNIQUE (uuid),
+    FOREIGN KEY (account_id) REFERENCES public.account (id) MATCH FULL,
+    FOREIGN KEY (chat_id) REFERENCES public.chat (id) MATCH FULL
 );
 
 -- Season
@@ -62,11 +54,30 @@ CREATE SEQUENCE IF NOT EXISTS public.seq_season;
 CREATE TABLE IF NOT EXISTS public.season
 (
     id         bigint                                              NOT NULL,
-    closed_on  timestamp(6) without time zone,
+    uuid       uuid                                                NOT NULL,
     created_on timestamp(6) without time zone                      NOT NULL,
+    closed_on  timestamp(6) without time zone,
     end_type   character varying(255) COLLATE pg_catalog."default" NOT NULL,
     type       character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT season_pkey PRIMARY KEY (id)
+    CONSTRAINT season_pkey PRIMARY KEY (id),
+    CONSTRAINT season_uk_uuid UNIQUE (uuid)
+);
+
+-- Achievements
+CREATE SEQUENCE IF NOT EXISTS public.seq_achievements;
+CREATE TABLE IF NOT EXISTS public.achievements
+(
+    id                      bigint  NOT NULL,
+    uuid                    uuid    NOT NULL,
+    account_id              bigint  NOT NULL,
+    season_id               bigint  NOT NULL,
+    asshole_points          integer NOT NULL,
+    pressed_asshole_buttons integer NOT NULL,
+    CONSTRAINT achievements_pkey PRIMARY KEY (id),
+    CONSTRAINT achievements_uk_uuid UNIQUE (uuid),
+    CONSTRAINT achievements_uk_account_season UNIQUE (account_id, season_id),
+    FOREIGN KEY (account_id) REFERENCES public.account (id) MATCH FULL,
+    FOREIGN KEY (season_id) REFERENCES public.season (id) MATCH FULL
 );
 
 -- Round
@@ -74,27 +85,46 @@ CREATE SEQUENCE IF NOT EXISTS public.seq_round;
 CREATE TABLE IF NOT EXISTS public.round
 (
     id                                bigint                   NOT NULL,
+    uuid                              uuid                     NOT NULL,
+    season_id                         bigint                   NOT NULL,
+    "number"                          integer                  NOT NULL,
+    created_on                        timestamp with time zone NOT NULL,
+    closed_on                         timestamp with time zone,
     base_asshole_ladder               integer                  NOT NULL,
     base_points_requirement           numeric(1000, 0)         NOT NULL,
-    closed_on                         timestamp with time zone,
-    created_on                        timestamp with time zone NOT NULL,
     highest_asshole_count             integer                  NOT NULL,
-    "number"                          integer                  NOT NULL,
     percentage_of_additional_assholes real                     NOT NULL,
-    season_id                         bigint                   NOT NULL,
-    uuid                              uuid                     NOT NULL,
     CONSTRAINT round_pkey PRIMARY KEY (id),
-    CONSTRAINT uk_number UNIQUE ("number")
+    CONSTRAINT round_uk_uuid UNIQUE (uuid),
+    CONSTRAINT round_uk_number UNIQUE ("number"),
+    FOREIGN KEY (season_id) REFERENCES public.season (id) MATCH FULL
 );
 
 CREATE TABLE IF NOT EXISTS public.round_type
 (
     round_entity_id bigint NOT NULL,
     types           character varying(255),
-    CONSTRAINT fk_round_type_round FOREIGN KEY (round_entity_id)
-        REFERENCES public.round (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
+    CONSTRAINT round_type_fk_round FOREIGN KEY (round_entity_id)
+        REFERENCES public.round (id) MATCH FULL
+);
+
+-- Unlocks
+CREATE SEQUENCE IF NOT EXISTS public.seq_unlocks;
+CREATE TABLE IF NOT EXISTS public.unlocks
+(
+    id                          bigint  NOT NULL,
+    uuid                        uuid    NOT NULL,
+    account_id                  bigint  NOT NULL,
+    round_id                    bigint  NOT NULL,
+    unlocked_auto_promote       boolean NOT NULL,
+    pressed_asshole_button      boolean NOT NULL,
+    reached_asshole_ladder      boolean NOT NULL,
+    reached_base_asshole_ladder boolean NOT NULL,
+    CONSTRAINT unlocks_pkey PRIMARY KEY (id),
+    CONSTRAINT unlocks_uk_uuid UNIQUE (uuid),
+    CONSTRAINT unlocks_uk_account_round UNIQUE (account_id, round_id),
+    FOREIGN KEY (account_id) REFERENCES public.account (id) MATCH FULL,
+    FOREIGN KEY (round_id) REFERENCES public.round (id) MATCH FULL
 );
 
 -- Ladder
@@ -102,24 +132,24 @@ CREATE SEQUENCE IF NOT EXISTS public.seq_ladder;
 CREATE TABLE IF NOT EXISTS public.ladder
 (
     id                     bigint                   NOT NULL,
+    uuid                   uuid                     NOT NULL,
+    round_id               bigint                   NOT NULL,
     base_points_to_promote numeric(1000, 0)         NOT NULL,
     created_on             timestamp with time zone NOT NULL,
     "number"               integer                  NOT NULL,
-    round_id               bigint                   NOT NULL,
     scaling                integer                  NOT NULL,
-    uuid                   uuid                     NOT NULL,
     CONSTRAINT ladder_pkey PRIMARY KEY (id),
-    CONSTRAINT uk_number_round UNIQUE ("number", round_id)
+    CONSTRAINT ladder_uk_uuid UNIQUE (uuid),
+    CONSTRAINT ladder_uk_number_round UNIQUE ("number", round_id),
+    FOREIGN KEY (round_id) REFERENCES public.round (id) MATCH FULL
 );
 
 CREATE TABLE IF NOT EXISTS public.ladder_type
 (
     ladder_entity_id bigint NOT NULL,
     types            character varying(255) COLLATE pg_catalog."default",
-    CONSTRAINT fk_ladder_type_ladder FOREIGN KEY (ladder_entity_id)
-        REFERENCES public.ladder (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
+    CONSTRAINT ladder_type_fk_ladder FOREIGN KEY (ladder_entity_id)
+        REFERENCES public.ladder (id) MATCH FULL
 );
 
 -- Ranker
@@ -127,6 +157,7 @@ CREATE SEQUENCE IF NOT EXISTS public.seq_ranker;
 CREATE TABLE IF NOT EXISTS public.ranker
 (
     id           bigint           NOT NULL,
+    uuid         uuid             NOT NULL,
     account_id   bigint           NOT NULL,
     auto_promote boolean,
     bias         integer          NOT NULL,
@@ -136,25 +167,13 @@ CREATE TABLE IF NOT EXISTS public.ranker
     points       numeric(1000, 0) NOT NULL,
     power        numeric(1000, 0) NOT NULL,
     rank         integer          NOT NULL,
-    uuid         uuid             NOT NULL,
     vinegar      numeric(1000, 0) NOT NULL,
     ladder_id    bigint           NOT NULL,
     CONSTRAINT ranker_pkey PRIMARY KEY (id),
-    CONSTRAINT uk_account_ladder UNIQUE (account_id, ladder_id),
-    FOREIGN KEY (account_id) REFERENCES public.ranker (id) MATCH SIMPLE,
-    FOREIGN KEY (ladder_id) REFERENCES public.ranker (id) MATCH SIMPLE
+    CONSTRAINT ranker_uk_account_ladder UNIQUE (account_id, ladder_id),
+    FOREIGN KEY (account_id) REFERENCES public.account (id) MATCH SIMPLE,
+    FOREIGN KEY (ladder_id) REFERENCES public.ladder (id) MATCH SIMPLE
 );
 
-CREATE TABLE IF NOT EXISTS public.ranker_unlocks
-(
-    id                          bigint  NOT NULL,
-    auto_promote                boolean NOT NULL,
-    pressed_asshole_button      boolean NOT NULL,
-    reached_asshole_ladder      boolean NOT NULL,
-    reached_base_asshole_ladder boolean NOT NULL,
-    CONSTRAINT ranker_unlocks_pkey PRIMARY KEY (id),
-    CONSTRAINT fk_unlocks_ranker FOREIGN KEY (id)
-        REFERENCES public.ranker (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-);
+
+

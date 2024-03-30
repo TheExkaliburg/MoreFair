@@ -1,14 +1,10 @@
 package de.kaliburg.morefair.game.ranker.model;
 
-import de.kaliburg.morefair.game.unlocks.model.UnlocksEntity;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -27,8 +23,8 @@ import lombok.NonNull;
 @Builder(toBuilder = true)
 @Entity
 @Table(name = "ranker", uniqueConstraints = {
-    @UniqueConstraint(name = "uk_uuid", columnNames = "uuid"),
-    @UniqueConstraint(name = "uk_account_ladder", columnNames = {"account_id", "ladder_id"})
+    @UniqueConstraint(name = "ranker_uk_uuid", columnNames = "uuid"),
+    @UniqueConstraint(name = "ranker_uk_account_ladder", columnNames = {"account_id", "ladder_id"})
 })
 @SequenceGenerator(name = "seq_ranker", sequenceName = "seq_ranker", allocationSize = 1)
 public class RankerEntity {
@@ -78,8 +74,6 @@ public class RankerEntity {
   @Column
   @Builder.Default
   private boolean autoPromote = false;
-  @OneToOne(mappedBy = "ranker", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-  private UnlocksEntity unlocks = new UnlocksEntity(this);
 
 
   public RankerEntity addPoints(Integer points, double secondsPassed) {

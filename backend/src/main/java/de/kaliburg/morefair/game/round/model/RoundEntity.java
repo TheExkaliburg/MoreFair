@@ -1,6 +1,7 @@
 package de.kaliburg.morefair.game.round.model;
 
 import de.kaliburg.morefair.FairConfig;
+import de.kaliburg.morefair.game.round.model.type.RoundType;
 import de.kaliburg.morefair.game.season.model.SeasonEntity;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -36,8 +37,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 @AllArgsConstructor
 @Entity
 @Table(name = "round", uniqueConstraints = {
-    @UniqueConstraint(name = "uk_uuid", columnNames = "uuid"),
-    @UniqueConstraint(name = "uk_number", columnNames = "number")})
+    @UniqueConstraint(name = "round_uk_uuid", columnNames = "uuid"),
+    @UniqueConstraint(name = "round_uk_number", columnNames = "number")})
 @SequenceGenerator(name = "seq_round", sequenceName = "seq_round", allocationSize = 1)
 public class RoundEntity {
 
@@ -54,7 +55,7 @@ public class RoundEntity {
   @NonNull
   @Column(nullable = false)
   private Integer number;
-  @CollectionTable(name = "round_type", foreignKey = @ForeignKey(name = "fk_round_type_round"))
+  @CollectionTable(name = "round_type", foreignKey = @ForeignKey(name = "round_type_fk_round"))
   @ElementCollection(targetClass = RoundType.class, fetch = FetchType.EAGER)
   @Enumerated(EnumType.STRING)
   private Set<RoundType> types = EnumSet.noneOf(RoundType.class);

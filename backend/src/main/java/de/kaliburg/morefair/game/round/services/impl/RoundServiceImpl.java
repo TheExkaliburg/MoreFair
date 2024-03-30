@@ -9,12 +9,14 @@ import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.core.concurrency.CriticalRegion;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.RoundEventTypes;
-import de.kaliburg.morefair.game.round.RoundService;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
-import de.kaliburg.morefair.game.round.model.RoundType;
+import de.kaliburg.morefair.game.round.model.type.RoundType;
+import de.kaliburg.morefair.game.round.services.RoundService;
 import de.kaliburg.morefair.game.round.services.repositories.RoundRepository;
 import de.kaliburg.morefair.game.round.services.utils.RoundUtilsServiceImpl;
+import de.kaliburg.morefair.game.season.model.AchievementsEntity;
 import de.kaliburg.morefair.game.season.model.SeasonEntity;
+import de.kaliburg.morefair.game.season.services.AchievementsService;
 import de.kaliburg.morefair.game.season.services.SeasonService;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -35,6 +37,7 @@ public class RoundServiceImpl implements RoundService {
   private final CriticalRegion semaphore = new CriticalRegion(1);
   private final RoundRepository roundRepository;
   private final SeasonService seasonService;
+  private final AchievementsService achievementsService;
   private final WsUtils wsUtils;
   private final RoundUtilsServiceImpl roundUtilsService;
   private final FairConfig fairConfig;
@@ -42,9 +45,11 @@ public class RoundServiceImpl implements RoundService {
   private Long currentRoundId;
 
   public RoundServiceImpl(RoundRepository roundRepository, SeasonService seasonService,
-      WsUtils wsUtils, RoundUtilsServiceImpl roundUtilsService, FairConfig fairConfig) {
+      AchievementsService achievementsService, WsUtils wsUtils,
+      RoundUtilsServiceImpl roundUtilsService, FairConfig fairConfig) {
     this.roundRepository = roundRepository;
     this.seasonService = seasonService;
+    this.achievementsService = achievementsService;
     this.wsUtils = wsUtils;
     this.roundUtilsService = roundUtilsService;
     this.fairConfig = fairConfig;
@@ -57,11 +62,13 @@ public class RoundServiceImpl implements RoundService {
 
   @Override
   public void updateHighestAssholeCountOfCurrentRound(AccountEntity account) {
-    Integer assholeCount = account.getAssholeCount();
+    AchievementsEntity achievements =
+        achievementsService.findOrCreateByAccountInCurrentSeason(account.getId());
+    Integer assholeCount = achievements.getAssholeCount();
     try (var ignored = semaphore.enter()) {
       RoundEntity currentRound = roundCache.get(currentRoundId);
 
-      if (account.getAssholeCount() > currentRound.getHighestAssholeCount()
+      if (achievements.getAssholeCount() > currentRound.getHighestAssholeCount()
           && currentRound.getTypes().contains(RoundType.CHAOS)) {
         currentRound.setHighestAssholeCount(assholeCount);
         currentRound = roundRepository.save(currentRound);

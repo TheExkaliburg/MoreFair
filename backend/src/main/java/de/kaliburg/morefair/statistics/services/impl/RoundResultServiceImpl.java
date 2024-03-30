@@ -2,7 +2,7 @@ package de.kaliburg.morefair.statistics.services.impl;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import de.kaliburg.morefair.game.round.RoundService;
+import de.kaliburg.morefair.game.round.services.RoundService;
 import de.kaliburg.morefair.game.season.model.SeasonEntity;
 import de.kaliburg.morefair.game.season.services.SeasonService;
 import de.kaliburg.morefair.statistics.model.dto.RoundResultsDto;

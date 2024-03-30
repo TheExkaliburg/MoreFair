@@ -5,7 +5,7 @@ import de.kaliburg.morefair.account.services.AccountService;
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.services.LadderService;
 import de.kaliburg.morefair.game.ranker.services.RankerService;
-import de.kaliburg.morefair.game.round.RoundService;
+import de.kaliburg.morefair.game.round.services.RoundService;
 import de.kaliburg.morefair.game.round.services.utils.RoundUtilsService;
 import de.kaliburg.morefair.security.SecurityUtils;
 import java.nio.charset.StandardCharsets;
