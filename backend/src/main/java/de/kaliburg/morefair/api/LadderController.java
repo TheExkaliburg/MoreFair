@@ -10,6 +10,7 @@ import de.kaliburg.morefair.events.types.LadderEventType;
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.services.LadderEventService;
 import de.kaliburg.morefair.game.ladder.services.LadderService;
+import de.kaliburg.morefair.game.ladder.services.LadderTickService;
 import de.kaliburg.morefair.game.ladder.services.mapper.LadderMapper;
 import de.kaliburg.morefair.game.ranker.services.RankerService;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
@@ -46,6 +47,7 @@ public class LadderController {
   private final WsUtils wsUtils;
   private final RoundService roundService;
   private final LadderService ladderService;
+  private final LadderTickService ladderTickService;
   private final LadderEventService ladderEventService;
   private final RoundUtilsService roundUtilsService;
   private final LadderMapper ladderMapper;
@@ -55,7 +57,7 @@ public class LadderController {
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> initLadder(@RequestParam(value = "number") Integer number,
       Authentication authentication) {
-    try {
+    try (var ignored = ladderTickService.getSemaphore().enter()) {
       AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
           .orElse(null);
       if (account == null || account.isBanned()) {

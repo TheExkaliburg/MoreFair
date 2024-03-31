@@ -13,6 +13,6 @@ public interface AchievementsService {
 
   default AchievementsEntity findOrCreateByAccountInCurrentSeason(Long accountId) {
     return findByAccountInCurrentSeason(accountId)
-        .orElse(createForAccountInCurrentSeason(accountId));
+        .orElseGet(() -> createForAccountInCurrentSeason(accountId));
   }
 }

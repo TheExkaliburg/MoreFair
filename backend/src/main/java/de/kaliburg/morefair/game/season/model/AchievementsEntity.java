@@ -58,8 +58,6 @@ public class AchievementsEntity {
   /**
    * Maps the saved assholePoints to the asshole Count that determines the asshole tag. The function
    * used is the inverse gauss sum formula.
-   * <p>
-   * FIXME: -> Move to Utils
    *
    * @return the asshole count
    */

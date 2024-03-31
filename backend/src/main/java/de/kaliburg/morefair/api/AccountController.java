@@ -7,6 +7,7 @@ import de.kaliburg.morefair.api.utils.HttpUtils;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.AccountEventTypes;
+import de.kaliburg.morefair.game.ladder.services.LadderTickService;
 import de.kaliburg.morefair.security.SecurityUtils;
 import de.kaliburg.morefair.statistics.services.StatisticsService;
 import java.util.HashMap;
@@ -38,6 +39,7 @@ public class AccountController {
   private final WsUtils wsUtils;
   private final AccountMapper accountMapper;
   private final StatisticsService statisticsService;
+  private final LadderTickService ladderTickService;
 
   /**
    * Returns the AccountDetails of an account.
@@ -47,11 +49,9 @@ public class AccountController {
    */
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> getAccount(Authentication authentication) {
-    try {
+    try (var ignored = ladderTickService.getSemaphore().enter()) {
       AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
           .orElseThrow();
-
-      // FIXME In case the Account doesn't have an AchievementsEntity yet
 
       statisticsService.recordLogin(account);
 

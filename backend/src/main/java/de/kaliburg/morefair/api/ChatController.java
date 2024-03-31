@@ -13,6 +13,7 @@ import de.kaliburg.morefair.chat.services.SuggestionsService;
 import de.kaliburg.morefair.chat.services.mapper.ChatMapper;
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.services.LadderService;
+import de.kaliburg.morefair.game.ladder.services.LadderTickService;
 import de.kaliburg.morefair.game.ranker.services.RankerService;
 import de.kaliburg.morefair.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +44,7 @@ public class ChatController {
   private final RequestThrottler throttler;
   private final ChatService chatService;
   private final LadderService ladderService;
+  private final LadderTickService ladderTickService;
   private final MessageService messageService;
   private final ChatMapper chatMapper;
   private final SuggestionsService suggestionsService;
@@ -53,7 +55,7 @@ public class ChatController {
       @PathVariable("type") String typeString,
       @RequestParam(value = "number", defaultValue = "0", required = false) Integer number,
       Authentication authentication) {
-    try {
+    try (var ignored = ladderTickService.getSemaphore().enter()) {
       ChatType type = ChatType.valueOf(typeString.toUpperCase());
 
       AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
@@ -86,7 +88,7 @@ public class ChatController {
 
   @GetMapping(value = "/suggestions")
   public ResponseEntity<?> getSuggestions() {
-    try {
+    try (var ignored = ladderTickService.getSemaphore().enter()) {
       return ResponseEntity.ok(suggestionsService.getAllSuggestions());
     } catch (Exception e) {
       log.error(e.getMessage(), e);

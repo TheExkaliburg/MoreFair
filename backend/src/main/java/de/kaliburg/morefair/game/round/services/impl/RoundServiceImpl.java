@@ -13,7 +13,7 @@ import de.kaliburg.morefair.game.round.model.RoundEntity;
 import de.kaliburg.morefair.game.round.model.type.RoundType;
 import de.kaliburg.morefair.game.round.services.RoundService;
 import de.kaliburg.morefair.game.round.services.repositories.RoundRepository;
-import de.kaliburg.morefair.game.round.services.utils.RoundUtilsServiceImpl;
+import de.kaliburg.morefair.game.round.services.utils.impl.RoundUtilsServiceImpl;
 import de.kaliburg.morefair.game.season.model.AchievementsEntity;
 import de.kaliburg.morefair.game.season.model.SeasonEntity;
 import de.kaliburg.morefair.game.season.services.AchievementsService;

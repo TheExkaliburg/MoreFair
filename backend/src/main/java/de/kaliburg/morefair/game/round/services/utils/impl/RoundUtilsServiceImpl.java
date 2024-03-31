@@ -1,6 +1,7 @@
-package de.kaliburg.morefair.game.round.services.utils;
+package de.kaliburg.morefair.game.round.services.utils.impl;
 
 import de.kaliburg.morefair.game.round.model.RoundEntity;
+import de.kaliburg.morefair.game.round.services.utils.RoundUtilsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

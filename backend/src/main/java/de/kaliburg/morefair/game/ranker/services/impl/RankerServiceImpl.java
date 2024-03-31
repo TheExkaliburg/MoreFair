@@ -202,8 +202,9 @@ public class RankerServiceImpl implements RankerService {
   public List<RankerEntity> updateRankersOfLadder(LadderEntity ladder, List<RankerEntity> rankers) {
     try (var ignored = semaphore.enter()) {
       rankers = rankers.stream().filter(r -> r.getLadderId().equals(ladder.getId())).toList();
-      rankers = rankerRepository.saveAll(rankers);
+      rankerRepository.saveAll(rankers);
       rankerCache.put(ladder.getId(), rankers);
+
       return rankers;
     } catch (InterruptedException e) {
       throw new RuntimeException(e);

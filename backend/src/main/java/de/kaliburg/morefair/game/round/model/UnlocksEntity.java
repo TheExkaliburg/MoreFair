@@ -56,19 +56,5 @@ public class UnlocksEntity {
   @Builder.Default
   @Column(nullable = false)
   private Boolean pressedAssholeButton = false;
-
-  // TODO: -> UnlockUtils
-  public Integer calculateAssholePoints() {
-    int result = 0;
-    if (getReachedBaseAssholeLadder()) {
-      result += 1;
-    }
-    if (getReachedAssholeLadder()) {
-      result += 2;
-    }
-    if (getPressedAssholeButton()) {
-      result += 7;
-    }
-    return result;
-  }
+  
 }

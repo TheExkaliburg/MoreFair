@@ -38,6 +38,7 @@ import de.kaliburg.morefair.game.round.model.UnlocksEntity;
 import de.kaliburg.morefair.game.round.model.type.RoundType;
 import de.kaliburg.morefair.game.round.services.RoundService;
 import de.kaliburg.morefair.game.round.services.UnlocksService;
+import de.kaliburg.morefair.game.round.services.utils.UnlocksUtilsService;
 import de.kaliburg.morefair.game.season.model.AchievementsEntity;
 import de.kaliburg.morefair.game.season.services.AchievementsService;
 import de.kaliburg.morefair.statistics.services.StatisticsService;
@@ -67,6 +68,7 @@ public class LadderEventServiceImpl implements LadderEventService {
   private final RankerUtilsService ladderUtilsService;
   private final RoundService roundService;
   private final UnlocksService unlocksService;
+  private final UnlocksUtilsService unlocksUtilsService;
   private final AchievementsService achievementsService;
   private final StatisticsService statisticsService;
   private final WsUtils wsUtils;
@@ -411,7 +413,9 @@ public class LadderEventServiceImpl implements LadderEventService {
             for (RankerEntity r : firstRankers) {
               var u = unlocksService.findOrCreateByAccountInCurrentRound(r.getAccountId());
               var a = achievementsService.findOrCreateByAccountInCurrentSeason(r.getAccountId());
-              a.setAssholePoints(a.getAssholePoints() + u.calculateAssholePoints());
+              a.setAssholePoints(
+                  a.getAssholePoints() + unlocksUtilsService.calculateAssholePoints(u)
+              );
 
               unlocksService.save(u);
               achievementsService.save(a);

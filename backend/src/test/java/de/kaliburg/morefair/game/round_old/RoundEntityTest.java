@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 @EnableLoggingPropertiesBeforeAll
 class RoundEntityTest {
 /*
+TODO: Fix these Test Cases
+
   @Test
   void constructor_WithRound100_ExpectingCorrectRoundTypes() {
     FairConfig fairConfig = new FairConfig();

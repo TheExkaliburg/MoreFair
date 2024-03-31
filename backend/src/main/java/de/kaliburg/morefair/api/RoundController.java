@@ -3,6 +3,7 @@ package de.kaliburg.morefair.api;
 import de.kaliburg.morefair.account.model.AccountEntity;
 import de.kaliburg.morefair.account.services.AccountService;
 import de.kaliburg.morefair.exceptions.ErrorDto;
+import de.kaliburg.morefair.game.ladder.services.LadderTickService;
 import de.kaliburg.morefair.game.round.services.RoundService;
 import de.kaliburg.morefair.game.round.services.mapper.RoundMapper;
 import de.kaliburg.morefair.security.SecurityUtils;
@@ -26,13 +27,14 @@ public class RoundController {
   public static final String TOPIC_EVENTS_DESTINATION = "/round/events";
 
   private final RoundService roundService;
+  private final LadderTickService ladderTickService;
   private final AccountService accountService;
   private final RoundMapper roundMapper;
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> getCurrentRound(Authentication authentication,
       HttpServletRequest request) {
-    try {
+    try (var ignored = ladderTickService.getSemaphore().enter()) {
       if (authentication != null) {
         AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
             .orElse(null);
