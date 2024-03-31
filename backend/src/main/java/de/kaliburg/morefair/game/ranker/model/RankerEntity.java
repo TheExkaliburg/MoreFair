@@ -10,6 +10,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -53,7 +55,7 @@ public class RankerEntity {
   @Column(nullable = false)
   private Integer multiplier = 1;
   @Builder.Default
-  @Column
+  @Column(nullable = false)
   private boolean growing = true;
   @NonNull
   @Column(name = "ladder_id", nullable = false)
@@ -71,9 +73,16 @@ public class RankerEntity {
   @Column(nullable = false, precision = 1000, scale = 0)
   @Builder.Default
   private BigInteger vinegar = BigInteger.ZERO;
-  @Column
+  @Column(nullable = false)
   @Builder.Default
   private boolean autoPromote = false;
+
+  @NonNull
+  @Builder.Default
+  @Column(nullable = false)
+  private OffsetDateTime createdOn = OffsetDateTime.now(ZoneOffset.UTC);
+  @Column
+  private OffsetDateTime promotedOn;
 
 
   public RankerEntity addPoints(Integer points, double secondsPassed) {

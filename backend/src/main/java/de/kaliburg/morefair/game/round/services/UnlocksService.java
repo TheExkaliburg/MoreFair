@@ -13,6 +13,6 @@ public interface UnlocksService {
 
   default UnlocksEntity findOrCreateByAccountInCurrentRound(Long accountId) {
     return findByAccountInCurrentRound(accountId)
-        .orElse(createForAccountInCurrentRound(accountId));
+        .orElseGet(() -> createForAccountInCurrentRound(accountId));
   }
 }

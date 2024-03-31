@@ -14,4 +14,6 @@ public interface RoundService {
   void updateHighestAssholeCountOfCurrentRound(AccountEntity account);
 
   Optional<RoundEntity> findById(long roundId);
+
+  void closeCurrentRound();
 }

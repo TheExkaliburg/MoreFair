@@ -9,6 +9,7 @@ import de.kaliburg.morefair.game.round.services.mapper.RoundMapper;
 import de.kaliburg.morefair.security.SecurityUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -40,7 +41,7 @@ public class RoundController {
             .orElse(null);
         if (account != null) {
           Integer ip = SecurityUtils.getIp(request);
-          account.setLastLogin(OffsetDateTime.now());
+          account.setLastLogin(OffsetDateTime.now(ZoneOffset.UTC));
           account.setLastIp(ip);
           accountService.save(account);
         }

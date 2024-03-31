@@ -10,6 +10,7 @@ import de.kaliburg.morefair.game.ladder.services.LadderService;
 import de.kaliburg.morefair.game.ladder.services.repositories.LadderRepository;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
 import de.kaliburg.morefair.game.round.services.RoundService;
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -17,6 +18,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -55,6 +57,27 @@ public class LadderServiceImpl implements LadderService {
                 .map(LadderEntity::getId)
                 .orElse(null)
         );
+  }
+
+  @PostConstruct
+  public void init() {
+    reloadLadders();
+  }
+
+  @Override
+  public void reloadLadders() {
+    try (var ignored = semaphore.enter()) {
+      RoundEntity currentRound = roundService.getCurrentRound();
+      currentLadderNumberLookup.invalidateAll();
+      Set<Integer> currentLadders = ladderRepository.findByRound(currentRound.getId()).stream()
+          .map(LadderEntity::getNumber)
+          .collect(Collectors.toSet());
+
+      currentLadderNumberLookup.getAll(currentLadders);
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+
   }
 
   @Override

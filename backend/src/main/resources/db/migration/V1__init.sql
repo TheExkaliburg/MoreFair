@@ -1,11 +1,15 @@
+-- Utilities
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+
 -- Account
 CREATE SEQUENCE IF NOT EXISTS public.seq_account;
 CREATE TABLE IF NOT EXISTS public.account
 (
     id                    bigint                   NOT NULL,
-    uuid                  uuid                     NOT NULL,
+    uuid                  uuid                     NOT NULL DEFAULT uuid_generate_v4(),
     access_role           character varying(255)   NOT NULL,
-    created_on            timestamp with time zone NOT NULL,
+    created_on            timestamp with time zone NOT NULL DEFAULT now(),
     display_name          character varying(255)   NOT NULL,
     guest                 boolean                  NOT NULL,
     last_ip               integer,
@@ -22,13 +26,13 @@ CREATE TABLE IF NOT EXISTS public.account
 CREATE SEQUENCE IF NOT EXISTS public.seq_chat;
 CREATE TABLE IF NOT EXISTS public.chat
 (
-    id       bigint                 NOT NULL,
-    uuid     uuid                   NOT NULL,
-    "number" integer,
-    type     character varying(255) NOT NULL,
+    id     bigint                 NOT NULL,
+    uuid   uuid                   NOT NULL DEFAULT uuid_generate_v4(),
+    number integer,
+    type   character varying(255) NOT NULL,
     CONSTRAINT chat_pkey PRIMARY KEY (id),
     CONSTRAINT chat_uk_uuid UNIQUE (uuid),
-    CONSTRAINT chat_uk_type_number UNIQUE (type, "number")
+    CONSTRAINT chat_uk_type_number UNIQUE (type, number)
 );
 
 -- Message
@@ -36,10 +40,10 @@ CREATE SEQUENCE IF NOT EXISTS public.seq_message;
 CREATE TABLE IF NOT EXISTS public.message
 (
     id         bigint                                              NOT NULL,
-    uuid       uuid                                                NOT NULL,
+    uuid       uuid                                                NOT NULL DEFAULT uuid_generate_v4(),
     account_id bigint                                              NOT NULL,
     chat_id    bigint                                              NOT NULL,
-    created_on timestamp with time zone                            NOT NULL,
+    created_on timestamp with time zone                            NOT NULL DEFAULT now(),
     deleted_on timestamp with time zone,
     message    character varying(512) COLLATE pg_catalog."default" NOT NULL,
     metadata   character varying(512) COLLATE pg_catalog."default",
@@ -54,13 +58,22 @@ CREATE SEQUENCE IF NOT EXISTS public.seq_season;
 CREATE TABLE IF NOT EXISTS public.season
 (
     id         bigint                                              NOT NULL,
-    uuid       uuid                                                NOT NULL,
-    created_on timestamp(6) without time zone                      NOT NULL,
-    closed_on  timestamp(6) without time zone,
-    end_type   character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    type       character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    uuid       uuid                                                NOT NULL DEFAULT uuid_generate_v4(),
+    number     integer                                             NOT NULL,
+    created_on timestamp(6) with time zone                         NOT NULL DEFAULT now(),
+    closed_on  timestamp(6) with time zone,
+    end_type   character varying(255) COLLATE pg_catalog."default" NOT NULL DEFAULT 'MANUAL',
     CONSTRAINT season_pkey PRIMARY KEY (id),
-    CONSTRAINT season_uk_uuid UNIQUE (uuid)
+    CONSTRAINT season_uk_uuid UNIQUE (uuid),
+    CONSTRAINT season_uk_number UNIQUE (number)
+);
+
+CREATE TABLE IF NOT EXISTS public.season_type
+(
+    season_entity_id bigint                                              NOT NULL,
+    types            character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT season_type_fk_season FOREIGN KEY (season_entity_id)
+        REFERENCES public.season (id) MATCH FULL
 );
 
 -- Achievements
@@ -68,7 +81,7 @@ CREATE SEQUENCE IF NOT EXISTS public.seq_achievements;
 CREATE TABLE IF NOT EXISTS public.achievements
 (
     id                      bigint  NOT NULL,
-    uuid                    uuid    NOT NULL,
+    uuid                    uuid    NOT NULL DEFAULT uuid_generate_v4(),
     account_id              bigint  NOT NULL,
     season_id               bigint  NOT NULL,
     asshole_points          integer NOT NULL,
@@ -85,10 +98,10 @@ CREATE SEQUENCE IF NOT EXISTS public.seq_round;
 CREATE TABLE IF NOT EXISTS public.round
 (
     id                                bigint                   NOT NULL,
-    uuid                              uuid                     NOT NULL,
+    uuid                              uuid                     NOT NULL DEFAULT uuid_generate_v4(),
     season_id                         bigint                   NOT NULL,
-    "number"                          integer                  NOT NULL,
-    created_on                        timestamp with time zone NOT NULL,
+    number                            integer                  NOT NULL,
+    created_on                        timestamp with time zone NOT NULL DEFAULT now(),
     closed_on                         timestamp with time zone,
     base_asshole_ladder               integer                  NOT NULL,
     base_points_requirement           numeric(1000, 0)         NOT NULL,
@@ -96,14 +109,14 @@ CREATE TABLE IF NOT EXISTS public.round
     percentage_of_additional_assholes real                     NOT NULL,
     CONSTRAINT round_pkey PRIMARY KEY (id),
     CONSTRAINT round_uk_uuid UNIQUE (uuid),
-    CONSTRAINT round_uk_number UNIQUE ("number"),
+    CONSTRAINT round_uk_season_number UNIQUE (season_id, number),
     FOREIGN KEY (season_id) REFERENCES public.season (id) MATCH FULL
 );
 
 CREATE TABLE IF NOT EXISTS public.round_type
 (
-    round_entity_id bigint NOT NULL,
-    types           character varying(255),
+    round_entity_id bigint                                              NOT NULL,
+    types           character varying(255) COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT round_type_fk_round FOREIGN KEY (round_entity_id)
         REFERENCES public.round (id) MATCH FULL
 );
@@ -113,7 +126,7 @@ CREATE SEQUENCE IF NOT EXISTS public.seq_unlocks;
 CREATE TABLE IF NOT EXISTS public.unlocks
 (
     id                          bigint  NOT NULL,
-    uuid                        uuid    NOT NULL,
+    uuid                        uuid    NOT NULL DEFAULT uuid_generate_v4(),
     account_id                  bigint  NOT NULL,
     round_id                    bigint  NOT NULL,
     unlocked_auto_promote       boolean NOT NULL,
@@ -132,22 +145,22 @@ CREATE SEQUENCE IF NOT EXISTS public.seq_ladder;
 CREATE TABLE IF NOT EXISTS public.ladder
 (
     id                     bigint                   NOT NULL,
-    uuid                   uuid                     NOT NULL,
+    uuid                   uuid                     NOT NULL DEFAULT uuid_generate_v4(),
     round_id               bigint                   NOT NULL,
     base_points_to_promote numeric(1000, 0)         NOT NULL,
-    created_on             timestamp with time zone NOT NULL,
-    "number"               integer                  NOT NULL,
+    created_on             timestamp with time zone NOT NULL DEFAULT now(),
+    number                 integer                  NOT NULL,
     scaling                integer                  NOT NULL,
     CONSTRAINT ladder_pkey PRIMARY KEY (id),
     CONSTRAINT ladder_uk_uuid UNIQUE (uuid),
-    CONSTRAINT ladder_uk_number_round UNIQUE ("number", round_id),
+    CONSTRAINT ladder_uk_number_round UNIQUE (number, round_id),
     FOREIGN KEY (round_id) REFERENCES public.round (id) MATCH FULL
 );
 
 CREATE TABLE IF NOT EXISTS public.ladder_type
 (
-    ladder_entity_id bigint NOT NULL,
-    types            character varying(255) COLLATE pg_catalog."default",
+    ladder_entity_id bigint                                              NOT NULL,
+    types            character varying(255) COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT ladder_type_fk_ladder FOREIGN KEY (ladder_entity_id)
         REFERENCES public.ladder (id) MATCH FULL
 );
@@ -156,19 +169,21 @@ CREATE TABLE IF NOT EXISTS public.ladder_type
 CREATE SEQUENCE IF NOT EXISTS public.seq_ranker;
 CREATE TABLE IF NOT EXISTS public.ranker
 (
-    id           bigint           NOT NULL,
-    uuid         uuid             NOT NULL,
-    account_id   bigint           NOT NULL,
-    auto_promote boolean,
-    bias         integer          NOT NULL,
-    grapes       numeric(1000, 0) NOT NULL,
-    growing      boolean,
-    multiplier   integer          NOT NULL,
-    points       numeric(1000, 0) NOT NULL,
-    power        numeric(1000, 0) NOT NULL,
-    rank         integer          NOT NULL,
-    vinegar      numeric(1000, 0) NOT NULL,
-    ladder_id    bigint           NOT NULL,
+    id           bigint                   NOT NULL,
+    uuid         uuid                     NOT NULL DEFAULT uuid_generate_v4(),
+    account_id   bigint                   NOT NULL,
+    ladder_id    bigint                   NOT NULL,
+    rank         integer                  NOT NULL,
+    growing      boolean                  NOT NULL,
+    multiplier   integer                  NOT NULL,
+    bias         integer                  NOT NULL,
+    power        numeric(1000, 0)         NOT NULL,
+    points       numeric(1000, 0)         NOT NULL,
+    grapes       numeric(1000, 0)         NOT NULL,
+    vinegar      numeric(1000, 0)         NOT NULL,
+    auto_promote boolean                  NOT NULL,
+    created_on   timestamp with time zone NOT NULL DEFAULT now(),
+    promoted_on  timestamp with time zone,
     CONSTRAINT ranker_pkey PRIMARY KEY (id),
     CONSTRAINT ranker_uk_account_ladder UNIQUE (account_id, ladder_id),
     FOREIGN KEY (account_id) REFERENCES public.account (id) MATCH SIMPLE,

@@ -30,6 +30,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 
 @Data
@@ -38,7 +40,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 @Entity
 @Table(name = "round", uniqueConstraints = {
     @UniqueConstraint(name = "round_uk_uuid", columnNames = "uuid"),
-    @UniqueConstraint(name = "round_uk_number", columnNames = "number")})
+    @UniqueConstraint(name = "round_uk_season_number", columnNames = {"seasonId", "number"})
+})
 @SequenceGenerator(name = "seq_round", sequenceName = "seq_round", allocationSize = 1)
 public class RoundEntity {
 
@@ -58,6 +61,7 @@ public class RoundEntity {
   @CollectionTable(name = "round_type", foreignKey = @ForeignKey(name = "round_type_fk_round"))
   @ElementCollection(targetClass = RoundType.class, fetch = FetchType.EAGER)
   @Enumerated(EnumType.STRING)
+  @Fetch(FetchMode.SELECT)
   private Set<RoundType> types = EnumSet.noneOf(RoundType.class);
   @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
   private OffsetDateTime createdOn = OffsetDateTime.now(ZoneOffset.UTC);

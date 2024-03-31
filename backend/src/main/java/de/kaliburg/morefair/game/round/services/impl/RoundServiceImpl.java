@@ -19,12 +19,14 @@ import de.kaliburg.morefair.game.season.model.SeasonEntity;
 import de.kaliburg.morefair.game.season.services.AchievementsService;
 import de.kaliburg.morefair.game.season.services.SeasonService;
 import java.time.Duration;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
-import java.util.Random;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * The RoundService that setups and manages the RoundEntities contained in the GameEntity.
@@ -33,7 +35,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class RoundServiceImpl implements RoundService {
 
-  private static final Random random = new Random();
   private final CriticalRegion semaphore = new CriticalRegion(1);
   private final RoundRepository roundRepository;
   private final SeasonService seasonService;
@@ -83,6 +84,7 @@ public class RoundServiceImpl implements RoundService {
   }
 
   @Override
+  @Transactional
   public RoundEntity getCurrentRound() {
     try (var ignored = semaphore.enter()) {
       if (currentRoundId == null) {
@@ -120,6 +122,24 @@ public class RoundServiceImpl implements RoundService {
       return roundRepository.findBySeasonAndNumber(season.getId(), number);
     } else {
       return Optional.of(currentRound);
+    }
+  }
+
+  @Override
+  public void closeCurrentRound() {
+    try (var ignored = semaphore.enter()) {
+      if (currentRoundId == null) {
+        return;
+      }
+
+      RoundEntity oldRound = roundCache.get(currentRoundId);
+      oldRound.setClosedOn(OffsetDateTime.now(ZoneOffset.UTC));
+      roundRepository.save(oldRound);
+      roundCache.put(oldRound.getId(), oldRound);
+
+      currentRoundId = null;
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
     }
   }
 

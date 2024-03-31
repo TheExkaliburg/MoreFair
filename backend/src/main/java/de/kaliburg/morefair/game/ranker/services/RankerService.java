@@ -19,4 +19,6 @@ public interface RankerService {
   Optional<RankerEntity> createRankerOnLadder(AccountEntity account, int ladderNumber);
 
   List<RankerEntity> updateRankersOfLadder(LadderEntity ladder, List<RankerEntity> rankers);
+
+  void reloadRankers();
 }

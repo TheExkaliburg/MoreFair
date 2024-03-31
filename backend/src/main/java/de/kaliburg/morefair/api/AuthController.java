@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.net.URI;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -254,20 +255,20 @@ public class AuthController {
         if (account != null && account.isGuest()) {
           account.setUsername(username);
           account.setPassword(passwordEncoder.encode(password));
-          account.setLastLogin(OffsetDateTime.now());
+          account.setLastLogin(OffsetDateTime.now(ZoneOffset.UTC));
           account.setLastIp(ip);
           account.setGuest(false);
           accountService.save(account);
         } else if (account == null) {
           account = accountService.create(username, password, ip, false).orElseThrow();
           account.setLastIp(ip);
-          account.setLastLogin(OffsetDateTime.now());
+          account.setLastLogin(OffsetDateTime.now(ZoneOffset.UTC));
           accountService.save(account);
         }
       } else {
         AccountEntity account = accountService.create(username, password, ip, false).orElseThrow();
         account.setLastIp(ip);
-        account.setLastLogin(OffsetDateTime.now());
+        account.setLastLogin(OffsetDateTime.now(ZoneOffset.UTC));
         accountService.save(account);
       }
 

@@ -30,8 +30,8 @@ public class RoundTypeSetBuilder {
   private Integer roundNumber = 1;
 
   public RoundTypeSetBuilder() {
-    roundSpeedTypeWeights.put(RoundType.FAST, 20.f);
-    roundSpeedTypeWeights.put(RoundType.SLOW, 10.f);
+    // FIXME: roundSpeedTypeWeights.put(RoundType.FAST, 20.f);
+    // roundSpeedTypeWeights.put(RoundType.SLOW, 10.f);
     roundSpeedTypeWeights.put(RoundType.DEFAULT, 70.f);
 
     roundAutoTypeWeights.put(RoundType.AUTO, 10.f);

@@ -420,6 +420,10 @@ public class LadderEventServiceImpl implements LadderEventService {
               unlocksService.save(u);
               achievementsService.save(a);
             }
+
+            roundService.closeCurrentRound();
+            ladderService.reloadLadders();
+            rankerService.reloadRankers();
           }
         }
         return true;

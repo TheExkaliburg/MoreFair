@@ -5,6 +5,7 @@ import de.kaliburg.morefair.game.season.model.SeasonEntity;
 import de.kaliburg.morefair.game.season.services.SeasonService;
 import de.kaliburg.morefair.game.season.services.repositories.SeasonRepository;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -33,24 +34,21 @@ public class SeasonServiceImpl implements SeasonService {
   @Transactional
   public SeasonEntity findNewestSeason() {
     try (var ignored = semaphore.enter()) {
-      if (currentSeason == null) {
-        List<SeasonEntity> openSeasons = seasonRepository.findAllOpenSeasonsOrderedByNewestFirst();
+      List<SeasonEntity> openSeasons = seasonRepository.findAllOpenSeasonsOrderedByNewestFirst();
 
-        if (openSeasons.isEmpty()) {
-          currentSeason = createNewSeason();
-          return currentSeason;
-        }
-
-        // Remove all OpenSeasons until only one is left over
-        while (openSeasons.size() > 1) {
-          SeasonEntity oldestOpenSeason = openSeasons.remove(openSeasons.size() - 1);
-          oldestOpenSeason.setClosedOn(OffsetDateTime.now());
-          seasonRepository.save(oldestOpenSeason);
-        }
-
-        currentSeason = openSeasons.get(openSeasons.size() - 1);
+      if (openSeasons.isEmpty()) {
+        currentSeason = createNewSeason();
+        return currentSeason;
       }
 
+      // Remove all OpenSeasons until only one is left over
+      while (openSeasons.size() > 1) {
+        SeasonEntity oldestOpenSeason = openSeasons.remove(openSeasons.size() - 1);
+        oldestOpenSeason.setClosedOn(OffsetDateTime.now(ZoneOffset.UTC));
+        seasonRepository.save(oldestOpenSeason);
+      }
+
+      currentSeason = openSeasons.get(openSeasons.size() - 1);
       return currentSeason;
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
@@ -77,7 +75,13 @@ public class SeasonServiceImpl implements SeasonService {
   }
 
   private SeasonEntity createNewSeason() {
-    SeasonEntity seasonEntity = SeasonEntity.builder().build();
+    Integer oldNumber = seasonRepository.findNewestSeason()
+        .map(SeasonEntity::getNumber)
+        .orElse(0);
+
+    SeasonEntity seasonEntity = SeasonEntity.builder()
+        .number(oldNumber + 1)
+        .build();
     return seasonRepository.save(seasonEntity);
   }
 

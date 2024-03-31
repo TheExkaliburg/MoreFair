@@ -23,6 +23,7 @@ import de.kaliburg.morefair.game.round.model.type.RoundType;
 import de.kaliburg.morefair.game.round.services.RoundService;
 import de.kaliburg.morefair.game.round.services.UnlocksService;
 import de.kaliburg.morefair.game.season.services.AchievementsService;
+import jakarta.annotation.PostConstruct;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -99,6 +100,20 @@ public class RankerServiceImpl implements RankerService {
         });
   }
 
+  @PostConstruct
+  public void init() {
+    reloadRankers();
+  }
+
+  @Override
+  public void reloadRankers() {
+    try (var ignored = semaphore.enter()) {
+      rankerCache.invalidateAll();
+      highestRankerCache.invalidateAll();
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
   @Override
   public void enterNewRanker(AccountEntity account) {
@@ -152,7 +167,7 @@ public class RankerServiceImpl implements RankerService {
     LadderEntity ladder = ladderService.findCurrentLadderWithNumber(ladderNumber)
         .orElseGet(() -> ladderService.createCurrentLadder(ladderNumber));
     try (var ignored = semaphore.enter()) {
-      List<RankerEntity> rankers = rankerCache.get(ladder.getId());
+      List<RankerEntity> rankers = new ArrayList<>(rankerCache.get(ladder.getId()));
       Optional<RankerEntity> optionalRanker = rankers.stream()
           .filter(r -> r.getAccountId().equals(account.getId()))
           .findAny();
@@ -219,7 +234,6 @@ public class RankerServiceImpl implements RankerService {
         .build();
 
     result = rankerRepository.save(result);
-    unlocksService.createForAccountInCurrentRound(result.getAccountId());
 
     highestRankerCache.put(account.getId(), result);
 

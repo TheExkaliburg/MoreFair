@@ -15,6 +15,7 @@ import de.kaliburg.morefair.chat.services.repositories.MessageRepository;
 import de.kaliburg.morefair.core.concurrency.CriticalRegion;
 import de.kaliburg.morefair.utils.FormattingUtils;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.NonNull;
@@ -98,7 +99,7 @@ public class MessageServiceImpl implements MessageService {
   @Override
   public void deleteMessagesOfAccount(AccountEntity account) {
     try (var ignored = semaphore.enter()) {
-      messageRepository.setDeletedOnForAccount(account.getId(), OffsetDateTime.now());
+      messageRepository.setDeletedOnForAccount(account.getId(), OffsetDateTime.now(ZoneOffset.UTC));
       messagesChatIdCache.invalidateAll();
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
