@@ -1,4 +1,4 @@
--- Utilities
+-- Utilities/Extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 
@@ -60,8 +60,8 @@ CREATE TABLE IF NOT EXISTS public.season
     id         bigint                                              NOT NULL,
     uuid       uuid                                                NOT NULL DEFAULT uuid_generate_v4(),
     number     integer                                             NOT NULL,
-    created_on timestamp(6) with time zone                         NOT NULL DEFAULT now(),
-    closed_on  timestamp(6) with time zone,
+    created_on timestamp with time zone                            NOT NULL DEFAULT now(),
+    closed_on  timestamp with time zone,
     end_type   character varying(255) COLLATE pg_catalog."default" NOT NULL DEFAULT 'MANUAL',
     CONSTRAINT season_pkey PRIMARY KEY (id),
     CONSTRAINT season_uk_uuid UNIQUE (uuid),
@@ -174,7 +174,6 @@ CREATE TABLE IF NOT EXISTS public.ranker
     account_id   bigint                   NOT NULL,
     ladder_id    bigint                   NOT NULL,
     rank         integer                  NOT NULL,
-    growing      boolean                  NOT NULL,
     multiplier   integer                  NOT NULL,
     bias         integer                  NOT NULL,
     power        numeric(1000, 0)         NOT NULL,

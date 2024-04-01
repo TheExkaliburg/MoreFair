@@ -54,9 +54,6 @@ public class RankerEntity {
   @Builder.Default
   @Column(nullable = false)
   private Integer multiplier = 1;
-  @Builder.Default
-  @Column(nullable = false)
-  private boolean growing = true;
   @NonNull
   @Column(name = "ladder_id", nullable = false)
   private Long ladderId;
@@ -84,6 +81,10 @@ public class RankerEntity {
   @Column
   private OffsetDateTime promotedOn;
 
+
+  public boolean isGrowing() {
+    return promotedOn == null;
+  }
 
   public RankerEntity addPoints(Integer points, double secondsPassed) {
     return addPoints(BigInteger.valueOf(points), secondsPassed);

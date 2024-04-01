@@ -44,6 +44,8 @@ import de.kaliburg.morefair.game.season.services.AchievementsService;
 import de.kaliburg.morefair.statistics.services.StatisticsService;
 import de.kaliburg.morefair.utils.FormattingUtils;
 import java.math.BigInteger;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -271,7 +273,7 @@ public class LadderEventServiceImpl implements LadderEventService {
         statisticsService.recordPromote(ranker, ladder, roundService.getCurrentRound());
         log.info("[L{}] Promotion for {} (#{})", ladder.getNumber(), account.getDisplayName(),
             account.getId());
-        ranker.setGrowing(false);
+        ranker.setPromotedOn(OffsetDateTime.now(ZoneOffset.UTC));
 
         RankerEntity newRanker = rankerService.createRankerOnLadder(account, ladder.getNumber() + 1)
             .orElseThrow();
