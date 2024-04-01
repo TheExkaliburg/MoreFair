@@ -355,13 +355,8 @@ public class LadderEventServiceImpl implements LadderEventService {
                   .divide(BigInteger.TEN));
         }
 
-        // TODO: Move into Utils Component
-        newRanker.setGrapes(newRanker.getGrapes()
-            .add(BigInteger.valueOf(
-                newLadder.getWinningGrapes(newRankers.size(),
-                    fairConfig.getBaseGrapesToBuyAutoPromote()
-                )
-            ))
+        newRanker.setGrapes(
+            newRanker.getGrapes().add(ladderUtilsService.getWinningGrapes(newLadder))
         );
 
         wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,

@@ -159,4 +159,33 @@ public class RankerUtilsServiceImpl implements RankerUtilsService {
         && !ladder.getTypes().contains(LadderType.NO_AUTO);
 
   }
+
+  @Override
+  public BigInteger getWinningGrapes(LadderEntity ladder) {
+    var baseGrapeCostForAuto = config.getBaseGrapesToBuyAutoPromote().intValue();
+
+    float multiplier = 1.f;
+    if (ladder.getTypes().contains(LadderType.GENEROUS)) {
+      multiplier = 3.f;
+    } else if (ladder.getTypes().contains(LadderType.STINGY)) {
+      multiplier = .5f;
+    }
+
+    List<RankerEntity> rankers = rankerService.findAllByLadderId(ladder.getId());
+    long place = rankers.stream()
+        .filter(r -> !r.isGrowing())
+        .count() + 1;
+
+    if (place != 1) {
+      if (place <= 3) {
+        baseGrapeCostForAuto /= 2;
+      } else if (place <= 10) {
+        baseGrapeCostForAuto /= 10;
+      } else {
+        baseGrapeCostForAuto = 0;
+      }
+    }
+
+    return BigInteger.valueOf(Math.round(baseGrapeCostForAuto * multiplier));
+  }
 }
