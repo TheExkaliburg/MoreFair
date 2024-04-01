@@ -10,11 +10,8 @@ public class UnlocksUtilsServiceImpl implements UnlocksUtilsService {
   @Override
   public int calculateAssholePoints(UnlocksEntity unlocks) {
     int result = 0;
-    if (unlocks.getReachedBaseAssholeLadder()) {
-      result += 1;
-    }
     if (unlocks.getReachedAssholeLadder()) {
-      result += 2;
+      result += 3;
     }
     if (unlocks.getPressedAssholeButton()) {
       result += 7;

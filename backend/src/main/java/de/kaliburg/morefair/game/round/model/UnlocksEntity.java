@@ -47,14 +47,10 @@ public class UnlocksEntity {
   @NonNull
   @Builder.Default
   @Column(nullable = false)
-  private Boolean reachedBaseAssholeLadder = false;
-  @NonNull
-  @Builder.Default
-  @Column(nullable = false)
   private Boolean reachedAssholeLadder = false;
   @NonNull
   @Builder.Default
   @Column(nullable = false)
   private Boolean pressedAssholeButton = false;
-  
+
 }

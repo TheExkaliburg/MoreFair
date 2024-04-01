@@ -39,7 +39,7 @@ public class RoundMapper {
         .settings(
             RoundSettingsDto.builder()
                 .basePointsForPromote(round.getBasePointsRequirement().toString())
-                .minimumPeopleForPromote(fairConfig.getBaseAssholeLadder())
+                .minimumPeopleForPromote(fairConfig.getMinimumPeopleForPromote())
                 .baseVinegarNeededToThrow(fairConfig.getBaseVinegarToThrow().toString())
                 .manualPromoteWaitTime(fairConfig.getManualPromoteWaitTime())
                 .baseGrapesNeededToAutoPromote(

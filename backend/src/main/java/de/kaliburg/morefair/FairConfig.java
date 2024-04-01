@@ -18,7 +18,7 @@ public class FairConfig {
   private BigInteger baseGrapesToBuyAutoPromote = new BigInteger("5000");
   private Integer autoPromoteLadder = 1;
   private Integer manualPromoteWaitTime = 30;
-  private Integer baseAssholeLadder = 10;
+  private Integer minimumPeopleForPromote = 10;
   private Secrets secrets;
 
   private List<String> assholeTags = Arrays.asList("", "♠", "♣", "♥", "♦", "♤", "♧", "♡", "♢",

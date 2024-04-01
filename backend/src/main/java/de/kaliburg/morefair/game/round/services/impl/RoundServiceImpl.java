@@ -3,26 +3,23 @@ package de.kaliburg.morefair.game.round.services.impl;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import de.kaliburg.morefair.FairConfig;
-import de.kaliburg.morefair.account.model.AccountEntity;
-import de.kaliburg.morefair.api.RoundController;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.core.concurrency.CriticalRegion;
-import de.kaliburg.morefair.events.Event;
-import de.kaliburg.morefair.events.types.RoundEventTypes;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
-import de.kaliburg.morefair.game.round.model.type.RoundType;
+import de.kaliburg.morefair.game.round.model.RoundTypeSetBuilder;
 import de.kaliburg.morefair.game.round.services.RoundService;
 import de.kaliburg.morefair.game.round.services.repositories.RoundRepository;
 import de.kaliburg.morefair.game.round.services.utils.impl.RoundUtilsServiceImpl;
-import de.kaliburg.morefair.game.season.model.AchievementsEntity;
 import de.kaliburg.morefair.game.season.model.SeasonEntity;
 import de.kaliburg.morefair.game.season.services.AchievementsService;
 import de.kaliburg.morefair.game.season.services.SeasonService;
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
+import java.util.Random;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -35,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class RoundServiceImpl implements RoundService {
 
+  private static final Random random = new Random();
   private final CriticalRegion semaphore = new CriticalRegion(1);
   private final RoundRepository roundRepository;
   private final SeasonService seasonService;
@@ -58,29 +56,6 @@ public class RoundServiceImpl implements RoundService {
     this.roundCache = Caffeine.newBuilder()
         .expireAfterWrite(Duration.of(30, ChronoUnit.MINUTES))
         .build(id -> this.roundRepository.findById(id).orElse(null));
-  }
-
-
-  @Override
-  public void updateHighestAssholeCountOfCurrentRound(AccountEntity account) {
-    AchievementsEntity achievements =
-        achievementsService.findOrCreateByAccountInCurrentSeason(account.getId());
-    Integer assholeCount = achievements.getAssholeCount();
-    try (var ignored = semaphore.enter()) {
-      RoundEntity currentRound = roundCache.get(currentRoundId);
-
-      if (achievements.getAssholeCount() > currentRound.getHighestAssholeCount()
-          && currentRound.getTypes().contains(RoundType.CHAOS)) {
-        currentRound.setHighestAssholeCount(assholeCount);
-        currentRound = roundRepository.save(currentRound);
-        roundCache.put(currentRoundId, currentRound);
-        wsUtils.convertAndSendToTopic(RoundController.TOPIC_EVENTS_DESTINATION, new Event<>(
-            RoundEventTypes.INCREASE_ASSHOLE_LADDER, account.getId(),
-            roundUtilsService.getAssholeLadderNumber(roundCache.get(currentRoundId))));
-      }
-    } catch (InterruptedException e) {
-      throw new RuntimeException(e);
-    }
   }
 
   @Override
@@ -160,7 +135,30 @@ public class RoundServiceImpl implements RoundService {
       return Optional.empty();
     }
 
-    RoundEntity result = new RoundEntity(currentSeason, newRoundNumber, fairConfig, previousRound);
+    // Determine the new RoundTypes
+    RoundTypeSetBuilder builder = new RoundTypeSetBuilder();
+    builder.setRoundNumber(newRoundNumber);
+    if (previousRound != null) {
+      builder.setPreviousRoundType(previousRound.getTypes());
+    }
+    var types = builder.build();
+
+    // Determine base Points
+    double percentage = roundUtilsService.getRoundBasePointRequirementMultiplier(types);
+    BigDecimal baseDec = new BigDecimal(fairConfig.getBasePointsToPromote());
+    baseDec = baseDec.multiply(BigDecimal.valueOf(percentage));
+
+    // Determining the Asshole Ladder
+    int assholeLadder = roundUtilsService.determineAssholeLadder(newRoundNumber, types);
+
+    RoundEntity result = RoundEntity.builder()
+        .number(newRoundNumber)
+        .assholeLadderNumber(assholeLadder)
+        .seasonId(currentSeason.getId())
+        .basePointsRequirement(baseDec.toBigInteger())
+        .percentageOfAdditionalAssholes(random.nextFloat(100))
+        .types(types)
+        .build();
 
     return Optional.of(roundRepository.save(result));
   }

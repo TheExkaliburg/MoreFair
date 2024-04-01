@@ -270,7 +270,8 @@ public class LadderEventServiceImpl implements LadderEventService {
       }
 
       if (ladderUtilsService.canPromote(ranker)) {
-        statisticsService.recordPromote(ranker, ladder, roundService.getCurrentRound());
+        RoundEntity currentRound = roundService.getCurrentRound();
+        statisticsService.recordPromote(ranker, ladder, currentRound);
         log.info("[L{}] Promotion for {} (#{})", ladder.getNumber(), account.getDisplayName(),
             account.getId());
         ranker.setPromotedOn(OffsetDateTime.now(ZoneOffset.UTC));
@@ -299,43 +300,10 @@ public class LadderEventServiceImpl implements LadderEventService {
         AchievementsEntity achievements =
             achievementsService.findOrCreateByAccountInCurrentSeason(account.getId());
 
-        // Special_100 Logic for moving the Ladder to 50 after finishing Ladder 100
-        RoundEntity round = roundService.getCurrentRound();
-        if (round.getTypes().contains(RoundType.SPECIAL_100)
-            && newLadder.getTypes().contains(LadderType.END)) {
-          LadderEntity assholeLadder =
-              ladderService.findCurrentLadderWithNumber(round.getModifiedBaseAssholeLadder())
-                  .orElseThrow();
-
-          assholeLadder.getTypes().remove(LadderType.DEFAULT);
-          assholeLadder.getTypes().add(LadderType.ASSHOLE);
-
-          List<RankerEntity> assholeRankers = rankerService.findAllByLadderId(
-              assholeLadder.getId());
-          assholeRankers.forEach(r -> {
-            AccountEntity a = accountService.findById(r.getAccountId()).orElseThrow();
-            if (!r.isGrowing()) {
-              achievements.setPressedAssholeButtons(achievements.getPressedAssholeButtons() + 1);
-              unlocks.setPressedAssholeButton(true);
-            }
-            unlocks.setReachedAssholeLadder(true);
-          });
-
-          Event<LadderEventType> e = new Event<>(LadderEventType.UPDATE_TYPES, account.getId(),
-              assholeLadder.getTypes());
-          wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
-              assholeLadder.getNumber(), e);
-        }
-
         // Unlocks
         if (!unlocks.getUnlockedAutoPromote()
             && newLadder.getNumber() >= fairConfig.getAutoPromoteLadder()) {
           unlocks.setUnlockedAutoPromote(true);
-        }
-        if (!unlocks.getReachedBaseAssholeLadder()
-            && newLadder.getNumber() >= roundService.getCurrentRound()
-            .getModifiedBaseAssholeLadder()) {
-          unlocks.setReachedBaseAssholeLadder(true);
         }
         if (!unlocks.getReachedAssholeLadder()
             && newLadder.getTypes().contains(LadderType.ASSHOLE)) {
@@ -392,15 +360,15 @@ public class LadderEventServiceImpl implements LadderEventService {
           messageService.create(broadCaster, chat, FormattingUtils.format(
               "{@} was welcomed by {@}. They are the {} lucky initiate for the {} big ritual.",
               FormattingUtils.ordinal(newRankers.size()),
-              FormattingUtils.ordinal(roundService.getCurrentRound().getNumber())
+              FormattingUtils.ordinal(currentRound.getNumber())
           ), metadataString);
 
-          int neededAssholesForReset = roundService.getCurrentRound().getAssholesForReset();
+          int neededAssholesForReset = currentRound.getAssholesForReset();
           int assholeCount = newRankers.size();
 
           // Is it time to reset the game
-          if (assholeCount >= neededAssholesForReset || round.getTypes()
-              .contains(RoundType.SPECIAL_100)) {
+          if (assholeCount >= neededAssholesForReset
+              || currentRound.getTypes().contains(RoundType.SPECIAL_100)) {
             wsUtils.convertAndSendToTopic(RoundController.TOPIC_EVENTS_DESTINATION,
                 new Event<>(RoundEventTypes.RESET, account.getId()));
 

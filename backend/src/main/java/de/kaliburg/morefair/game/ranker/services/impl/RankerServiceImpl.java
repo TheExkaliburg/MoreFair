@@ -19,7 +19,6 @@ import de.kaliburg.morefair.game.ranker.model.RankerEntity;
 import de.kaliburg.morefair.game.ranker.services.RankerService;
 import de.kaliburg.morefair.game.ranker.services.repositories.RankerRepository;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
-import de.kaliburg.morefair.game.round.model.type.RoundType;
 import de.kaliburg.morefair.game.round.services.RoundService;
 import de.kaliburg.morefair.game.round.services.UnlocksService;
 import de.kaliburg.morefair.game.season.services.AchievementsService;
@@ -185,15 +184,6 @@ public class RankerServiceImpl implements RankerService {
         Event<RoundEventTypes> joinEvent = new Event<>(RoundEventTypes.JOIN, account.getId());
         joinEvent.setData(new SuggestionDto(account.getId(), account.getDisplayName()));
         wsUtils.convertAndSendToTopic(RoundController.TOPIC_EVENTS_DESTINATION, joinEvent);
-
-        RoundEntity currentRound = roundService.getCurrentRound();
-        int baseAssholeLadderNumber = currentRound.getTypes().contains(RoundType.FAST)
-            ? currentRound.getBaseAssholeLadder() / 2
-            : currentRound.getBaseAssholeLadder();
-
-        if (ladderService.findCurrentLadderWithNumber(baseAssholeLadderNumber).isEmpty()) {
-          roundService.updateHighestAssholeCountOfCurrentRound(account);
-        }
       }
 
       Event<LadderEventType> joinEvent = new Event<>(LadderEventType.JOIN, account.getId());

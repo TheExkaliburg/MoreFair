@@ -5,8 +5,6 @@ import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.model.LadderType;
 import de.kaliburg.morefair.game.ranker.model.RankerEntity;
 import de.kaliburg.morefair.game.ranker.services.RankerService;
-import de.kaliburg.morefair.game.round.model.RoundEntity;
-import de.kaliburg.morefair.game.round.model.type.RoundType;
 import de.kaliburg.morefair.game.round.services.RoundService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -22,12 +20,7 @@ public class LadderUtilsServiceImpl implements LadderUtilsService {
   private final RoundService roundService;
 
   public Integer getRequiredRankerCountToUnlock(LadderEntity ladder) {
-    RoundEntity round = roundService.findById(ladder.getRoundId()).orElseThrow();
-    if (round.getTypes().contains(RoundType.SPECIAL_100)) {
-      return config.getBaseAssholeLadder();
-    }
-
-    return Math.max(config.getBaseAssholeLadder(), ladder.getScaling());
+    return Math.max(config.getMinimumPeopleForPromote(), ladder.getScaling());
   }
 
   public boolean isLadderUnlocked(@NonNull LadderEntity ladder) {

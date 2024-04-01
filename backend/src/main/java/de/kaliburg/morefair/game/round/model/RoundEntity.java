@@ -1,8 +1,6 @@
 package de.kaliburg.morefair.game.round.model;
 
-import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.game.round.model.type.RoundType;
-import de.kaliburg.morefair.game.season.model.SeasonEntity;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -17,7 +15,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -26,15 +23,16 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -50,6 +48,7 @@ public class RoundEntity {
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_round")
   private Long id;
   @NonNull
+  @Builder.Default
   @Column(nullable = false)
   private UUID uuid = UUID.randomUUID();
   @NonNull
@@ -62,17 +61,16 @@ public class RoundEntity {
   @ElementCollection(targetClass = RoundType.class, fetch = FetchType.EAGER)
   @Enumerated(EnumType.STRING)
   @Fetch(FetchMode.SELECT)
-  private Set<RoundType> types = EnumSet.noneOf(RoundType.class);
+  private Set<RoundType> types = EnumSet.of(RoundType.DEFAULT);
+  @NonNull
+  @Builder.Default
   @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
   private OffsetDateTime createdOn = OffsetDateTime.now(ZoneOffset.UTC);
   @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
   private OffsetDateTime closedOn;
   @NonNull
   @Column(nullable = false)
-  private Integer highestAssholeCount = 0;
-  @NonNull
-  @Column(nullable = false)
-  private Integer baseAssholeLadder;
+  private Integer assholeLadderNumber;
   @NonNull
   @Column(nullable = false, precision = 1000)
   private BigInteger basePointsRequirement;
@@ -80,108 +78,20 @@ public class RoundEntity {
   @Column(nullable = false)
   private Float percentageOfAdditionalAssholes;
 
-  public RoundEntity(SeasonEntity season, @NonNull Integer number, FairConfig config,
-      @Nullable RoundEntity previousRound) {
-    this.number = number;
-    this.baseAssholeLadder = config.getBaseAssholeLadder();
-    this.seasonId = season.getId();
-
-    determineRoundTypes(previousRound);
-
-    if (types.contains(RoundType.CHAOS)) {
-      // CHAOS rounds add a random number of additional ladders (up to 15)
-      this.highestAssholeCount = random.nextInt(16);
-      if (number == 100) {
-        this.highestAssholeCount = 15;
-      }
-    }
-
-    double percentage = getRoundBasePointRequirementMultiplier();
-
-    BigDecimal baseDec = new BigDecimal(config.getBasePointsToPromote());
-    baseDec = baseDec.multiply(BigDecimal.valueOf(percentage));
-    this.basePointsRequirement = baseDec.toBigInteger();
-    this.percentageOfAdditionalAssholes = random.nextFloat(100);
-  }
-
-  public RoundEntity(SeasonEntity season, @NonNull Integer number, FairConfig config) {
-    this(season, number, config, null);
-  }
-
-  private void determineRoundTypes(RoundEntity previousRound) {
-    types.clear();
-
-    RoundTypeSetBuilder builder = new RoundTypeSetBuilder();
-    builder.setRoundNumber(number);
-    if (previousRound != null) {
-      builder.setPreviousRoundType(previousRound.getTypes());
-    }
-
-    types = builder.build();
-  }
-
-  private double getRoundBasePointRequirementMultiplier() {
-    double lowerBound = 0.5f;
-    double upperBound = 1.5f;
-
-    if (types.contains(RoundType.SPECIAL_100)) {
-      return upperBound;
-    }
-
-    if (types.contains(RoundType.CHAOS)) {
-      lowerBound /= 2.0f;
-      upperBound *= 1.25f;
-    } else if (types.contains(RoundType.FAST)) {
-      lowerBound /= 2.0f;
-      upperBound /= 2.0f;
-    } else if (types.contains(RoundType.SLOW)) {
-      lowerBound *= 1.25f;
-      upperBound *= 1.25f;
-    }
-
-    return random.nextDouble(lowerBound, upperBound);
-  }
-
-  public Integer getAssholeLadderNumber() {
-    if (types.contains(RoundType.SPECIAL_100)) {
-      return 100;
-    }
-
-    int result = baseAssholeLadder + highestAssholeCount;
-    result = Math.min(25, result);
-    if (types.contains(RoundType.FAST)) {
-      result = (result + 1) / 2;
-    } else if (types.contains(RoundType.SLOW)) {
-      result += 5;
-    }
-    return result;
-  }
-
+  /**
+   * Getting the Assholes needed based on the percentageOfAdditionalAssholes.
+   *
+   * @return the assholes needed for reset
+   */
   public Integer getAssholesForReset() {
-    int max = getAssholeLadderNumber();
-    int min = getBaseAssholeLadder() / 2;
+    int max = 10;
+    int min = 5;
 
-    return min + Math.round((max - min) * getPercentageOfAdditionalAssholes() / 100);
-  }
-
-  public Integer getModifiedBaseAssholeLadder() {
-    if (types.contains(RoundType.SPECIAL_100)) {
-      return 50;
-    }
-
-    int result = baseAssholeLadder;
-    if (types.contains(RoundType.FAST)) {
-      result = getBaseAssholeLadder() / 2;
-    } else if (types.contains(RoundType.SLOW)) {
-      result = getBaseAssholeLadder() + 5;
-    }
-    return result;
+    float random = (max - min + 1) * getPercentageOfAdditionalAssholes() / 100;
+    return min + Math.round(random - 0.5f);
   }
 
   public boolean isClosed() {
-    if (closedOn == null) {
-      return false;
-    }
-    return true;
+    return closedOn != null;
   }
 }
