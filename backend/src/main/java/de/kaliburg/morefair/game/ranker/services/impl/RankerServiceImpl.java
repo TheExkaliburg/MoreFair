@@ -191,7 +191,7 @@ public class RankerServiceImpl implements RankerService {
 
       joinEvent.setData(
           new JoinData(account.getDisplayName(),
-              fairConfig.getAssholeTag(achievements.getAssholeCount()),
+              fairConfig.getAssholeTag(achievements.getAssholeLevel()),
               achievements.getAssholePoints()));
       wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
           ladderNumber,

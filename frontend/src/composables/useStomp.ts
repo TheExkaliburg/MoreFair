@@ -321,10 +321,11 @@ const wsApi = (client: Client) => {
           }),
         });
       },
-      throwVinegar: (e: Event) => {
+      throwVinegar: (e: Event, percentage: number) => {
         client.publish({
           destination: "/app/ladder/vinegar",
           body: JSON.stringify({
+            content: percentage,
             event: parseEvent(e),
           }),
         });

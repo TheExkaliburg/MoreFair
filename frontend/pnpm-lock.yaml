@@ -201,8 +201,8 @@ devDependencies:
     specifier: ^6.0.0
     version: 6.2.0(vue@3.3.4)
   vue-virtual-scroller:
-    specifier: 2.0.0-beta.7
-    version: 2.0.0-beta.7(vue@3.3.4)
+    specifier: 2.0.0-beta.8
+    version: 2.0.0-beta.8(vue@3.3.4)
   vue3-toastify:
     specifier: ^0.1.8
     version: 0.1.11(vue@3.3.4)
@@ -1621,7 +1621,7 @@ packages:
     engines: {node: '>= 14'}
     dependencies:
       eslint: 8.48.0
-      jschardet: 3.0.0
+      jschardet: 3.1.2
       lodash: 4.17.21
       utf8: 3.0.0
     transitivePeerDependencies:
@@ -3554,6 +3554,7 @@ packages:
 
   /babel-merge@3.0.0(@babel/core@7.22.9):
     resolution: {integrity: sha512-eBOBtHnzt9xvnjpYNI5HmaPp/b2vMveE5XggzqHnQeHJ8mFIBrBv6WZEVIj5jJ2uwTItkqKo9gWzEEcBxEq0yw==}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
     peerDependencies:
       '@babel/core': ^7.0.0
     dependencies:
@@ -6482,8 +6483,8 @@ packages:
       argparse: 2.0.1
     dev: true
 
-  /jschardet@3.0.0:
-    resolution: {integrity: sha512-lJH6tJ77V8Nzd5QWRkFYCLc13a3vADkh3r/Fi8HupZGWk2OVVDfnZP8V/VgQgZ+lzW0kG2UGb5hFgt3V3ndotQ==}
+  /jschardet@3.1.2:
+    resolution: {integrity: sha512-mw3CBZGzW8nUBPYhFU2ztZ/kJ6NClQUQVpyzvFMfznZsoC///ZQ30J2RCUanNsr5yF22LqhgYr/lj807/ZleWA==}
     engines: {node: '>=0.1.90'}
     dev: true
 
@@ -11025,8 +11026,8 @@ packages:
       vue: 3.3.4
     dev: true
 
-  /vue-virtual-scroller@2.0.0-beta.7(vue@3.3.4):
-    resolution: {integrity: sha512-OrouVj1i2939jaLjVfu8f5fsDlbzhAb4bOsYZYrAkpcVLylAmMoGtIL7eT3hJrdTiaKbwQpRdnv7DKf9Fn+tHg==}
+  /vue-virtual-scroller@2.0.0-beta.8(vue@3.3.4):
+    resolution: {integrity: sha512-b8/f5NQ5nIEBRTNi6GcPItE4s7kxNHw2AIHLtDp+2QvqdTjVN0FgONwX9cr53jWRgnu+HRLPaWDOR2JPI5MTfQ==}
     peerDependencies:
       vue: latest
     dependencies:

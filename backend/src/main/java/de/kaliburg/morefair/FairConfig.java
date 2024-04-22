@@ -15,18 +15,20 @@ public class FairConfig {
 
   private BigInteger basePointsToPromote = new BigInteger("100000000");
   private BigInteger baseVinegarToThrow = new BigInteger("500000");
-  private BigInteger baseGrapesToBuyAutoPromote = new BigInteger("5000");
+  private BigInteger baseGrapesToBuyAutoPromote = new BigInteger("2000");
   private Integer autoPromoteLadder = 1;
   private Integer manualPromoteWaitTime = 30;
   private Integer minimumPeopleForPromote = 10;
   private Secrets secrets;
+  private Integer minVinegarThrown = 50;
+  private Integer maxVinegarThrown = 100;
 
   private List<String> assholeTags = Arrays.asList("", "♠", "♣", "♥", "♦", "♤", "♧", "♡", "♢",
       "♟", "♙", "♞", "♘", "♝", "♗", "♖", "♛", "♕", "♚", "♔", "🂠", "🂡", "🂢", "🂣", "🂣", "🂥",
       "🂦", "🂧", "🂧", "🂩", "🂪", "🂫", "🂬", "🂭", "🂮");
 
-  public String getAssholeTag(Integer assholeCount) {
-    return assholeTags.get(Math.min(assholeCount, assholeTags.size() - 1));
+  public String getAssholeTag(Integer assholeLevel) {
+    return assholeTags.get(Math.min(assholeLevel, assholeTags.size() - 1));
   }
 
   /**

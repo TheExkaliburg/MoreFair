@@ -27,6 +27,8 @@ public class RoundDto {
     private String baseVinegarNeededToThrow;
     private String baseGrapesNeededToAutoPromote;
     private Integer manualPromoteWaitTime;
+    private Integer minVinegarThrown;
+    private Integer maxVinegarThrown;
 
   }
 }

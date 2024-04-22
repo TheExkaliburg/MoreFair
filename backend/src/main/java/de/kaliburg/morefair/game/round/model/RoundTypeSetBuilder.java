@@ -17,6 +17,7 @@ public class RoundTypeSetBuilder {
 
   private static final Random random = new Random();
   private final Map<RoundType, Float> roundSpeedTypeWeights = new HashMap<>();
+  private final Map<RoundType, Float> roundLengthTypeWeights = new HashMap<>();
   private final Map<RoundType, Float> roundAutoTypeWeights = new HashMap<>();
   private final Map<RoundType, Float> roundChaosTypeWeights = new HashMap<>();
   private final Map<RoundType, Float> roundGrapesTypeWeights = new HashMap<>();
@@ -30,9 +31,13 @@ public class RoundTypeSetBuilder {
   private Integer roundNumber = 1;
 
   public RoundTypeSetBuilder() {
-    // FIXME: roundSpeedTypeWeights.put(RoundType.FAST, 20.f);
-    // roundSpeedTypeWeights.put(RoundType.SLOW, 10.f);
+    roundSpeedTypeWeights.put(RoundType.FAST, 20.f);
+    roundSpeedTypeWeights.put(RoundType.SLOW, 10.f);
     roundSpeedTypeWeights.put(RoundType.DEFAULT, 70.f);
+
+    roundLengthTypeWeights.put(RoundType.SHORT, 20.f);
+    roundLengthTypeWeights.put(RoundType.LONG, 10.f);
+    roundLengthTypeWeights.put(RoundType.DEFAULT, 70.f);
 
     roundAutoTypeWeights.put(RoundType.AUTO, 10.f);
     roundAutoTypeWeights.put(RoundType.DEFAULT, 90.f);
@@ -52,26 +57,34 @@ public class RoundTypeSetBuilder {
   }
 
   public Set<RoundType> build() {
-    if (roundNumber % 100 == 0) {
-      return EnumSet.of(RoundType.SPECIAL_100, RoundType.REVERSE_SCALING);
-    } else if (roundNumber % 10 == 0) {
+    if (roundNumber % 10 == 0) {
       roundSpeedTypeWeights.put(RoundType.FAST, 1.f);
       roundSpeedTypeWeights.put(RoundType.SLOW, 1.f);
       roundSpeedTypeWeights.put(RoundType.DEFAULT, 1.f);
+
+      roundLengthTypeWeights.put(RoundType.SHORT, 1.f);
+      roundLengthTypeWeights.put(RoundType.LONG, 1.f);
+      roundLengthTypeWeights.put(RoundType.DEFAULT, 1.f);
 
       roundAutoTypeWeights.put(RoundType.AUTO, 1.f);
       roundAutoTypeWeights.put(RoundType.DEFAULT, 1.f);
 
       roundChaosTypeWeights.put(RoundType.CHAOS, 1.f);
       roundChaosTypeWeights.put(RoundType.DEFAULT, 1.f);
+
+      roundGrapesTypeWeights.put(RoundType.FARMER, 1.f);
+      roundGrapesTypeWeights.put(RoundType.RAILROAD, 1.f);
+      roundGrapesTypeWeights.put(RoundType.RACE, 1.f);
+      roundGrapesTypeWeights.put(RoundType.DEFAULT, 1.f);
     }
 
     Set<RoundType> roundTypes;
     int iterations = 0;
     do {
-      roundTypes = EnumSet.noneOf(RoundType.class);
+      roundTypes = EnumSet.of(RoundType.DEFAULT);
       roundTypes.stream().sorted(new RoundType.Comparator()).forEach(this::handlePreviousRoundType);
       roundTypes.add(getRandomLadderType(roundSpeedTypeWeights, "Speed"));
+      roundTypes.add(getRandomLadderType(roundLengthTypeWeights, "Length"));
       roundTypes.add(getRandomLadderType(roundAutoTypeWeights, "Auto"));
       roundTypes.add(getRandomLadderType(roundChaosTypeWeights, "Chaos"));
       roundTypes.add(getRandomLadderType(roundGrapesTypeWeights, "Grapes"));

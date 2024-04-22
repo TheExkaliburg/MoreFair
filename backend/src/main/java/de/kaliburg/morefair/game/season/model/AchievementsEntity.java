@@ -61,7 +61,7 @@ public class AchievementsEntity {
    *
    * @return the asshole count
    */
-  public @NonNull Integer getAssholeCount() {
+  public @NonNull Integer getAssholeLevel() {
     if (assholePoints <= 0) {
       return 0;
     }

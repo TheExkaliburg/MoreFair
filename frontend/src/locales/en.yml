@@ -37,7 +37,7 @@ components:
       bias: Bias
       bias_short: B
       autopromote: Buy Autopromote
-      vinegar: Throw all Vinegar
+      vinegar: Throw %s Vinegar
       promote: Promote
       asshole: Be Asshole
       info:

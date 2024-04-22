@@ -10,6 +10,8 @@ public class VinegarData {
 
   @NonNull
   private String amount;
+  @NonNull
+  private Integer percentage;
   private boolean success = false;
   @NonNull
   private Long targetId;

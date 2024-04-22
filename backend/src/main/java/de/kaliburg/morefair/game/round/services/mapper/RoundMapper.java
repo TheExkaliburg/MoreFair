@@ -45,6 +45,8 @@ public class RoundMapper {
                 .baseGrapesNeededToAutoPromote(
                     fairConfig.getBaseGrapesToBuyAutoPromote().toString()
                 )
+                .minVinegarThrown(fairConfig.getMinVinegarThrown())
+                .maxVinegarThrown(fairConfig.getMaxVinegarThrown())
                 .build()
         )
         .build();

@@ -7,13 +7,21 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public enum RoundType {
   DEFAULT,
+  // Speed -> Point Requirements
   FAST,
   SLOW,
+  // Ladders Per Round
+  SHORT,
+  LONG,
+  // AutoPromote enabled
   AUTO,
+  // more Randomness
   CHAOS(1),
+  // Vinegar Modifiers
   RAILROAD,
   FARMER,
   RACE,
+  // Unused
   REVERSE_SCALING,
   SPECIAL_100;
 

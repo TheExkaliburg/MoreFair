@@ -4,7 +4,8 @@
   >
     <LadderWindowHeader class="h-8 w-full shrink-0" />
     <LadderWindowTable class="w-full flex-auto" />
-    <LadderWindowBody class="min-h-fit w-full shrink-0" />
+    <LadderWindowBody class="w-full shrink-0" />
+    <LadderWindowMenus class="w-full shrink-0" />
   </div>
 </template>
 
@@ -12,6 +13,7 @@
 import LadderWindowHeader from "./LadderWindowHeader.vue";
 import LadderWindowTable from "./LadderWindowTable.vue";
 import LadderWindowBody from "./LadderWindowBody.vue";
+import LadderWindowMenus from "./LadderWindowMenus.vue";
 </script>
 
 <style lang="scss" scoped>

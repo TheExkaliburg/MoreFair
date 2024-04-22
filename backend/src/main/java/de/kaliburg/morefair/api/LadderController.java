@@ -153,6 +153,11 @@ public class LadderController {
   public void throwVinegar(SimpMessageHeaderAccessor sha, Authentication authentication,
       WsMessage wsMessage) {
     try {
+      int percentage = 100;
+      if (wsMessage.getContent() != null) {
+        percentage = Math.round(Float.parseFloat(wsMessage.getContent()));
+      }
+
       AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
           .orElse(null);
       if (account == null || account.isBanned()) {
@@ -172,7 +177,7 @@ public class LadderController {
       wsUtils.convertAndSendToTopic(ModerationController.TOPIC_LOG_EVENTS_DESTINATION + num, data);
 
       ladderEventService.addEvent(num,
-          new Event<>(LadderEventType.THROW_VINEGAR, account.getId()));
+          new Event<>(LadderEventType.THROW_VINEGAR, account.getId(), percentage));
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }

@@ -47,10 +47,10 @@ public class RoundUtilsServiceImpl implements RoundUtilsService {
     int additionalLadders;
 
     if (types.contains(RoundType.CHAOS)) {
-      if (types.contains(RoundType.FAST)) {
+      if (types.contains(RoundType.SHORT)) {
         baseAsshole = 5;
         additionalLadders = random.nextInt(6);
-      } else if (types.contains(RoundType.SLOW)) {
+      } else if (types.contains(RoundType.LONG)) {
         baseAsshole = 25;
         additionalLadders = random.nextInt(11);
       } else {
@@ -58,9 +58,9 @@ public class RoundUtilsServiceImpl implements RoundUtilsService {
         additionalLadders = random.nextInt(21);
       }
     } else {
-      if (types.contains(RoundType.FAST)) {
+      if (types.contains(RoundType.SHORT)) {
         baseAsshole = 10;
-      } else if (types.contains(RoundType.SLOW)) {
+      } else if (types.contains(RoundType.LONG)) {
         baseAsshole = 20;
       } else {
         baseAsshole = 15;

@@ -15,6 +15,7 @@ import { useFormatter } from "~/composables/useFormatter";
 import { useToasts } from "~/composables/useToasts";
 import { SOUNDS, useSound } from "~/composables/useSound";
 import { useOptionsStore } from "~/store/options";
+import { useRoundStore } from "~/store/round";
 
 export enum LadderType {
   DEFAULT = "DEFAULT",
@@ -349,27 +350,42 @@ export const useLadderStore = defineStore("ladder", () => {
   function handleThrowVinegarEvent(ranker: Ranker, event: OnLadderEventBody) {
     if (getters.yourRanker === undefined) return;
     const vinegarThrown = new Decimal(event.data.amount);
+    const percentage = event.data.percentage;
     if (ranker.accountId === getters.yourRanker.accountId) {
-      ranker.vinegar = Object.freeze(new Decimal(0));
+      // THROWER
+
+      const restoredVinegar = getters.yourRanker.vinegar
+        .mul(useRoundStore().state.settings.minVinegarThrown)
+        .div(200);
+
+      ranker.vinegar = Object.freeze(
+        getters.yourRanker.vinegar.sub(vinegarThrown).add(restoredVinegar),
+      );
       return;
     }
 
     if (event.data.targetId === getters.yourRanker.accountId) {
+      // DEFENDED
+
+      const subtractedVinegar = vinegarThrown.mul(percentage).div(100);
+
       getters.yourRanker.vinegar = Object.freeze(
         Decimal.max(
-          getters.yourRanker.vinegar.sub(vinegarThrown),
+          getters.yourRanker.vinegar.sub(subtractedVinegar),
           new Decimal(0),
         ),
       );
       useToasts(
         `${ranker.username} (#${ranker.accountId}) ${
           event.data.success ? "successfully" : ""
-        } threw  ${useFormatter(vinegarThrown)} vinegar at you!`,
+        } threw  ${useFormatter(
+          vinegarThrown,
+        )} (${percentage}%) vinegar at you!`,
       );
       chatStore.actions.addSystemMessage(
         `{@} saw {@} throwing vinegar at {@}. They've ${
           event.data.success ? "successfully" : ""
-        } used ${useFormatter(vinegarThrown)} vinegar!`,
+        } used ${useFormatter(vinegarThrown)} (${percentage}%) vinegar!`,
         JSON.stringify([
           { u: "Chad", i: 0, id: 1 },
           { u: ranker.username, i: 8, id: ranker.accountId },

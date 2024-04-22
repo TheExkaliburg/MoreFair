@@ -6,7 +6,7 @@ import java.math.BigInteger;
 
 public interface RankerUtilsService {
 
-  boolean canThrowVinegarAt(RankerEntity ranker, RankerEntity target);
+  boolean canThrowVinegarAt(RankerEntity ranker, RankerEntity target, int percentage);
 
   boolean canBuyAutoPromote(RankerEntity ranker);
 

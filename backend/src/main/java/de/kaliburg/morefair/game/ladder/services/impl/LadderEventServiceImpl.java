@@ -410,6 +410,7 @@ public class LadderEventServiceImpl implements LadderEventService {
    */
   boolean throwVinegar(Event<LadderEventType> event, LadderEntity ladder) {
     try {
+      int percentage = (Integer) event.getData();
       AccountEntity rankerAccount = accountService.findById(event.getAccountId()).orElseThrow();
       RankerEntity ranker = rankerService.findHighestActiveRankerOfAccount(rankerAccount)
           .orElseThrow();
@@ -430,21 +431,43 @@ public class LadderEventServiceImpl implements LadderEventService {
         return false;
       }
 
-      if (ladderUtilsService.canThrowVinegarAt(ranker, target)) {
+      if (ladderUtilsService.canThrowVinegarAt(ranker, target, percentage)) {
         statisticsService.recordVinegarThrow(ranker, target, ladder,
             roundService.getCurrentRound());
         BigInteger rankerVinegar = ranker.getVinegar();
+        BigInteger thrownVinegar = rankerVinegar
+            .multiply(BigInteger.valueOf(percentage))
+            .divide(BigInteger.valueOf(100));
         BigInteger targetVinegar = target.getVinegar();
 
-        log.info("[L{}] {} (#{}) is using their {} Vinegar on {} (#{}) with {} Vinegar",
+        log.info("[L{}] {} (#{}) is using their {} ({}%) Vinegar on {} (#{}) with {} Vinegar",
             ladder.getNumber(), rankerAccount.getDisplayName(), rankerAccount.getId(),
-            rankerVinegar,
+            rankerVinegar, percentage,
             targetAccount.getDisplayName(), targetAccount.getId(), targetVinegar);
 
-        VinegarData data = new VinegarData(rankerVinegar.toString(), targetAccount.getId());
-        if (targetVinegar.compareTo(rankerVinegar) > 0) {
-          targetVinegar = targetVinegar.subtract(rankerVinegar);
+        VinegarData data = new VinegarData(thrownVinegar.toString(), percentage,
+            targetAccount.getId());
+
+        // Handle the Comparing Logic
+        if (targetVinegar.compareTo(thrownVinegar) > 0) {
+          // DEFENDED
+
+          // Only remove the same fraction of that vinegar
+          BigInteger subtractedVinegar = thrownVinegar
+              .multiply(BigInteger.valueOf(percentage))
+              .divide(BigInteger.valueOf(100));
+
+          rankerVinegar = rankerVinegar.subtract(thrownVinegar);
+          targetVinegar = targetVinegar.subtract(subtractedVinegar);
         } else {
+          // THROW DOWN
+
+          // Getting half of the minimum Vinegar needed to throw back
+          BigInteger restoredVinegar = rankerVinegar
+              .multiply(BigInteger.valueOf(fairConfig.getMinVinegarThrown()))
+              .divide(BigInteger.valueOf(200));
+
+          rankerVinegar = rankerVinegar.subtract(thrownVinegar).add(restoredVinegar);
           targetVinegar = BigInteger.ZERO;
           data.setSuccess(true);
         }
@@ -461,7 +484,7 @@ public class LadderEventServiceImpl implements LadderEventService {
           removeMulti(new Event<>(LadderEventType.REMOVE_MULTI, targetAccount.getId()), ladder);
         }
 
-        ranker.setVinegar(BigInteger.ZERO);
+        ranker.setVinegar(rankerVinegar);
         target.setVinegar(targetVinegar);
         return true;
       }

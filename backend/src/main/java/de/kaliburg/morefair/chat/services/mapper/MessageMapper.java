@@ -45,7 +45,7 @@ public class MessageMapper {
         .username(account.getDisplayName())
         .accountId(account.getId())
         .assholePoints(achievements.getAssholePoints())
-        .tag(fairConfig.getAssholeTag(achievements.getAssholeCount()))
+        .tag(fairConfig.getAssholeTag(achievements.getAssholeLevel()))
         .isMod(account.isMod())
         .timestamp(message.getCreatedOn().withOffsetSameInstant(ZoneOffset.UTC).toEpochSecond())
         .chatType(chat.getType())

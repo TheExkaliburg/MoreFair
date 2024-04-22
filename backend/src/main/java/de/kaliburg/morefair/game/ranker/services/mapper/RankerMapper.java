@@ -42,7 +42,7 @@ public class RankerMapper {
         .bias(ranker.getBias())
         .multi(ranker.getMultiplier())
         .isGrowing(ranker.isGrowing())
-        .assholeTag(fairConfig.getAssholeTag(achievements.getAssholeCount()))
+        .assholeTag(fairConfig.getAssholeTag(achievements.getAssholeLevel()))
         .assholePoints(achievements.getAssholePoints())
         .build();
   }
@@ -72,7 +72,7 @@ public class RankerMapper {
         .bias(ranker.getBias())
         .multi(ranker.getMultiplier())
         .isGrowing(ranker.isGrowing())
-        .assholeTag(fairConfig.getAssholeTag(achievements.getAssholeCount()))
+        .assholeTag(fairConfig.getAssholeTag(achievements.getAssholeLevel()))
         .assholePoints(achievements.getAssholePoints())
         .build();
   }

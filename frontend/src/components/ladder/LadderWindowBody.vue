@@ -120,6 +120,7 @@ import { useFormatter, useTimeFormatter } from "~/composables/useFormatter";
 import { useLadderUtils } from "~/composables/useLadderUtils";
 import { useStomp } from "~/composables/useStomp";
 import { useEta } from "~/composables/useEta";
+import { useGrapesStore } from "~/store/grapes";
 
 const lang = useLang("components.ladder.buttons");
 const optionsStore = useOptionsStore();
@@ -168,7 +169,12 @@ const multiButtonLabel = computed<string>(() => {
 
 const vinegarButtonLabel = computed<string>(() => {
   const eta = useEta(yourRanker.value).toVinegarThrow();
-  if (eta === 0 || eta === Infinity) return `${lang("vinegar")}`;
+  if (eta === 0 || eta === Infinity) {
+    return `${lang(
+      "vinegar",
+      useFormatter(useGrapesStore().getters.selectedVinegar),
+    )}`;
+  }
   return `${lang("vinegar")} (${useTimeFormatter(eta)})`;
 });
 
@@ -226,7 +232,9 @@ const canBuyAutoPromote = computed<boolean>(() => {
 });
 const canThrowVinegar = computed<boolean>(() => {
   return (
-    ladderUtils.getVinegarThrowCost.value.cmp(yourRanker.value.vinegar) <= 0 &&
+    ladderUtils.getVinegarThrowCost.value.cmp(
+      useGrapesStore().getters.selectedVinegar,
+    ) <= 0 &&
     ladderStore.state.rankers[0].growing &&
     ladderUtils.isLadderPromotable.value
   );
@@ -309,7 +317,10 @@ function buyAutoPromote(e: Event) {
 function throwVinegar(e: Event) {
   if (pressedVinegarRecently.value || !canThrowVinegar.value) return;
   pressedVinegarRecently.value = true;
-  useStomp().wsApi.ladder.throwVinegar(e);
+  useStomp().wsApi.ladder.throwVinegar(
+    e,
+    useGrapesStore().state.vinegarThrowPercentage,
+  );
 }
 
 function promote(e: Event) {

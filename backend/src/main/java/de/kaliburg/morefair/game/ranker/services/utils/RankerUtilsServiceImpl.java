@@ -122,16 +122,20 @@ public class RankerUtilsServiceImpl implements RankerUtilsService {
    * @return if the ranker can throw the vinegar
    */
   @Override
-  public boolean canThrowVinegarAt(RankerEntity ranker, RankerEntity target) {
+  public boolean canThrowVinegarAt(RankerEntity ranker, RankerEntity target, int percentage) {
     LadderEntity ladder = ladderService.findLadderById(ranker.getLadderId()).orElseThrow();
 
     if (!ladderUtilsService.isLadderPromotable(ladder)) {
       return false;
     }
 
+    BigInteger rankerVinegar = ranker.getVinegar()
+        .multiply(BigInteger.valueOf(percentage))
+        .divide(BigInteger.valueOf(100));
+
     return target.getRank() == 1 && !ranker.getUuid().equals(target.getUuid()) && target.isGrowing()
         && !target.isAutoPromote()
-        && ranker.getVinegar().compareTo(upgradeUtils.throwVinegarCost(ladder.getScaling())) >= 0;
+        && rankerVinegar.compareTo(upgradeUtils.throwVinegarCost(ladder.getScaling())) >= 0;
   }
 
   /**
