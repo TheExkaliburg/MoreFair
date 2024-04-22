@@ -104,6 +104,10 @@
           yourTimeToPromotion
         }})
       </p>
+      <p data-tutorial="wine">
+        (<span class="text-text-dark">{{ formattedWineShieldEta }}</span
+        >) {{ yourFormattedWine }} {{ lang("info.wine") }}
+      </p>
     </div>
   </div>
 </template>
@@ -121,6 +125,7 @@ import { useLadderUtils } from "~/composables/useLadderUtils";
 import { useStomp } from "~/composables/useStomp";
 import { useEta } from "~/composables/useEta";
 import { useGrapesStore } from "~/store/grapes";
+import { useAccountStore } from "~/store/account";
 
 const lang = useLang("components.ladder.buttons");
 const optionsStore = useOptionsStore();
@@ -197,6 +202,28 @@ const yourFormattedGrapes = computed<string>(() => {
 const yourFormattedVinegar = computed<string>(() => {
   if (optionsStore.state.ladder.hideVinegarAndGrapes.value) return "[Hidden]";
   return useFormatter(yourRanker.value.vinegar);
+});
+const yourFormattedWine = computed<string>(() => {
+  if (optionsStore.state.ladder.hideVinegarAndGrapes.value) return "[Hidden]";
+  return useFormatter(yourRanker.value.wine);
+});
+const isWineShieldActive = computed<boolean>(() => {
+  return yourRanker.value.vinegar.cmp(yourRanker.value.wine) < 0;
+});
+const formattedWineShieldEta = computed<string>(() => {
+  if (isWineShieldActive.value) return lang("info.shielded");
+  const winePerSec = yourRanker.value.grapes
+    .mul(100 - useAccountStore().state.settings.vinegarSplit)
+    .div(50);
+  const vinegarPerSec = yourRanker.value.grapes
+    .mul(useAccountStore().state.settings.vinegarSplit)
+    .div(100);
+
+  const wineDeltaPerSec = winePerSec.sub(vinegarPerSec);
+  if (wineDeltaPerSec.cmp(0) < 0) return useTimeFormatter(Infinity);
+  const wineMissing = yourRanker.value.vinegar.sub(yourRanker.value.wine);
+  const seconds = wineMissing.div(wineDeltaPerSec).ceil();
+  return useTimeFormatter(seconds.toNumber());
 });
 
 const yourBiasCostFormatted = computed<string>(() => {

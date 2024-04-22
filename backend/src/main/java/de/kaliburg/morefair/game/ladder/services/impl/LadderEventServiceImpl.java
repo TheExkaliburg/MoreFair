@@ -22,6 +22,7 @@ import de.kaliburg.morefair.chat.services.MessageService;
 import de.kaliburg.morefair.core.concurrency.CriticalRegion;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.data.VinegarData;
+import de.kaliburg.morefair.events.data.VinegarData.VinegarSuccessType;
 import de.kaliburg.morefair.events.types.AccountEventTypes;
 import de.kaliburg.morefair.events.types.LadderEventType;
 import de.kaliburg.morefair.events.types.RoundEventTypes;
@@ -439,6 +440,7 @@ public class LadderEventServiceImpl implements LadderEventService {
             .multiply(BigInteger.valueOf(percentage))
             .divide(BigInteger.valueOf(100));
         BigInteger targetVinegar = target.getVinegar();
+        BigInteger restoredVinegar = BigInteger.ZERO;
 
         log.info("[L{}] {} (#{}) is using their {} ({}%) Vinegar on {} (#{}) with {} Vinegar",
             ladder.getNumber(), rankerAccount.getDisplayName(), rankerAccount.getId(),
@@ -448,28 +450,58 @@ public class LadderEventServiceImpl implements LadderEventService {
         VinegarData data = new VinegarData(thrownVinegar.toString(), percentage,
             targetAccount.getId());
 
+        boolean isWineShieldActive = target.getVinegar().compareTo(target.getWine()) < 0;
+
+        BigInteger passedVinegar = thrownVinegar;
+        if (isWineShieldActive) {
+          BigInteger targetWine = target.getWine();
+
+          if (targetWine.compareTo(thrownVinegar) <= 0) {
+            // BROKE THROUGH SHIELD
+
+            passedVinegar = passedVinegar.subtract(targetWine);
+            restoredVinegar = restoredVinegar.add(
+                rankerVinegar
+                    .multiply(BigInteger.valueOf(fairConfig.getMinVinegarThrown()))
+                    .divide(BigInteger.valueOf(200))
+            );
+          } else {
+            // DEFENDED WITH SHIELD
+            passedVinegar = BigInteger.ZERO;
+          }
+
+          // OneShot either Way
+          data.setSuccess(VinegarSuccessType.SHIELDED);
+          target.setWine(BigInteger.ZERO);
+        }
+
         // Handle the Comparing Logic
-        if (targetVinegar.compareTo(thrownVinegar) > 0) {
+        if (targetVinegar.compareTo(passedVinegar) > 0) {
           // DEFENDED
 
           // Only remove the same fraction of that vinegar
-          BigInteger subtractedVinegar = thrownVinegar
+          BigInteger subtractedVinegar = passedVinegar
               .multiply(BigInteger.valueOf(percentage))
               .divide(BigInteger.valueOf(100));
 
-          rankerVinegar = rankerVinegar.subtract(thrownVinegar);
-          targetVinegar = targetVinegar.subtract(subtractedVinegar);
+          ranker.setVinegar(rankerVinegar.subtract(thrownVinegar).add(restoredVinegar));
+          target.setVinegar(targetVinegar.subtract(subtractedVinegar));
+          data.setSuccess(data.getSuccess().equals(VinegarSuccessType.SHIELDED)
+              ? VinegarSuccessType.SHIELD_DEFENDED : VinegarSuccessType.DEFENDED
+          );
         } else {
           // THROW DOWN
 
           // Getting half of the minimum Vinegar needed to throw back
-          BigInteger restoredVinegar = rankerVinegar
+          restoredVinegar = rankerVinegar
               .multiply(BigInteger.valueOf(fairConfig.getMinVinegarThrown()))
               .divide(BigInteger.valueOf(200));
 
-          rankerVinegar = rankerVinegar.subtract(thrownVinegar).add(restoredVinegar);
-          targetVinegar = BigInteger.ZERO;
-          data.setSuccess(true);
+          ranker.setVinegar(rankerVinegar.subtract(thrownVinegar).add(restoredVinegar));
+          target.setVinegar(BigInteger.ZERO);
+          data.setSuccess(data.getSuccess().equals(VinegarSuccessType.SHIELDED)
+              ? VinegarSuccessType.DOUBLE_SUCCESS : VinegarSuccessType.SUCCESS
+          );
         }
 
         event.setData(data);
@@ -480,12 +512,10 @@ public class LadderEventServiceImpl implements LadderEventService {
             accountService.findById(target.getAccountId()).orElseThrow().getUuid(),
             LadderController.PRIVATE_EVENTS_DESTINATION, event);
 
-        if (data.isSuccess()) {
+        if (data.getSuccess().equals(VinegarSuccessType.SUCCESS)) {
           removeMulti(new Event<>(LadderEventType.REMOVE_MULTI, targetAccount.getId()), ladder);
         }
 
-        ranker.setVinegar(rankerVinegar);
-        target.setVinegar(targetVinegar);
         return true;
       }
     } catch (Exception e) {

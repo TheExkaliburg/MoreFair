@@ -17,5 +17,6 @@ public class AccountDetailsDto {
   private String email;
   private Integer highestCurrentLadder;
   private AccountAccessType accessRole;
+  private AccountSettingsDto settings;
 
 }

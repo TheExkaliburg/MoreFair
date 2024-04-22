@@ -22,6 +22,20 @@ CREATE TABLE IF NOT EXISTS public.account
     CONSTRAINT account_uk_username UNIQUE (username)
 );
 
+-- Account Settings
+CREATE SEQUENCE IF NOT EXISTS public.seq_account_settings;
+CREATE TABLE IF NOT EXISTS public.account_settings
+(
+    id            bigint  NOT NULL,
+    uuid          uuid    NOT NULL DEFAULT uuid_generate_v4(),
+    account_id    bigint  NOT NULL,
+    vinegar_split integer NOT NULL DEFAULT 50,
+    CONSTRAINT account_settings_pkey PRIMARY KEY (id),
+    CONSTRAINT account_settings_uuid UNIQUE (uuid),
+    CONSTRAINT account_settings_account UNIQUE (account_id),
+    FOREIGN KEY (account_id) REFERENCES public.account (id) MATCH FULL
+);
+
 -- Chat
 CREATE SEQUENCE IF NOT EXISTS public.seq_chat;
 CREATE TABLE IF NOT EXISTS public.chat
@@ -92,6 +106,7 @@ CREATE TABLE IF NOT EXISTS public.achievements
     FOREIGN KEY (account_id) REFERENCES public.account (id) MATCH FULL,
     FOREIGN KEY (season_id) REFERENCES public.season (id) MATCH FULL
 );
+
 
 -- Round
 CREATE SEQUENCE IF NOT EXISTS public.seq_round;
@@ -178,6 +193,7 @@ CREATE TABLE IF NOT EXISTS public.ranker
     points       numeric(1000, 0)         NOT NULL,
     grapes       numeric(1000, 0)         NOT NULL,
     vinegar      numeric(1000, 0)         NOT NULL,
+    wine         numeric(1000, 0)         NOT NULL,
     auto_promote boolean                  NOT NULL,
     created_on   timestamp with time zone NOT NULL DEFAULT now(),
     promoted_on  timestamp with time zone,

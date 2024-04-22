@@ -2,6 +2,7 @@ import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import Cookies from "js-cookie";
 import { useToasts } from "~/composables/useToasts";
 import { ChatType } from "~/store/chat";
+import { AccountSettings } from "~/store/account";
 
 const isDevMode = process.env.NODE_ENV !== "production";
 let lastXsrfToken = Cookies.get("XSRF-TOKEN");
@@ -151,6 +152,9 @@ const API = {
 
     getAccountDetails: () => {
       return axiosInstance.get("/api/account");
+    },
+    saveSettings(settings: AccountSettings) {
+      return axiosInstance.patch("/api/account/settings", settings);
     },
   },
   ladder: {

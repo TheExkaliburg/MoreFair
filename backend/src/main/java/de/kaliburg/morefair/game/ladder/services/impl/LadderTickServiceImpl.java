@@ -2,6 +2,7 @@ package de.kaliburg.morefair.game.ladder.services.impl;
 
 import static de.kaliburg.morefair.events.types.LadderEventType.PROMOTE;
 
+import de.kaliburg.morefair.account.services.AccountSettingsService;
 import de.kaliburg.morefair.api.FairController;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.core.concurrency.CriticalRegion;
@@ -36,6 +37,7 @@ public class LadderTickServiceImpl implements LadderTickService {
 
   private static final double NANOS_IN_SECONDS = TimeUnit.SECONDS.toNanos(1);
   private final CriticalRegion semaphore = new CriticalRegion(1);
+  private final AccountSettingsService accountSettingsService;
   private final LadderEventService ladderEventService;
   private final RankerService rankerService;
   private final LadderService ladderService;
@@ -93,11 +95,22 @@ public class LadderTickServiceImpl implements LadderTickService {
         currentRanker.addPoints(currentRanker.getPower(), delta);
 
         // Calculating Vinegar based on Grapes count
+        var settings = accountSettingsService.findOrCreateByAccount(currentRanker.getAccountId());
+
         if (currentRanker.getRank() != 1) {
-          currentRanker.addVinegar(currentRanker.getGrapes(), delta);
+          var addedVinegar = currentRanker.getGrapes()
+              .multiply(BigInteger.valueOf(settings.getVinegarSplit()))
+              .divide(BigInteger.valueOf(100));
+          currentRanker.addVinegar(addedVinegar, delta);
+
+          var addedWine = currentRanker.getGrapes()
+              .multiply(BigInteger.valueOf(settings.getWineSplit()))
+              .divide(BigInteger.valueOf(50));
+          currentRanker.addWine(addedWine, delta);
         }
         if (currentRanker.getRank() == 1 && ladderUtilsService.isLadderPromotable(ladder)) {
           currentRanker.mulVinegar(0.9975, delta);
+          currentRanker.mulWine(0.9975, delta);
         }
 
         for (int j = i - 1; j >= 0; j--) {
@@ -123,7 +136,7 @@ public class LadderTickServiceImpl implements LadderTickService {
         }
       }
     }
-    // Ranker on Last Place gains 1 Grape, even if hes also in first at the same time (ladder of 1)
+    // Ranker on Last Place gains 1 Grape, even if he's also in first at the same time (ladder of 1)
     if (!rankers.isEmpty()) {
       RankerEntity lastRanker = rankers.get(rankers.size() - 1);
       if (lastRanker.isGrowing()) {

@@ -1,5 +1,5 @@
 <template>
-  <LadderSettingsWithIcon @click="isOpen = true">
+  <LadderSettingsWithIcon @click="open">
     <font-awesome-icon icon="fa-solid fa-wine-bottle" />
   </LadderSettingsWithIcon>
   <FairDialog
@@ -8,6 +8,29 @@
     @close="isOpen = false"
   >
     <div class="flex flex-col">
+      <p class="w-fit whitespace-nowrap h-full align-middle text-xl pb-2">
+        Wine/Vinegar Split (Placeholder):
+      </p>
+      <div class="flex flex-row justify-between">
+        <span class="flex flex-col-reverse"
+          >{{ 100 - splitValue }}% x Wine/s</span
+        >
+        <span class="flex flex-col-reverse">{{ splitValue }}% x Vinegar/s</span>
+      </div>
+      <input
+        type="range"
+        :value="splitValue"
+        @input="(event) => setSplit(event.target.valueAsNumber)"
+      />
+      <div class="flex flex-row-reverse justify-between pb-4">
+        <FairButton
+          :disabled="splitValue === savedVinegarSplit"
+          @click="saveVinegarSplit"
+          >Save Split</FairButton
+        >
+        <span>Current: {{ savedWineSplit }}/{{ savedVinegarSplit }}</span>
+      </div>
+
       <p class="w-fit whitespace-nowrap h-full align-middle text-xl pb-2">
         Throwing Amount (Placeholder):
       </p>
@@ -41,22 +64,26 @@
         @input="(event) => setVinegarPercentage(event.target.valueAsNumber)"
       />
       <div class="flex flex-row-reverse">
-        ({{ grapesStore.state.vinegarThrowPercentage }}%) {{ selectedVinegar }}
+        ({{ grapesStore.state.vinegarThrowPercentage }}%)
+        {{ selectedVinegar }} Vinegar
       </div>
     </div>
   </FairDialog>
 </template>
 
 <script lang="ts" setup>
+// FIXME: I18N
 import FairDialog from "~/components/interactables/FairDialog.vue";
 import FairButton from "~/components/interactables/FairButton.vue";
 import { useGrapesStore } from "~/store/grapes";
 import { useRoundStore } from "~/store/round";
 import { useFormatter } from "~/composables/useFormatter";
+import { useAccountStore } from "~/store/account";
 
 const isOpen = ref<boolean>(false);
 
 const grapesStore = useGrapesStore();
+const accountStore = useAccountStore();
 const roundStore = useRoundStore();
 
 const min = computed(() =>
@@ -71,6 +98,15 @@ const max = computed(() =>
 );
 const middle = computed(() => Math.round((max.value + min.value) / 2));
 
+const splitValue = ref<number>(50);
+
+const savedVinegarSplit = computed(
+  () => accountStore.state.settings.vinegarSplit,
+);
+const savedWineSplit = computed(
+  () => 100 - accountStore.state.settings.vinegarSplit,
+);
+
 const selectedVinegar = computed<string>(() =>
   useFormatter(grapesStore.getters.selectedVinegar),
 );
@@ -78,5 +114,19 @@ const selectedVinegar = computed<string>(() =>
 function setVinegarPercentage(value: number) {
   if (value < min.value || value > max.value) return;
   grapesStore.state.vinegarThrowPercentage = value;
+}
+
+function setSplit(value: number) {
+  if (value < 0 || value > 100) return;
+  splitValue.value = value;
+}
+
+function saveVinegarSplit() {
+  grapesStore.actions.setVinegarSplit(splitValue.value);
+}
+
+function open() {
+  isOpen.value = true;
+  splitValue.value = accountStore.state.settings.vinegarSplit;
 }
 </script>

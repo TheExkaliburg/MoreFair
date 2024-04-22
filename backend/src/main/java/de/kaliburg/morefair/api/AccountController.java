@@ -1,8 +1,11 @@
 package de.kaliburg.morefair.api;
 
 import de.kaliburg.morefair.account.model.AccountEntity;
+import de.kaliburg.morefair.account.model.dto.AccountSettingsDto;
 import de.kaliburg.morefair.account.services.AccountService;
+import de.kaliburg.morefair.account.services.AccountSettingsService;
 import de.kaliburg.morefair.account.services.mapper.AccountMapper;
+import de.kaliburg.morefair.account.services.mapper.AccountSettingsMapper;
 import de.kaliburg.morefair.api.utils.HttpUtils;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.events.Event;
@@ -21,6 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,8 +40,10 @@ public class AccountController {
   public static final String PRIVATE_EVENTS_DESTINATION = "/account/events";
 
   private final AccountService accountService;
+  private final AccountSettingsService accountSettingsService;
   private final WsUtils wsUtils;
   private final AccountMapper accountMapper;
+  private final AccountSettingsMapper accountSettingsMapper;
   private final StatisticsService statisticsService;
   private final LadderTickService ladderTickService;
 
@@ -116,5 +122,28 @@ public class AccountController {
     }
   }
 
+  @PatchMapping("/settings")
+  public ResponseEntity<?> updateAccountSettings(Authentication authentication,
+      @RequestBody AccountSettingsDto settingsDto) {
+    try {
+      if (settingsDto == null) {
+        return ResponseEntity.badRequest().build();
+      }
 
+      AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
+          .orElseThrow();
+
+      log.info("[G] SETTINGS: {} (#{}) -> {}", account.getDisplayName(), account.getId(),
+          settingsDto);
+
+      var settingsEntity = accountSettingsService.findOrCreateByAccount(account.getId());
+      settingsEntity.setVinegarSplit(settingsDto.getVinegarSplit());
+      settingsEntity = accountSettingsService.save(settingsEntity);
+
+      return ResponseEntity.ok(accountSettingsMapper.mapToAccountSettingsDto(settingsEntity));
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+      return ResponseEntity.internalServerError().body(e.getMessage());
+    }
+  }
 }

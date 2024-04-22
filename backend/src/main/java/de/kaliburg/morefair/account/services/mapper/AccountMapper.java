@@ -2,6 +2,7 @@ package de.kaliburg.morefair.account.services.mapper;
 
 import de.kaliburg.morefair.account.model.AccountEntity;
 import de.kaliburg.morefair.account.model.dto.AccountDetailsDto;
+import de.kaliburg.morefair.account.services.AccountSettingsService;
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.services.LadderService;
 import de.kaliburg.morefair.game.ranker.services.RankerService;
@@ -19,6 +20,10 @@ public class AccountMapper {
 
   private final RankerService rankerService;
 
+  private final AccountSettingsService accountSettingsService;
+
+  private final AccountSettingsMapper accountSettingsMapper;
+
   /**
    * Mapping the {@link AccountEntity} to a {@link AccountDetailsDto}.
    *
@@ -31,6 +36,8 @@ public class AccountMapper {
         .map(LadderEntity::getNumber)
         .orElse(1);
 
+    var accountSettings = accountSettingsService.findOrCreateByAccount(account.getId());
+
     return AccountDetailsDto.builder()
         .uuid(account.getUuid())
         .accountId(account.getId())
@@ -38,6 +45,7 @@ public class AccountMapper {
         .email(account.getUsername())
         .accessRole(account.getAccessRole())
         .highestCurrentLadder(ladderNumber)
+        .settings(accountSettingsMapper.mapToAccountSettingsDto(accountSettings))
         .build();
   }
 }

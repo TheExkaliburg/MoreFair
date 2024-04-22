@@ -70,6 +70,10 @@ public class RankerEntity {
   @Column(nullable = false, precision = 1000, scale = 0)
   @Builder.Default
   private BigInteger vinegar = BigInteger.ZERO;
+  @NonNull
+  @Column(nullable = false, precision = 1000, scale = 0)
+  @Builder.Default
+  private BigInteger wine = BigInteger.ZERO;
   @Column(nullable = false)
   @Builder.Default
   private boolean autoPromote = false;
@@ -84,10 +88,6 @@ public class RankerEntity {
 
   public boolean isGrowing() {
     return promotedOn == null;
-  }
-
-  public RankerEntity addPoints(Integer points, double secondsPassed) {
-    return addPoints(BigInteger.valueOf(points), secondsPassed);
   }
 
   public RankerEntity addPoints(BigInteger points, double secondsPassed) {
@@ -108,10 +108,6 @@ public class RankerEntity {
     return addPower(BigInteger.valueOf(power), secondsPassed);
   }
 
-  public RankerEntity addVinegar(Integer vinegar, double secondsPassed) {
-    return addVinegar(BigInteger.valueOf(vinegar), secondsPassed);
-  }
-
   public RankerEntity addVinegar(BigInteger vinegar, double secondsPassed) {
     BigDecimal decVinegar = new BigDecimal(vinegar);
     decVinegar = decVinegar.multiply(BigDecimal.valueOf(secondsPassed));
@@ -119,15 +115,25 @@ public class RankerEntity {
     return this;
   }
 
-  public RankerEntity mulVinegar(double multiplier, double deltaSec) {
+  public RankerEntity mulVinegar(double multiplier, double secondsPassed) {
     BigDecimal decVinegar = new BigDecimal(this.vinegar);
-    this.vinegar = decVinegar.multiply(BigDecimal.valueOf(Math.pow(multiplier, deltaSec)))
+    this.vinegar = decVinegar.multiply(BigDecimal.valueOf(Math.pow(multiplier, secondsPassed)))
         .toBigInteger();
     return this;
   }
 
-  public RankerEntity addGrapes(Integer grapes, double secondsPassed) {
-    return addGrapes(BigInteger.valueOf(grapes), secondsPassed);
+  public RankerEntity addWine(BigInteger wine, double secondsPassed) {
+    BigDecimal decWine = new BigDecimal(wine);
+    decWine = decWine.multiply(BigDecimal.valueOf(secondsPassed));
+    this.wine = this.wine.add(decWine.toBigInteger());
+    return this;
+  }
+
+  public RankerEntity mulWine(double multiplier, double secondsPassed) {
+    BigDecimal decWine = new BigDecimal(this.wine);
+    this.wine = decWine.multiply(BigDecimal.valueOf(Math.pow(multiplier, secondsPassed)))
+        .toBigInteger();
+    return this;
   }
 
   public RankerEntity addGrapes(BigInteger grapes, double secondsPassed) {
@@ -136,5 +142,6 @@ public class RankerEntity {
     this.grapes = this.grapes.add(decGrapes.toBigInteger());
     return this;
   }
+
 
 }

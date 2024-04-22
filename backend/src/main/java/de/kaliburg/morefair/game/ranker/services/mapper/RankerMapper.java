@@ -63,6 +63,7 @@ public class RankerMapper {
     return RankerPrivateDto.builder()
         .grapes(ranker.getGrapes().toString())
         .vinegar(ranker.getVinegar().toString())
+        .wine(ranker.getWine().toString())
         .autoPromote(ranker.isAutoPromote())
         .accountId(ranker.getAccountId())
         .username(account.getDisplayName())

@@ -26,6 +26,10 @@ export enum AccountEventType {
   INCREASE_HIGHEST_LADDER = "INCREASE_HIGHEST_LADDER",
 }
 
+export type AccountSettings = {
+  vinegarSplit: number;
+};
+
 export type AccountData = {
   accessRole: AccessRole;
   accountId: number;
@@ -33,6 +37,7 @@ export type AccountData = {
   email: string;
   highestCurrentLadder: number;
   uuid: string;
+  settings: AccountSettings;
 };
 
 export const useAccountStore = defineStore("account", () => {
@@ -48,6 +53,9 @@ export const useAccountStore = defineStore("account", () => {
     email: "",
     highestCurrentLadder: 1,
     uuid: "",
+    settings: {
+      vinegarSplit: 50,
+    },
   });
   const getters = reactive({
     isGuest: computed<boolean>(() => useAuthStore().getters.isGuest),
@@ -80,6 +88,7 @@ export const useAccountStore = defineStore("account", () => {
         state.uuid = data.uuid;
         state.username = data.username;
         state.email = data.email;
+        state.settings = data.settings;
         stomp.connectPrivateChannel(state.uuid);
         stomp.addCallback(
           stomp.callbacks.onAccountEvent,
@@ -149,6 +158,19 @@ export const useAccountStore = defineStore("account", () => {
       });
   }
 
+  async function saveSettings(settings: AccountSettings) {
+    return await api.account
+      .saveSettings(settings)
+      .then((result) => {
+        state.settings = result.data;
+        return Promise.resolve(result);
+      })
+      .catch((err) => {
+        useToasts(err.response.data.message, { type: "error" });
+        return Promise.reject(err);
+      });
+  }
+
   return {
     state,
     getters,
@@ -156,6 +178,7 @@ export const useAccountStore = defineStore("account", () => {
       init,
       reset,
       changeDisplayName,
+      saveSettings,
     },
   };
 });

@@ -50,6 +50,14 @@ export enum LadderEventType {
   UPDATE_TYPES = "UPDATE_TYPES",
 }
 
+export enum VinegarSuccessType {
+  SHIELDED = "SHIELDED",
+  SHIELD_DEFENDED = "SHIELD_DEFENDED",
+  DEFENDED = "DEFENDED",
+  SUCCESS = "SUCCESS",
+  DOUBLE_SUCCESS = "DOUBLE_SUCCESS",
+}
+
 export type LadderData = {
   rankers: RankerData[];
   number: number;
@@ -244,15 +252,32 @@ export const useLadderStore = defineStore("ladder", () => {
       }
     }
 
-    if (yourRanker !== undefined && yourRanker.growing) {
+    if (yourRanker?.growing) {
       if (yourRanker.rank !== 1) {
+        const vinegarAdded = yourRanker.grapes
+          .mul(accountStore.state.settings.vinegarSplit)
+          .div(100);
+
         yourRanker.vinegar = Object.freeze(
-          yourRanker.vinegar.add(yourRanker.grapes.mul(deltaSeconds).floor()),
+          yourRanker.vinegar.add(vinegarAdded.mul(deltaSeconds).floor()),
+        );
+
+        const wineAdded = yourRanker.grapes
+          .mul(100 - accountStore.state.settings.vinegarSplit)
+          .div(50);
+        yourRanker.wine = Object.freeze(
+          yourRanker.wine.add(wineAdded.mul(deltaSeconds).floor()),
         );
       }
       if (yourRanker.rank === 1 && ladderUtils.isLadderPromotable.value) {
         yourRanker.vinegar = Object.freeze(
           yourRanker.vinegar
+            .mul(Decimal.pow(new Decimal(0.9975), deltaSeconds))
+            .floor(),
+        );
+
+        yourRanker.wine = Object.freeze(
+          yourRanker.wine
             .mul(Decimal.pow(new Decimal(0.9975), deltaSeconds))
             .floor(),
         );
@@ -351,12 +376,21 @@ export const useLadderStore = defineStore("ladder", () => {
     if (getters.yourRanker === undefined) return;
     const vinegarThrown = new Decimal(event.data.amount);
     const percentage = event.data.percentage;
+    const success: VinegarSuccessType = event.data.success;
+
     if (ranker.accountId === getters.yourRanker.accountId) {
       // THROWER
 
-      const restoredVinegar = getters.yourRanker.vinegar
-        .mul(useRoundStore().state.settings.minVinegarThrown)
-        .div(200);
+      let restoredVinegar = new Decimal(0);
+      if (success === VinegarSuccessType.SUCCESS) {
+        restoredVinegar = getters.yourRanker.vinegar
+          .mul(useRoundStore().state.settings.minVinegarThrown)
+          .div(200);
+      } else if (success === VinegarSuccessType.DOUBLE_SUCCESS) {
+        restoredVinegar = getters.yourRanker.vinegar
+          .mul(useRoundStore().state.settings.minVinegarThrown)
+          .div(100);
+      }
 
       ranker.vinegar = Object.freeze(
         getters.yourRanker.vinegar.sub(vinegarThrown).add(restoredVinegar),
@@ -366,8 +400,27 @@ export const useLadderStore = defineStore("ladder", () => {
 
     if (event.data.targetId === getters.yourRanker.accountId) {
       // DEFENDED
+      let passedVinegar = vinegarThrown;
+      if (
+        success === VinegarSuccessType.SHIELDED ||
+        success === VinegarSuccessType.SHIELD_DEFENDED
+      ) {
+        // SHIELD - DEFENSE
+        getters.yourRanker.wine = Object.freeze(new Decimal(0));
+        passedVinegar = Decimal.max(
+          passedVinegar.sub(getters.yourRanker.wine),
+          new Decimal(0),
+        );
+      }
 
-      const subtractedVinegar = vinegarThrown.mul(percentage).div(100);
+      let subtractedVinegar = passedVinegar;
+      if (
+        success === VinegarSuccessType.DEFENDED ||
+        success === VinegarSuccessType.SHIELD_DEFENDED
+      ) {
+        // VINEGAR-DEFENSE
+        subtractedVinegar = subtractedVinegar.mul(percentage).div(100);
+      }
 
       getters.yourRanker.vinegar = Object.freeze(
         Decimal.max(

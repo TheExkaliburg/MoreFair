@@ -12,5 +12,6 @@ public class RankerPrivateDto extends RankerDto {
 
   private String grapes;
   private String vinegar;
+  private String wine;
   private boolean autoPromote;
 }

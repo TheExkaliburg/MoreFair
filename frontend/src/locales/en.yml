@@ -43,6 +43,8 @@ components:
       info:
         grapes: Grapes
         vinegar: Vinegar
+        shielded: Shielded
+        wine: Wine
         active: Active
         points: Points
         power: Power
