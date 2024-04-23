@@ -3,8 +3,10 @@
 DO
 $$
     DECLARE
-        season_id bigint := 2;
+        season_id bigint;
     BEGIN
+        SELECT nextval('seq_season') INTO season_id;
+
         INSERT INTO public.season (id, number)
         VALUES (season_id, 2);
 

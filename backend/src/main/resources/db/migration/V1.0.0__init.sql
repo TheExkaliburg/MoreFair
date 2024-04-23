@@ -1,12 +1,11 @@
 -- Utilities/Extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-
 -- Account
 CREATE SEQUENCE IF NOT EXISTS public.seq_account;
 CREATE TABLE IF NOT EXISTS public.account
 (
-    id                    bigint                   NOT NULL,
+    id                    bigint                   NOT NULL DEFAULT nextval('public.seq_account'),
     uuid                  uuid                     NOT NULL DEFAULT uuid_generate_v4(),
     access_role           character varying(255)   NOT NULL,
     created_on            timestamp with time zone NOT NULL DEFAULT now(),
@@ -26,7 +25,7 @@ CREATE TABLE IF NOT EXISTS public.account
 CREATE SEQUENCE IF NOT EXISTS public.seq_account_settings;
 CREATE TABLE IF NOT EXISTS public.account_settings
 (
-    id            bigint  NOT NULL,
+    id            bigint  NOT NULL DEFAULT nextval('public.seq_account_settings'),
     uuid          uuid    NOT NULL DEFAULT uuid_generate_v4(),
     account_id    bigint  NOT NULL,
     vinegar_split integer NOT NULL DEFAULT 50,
@@ -40,7 +39,7 @@ CREATE TABLE IF NOT EXISTS public.account_settings
 CREATE SEQUENCE IF NOT EXISTS public.seq_chat;
 CREATE TABLE IF NOT EXISTS public.chat
 (
-    id     bigint                 NOT NULL,
+    id     bigint                 NOT NULL DEFAULT nextval('public.seq_chat'),
     uuid   uuid                   NOT NULL DEFAULT uuid_generate_v4(),
     number integer,
     type   character varying(255) NOT NULL,
@@ -53,7 +52,7 @@ CREATE TABLE IF NOT EXISTS public.chat
 CREATE SEQUENCE IF NOT EXISTS public.seq_message;
 CREATE TABLE IF NOT EXISTS public.message
 (
-    id         bigint                                              NOT NULL,
+    id         bigint                                              NOT NULL DEFAULT nextval('public.seq_message'),
     uuid       uuid                                                NOT NULL DEFAULT uuid_generate_v4(),
     account_id bigint                                              NOT NULL,
     chat_id    bigint                                              NOT NULL,
@@ -71,7 +70,7 @@ CREATE TABLE IF NOT EXISTS public.message
 CREATE SEQUENCE IF NOT EXISTS public.seq_season;
 CREATE TABLE IF NOT EXISTS public.season
 (
-    id         bigint                                              NOT NULL,
+    id         bigint                                              NOT NULL DEFAULT nextval('public.seq_season'),
     uuid       uuid                                                NOT NULL DEFAULT uuid_generate_v4(),
     number     integer                                             NOT NULL,
     created_on timestamp with time zone                            NOT NULL DEFAULT now(),
@@ -94,7 +93,7 @@ CREATE TABLE IF NOT EXISTS public.season_type
 CREATE SEQUENCE IF NOT EXISTS public.seq_achievements;
 CREATE TABLE IF NOT EXISTS public.achievements
 (
-    id                      bigint  NOT NULL,
+    id                      bigint  NOT NULL DEFAULT nextval('public.seq_achievements'),
     uuid                    uuid    NOT NULL DEFAULT uuid_generate_v4(),
     account_id              bigint  NOT NULL,
     season_id               bigint  NOT NULL,
@@ -112,7 +111,7 @@ CREATE TABLE IF NOT EXISTS public.achievements
 CREATE SEQUENCE IF NOT EXISTS public.seq_round;
 CREATE TABLE IF NOT EXISTS public.round
 (
-    id                                bigint                   NOT NULL,
+    id                                bigint                   NOT NULL DEFAULT nextval('public.seq_round'),
     uuid                              uuid                     NOT NULL DEFAULT uuid_generate_v4(),
     season_id                         bigint                   NOT NULL,
     number                            integer                  NOT NULL,
@@ -139,7 +138,7 @@ CREATE TABLE IF NOT EXISTS public.round_type
 CREATE SEQUENCE IF NOT EXISTS public.seq_unlocks;
 CREATE TABLE IF NOT EXISTS public.unlocks
 (
-    id                     bigint  NOT NULL,
+    id                     bigint  NOT NULL DEFAULT nextval('public.seq_unlocks'),
     uuid                   uuid    NOT NULL DEFAULT uuid_generate_v4(),
     account_id             bigint  NOT NULL,
     round_id               bigint  NOT NULL,
@@ -157,7 +156,7 @@ CREATE TABLE IF NOT EXISTS public.unlocks
 CREATE SEQUENCE IF NOT EXISTS public.seq_ladder;
 CREATE TABLE IF NOT EXISTS public.ladder
 (
-    id                     bigint                   NOT NULL,
+    id                     bigint                   NOT NULL DEFAULT nextval('public.seq_ladder'),
     uuid                   uuid                     NOT NULL DEFAULT uuid_generate_v4(),
     round_id               bigint                   NOT NULL,
     base_points_to_promote numeric(1000, 0)         NOT NULL,
@@ -182,7 +181,7 @@ CREATE TABLE IF NOT EXISTS public.ladder_type
 CREATE SEQUENCE IF NOT EXISTS public.seq_ranker;
 CREATE TABLE IF NOT EXISTS public.ranker
 (
-    id           bigint                   NOT NULL,
+    id           bigint                   NOT NULL DEFAULT nextval('public.seq_ranker'),
     uuid         uuid                     NOT NULL DEFAULT uuid_generate_v4(),
     account_id   bigint                   NOT NULL,
     ladder_id    bigint                   NOT NULL,
