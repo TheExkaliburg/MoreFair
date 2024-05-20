@@ -12,7 +12,8 @@ public class VinegarData {
   private String amount;
   @NonNull
   private Integer percentage;
-  private VinegarSuccessType success = VinegarSuccessType.DEFENDED;
+  @NonNull
+  private VinegarSuccessType success;
   @NonNull
   private Long targetId;
 

@@ -42,6 +42,8 @@ import de.kaliburg.morefair.game.round.services.UnlocksService;
 import de.kaliburg.morefair.game.round.services.utils.UnlocksUtilsService;
 import de.kaliburg.morefair.game.season.model.AchievementsEntity;
 import de.kaliburg.morefair.game.season.services.AchievementsService;
+import de.kaliburg.morefair.game.vinegar.model.VinegarThrowEntity;
+import de.kaliburg.morefair.game.vinegar.services.VinegarThrowService;
 import de.kaliburg.morefair.statistics.services.StatisticsService;
 import de.kaliburg.morefair.utils.FormattingUtils;
 import java.math.BigInteger;
@@ -68,11 +70,12 @@ public class LadderEventServiceImpl implements LadderEventService {
   private final MessageService messageService;
   private final RankerService rankerService;
   private final LadderService ladderService;
-  private final RankerUtilsService ladderUtilsService;
+  private final RankerUtilsService rankerUtilsService;
   private final RoundService roundService;
   private final UnlocksService unlocksService;
   private final UnlocksUtilsService unlocksUtilsService;
   private final AchievementsService achievementsService;
+  private final VinegarThrowService vinegarThrowService;
   private final StatisticsService statisticsService;
   private final WsUtils wsUtils;
   private final UpgradeUtils upgradeUtils;
@@ -238,7 +241,7 @@ public class LadderEventServiceImpl implements LadderEventService {
         return true;
       }
 
-      if (ladderUtilsService.canBuyAutoPromote(ranker)) {
+      if (rankerUtilsService.canBuyAutoPromote(ranker)) {
         statisticsService.recordAutoPromote(ranker, ladder, roundService.getCurrentRound());
         ranker.setGrapes(ranker.getGrapes().subtract(cost));
         ranker.setAutoPromote(true);
@@ -270,7 +273,7 @@ public class LadderEventServiceImpl implements LadderEventService {
         return false;
       }
 
-      if (ladderUtilsService.canPromote(ranker)) {
+      if (rankerUtilsService.canPromote(ranker)) {
         RoundEntity currentRound = roundService.getCurrentRound();
         statisticsService.recordPromote(ranker, ladder, currentRound);
         log.info("[L{}] Promotion for {} (#{})", ladder.getNumber(), account.getDisplayName(),
@@ -327,7 +330,7 @@ public class LadderEventServiceImpl implements LadderEventService {
         }
 
         newRanker.setGrapes(
-            newRanker.getGrapes().add(ladderUtilsService.getWinningGrapes(newLadder))
+            newRanker.getGrapes().add(rankerUtilsService.getWinningGrapes(newLadder))
         );
 
         wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
@@ -411,113 +414,36 @@ public class LadderEventServiceImpl implements LadderEventService {
    */
   boolean throwVinegar(Event<LadderEventType> event, LadderEntity ladder) {
     try {
-      int percentage = (Integer) event.getData();
-      AccountEntity rankerAccount = accountService.findById(event.getAccountId()).orElseThrow();
-      RankerEntity ranker = rankerService.findHighestActiveRankerOfAccount(rankerAccount)
-          .orElseThrow();
-
-      if (!ladder.getId().equals(ranker.getLadderId())) {
+      var optional = vinegarThrowService.throwVinegar(event);
+      if (optional.isEmpty()) {
         return false;
       }
+      VinegarThrowEntity vinegarThrow = optional.get();
 
-      List<RankerEntity> rankers = rankerService.findAllByLadderId(ladder.getId());
+      VinegarData data = new VinegarData(
+          vinegarThrow.getVinegarThrown().toString(),
+          vinegarThrow.getPercentageThrown(),
+          vinegarThrow.getSuccessType(),
+          vinegarThrow.getTargetAccountId()
+      );
 
-      RankerEntity target = rankers.get(0);
-      AccountEntity targetAccount = accountService.findById(target.getAccountId()).orElseThrow();
+      event.setData(data);
+      wsUtils.convertAndSendToUser(
+          accountService.findById(vinegarThrow.getThrowerAccountId()).orElseThrow().getUuid(),
+          LadderController.PRIVATE_EVENTS_DESTINATION, event);
+      wsUtils.convertAndSendToUser(
+          accountService.findById(vinegarThrow.getTargetAccountId()).orElseThrow().getUuid(),
+          LadderController.PRIVATE_EVENTS_DESTINATION, event);
 
-      if (target.isAutoPromote() || ladder.getTypes().contains(LadderType.FREE_AUTO)) {
-        log.info("[L{}] {} (#{}) tried to throw Vinegar at {} (#{}), but they had Auto-Promote!",
-            ladder.getNumber(), rankerAccount.getDisplayName(), rankerAccount.getId(),
-            targetAccount.getDisplayName(), targetAccount.getId());
-        return false;
+      if (data.getSuccess().equals(VinegarSuccessType.SUCCESS) || data.getSuccess()
+          .equals(VinegarSuccessType.DOUBLE_SUCCESS)) {
+        removeMulti(
+            new Event<>(LadderEventType.REMOVE_MULTI, vinegarThrow.getTargetAccountId()),
+            ladder
+        );
       }
 
-      if (ladderUtilsService.canThrowVinegarAt(ranker, target, percentage)) {
-        statisticsService.recordVinegarThrow(ranker, target, ladder,
-            roundService.getCurrentRound());
-        BigInteger rankerVinegar = ranker.getVinegar();
-        BigInteger thrownVinegar = rankerVinegar
-            .multiply(BigInteger.valueOf(percentage))
-            .divide(BigInteger.valueOf(100));
-        BigInteger targetVinegar = target.getVinegar();
-        BigInteger restoredVinegar = BigInteger.ZERO;
-
-        log.info("[L{}] {} (#{}) is using their {} ({}%) Vinegar on {} (#{}) with {} Vinegar",
-            ladder.getNumber(), rankerAccount.getDisplayName(), rankerAccount.getId(),
-            rankerVinegar, percentage,
-            targetAccount.getDisplayName(), targetAccount.getId(), targetVinegar);
-
-        VinegarData data = new VinegarData(thrownVinegar.toString(), percentage,
-            targetAccount.getId());
-
-        boolean isWineShieldActive = target.getVinegar().compareTo(target.getWine()) < 0;
-
-        BigInteger passedVinegar = thrownVinegar;
-        if (isWineShieldActive) {
-          BigInteger targetWine = target.getWine();
-
-          if (targetWine.compareTo(thrownVinegar) <= 0) {
-            // BROKE THROUGH SHIELD
-
-            passedVinegar = passedVinegar.subtract(targetWine);
-            restoredVinegar = restoredVinegar.add(
-                rankerVinegar
-                    .multiply(BigInteger.valueOf(fairConfig.getMinVinegarThrown()))
-                    .divide(BigInteger.valueOf(200))
-            );
-          } else {
-            // DEFENDED WITH SHIELD
-            passedVinegar = BigInteger.ZERO;
-          }
-
-          // OneShot either Way
-          data.setSuccess(VinegarSuccessType.SHIELDED);
-          target.setWine(BigInteger.ZERO);
-        }
-
-        // Handle the Comparing Logic
-        if (targetVinegar.compareTo(passedVinegar) > 0) {
-          // DEFENDED
-
-          // Only remove the same fraction of that vinegar
-          BigInteger subtractedVinegar = passedVinegar
-              .multiply(BigInteger.valueOf(percentage))
-              .divide(BigInteger.valueOf(100));
-
-          ranker.setVinegar(rankerVinegar.subtract(thrownVinegar).add(restoredVinegar));
-          target.setVinegar(targetVinegar.subtract(subtractedVinegar));
-          data.setSuccess(data.getSuccess().equals(VinegarSuccessType.SHIELDED)
-              ? VinegarSuccessType.SHIELD_DEFENDED : VinegarSuccessType.DEFENDED
-          );
-        } else {
-          // THROW DOWN
-
-          // Getting half of the minimum Vinegar needed to throw back
-          restoredVinegar = rankerVinegar
-              .multiply(BigInteger.valueOf(fairConfig.getMinVinegarThrown()))
-              .divide(BigInteger.valueOf(200));
-
-          ranker.setVinegar(rankerVinegar.subtract(thrownVinegar).add(restoredVinegar));
-          target.setVinegar(BigInteger.ZERO);
-          data.setSuccess(data.getSuccess().equals(VinegarSuccessType.SHIELDED)
-              ? VinegarSuccessType.DOUBLE_SUCCESS : VinegarSuccessType.SUCCESS
-          );
-        }
-
-        event.setData(data);
-        wsUtils.convertAndSendToUser(
-            accountService.findById(ranker.getAccountId()).orElseThrow().getUuid(),
-            LadderController.PRIVATE_EVENTS_DESTINATION, event);
-        wsUtils.convertAndSendToUser(
-            accountService.findById(target.getAccountId()).orElseThrow().getUuid(),
-            LadderController.PRIVATE_EVENTS_DESTINATION, event);
-
-        if (data.getSuccess().equals(VinegarSuccessType.SUCCESS)) {
-          removeMulti(new Event<>(LadderEventType.REMOVE_MULTI, targetAccount.getId()), ladder);
-        }
-
-        return true;
-      }
+      return true;
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
