@@ -17,13 +17,16 @@ export enum VinegarSuccessType {
 export type VinegarThrow = {
   accountId: number;
   targetId: number;
-  percentage: number;
+  timestamp: number;
+  ladderNumber: number;
+  roundNumber: number;
   vinegarThrown: Decimal;
+  percentage: number;
   successType: VinegarSuccessType;
 };
 
 export type GrapesState = {
-  vinegarThrowLog: VinegarThrow[];
+  throwRecords: VinegarThrow[];
 };
 
 export type GrapesStorage = {
@@ -47,7 +50,7 @@ export const useGrapesStore = defineStore("grapes", () => {
 
   const startedInitialization = ref<boolean>(false);
   const state = reactive<GrapesState>({
-    vinegarThrowLog: [],
+    throwRecords: [],
   });
 
   const getters = reactive({
@@ -72,12 +75,17 @@ export const useGrapesStore = defineStore("grapes", () => {
 
   async function getVinegarRecords() {
     startedInitialization.value = true;
-    return await api.vinegar
+    return await api.grapes
       .getVinegarRecords()
       .then((response) => {
         const data: GrapesState = response.data;
-        state.vinegarThrowLog.length = 0;
-        data.vinegarThrowLog.forEach((v) => state.vinegarThrowLog.push(v));
+        state.throwRecords.length = 0;
+        data.throwRecords.forEach((v) => {
+          return state.throwRecords.push({
+            ...v,
+            vinegarThrown: new Decimal(v.vinegarThrown),
+          });
+        });
       })
       .catch((_) => {
         startedInitialization.value = false;

@@ -197,9 +197,9 @@ const API = {
       return axiosInstance.get("/api/moderation/search/alts", { params });
     },
   },
-  vinegar: {
+  grapes: {
     getVinegarRecords: () => {
-      return axiosInstance.get("/api/vinegar");
+      return axiosInstance.get("/api/grapes/vinegar/throw/record");
     },
   },
   user: {

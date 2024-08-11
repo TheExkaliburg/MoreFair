@@ -1,30 +1,31 @@
 <template>
   <table>
     <tr>
+      <th>Ladder</th>
+      <th>Timestamp</th>
       <th>Thrower</th>
       <th>Target</th>
       <th>Vinegar</th>
       <th>Success</th>
     </tr>
-    <tr v-for="(vinThrow, index) in shownThrows" :key="index">
-      <td><UserLabel :account-id="vinThrow.accountId" /></td>
-      <td><UserLabel :account-id="vinThrow.targetId" /></td>
-      <td>{{ vinThrow.vinegarThrown }} ({{ vinThrow.percentage }}%)</td>
-      <td>{{ vinThrow.successType }}</td>
-    </tr>
+    <VinegarThrowTableRow
+      v-for="(vinThrow, index) in shownThrows"
+      :key="index"
+      :vin-throw="vinThrow"
+    />
   </table>
 </template>
 
 <script setup lang="ts">
-import UserLabel from "~/components/core/UserLabel.vue";
 import { useGrapesStore, VinegarThrow } from "~/store/grapes";
+import VinegarThrowTableRow from "~/components/grapes/VinegarThrowTableRow.vue";
 
 const grapesStore = useGrapesStore();
 
 const shownThrows = computed<VinegarThrow[]>(() =>
-  grapesStore.state.vinegarThrowLog.slice(
+  grapesStore.state.throwRecords.slice(
     0,
-    Math.min(grapesStore.state.vinegarThrowLog.length, 10),
+    Math.min(grapesStore.state.throwRecords.length, 10),
   ),
 );
 </script>

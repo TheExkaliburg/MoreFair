@@ -13,6 +13,20 @@ const numberFormatter = new numberformat.Formatter({
   default: 0,
 });
 
+// Set the options for the Intl.DateTimeFormat object
+const dateFormatOptions: Intl.DateTimeFormatOptions = {
+  weekday: "short",
+  hour: "numeric",
+  minute: "numeric",
+  hour12: false,
+};
+
+// Create the Intl.DateTimeFormat object with the client's default locale
+const dateFormatter = new Intl.DateTimeFormat(
+  navigator.language,
+  dateFormatOptions,
+);
+
 export const useFormatter = (number: Decimal | number) => {
   if (typeof number === "number" && !isFinite(number)) return "∞";
 
@@ -33,4 +47,21 @@ export const useTimeFormatter = (seconds: number) => {
 
   const hours = (seconds - (seconds % 3600)) / 3600;
   return hours + ":" + new Date(seconds * 1000).toISOString().substring(14, 19);
+};
+
+export const useDateFormatter = (
+  utcTimestamp: number,
+  options?: Intl.DateTimeFormatOptions,
+) => {
+  // Create a date object with the timestamp
+  const date = new Date(0);
+  date.setUTCSeconds(utcTimestamp);
+
+  if (options) {
+    const dateFormatter = new Intl.DateTimeFormat(navigator.language, options);
+    return dateFormatter.format(date);
+  }
+
+  // Format the date using the formatter object
+  return dateFormatter.format(date);
 };

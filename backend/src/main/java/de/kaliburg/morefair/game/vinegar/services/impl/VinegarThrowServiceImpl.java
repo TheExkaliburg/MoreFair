@@ -15,7 +15,6 @@ import de.kaliburg.morefair.game.ranker.services.utils.RankerUtilsService;
 import de.kaliburg.morefair.game.round.services.RoundService;
 import de.kaliburg.morefair.game.season.services.AchievementsService;
 import de.kaliburg.morefair.game.season.services.SeasonService;
-import de.kaliburg.morefair.game.vinegar.model.VinegarFeud;
 import de.kaliburg.morefair.game.vinegar.model.VinegarThrowEntity;
 import de.kaliburg.morefair.game.vinegar.model.VinegarThrowEntity.VinegarThrowEntityBuilder;
 import de.kaliburg.morefair.game.vinegar.services.VinegarThrowService;
@@ -190,29 +189,25 @@ public class VinegarThrowServiceImpl implements VinegarThrowService {
       achievementsService.save(targetAch);
 
       return Optional.of(result);
-
     }
 
     return Optional.empty();
   }
 
   @Override
-  public List<VinegarThrowEntity> findListOfPastThrows(Long accountId) {
-    return List.of();
-  }
-
-  @Override
-  public List<VinegarFeud> findCurrentFeuds(Long accountId) {
-    return List.of();
+  public List<VinegarThrowEntity> findVinegarThrowRecordsOfCurrentSeason(Long accountId) {
+    return repository.findAllByAccountId(accountId);
   }
 
   private boolean canSteal(Long throwerAccountId, Long targetAccountId) {
-    // FIXME: return if account can steal from the other (based on ah-points)
+    // TODO: return if account can steal from the other (based on ah-points)
+    // Right now completely disables this mechanic
     return false;
   }
 
   private Integer getCurrentStealStreak(Long throwerAccountId, Long targetAccountId) {
-    // FIXME: Implement negative if stolen from (revenge), positive if thrower has stolen already
+    // TODO: Implement negative if stolen from (revenge), positive if thrower has stolen already
+    // Right now the streak is always 0
     return 0;
   }
 }

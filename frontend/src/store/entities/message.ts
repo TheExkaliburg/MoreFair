@@ -1,5 +1,6 @@
 import { ChatType } from "~/store/chat";
 import { useLang } from "~/composables/useLang";
+import { useDateFormatter } from "~/composables/useFormatter";
 
 export enum MessagePartType {
   plain,
@@ -54,17 +55,6 @@ export type MessageData = {
   chatType: ChatType;
 };
 
-// Set the options for the Intl.DateTimeFormat object
-const options: Intl.DateTimeFormatOptions = {
-  weekday: "short",
-  hour: "numeric",
-  minute: "numeric",
-  hour12: false,
-};
-
-// Create the Intl.DateTimeFormat object with the client's default locale
-const formatter = new Intl.DateTimeFormat(navigator.language, options);
-
 export class Message implements MessageData {
   accountId = 0;
   username = "";
@@ -103,12 +93,7 @@ export class Message implements MessageData {
   }
 
   getTimestampString() {
-    // Create a date object with the timestamp
-    const date = new Date(0);
-    date.setUTCSeconds(this.timestamp);
-
-    // Format the date using the formatter object
-    return formatter.format(date);
+    return useDateFormatter(this.timestamp);
   }
 
   getChatTypeIdentifier(): string {
@@ -129,7 +114,7 @@ export class Message implements MessageData {
       return [new MessagePart(MessagePartType.plain, message)];
     }
 
-    const combinedMentions = metadata.sort((a, b) => a.i - b.i);
+    const combinedMentions = [...metadata].sort((a, b) => a.i - b.i);
 
     let lastIndex = 0;
     combinedMentions.forEach((m) => {
