@@ -57,6 +57,8 @@ export const useRoundStore = defineStore("round", () => {
     }),
   });
 
+  init();
+
   function init() {
     if (isInitialized.value) return;
     getCurrentRound();

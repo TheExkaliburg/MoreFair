@@ -16,6 +16,7 @@ import { useToasts } from "~/composables/useToasts";
 import { SOUNDS, useSound } from "~/composables/useSound";
 import { useOptionsStore } from "~/store/options";
 import { useRoundStore } from "~/store/round";
+import { VinegarSuccessType } from "~/store/grapes";
 
 export enum LadderType {
   DEFAULT = "DEFAULT",
@@ -48,14 +49,6 @@ export enum LadderEventType {
   JOIN = "JOIN",
   ADD_FREE_AUTO = "ADD_FREE_AUTO",
   UPDATE_TYPES = "UPDATE_TYPES",
-}
-
-export enum VinegarSuccessType {
-  SHIELDED = "SHIELDED",
-  SHIELD_DEFENDED = "SHIELD_DEFENDED",
-  DEFENDED = "DEFENDED",
-  SUCCESS = "SUCCESS",
-  DOUBLE_SUCCESS = "DOUBLE_SUCCESS",
 }
 
 export type LadderData = {
@@ -141,6 +134,8 @@ export const useLadderStore = defineStore("ladder", () => {
     }),
   });
 
+  accountStore.actions.init().then(() => init());
+
   function init() {
     if (isInitialized.value) return;
     getLadder(accountStore.state.highestCurrentLadder);
@@ -153,7 +148,7 @@ export const useLadderStore = defineStore("ladder", () => {
 
   function getLadder(ladderNumber: number) {
     isInitialized.value = true;
-    api.ladder
+    return api.ladder
       .getLadder(ladderNumber)
       .then((res) => {
         const data: LadderData = res.data;

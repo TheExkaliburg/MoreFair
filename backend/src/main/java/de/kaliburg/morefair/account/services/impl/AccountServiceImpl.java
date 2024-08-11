@@ -231,4 +231,9 @@ public class AccountServiceImpl implements AccountService {
       throw new RuntimeException(e);
     }
   }
+
+  @Override
+  public List<AccountEntity> findAllActive() {
+    return new ArrayList<>(accountCache.asMap().values());
+  }
 }

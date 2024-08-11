@@ -17,7 +17,7 @@ export const useAuthStore = defineStore("auth", () => {
   const API = useAPI();
 
   const state = reactive({
-    uuid: ref<string>(Cookies.get("_uuid") || ""),
+    uuid: ref<string>(Cookies.get("_uuid") ?? ""),
     authenticationStatus: ref<boolean>(false),
   });
 
@@ -30,7 +30,9 @@ export const useAuthStore = defineStore("auth", () => {
     }),
   });
 
-  getAuthenticationStatus().then();
+  if (!state.authenticationStatus) {
+    getAuthenticationStatus().then();
+  }
 
   // actions
   async function getAuthenticationStatus() {

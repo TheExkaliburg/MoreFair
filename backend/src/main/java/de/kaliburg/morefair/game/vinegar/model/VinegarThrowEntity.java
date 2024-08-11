@@ -3,6 +3,8 @@ package de.kaliburg.morefair.game.vinegar.model;
 import de.kaliburg.morefair.events.data.VinegarData.VinegarSuccessType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -31,7 +33,7 @@ import lombok.NonNull;
 public class VinegarThrowEntity {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_vinegar_steal")
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_vinegar_throw")
   private Long id;
   @NonNull
   @Builder.Default
@@ -63,6 +65,7 @@ public class VinegarThrowEntity {
   @Column(nullable = false)
   private BigInteger wineDefended;
   @NonNull
+  @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private VinegarSuccessType successType;
   @NonNull

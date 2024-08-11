@@ -24,13 +24,9 @@
 <script lang="ts" setup>
 import { useUiStore } from "~/store/ui";
 import { useStomp } from "~/composables/useStomp";
-import { useChatStore } from "~/store/chat";
-import { useLadderStore } from "~/store/ladder";
 import { useTutorialTour } from "~/composables/useTour";
-import { useRoundStore } from "~/store/round";
-import { useAccountStore } from "~/store/account";
 import { useAuthStore } from "~/store/authentication";
-import { useModerationStore } from "~/store/moderation";
+import { useAccountStore } from "~/store/account";
 
 const uiStore = useUiStore();
 
@@ -42,16 +38,7 @@ useSeoMeta({
 useStomp();
 
 onMounted(async () => {
-  await useAccountStore()
-    .actions.init()
-    .then(() => {
-      useRoundStore().actions.init();
-      useChatStore().actions.init();
-      useLadderStore().actions.init();
-      if (useAccountStore().getters.isMod) {
-        useModerationStore().actions.init();
-      }
-    });
+  await useAccountStore().actions.init();
   const tour = useTutorialTour();
   if (!tour.getFlag() && useAuthStore().state.authenticationStatus) {
     tour.start();

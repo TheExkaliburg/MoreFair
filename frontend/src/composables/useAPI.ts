@@ -149,7 +149,6 @@ const API = {
       params.append("displayName", displayName);
       return axiosInstance.patch("/api/account/name", params);
     },
-
     getAccountDetails: () => {
       return axiosInstance.get("/api/account");
     },
@@ -192,16 +191,30 @@ const API = {
       params.append("username", username);
       return axiosInstance.get("/api/moderation/search/user", { params });
     },
-    searchAltAccouunts(accountId: number) {
+    searchAltAccounts(accountId: number) {
       const params = new URLSearchParams();
       params.append("accountId", accountId.toString());
       return axiosInstance.get("/api/moderation/search/alts", { params });
+    },
+  },
+  vinegar: {
+    getVinegarRecords: () => {
+      return axiosInstance.get("/api/vinegar");
+    },
+  },
+  user: {
+    getActiveUsers() {
+      return axiosInstance.get("/api/user");
+    },
+    getUser(accountId: number) {
+      return axiosInstance.get(`/api/user/${accountId}`);
     },
   },
 };
 
 let isInitialized = false;
 if (!isInitialized) {
+  // TODO: Why do we need to double call authenticationStatus ? @see store/auth.ts
   API.auth.authenticationStatus().then((_) => {
     isInitialized = true;
   });

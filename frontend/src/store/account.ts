@@ -7,6 +7,7 @@ import { useChatStore } from "~/store/chat";
 import { useAuthStore } from "~/store/authentication";
 import { SOUNDS, useSound } from "~/composables/useSound";
 import { useToasts } from "~/composables/useToasts";
+import { useModerationStore } from "~/store/moderation";
 
 export enum AccessRole {
   OWNER = "OWNER",
@@ -42,10 +43,10 @@ export type AccountData = {
 
 export const useAccountStore = defineStore("account", () => {
   const api = useAPI();
-  const ladderStore = useLadderStore();
   const stomp = useStomp();
 
   const isInitialized = ref<boolean>(false);
+
   const state = reactive<AccountData>({
     accessRole: AccessRole.PLAYER,
     accountId: 1,
@@ -67,6 +68,8 @@ export const useAccountStore = defineStore("account", () => {
     }),
   });
 
+  init().then();
+
   async function init() {
     if (isInitialized.value) return Promise.resolve();
     return await getAccountDetails();
@@ -78,6 +81,7 @@ export const useAccountStore = defineStore("account", () => {
   }
 
   async function getAccountDetails() {
+    isInitialized.value = true;
     return await api.account
       .getAccountDetails()
       .then((res) => {
@@ -95,6 +99,11 @@ export const useAccountStore = defineStore("account", () => {
           "fair_account_events",
           handleAccountEvents,
         );
+
+        if (getters.isMod) {
+          useModerationStore().actions.init();
+        }
+
         return Promise.resolve(res);
       })
       .catch((_) => {
@@ -107,9 +116,9 @@ export const useAccountStore = defineStore("account", () => {
     const isYou = state.accountId === body.accountId;
     let ranker;
     if (isYou) {
-      ranker = ladderStore.getters.yourRanker;
+      ranker = useLadderStore().getters.yourRanker;
     } else {
-      ranker = ladderStore.state.rankers.find(
+      ranker = useLadderStore().state.rankers.find(
         (r) => r.accountId === body.accountId,
       );
     }

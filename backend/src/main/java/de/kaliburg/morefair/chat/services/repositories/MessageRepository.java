@@ -26,15 +26,19 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long> {
     return findMessagesByChatId(chatId, PageRequest.of(0, MESSAGES_PER_PAGE));
   }
 
-  @Query(value = "SELECT * FROM message m "
+  @Query(value = "SELECT m.* FROM message m "
       + "JOIN chat c ON m.chat_id = c.id "
       + "WHERE c.type IN :chatTypes "
       + "ORDER BY m.created_on DESC", nativeQuery = true)
-  List<MessageEntity> findMessagesByChatType(@Param("chatTypes") List<ChatType> chatType,
+  List<MessageEntity> findMessagesByChatTypeNames(@Param("chatTypes") List<String> chatType,
       Pageable pageable);
 
+  default List<MessageEntity> findMessagesByChatType(List<ChatType> chatType, Pageable pageable) {
+    return findMessagesByChatTypeNames(chatType.stream().map(Enum::toString).toList(), pageable);
+  }
+
   default List<MessageEntity> findNewestMessagesByChatTypes(List<ChatType> chatTypes) {
-    return findMessagesByChatType(chatTypes, PageRequest.of(0, MESSAGES_PER_PAGE));
+    return this.findMessagesByChatType(chatTypes, PageRequest.of(0, MESSAGES_PER_PAGE));
   }
 
   @Modifying

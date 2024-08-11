@@ -25,4 +25,6 @@ public interface AccountService extends UserDetailsService {
   AccountEntity save(AccountEntity account);
 
   List<AccountEntity> saveAll(List<AccountEntity> accounts);
+
+  List<AccountEntity> findAllActive();
 }

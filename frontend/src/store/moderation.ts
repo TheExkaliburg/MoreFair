@@ -126,7 +126,7 @@ export const useModerationStore = defineStore("moderation", () => {
 
   function searchAltAccounts(accountId: number) {
     return api.moderation
-      .searchAltAccouunts(accountId)
+      .searchAltAccounts(accountId)
       .then((res) => {
         const data: { [key: number]: string } = res.data;
         state.altSearchResults = JSON.stringify(data);

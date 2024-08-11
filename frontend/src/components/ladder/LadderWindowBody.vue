@@ -346,7 +346,7 @@ function throwVinegar(e: Event) {
   pressedVinegarRecently.value = true;
   useStomp().wsApi.ladder.throwVinegar(
     e,
-    useGrapesStore().state.vinegarThrowPercentage,
+    useGrapesStore().storage.vinegarThrowPercentage,
   );
 }
 

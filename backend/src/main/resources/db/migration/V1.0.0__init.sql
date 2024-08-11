@@ -197,10 +197,33 @@ CREATE TABLE IF NOT EXISTS public.ranker
     created_on   timestamp with time zone NOT NULL DEFAULT now(),
     promoted_on  timestamp with time zone,
     CONSTRAINT ranker_pkey PRIMARY KEY (id),
+    CONSTRAINT ranker_uk_uuid UNIQUE (uuid),
     CONSTRAINT ranker_uk_account_ladder UNIQUE (account_id, ladder_id),
     FOREIGN KEY (account_id) REFERENCES public.account (id) MATCH SIMPLE,
     FOREIGN KEY (ladder_id) REFERENCES public.ladder (id) MATCH SIMPLE
 );
 
-
+--Vinegar Throws
+CREATE SEQUENCE IF NOT EXISTS public.seq_vinegar_throw;
+CREATE TABLE IF NOT EXISTS public.vinegar_throw
+(
+    id                 bigint                                              NOT NULL DEFAULT nextval('public.seq_vinegar_throw'),
+    uuid               uuid                                                NOT NULL DEFAULT uuid_generate_v4(),
+    timestamp          timestamp with time zone                            NOT NULL DEFAULT now(),
+    thrower_account_id bigint                                              NOT NULL,
+    target_account_id  bigint                                              NOT NULL,
+    ladder_id          bigint                                              NOT NULL,
+    vinegar_thrown     numeric(1000, 0)                                    NOT NULL,
+    percentage_thrown  integer                                             NOT NULL,
+    vinegar_defended   numeric(1000, 0)                                    NOT NULL,
+    wine_defended      numeric(1000, 0)                                    NOT NULL,
+    success_type       character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    stolen_points      integer                                             NOT NULL,
+    stolen_streak      integer                                             NOT NULL,
+    CONSTRAINT vinegar_throw_pkey PRIMARY KEY (id),
+    CONSTRAINT vinegar_throw_uk_uuid UNIQUE (uuid),
+    FOREIGN KEY (thrower_account_id) REFERENCES public.account (id) MATCH SIMPLE,
+    FOREIGN KEY (target_account_id) REFERENCES public.account (id) MATCH SIMPLE,
+    FOREIGN KEY (ladder_id) REFERENCES public.ladder (id) MATCH SIMPLE
+)
 
