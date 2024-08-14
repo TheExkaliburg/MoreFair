@@ -1,7 +1,7 @@
 <template>
-  <div>
-    {{ username }}<sub class="">{{ accountId }}</sub>
-  </div>
+  <span class="whitespace-nowrap overflow-hidden">
+    {{ username }}<sub class="text-text-dark">#{{ accountId }}</sub>
+  </span>
 </template>
 
 <script setup lang="ts">

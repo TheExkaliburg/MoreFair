@@ -68,26 +68,15 @@
         {{ selectedVinegar }} Vinegar
       </div>
       <p class="w-fit whitespace-nowrap h-full align-middle text-xl pb-2">
-        Feuds:
+        Vinegar-Throws:
       </p>
-      <div class="flex flex-col">
-        Steals:
-        <AccountLabel account-id="1" />
-        <span>+5 (Grapes #100000)</span>
-        <span>+2 (MobileChecker #80000)</span>
-        <span>+1 (Lola #9999)</span>
-      </div>
-      <div class="flex flex-col">
-        Stealbacks:
-        <span>-3 (SE<sub>#420</sub>)</span>
-        <span>-1 (Psyche #1123)</span>
-        <span>-1 (Malice #134569)</span>
-      </div>
+      <TheVinegarThrowTable />
     </div>
     <br />
     <div class="flex flex-row justify-between">
-      <FairButton>Show All Feuds</FairButton>
-      <FairButton>Show Throw-Log</FairButton>
+      <NuxtLink to="/grapes">
+        <FairButton>Show Throw-Log</FairButton>
+      </NuxtLink>
     </div>
   </FairDialog>
 </template>
@@ -100,7 +89,7 @@ import { useGrapesStore } from "~/store/grapes";
 import { useRoundStore } from "~/store/round";
 import { useFormatter } from "~/composables/useFormatter";
 import { useAccountStore } from "~/store/account";
-import AccountLabel from "~/components/core/UserLabel.vue";
+import TheVinegarThrowTable from "~/components/grapes/TheVinegarThrowTable.vue";
 
 const isOpen = ref<boolean>(false);
 
