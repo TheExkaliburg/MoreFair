@@ -1,5 +1,5 @@
 <template>
-  <LadderSettingsWithIcon @click="open">
+  <LadderSettingsWithIcon data-tutorial="vinegarSettings" @click="open">
     <font-awesome-icon icon="fa-solid fa-wine-bottle" />
   </LadderSettingsWithIcon>
   <FairDialog

@@ -47,9 +47,11 @@
       class="flex flex-row text-xs lg:text-sm w-full justify-between text-text-light"
     >
       <p data-tutorial="grapes">
-        {{ yourFormattedGrapes }}/<span class="text-text-dark">{{
-          yourAutoPromoteCostFormatted
-        }}</span>
+        {{ yourFormattedGrapes }}/<span
+          class="text-text-dark"
+          data-tutorial="autoPromoteCost"
+          >{{ yourAutoPromoteCostFormatted }}</span
+        >
         {{ lang("info.grapes") }}
         <span
           v-if="
@@ -71,6 +73,7 @@
         :class="{ 'border-r-0': isAutoPromoteButtonDisabled }"
         :disabled="isAutoPromoteButtonDisabled"
         class="w-full rounded-r-none whitespace-nowrap"
+        data-tutorial="autoPromote"
         @click="buyAutoPromote"
       >
         {{ lang("autopromote") }}
@@ -80,6 +83,7 @@
         :class="{ 'border-l-1': isAutoPromoteButtonDisabled }"
         :disabled="isVinegarButtonDisabled"
         class="w-full rounded-l-none border-l-0 whitespace-nowrap"
+        data-tutorial="throwVinegar"
         @click="throwVinegar"
       >
         {{ vinegarButtonLabel }}

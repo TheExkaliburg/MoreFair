@@ -123,7 +123,7 @@ import SidebarButton from "../../components/navbar/SidebarButton.vue";
 import BrandedSidebarToggle from "../../components/navbar/BrandedSidebarToggle.vue";
 import { NuxtLink } from "#components";
 import { useUiStore } from "~/store/ui";
-import { useTutorialTour } from "~/composables/useTour";
+import { useStartupTour } from "~/composables/useTour";
 import { useLang } from "~/composables/useLang";
 import { useAccountStore } from "~/store/account";
 
@@ -148,7 +148,7 @@ function close() {
 
 function help() {
   close();
-  useTutorialTour().start();
+  useStartupTour().start();
   uiStore.state.sidebarExpanded = false;
 }
 </script>

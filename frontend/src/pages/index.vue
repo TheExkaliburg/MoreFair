@@ -24,8 +24,6 @@
 <script lang="ts" setup>
 import { useUiStore } from "~/store/ui";
 import { useStomp } from "~/composables/useStomp";
-import { useTutorialTour } from "~/composables/useTour";
-import { useAuthStore } from "~/store/authentication";
 import { useAccountStore } from "~/store/account";
 
 const uiStore = useUiStore();
@@ -39,9 +37,5 @@ useStomp();
 
 onMounted(async () => {
   await useAccountStore().actions.init();
-  const tour = useTutorialTour();
-  if (!tour.getFlag() && useAuthStore().state.authenticationStatus) {
-    tour.start();
-  }
 });
 </script>

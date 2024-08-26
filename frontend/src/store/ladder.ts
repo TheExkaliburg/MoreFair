@@ -17,6 +17,14 @@ import { SOUNDS, useSound } from "~/composables/useSound";
 import { useOptionsStore } from "~/store/options";
 import { useRoundStore } from "~/store/round";
 import { VinegarSuccessType } from "~/store/grapes";
+import {
+  useAutoPromoteTour,
+  useBiasedTour,
+  useMultiedTour,
+  usePromoteTour,
+  useStartupTour,
+  useVinegarTour,
+} from "~/composables/useTour";
 
 export enum LadderType {
   DEFAULT = "DEFAULT",
@@ -177,6 +185,11 @@ export const useLadderStore = defineStore("ladder", () => {
           "fair_ladder_calculateTick",
           (body: OnTickBody) => calculateTick(body.delta),
         );
+
+        const tour = usePromoteTour();
+        if (state.number >= 2 && !tour.flags.value.shownPromoted) {
+          tour.start();
+        }
       })
       .catch((_) => {
         isInitialized.value = false;
@@ -291,6 +304,31 @@ export const useLadderStore = defineStore("ladder", () => {
     if (isFirst && !wasFirst) {
       useSound(SOUNDS.GOT_FIRST).play();
     }
+
+    let tour = useStartupTour();
+    if (!tour.flags.value.shownStartup) {
+      tour.start();
+    }
+
+    tour = useAutoPromoteTour();
+    if (
+      !tour.flags.value.shownAutoPromote &&
+      tour.flags.value.shownMultied &&
+      yourRanker &&
+      yourRanker.points.mul(100).cmp(rankers[0].points) > 0
+    ) {
+      tour.start();
+    }
+
+    tour = useVinegarTour();
+    if (
+      !tour.flags.value.shownVinegar &&
+      tour.flags.value.shownAutoPromote &&
+      yourRanker &&
+      yourRanker.points.mul(10).cmp(rankers[0].points) > 0
+    ) {
+      tour.start();
+    }
   }
 
   function handleEvents() {
@@ -363,6 +401,18 @@ export const useLadderStore = defineStore("ladder", () => {
         default:
           console.error("Unknown event type", event);
           break;
+      }
+
+      if (event.eventType === LadderEventType.BUY_BIAS) {
+        const tour = useBiasedTour();
+        if (tour.flags.value.shownStartup && !tour.flags.value.shownBiased) {
+          tour.start();
+        }
+      } else if (event.eventType === LadderEventType.BUY_MULTI) {
+        const tour = useMultiedTour();
+        if (tour.flags.value.shownBiased && !tour.flags.value.shownMultied) {
+          tour.start();
+        }
       }
     }
   }
