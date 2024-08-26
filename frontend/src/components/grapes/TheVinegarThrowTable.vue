@@ -3,8 +3,10 @@
     <table class="w-full h-full">
       <tr class="text-text-light">
         <th>
-          {{ abbrv("round") }}<span class="text-sm text-text-dark">x</span
-          >{{ abbrv("ladder") }}<span class="text-sm text-text-dark">x</span>
+          {{ abbreviation("round")
+          }}<span class="text-sm text-text-dark">x</span
+          >{{ abbreviation("ladder")
+          }}<span class="text-sm text-text-dark">x</span>
         </th>
         <th>{{ lang("time") }}</th>
         <th>{{ lang("users") }}</th>
@@ -27,7 +29,7 @@ import { useGrapesStore, VinegarThrow } from "~/store/grapes";
 import VinegarThrowTableRow from "~/components/grapes/VinegarThrowTableRow.vue";
 
 const grapesStore = useGrapesStore();
-const abbrv = useLang("abbreviations");
+const abbreviation = useLang("abbreviations");
 const lang = useLang("components.vinegarThrowTable");
 
 const props = defineProps({

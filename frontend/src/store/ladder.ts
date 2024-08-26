@@ -424,16 +424,14 @@ export const useLadderStore = defineStore("ladder", () => {
         ),
       );
       useToasts(
-        `${ranker.username} (#${ranker.accountId}) ${
-          event.data.success ? "successfully" : ""
-        } threw  ${useFormatter(
+        `${ranker.username} (#${ranker.accountId}) threw ${useFormatter(
           vinegarThrown,
         )} (${percentage}%) vinegar at you!`,
       );
       chatStore.actions.addSystemMessage(
-        `{@} saw {@} throwing vinegar at {@}. They've ${
-          event.data.success ? "successfully" : ""
-        } used ${useFormatter(vinegarThrown)} (${percentage}%) vinegar!`,
+        `{@} saw {@} throwing vinegar at {@}. They've used ${useFormatter(
+          vinegarThrown,
+        )} (${percentage}%) vinegar!`,
         JSON.stringify([
           { u: "Chad", i: 0, id: 1 },
           { u: ranker.username, i: 8, id: ranker.accountId },

@@ -12,6 +12,7 @@ import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.model.AccountEntity;
 import de.kaliburg.morefair.account.services.AccountService;
 import de.kaliburg.morefair.api.AccountController;
+import de.kaliburg.morefair.api.GrapesController;
 import de.kaliburg.morefair.api.LadderController;
 import de.kaliburg.morefair.api.RoundController;
 import de.kaliburg.morefair.api.utils.WsUtils;
@@ -43,7 +44,9 @@ import de.kaliburg.morefair.game.round.services.utils.UnlocksUtilsService;
 import de.kaliburg.morefair.game.season.model.AchievementsEntity;
 import de.kaliburg.morefair.game.season.services.AchievementsService;
 import de.kaliburg.morefair.game.vinegar.model.VinegarThrowEntity;
+import de.kaliburg.morefair.game.vinegar.model.dto.ThrowRecordResponse;
 import de.kaliburg.morefair.game.vinegar.services.VinegarThrowService;
+import de.kaliburg.morefair.game.vinegar.services.mapper.VinegarThrowMapper;
 import de.kaliburg.morefair.statistics.services.StatisticsService;
 import de.kaliburg.morefair.utils.FormattingUtils;
 import java.math.BigInteger;
@@ -76,6 +79,7 @@ public class LadderEventServiceImpl implements LadderEventService {
   private final UnlocksUtilsService unlocksUtilsService;
   private final AchievementsService achievementsService;
   private final VinegarThrowService vinegarThrowService;
+  private final VinegarThrowMapper vinegarThrowMapper;
   private final StatisticsService statisticsService;
   private final WsUtils wsUtils;
   private final UpgradeUtils upgradeUtils;
@@ -434,6 +438,17 @@ public class LadderEventServiceImpl implements LadderEventService {
       wsUtils.convertAndSendToUser(
           accountService.findById(vinegarThrow.getTargetAccountId()).orElseThrow().getUuid(),
           LadderController.PRIVATE_EVENTS_DESTINATION, event);
+      // TODO: Remove old Vinegar Data/Logic above this line
+
+      ThrowRecordResponse throwRecordResponse = vinegarThrowMapper.mapVinegarThrowToThrowRecord(
+          vinegarThrow);
+
+      wsUtils.convertAndSendToUser(
+          accountService.findById(vinegarThrow.getThrowerAccountId()).orElseThrow().getUuid(),
+          GrapesController.PRIVATE_VINEGAR_DESTINATION, throwRecordResponse);
+      wsUtils.convertAndSendToUser(
+          accountService.findById(vinegarThrow.getTargetAccountId()).orElseThrow().getUuid(),
+          GrapesController.PRIVATE_VINEGAR_DESTINATION, throwRecordResponse);
 
       if (data.getSuccess().equals(VinegarSuccessType.SUCCESS) || data.getSuccess()
           .equals(VinegarSuccessType.DOUBLE_SUCCESS)) {

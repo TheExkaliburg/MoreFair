@@ -5,8 +5,8 @@ import de.kaliburg.morefair.game.ladder.services.LadderService;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
 import de.kaliburg.morefair.game.round.services.RoundService;
 import de.kaliburg.morefair.game.vinegar.model.VinegarThrowEntity;
+import de.kaliburg.morefair.game.vinegar.model.dto.ThrowRecordResponse;
 import de.kaliburg.morefair.game.vinegar.model.dto.VinegarThrowRecordResponse;
-import de.kaliburg.morefair.game.vinegar.model.dto.VinegarThrowRecordResponse.ThrowRecord;
 import java.time.ZoneOffset;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -31,14 +31,14 @@ public class VinegarThrowMapper {
   }
 
 
-  public VinegarThrowRecordResponse.ThrowRecord mapVinegarThrowToThrowRecord(
+  public ThrowRecordResponse mapVinegarThrowToThrowRecord(
       VinegarThrowEntity vinegarThrow) {
     LadderEntity ladder = ladderService.findLadderById(vinegarThrow.getLadderId())
         .orElseThrow();
 
     RoundEntity round = roundService.findById(ladder.getRoundId()).orElseThrow();
 
-    return ThrowRecord.builder()
+    return ThrowRecordResponse.builder()
         .accountId(vinegarThrow.getThrowerAccountId())
         .targetId(vinegarThrow.getTargetAccountId())
         .timestamp(

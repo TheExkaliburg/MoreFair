@@ -53,10 +53,11 @@ components:
     users: Users
     amount: Amount
     result: "?"
+    percentageTooltip: Threw %s% of their Vinegar
     results:
       DOUBLE_SUCCESS: The throw broke through the target's shield and depleted all of their vinegar. (Refunds 50%)
       SUCCESS: The target had no shield, and the throw depleted all of their vinegar. (Refunds 25%)
-      DEFENDED: The throw broke through the target's shield, but did not deplete all of their vinegar. (Refunds 25%)
+      DEFENDED: The target had no shield, but the throw did not deplete all of their vinegar.
       SHIELDED: The throw was completely absorbed by the target's shield.
       SHIELD_DEFENDED: The throw broke through the target's shield, but did not deplete all of their vinegar. (Refunds 25%)
 abbreviations:

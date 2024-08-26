@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequiredArgsConstructor
 public class GrapesController {
 
+  public static final String PRIVATE_VINEGAR_DESTINATION = "/vinegar/events";
+
   private final AccountService accountService;
   private final VinegarThrowService vinegarThrowService;
   private final VinegarThrowMapper vinegarThrowMapper;

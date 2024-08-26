@@ -7,6 +7,7 @@ import { RoundEventType } from "~/store/round";
 import { LadderEventType } from "~/store/ladder";
 import { ChatLogMessageData } from "~/store/moderation";
 import { User } from "~/store/user";
+import { VinegarThrow } from "~/store/grapes";
 
 export type OnTickBody = {
   delta: number;
@@ -31,6 +32,7 @@ export type OnAccountEventBody = {
 export type OnUserEventBody = {
   data: User;
 };
+export type OnVinegarThrowEventBody = VinegarThrow;
 
 export type OnModChatEventBody = OnChatEventBody & ChatLogMessageData;
 export type OnModLogEventBody = {};
@@ -49,6 +51,7 @@ export type StompCallbacks = {
   onAccountEvent: StompCallback<OnAccountEventBody>[];
   onModChatEvent: StompCallback<OnModChatEventBody>[];
   onModLogEvent: StompCallback<OnModLogEventBody>[];
+  onVinegarThrowEvent: StompCallback<OnVinegarThrowEventBody>[];
 };
 
 const callbacks: StompCallbacks = {
@@ -60,6 +63,7 @@ const callbacks: StompCallbacks = {
   onUserEvent: [],
   onModChatEvent: [],
   onModLogEvent: [],
+  onVinegarThrowEvent: [],
 };
 
 function addCallback<T>(
@@ -187,6 +191,10 @@ function connectPrivateChannel(uuid: string) {
   client.subscribe(`/private/${uuid}/account/events`, (message) => {
     const body: OnAccountEventBody = JSON.parse(message.body);
     callbacks.onAccountEvent.forEach(({ callback }) => callback(body));
+  });
+  client.subscribe(`/private/${uuid}/vinegar/events`, (message) => {
+    const body: OnVinegarThrowEventBody = JSON.parse(message.body);
+    callbacks.onVinegarThrowEvent.forEach(({ callback }) => callback(body));
   });
 
   connectModeratorChannel();

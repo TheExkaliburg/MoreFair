@@ -47,6 +47,7 @@ export const useGrapesStore = defineStore("grapes", () => {
   const accountStore = useAccountStore();
 
   const api = useAPI();
+  const stomp = useStomp();
 
   const startedInitialization = ref<boolean>(false);
   const state = reactive<GrapesState>({
@@ -86,6 +87,13 @@ export const useGrapesStore = defineStore("grapes", () => {
             vinegarThrown: new Decimal(v.vinegarThrown),
           });
         });
+        stomp.addCallback(
+          stomp.callbacks.onVinegarThrowEvent,
+          "fair_vinegarThrow_events",
+          (body) => {
+            state.throwRecords.unshift(body);
+          },
+        );
       })
       .catch((_) => {
         startedInitialization.value = false;

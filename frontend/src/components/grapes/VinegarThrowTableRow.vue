@@ -14,7 +14,9 @@
       <p />
       <UserLabel :account-id="typedVinThrow.targetId" />
     </td>
-    <td class="text-right">{{ vinegarString }}</td>
+    <td v-tippy="{ content: percentageTooltip }" class="text-right">
+      {{ vinegarString }}
+    </td>
     <td v-tippy="{ content: successTypeTooltip }" class="text-right">
       <div
         v-if="
@@ -71,6 +73,10 @@ const lang = useLang("components.vinegarThrowTable");
 
 const typedVinThrow = computed<VinegarThrow>(
   () => props.vinThrow as VinegarThrow,
+);
+
+const percentageTooltip = computed<string>(() =>
+  lang("percentageTooltip", String(typedVinThrow.value.percentage)),
 );
 
 const timestampTimeString = computed<string>(() =>
