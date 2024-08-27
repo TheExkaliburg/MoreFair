@@ -99,11 +99,12 @@
       </FairButton>
     </div>
     <div
-      class="flex flex-row text-xs lg:text-sm w-full justify-between text-text-light"
+      class="flex flex-row text-xs lg:text-sm w-full justify-between text-text-light whitespace-nowrap"
     >
       <p>
-        {{ lang("info.promoteAt") }}
-        <span class="text-text-dark">{{ pointsNeededToPromoteFormatted }}</span>
+        {{ lang("info.promoteAt") }} @<span class="text-text-dark">{{
+          pointsNeededToPromoteFormatted
+        }}</span>
         {{ lang("info.points") }} ({{ yourPercentageToPromotion }}%) ({{
           yourTimeToPromotion
         }})
@@ -135,6 +136,8 @@ const lang = useLang("components.ladder.buttons");
 const optionsStore = useOptionsStore();
 const ladderStore = useLadderStore();
 const ladderUtils = useLadderUtils();
+const flags = useStartupTour().flags;
+
 const isButtonLocked = computed<boolean>(() => {
   return (
     optionsStore.state.ladder.lockButtons.value || !yourRanker.value.growing
@@ -292,25 +295,35 @@ const pressedAutoPromoteRecently = ref<boolean>(false);
 const pressedPromoteRecently = ref<boolean>(false);
 
 const isBiasButtonDisabled = computed<boolean>(() => {
-  return !canBuyBias.value || isButtonLocked.value || pressedBiasRecently.value;
+  return (
+    !canBuyBias.value ||
+    isButtonLocked.value ||
+    pressedBiasRecently.value ||
+    !flags.value.shownStartup
+  );
 });
 const isMultiButtonDisabled = computed<boolean>(() => {
   return (
-    !canBuyMulti.value || isButtonLocked.value || pressedMultiRecently.value
+    !canBuyMulti.value ||
+    isButtonLocked.value ||
+    pressedMultiRecently.value ||
+    !flags.value.shownBiased
   );
 });
 const isVinegarButtonDisabled = computed<boolean>(() => {
   return (
     !canThrowVinegar.value ||
     isButtonLocked.value ||
-    pressedVinegarRecently.value
+    pressedVinegarRecently.value ||
+    !flags.value.shownVinegar
   );
 });
 const isAutoPromoteButtonDisabled = computed<boolean>(() => {
   return (
     !canBuyAutoPromote.value ||
     isButtonLocked.value ||
-    pressedAutoPromoteRecently.value
+    pressedAutoPromoteRecently.value ||
+    !flags.value.shownAutoPromote
   );
 });
 const isPromoteButtonDisabled = computed<boolean>(() => {

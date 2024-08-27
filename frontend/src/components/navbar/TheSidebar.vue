@@ -34,15 +34,6 @@
               </template>
             </SidebarButton>
           </NuxtLink>
-          <SidebarButton
-            v-tippy="{ content: lang('help'), placement: 'right' }"
-            aria-label="Start Tutorial"
-            @click="help"
-          >
-            <template #icon>
-              <QuestionMarkCircleIcon />
-            </template>
-          </SidebarButton>
           <NuxtLink
             v-tippy="{ content: lang('wiki'), placement: 'right' }"
             aria-label="Goto Fair Wiki"
@@ -114,22 +105,16 @@ import {
   Cog8ToothIcon,
   DocumentTextIcon,
   NewspaperIcon,
-  QuestionMarkCircleIcon,
   UserCircleIcon,
 } from "@heroicons/vue/24/outline";
 import { useLang } from "~/composables/useLang";
 import SidebarButton from "~/components/navbar/SidebarButton.vue";
-import { useStartupTour } from "~/composables/useTour";
 import { useAccountStore } from "~/store/account";
 
 const accountStore = useAccountStore();
 
 const classesForSize = "min-w-12 w-12 max-w-12 px-2 py-2";
 const lang = useLang("components.navbar.sidebar");
-
-function help() {
-  useStartupTour().start();
-}
 </script>
 
 <style lang="scss" scoped></style>

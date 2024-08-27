@@ -187,7 +187,11 @@ export const useLadderStore = defineStore("ladder", () => {
         );
 
         const tour = usePromoteTour();
-        if (state.number >= 2 && !tour.flags.value.shownPromoted) {
+        if (
+          state.number >= 2 &&
+          !tour.flags.value.shownPromoted &&
+          tour.flags.value.shownVinegar
+        ) {
           tour.start();
         }
       })

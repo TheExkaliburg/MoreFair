@@ -45,7 +45,7 @@ components:
         active: Active
         points: Points
         power: Power
-        promoteAt: Promote at
+        promoteAt: Promote
         multi_short: M
         bias_short: B
   vinegarThrowTable:
@@ -156,10 +156,21 @@ account:
 zxcvbn:
   strength: Strength
 tour:
+  names:
+    tutorials: Tutorials
+    first: First Steps
+    upgrades: Upgrades
+    climbing: Climbing the Ladder
+    grapes: Grapes & AutoPromote
+    vinegar: Vinegar & Wine
+    goodluck: Good Luck
   startup:
     welcome:
       title: Welcome
       intro: Welcome to the FairGame-Tutorial!
+    help:
+      title: Help
+      intro: If you are ever stuck you can always check this tutorial again or ask in chad.
     points:
       title: Points
       intro: These are your Points, you get a number of Points/sec based on your Power.
@@ -222,6 +233,9 @@ tour:
     balance:
       title: Balance
       intro: Need to keep a balance on Vinegar/Wine & Grapes while climbing faster than the others.
+    goodluck:
+      title: Good Luck
+      intro: Good Luck competing with your fellow Rankers and don't forget to check out our wiki or discord. <3
 modifier:
   DEFAULT:
     title: Default

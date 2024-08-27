@@ -92,6 +92,7 @@ export const useGrapesStore = defineStore("grapes", () => {
           "fair_vinegarThrow_events",
           (body) => {
             state.throwRecords.unshift(body);
+            if (state.throwRecords.length > 50) state.throwRecords.length = 50;
           },
         );
       })

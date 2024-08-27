@@ -2,7 +2,6 @@ import introJs from "intro.js";
 // @ts-ignore
 import { navigateTo } from "nuxt/app";
 import { RemovableRef } from "@vueuse/core";
-import { useUiStore } from "~/store/ui";
 import { useLang } from "~/composables/useLang";
 
 export type TourFlags = {
@@ -25,10 +24,15 @@ const defaultValues: TourFlags = {
   shownPromoted: false,
 };
 
+export type Tour = {
+  flags: RemovableRef<TourFlags>;
+  start: () => void;
+};
+
 const flags: RemovableRef<TourFlags> = useLocalStorage("flags", defaultValues);
 flags.value.isOpen = false;
 
-export const useStartupTour = () => {
+export const useStartupTour = (): Tour => {
   const lang = useLang("tour.startup");
   const tour = introJs();
 
@@ -39,6 +43,11 @@ export const useStartupTour = () => {
       {
         title: lang("welcome.title"),
         intro: lang("welcome.intro"),
+      },
+      {
+        element: document.querySelector("[data-tutorial='help']") || undefined,
+        title: lang("help.title"),
+        intro: lang("help.intro"),
       },
       {
         element: document.querySelector(".ranker-you .points") || undefined,
@@ -65,16 +74,6 @@ export const useStartupTour = () => {
       prevLabel: "Back",
       doneLabel: "Done",
     });
-    tour.onbeforechange((targetElement) => {
-      return new Promise<void>((resolve) => {
-        if (targetElement.dataset.tutorial === "help") {
-          useUiStore().state.sidebarExpanded = true;
-          setTimeout(resolve, 150);
-        } else {
-          resolve();
-        }
-      });
-    });
     tour.oncomplete(() => {
       flags.value.shownStartup = true;
       flags.value.isOpen = false;
@@ -93,7 +92,7 @@ export const useStartupTour = () => {
   };
 };
 
-export const useBiasedTour = () => {
+export const useBiasedTour = (): Tour => {
   const lang = useLang("tour.biased");
   const tour = introJs();
 
@@ -146,7 +145,7 @@ export const useBiasedTour = () => {
   };
 };
 
-export const useMultiedTour = () => {
+export const useMultiedTour = (): Tour => {
   const lang = useLang("tour.multied");
   const tour = introJs();
 
@@ -198,7 +197,7 @@ export const useMultiedTour = () => {
   };
 };
 
-export const useAutoPromoteTour = () => {
+export const useAutoPromoteTour = (): Tour => {
   const lang = useLang("tour.autoPromote");
   const tour = introJs();
 
@@ -258,7 +257,7 @@ export const useAutoPromoteTour = () => {
   };
 };
 
-export const useVinegarTour = () => {
+export const useVinegarTour = (): Tour => {
   const lang = useLang("tour.vinegar");
   const tour = introJs();
 
@@ -316,7 +315,7 @@ export const useVinegarTour = () => {
   };
 };
 
-export const usePromoteTour = () => {
+export const usePromoteTour = (): Tour => {
   const lang = useLang("tour.promote");
   const tour = introJs();
 
@@ -330,6 +329,10 @@ export const usePromoteTour = () => {
       {
         title: lang("balance.title"),
         intro: lang("balance.intro"),
+      },
+      {
+        title: lang("goodluck.title"),
+        intro: lang("goodluck.intro"),
       },
     ];
 
@@ -357,13 +360,4 @@ export const usePromoteTour = () => {
     start,
     flags,
   };
-};
-
-(window as any).tours = {
-  useStartupTour,
-  useBiasedTour,
-  useMultiedTour,
-  useAutoPromoteTour,
-  useVinegarTour,
-  usePromoteTour,
 };

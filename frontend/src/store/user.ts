@@ -35,8 +35,6 @@ export const useUserStore = defineStore("user", () => {
       if (!userComputedGetter) {
         userComputedGetter = computed(() => {
           const result = state.users.get(id);
-
-          console.log("result", result);
           // Trigger a singular fetch if user is unknown
           if (isInitialized.value && !result) {
             fetchUser(id).then();
