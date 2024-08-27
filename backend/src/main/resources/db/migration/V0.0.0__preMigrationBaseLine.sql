@@ -47,13 +47,13 @@ CREATE SEQUENCE IF NOT EXISTS public.seq_message;
 CREATE TABLE IF NOT EXISTS public.message
 (
     id         bigint                                              NOT NULL,
-    created_on timestamp with time zone                            NOT NULL,
-    message    character varying(512) COLLATE pg_catalog."default" NOT NULL,
-    metadata   character varying(512) COLLATE pg_catalog."default",
     uuid       uuid                                                NOT NULL,
     account_id bigint                                              NOT NULL,
     chat_id    bigint                                              NOT NULL,
+    created_on timestamp with time zone                            NOT NULL,
     deleted_on timestamp with time zone,
+    message    character varying(512) COLLATE pg_catalog."default" NOT NULL,
+    metadata   character varying(512) COLLATE pg_catalog."default",
     CONSTRAINT message_pkey PRIMARY KEY (id),
     CONSTRAINT fk_message_account FOREIGN KEY (account_id)
         REFERENCES public.account (id) MATCH SIMPLE
@@ -69,14 +69,14 @@ CREATE SEQUENCE IF NOT EXISTS public.seq_round;
 CREATE TABLE IF NOT EXISTS public.round
 (
     id                                bigint                   NOT NULL,
-    base_asshole_ladder               integer                  NOT NULL,
-    base_points_requirement           numeric(1000, 0)         NOT NULL,
-    created_on                        timestamp with time zone NOT NULL,
-    highest_asshole_count             integer                  NOT NULL,
-    "number"                          integer                  NOT NULL,
-    percentage_of_additional_assholes real                     NOT NULL,
     uuid                              uuid                     NOT NULL,
+    "number"                          integer                  NOT NULL,
+    created_on                        timestamp with time zone NOT NULL,
     closed_on                         timestamp with time zone,
+    base_asshole_ladder               integer                  NOT NULL,
+    highest_asshole_count             integer                  NOT NULL,
+    base_points_requirement           numeric(1000, 0)         NOT NULL,
+    percentage_of_additional_assholes real                     NOT NULL,
     CONSTRAINT round_pkey PRIMARY KEY (id),
     CONSTRAINT uk_number UNIQUE ("number")
 );
@@ -108,11 +108,11 @@ CREATE SEQUENCE IF NOT EXISTS public.seq_ladder;
 CREATE TABLE IF NOT EXISTS public.ladder
 (
     id                     bigint                   NOT NULL,
-    base_points_to_promote numeric(1000, 0)         NOT NULL,
-    "number"               integer                  NOT NULL,
     uuid                   uuid                     NOT NULL,
     round_id               bigint                   NOT NULL,
+    base_points_to_promote numeric(1000, 0)         NOT NULL,
     created_on             timestamp with time zone NOT NULL,
+    "number"               integer                  NOT NULL,
     scaling                integer                  NOT NULL,
     CONSTRAINT ladder_pkey PRIMARY KEY (id),
     CONSTRAINT uk_number_round UNIQUE ("number", round_id),
@@ -136,18 +136,18 @@ CREATE SEQUENCE IF NOT EXISTS public.seq_ranker;
 CREATE TABLE IF NOT EXISTS public.ranker
 (
     id           bigint           NOT NULL,
-    auto_promote boolean,
-    bias         integer          NOT NULL,
-    grapes       numeric(1000, 0) NOT NULL,
-    growing      boolean,
-    multiplier   integer          NOT NULL,
-    points       numeric(1000, 0) NOT NULL,
-    power        numeric(1000, 0) NOT NULL,
-    rank         integer          NOT NULL,
     uuid         uuid             NOT NULL,
-    vinegar      numeric(1000, 0) NOT NULL,
     account_id   bigint           NOT NULL,
     ladder_id    bigint           NOT NULL,
+    rank         integer          NOT NULL,
+    multiplier   integer          NOT NULL,
+    bias         integer          NOT NULL,
+    power        numeric(1000, 0) NOT NULL,
+    points       numeric(1000, 0) NOT NULL,
+    grapes       numeric(1000, 0) NOT NULL,
+    vinegar      numeric(1000, 0) NOT NULL,
+    auto_promote boolean,
+    growing      boolean,
     CONSTRAINT ranker_pkey PRIMARY KEY (id),
     CONSTRAINT uk_account_ladder UNIQUE (account_id, ladder_id),
     CONSTRAINT fk_ranker_account FOREIGN KEY (account_id)
