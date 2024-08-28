@@ -2,6 +2,7 @@ package de.kaliburg.morefair.api;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.model.AccountEntity;
 import de.kaliburg.morefair.account.services.AccountService;
 import de.kaliburg.morefair.api.utils.HttpUtils;
@@ -47,6 +48,7 @@ public class AuthController {
   private final PasswordEncoder passwordEncoder;
   private final SecurityUtils securityUtils;
   private final EmailService emailService;
+  private final FairConfig fairConfig;
 
   private final RequestThrottler requestThrottler;
   private final Pattern emailRegexPattern = Pattern.compile(
@@ -81,6 +83,11 @@ public class AuthController {
   public ResponseEntity<?> register(@RequestParam String username, @RequestParam String password,
       HttpServletRequest request, @RequestParam(required = false) String uuid) {
     try {
+      if (!fairConfig.getAuth().isCanSignUp()) {
+        return HttpUtils.buildErrorMessage(HttpStatus.SERVICE_UNAVAILABLE,
+            "Signup is currently disabled");
+      }
+
       username = username.toLowerCase();
 
       if (password.length() < 8) {
@@ -297,6 +304,15 @@ public class AuthController {
   @PostMapping(value = "/register/guest", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> registerGuest(HttpServletRequest request) {
     try {
+      if (!fairConfig.getAuth().isCanSignUp()) {
+        return HttpUtils.buildErrorMessage(HttpStatus.SERVICE_UNAVAILABLE,
+            "Signup is currently disabled");
+      }
+      if (!fairConfig.getAuth().isCanSignUpAsGuest()) {
+        return HttpUtils.buildErrorMessage(HttpStatus.SERVICE_UNAVAILABLE,
+            "Creation of MysteryGuests is currently disabled, please Signup with your Email");
+      }
+
       Integer ip = HttpUtils.getIp(request);
 
       if (!requestThrottler.canCreateAccount(ip)) {

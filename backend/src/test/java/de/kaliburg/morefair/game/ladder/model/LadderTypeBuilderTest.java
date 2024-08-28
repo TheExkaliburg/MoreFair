@@ -1,9 +1,7 @@
-package de.kaliburg.morefair.game.round_old;
+package de.kaliburg.morefair.game.ladder.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import de.kaliburg.morefair.game.ladder.model.LadderType;
-import de.kaliburg.morefair.game.ladder.model.LadderTypeBuilder;
 import de.kaliburg.morefair.game.round.model.type.RoundType;
 import de.kaliburg.morefair.utils.EnableLoggingPropertiesBeforeAll;
 import java.util.ArrayList;

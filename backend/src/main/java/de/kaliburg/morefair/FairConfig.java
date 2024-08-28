@@ -22,6 +22,7 @@ public class FairConfig {
   private Secrets secrets;
   private Integer minVinegarPercentageThrown = 50;
   private Integer maxVinegarThrown = 100;
+  private Authentication auth = new Authentication();
 
   private List<String> assholeTags = Arrays.asList("", "♣", "♠", "♦", "♥", "♙", "♘", "♗", "♖", "♕",
       "♔", "🂠", "🂱", "🂲", "🂳", "🂴", "🂵", "🂶", "🂷", "🂸", "🂹", "🂺", "🂻", "🂽", "🂾");
@@ -44,6 +45,14 @@ public class FairConfig {
     int size = assholeTags.size() - 1;
     int result = (size * (size + 1)) / 2;
     return result * 10;
+  }
+
+  @Data
+  public static class Authentication {
+
+    private boolean canSignUp = true;
+    private boolean canSignUpAsGuest = true;
+
   }
 
   @Data

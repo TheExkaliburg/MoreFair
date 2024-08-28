@@ -1,9 +1,8 @@
-package de.kaliburg.morefair.game.round_old;
+package de.kaliburg.morefair.game.round.model;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import de.kaliburg.morefair.game.round.model.RoundTypeSetBuilder;
 import de.kaliburg.morefair.game.round.model.type.RoundType;
 import de.kaliburg.morefair.utils.EnableLoggingPropertiesBeforeAll;
 import java.util.ArrayList;
