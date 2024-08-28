@@ -142,7 +142,6 @@ CREATE TABLE IF NOT EXISTS public.unlocks
     uuid                   uuid    NOT NULL DEFAULT uuid_generate_v4(),
     account_id             bigint  NOT NULL,
     round_id               bigint  NOT NULL,
-    unlocked_auto_promote  boolean NOT NULL,
     pressed_asshole_button boolean NOT NULL,
     reached_asshole_ladder boolean NOT NULL,
     CONSTRAINT unlocks_pkey PRIMARY KEY (id),

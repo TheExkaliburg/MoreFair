@@ -309,10 +309,6 @@ public class LadderEventServiceImpl implements LadderEventService {
             achievementsService.findOrCreateByAccountInCurrentSeason(account.getId());
 
         // Unlocks
-        if (!unlocks.getUnlockedAutoPromote()
-            && newLadder.getNumber() >= fairConfig.getAutoPromoteLadder()) {
-          unlocks.setUnlockedAutoPromote(true);
-        }
         if (!unlocks.getReachedAssholeLadder()
             && newLadder.getTypes().contains(LadderType.ASSHOLE)) {
           unlocks.setReachedAssholeLadder(true);

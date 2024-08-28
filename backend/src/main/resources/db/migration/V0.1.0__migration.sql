@@ -168,8 +168,6 @@ ALTER TABLE IF EXISTS public.ladder
 ALTER TABLE IF EXISTS public.ladder
     ALTER COLUMN created_on SET DEFAULT now();
 ALTER TABLE IF EXISTS public.ladder
-    RENAME "number" TO number;
-ALTER TABLE IF EXISTS public.ladder
     DROP CONSTRAINT uk_number_round;
 ALTER TABLE IF EXISTS public.ladder
     DROP CONSTRAINT fk_ladder_round;
@@ -231,7 +229,6 @@ CREATE TABLE IF NOT EXISTS public.unlocks
     uuid                   uuid    NOT NULL DEFAULT uuid_generate_v4(),
     account_id             bigint  NOT NULL,
     round_id               bigint  NOT NULL,
-    unlocked_auto_promote  boolean NOT NULL,
     pressed_asshole_button boolean NOT NULL,
     reached_asshole_ladder boolean NOT NULL,
     CONSTRAINT unlocks_pkey PRIMARY KEY (id),
@@ -241,11 +238,9 @@ CREATE TABLE IF NOT EXISTS public.unlocks
     FOREIGN KEY (round_id) REFERENCES public.round (id) MATCH FULL
 );
 
-INSERT INTO public.unlocks (account_id, round_id, unlocked_auto_promote, pressed_asshole_button,
-                            reached_asshole_ladder)
+INSERT INTO public.unlocks (account_id, round_id, pressed_asshole_button, reached_asshole_ladder)
 SELECT DISTINCT ON (ro.id, r.account_id) r.account_id              AS account_id,
                                          ro.id                     AS round_id,
-                                         ru.auto_promote           AS unlocked_auto_promote,
                                          ru.pressed_asshole_button AS pressed_asshole_button,
                                          ru.reached_asshole_ladder AS reached_asshole_ladder
 FROM public.ranker_unlocks ru
@@ -258,8 +253,6 @@ DROP TABLE IF EXISTS public.ranker_unlocks;
 
 
 -- Update Message and Chat
-ALTER TABLE IF EXISTS public.chat
-    RENAME COLUMN "number" TO number;
 ALTER TABLE IF EXISTS public.chat
     ALTER COLUMN id SET DEFAULT nextval('public.seq_chat'),
     ALTER COLUMN uuid SET DEFAULT uuid_generate_v4(),
@@ -276,11 +269,7 @@ ALTER TABLE IF EXISTS public.chat
 ALTER TABLE IF EXISTS public.message
     ALTER COLUMN id SET DEFAULT nextval('public.seq_message'),
     ALTER COLUMN uuid SET DEFAULT uuid_generate_v4(),
-    ALTER COLUMN created_on SET DEFAULT now(),
-    ALTER COLUMN number DROP NOT NULL,
-    ALTER COLUMN type TYPE character varying(255),
-    ALTER COLUMN type DROP DEFAULT,
-    ALTER COLUMN type SET NOT NULL;
+    ALTER COLUMN created_on SET DEFAULT now();
 ALTER TABLE IF EXISTS public.message
     DROP CONSTRAINT fk_message_account,
     DROP CONSTRAINT fk_message_chat;
