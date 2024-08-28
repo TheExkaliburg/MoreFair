@@ -72,6 +72,7 @@ function finishTutorials() {
 }
 
 function resetTutorials() {
+  isOpen.value = false;
   const flags = useStartupTour().flags;
   flags.value.shownStartup = false;
   flags.value.shownBiased = false;
