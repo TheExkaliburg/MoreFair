@@ -34,6 +34,11 @@
         @click="start(usePromoteTour)"
         >6. {{ lang("goodluck") }}</a
       >
+
+      <div class="flex flex-row justify-between pt-10">
+        <FairButton @click="finishTutorials">Skip Tutorials</FairButton>
+        <FairButton @click="resetTutorials">Reset Tutorials</FairButton>
+      </div>
     </div>
   </FairDialog>
 </template>
@@ -42,6 +47,7 @@
 import { QuestionMarkCircleIcon } from "@heroicons/vue/24/outline";
 import FairDialog from "~/components/interactables/FairDialog.vue";
 import { Tour } from "~/composables/useTour";
+import FairButton from "~/components/interactables/FairButton.vue";
 
 const lang = useLang("tour.names");
 const isOpen = ref<boolean>(false);
@@ -53,5 +59,25 @@ function open(): void {
 function start(tourFn: () => Tour): void {
   isOpen.value = false;
   tourFn().start();
+}
+
+function finishTutorials() {
+  const flags = useStartupTour().flags;
+  flags.value.shownStartup = true;
+  flags.value.shownBiased = true;
+  flags.value.shownMultied = true;
+  flags.value.shownAutoPromote = true;
+  flags.value.shownVinegar = true;
+  flags.value.shownPromoted = true;
+}
+
+function resetTutorials() {
+  const flags = useStartupTour().flags;
+  flags.value.shownStartup = false;
+  flags.value.shownBiased = false;
+  flags.value.shownMultied = false;
+  flags.value.shownAutoPromote = false;
+  flags.value.shownVinegar = false;
+  flags.value.shownPromoted = false;
 }
 </script>
