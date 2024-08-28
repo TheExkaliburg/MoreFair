@@ -87,8 +87,8 @@ public class RoundEntity {
     int max = 10;
     int min = 5;
 
-    float random = (max - min + 1) * getPercentageOfAdditionalAssholes() / 100;
-    return min + Math.round(random - 0.5f);
+    float rnd = (max - min + 1) * getPercentageOfAdditionalAssholes() / 100;
+    return min + Math.round(rnd - 0.5f);
   }
 
   public boolean isClosed() {

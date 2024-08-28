@@ -12,6 +12,7 @@ import de.kaliburg.morefair.game.ladder.services.LadderService;
 import de.kaliburg.morefair.game.ranker.model.RankerEntity;
 import de.kaliburg.morefair.game.ranker.services.RankerService;
 import de.kaliburg.morefair.game.ranker.services.utils.RankerUtilsService;
+import de.kaliburg.morefair.game.round.model.RoundEntity;
 import de.kaliburg.morefair.game.round.services.RoundService;
 import de.kaliburg.morefair.game.season.services.AchievementsService;
 import de.kaliburg.morefair.game.season.services.SeasonService;
@@ -195,8 +196,14 @@ public class VinegarThrowServiceImpl implements VinegarThrowService {
   }
 
   @Override
-  public List<VinegarThrowEntity> findVinegarThrowRecordsOfCurrentSeason(Long accountId) {
+  public List<VinegarThrowEntity> findVinegarThrowsOfCurrentSeason(Long accountId) {
     return repository.findAllByAccountId(accountId);
+  }
+
+  @Override
+  public List<VinegarThrowEntity> findVinegarThrowsOfCurrentRound(Long accountId) {
+    RoundEntity currentRound = roundService.getCurrentRound();
+    return repository.findAllByAccountIdAndRoundId(accountId, currentRound.getId());
   }
 
   private boolean canSteal(Long throwerAccountId, Long targetAccountId) {

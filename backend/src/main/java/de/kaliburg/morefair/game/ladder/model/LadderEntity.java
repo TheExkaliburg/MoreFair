@@ -81,7 +81,7 @@ public final class LadderEntity {
     determineLadderType(round, previousLadder);
 
     if (round.getTypes().contains(RoundType.REVERSE_SCALING)) {
-      // Makes Ladder 1 be Asshole Ladder etc.
+      // Makes Ladder 1 be Asshole Ladder Scaling etc.
       this.scaling = Math.max(round.getAssholeLadderNumber() + 1 - number, 1);
     } else {
       this.scaling = number;
@@ -98,7 +98,6 @@ public final class LadderEntity {
     } else if (types.contains(LadderType.GIGANTIC)) {
       base = base.multiply(BigInteger.valueOf(10));
     }
-    Random random = new Random();
     double percentage = random.nextDouble(0.8, 1.2);
 
     BigDecimal baseDec = new BigDecimal(base);
@@ -132,35 +131,19 @@ public final class LadderEntity {
 
   public int getBottomGrapes() {
     if (types.contains(LadderType.BOUNTIFUL)) {
-      return 5;
+      return 3;
     } else if (types.contains(LadderType.DROUGHT)) {
-      return 1;
+      return 0;
     }
-    return 2;
+    return 1;
   }
 
-  public int getWinningGrapes(int place, BigInteger baseGrapeCostForAuto) {
-    float multiplier = 1.f;
-    if (types.contains(LadderType.GENEROUS)) {
-      multiplier = 3.f;
-    } else if (types.contains(LadderType.STINGY)) {
-      multiplier = .5f;
-    }
-
-    if (place == 1) {
-      return (int) (baseGrapeCostForAuto.intValue() * multiplier);
-    } else if (place < 4) {
-      return (int) (baseGrapeCostForAuto.divide(BigInteger.TWO).intValue() * multiplier);
-    } else if (place < 11) {
-      return (int) (baseGrapeCostForAuto.divide(BigInteger.TEN).intValue() * multiplier);
-    }
-    return 0;
-  }
-
-  //This is the bonus vin multiplier, the ladder winner gets vin X (getWinningMultipler / 10)
+  /**
+   * This is the bonus vin multiplier, the ladder winner gets vin X (getWinningMultipler / 10).
+   */
   public int getWinningMultiplier() {
     if (types.contains(LadderType.GENEROUS)) {
-      return 14;
+      return 15;
     } else if (types.contains(LadderType.STINGY)) {
       return 11;
     }

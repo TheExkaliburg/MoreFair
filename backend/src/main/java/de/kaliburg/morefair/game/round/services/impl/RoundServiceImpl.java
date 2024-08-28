@@ -77,6 +77,7 @@ public class RoundServiceImpl implements RoundService {
       }
       return roundCache.get(currentRoundId);
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException(e);
     }
   }
@@ -86,6 +87,7 @@ public class RoundServiceImpl implements RoundService {
     try (var ignored = semaphore.enter()) {
       return Optional.of(roundCache.get(id));
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException(e);
     }
   }
@@ -114,6 +116,7 @@ public class RoundServiceImpl implements RoundService {
 
       currentRoundId = null;
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException(e);
     }
   }

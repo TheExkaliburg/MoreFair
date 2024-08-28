@@ -75,4 +75,9 @@ public class VinegarThrowEntity {
   @Column(nullable = false)
   private Integer stolenStreak;
 
+  public boolean isSuccessful() {
+    return successType == VinegarSuccessType.SUCCESS
+        || successType == VinegarSuccessType.DOUBLE_SUCCESS;
+  }
+
 }

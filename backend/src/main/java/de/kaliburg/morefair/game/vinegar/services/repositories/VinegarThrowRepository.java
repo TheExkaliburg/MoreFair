@@ -25,4 +25,13 @@ public interface VinegarThrowRepository extends JpaRepository<VinegarThrowEntity
     return findAllByAccountId(accountId, PageRequest.of(0, THROWS_PER_PAGE));
   }
 
+  @Query(value = "SELECT vt.* FROM vinegar_throw vt "
+      + "JOIN ladder l ON l.id = vt.ladder_id "
+      + "WHERE l.round_id = :roundId "
+      + "AND (vt.thrower_account_id = :accountId "
+      + "OR vt.target_account_id = :accountId) "
+      + "ORDER BY vt.timestamp DESC", nativeQuery = true)
+  List<VinegarThrowEntity> findAllByAccountIdAndRoundId(@Param("accountId") Long accountId,
+      @Param("roundId") Long roundId);
+
 }

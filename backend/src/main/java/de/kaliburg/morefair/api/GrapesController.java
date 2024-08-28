@@ -40,7 +40,7 @@ public class GrapesController {
     }
 
     List<VinegarThrowEntity> listOfPastThrows = vinegarThrowService
-        .findVinegarThrowRecordsOfCurrentSeason(account.getId());
+        .findVinegarThrowsOfCurrentSeason(account.getId());
 
     VinegarThrowRecordResponse response = vinegarThrowMapper
         .mapVinegarThrowListToVinegarThrowRecords(listOfPastThrows, account.getId());

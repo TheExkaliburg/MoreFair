@@ -10,5 +10,7 @@ public interface VinegarThrowService {
 
   Optional<VinegarThrowEntity> throwVinegar(Event<LadderEventType> event);
 
-  List<VinegarThrowEntity> findVinegarThrowRecordsOfCurrentSeason(Long accountId);
+  List<VinegarThrowEntity> findVinegarThrowsOfCurrentSeason(Long accountId);
+
+  List<VinegarThrowEntity> findVinegarThrowsOfCurrentRound(Long accountId);
 }
