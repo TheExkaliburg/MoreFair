@@ -243,12 +243,20 @@ modifier:
     identifier: DEF
   FAST:
     title: Fast
-    description: Smaller ladders, and fewer of them.
+    description: Smaller ladders
     identifier: FAST
   SLOW:
     title: Slow
-    description: Larger ladders, and more of them.
+    description: Larger ladders
     identifier: SLOW
+  SHORT:
+    title: Short
+    description: Fewer ladders
+    identifier: SHORT
+  LONG:
+    title: Long
+    description: More ladders
+    identifier: LONG
   CHAOS:
     title: Chaos
     description: Anything can happen, with random ladder counts and sizes.
@@ -315,7 +323,7 @@ modifier:
   CONSOLATION:
     title: Consolation
     description: Passing grapes are increased.
-    identifier: CONSOL
+    identifier: CONSL
   NO_HANDOUTS:
     title: No Handouts
     description: No passing grapes.
