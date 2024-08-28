@@ -31,10 +31,9 @@ pipeline {
 
         stage('Docker') {
             steps {
-                sh 'echo $DOCKERHUB_CREDENTIALS_PSW'
-                sh 'sudo docker build -t kaliburg/fairgame:staging .'
-                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | sudo docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-                sh 'sudo docker push kaliburg/fairgame:staging'
+                sh 'docker build -t kaliburg/fairgame:staging .'
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+                sh 'docker push kaliburg/fairgame:staging'
             }
             post {
                 always {
@@ -45,8 +44,8 @@ pipeline {
 
         stage('Compose/Startup') {
             steps {
-                sh 'sudo docker compose stop'
-                sh 'sudo docker compose -f docker-compose-staging.yml --env-file $ENV_FILE up --pull always --force-recreate --detach'
+                sh 'docker compose stop'
+                sh 'docker compose -f docker-compose-staging.yml --env-file $ENV_FILE up --pull always --force-recreate --detach'
             }
         }
     }
