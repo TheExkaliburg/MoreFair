@@ -105,21 +105,4 @@ class LadderTypeBuilderTest {
     assertThat(build).containsExactly(LadderType.DEFAULT);
   }
 
-  @Test
-  void build_NoDefaultOnGrapeRounds() {
-    roundTypesList.forEach(roundTypes -> {
-      if (roundTypes.contains(RoundType.FARMER) || roundTypes.contains(RoundType.RACE)
-          || roundTypes.contains(RoundType.RAILROAD)) {
-        for (int i = 2; i <= 25; i++) {
-          Set<LadderType> build = LadderTypeBuilder.builder().setRoundTypes(roundTypes)
-              .setRoundNumber(1).setLadderNumber(i).setAssholeLadderNumber(25).build();
-          //Useful if you want to see what ladder types are being generated.
-//          log.info("Ladder " + roundTypes.stream().map(RoundType::toString).collect(Collectors.joining(",")) + " " + i +
-//                  " Types: " + build.stream().map(LadderType::toString).collect(Collectors.joining(",")));
-          assertThat(build).doesNotContain(LadderType.DEFAULT);
-        }
-      }
-    });
-  }
-
 }

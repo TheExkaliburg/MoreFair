@@ -56,9 +56,8 @@ public class RoundTypeSetBuilder {
     scalingTypeWeights.put(RoundType.DEFAULT, 1.f);
   }
 
-  // TODO: add reference to last Round into this method
   private void handlePreviousRoundType(RoundType roundType) {
-    // Logic goes here
+    // currently not doing anything to the modifiers based on previous Ladder
   }
 
   public Set<RoundType> build() {

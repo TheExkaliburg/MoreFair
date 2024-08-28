@@ -101,7 +101,7 @@ public class AuthController {
             "Invalid email address");
       }
 
-      if (accountService.findByUsername(username) != null) {
+      if (accountService.findByUsername(username).isPresent()) {
         return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST,
             "Email address already in use");
       }
@@ -123,8 +123,7 @@ public class AuthController {
       URI uri = HttpUtils.createCreatedUri("/api/auth/register");
       return ResponseEntity.created(uri).body(response);
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
       return HttpUtils.buildErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
@@ -339,7 +338,7 @@ public class AuthController {
         return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST, "Invalid email address");
       }
 
-      if (accountService.findByUsername(newMail) != null) {
+      if (accountService.findByUsername(newMail).isPresent()) {
         return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST, "Email address already in use");
       }
 

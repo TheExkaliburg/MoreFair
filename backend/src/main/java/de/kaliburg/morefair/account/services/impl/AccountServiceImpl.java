@@ -68,7 +68,6 @@ public class AccountServiceImpl implements AccountService {
                 .map(AccountEntity::getId)
                 .orElse(null)
         );
-
     findBroadcaster();
   }
 
@@ -78,6 +77,7 @@ public class AccountServiceImpl implements AccountService {
     try (var ignored = semaphore.enter()) {
       return Optional.ofNullable(uuidLookupCache.get(uuid)).map(accountCache::get);
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException(e);
     }
   }
@@ -87,6 +87,7 @@ public class AccountServiceImpl implements AccountService {
     try (var ignored = semaphore.enter()) {
       return Optional.ofNullable(accountCache.get(id));
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException(e);
     }
   }
@@ -94,8 +95,9 @@ public class AccountServiceImpl implements AccountService {
   @Override
   public Optional<AccountEntity> findByUsername(String username) {
     try (var ignored = semaphore.enter()) {
-      return Optional.of(usernameLookupCache.get(username)).map(accountCache::get);
+      return Optional.ofNullable(usernameLookupCache.get(username)).map(accountCache::get);
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException(e);
     }
   }
@@ -133,6 +135,7 @@ public class AccountServiceImpl implements AccountService {
 
       return Optional.of(accountCache.get(this.broadcasterAccountId));
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException(e);
     }
   }
@@ -154,6 +157,7 @@ public class AccountServiceImpl implements AccountService {
       log.debug("Created Mystery Guest (#{})", result.getId());
       return Optional.of(result);
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException(e);
     }
   }
@@ -169,6 +173,7 @@ public class AccountServiceImpl implements AccountService {
       return accounts;
 
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException(e);
     }
   }
@@ -183,6 +188,7 @@ public class AccountServiceImpl implements AccountService {
       return accountCache.getAll(list).values().stream().toList();
 
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException(e);
     }
   }
@@ -194,6 +200,7 @@ public class AccountServiceImpl implements AccountService {
       accountCache.put(account.getId(), account);
       return account;
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException(e);
     }
   }
@@ -208,6 +215,7 @@ public class AccountServiceImpl implements AccountService {
 
       return accounts;
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException(e);
     }
   }
@@ -228,6 +236,7 @@ public class AccountServiceImpl implements AccountService {
           account.getUuid()
       );
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException(e);
     }
   }

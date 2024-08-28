@@ -3,8 +3,6 @@ package de.kaliburg.morefair.game.round_old;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import de.kaliburg.morefair.game.ladder.model.LadderType;
-import de.kaliburg.morefair.game.ladder.model.LadderTypeBuilder;
 import de.kaliburg.morefair.game.round.model.RoundTypeSetBuilder;
 import de.kaliburg.morefair.game.round.model.type.RoundType;
 import de.kaliburg.morefair.utils.EnableLoggingPropertiesBeforeAll;
@@ -14,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 
@@ -44,20 +41,5 @@ class RoundTypeSetBuilderTest {
         assertThat(roundTypes).doesNotContain(RoundType.DEFAULT);
       }
     });
-  }
-
-  @Test
-  @Disabled
-  void build_round100_ChaosSlowAuto() {
-    RoundTypeSetBuilder builder = new RoundTypeSetBuilder();
-    builder.setRoundNumber(100);
-    Set<RoundType> build = builder.build();
-
-    LadderTypeBuilder ladderTypeBuilder = new LadderTypeBuilder();
-    ladderTypeBuilder.setRoundTypes(build);
-    ladderTypeBuilder.setLadderNumber(1);
-    ladderTypeBuilder.setAssholeLadderNumber(30);
-    ladderTypeBuilder.setRoundNumber(100);
-    Set<LadderType> build1 = ladderTypeBuilder.build();
   }
 }
