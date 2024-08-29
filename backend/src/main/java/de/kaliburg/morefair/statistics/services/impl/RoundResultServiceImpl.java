@@ -11,6 +11,7 @@ import de.kaliburg.morefair.statistics.services.mapper.RoundResultMapper;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.javatuples.Pair;
 import org.springframework.stereotype.Service;
 
 /**
@@ -27,21 +28,26 @@ public class RoundResultServiceImpl implements RoundResultService {
 
   private final RoundResultMapper roundResultMapper;
 
-  private final Cache<Integer, RoundResultsDto> roundResultsCache = Caffeine.newBuilder()
+  private final Cache<Pair<Integer, Integer>, RoundResultsDto> roundResultsCache = Caffeine.newBuilder()
       .expireAfterAccess(1, TimeUnit.HOURS).maximumSize(10)
       .build();
-  ;
 
-  public RoundResultsDto getRoundResults(Integer number) {
-    RoundResultsDto result = roundResultsCache.getIfPresent(number);
+  @Override
+  public RoundResultsDto getRoundResults(Integer seasonNumber, Integer roundNumber) {
+    Pair<Integer, Integer> id = Pair.with(seasonNumber, roundNumber);
+    RoundResultsDto result = roundResultsCache.getIfPresent(id);
     if (result == null) {
-      SeasonEntity currentSeason = seasonService.getCurrentSeason();
-      result = roundService.findBySeasonAndNumber(currentSeason, number)
+      SeasonEntity currentSeason = seasonService.findByNumber(seasonNumber).orElse(null);
+      if (currentSeason == null) {
+        return null;
+      }
+
+      result = roundService.findBySeasonAndNumber(currentSeason, roundNumber)
           .map(roundResultMapper::mapToRoundResults)
           .orElse(null);
 
       if (result != null) {
-        roundResultsCache.put(number, result);
+        roundResultsCache.put(id, result);
       }
     }
     return result;

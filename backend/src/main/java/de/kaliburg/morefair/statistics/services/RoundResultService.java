@@ -4,6 +4,6 @@ import de.kaliburg.morefair.statistics.model.dto.RoundResultsDto;
 
 public interface RoundResultService {
 
-  RoundResultsDto getRoundResults(Integer roundNumber);
-  
+  RoundResultsDto getRoundResults(Integer seasonNumber, Integer roundNumber);
+
 }

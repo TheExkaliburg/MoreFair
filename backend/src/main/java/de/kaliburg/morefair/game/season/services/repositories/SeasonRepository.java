@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 
@@ -22,4 +23,7 @@ public interface SeasonRepository extends JpaRepository<SeasonEntity, Long> {
 
   @Query(value = "SELECT * FROM season ORDER BY created_on DESC LIMIT 1", nativeQuery = true)
   Optional<SeasonEntity> findNewestSeason();
+
+  @Query(value = "SELECT * FROM season WHERE number = :number", nativeQuery = true)
+  Optional<SeasonEntity> findByNumber(@Param("number") int number);
 }

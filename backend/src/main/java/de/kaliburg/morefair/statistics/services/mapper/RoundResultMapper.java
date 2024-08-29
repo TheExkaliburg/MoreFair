@@ -5,6 +5,8 @@ import de.kaliburg.morefair.game.ladder.services.LadderService;
 import de.kaliburg.morefair.game.ranker.services.RankerService;
 import de.kaliburg.morefair.game.ranker.services.mapper.RankerMapper;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
+import de.kaliburg.morefair.game.season.model.SeasonEntity;
+import de.kaliburg.morefair.game.season.services.SeasonService;
 import de.kaliburg.morefair.statistics.model.dto.LadderResultsDto;
 import de.kaliburg.morefair.statistics.model.dto.RoundResultsDto;
 import de.kaliburg.morefair.statistics.model.dto.RoundResultsDto.RoundResultsDtoBuilder;
@@ -26,10 +28,9 @@ import org.springframework.stereotype.Component;
 public class RoundResultMapper {
 
   private final RankerService rankerService;
-
   private final RankerMapper rankerMapper;
-
   private final LadderService ladderService;
+  private final SeasonService seasonService;
 
   /**
    * Mapping a {@link RoundEntity} to a {@link RoundResultsDto}.
@@ -46,8 +47,11 @@ public class RoundResultMapper {
       ladderResultsDtoMap.put(integer, mapToLadderResults(ladder));
     });
 
+    SeasonEntity season = seasonService.findById(round.getSeasonId()).orElseThrow();
+
     RoundResultsDtoBuilder builder = RoundResultsDto.builder()
         .number(round.getNumber())
+        .seasonNumber(season.getNumber())
         .roundTypes(round.getTypes())
         .basePointsToPromote(round.getBasePointsRequirement().toString())
         .ladders(ladderResultsDtoMap)

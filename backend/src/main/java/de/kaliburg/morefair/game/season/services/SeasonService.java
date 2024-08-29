@@ -12,5 +12,7 @@ public interface SeasonService {
 
   Optional<SeasonEntity> findById(long id);
 
+  Optional<SeasonEntity> findByNumber(int number);
+
   SeasonEntity getCurrentSeason();
 }

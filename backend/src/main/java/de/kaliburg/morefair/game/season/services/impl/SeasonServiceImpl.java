@@ -51,6 +51,7 @@ public class SeasonServiceImpl implements SeasonService {
       currentSeason = openSeasons.get(openSeasons.size() - 1);
       return currentSeason;
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException(e);
     }
   }
@@ -65,6 +66,7 @@ public class SeasonServiceImpl implements SeasonService {
 
       return currentSeason;
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException(e);
     }
   }
@@ -72,6 +74,15 @@ public class SeasonServiceImpl implements SeasonService {
   @Override
   public Optional<SeasonEntity> findById(long id) {
     return seasonRepository.findById(id);
+  }
+
+  @Override
+  public Optional<SeasonEntity> findByNumber(int number) {
+    if (currentSeason != null && currentSeason.getNumber() == number) {
+      return Optional.of(currentSeason);
+    }
+
+    return seasonRepository.findByNumber(number);
   }
 
   private SeasonEntity createNewSeason() {

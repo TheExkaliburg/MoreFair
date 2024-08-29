@@ -95,7 +95,9 @@ public class RoundServiceImpl implements RoundService {
   @Override
   public Optional<RoundEntity> findBySeasonAndNumber(SeasonEntity season, int number) {
     RoundEntity currentRound = roundCache.get(currentRoundId);
-    if (number != currentRound.getNumber()) {
+
+    if (currentRound == null || number != currentRound.getNumber()
+        || season.getId() != currentRound.getSeasonId()) {
       return roundRepository.findBySeasonAndNumber(season.getId(), number);
     } else {
       return Optional.of(currentRound);

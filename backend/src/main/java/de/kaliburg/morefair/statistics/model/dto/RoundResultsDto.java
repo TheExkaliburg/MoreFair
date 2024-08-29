@@ -23,4 +23,5 @@ public class RoundResultsDto {
   @Builder.Default
   private String closedOn = "stillOpen";
   private Integer number;
+  private Integer seasonNumber;
 }
