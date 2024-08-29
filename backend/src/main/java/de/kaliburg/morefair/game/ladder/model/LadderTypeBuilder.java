@@ -169,19 +169,20 @@ public class LadderTypeBuilder {
       return EnumSet.of(LadderType.END);
     }
 
-    if (ladderNumber > 25) {
-      sizeTypeWeights.put(LadderType.GIGANTIC, 0.f);
-    }
-    
     this.roundTypes.stream().sorted(new RoundType.Comparator()).forEach(this::handleRoundTypes);
     this.previousLadderType.stream().sorted(new LadderType.Comparator())
         .forEach(this::handlePreviousLadderType);
 
-    if (ladderNumber == 1) {
-      ladderSizeTypeWeights.put(LadderType.TINY, 0.f);
-      ladderAutoTypeWeights.put(LadderType.FREE_AUTO, 0.f);
-      ladderAutoTypeWeights.put(LadderType.NO_AUTO, 0.f);
+    if (ladderNumber > 25) {
+      sizeTypeWeights.put(LadderType.GIGANTIC, 0.f);
     }
+
+    if (ladderNumber == 1) {
+      sizeTypeWeights.put(LadderType.TINY, 0.f);
+      autoTypeWeights.put(LadderType.FREE_AUTO, 0.f);
+      autoTypeWeights.put(LadderType.NO_AUTO, 0.f);
+    }
+
     Set<LadderType> ladderTypes = EnumSet.noneOf(LadderType.class);
 
     if (ladderNumber.equals(assholeLadderNumber)) {

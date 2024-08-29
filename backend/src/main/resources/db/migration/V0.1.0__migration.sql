@@ -1,5 +1,4 @@
 -- ### Create Seasons And Achievements
--- FIXME Make sure these are the correct Season And Achievements Schemas
 -- Season
 CREATE SEQUENCE IF NOT EXISTS public.seq_season;
 CREATE TABLE IF NOT EXISTS public.season
@@ -202,16 +201,16 @@ ALTER TABLE IF EXISTS public.ranker
     ADD COLUMN IF NOT EXISTS created_on timestamp with time zone NOT NULL DEFAULT now();
 ALTER TABLE IF EXISTS public.ranker
     ADD COLUMN IF NOT EXISTS promoted_on timestamp with time zone;
+
 UPDATE public.ranker
 SET promoted_on = now()
 WHERE growing IS FALSE;
+
 ALTER TABLE IF EXISTS public.ranker
     DROP COLUMN growing;
 ALTER TABLE IF EXISTS public.ranker
-    DROP CONSTRAINT uk_account_ladder;
-ALTER TABLE IF EXISTS public.ranker
-    DROP CONSTRAINT fk_ranker_account;
-ALTER TABLE IF EXISTS public.ranker
+    DROP CONSTRAINT uk_account_ladder,
+    DROP CONSTRAINT fk_ranker_account,
     DROP CONSTRAINT fk_ranker_ladder;
 ALTER TABLE IF EXISTS public.ranker
     ADD CONSTRAINT ranker_uk_uuid UNIQUE (uuid);
@@ -281,6 +280,62 @@ ALTER TABLE IF EXISTS public.message
 -- Drop Unneeded Tables
 DROP TABLE IF EXISTS public.account_achievements;
 DROP TABLE IF EXISTS public.game;
+
+-- Remove unfinished Round of Previous Season
+DO
+$$
+    DECLARE
+        id_season bigint;
+        id_round  bigint;
+    BEGIN
+        SELECT s.id
+        FROM public.season s
+        ORDER BY s.number DESC
+        LIMIT 1 OFFSET 1
+        INTO id_season;
+
+        SELECT r.id
+        FROM public.round r
+        WHERE r.closed_on IS NULL
+          AND r.season_id = id_season
+        INTO id_round;
+
+        -- Delete Rankers
+        DELETE
+        from public.ranker r
+            USING ladder l
+        WHERE r.ladder_id = l.id
+          AND l.round_id = id_round;
+
+        -- Delete Ladders && Ladder_Types
+        DELETE
+        from public.ladder_type lt
+            USING public.ladder l
+        WHERE lt.ladder_entity_id = l.id
+          AND l.round_id = id_round;
+
+        DELETE
+        from public.ladder l
+        WHERE l.round_id = id_round;
+
+
+        -- Delete Unlocks of that Round
+        DELETE
+        from public.unlocks u
+        WHERE u.round_id = id_round;
+
+        -- Delete Round & Round_Types
+        DELETE
+        from public.round_type rt
+        WHERE rt.round_entity_id = id_round;
+
+        DELETE
+        from public.round r
+        WHERE r.id = id_round;
+
+    END
+$$;
+
 
 -- Drop All Sequences
 DROP SEQUENCE IF EXISTS public.seq_game;
