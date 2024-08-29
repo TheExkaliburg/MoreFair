@@ -315,11 +315,11 @@ modifier:
   BOUNTIFUL:
     title: Bountiful
     description: Bottom grapes are increased.
-    indentifier: BOUNT
+    identifier: BOUNT
   DROUGHT:
     title: Drought
     description: Bottom grapes are reduced.
-    indentifier: DRY
+    identifier: DRY
   CONSOLATION:
     title: Consolation
     description: Passing grapes are increased.
@@ -346,7 +346,7 @@ modifier:
     identifier: "100"
   END:
     title: The End
-    description: There is nowhere else to go.
+    description: There is nowhere else to go. Or is there?
     identifier: END
 chat:
   GLOBAL:

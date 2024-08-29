@@ -24,7 +24,7 @@ const getMinimumPeopleForPromote = computed<number>(() => {
 
 const getVinegarThrowCost = computed<Decimal>(() => {
   return round.state.settings.baseVinegarNeededToThrow.mul(
-    new Decimal(ladder.state.scaling),
+    new Decimal(ladder.state.scaling - 1),
   );
 });
 

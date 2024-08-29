@@ -187,7 +187,7 @@ const vinegarButtonLabel = computed<string>(() => {
       useFormatter(useGrapesStore().getters.selectedVinegar),
     )}`;
   }
-  return `${lang("vinegar")} (${useTimeFormatter(eta)})`;
+  return `${lang("vinegar", "0")} (${useTimeFormatter(eta)})`;
 });
 
 const yourFormattedMulti = computed<string>(() => {
@@ -269,6 +269,7 @@ const canThrowVinegar = computed<boolean>(() => {
     ladderUtils.getVinegarThrowCost.value.cmp(
       useGrapesStore().getters.selectedVinegar,
     ) <= 0 &&
+    ladderStore.state.rankers.length > 0 &&
     ladderStore.state.rankers[0].growing &&
     ladderUtils.isLadderPromotable.value
   );

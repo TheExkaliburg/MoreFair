@@ -1,6 +1,6 @@
 <template>
   <div class="w-full">
-    <table class="w-full h-full">
+    <table class="w-full">
       <tr class="text-text-light">
         <th>
           {{ abbreviation("round")
