@@ -175,16 +175,16 @@ function getPassingGrapes() {
   } else if (ladder.state.types.has(LadderType.NO_HANDOUTS)) {
     return 0;
   }
-  return 0;
+  return 1;
 }
 
 function getBottomGrapes() {
   if (ladder.state.types.has(LadderType.BOUNTIFUL)) {
-    return 5;
+    return 3;
   } else if (ladder.state.types.has(LadderType.DROUGHT)) {
-    return 1;
+    return 0;
   }
-  return 2;
+  return 1;
 }
 
 function getWinningGrapes(place: number, baseGrapeCostForAuto: number) {
@@ -205,7 +205,7 @@ function getWinningGrapes(place: number, baseGrapeCostForAuto: number) {
   return 0;
 }
 
-function getWinningMultiplier() {
+function getWinningVinMultiplier() {
   if (ladder.state.types.has(LadderType.GENEROUS)) {
     return 14;
   } else if (ladder.state.types.has(LadderType.STINGY)) {
@@ -236,6 +236,6 @@ export const useLadderUtils = () => {
     getPassingGrapes,
     getBottomGrapes,
     getWinningGrapes,
-    getWinningMultiplier,
+    getWinningMultiplier: getWinningVinMultiplier,
   };
 };

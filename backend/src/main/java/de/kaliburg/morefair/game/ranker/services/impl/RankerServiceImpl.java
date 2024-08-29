@@ -199,6 +199,7 @@ public class RankerServiceImpl implements RankerService {
 
       return Optional.of(result);
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException(e);
     }
   }

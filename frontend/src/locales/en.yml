@@ -318,7 +318,7 @@ modifier:
     identifier: BOUNT
   DROUGHT:
     title: Drought
-    description: Bottom grapes are reduced.
+    description: Bottom grapes are dried out.
     identifier: DRY
   CONSOLATION:
     title: Consolation

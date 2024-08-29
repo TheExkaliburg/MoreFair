@@ -325,7 +325,8 @@ public class LadderEventServiceImpl implements LadderEventService {
         if (newRankers.size() <= 1) {
           newRanker.setAutoPromote(true);
           newRanker.setVinegar(
-              newRanker.getVinegar().multiply(BigInteger.valueOf(newLadder.getWinningMultiplier()))
+              newRanker.getVinegar()
+                  .multiply(BigInteger.valueOf(newLadder.getWinningVinMultiplier()))
                   .divide(BigInteger.TEN));
         }
 

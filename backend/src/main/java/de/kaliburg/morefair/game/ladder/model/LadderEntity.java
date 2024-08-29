@@ -141,7 +141,7 @@ public final class LadderEntity {
   /**
    * This is the bonus vin multiplier, the ladder winner gets vin X (getWinningMultipler / 10).
    */
-  public int getWinningMultiplier() {
+  public int getWinningVinMultiplier() {
     if (types.contains(LadderType.GENEROUS)) {
       return 15;
     } else if (types.contains(LadderType.STINGY)) {

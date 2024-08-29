@@ -2,9 +2,13 @@ package de.kaliburg.morefair.game.ladder.services.impl;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import de.kaliburg.morefair.api.RoundController;
+import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.chat.services.MessageService;
 import de.kaliburg.morefair.chat.services.impl.ChatServiceImpl;
 import de.kaliburg.morefair.core.concurrency.CriticalRegion;
+import de.kaliburg.morefair.events.Event;
+import de.kaliburg.morefair.events.types.RoundEventTypes;
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.services.LadderService;
 import de.kaliburg.morefair.game.ladder.services.repositories.LadderRepository;
@@ -39,10 +43,13 @@ public class LadderServiceImpl implements LadderService {
   private final LoadingCache<Integer, Long> currentLadderNumberLookup;
   private final LadderRepository ladderRepository;
   private final RoundService roundService;
+  private final WsUtils wsUtils;
 
-  public LadderServiceImpl(LadderRepository ladderRepository, RoundService roundService) {
+  public LadderServiceImpl(LadderRepository ladderRepository, RoundService roundService,
+      WsUtils wsUtils) {
     this.ladderRepository = ladderRepository;
     this.roundService = roundService;
+    this.wsUtils = wsUtils;
 
     this.ladderCache = Caffeine.newBuilder()
         .expireAfterAccess(Duration.of(10, ChronoUnit.MINUTES))
@@ -134,6 +141,10 @@ public class LadderServiceImpl implements LadderService {
       LadderEntity result =
           new LadderEntity(ladderNumber, roundService.getCurrentRound(), previousLadder);
       result = ladderRepository.save(result);
+
+      Event<RoundEventTypes> topLadderEvent = new Event<>(RoundEventTypes.INCREASE_TOP_LADDER);
+      topLadderEvent.setData(ladderNumber);
+      wsUtils.convertAndSendToTopic(RoundController.TOPIC_EVENTS_DESTINATION, topLadderEvent);
 
       currentLadderNumberLookup.put(result.getNumber(), result.getId());
       ladderCache.put(result.getId(), result);
