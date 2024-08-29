@@ -12,7 +12,7 @@
   >
     <div
       :style="tableSpaceStyles.rank"
-      class="whitespace-nowrap overflow-hidden"
+      class="whitespace-nowrap overflow-hidden rank"
     >
       {{ ranker.rank }} {{ ranker.assholeTag }}
       <sub
@@ -67,7 +67,7 @@
     <div
       v-if="tableSpace.powerGain > 0"
       :style="tableSpaceStyles.powerGain"
-      class="text-right whitespace-nowrap overflow-hidden"
+      class="text-right whitespace-nowrap overflow-hidden formattedPowerPerSec"
     >
       <span v-if="optionsStore.state.ladder.showPowerGain.value">{{
         formattedPowerPerSec

@@ -2,8 +2,7 @@ package de.kaliburg.morefair.game;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.kaliburg.morefair.game.round.LadderType;
-import de.kaliburg.morefair.game.round.UpgradeUtils;
+import de.kaliburg.morefair.game.ladder.model.LadderType;
 import de.kaliburg.morefair.utils.FairTest;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -123,7 +122,8 @@ class UpgradeUtilsTest {
     List<BigInteger> costs = new ArrayList<>();
     costs.add(
         upgradeUtils.buyUpgradeCost(ladderNumber, currentUpgrade, EnumSet.of(LadderType.CHEAP)));
-    costs.add(upgradeUtils.buyUpgradeCost(ladderNumber, currentUpgrade));
+    costs.add(
+        upgradeUtils.buyUpgradeCost(ladderNumber, currentUpgrade, EnumSet.of(LadderType.DEFAULT)));
     costs.add(
         upgradeUtils.buyUpgradeCost(ladderNumber, currentUpgrade,
             EnumSet.of(LadderType.EXPENSIVE)));

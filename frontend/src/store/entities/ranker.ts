@@ -13,6 +13,7 @@ export type RankerData = {
   assholePoints: number;
   grapes: Decimal;
   vinegar: Decimal;
+  wine: Decimal;
   autoPromote: boolean;
 };
 
@@ -29,6 +30,7 @@ export class Ranker implements RankerData {
   assholePoints = 0;
   grapes: Decimal = new Decimal(0);
   vinegar: Decimal = new Decimal(0);
+  wine: Decimal = new Decimal(0);
   autoPromote = false;
 
   constructor(data: any) {
@@ -37,6 +39,7 @@ export class Ranker implements RankerData {
     this.power = Object.freeze(new Decimal(this.power));
     this.grapes = Object.freeze(new Decimal(this.grapes));
     this.vinegar = Object.freeze(new Decimal(this.vinegar));
+    this.wine = Object.freeze(new Decimal(this.wine));
   }
 
   getPowerPerSecond(rank: number = this.rank): Decimal {

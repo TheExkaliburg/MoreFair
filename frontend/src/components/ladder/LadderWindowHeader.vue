@@ -47,7 +47,7 @@
       </ExtendedInformationModal>
       <div class="flex flex-row gap-6 text-xs">
         <div class="flex flex-col">
-          <div class="whitespace-nowrap" data-tutorial="info">
+          <div class="whitespace-nowrap" data-tutorial="ladders">
             Ladders: {{ accountStore.state.highestCurrentLadder }}/{{
               formattedAssholeLadder
             }}

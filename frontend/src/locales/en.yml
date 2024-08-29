@@ -1,6 +1,3 @@
-pages:
-  index:
-    title: test
 components:
   navbar:
     sidebar:
@@ -37,18 +34,35 @@ components:
       bias: Bias
       bias_short: B
       autopromote: Buy Autopromote
-      vinegar: Throw all Vinegar
+      vinegar: Throw %s Vinegar
       promote: Promote
       asshole: Be Asshole
       info:
         grapes: Grapes
         vinegar: Vinegar
+        shielded: Shielded
+        wine: Wine
         active: Active
         points: Points
         power: Power
-        promoteAt: Promote at
+        promoteAt: Promote
         multi_short: M
         bias_short: B
+  vinegarThrowTable:
+    time: Time
+    users: Users
+    amount: Amount
+    result: "?"
+    percentageTooltip: Threw %s% of their Vinegar
+    results:
+      DOUBLE_SUCCESS: The throw broke through the target's shield and depleted all of their vinegar. (Refunds 50%)
+      SUCCESS: The target had no shield, and the throw depleted all of their vinegar. (Refunds 25%)
+      DEFENDED: The target had no shield, but the throw did not deplete all of their vinegar.
+      SHIELDED: The throw was completely absorbed by the target's shield.
+      SHIELD_DEFENDED: The throw broke through the target's shield, but did not deplete all of their vinegar. (Refunds 25%)
+abbreviations:
+  round: R
+  ladder: L
 options:
   section:
     general: General
@@ -142,37 +156,86 @@ account:
 zxcvbn:
   strength: Strength
 tour:
-  tutorial:
+  names:
+    tutorials: Tutorials
+    first: First Steps
+    upgrades: Upgrades
+    climbing: Climbing the Ladder
+    grapes: Grapes & AutoPromote
+    vinegar: Vinegar & Wine
+    goodluck: Good Luck
+  startup:
     welcome:
       title: Welcome
       intro: Welcome to the FairGame-Tutorial!
-    goal1:
-      title: Goal
-      intro: The game is separated into Ladders, the goal of each Ladder is to reach the top and promote to the next one.
-    goal2:
-      title: Goal
-      intro: The goal of the game is to reach the highest ladder in a round and promote before the game resets.
+    help:
+      title: Help
+      intro: If you are ever stuck you can always check this tutorial again or ask in chad.
     points:
       title: Points
-      intro: Points define your Rank. \n\n You need to reach the most points to promote to the next Ladder.
+      intro: These are your Points, you get a number of Points/sec based on your Power.
     power:
       title: Power
-      intro: Power defines how many points you get each Second. \n\n The lower you are on the ladder, the more power/s you get.
+      intro: This is your Power, you get a number of Power/sec based on how low you rank.
     bias:
       title: Bias
-      intro: You can use Bias to gain a flat increase in power/s. This upgrade resets your points back to 0.
+      intro: You can increase your power/sec by 1, by resetting all your points and buying 1 bias.
+  biased:
+    rank:
+      title: Position
+      intro: Position is based on Points. If you overtake someone else's points you raise one rank.
+    power:
+      title: Power/sec Formula
+      intro: You gain power based on the formula \n\n power/sec = multi * (bias + rank - 1)
     multi:
       title: Multi
-      intro: Multi can be used to increase your power/s multiplicatively. This upgrade resets not only your points, but also your power.
-    vinegar:
-      title: Vinegar
-      intro: Vinegar is used to throw at active Ranker at the top of you Ladder. \n\n If you have more than them they get thrown down to the bottom of your Ladder. \n\n If not, then they lose the amount of vinegar that you threw and they stay at the top.
+      intro: Best way to increase power/sec is to multi, which also resets all bias/power/points.
+  multied:
+    tip:
+      title: Tip
+      intro: Try to collect a lot of power while staying on low position. Then shoot up the ranks, while carrying your power/sec through multi + bias instead of your position.
+    goal1:
+      title: Goal of Ladder
+      intro: The goal is to reach rank 1 on this ladder and promote to the next.
+    goal2:
+      title: Goal of Game
+      intro: Once you reach the last Ladder, you can "be an asshole" and reset the round for everyone, gaining prestige.
+  autoPromote:
+    shootdown:
+      title: Sabotage
+      intro: Escaping this ladder is not as easy, since you can get shot down by your competition. The reason is needing to wait for 30sec on rank 1.
     grapes:
       title: Grapes
-      intro: Grapes define how much vinegar/s you get. \n\n You gain 2 Grapes for every second at the bottom of the Ladder and 1 Grape for every Ranker that passes you (if you are at x2 or above). \n\n You can also buy Autopromote with Grapes (cheapest at the bottom).
-    end:
-      title: That's it!
-      intro: You are now ready to play FairGame. If you ever need this tutorial again, just click this help button again.
+      intro: To shoot someone down or prevent getting shot down, you need grapes. You can get these by either being in last place or getting passed by another Ranker.
+    autoPromote:
+      title: AutoPromote
+      intro: If you want skip the 30sec wait window and promotes once you reach rank 1 you can buy autopromote with hard-earned grapes.
+    cost:
+      title: AutoPromote Costs
+      intro: The further down you are the less the autopromote costs, so try to buy before starting the final climb.
+  vinegar:
+    split:
+      title: Split Grapes
+      intro: Another use of Grapes is to generate side-products such as vinegar and wine. You can set the split in the grapes-settings menu.
+    throwing:
+      title: Throwing Vinegar
+      intro: When you have enough vinegar you can throw between 50% - 100% of your current Vinegar.
+    wine:
+      title: Wine
+      intro: Wine is a 1 time shield, that's active when you have more wine than vinegar. The overflow hits the vinegar of the target.
+    refunds:
+      title: Refunds
+      intro: When either wine or vinegar hit 0 you get for each of them 25% of your vinegar from before the throw back (up to 50%, which is the minimum amount of vinegar you need to throw)
+  promote:
+    top10:
+      title: Top10
+      intro: Finishing a ladder in the Top 10 also rewards Grapes/Vinegar/AutoPromotes.
+    balance:
+      title: Balance
+      intro: Need to keep a balance on Vinegar/Wine & Grapes while climbing faster than the others.
+    goodluck:
+      title: Good Luck
+      intro: Good Luck competing with your fellow Rankers and don't forget to check out our wiki or discord. <3
 modifier:
   DEFAULT:
     title: Default
@@ -180,12 +243,20 @@ modifier:
     identifier: DEF
   FAST:
     title: Fast
-    description: Smaller ladders, and fewer of them.
+    description: Smaller ladders
     identifier: FAST
   SLOW:
     title: Slow
-    description: Larger ladders, and more of them.
+    description: Larger ladders
     identifier: SLOW
+  SHORT:
+    title: Short
+    description: Fewer ladders
+    identifier: SHORT
+  LONG:
+    title: Long
+    description: More ladders
+    identifier: LONG
   CHAOS:
     title: Chaos
     description: Anything can happen, with random ladder counts and sizes.
@@ -194,6 +265,17 @@ modifier:
     title: Auto
     description: Free auto-promote is applied to almost all ladders. No auto is slightly more common.
     identifier: AUTO
+  RAILROAD:
+    title: Railroad
+    description: Ladders more likely to encourage passing grapes.
+    identifier: RR
+  FARMER:
+    title: Farmer
+    description: Ladders more likely to encourage bottom grapes.
+    identifier: FARM
+  RACE:
+    title: Race
+    description: Ladders more likely to encourage first promoters.
   BIG:
     title: Big
     description: This ladder is longer than usual.
@@ -230,6 +312,30 @@ modifier:
     title: Asshole
     description: The final ladder - promotion from here will grant entry to Chad's ritual.
     identifier: AH
+  BOUNTIFUL:
+    title: Bountiful
+    description: Bottom grapes are increased.
+    indentifier: BOUNT
+  DROUGHT:
+    title: Drought
+    description: Bottom grapes are reduced.
+    indentifier: DRY
+  CONSOLATION:
+    title: Consolation
+    description: Passing grapes are increased.
+    identifier: CONSL
+  NO_HANDOUTS:
+    title: No Handouts
+    description: No passing grapes.
+    identifier: NHAND
+  GENEROUS:
+    title: Generous
+    description: Ladder winnings are increased.
+    identifier: GEN
+  STINGY:
+    title: Stingy
+    description: Ladder winnings are decreased.
+    identifier: STINGY
   REVERSE_SCALING:
     title: Reverse Scaling
     description: Costs and promotion requirements start high, and decrease as the round progresses.

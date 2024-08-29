@@ -4,7 +4,7 @@
       class="flex flex-row relative justify-center items-center w-full bg-background z-10"
     >
       <ChatWindowChannelSelector
-        class="z-20 w-8 h-8 pl-2 px-1 overflow-visible border-button-border border-1 border-r-0 rounded-l-md"
+        class="z-20 w-8 h-8 pl-2 px-0 overflow-visible border-button-border border-1 border-r-0 rounded-l-md"
       />
       <EditorContent
         :editor="editor"

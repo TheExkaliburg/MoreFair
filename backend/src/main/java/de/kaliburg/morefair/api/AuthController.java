@@ -1,19 +1,21 @@
 package de.kaliburg.morefair.api;
 
+import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
-import de.kaliburg.morefair.account.AccountEntity;
-import de.kaliburg.morefair.account.AccountService;
+import de.kaliburg.morefair.FairConfig;
+import de.kaliburg.morefair.account.model.AccountEntity;
+import de.kaliburg.morefair.account.services.AccountService;
 import de.kaliburg.morefair.api.utils.HttpUtils;
 import de.kaliburg.morefair.api.utils.RequestThrottler;
+import de.kaliburg.morefair.mail.services.EmailService;
 import de.kaliburg.morefair.security.SecurityUtils;
-import de.kaliburg.morefair.services.EmailService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.net.URI;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -46,25 +48,26 @@ public class AuthController {
   private final PasswordEncoder passwordEncoder;
   private final SecurityUtils securityUtils;
   private final EmailService emailService;
+  private final FairConfig fairConfig;
 
   private final RequestThrottler requestThrottler;
   private final Pattern emailRegexPattern = Pattern.compile(
       "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,15}$");
 
-  private final LoadingCache<String, UserRegistrationDetails> registrationTokens =
+  private final Cache<String, UserRegistrationDetails> registrationTokens =
       Caffeine.newBuilder()
           .expireAfterWrite(1, TimeUnit.HOURS)
-          .build(uuid -> null);
+          .build();
 
-  private final LoadingCache<String, String> passwordResetTokens =
+  private final Cache<String, String> passwordResetTokens =
       Caffeine.newBuilder()
           .expireAfterWrite(1, TimeUnit.HOURS)
-          .build(uuid -> "");
+          .build();
 
-  private final LoadingCache<String, EmailChangeRequest> changeEmailTokens =
+  private final Cache<String, EmailChangeRequest> changeEmailTokens =
       Caffeine.newBuilder()
           .expireAfterWrite(1, TimeUnit.HOURS)
-          .build(key -> null);
+          .build();
 
   @GetMapping
   public ResponseEntity<?> getAuthenticationStatus(Authentication authentication) {
@@ -80,6 +83,11 @@ public class AuthController {
   public ResponseEntity<?> register(@RequestParam String username, @RequestParam String password,
       HttpServletRequest request, @RequestParam(required = false) String uuid) {
     try {
+      if (!fairConfig.getAuth().isCanSignUp()) {
+        return HttpUtils.buildErrorMessage(HttpStatus.SERVICE_UNAVAILABLE,
+            "Signup is currently disabled");
+      }
+
       username = username.toLowerCase();
 
       if (password.length() < 8) {
@@ -100,7 +108,7 @@ public class AuthController {
             "Invalid email address");
       }
 
-      if (accountService.findByUsername(username) != null) {
+      if (accountService.findByUsername(username).isPresent()) {
         return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST,
             "Email address already in use");
       }
@@ -122,8 +130,7 @@ public class AuthController {
       URI uri = HttpUtils.createCreatedUri("/api/auth/register");
       return ResponseEntity.created(uri).body(response);
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
       return HttpUtils.buildErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
@@ -145,9 +152,8 @@ public class AuthController {
             "Password must be at most 64 characters long.");
       }
 
-      UUID uuid = SecurityUtils.getUuid(authentication);
-
-      AccountEntity account = accountService.find(uuid);
+      AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
+          .orElseThrow();
 
       if (!passwordEncoder.matches(oldPassword, account.getPassword())) {
         return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST, "Wrong password");
@@ -160,8 +166,7 @@ public class AuthController {
 
       return ResponseEntity.ok("Password changed, please log back in with your new password.");
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
       return HttpUtils.buildErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }
@@ -176,7 +181,7 @@ public class AuthController {
 
       username = username.toLowerCase();
       URI uri = HttpUtils.createCreatedUri("/api/auth/password/forgot");
-      AccountEntity account = accountService.findByUsername(username);
+      AccountEntity account = accountService.findByUsername(username).orElse(null);
       if (account == null || account.isGuest()) {
         return ResponseEntity.created(uri).body("Please look into your inbox for the reset token");
       }
@@ -215,14 +220,13 @@ public class AuthController {
         return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST, "Invalid token");
       }
 
-      AccountEntity account = accountService.findByUsername(username);
-
       HttpSession session = request.getSession(false);
       if (session != null) {
         SecurityContextLogoutHandler handler = new SecurityContextLogoutHandler();
         handler.logout(request, response, null);
       }
 
+      AccountEntity account = accountService.findByUsername(username).orElseThrow();
       account.setPassword(passwordEncoder.encode(newPassword));
       accountService.save(account);
 
@@ -230,8 +234,7 @@ public class AuthController {
       result.put("message", "Password changed");
       return ResponseEntity.ok(result);
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
       return HttpUtils.buildErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }
@@ -254,24 +257,24 @@ public class AuthController {
       String password = details.getPassword();
 
       if (uuid != null && !uuid.isEmpty()) {
-        AccountEntity account = accountService.findByUsername(uuid);
+        AccountEntity account = accountService.findByUsername(uuid).orElse(null);
         if (account != null && account.isGuest()) {
           account.setUsername(username);
           account.setPassword(passwordEncoder.encode(password));
-          account.setLastLogin(OffsetDateTime.now());
+          account.setLastLogin(OffsetDateTime.now(ZoneOffset.UTC));
           account.setLastIp(ip);
           account.setGuest(false);
           accountService.save(account);
         } else if (account == null) {
-          account = accountService.create(username, password, ip, false);
+          account = accountService.create(username, password, ip, false).orElseThrow();
           account.setLastIp(ip);
-          account.setLastLogin(OffsetDateTime.now());
+          account.setLastLogin(OffsetDateTime.now(ZoneOffset.UTC));
           accountService.save(account);
         }
       } else {
-        AccountEntity account = accountService.create(username, password, ip, false);
+        AccountEntity account = accountService.create(username, password, ip, false).orElseThrow();
         account.setLastIp(ip);
-        account.setLastLogin(OffsetDateTime.now());
+        account.setLastLogin(OffsetDateTime.now(ZoneOffset.UTC));
         accountService.save(account);
       }
 
@@ -292,8 +295,7 @@ public class AuthController {
           .body("Registration successful; Please log into your account");
 
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
       return HttpUtils.buildErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
@@ -302,6 +304,15 @@ public class AuthController {
   @PostMapping(value = "/register/guest", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> registerGuest(HttpServletRequest request) {
     try {
+      if (!fairConfig.getAuth().isCanSignUp()) {
+        return HttpUtils.buildErrorMessage(HttpStatus.SERVICE_UNAVAILABLE,
+            "Signup is currently disabled");
+      }
+      if (!fairConfig.getAuth().isCanSignUpAsGuest()) {
+        return HttpUtils.buildErrorMessage(HttpStatus.SERVICE_UNAVAILABLE,
+            "Creation of MysteryGuests is currently disabled, please Signup with your Email");
+      }
+
       Integer ip = HttpUtils.getIp(request);
 
       if (!requestThrottler.canCreateAccount(ip)) {
@@ -310,14 +321,14 @@ public class AuthController {
       }
 
       UUID uuid = UUID.randomUUID();
-      AccountEntity account = accountService.create(uuid.toString(), uuid.toString(), ip, true);
+      AccountEntity account = accountService.create(uuid.toString(), uuid.toString(), ip, true)
+          .orElseThrow();
 
       URI uri = HttpUtils.createCreatedUri("/api/auth/signup/guest");
       return ResponseEntity.created(uri).body(account.getUsername());
 
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
       return HttpUtils.buildErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
@@ -343,12 +354,13 @@ public class AuthController {
         return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST, "Invalid email address");
       }
 
-      if (accountService.findByUsername(newMail) != null) {
+      if (accountService.findByUsername(newMail).isPresent()) {
         return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST, "Email address already in use");
       }
 
       URI uri = HttpUtils.createCreatedUri("/api/account/email");
-      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
+      AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
+          .orElseThrow();
 
       if (account.isGuest()) {
         return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST,
@@ -361,8 +373,7 @@ public class AuthController {
 
       return ResponseEntity.created(uri).body("Please look into your inbox for the reset token");
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
       return HttpUtils.buildErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }
@@ -378,10 +389,11 @@ public class AuthController {
         return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST, "Invalid or expired token");
       }
 
-      AccountEntity account = accountService.find(details.getUuid());
-      if (account == null) {
+      var optionalAccount = accountService.findByUuid(details.getUuid());
+      if (optionalAccount.isEmpty()) {
         return HttpUtils.buildErrorMessage(HttpStatus.BAD_REQUEST, "Account not found");
       }
+      var account = optionalAccount.get();
 
       account.setUsername(details.getEmail());
       accountService.save(account);
@@ -395,8 +407,7 @@ public class AuthController {
 
       return ResponseEntity.ok(result);
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
       return HttpUtils.buildErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }

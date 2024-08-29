@@ -153,10 +153,8 @@ function getThemeNames() {
   // find all the theme names that are like ::root.theme-name
   const themeNames = [];
   const sheets = document.styleSheets;
-  for (let i = 0; i < sheets.length; i++) {
-    const rules = sheets[i].cssRules;
-    for (let j = 0; j < rules.length; j++) {
-      const rule = rules[j];
+  for (const element of sheets) {
+    for (const rule of element.cssRules) {
       if (!(rule instanceof CSSStyleRule)) continue;
       if (
         rule.selectorText.startsWith(":root.") &&

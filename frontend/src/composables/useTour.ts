@@ -1,90 +1,71 @@
 import introJs from "intro.js";
-import { useStorage } from "@vueuse/core";
 // @ts-ignore
-import { deepMerge } from "@antfu/utils";
 import { navigateTo } from "nuxt/app";
-import { useUiStore } from "~/store/ui";
+import { RemovableRef } from "@vueuse/core";
 import { useLang } from "~/composables/useLang";
 
-const defaultValues = {
-  showHelp: false,
+export type TourFlags = {
+  isOpen: boolean;
+  shownStartup: boolean;
+  shownBiased: boolean;
+  shownMultied: boolean;
+  shownAutoPromote: boolean;
+  shownVinegar: boolean;
+  shownPromoted: boolean;
 };
 
-export const useTutorialTour = () => {
-  const lang = useLang("tour.tutorial");
+const defaultValues: TourFlags = {
+  isOpen: false,
+  shownStartup: false,
+  shownBiased: false,
+  shownMultied: false,
+  shownAutoPromote: false,
+  shownVinegar: false,
+  shownPromoted: false,
+};
+
+export type Tour = {
+  flags: RemovableRef<TourFlags>;
+  start: () => void;
+};
+
+const flags: RemovableRef<TourFlags> = useLocalStorage("flags", defaultValues);
+flags.value.isOpen = false;
+
+export const useStartupTour = (): Tour => {
+  const lang = useLang("tour.startup");
   const tour = introJs();
 
-  navigateTo("/");
-  const steps: introJs.Step[] = [
-    {
-      title: lang("welcome.title"),
-      intro: lang("welcome.intro"),
-    },
-    {
-      element: document.querySelector(".ranker-1") || undefined,
-      title: lang("goal1.title"),
-      intro: lang("goal1.intro"),
-      position: "bottom",
-    },
-    {
-      element: document.querySelector("[data-tutorial='info']") || undefined,
-      title: lang("goal2.title"),
-      intro: lang("goal2.intro"),
-      position: "bottom",
-    },
-    {
-      element: document.querySelector(".ranker-1 .points") || undefined,
-      title: lang("points.title"),
-      intro: lang("points.intro"),
-      position: "left",
-    },
-    {
-      element: document.querySelector(".ranker-you .power") || undefined,
-      title: lang("power.title"),
-      intro: lang("power.intro"),
-      position: "left",
-    },
-    {
-      element: document.querySelector("[data-tutorial='bias']") || undefined,
-      title: lang("bias.title"),
-      intro: lang("bias.intro"),
-      position: "top",
-    },
-    {
-      element: document.querySelector("[data-tutorial='multi']") || undefined,
-      title: lang("multi.title"),
-      intro: lang("multi.intro"),
-      position: "top",
-    },
-    {
-      element: document.querySelector("[data-tutorial='vinegar']") || undefined,
-      title: lang("vinegar.title"),
-      intro: lang("vinegar.intro"),
-      position: "top",
-    },
-    {
-      element: document.querySelector("[data-tutorial='grapes']") || undefined,
-      title: lang("grapes.title"),
-      intro: lang("grapes.intro"),
-      position: "top",
-    },
-    {
-      element: document.querySelector("[data-tutorial='help']") || undefined,
-      title: lang("end.title"),
-      intro: lang("end.intro"),
-      position: "top",
-    },
-  ];
-
-  const initialValues = {};
-  Object.assign(initialValues, defaultValues);
-  const flags: any = useStorage("tutorial", initialValues, localStorage, {
-    mergeDefaults: (storageValue, defaultValue) =>
-      deepMerge(defaultValue, storageValue),
-  });
-
   function start() {
+    if (flags.value.isOpen) return;
     navigateTo("/");
+    const steps: introJs.Step[] = [
+      {
+        title: lang("welcome.title"),
+        intro: lang("welcome.intro"),
+      },
+      {
+        element: document.querySelector("[data-tutorial='help']") || undefined,
+        title: lang("help.title"),
+        intro: lang("help.intro"),
+      },
+      {
+        element: document.querySelector(".ranker-you .points") || undefined,
+        title: lang("points.title"),
+        intro: lang("points.intro"),
+      },
+      {
+        element: document.querySelector(".ranker-you .power") || undefined,
+        title: lang("power.title"),
+        intro: lang("power.intro"),
+      },
+      {
+        element: document.querySelector("[data-tutorial='bias']") || undefined,
+        title: lang("bias.title"),
+        intro: lang("bias.intro"),
+      },
+    ];
+
     tour.setOptions({
       steps,
       exitOnOverlayClick: false,
@@ -93,31 +74,290 @@ export const useTutorialTour = () => {
       prevLabel: "Back",
       doneLabel: "Done",
     });
-    tour.onbeforechange((targetElement) => {
-      return new Promise<void>((resolve) => {
-        if (targetElement.dataset.tutorial === "help") {
-          useUiStore().state.sidebarExpanded = true;
-          setTimeout(() => resolve(), 150);
-        } else {
-          resolve();
-        }
-      });
-    });
     tour.oncomplete(() => {
-      flags.value.showHelp = true;
+      flags.value.shownStartup = true;
+      flags.value.isOpen = false;
     });
     tour.onexit(() => {
-      flags.value.showHelp = true;
+      flags.value.shownStartup = true;
+      flags.value.isOpen = false;
     });
     tour.start();
-  }
-
-  function getFlag() {
-    return flags.value.showHelp;
+    flags.value.isOpen = true;
   }
 
   return {
     start,
-    getFlag,
+    flags,
+  };
+};
+
+export const useBiasedTour = (): Tour => {
+  const lang = useLang("tour.biased");
+  const tour = introJs();
+
+  function start() {
+    if (flags.value.isOpen) return;
+    navigateTo("/");
+    const steps: introJs.Step[] = [
+      {
+        element: document.querySelector(".ranker-you .rank") || undefined,
+        title: lang("rank.title"),
+        intro: lang("rank.intro"),
+      },
+      {
+        element:
+          document.querySelector(".ranker-you .formattedPowerPerSec") ||
+          undefined,
+        title: lang("power.title"),
+        intro: lang("power.intro"),
+      },
+      {
+        element: document.querySelector("[data-tutorial='multi']") || undefined,
+        title: lang("multi.title"),
+        intro: lang("multi.intro"),
+      },
+    ];
+
+    tour.setOptions({
+      steps,
+      exitOnOverlayClick: false,
+      exitOnEsc: false,
+      nextLabel: "Next",
+      prevLabel: "Back",
+      doneLabel: "Done",
+    });
+    tour.oncomplete(() => {
+      flags.value.shownBiased = true;
+      flags.value.isOpen = false;
+    });
+    tour.onexit(() => {
+      flags.value.shownBiased = true;
+      flags.value.isOpen = false;
+    });
+    tour.start();
+    flags.value.isOpen = true;
+  }
+
+  return {
+    start,
+    flags,
+  };
+};
+
+export const useMultiedTour = (): Tour => {
+  const lang = useLang("tour.multied");
+  const tour = introJs();
+
+  function start() {
+    if (flags.value.isOpen) return;
+    navigateTo("/");
+    const steps: introJs.Step[] = [
+      {
+        element: document.querySelector(".ranker-you") || undefined,
+        title: lang("tip.title"),
+        intro: lang("tip.intro"),
+      },
+      {
+        element: document.querySelector(".ranker-1 .rank") || undefined,
+        title: lang("goal1.title"),
+        intro: lang("goal1.intro"),
+      },
+      {
+        element:
+          document.querySelector("[data-tutorial='ladders']") || undefined,
+        title: lang("goal2.title"),
+        intro: lang("goal2.intro"),
+      },
+    ];
+
+    tour.setOptions({
+      steps,
+      exitOnOverlayClick: false,
+      exitOnEsc: false,
+      nextLabel: "Next",
+      prevLabel: "Back",
+      doneLabel: "Done",
+    });
+    tour.oncomplete(() => {
+      flags.value.shownMultied = true;
+      flags.value.isOpen = false;
+    });
+    tour.onexit(() => {
+      flags.value.shownMultied = true;
+      flags.value.isOpen = false;
+    });
+    tour.start();
+    flags.value.isOpen = true;
+  }
+
+  return {
+    start,
+    flags,
+  };
+};
+
+export const useAutoPromoteTour = (): Tour => {
+  const lang = useLang("tour.autoPromote");
+  const tour = introJs();
+
+  function start() {
+    if (flags.value.isOpen) return;
+    navigateTo("/");
+    const steps: introJs.Step[] = [
+      {
+        element: document.querySelector(".ranker-1") || undefined,
+        title: lang("shootdown.title"),
+        intro: lang("shootdown.intro"),
+      },
+      {
+        element:
+          document.querySelector("[data-tutorial='grapes']") || undefined,
+        title: lang("grapes.title"),
+        intro: lang("grapes.intro"),
+      },
+      {
+        element:
+          document.querySelector("[data-tutorial='autoPromote']") || undefined,
+        title: lang("autoPromote.title"),
+        intro: lang("autoPromote.intro"),
+      },
+      {
+        element:
+          document.querySelector("[data-tutorial='autoPromoteCost']") ||
+          undefined,
+        title: lang("cost.title"),
+        intro: lang("cost.intro"),
+      },
+    ];
+
+    tour.setOptions({
+      steps,
+      exitOnOverlayClick: false,
+      exitOnEsc: false,
+      nextLabel: "Next",
+      prevLabel: "Back",
+      doneLabel: "Done",
+    });
+    tour.oncomplete(() => {
+      flags.value.shownAutoPromote = true;
+      flags.value.isOpen = false;
+    });
+    tour.onexit(() => {
+      flags.value.shownAutoPromote = true;
+      flags.value.isOpen = false;
+    });
+    tour.start();
+    flags.value.isOpen = true;
+  }
+
+  return {
+    start,
+    flags,
+  };
+};
+
+export const useVinegarTour = (): Tour => {
+  const lang = useLang("tour.vinegar");
+  const tour = introJs();
+
+  function start() {
+    if (flags.value.isOpen) return;
+    navigateTo("/");
+    const steps: introJs.Step[] = [
+      {
+        title: lang("split.title"),
+        intro: lang("split.intro"),
+      },
+      {
+        element:
+          document.querySelector("[data-tutorial='throwVinegar']") || undefined,
+        title: lang("throwing.title"),
+        intro: lang("throwing.intro"),
+      },
+      {
+        element: document.querySelector("[data-tutorial='wine']") || undefined,
+        title: lang("wine.title"),
+        intro: lang("wine.intro"),
+      },
+      {
+        element:
+          document.querySelector("[data-tutorial='vinegarSettings']") ||
+          undefined,
+        title: lang("refunds.title"),
+        intro: lang("refunds.intro"),
+      },
+    ];
+
+    tour.setOptions({
+      steps,
+      exitOnOverlayClick: false,
+      exitOnEsc: false,
+      nextLabel: "Next",
+      prevLabel: "Back",
+      doneLabel: "Done",
+    });
+    tour.oncomplete(() => {
+      flags.value.shownVinegar = true;
+      flags.value.isOpen = false;
+    });
+    tour.onexit(() => {
+      flags.value.shownVinegar = true;
+      flags.value.isOpen = false;
+    });
+    tour.start();
+    flags.value.isOpen = true;
+  }
+
+  return {
+    start,
+    flags,
+  };
+};
+
+export const usePromoteTour = (): Tour => {
+  const lang = useLang("tour.promote");
+  const tour = introJs();
+
+  function start() {
+    navigateTo("/");
+    const steps: introJs.Step[] = [
+      {
+        title: lang("top10.title"),
+        intro: lang("top10.intro"),
+      },
+      {
+        title: lang("balance.title"),
+        intro: lang("balance.intro"),
+      },
+      {
+        title: lang("goodluck.title"),
+        intro: lang("goodluck.intro"),
+      },
+    ];
+
+    tour.setOptions({
+      steps,
+      exitOnOverlayClick: false,
+      exitOnEsc: false,
+      nextLabel: "Next",
+      prevLabel: "Back",
+      doneLabel: "Done",
+    });
+    tour.oncomplete(() => {
+      flags.value.shownPromoted = true;
+      flags.value.isOpen = false;
+    });
+    tour.onexit(() => {
+      flags.value.shownPromoted = true;
+      flags.value.isOpen = false;
+    });
+    tour.start();
+    flags.value.isOpen = true;
+  }
+
+  return {
+    start,
+    flags,
   };
 };

@@ -169,6 +169,51 @@ function getNextUpgradeCost(currentUpgrade: number): Decimal {
   return result.round().max(new Decimal(1));
 }
 
+function getPassingGrapes() {
+  if (ladder.state.types.has(LadderType.CONSOLATION)) {
+    return 3;
+  } else if (ladder.state.types.has(LadderType.NO_HANDOUTS)) {
+    return 0;
+  }
+  return 0;
+}
+
+function getBottomGrapes() {
+  if (ladder.state.types.has(LadderType.BOUNTIFUL)) {
+    return 5;
+  } else if (ladder.state.types.has(LadderType.DROUGHT)) {
+    return 1;
+  }
+  return 2;
+}
+
+function getWinningGrapes(place: number, baseGrapeCostForAuto: number) {
+  let multiplier = 1;
+  if (ladder.state.types.has(LadderType.GENEROUS)) {
+    multiplier = 3;
+  } else if (ladder.state.types.has(LadderType.STINGY)) {
+    multiplier = 0.5;
+  }
+
+  if (place === 1) {
+    return Math.round(baseGrapeCostForAuto * multiplier);
+  } else if (place < 4) {
+    return Math.round((baseGrapeCostForAuto / 2) * multiplier);
+  } else if (place < 11) {
+    return Math.round((baseGrapeCostForAuto / 10) * multiplier);
+  }
+  return 0;
+}
+
+function getWinningMultiplier() {
+  if (ladder.state.types.has(LadderType.GENEROUS)) {
+    return 14;
+  } else if (ladder.state.types.has(LadderType.STINGY)) {
+    return 11;
+  }
+  return 12;
+}
+
 export const useLadderUtils = () => {
   ladder = useLadderStore();
   round = useRoundStore();
@@ -188,5 +233,9 @@ export const useLadderUtils = () => {
     getPointsNeededToPromote,
     getAutoPromoteCost,
     getNextUpgradeCost,
+    getPassingGrapes,
+    getBottomGrapes,
+    getWinningGrapes,
+    getWinningMultiplier,
   };
 };

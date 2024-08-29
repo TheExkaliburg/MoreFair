@@ -15,6 +15,16 @@ import { useFormatter } from "~/composables/useFormatter";
 import { useToasts } from "~/composables/useToasts";
 import { SOUNDS, useSound } from "~/composables/useSound";
 import { useOptionsStore } from "~/store/options";
+import { useRoundStore } from "~/store/round";
+import { VinegarSuccessType } from "~/store/grapes";
+import {
+  useAutoPromoteTour,
+  useBiasedTour,
+  useMultiedTour,
+  usePromoteTour,
+  useStartupTour,
+  useVinegarTour,
+} from "~/composables/useTour";
 
 export enum LadderType {
   DEFAULT = "DEFAULT",
@@ -27,6 +37,12 @@ export enum LadderType {
   ASSHOLE = "ASSHOLE",
   CHEAP = "CHEAP",
   EXPENSIVE = "EXPENSIVE",
+  BOUNTIFUL = "BOUNTIFUL",
+  DROUGHT = "DROUGHT",
+  CONSOLATION = "CONSOLATION",
+  NO_HANDOUTS = "NO_HANDOUTS",
+  GENEROUS = "GENEROUS",
+  STINGY = "STINGY",
   END = "END",
 }
 
@@ -126,6 +142,8 @@ export const useLadderStore = defineStore("ladder", () => {
     }),
   });
 
+  accountStore.actions.init().then(() => init());
+
   function init() {
     if (isInitialized.value) return;
     getLadder(accountStore.state.highestCurrentLadder);
@@ -138,7 +156,7 @@ export const useLadderStore = defineStore("ladder", () => {
 
   function getLadder(ladderNumber: number) {
     isInitialized.value = true;
-    api.ladder
+    return api.ladder
       .getLadder(ladderNumber)
       .then((res) => {
         const data: LadderData = res.data;
@@ -167,6 +185,15 @@ export const useLadderStore = defineStore("ladder", () => {
           "fair_ladder_calculateTick",
           (body: OnTickBody) => calculateTick(body.delta),
         );
+
+        const tour = usePromoteTour();
+        if (
+          state.number >= 2 &&
+          !tour.flags.value.shownPromoted &&
+          tour.flags.value.shownVinegar
+        ) {
+          tour.start();
+        }
       })
       .catch((_) => {
         isInitialized.value = false;
@@ -221,7 +248,9 @@ export const useLadderStore = defineStore("ladder", () => {
               rankers[j].accountId === yourRanker?.accountId &&
               rankers[j].multi > 1
             ) {
-              rankers[j].grapes = Object.freeze(rankers[j].grapes.add(1));
+              state.rankers[j].grapes = Object.freeze(
+                state.rankers[j].grapes.add(ladderUtils.getPassingGrapes()),
+              );
             }
             rankers[j + 1] = rankers[j];
 
@@ -235,10 +264,21 @@ export const useLadderStore = defineStore("ladder", () => {
       }
     }
 
-    if (yourRanker !== undefined && yourRanker.growing) {
+    if (yourRanker?.growing) {
       if (yourRanker.rank !== 1) {
+        const vinegarAdded = yourRanker.grapes
+          .mul(accountStore.state.settings.vinegarSplit)
+          .div(100);
+
         yourRanker.vinegar = Object.freeze(
-          yourRanker.vinegar.add(yourRanker.grapes.mul(deltaSeconds).floor()),
+          yourRanker.vinegar.add(vinegarAdded.mul(deltaSeconds).floor()),
+        );
+
+        const wineAdded = yourRanker.grapes
+          .mul(100 - accountStore.state.settings.vinegarSplit)
+          .div(50);
+        yourRanker.wine = Object.freeze(
+          yourRanker.wine.add(wineAdded.mul(deltaSeconds).floor()),
         );
       }
       if (yourRanker.rank === 1 && ladderUtils.isLadderPromotable.value) {
@@ -247,11 +287,17 @@ export const useLadderStore = defineStore("ladder", () => {
             .mul(Decimal.pow(new Decimal(0.9975), deltaSeconds))
             .floor(),
         );
+
+        yourRanker.wine = Object.freeze(
+          yourRanker.wine
+            .mul(Decimal.pow(new Decimal(0.9975), deltaSeconds))
+            .floor(),
+        );
       }
 
       if (yourRanker.rank === rankers.length && rankers.length >= 1) {
         yourRanker.grapes = Object.freeze(
-          yourRanker.grapes.add(new Decimal(2)),
+          yourRanker.grapes.add(new Decimal(ladderUtils.getBottomGrapes())),
         );
       }
     }
@@ -261,6 +307,31 @@ export const useLadderStore = defineStore("ladder", () => {
     const isFirst = yourRanker?.rank === 1;
     if (isFirst && !wasFirst) {
       useSound(SOUNDS.GOT_FIRST).play();
+    }
+
+    let tour = useStartupTour();
+    if (!tour.flags.value.shownStartup) {
+      tour.start();
+    }
+
+    tour = useAutoPromoteTour();
+    if (
+      !tour.flags.value.shownAutoPromote &&
+      tour.flags.value.shownMultied &&
+      yourRanker &&
+      yourRanker.points.mul(100).cmp(rankers[0].points) > 0
+    ) {
+      tour.start();
+    }
+
+    tour = useVinegarTour();
+    if (
+      !tour.flags.value.shownVinegar &&
+      tour.flags.value.shownAutoPromote &&
+      yourRanker &&
+      yourRanker.points.mul(10).cmp(rankers[0].points) > 0
+    ) {
+      tour.start();
     }
   }
 
@@ -335,33 +406,86 @@ export const useLadderStore = defineStore("ladder", () => {
           console.error("Unknown event type", event);
           break;
       }
+
+      if (event.eventType === LadderEventType.BUY_BIAS) {
+        const tour = useBiasedTour();
+        if (tour.flags.value.shownStartup && !tour.flags.value.shownBiased) {
+          tour.start();
+        }
+      } else if (event.eventType === LadderEventType.BUY_MULTI) {
+        const tour = useMultiedTour();
+        if (tour.flags.value.shownBiased && !tour.flags.value.shownMultied) {
+          tour.start();
+        }
+      }
     }
   }
 
   function handleThrowVinegarEvent(ranker: Ranker, event: OnLadderEventBody) {
     if (getters.yourRanker === undefined) return;
     const vinegarThrown = new Decimal(event.data.amount);
+    const percentage = event.data.percentage;
+    const success: VinegarSuccessType = event.data.success;
+
     if (ranker.accountId === getters.yourRanker.accountId) {
-      ranker.vinegar = Object.freeze(new Decimal(0));
+      // THROWER
+
+      let restoredVinegar = new Decimal(0);
+      if (success === VinegarSuccessType.SUCCESS) {
+        restoredVinegar = getters.yourRanker.vinegar
+          .mul(useRoundStore().state.settings.minVinegarThrown)
+          .div(200);
+      } else if (success === VinegarSuccessType.DOUBLE_SUCCESS) {
+        restoredVinegar = getters.yourRanker.vinegar
+          .mul(useRoundStore().state.settings.minVinegarThrown)
+          .div(100);
+      }
+
+      ranker.vinegar = Object.freeze(
+        getters.yourRanker.vinegar.sub(vinegarThrown).add(restoredVinegar),
+      );
       return;
     }
 
     if (event.data.targetId === getters.yourRanker.accountId) {
+      // DEFENDED
+      let passedVinegar = vinegarThrown;
+      if (
+        success === VinegarSuccessType.SHIELDED ||
+        success === VinegarSuccessType.SHIELD_DEFENDED
+      ) {
+        // SHIELD - DEFENSE
+        getters.yourRanker.wine = Object.freeze(new Decimal(0));
+        passedVinegar = Decimal.max(
+          passedVinegar.sub(getters.yourRanker.wine),
+          new Decimal(0),
+        );
+      }
+
+      let subtractedVinegar = passedVinegar;
+      if (
+        success === VinegarSuccessType.DEFENDED ||
+        success === VinegarSuccessType.SHIELD_DEFENDED
+      ) {
+        // VINEGAR-DEFENSE
+        subtractedVinegar = subtractedVinegar.mul(percentage).div(100);
+      }
+
       getters.yourRanker.vinegar = Object.freeze(
         Decimal.max(
-          getters.yourRanker.vinegar.sub(vinegarThrown),
+          getters.yourRanker.vinegar.sub(subtractedVinegar),
           new Decimal(0),
         ),
       );
       useToasts(
-        `${ranker.username} (#${ranker.accountId}) ${
-          event.data.success ? "successfully" : ""
-        } threw  ${useFormatter(vinegarThrown)} vinegar at you!`,
+        `${ranker.username} (#${ranker.accountId}) threw ${useFormatter(
+          vinegarThrown,
+        )} (${percentage}%) vinegar at you!`,
       );
       chatStore.actions.addSystemMessage(
-        `{@} saw {@} throwing vinegar at {@}. They've ${
-          event.data.success ? "successfully" : ""
-        } used ${useFormatter(vinegarThrown)} vinegar!`,
+        `{@} saw {@} throwing vinegar at {@}. They've used ${useFormatter(
+          vinegarThrown,
+        )} (${percentage}%) vinegar!`,
         JSON.stringify([
           { u: "Chad", i: 0, id: 1 },
           { u: ranker.username, i: 8, id: ranker.accountId },

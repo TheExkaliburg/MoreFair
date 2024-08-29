@@ -13,8 +13,13 @@ export enum RoundType {
   DEFAULT = "DEFAULT",
   FAST = "FAST",
   SLOW = "SLOW",
+  SHORT = "SHORT",
+  LONG = "LONG",
   AUTO = "AUTO",
   CHAOS = "CHAOS",
+  RAILROAD = "RAILROAD",
+  FARMER = "FARMER",
+  RACE = "RACE",
   REVERSE_SCALING = "REVERSE_SCALING",
   SPECIAL_100 = "SPECIAL_100",
 }
@@ -51,6 +56,8 @@ export const useRoundStore = defineStore("round", () => {
       return Array.from(state.types).join(",");
     }),
   });
+
+  init();
 
   function init() {
     if (isInitialized.value) return;

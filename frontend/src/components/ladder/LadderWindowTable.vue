@@ -1,39 +1,5 @@
 <template>
   <div ref="container" class="overflow-y-auto h-full" @scroll="onScroll">
-    <!--DynamicScroller
-      :buffer="200"
-      :items="ladder.rankers"
-      :min-item-size="23"
-      class="h-full overflow-y-auto text-sm"
-      key-field="rank"
-      page-mode
-    >
-      <template #before>
-        <div
-          class="grid grid-cols-24 gap-1 px-1 px-1 font-bold text-text-light sticky top-0"
-        >
-          <div class="col-span-3">#</div>
-          <div class="col-span-9">Username</div>
-          <div class="col-span-6 text-right">Power</div>
-          <div class="col-span-6 text-right">Points</div>
-        </div>
-      </template>
-      <template #default="{ item, index, active }">
-        <DynamicScrollerItem
-          :active="active"
-          :data-active="active"
-          :data-index="index"
-          :item="item"
-          :size-dependencies="[item]"
-        >
-          <LadderWindowTableRow
-            :active="active"
-            :index="index"
-            :ranker="item"
-          />
-        </DynamicScrollerItem>
-      </template>
-    </DynamicScroller-->
     <div
       class="grid gap-1 px-1 text-sm md:text-base font-bold text-text-light top-0 bg-background z-1"
       :style="tableSpaceClasses.total"

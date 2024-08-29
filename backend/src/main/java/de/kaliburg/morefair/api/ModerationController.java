@@ -1,20 +1,18 @@
 package de.kaliburg.morefair.api;
 
-import de.kaliburg.morefair.FairConfig;
-import de.kaliburg.morefair.account.AccountAccessRole;
-import de.kaliburg.morefair.account.AccountEntity;
-import de.kaliburg.morefair.account.AccountService;
+import de.kaliburg.morefair.account.model.AccountEntity;
+import de.kaliburg.morefair.account.model.types.AccountAccessType;
+import de.kaliburg.morefair.account.services.AccountService;
 import de.kaliburg.morefair.api.utils.HttpUtils;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WsMessage;
+import de.kaliburg.morefair.chat.model.MessageEntity;
+import de.kaliburg.morefair.chat.model.types.ChatType;
+import de.kaliburg.morefair.chat.services.MessageService;
+import de.kaliburg.morefair.chat.services.mapper.ChatMapper;
 import de.kaliburg.morefair.data.ModChatDto;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.AccountEventTypes;
-import de.kaliburg.morefair.game.chat.ChatService;
-import de.kaliburg.morefair.game.chat.ChatType;
-import de.kaliburg.morefair.game.chat.MessageEntity;
-import de.kaliburg.morefair.game.chat.MessageService;
-import de.kaliburg.morefair.game.round.LadderService;
 import de.kaliburg.morefair.security.SecurityUtils;
 import java.util.HashMap;
 import java.util.List;
@@ -48,26 +46,26 @@ public class ModerationController {
   private static final String APP_MOD_DESTINATION = "/moderation/mod/{id}";
   private final AccountService accountService;
   private final WsUtils wsUtils;
-  private final LadderService ladderService;
   private final MessageService messageService;
-  private final ChatService chatService;
-  private final FairConfig config;
+  private final ChatMapper chatMapper;
 
   @GetMapping("/chat")
   public ResponseEntity<?> getChat(Authentication authentication) {
     try {
-      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
+      AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
+          .orElse(null);
       if (account == null || !account.isMod()) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       } else {
         List<MessageEntity> messages =
             messageService.findNewestMessagesByChatType(List.of(ChatType.LADDER, ChatType.GLOBAL,
                 ChatType.SYSTEM, ChatType.MOD));
-        return new ResponseEntity<>(new ModChatDto(messages, config), HttpStatus.OK);
+
+        ModChatDto modChatDto = chatMapper.mapToModChatDto(messages);
+        return new ResponseEntity<>(modChatDto, HttpStatus.OK);
       }
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
       return HttpUtils.buildErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }
@@ -76,16 +74,18 @@ public class ModerationController {
   public void ban(Authentication authentication, @DestinationVariable("id") Long id) {
     try {
 
-      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
+      AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
+          .orElse(null);
       if (account == null || !account.isMod()) {
         return;
       }
 
-      AccountEntity target = accountService.find(id);
+      AccountEntity target = accountService.findById(id).orElseThrow();
+
       if (target.isOwner()) {
         return;
       }
-      target.setAccessRole(AccountAccessRole.BANNED_PLAYER);
+      target.setAccessRole(AccountAccessType.BANNED_PLAYER);
       target.setDisplayName("[BANNED]");
       target = accountService.save(target);
       messageService.deleteMessagesOfAccount(target);
@@ -97,24 +97,24 @@ public class ModerationController {
       wsUtils.convertAndSendToTopic(AccountController.TOPIC_EVENTS_DESTINATION, new Event<>(
           AccountEventTypes.NAME_CHANGE, target.getId(), target.getDisplayName()));
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
   }
 
   @MessageMapping(APP_MUTE_DESTINATION)
   public void mute(Authentication authentication, @DestinationVariable("id") Long id) {
     try {
-      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
+      AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
+          .orElse(null);
       if (account == null || !account.isMod()) {
         return;
       }
 
-      AccountEntity target = accountService.find(id);
+      AccountEntity target = accountService.findById(id).orElseThrow();
       if (target.isOwner()) {
         return;
       }
-      target.setAccessRole(AccountAccessRole.MUTED_PLAYER);
+      target.setAccessRole(AccountAccessType.MUTED_PLAYER);
       target.setDisplayName("[MUTED]" + target.getDisplayName());
       target = accountService.save(target);
       messageService.deleteMessagesOfAccount(target);
@@ -126,24 +126,24 @@ public class ModerationController {
       wsUtils.convertAndSendToTopic(AccountController.TOPIC_EVENTS_DESTINATION, new Event<>(
           AccountEventTypes.NAME_CHANGE, target.getId(), target.getDisplayName()));
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
   }
 
   @MessageMapping(APP_FREE_DESTINATION)
   public void free(Authentication authentication, @DestinationVariable("id") Long id) {
     try {
-      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
+      AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
+          .orElse(null);
       if (account == null || !account.isMod()) {
         return;
       }
 
-      AccountEntity target = accountService.find(id);
+      AccountEntity target = accountService.findById(id).orElseThrow();
       if (target.isOwner()) {
         return;
       }
-      target.setAccessRole(AccountAccessRole.PLAYER);
+      target.setAccessRole(AccountAccessType.PLAYER);
       target = accountService.save(target);
       log.info("[MOD] {} (#{}) is freeing the account {} (#{})", account.getDisplayName(),
           account.getId(),
@@ -151,8 +151,7 @@ public class ModerationController {
       wsUtils.convertAndSendToTopic(AccountController.TOPIC_EVENTS_DESTINATION, new Event<>(
           AccountEventTypes.FREE, target.getId()));
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
   }
 
@@ -160,7 +159,8 @@ public class ModerationController {
   public void changeName(Authentication authentication, String displayName,
       @DestinationVariable("id") Long id) {
     try {
-      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
+      AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
+          .orElse(null);
       if (account == null || !account.isMod()) {
         return;
       }
@@ -174,7 +174,7 @@ public class ModerationController {
         return;
       }
 
-      AccountEntity target = accountService.find(id);
+      AccountEntity target = accountService.findById(id).orElseThrow();
       if (target.isOwner()) {
         return;
       }
@@ -185,8 +185,7 @@ public class ModerationController {
       wsUtils.convertAndSendToTopic(AccountController.TOPIC_EVENTS_DESTINATION, new Event<>(
           AccountEventTypes.NAME_CHANGE, target.getId(), displayName));
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
   }
 
@@ -200,19 +199,19 @@ public class ModerationController {
         throw new IllegalArgumentException();
       }
 
-      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
+      AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
+          .orElse(null);
       if (account == null || !account.isMod()) {
         return;
       }
 
-      AccountEntity target = accountService.find(id);
-      //wsUtils.convertAndSendToTopic(AccountController.TOPIC_EVENTS_DESTINATION, new Event<>(
-      //    AccountEventTypes.MOD, target.getId(), text));
+      AccountEntity target = accountService.findById(id).orElseThrow();
+      wsUtils.convertAndSendToTopic(AccountController.TOPIC_EVENTS_DESTINATION,
+          new Event<>(AccountEventTypes.MOD, target.getId(), text));
       log.info("[MOD] {} (#{}) is prompting the account {} (#{}) with {}", account.getDisplayName(),
           account.getId(), target.getDisplayName(), target.getId(), text);
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
   }
 
@@ -220,24 +219,24 @@ public class ModerationController {
   public void mod(Authentication authentication, @DestinationVariable("id") Long id) {
     try {
 
-      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
+      AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
+          .orElse(null);
       if (account == null || !account.isOwner()) {
         return;
       }
 
-      AccountEntity target = accountService.find(id);
+      AccountEntity target = accountService.findById(id).orElseThrow();
       if (target.isOwner()) {
         return;
       }
-      target.setAccessRole(AccountAccessRole.MODERATOR);
+      target.setAccessRole(AccountAccessType.MODERATOR);
       target = accountService.save(target);
       log.info("[MOD] {} (#{}) is modding the account {} (#{})", account.getDisplayName(),
           account.getId(), target.getDisplayName(), target.getId());
       wsUtils.convertAndSendToTopic(AccountController.TOPIC_EVENTS_DESTINATION, new Event<>(
           AccountEventTypes.MOD, target.getId(), account.getId()));
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
   }
 
@@ -247,7 +246,8 @@ public class ModerationController {
       @RequestParam("username") String name) {
     try {
 
-      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
+      AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
+          .orElse(null);
       if (account == null || !account.isMod()) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       }
@@ -257,8 +257,7 @@ public class ModerationController {
           .collect(Collectors.toMap(AccountEntity::getId, AccountEntity::getDisplayName));
       return new ResponseEntity<>(result, HttpStatus.OK);
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -268,11 +267,12 @@ public class ModerationController {
       @RequestParam("accountId") String accountId) {
     try {
 
-      AccountEntity account = accountService.find(SecurityUtils.getUuid(authentication));
+      AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
+          .orElse(null);
       if (account == null || !account.isMod()) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
       }
-      AccountEntity target = accountService.find(Long.parseLong(accountId));
+      AccountEntity target = accountService.findById(Long.parseLong(accountId)).orElse(null);
       if (target == null) {
         return new ResponseEntity<>(new HashMap<Long, String>(), HttpStatus.OK);
       }
@@ -282,8 +282,7 @@ public class ModerationController {
 
       return new ResponseEntity<>(result, HttpStatus.OK);
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
       return ResponseEntity.internalServerError().body(e.getMessage());
     }
   }

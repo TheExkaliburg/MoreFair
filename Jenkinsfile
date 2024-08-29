@@ -31,21 +31,21 @@ pipeline {
 
         stage('Docker') {
             steps {
-                sh 'sudo docker build -t kaliburg/fairgame:latest .'
-                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | sudo docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-                sh 'sudo docker push kaliburg/fairgame:latest'
+                sh 'docker build -t kaliburg/fairgame:latest .'
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+                sh 'docker push kaliburg/fairgame:latest'
             }
             post {
                 always {
-                    sh 'sudo docker logout'
+                    sh 'docker logout'
                 }
             }
         }
 
         stage('Compose/Startup') {
             steps {
-                sh 'sudo docker compose stop'
-                sh 'sudo docker compose --env-file $ENV_FILE up --pull always --force-recreate --detach'
+                sh 'docker compose stop'
+                sh 'docker compose --env-file $ENV_FILE up --pull always --force-recreate --detach'
             }
         }
     }

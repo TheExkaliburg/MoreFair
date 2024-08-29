@@ -33,16 +33,6 @@
             </template>
           </SidebarButton>
         </NuxtLink>
-        <SidebarButton
-          :label="helpLabel"
-          aria-label="Start Tutorial"
-          data-tutorial="help"
-          @click="help"
-        >
-          <template #icon>
-            <QuestionMarkCircleIcon />
-          </template>
-        </SidebarButton>
         <NuxtLink
           to="https://fairwiki.kaliburg.de/"
           target="_blank"
@@ -115,7 +105,6 @@ import {
   Cog8ToothIcon,
   DocumentTextIcon,
   NewspaperIcon,
-  QuestionMarkCircleIcon,
   UserCircleIcon,
 } from "@heroicons/vue/24/outline";
 import { MaybeElement, onClickOutside } from "@vueuse/core";
@@ -123,7 +112,6 @@ import SidebarButton from "../../components/navbar/SidebarButton.vue";
 import BrandedSidebarToggle from "../../components/navbar/BrandedSidebarToggle.vue";
 import { NuxtLink } from "#components";
 import { useUiStore } from "~/store/ui";
-import { useTutorialTour } from "~/composables/useTour";
 import { useLang } from "~/composables/useLang";
 import { useAccountStore } from "~/store/account";
 
@@ -133,7 +121,6 @@ const offCanvas = ref<MaybeElement>();
 
 const lang = useLang("components.navbar.sidebar");
 const optionsLabel = computed<string>(() => lang("options"));
-const helpLabel = computed<string>(() => lang("help"));
 const discordLabel = computed<string>(() => lang("discord"));
 const privacyLabel = computed<string>(() => lang("privacy"));
 const impressumLabel = computed<string>(() => lang("impressum"));
@@ -143,12 +130,6 @@ onClickOutside(offCanvas.value, () => {
 });
 
 function close() {
-  uiStore.state.sidebarExpanded = false;
-}
-
-function help() {
-  close();
-  useTutorialTour().start();
   uiStore.state.sidebarExpanded = false;
 }
 </script>

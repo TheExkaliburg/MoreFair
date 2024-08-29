@@ -1,21 +1,17 @@
 package de.kaliburg.morefair.data;
 
-import de.kaliburg.morefair.FairConfig;
-import de.kaliburg.morefair.game.chat.MessageEntity;
-import de.kaliburg.morefair.game.chat.dto.MessageDto;
+import de.kaliburg.morefair.chat.model.dto.MessageDto;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
+@AllArgsConstructor
 public class ModChatDto {
 
+  @Builder.Default
   private final List<MessageDto> messages = new ArrayList<>();
-
-  public ModChatDto(List<MessageEntity> messages, FairConfig config) {
-    messages.sort((o1, o2) -> o2.getCreatedOn().compareTo(o1.getCreatedOn()));
-    for (MessageEntity m : messages) {
-      this.messages.add(new MessageDto(m, config));
-    }
-  }
 }

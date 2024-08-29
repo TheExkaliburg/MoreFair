@@ -47,9 +47,11 @@
       class="flex flex-row text-xs lg:text-sm w-full justify-between text-text-light"
     >
       <p data-tutorial="grapes">
-        {{ yourFormattedGrapes }}/<span class="text-text-dark">{{
-          yourAutoPromoteCostFormatted
-        }}</span>
+        {{ yourFormattedGrapes }}/<span
+          class="text-text-dark"
+          data-tutorial="autoPromoteCost"
+          >{{ yourAutoPromoteCostFormatted }}</span
+        >
         {{ lang("info.grapes") }}
         <span
           v-if="
@@ -71,6 +73,7 @@
         :class="{ 'border-r-0': isAutoPromoteButtonDisabled }"
         :disabled="isAutoPromoteButtonDisabled"
         class="w-full rounded-r-none whitespace-nowrap"
+        data-tutorial="autoPromote"
         @click="buyAutoPromote"
       >
         {{ lang("autopromote") }}
@@ -80,6 +83,7 @@
         :class="{ 'border-l-1': isAutoPromoteButtonDisabled }"
         :disabled="isVinegarButtonDisabled"
         class="w-full rounded-l-none border-l-0 whitespace-nowrap"
+        data-tutorial="throwVinegar"
         @click="throwVinegar"
       >
         {{ vinegarButtonLabel }}
@@ -95,14 +99,19 @@
       </FairButton>
     </div>
     <div
-      class="flex flex-row text-xs lg:text-sm w-full justify-between text-text-light"
+      class="flex flex-row text-xs lg:text-sm w-full justify-between text-text-light whitespace-nowrap"
     >
       <p>
-        {{ lang("info.promoteAt") }}
-        <span class="text-text-dark">{{ pointsNeededToPromoteFormatted }}</span>
+        {{ lang("info.promoteAt") }} @<span class="text-text-dark">{{
+          pointsNeededToPromoteFormatted
+        }}</span>
         {{ lang("info.points") }} ({{ yourPercentageToPromotion }}%) ({{
           yourTimeToPromotion
         }})
+      </p>
+      <p data-tutorial="wine">
+        (<span class="text-text-dark">{{ formattedWineShieldEta }}</span
+        >) {{ yourFormattedWine }} {{ lang("info.wine") }}
       </p>
     </div>
   </div>
@@ -120,11 +129,15 @@ import { useFormatter, useTimeFormatter } from "~/composables/useFormatter";
 import { useLadderUtils } from "~/composables/useLadderUtils";
 import { useStomp } from "~/composables/useStomp";
 import { useEta } from "~/composables/useEta";
+import { useGrapesStore } from "~/store/grapes";
+import { useAccountStore } from "~/store/account";
 
 const lang = useLang("components.ladder.buttons");
 const optionsStore = useOptionsStore();
 const ladderStore = useLadderStore();
 const ladderUtils = useLadderUtils();
+const flags = useStartupTour().flags;
+
 const isButtonLocked = computed<boolean>(() => {
   return (
     optionsStore.state.ladder.lockButtons.value || !yourRanker.value.growing
@@ -168,7 +181,12 @@ const multiButtonLabel = computed<string>(() => {
 
 const vinegarButtonLabel = computed<string>(() => {
   const eta = useEta(yourRanker.value).toVinegarThrow();
-  if (eta === 0 || eta === Infinity) return `${lang("vinegar")}`;
+  if (eta === 0 || eta === Infinity) {
+    return `${lang(
+      "vinegar",
+      useFormatter(useGrapesStore().getters.selectedVinegar),
+    )}`;
+  }
   return `${lang("vinegar")} (${useTimeFormatter(eta)})`;
 });
 
@@ -191,6 +209,28 @@ const yourFormattedGrapes = computed<string>(() => {
 const yourFormattedVinegar = computed<string>(() => {
   if (optionsStore.state.ladder.hideVinegarAndGrapes.value) return "[Hidden]";
   return useFormatter(yourRanker.value.vinegar);
+});
+const yourFormattedWine = computed<string>(() => {
+  if (optionsStore.state.ladder.hideVinegarAndGrapes.value) return "[Hidden]";
+  return useFormatter(yourRanker.value.wine);
+});
+const isWineShieldActive = computed<boolean>(() => {
+  return yourRanker.value.vinegar.cmp(yourRanker.value.wine) < 0;
+});
+const formattedWineShieldEta = computed<string>(() => {
+  if (isWineShieldActive.value) return lang("info.shielded");
+  const winePerSec = yourRanker.value.grapes
+    .mul(100 - useAccountStore().state.settings.vinegarSplit)
+    .div(50);
+  const vinegarPerSec = yourRanker.value.grapes
+    .mul(useAccountStore().state.settings.vinegarSplit)
+    .div(100);
+
+  const wineDeltaPerSec = winePerSec.sub(vinegarPerSec);
+  if (wineDeltaPerSec.cmp(0) < 0) return useTimeFormatter(Infinity);
+  const wineMissing = yourRanker.value.vinegar.sub(yourRanker.value.wine);
+  const seconds = wineMissing.div(wineDeltaPerSec).ceil();
+  return useTimeFormatter(seconds.toNumber());
 });
 
 const yourBiasCostFormatted = computed<string>(() => {
@@ -226,7 +266,9 @@ const canBuyAutoPromote = computed<boolean>(() => {
 });
 const canThrowVinegar = computed<boolean>(() => {
   return (
-    ladderUtils.getVinegarThrowCost.value.cmp(yourRanker.value.vinegar) <= 0 &&
+    ladderUtils.getVinegarThrowCost.value.cmp(
+      useGrapesStore().getters.selectedVinegar,
+    ) <= 0 &&
     ladderStore.state.rankers[0].growing &&
     ladderUtils.isLadderPromotable.value
   );
@@ -253,25 +295,35 @@ const pressedAutoPromoteRecently = ref<boolean>(false);
 const pressedPromoteRecently = ref<boolean>(false);
 
 const isBiasButtonDisabled = computed<boolean>(() => {
-  return !canBuyBias.value || isButtonLocked.value || pressedBiasRecently.value;
+  return (
+    !canBuyBias.value ||
+    isButtonLocked.value ||
+    pressedBiasRecently.value ||
+    !flags.value.shownStartup
+  );
 });
 const isMultiButtonDisabled = computed<boolean>(() => {
   return (
-    !canBuyMulti.value || isButtonLocked.value || pressedMultiRecently.value
+    !canBuyMulti.value ||
+    isButtonLocked.value ||
+    pressedMultiRecently.value ||
+    !flags.value.shownBiased
   );
 });
 const isVinegarButtonDisabled = computed<boolean>(() => {
   return (
     !canThrowVinegar.value ||
     isButtonLocked.value ||
-    pressedVinegarRecently.value
+    pressedVinegarRecently.value ||
+    !flags.value.shownVinegar
   );
 });
 const isAutoPromoteButtonDisabled = computed<boolean>(() => {
   return (
     !canBuyAutoPromote.value ||
     isButtonLocked.value ||
-    pressedAutoPromoteRecently.value
+    pressedAutoPromoteRecently.value ||
+    !flags.value.shownAutoPromote
   );
 });
 const isPromoteButtonDisabled = computed<boolean>(() => {
@@ -309,7 +361,10 @@ function buyAutoPromote(e: Event) {
 function throwVinegar(e: Event) {
   if (pressedVinegarRecently.value || !canThrowVinegar.value) return;
   pressedVinegarRecently.value = true;
-  useStomp().wsApi.ladder.throwVinegar(e);
+  useStomp().wsApi.ladder.throwVinegar(
+    e,
+    useGrapesStore().storage.vinegarThrowPercentage,
+  );
 }
 
 function promote(e: Event) {

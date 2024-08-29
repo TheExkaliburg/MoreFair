@@ -6,6 +6,8 @@ import { ChatType, useChatStore } from "~/store/chat";
 import { RoundEventType } from "~/store/round";
 import { LadderEventType } from "~/store/ladder";
 import { ChatLogMessageData } from "~/store/moderation";
+import { User } from "~/store/user";
+import { VinegarThrow } from "~/store/grapes";
 
 export type OnTickBody = {
   delta: number;
@@ -27,6 +29,10 @@ export type OnAccountEventBody = {
   accountId: number;
   data?: any;
 };
+export type OnUserEventBody = {
+  data: User;
+};
+export type OnVinegarThrowEventBody = VinegarThrow;
 
 export type OnModChatEventBody = OnChatEventBody & ChatLogMessageData;
 export type OnModLogEventBody = {};
@@ -41,9 +47,11 @@ export type StompCallbacks = {
   onChatEvent: StompCallback<OnChatEventBody>[];
   onLadderEvent: StompCallback<OnLadderEventBody>[];
   onRoundEvent: StompCallback<OnRoundEventBody>[];
+  onUserEvent: StompCallback<OnUserEventBody>[];
   onAccountEvent: StompCallback<OnAccountEventBody>[];
   onModChatEvent: StompCallback<OnModChatEventBody>[];
   onModLogEvent: StompCallback<OnModLogEventBody>[];
+  onVinegarThrowEvent: StompCallback<OnVinegarThrowEventBody>[];
 };
 
 const callbacks: StompCallbacks = {
@@ -52,8 +60,10 @@ const callbacks: StompCallbacks = {
   onLadderEvent: [],
   onRoundEvent: [],
   onAccountEvent: [],
+  onUserEvent: [],
   onModChatEvent: [],
   onModLogEvent: [],
+  onVinegarThrowEvent: [],
 };
 
 function addCallback<T>(
@@ -182,6 +192,10 @@ function connectPrivateChannel(uuid: string) {
     const body: OnAccountEventBody = JSON.parse(message.body);
     callbacks.onAccountEvent.forEach(({ callback }) => callback(body));
   });
+  client.subscribe(`/private/${uuid}/vinegar/events`, (message) => {
+    const body: OnVinegarThrowEventBody = JSON.parse(message.body);
+    callbacks.onVinegarThrowEvent.forEach(({ callback }) => callback(body));
+  });
 
   connectModeratorChannel();
 }
@@ -218,16 +232,6 @@ client.onWebSocketClose = (_) => {
     window.location.reload();
   }, reconnectTimeout);
 };
-
-/* client.onDisconnect = (_) => {
-  // gets called when the client disconnects by itself through script, but before the onWebSocketClose
-  console.log("disconnected");
-  isPrivateConnectionEstablished = false;
-  useChatStore().actions.addSystemMessage(disconnectMessage);
-  setTimeout(() => {
-    window.location.reload();
-  }, reconnectTimeout);
-}; */
 
 function reset() {
   client.deactivate().then();
@@ -321,10 +325,11 @@ const wsApi = (client: Client) => {
           }),
         });
       },
-      throwVinegar: (e: Event) => {
+      throwVinegar: (e: Event, percentage: number) => {
         client.publish({
           destination: "/app/ladder/vinegar",
           body: JSON.stringify({
+            content: percentage,
             event: parseEvent(e),
           }),
         });

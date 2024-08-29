@@ -186,4 +186,8 @@ $transparent: rgba(0, 0, 0, 0);
   // Link
   --link-hover-color: #{$color-st-tropaz};
   --link-color: #{$color-steel-blue};
+
+  // Tooltips and Notifications
+  --tooltip-background: #{$color-st-tropaz};
+  --tooltip-text: #{$color-givry};
 }

@@ -7,6 +7,7 @@ import { useChatStore } from "~/store/chat";
 import { useAuthStore } from "~/store/authentication";
 import { SOUNDS, useSound } from "~/composables/useSound";
 import { useToasts } from "~/composables/useToasts";
+import { useModerationStore } from "~/store/moderation";
 
 export enum AccessRole {
   OWNER = "OWNER",
@@ -26,6 +27,10 @@ export enum AccountEventType {
   INCREASE_HIGHEST_LADDER = "INCREASE_HIGHEST_LADDER",
 }
 
+export type AccountSettings = {
+  vinegarSplit: number;
+};
+
 export type AccountData = {
   accessRole: AccessRole;
   accountId: number;
@@ -33,14 +38,15 @@ export type AccountData = {
   email: string;
   highestCurrentLadder: number;
   uuid: string;
+  settings: AccountSettings;
 };
 
 export const useAccountStore = defineStore("account", () => {
   const api = useAPI();
-  const ladderStore = useLadderStore();
   const stomp = useStomp();
 
   const isInitialized = ref<boolean>(false);
+
   const state = reactive<AccountData>({
     accessRole: AccessRole.PLAYER,
     accountId: 1,
@@ -48,6 +54,9 @@ export const useAccountStore = defineStore("account", () => {
     email: "",
     highestCurrentLadder: 1,
     uuid: "",
+    settings: {
+      vinegarSplit: 50,
+    },
   });
   const getters = reactive({
     isGuest: computed<boolean>(() => useAuthStore().getters.isGuest),
@@ -58,6 +67,8 @@ export const useAccountStore = defineStore("account", () => {
       );
     }),
   });
+
+  init().then();
 
   async function init() {
     if (isInitialized.value) return Promise.resolve();
@@ -70,6 +81,7 @@ export const useAccountStore = defineStore("account", () => {
   }
 
   async function getAccountDetails() {
+    isInitialized.value = true;
     return await api.account
       .getAccountDetails()
       .then((res) => {
@@ -80,12 +92,18 @@ export const useAccountStore = defineStore("account", () => {
         state.uuid = data.uuid;
         state.username = data.username;
         state.email = data.email;
+        state.settings = data.settings;
         stomp.connectPrivateChannel(state.uuid);
         stomp.addCallback(
           stomp.callbacks.onAccountEvent,
           "fair_account_events",
           handleAccountEvents,
         );
+
+        if (getters.isMod) {
+          useModerationStore().actions.init();
+        }
+
         return Promise.resolve(res);
       })
       .catch((_) => {
@@ -98,9 +116,9 @@ export const useAccountStore = defineStore("account", () => {
     const isYou = state.accountId === body.accountId;
     let ranker;
     if (isYou) {
-      ranker = ladderStore.getters.yourRanker;
+      ranker = useLadderStore().getters.yourRanker;
     } else {
-      ranker = ladderStore.state.rankers.find(
+      ranker = useLadderStore().state.rankers.find(
         (r) => r.accountId === body.accountId,
       );
     }
@@ -149,6 +167,19 @@ export const useAccountStore = defineStore("account", () => {
       });
   }
 
+  async function saveSettings(settings: AccountSettings) {
+    return await api.account
+      .saveSettings(settings)
+      .then((result) => {
+        state.settings = result.data;
+        return Promise.resolve(result);
+      })
+      .catch((err) => {
+        useToasts(err.response.data.message, { type: "error" });
+        return Promise.reject(err);
+      });
+  }
+
   return {
     state,
     getters,
@@ -156,6 +187,7 @@ export const useAccountStore = defineStore("account", () => {
       init,
       reset,
       changeDisplayName,
+      saveSettings,
     },
   };
 });

@@ -60,6 +60,12 @@ module.exports = {
             title: "var(--modal-text-title-color)",
           },
         },
+        link: {
+          text: {
+            DEFAULT: "var(--link-color)",
+            hover: "var(--link-hover-color)",
+          },
+        },
       },
       fontSize: {
         "2xs": "0.64rem",

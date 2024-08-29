@@ -1,10 +1,11 @@
 package de.kaliburg.morefair.api;
 
-import de.kaliburg.morefair.game.round.RoundService;
-import de.kaliburg.morefair.game.round.dto.RoundResultsDto;
-import de.kaliburg.morefair.statistics.StatisticsService;
+import de.kaliburg.morefair.game.round.services.RoundService;
+import de.kaliburg.morefair.statistics.model.dto.RoundResultsDto;
 import de.kaliburg.morefair.statistics.results.ActivityAnalysisEntity;
 import de.kaliburg.morefair.statistics.results.RoundStatisticsEntity;
+import de.kaliburg.morefair.statistics.services.RoundResultService;
+import de.kaliburg.morefair.statistics.services.StatisticsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ public class StatisticsController {
 
   private final RoundService roundService;
   private final StatisticsService statisticsService;
+  private final RoundResultService roundResultService;
 
   @GetMapping(value = "/round/raw", produces = "application/json")
   public ResponseEntity<?> getRoundResults(
@@ -35,14 +37,13 @@ public class StatisticsController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
       }
 
-      RoundResultsDto results = statisticsService.getRoundResults(roundNumber);
+      RoundResultsDto results = roundResultService.getRoundResults(roundNumber);
       if (results == null) {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
       }
       return new ResponseEntity<>(results, HttpStatus.OK);
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -65,8 +66,7 @@ public class StatisticsController {
       }
       return new ResponseEntity<>(results, HttpStatus.OK);
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -80,8 +80,7 @@ public class StatisticsController {
       }
       return new ResponseEntity<>(results, HttpStatus.OK);
     } catch (Exception e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }

@@ -1,16 +1,18 @@
 package de.kaliburg.morefair.api.websockets;
 
-import de.kaliburg.morefair.account.AccountEntity;
-import de.kaliburg.morefair.account.AccountService;
-import de.kaliburg.morefair.game.round.RankerService;
-import de.kaliburg.morefair.game.round.RoundEntity;
-import de.kaliburg.morefair.game.round.RoundService;
-import de.kaliburg.morefair.game.round.RoundUtils;
+import de.kaliburg.morefair.account.model.AccountEntity;
+import de.kaliburg.morefair.account.services.AccountService;
+import de.kaliburg.morefair.game.ladder.model.LadderEntity;
+import de.kaliburg.morefair.game.ladder.services.LadderService;
+import de.kaliburg.morefair.game.ranker.services.RankerService;
+import de.kaliburg.morefair.game.round.services.RoundService;
+import de.kaliburg.morefair.game.round.services.utils.RoundUtilsService;
 import de.kaliburg.morefair.security.SecurityUtils;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.UUID;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -22,21 +24,14 @@ import org.springframework.stereotype.Component;
 
 @Log4j2
 @Component
+@RequiredArgsConstructor
 public class TopicSubscriptionInterceptor implements ChannelInterceptor {
 
   private final AccountService accountService;
-  private final RankerService rankerService;
   private final RoundService roundService;
-  private final RoundUtils roundUtils;
-
-  public TopicSubscriptionInterceptor(AccountService accountService, RankerService rankerService,
-      RoundService roundService,
-      RoundUtils roundUtils) {
-    this.accountService = accountService;
-    this.rankerService = rankerService;
-    this.roundService = roundService;
-    this.roundUtils = roundUtils;
-  }
+  private final LadderService ladderService;
+  private final RankerService rankerService;
+  private final RoundUtilsService roundUtilsService;
 
   @Override
   public Message<?> preSend(@NonNull Message<?> message, @NonNull MessageChannel channel) {
@@ -67,7 +62,7 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
       return true;
     }
 
-    AccountEntity account = accountService.find(uuid);
+    AccountEntity account = accountService.findByUuid(uuid).orElse(null);
 
     if (account == null) {
       return false;
@@ -80,14 +75,14 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
       return false;
     }
 
-    RoundEntity currentRound = roundService.getCurrentRound();
-
     if (topicDestination.contains("/topic/chat/events/ladder/")) {
-
       int chatDestination = Integer.parseInt(
           topicDestination.substring("/topic/chat/events/ladder/".length()));
-      int highestLadder = rankerService.findCurrentRankersOfAccount(account, currentRound).stream()
-          .mapToInt(v -> v.getLadder().getNumber()).max().orElse(1);
+
+      int highestLadder = rankerService.findHighestActiveRankerOfAccount(account)
+          .map(r -> ladderService.findLadderById(r.getLadderId()).orElseThrow())
+          .map(LadderEntity::getNumber)
+          .orElse(1);
       if (chatDestination > highestLadder) {
         return false;
       }
@@ -96,12 +91,14 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
     if (topicDestination.contains("/topic/game/events/")) {
       int ladderDestination = Integer.parseInt(
           topicDestination.substring("/topic/game/events/".length()));
-      if (ladderDestination == roundUtils.getAssholeLadderNumber(roundService.getCurrentRound())) {
+      if (ladderDestination == roundUtilsService.getAssholeLadderNumber(
+          roundService.getCurrentRound())) {
         return true;
       }
-      int highestLadder = rankerService.findCurrentRankersOfAccount(account, currentRound).stream()
-          .mapToInt(v -> v.getLadder().getNumber())
-          .max().orElse(1);
+      int highestLadder = rankerService.findHighestActiveRankerOfAccount(account)
+          .map(r -> ladderService.findLadderById(r.getLadderId()).orElseThrow())
+          .map(LadderEntity::getNumber)
+          .orElse(1);
       if (ladderDestination > highestLadder) {
         return false;
       }

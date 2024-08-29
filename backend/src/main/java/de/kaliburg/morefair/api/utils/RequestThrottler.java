@@ -2,7 +2,7 @@ package de.kaliburg.morefair.api.utils;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import de.kaliburg.morefair.account.AccountEntity;
+import de.kaliburg.morefair.account.model.AccountEntity;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.log4j.Log4j2;
