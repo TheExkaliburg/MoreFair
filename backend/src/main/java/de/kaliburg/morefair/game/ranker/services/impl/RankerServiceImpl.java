@@ -213,6 +213,7 @@ public class RankerServiceImpl implements RankerService {
 
       return rankers;
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException(e);
     }
   }

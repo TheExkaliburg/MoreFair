@@ -287,6 +287,7 @@ public class LadderEventServiceImpl implements LadderEventService {
         RankerEntity newRanker = rankerService.createRankerOnLadder(account, ladder.getNumber() + 1)
             .orElseThrow();
         newRanker.setVinegar(ranker.getVinegar());
+        newRanker.setWine(ranker.getWine());
         newRanker.setGrapes(ranker.getGrapes());
         LadderEntity newLadder = ladderService.findLadderById(newRanker.getLadderId())
             .orElseThrow();
@@ -326,6 +327,10 @@ public class LadderEventServiceImpl implements LadderEventService {
           newRanker.setAutoPromote(true);
           newRanker.setVinegar(
               newRanker.getVinegar()
+                  .multiply(BigInteger.valueOf(newLadder.getWinningVinMultiplier()))
+                  .divide(BigInteger.TEN));
+          newRanker.setWine(
+              newRanker.getWine()
                   .multiply(BigInteger.valueOf(newLadder.getWinningVinMultiplier()))
                   .divide(BigInteger.TEN));
         }
