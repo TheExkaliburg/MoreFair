@@ -122,7 +122,8 @@ class UpgradeUtilsTest {
     List<BigInteger> costs = new ArrayList<>();
     costs.add(
         upgradeUtils.buyUpgradeCost(ladderNumber, currentUpgrade, EnumSet.of(LadderType.CHEAP)));
-    costs.add(upgradeUtils.buyUpgradeCost(ladderNumber, currentUpgrade));
+    costs.add(
+        upgradeUtils.buyUpgradeCost(ladderNumber, currentUpgrade, EnumSet.of(LadderType.DEFAULT)));
     costs.add(
         upgradeUtils.buyUpgradeCost(ladderNumber, currentUpgrade,
             EnumSet.of(LadderType.EXPENSIVE)));

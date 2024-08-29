@@ -8,7 +8,6 @@ import de.kaliburg.morefair.game.round.model.RoundEntity;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.util.EnumSet;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -22,19 +21,6 @@ public class UpgradeUtils {
 
   private final FairConfig config;
   private final LadderUtilsService ladderUtils;
-
-  /**
-   * Calculates the default cost of the next bias/multi upgrade.
-   *
-   * <p><code>cost = (ladder + 1) ^ (currentUpgrade + 1)</code>
-   *
-   * @param currentUpgrade the current amount of upgrades
-   * @param ladderNumber   the ladder where you would buy the upgrade
-   * @return the cost of the (currentUpgrade + 1)th bias/multi
-   */
-  public BigInteger buyUpgradeCost(Integer ladderNumber, Integer currentUpgrade) {
-    return buyUpgradeCost(ladderNumber, currentUpgrade, EnumSet.of(LadderType.DEFAULT));
-  }
 
   /**
    * Calculates the cost of the next bias/multi upgrade.
@@ -75,7 +61,7 @@ public class UpgradeUtils {
   }
 
   public BigInteger throwVinegarCost(Integer ladderNum) {
-    return config.getBaseVinegarToThrow().multiply(BigInteger.valueOf(ladderNum));
+    return config.getBaseVinegarToThrow().multiply(BigInteger.valueOf(ladderNum - 1));
   }
 
   public BigInteger buyAutoPromoteCost(RoundEntity round, LadderEntity ladder, Integer rank) {
