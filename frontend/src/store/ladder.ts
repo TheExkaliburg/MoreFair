@@ -264,6 +264,8 @@ export const useLadderStore = defineStore("ladder", () => {
       }
     }
 
+    state.rankers = rankers;
+
     if (yourRanker?.growing) {
       if (yourRanker.rank !== 1) {
         const vinegarAdded = yourRanker.grapes
@@ -284,13 +286,13 @@ export const useLadderStore = defineStore("ladder", () => {
       if (yourRanker.rank === 1 && ladderUtils.isLadderPromotable.value) {
         yourRanker.vinegar = Object.freeze(
           yourRanker.vinegar
-            .mul(Decimal.pow(new Decimal(0.9975), deltaSeconds))
+            .mul(new Decimal(Math.pow(0.9975, deltaSeconds)))
             .floor(),
         );
 
         yourRanker.wine = Object.freeze(
           yourRanker.wine
-            .mul(Decimal.pow(new Decimal(0.9975), deltaSeconds))
+            .mul(new Decimal(Math.pow(0.9975, deltaSeconds)))
             .floor(),
         );
       }
@@ -302,7 +304,12 @@ export const useLadderStore = defineStore("ladder", () => {
       }
     }
 
-    state.rankers = rankers;
+    /* console.log(
+      deltaSeconds,
+      yourRanker?.grapes.toNumber(),
+      yourRanker?.vinegar.toNumber(),
+      yourRanker?.wine.toNumber(),
+    ); */
 
     const isFirst = yourRanker?.rank === 1;
     if (isFirst && !wasFirst) {

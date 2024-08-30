@@ -207,7 +207,7 @@ function getWinningGrapes(place: number, baseGrapeCostForAuto: number) {
 
 function getWinningVinMultiplier() {
   if (ladder.state.types.has(LadderType.GENEROUS)) {
-    return 14;
+    return 15;
   } else if (ladder.state.types.has(LadderType.STINGY)) {
     return 11;
   }

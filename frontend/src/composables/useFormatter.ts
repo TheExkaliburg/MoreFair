@@ -27,7 +27,10 @@ const dateFormatter = new Intl.DateTimeFormat(
   dateFormatOptions,
 );
 
-export const useFormatter = (number: Decimal | number) => {
+export const useFormatter = (number: Decimal | number | undefined) => {
+  if (number === undefined) {
+    return "0";
+  }
   if (typeof number === "number" && !isFinite(number)) return "∞";
 
   let result = numberFormatter.format(number);

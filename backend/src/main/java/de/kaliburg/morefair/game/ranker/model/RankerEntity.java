@@ -8,7 +8,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -90,57 +89,49 @@ public class RankerEntity {
     return promotedOn == null;
   }
 
-  public RankerEntity addPoints(BigInteger points, double secondsPassed) {
-    BigDecimal decPoints = new BigDecimal(points);
-    decPoints = decPoints.multiply(BigDecimal.valueOf(secondsPassed));
-    this.points = this.points.add(decPoints.toBigInteger());
-    return this;
+  public void addPoints(BigInteger points, int deltaSeconds) {
+    this.points = this.points.add(points.multiply(BigInteger.valueOf(deltaSeconds)));
   }
 
-  public RankerEntity addPower(BigInteger power, double secondsPassed) {
-    BigDecimal decPower = new BigDecimal(power);
-    decPower = decPower.multiply(BigDecimal.valueOf(secondsPassed));
-    this.power = this.power.add(decPower.toBigInteger());
-    return this;
+  public void addPower(BigInteger power, int deltaSeconds) {
+    this.power = this.power.add(power.multiply(BigInteger.valueOf(deltaSeconds)));
   }
 
-  public RankerEntity addPower(Integer power, double secondsPassed) {
-    return addPower(BigInteger.valueOf(power), secondsPassed);
+  public void addPower(Integer power, int deltaSeconds) {
+    addPower(BigInteger.valueOf(power), deltaSeconds);
   }
 
-  public RankerEntity addVinegar(BigInteger vinegar, double secondsPassed) {
-    BigDecimal decVinegar = new BigDecimal(vinegar);
-    decVinegar = decVinegar.multiply(BigDecimal.valueOf(secondsPassed));
-    this.vinegar = this.vinegar.add(decVinegar.toBigInteger());
-    return this;
+  public void addVinegar(BigInteger vinegar, int deltaSeconds) {
+    this.vinegar = this.vinegar.add(vinegar.multiply(BigInteger.valueOf(deltaSeconds)));
   }
 
-  public RankerEntity mulVinegar(double multiplier, double secondsPassed) {
-    BigDecimal decVinegar = new BigDecimal(this.vinegar);
-    this.vinegar = decVinegar.multiply(BigDecimal.valueOf(Math.pow(multiplier, secondsPassed)))
-        .toBigInteger();
-    return this;
+  public void decayVinegar(int deltaSeconds) {
+    BigInteger decayMultiplier = BigInteger.valueOf(9975);
+    BigInteger decayDivider = BigInteger.valueOf(10000);
+
+    decayMultiplier = decayMultiplier.pow(deltaSeconds);
+    decayDivider = decayDivider.pow(deltaSeconds);
+
+    this.vinegar = this.vinegar.multiply(decayMultiplier).divide(decayDivider);
   }
 
-  public RankerEntity addWine(BigInteger wine, double secondsPassed) {
-    BigDecimal decWine = new BigDecimal(wine);
-    decWine = decWine.multiply(BigDecimal.valueOf(secondsPassed));
-    this.wine = this.wine.add(decWine.toBigInteger());
-    return this;
+  public void addWine(BigInteger wine, int deltaSeconds) {
+
+    this.wine = this.wine.add(wine.multiply(BigInteger.valueOf(deltaSeconds)));
   }
 
-  public RankerEntity mulWine(double multiplier, double secondsPassed) {
-    BigDecimal decWine = new BigDecimal(this.wine);
-    this.wine = decWine.multiply(BigDecimal.valueOf(Math.pow(multiplier, secondsPassed)))
-        .toBigInteger();
-    return this;
+  public void decayWine(int deltaSeconds) {
+    BigInteger decayMultiplier = BigInteger.valueOf(9975);
+    BigInteger decayDivider = BigInteger.valueOf(10000);
+
+    decayMultiplier = decayMultiplier.pow(deltaSeconds);
+    decayDivider = decayDivider.pow(deltaSeconds);
+
+    this.wine = this.wine.multiply(decayMultiplier).divide(decayDivider);
   }
 
-  public RankerEntity addGrapes(BigInteger grapes, double secondsPassed) {
-    BigDecimal decGrapes = new BigDecimal(grapes);
-    decGrapes = decGrapes.multiply(BigDecimal.valueOf(secondsPassed));
-    this.grapes = this.grapes.add(decGrapes.toBigInteger());
-    return this;
+  public void addGrapes(BigInteger grapes, int deltaSeconds) {
+    this.grapes = this.grapes.add(grapes.multiply(BigInteger.valueOf(deltaSeconds)));
   }
 
 

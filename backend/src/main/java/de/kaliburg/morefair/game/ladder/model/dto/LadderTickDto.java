@@ -12,5 +12,5 @@ public class LadderTickDto {
 
   @NonNull
   @Builder.Default
-  Double delta = 1d;
+  Integer delta = 1;
 }

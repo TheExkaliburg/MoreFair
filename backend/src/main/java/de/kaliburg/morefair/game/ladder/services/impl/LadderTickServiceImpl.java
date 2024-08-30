@@ -53,10 +53,10 @@ public class LadderTickServiceImpl implements LadderTickService {
 
       // Calculate Time passed
       long currentTimeInNanos = System.nanoTime();
-      double deltaInSeconds = Math.max(
+      int deltaInSeconds = (int) Math.round(Math.max(
           (currentTimeInNanos - lastTickInNanos) / NANOS_IN_SECONDS,
-          1.0d
-      );
+          1.0f
+      ));
       lastTickInNanos = currentTimeInNanos;
 
       // Send the tick for everyone
@@ -78,7 +78,7 @@ public class LadderTickServiceImpl implements LadderTickService {
     }
   }
 
-  private void calculateLadder(LadderEntity ladder, double delta) {
+  private void calculateLadder(LadderEntity ladder, int delta) {
     List<RankerEntity> rankers = rankerService.findAllByCurrentLadderNumber(ladder.getNumber());
     rankers.sort(Comparator.comparing(RankerEntity::getPoints).reversed());
 
@@ -109,8 +109,8 @@ public class LadderTickServiceImpl implements LadderTickService {
           currentRanker.addWine(addedWine, delta);
         }
         if (currentRanker.getRank() == 1 && ladderUtilsService.isLadderPromotable(ladder)) {
-          currentRanker.mulVinegar(0.9975, delta);
-          currentRanker.mulWine(0.9975, delta);
+          currentRanker.decayVinegar(delta);
+          currentRanker.decayWine(delta);
         }
 
         for (int j = i - 1; j >= 0; j--) {
@@ -135,6 +135,11 @@ public class LadderTickServiceImpl implements LadderTickService {
           }
         }
       }
+
+      /*if (currentRanker.getAccountId() == 3) {
+        log.info("{} {} {} {}", delta, currentRanker.getGrapes(), currentRanker.getVinegar(),
+            currentRanker.getWine());
+      }*/
     }
     // Ranker on Last Place gains 1 Grape, even if he's also in first at the same time (ladder of 1)
     if (!rankers.isEmpty()) {
