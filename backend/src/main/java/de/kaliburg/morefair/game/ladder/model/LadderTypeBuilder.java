@@ -186,8 +186,7 @@ public class LadderTypeBuilder {
     Set<LadderType> ladderTypes = EnumSet.noneOf(LadderType.class);
 
     if (ladderNumber.equals(assholeLadderNumber)) {
-      autoTypeWeights.put(LadderType.NO_AUTO,
-          Math.max(1.f, autoTypeWeights.get(LadderType.NO_AUTO)));
+      autoTypeWeights.put(LadderType.NO_AUTO, 1.f);
       autoTypeWeights.put(LadderType.FREE_AUTO, 0.f);
       autoTypeWeights.put(LadderType.DEFAULT, 0.f);
       ladderTypes.add(LadderType.ASSHOLE);
