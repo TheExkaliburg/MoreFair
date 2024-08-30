@@ -111,7 +111,7 @@ public class LadderTypeBuilder {
         grapesTypeWeights.computeIfPresent(LadderType.CONSOLATION, (k, v) -> 1.f);
         grapesTypeWeights.computeIfPresent(LadderType.NO_HANDOUTS, (k, v) -> 1.f);
         grapesTypeWeights.computeIfPresent(LadderType.GENEROUS, (k, v) -> 1.f);
-        grapesTypeWeights.computeIfPresent(LadderType.DEFAULT, (k, v) -> 1.f);
+        grapesTypeWeights.computeIfPresent(LadderType.DEFAULT, (k, v) -> 0.f);
       }
       case SLOW -> {
         sizeTypeWeights.put(LadderType.TINY, 0.f);
@@ -172,6 +172,7 @@ public class LadderTypeBuilder {
     }
 
     if (ladderNumber == 1) {
+      autoTypeWeights.put(LadderType.DROUGHT, 0.f);
       sizeTypeWeights.put(LadderType.TINY, 0.f);
       autoTypeWeights.put(LadderType.FREE_AUTO, 0.f);
       autoTypeWeights.put(LadderType.NO_AUTO, 0.f);
@@ -218,6 +219,10 @@ public class LadderTypeBuilder {
 
   private LadderType getRandomLadderType(Map<LadderType, Float> weights, String categoryName) {
     try {
+      if (weights.isEmpty()) {
+        return LadderType.DEFAULT;
+      }
+
       float totalWeight = weights.values().stream().reduce(0.f, Float::sum);
       float randomNumber = random.nextFloat(totalWeight);
       List<Entry<Float, LadderType>> inverseLookupEntries = createInverseLookupTable(
