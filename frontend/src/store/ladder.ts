@@ -142,8 +142,6 @@ export const useLadderStore = defineStore("ladder", () => {
     }),
   });
 
-  accountStore.actions.init().then(() => init());
-
   function init() {
     if (isInitialized.value) return;
     getLadder(accountStore.state.highestCurrentLadder);

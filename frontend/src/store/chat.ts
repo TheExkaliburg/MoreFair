@@ -75,8 +75,6 @@ export const useChatStore = defineStore("chat", () => {
     }),
   });
 
-  accountStore.actions.init().then(init);
-
   function init() {
     if (isInitialized.value) return;
     getChat(ChatType.LADDER, accountStore.state.highestCurrentLadder);

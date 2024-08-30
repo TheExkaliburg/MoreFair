@@ -104,6 +104,8 @@ export const useAccountStore = defineStore("account", () => {
           useModerationStore().actions.init();
         }
 
+        useLadderStore().actions.init();
+        useChatStore().actions.init();
         return Promise.resolve(res);
       })
       .catch((_) => {
