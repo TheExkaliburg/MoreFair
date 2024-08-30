@@ -128,7 +128,13 @@ public class RoundTypeSetBuilder {
 
   private RoundType getRandomLadderType(Map<RoundType, Float> weights, String categoryName) {
     try {
+      if (weights.isEmpty()) {
+        return RoundType.DEFAULT;
+      }
       float totalWeight = weights.values().stream().reduce(0.f, Float::sum);
+      if (totalWeight <= 0) {
+        return RoundType.DEFAULT;
+      }
       float randomNumber = random.nextFloat(totalWeight);
       List<Entry<Float, RoundType>> sortedInverseLookupEntries = createInverseLookupTable(
           weights).entrySet().stream().sorted(Entry.comparingByKey()).toList();

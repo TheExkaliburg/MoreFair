@@ -222,8 +222,11 @@ public class LadderTypeBuilder {
       if (weights.isEmpty()) {
         return LadderType.DEFAULT;
       }
-
       float totalWeight = weights.values().stream().reduce(0.f, Float::sum);
+      if (totalWeight <= 0) {
+        return LadderType.DEFAULT;
+      }
+
       float randomNumber = random.nextFloat(totalWeight);
       List<Entry<Float, LadderType>> inverseLookupEntries = createInverseLookupTable(
           weights).entrySet().stream().sorted(Entry.comparingByKey()).toList();
