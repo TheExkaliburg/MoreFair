@@ -52,13 +52,7 @@ public class LadderTypeBuilder {
     costTypeWeights.put(LadderType.EXPENSIVE, 10.f);
     costTypeWeights.put(LadderType.DEFAULT, 100.f);
 
-    grapesTypeWeights.put(LadderType.BOUNTIFUL, 0.f);
-    grapesTypeWeights.put(LadderType.DROUGHT, 0.f);
-    grapesTypeWeights.put(LadderType.STINGY, 0.f);
-    grapesTypeWeights.put(LadderType.CONSOLATION, 0.f);
-    grapesTypeWeights.put(LadderType.NO_HANDOUTS, 0.f);
-    grapesTypeWeights.put(LadderType.GENEROUS, 0.f);
-    grapesTypeWeights.put(LadderType.DEFAULT, 100.f);
+    grapesTypeWeights.put(LadderType.DEFAULT, 1.f);
   }
 
   public static LadderTypeBuilder builder() {
@@ -111,13 +105,13 @@ public class LadderTypeBuilder {
         costTypeWeights.put(LadderType.CHEAP, 1.f);
         costTypeWeights.put(LadderType.EXPENSIVE, 1.f);
         costTypeWeights.put(LadderType.DEFAULT, 1.f);
-        grapesTypeWeights.put(LadderType.BOUNTIFUL, 1.f);
-        grapesTypeWeights.put(LadderType.DROUGHT, 1.f);
-        grapesTypeWeights.put(LadderType.STINGY, 1.f);
-        grapesTypeWeights.put(LadderType.CONSOLATION, 1.f);
-        grapesTypeWeights.put(LadderType.NO_HANDOUTS, 1.f);
-        grapesTypeWeights.put(LadderType.GENEROUS, 1.f);
-        grapesTypeWeights.put(LadderType.DEFAULT, 1.f);
+        grapesTypeWeights.computeIfPresent(LadderType.BOUNTIFUL, (k, v) -> 1.f);
+        grapesTypeWeights.computeIfPresent(LadderType.DROUGHT, (k, v) -> 1.f);
+        grapesTypeWeights.computeIfPresent(LadderType.STINGY, (k, v) -> 1.f);
+        grapesTypeWeights.computeIfPresent(LadderType.CONSOLATION, (k, v) -> 1.f);
+        grapesTypeWeights.computeIfPresent(LadderType.NO_HANDOUTS, (k, v) -> 1.f);
+        grapesTypeWeights.computeIfPresent(LadderType.GENEROUS, (k, v) -> 1.f);
+        grapesTypeWeights.computeIfPresent(LadderType.DEFAULT, (k, v) -> 1.f);
       }
       case SLOW -> {
         sizeTypeWeights.put(LadderType.TINY, 0.f);

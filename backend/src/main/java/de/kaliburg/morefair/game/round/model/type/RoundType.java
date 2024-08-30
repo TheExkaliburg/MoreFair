@@ -18,9 +18,9 @@ public enum RoundType {
   // more Randomness
   CHAOS(1),
   // Vinegar Modifiers
-  RAILROAD,
-  FARMER,
-  RACE,
+  RAILROAD(2),
+  FARMER(2),
+  RACE(2),
   // Unused
   REVERSE_SCALING,
   SPECIAL_100;
@@ -31,6 +31,9 @@ public enum RoundType {
     this.priority = priority;
   }
 
+  /**
+   * Lets the higher Priority get handled first.
+   */
   public static class Comparator implements java.util.Comparator<RoundType> {
 
     @Override
