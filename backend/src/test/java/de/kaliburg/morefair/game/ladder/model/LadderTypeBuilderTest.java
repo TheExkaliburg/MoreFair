@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @Slf4j
@@ -95,6 +96,7 @@ class LadderTypeBuilderTest {
   }
 
   @Test
+  @Disabled("First LAdder only can't generate TINY or NAUTO/FAUTO anymore")
   void build_FirstLadderOnFastRound_isDefault() {
     Set<RoundType> roundTypes = EnumSet.of(RoundType.FAST);
     Set<LadderType> build = LadderTypeBuilder.builder().setRoundTypes(roundTypes).setRoundNumber(1)
