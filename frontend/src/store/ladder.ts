@@ -449,7 +449,10 @@ export const useLadderStore = defineStore("ladder", () => {
       }
 
       ranker.vinegar = Object.freeze(
-        getters.yourRanker.vinegar.sub(vinegarThrown).add(restoredVinegar),
+        Decimal.max(
+          new Decimal(0),
+          ranker.vinegar.sub(vinegarThrown).add(restoredVinegar),
+        ),
       );
       return;
     }

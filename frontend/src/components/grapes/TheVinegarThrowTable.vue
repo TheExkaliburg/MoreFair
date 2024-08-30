@@ -2,16 +2,16 @@
   <div class="w-full">
     <table class="w-full">
       <tr class="text-text-light">
-        <th>
+        <th class="text-left">
           {{ abbreviation("round")
           }}<span class="text-sm text-text-dark">x</span
           >{{ abbreviation("ladder")
           }}<span class="text-sm text-text-dark">x</span>
         </th>
-        <th>{{ lang("time") }}</th>
-        <th>{{ lang("users") }}</th>
-        <th>{{ lang("amount") }}</th>
-        <th>{{ lang("result") }}</th>
+        <th class="text-left">{{ lang("time") }}</th>
+        <th class="text-left">{{ lang("users") }}</th>
+        <th class="text-right">{{ lang("amount") }}</th>
+        <th class="text-right">{{ lang("result") }}</th>
       </tr>
       <VinegarThrowTableRow
         v-for="(vinThrow, index) in shownThrows"
