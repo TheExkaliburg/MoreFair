@@ -28,6 +28,7 @@
           @click="saveVinegarSplit"
           >Save Split</FairButton
         >
+        <span>{{ formattedWineShieldEta }}</span>
         <span>Current: {{ savedWineSplit }}/{{ savedVinegarSplit }}</span>
       </div>
 
@@ -87,15 +88,22 @@ import FairDialog from "~/components/interactables/FairDialog.vue";
 import FairButton from "~/components/interactables/FairButton.vue";
 import { useGrapesStore } from "~/store/grapes";
 import { useRoundStore } from "~/store/round";
-import { useFormatter } from "~/composables/useFormatter";
+import { useFormatter, useTimeFormatter } from "~/composables/useFormatter";
 import { useAccountStore } from "~/store/account";
 import TheVinegarThrowTable from "~/components/grapes/TheVinegarThrowTable.vue";
+import { useLadderStore } from "~/store/ladder";
+import { Ranker } from "~/store/entities/ranker";
 
 const isOpen = ref<boolean>(false);
 
 const grapesStore = useGrapesStore();
 const accountStore = useAccountStore();
 const roundStore = useRoundStore();
+const ladderStore = useLadderStore();
+
+const yourRanker = computed(
+  () => ladderStore.getters.yourRanker ?? new Ranker({}),
+);
 
 const min = computed(() =>
   roundStore.state.settings.minVinegarThrown < 0
@@ -117,6 +125,28 @@ const savedVinegarSplit = computed(
 const savedWineSplit = computed(
   () => 100 - accountStore.state.settings.vinegarSplit,
 );
+
+const formattedWineShieldEta = computed<string>(() => {
+  const winePerSec = yourRanker.value.grapes
+    .mul(100 - splitValue.value)
+    .div(50);
+  const vinegarPerSec = yourRanker.value.grapes.mul(splitValue.value).div(100);
+
+  const wineDeltaPerSec = winePerSec.sub(vinegarPerSec);
+  const wineMissing = yourRanker.value.vinegar.sub(yourRanker.value.wine);
+  const seconds = wineMissing.div(wineDeltaPerSec).ceil();
+  const formattedSeconds = useTimeFormatter(seconds.toNumber());
+  if (wineDeltaPerSec.cmp(0) > 0 && wineMissing.cmp(0) > 0) {
+    // Loose more Wine; missing Wine > 0
+    return `${formattedSeconds} till Shielded`;
+  } else if (wineDeltaPerSec.cmp(0) < 0 && wineMissing.cmp(0) < 0) {
+    return `${formattedSeconds} till Unshielded`;
+  } else if (wineDeltaPerSec.cmp(0) > 0 && wineMissing.cmp(0) < 0) {
+    return "Stay Shielded";
+  } else {
+    return "Stay Unshielded";
+  }
+});
 
 const selectedVinegar = computed<string>(() =>
   useFormatter(grapesStore.getters.selectedVinegar),
