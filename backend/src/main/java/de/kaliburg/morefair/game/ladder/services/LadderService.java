@@ -16,4 +16,6 @@ public interface LadderService {
   Optional<LadderEntity> findLadderById(long ladderId);
 
   void reloadLadders();
+
+  LadderEntity save(LadderEntity ladder);
 }

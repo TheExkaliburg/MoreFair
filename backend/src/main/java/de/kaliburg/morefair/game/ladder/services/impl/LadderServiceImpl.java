@@ -82,6 +82,7 @@ public class LadderServiceImpl implements LadderService {
 
       currentLadderNumberLookup.getAll(currentLadders);
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException(e);
     }
 
@@ -92,6 +93,7 @@ public class LadderServiceImpl implements LadderService {
     try (var ignored = semaphore.enter()) {
       return Optional.ofNullable(ladderCache.get(ladderId));
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException(e);
     }
   }
@@ -102,6 +104,7 @@ public class LadderServiceImpl implements LadderService {
       return Optional.ofNullable(currentLadderNumberLookup.get(ladderNumber))
           .map(ladderCache::get);
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException(e);
     }
   }
@@ -121,6 +124,7 @@ public class LadderServiceImpl implements LadderService {
       // The Reason we don't cache this, is because it's not the stuff of the current Round
       return ladderRepository.findByRound(round.getId()).stream().toList();
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException(e);
     }
   }
@@ -140,19 +144,31 @@ public class LadderServiceImpl implements LadderService {
 
       LadderEntity result =
           new LadderEntity(ladderNumber, roundService.getCurrentRound(), previousLadder);
-      result = ladderRepository.save(result);
+      result = this.save(result);
 
       Event<RoundEventTypes> topLadderEvent = new Event<>(RoundEventTypes.INCREASE_TOP_LADDER);
       topLadderEvent.setData(ladderNumber);
       wsUtils.convertAndSendToTopic(RoundController.TOPIC_EVENTS_DESTINATION, topLadderEvent);
 
-      currentLadderNumberLookup.put(result.getNumber(), result.getId());
       ladderCache.put(result.getId(), result);
       return result;
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException(e);
     }
   }
 
 
+  @Override
+  @Transactional
+  public LadderEntity save(LadderEntity ladder) {
+    LadderEntity result = ladderRepository.save(ladder);
+    ladderCache.put(ladder.getId(), result);
+
+    if (roundService.getCurrentRound().getId().equals(result.getRoundId())) {
+      currentLadderNumberLookup.put(result.getNumber(), result.getId());
+    }
+
+    return result;
+  }
 }

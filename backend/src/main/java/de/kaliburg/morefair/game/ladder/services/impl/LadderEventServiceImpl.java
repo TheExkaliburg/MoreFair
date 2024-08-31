@@ -299,6 +299,7 @@ public class LadderEventServiceImpl implements LadderEventService {
         if (autoLadder != null && !autoLadder.getTypes().contains(LadderType.FREE_AUTO)
             && !autoLadder.getTypes().contains(LadderType.NO_AUTO)) {
           autoLadder.getTypes().add(LadderType.FREE_AUTO);
+          autoLadder = ladderService.save(autoLadder);
           Event<LadderEventType> e = new Event<>(LadderEventType.UPDATE_TYPES, account.getId(),
               autoLadder.getTypes());
           wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
