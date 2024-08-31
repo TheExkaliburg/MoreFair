@@ -453,8 +453,9 @@ public class LadderEventServiceImpl implements LadderEventService {
           accountService.findById(vinegarThrow.getTargetAccountId()).orElseThrow().getUuid(),
           GrapesController.PRIVATE_VINEGAR_DESTINATION, throwRecordResponse);
 
-      if (data.getSuccess().equals(VinegarSuccessType.SUCCESS) || data.getSuccess()
-          .equals(VinegarSuccessType.DOUBLE_SUCCESS)) {
+      if (data.getSuccess().equals(VinegarSuccessType.SUCCESS)
+          || data.getSuccess().equals(VinegarSuccessType.DOUBLE_SUCCESS)
+          || data.getSuccess().equals(VinegarSuccessType.SUCCESS_PLUS)) {
         removeMulti(
             new Event<>(LadderEventType.REMOVE_MULTI, vinegarThrow.getTargetAccountId()),
             ladder
