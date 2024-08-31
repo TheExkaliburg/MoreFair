@@ -39,7 +39,9 @@ public class UnlocksUtilsServiceImpl implements UnlocksUtilsService {
         .orElse(null);
 
     List<VinegarThrowEntity> vinThrows = vinegarThrowService
-        .findVinegarThrowsOfCurrentRound(accountId);
+        .findVinegarThrowsOfCurrentRound(accountId).stream()
+        .filter(vt -> vt.getThrowerAccountId().equals(accountId))
+        .toList();
 
     long successNonAssholeThrows = vinThrows.stream()
         .filter(t -> !t.getLadderId().equals(assholeLadderId))
