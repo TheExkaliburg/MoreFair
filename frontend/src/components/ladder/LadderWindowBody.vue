@@ -180,6 +180,8 @@ const multiButtonLabel = computed<string>(() => {
 });
 
 const vinegarButtonLabel = computed<string>(() => {
+  if (optionsStore.state.ladder.hideVinegarAndGrapes.value)
+    return `${lang("vinegar", "[Hidden]")}`;
   const eta = useEta(yourRanker.value).toVinegarThrow();
   if (eta === 0 || eta === Infinity) {
     return `${lang(
@@ -218,6 +220,7 @@ const isWineShieldActive = computed<boolean>(() => {
   return yourRanker.value.vinegar.cmp(yourRanker.value.wine) < 0;
 });
 const formattedWineShieldEta = computed<string>(() => {
+  if (optionsStore.state.ladder.hideVinegarAndGrapes.value) return "[Hidden]";
   if (isWineShieldActive.value) return lang("info.shielded");
   const winePerSec = yourRanker.value.grapes
     .mul(100 - useAccountStore().state.settings.vinegarSplit)
