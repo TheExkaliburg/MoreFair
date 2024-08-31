@@ -443,7 +443,10 @@ export const useLadderStore = defineStore("ladder", () => {
         restoredVinegar = getters.yourRanker.vinegar
           .mul(useRoundStore().state.settings.minVinegarThrown)
           .div(200);
-      } else if (success === VinegarSuccessType.DOUBLE_SUCCESS) {
+      } else if (
+        success === VinegarSuccessType.DOUBLE_SUCCESS ||
+        success === VinegarSuccessType.SUCCESS_PLUS
+      ) {
         restoredVinegar = getters.yourRanker.vinegar
           .mul(useRoundStore().state.settings.minVinegarThrown)
           .div(100);

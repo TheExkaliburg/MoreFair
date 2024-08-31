@@ -43,7 +43,8 @@
       /><font-awesome-icon
         v-if="
           typedVinThrow.successType === VinegarSuccessType.SUCCESS ||
-          typedVinThrow.successType === VinegarSuccessType.SHIELD_DEFENDED
+          typedVinThrow.successType === VinegarSuccessType.SHIELD_DEFENDED ||
+          typedVinThrow.successType === VinegarSuccessType.SUCCESS_PLUS
         "
         class="w-4"
         icon="fa-solid fa-check"
@@ -51,6 +52,10 @@
         v-if="typedVinThrow.successType === VinegarSuccessType.DOUBLE_SUCCESS"
         class="w-4"
         icon="fa-solid fa-check-double"
+      /><font-awesome-icon
+        v-if="typedVinThrow.successType === VinegarSuccessType.SUCCESS_PLUS"
+        class="w-4"
+        icon="fa-solid fa-plus"
       />
     </td>
   </tr>

@@ -6,6 +6,7 @@ import { defineNuxtPlugin } from "nuxt/app";
 import {
   faCheck,
   faCheckDouble,
+  faPlus,
   faShieldHalved,
   faUmbrella,
   faWineBottle,
@@ -24,6 +25,7 @@ library.add(faUmbrella);
 library.add(faCheck);
 library.add(faCheckDouble);
 library.add(faX);
+library.add(faPlus);
 
 export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.component("font-awesome-icon", FontAwesomeIcon);

@@ -18,6 +18,6 @@ public class VinegarData {
   private Long targetId;
 
   public enum VinegarSuccessType {
-    SHIELDED, SHIELD_DEFENDED, DEFENDED, SUCCESS, DOUBLE_SUCCESS
+    SHIELDED, SHIELD_DEFENDED, DEFENDED, SUCCESS, DOUBLE_SUCCESS, SUCCESS_PLUS
   }
 }

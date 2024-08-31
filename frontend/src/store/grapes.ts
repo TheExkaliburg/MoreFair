@@ -12,6 +12,7 @@ export enum VinegarSuccessType {
   DEFENDED = "DEFENDED",
   SUCCESS = "SUCCESS",
   DOUBLE_SUCCESS = "DOUBLE_SUCCESS",
+  SUCCESS_PLUS = "SUCCESS_PLUS",
 }
 
 export type VinegarThrow = {

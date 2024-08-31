@@ -60,6 +60,7 @@ components:
       DEFENDED: The target had no shield, but the throw did not deplete all of their vinegar.
       SHIELDED: The throw was completely absorbed by the target's shield.
       SHIELD_DEFENDED: The throw broke through the target's shield, but did not deplete all of their vinegar. (Refunds 25%)
+      SUCCESS_PLUS: The target had no shield, but the throw would have been enough to deplete both their vinegar and wine. (Refunds 50%)
 abbreviations:
   round: R
   ladder: L

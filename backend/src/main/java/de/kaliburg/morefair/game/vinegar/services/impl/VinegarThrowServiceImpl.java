@@ -142,6 +142,8 @@ public class VinegarThrowServiceImpl implements VinegarThrowService {
         if (passedVinegar.compareTo(BigInteger.ZERO) > 0) {
           successType = Objects.equals(successType, VinegarSuccessType.SHIELDED)
               ? VinegarSuccessType.SHIELD_DEFENDED : VinegarSuccessType.DEFENDED;
+        } else {
+          successType = VinegarSuccessType.SHIELDED;
         }
       } else {
         // THROW DOWN
@@ -153,10 +155,27 @@ public class VinegarThrowServiceImpl implements VinegarThrowService {
                 .divide(BigInteger.valueOf(200))
         );
 
+        if (!isWineShieldActive) {
+          // If the leftover vinegar had been able to take down the wine as well,
+          // but wine shield was not active
+          passedVinegar = passedVinegar.subtract(targetVinegar);
+          if (passedVinegar.compareTo(targetWine) > 0) {
+            restoredVinegar = restoredVinegar.add(
+                throwerVinegar
+                    .multiply(BigInteger.valueOf(fairConfig.getMinVinegarPercentageThrown()))
+                    .divide(BigInteger.valueOf(200))
+            );
+            successType = VinegarSuccessType.SUCCESS_PLUS;
+          }
+        }
+
         throwerRanker.setVinegar(throwerVinegar.subtract(thrownVinegar).add(restoredVinegar));
         targetRanker.setVinegar(BigInteger.ZERO);
-        successType = Objects.equals(successType, VinegarSuccessType.SHIELDED)
-            ? VinegarSuccessType.DOUBLE_SUCCESS : VinegarSuccessType.SUCCESS;
+
+        if (successType != VinegarSuccessType.SUCCESS_PLUS) {
+          successType = Objects.equals(successType, VinegarSuccessType.SHIELDED)
+              ? VinegarSuccessType.DOUBLE_SUCCESS : VinegarSuccessType.SUCCESS;
+        }
 
         int stolenPoints = 0;
         if (currentStreak < 0) {
