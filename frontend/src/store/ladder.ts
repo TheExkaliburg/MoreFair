@@ -436,7 +436,10 @@ export const useLadderStore = defineStore("ladder", () => {
       // THROWER
 
       let restoredVinegar = new Decimal(0);
-      if (success === VinegarSuccessType.SUCCESS) {
+      if (
+        success === VinegarSuccessType.SUCCESS ||
+        success === VinegarSuccessType.SHIELD_DEFENDED
+      ) {
         restoredVinegar = getters.yourRanker.vinegar
           .mul(useRoundStore().state.settings.minVinegarThrown)
           .div(200);
