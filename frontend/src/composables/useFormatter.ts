@@ -2,16 +2,38 @@
 import { numberformat } from "swarm-numberformat";
 import Decimal from "break_infinity.js";
 
-const numberFormatter = new numberformat.Formatter({
-  backend: "decimal.js",
-  Decimal,
-  format: "hybrid",
-  sigfigs: 5,
-  flavor: "short",
-  minSuffix: 1e6,
-  maxSmall: 0,
-  default: 0,
-});
+export enum NumberFormatterType {
+  DEFAULT,
+  SMALL,
+}
+
+const numberFormatterMap = new Map<NumberFormatterType, any>();
+numberFormatterMap.set(
+  NumberFormatterType.DEFAULT,
+  new numberformat.Formatter({
+    backend: "decimal.js",
+    Decimal,
+    format: "hybrid",
+    sigfigs: 5,
+    flavor: "short",
+    minSuffix: 1e6,
+    maxSmall: 0,
+    default: 0,
+  }),
+);
+numberFormatterMap.set(
+  NumberFormatterType.SMALL,
+  new numberformat.Formatter({
+    backend: "decimal.js",
+    Decimal,
+    format: "hybrid",
+    sigfigs: 4,
+    flavor: "short",
+    minSuffix: 1e4,
+    maxSmall: 0,
+    default: 0,
+  }),
+);
 
 // Set the options for the Intl.DateTimeFormat object
 const dateFormatOptions: Intl.DateTimeFormatOptions = {
@@ -27,13 +49,18 @@ const dateFormatter = new Intl.DateTimeFormat(
   dateFormatOptions,
 );
 
-export const useFormatter = (number: Decimal | number | undefined) => {
+export const useFormatter = (
+  number: Decimal | number | undefined,
+  type?: NumberFormatterType,
+) => {
   if (number === undefined) {
     return "0";
   }
   if (typeof number === "number" && !isFinite(number)) return "∞";
 
-  let result = numberFormatter.format(number);
+  let result = numberFormatterMap
+    .get(type ?? NumberFormatterType.DEFAULT)
+    .format(number);
 
   if (result === "Infinity") result = "∞";
 

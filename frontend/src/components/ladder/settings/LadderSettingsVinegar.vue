@@ -11,11 +11,15 @@
       <p class="w-fit whitespace-nowrap h-full align-middle text-xl pb-2">
         Wine/Vinegar Split:
       </p>
-      <div class="flex flex-row justify-between">
-        <span class="flex flex-col-reverse"
-          >{{ 100 - splitValue }}% x Wine/s</span
+      <div
+        class="flex flex-row justify-between whitespace-nowrap overflow-hidden"
+      >
+        <span class="flex flex-col-reverse">
+          {{ formattedWinePerSec }} Wine/s ({{ 100 - splitValue }}%)</span
         >
-        <span class="flex flex-col-reverse">{{ splitValue }}% x Vinegar/s</span>
+        <span class="flex flex-col-reverse"
+          >({{ splitValue }}%) {{ formattedVinegarPerSec }} x Vinegar/s
+        </span>
       </div>
       <input
         type="range"
@@ -88,7 +92,11 @@ import FairDialog from "~/components/interactables/FairDialog.vue";
 import FairButton from "~/components/interactables/FairButton.vue";
 import { useGrapesStore } from "~/store/grapes";
 import { useRoundStore } from "~/store/round";
-import { useFormatter, useTimeFormatter } from "~/composables/useFormatter";
+import {
+  NumberFormatterType,
+  useFormatter,
+  useTimeFormatter,
+} from "~/composables/useFormatter";
 import { useAccountStore } from "~/store/account";
 import TheVinegarThrowTable from "~/components/grapes/TheVinegarThrowTable.vue";
 import { useLadderStore } from "~/store/ladder";
@@ -119,6 +127,28 @@ const middle = computed(() => Math.round((max.value + min.value) / 2));
 
 const splitValue = ref<number>(50);
 
+const winePerSec = computed(() =>
+  yourRanker.value.grapes.mul(100 - splitValue.value).div(50),
+);
+const vinegarPerSec = computed(() =>
+  yourRanker.value.grapes.mul(splitValue.value).div(100),
+);
+
+const formattedWinePerSec = computed(() =>
+  useFormatter(winePerSec.value, formattingSize.value),
+);
+const formattedVinegarPerSec = computed(() =>
+  useFormatter(vinegarPerSec.value, formattingSize.value),
+);
+
+const formattingSize = computed(() => {
+  if (useWindowSize().isSmallerThanSm) {
+    return NumberFormatterType.SMALL;
+  } else {
+    return NumberFormatterType.DEFAULT;
+  }
+});
+
 const savedVinegarSplit = computed(
   () => accountStore.state.settings.vinegarSplit,
 );
@@ -127,12 +157,7 @@ const savedWineSplit = computed(
 );
 
 const formattedWineShieldEta = computed<string>(() => {
-  const winePerSec = yourRanker.value.grapes
-    .mul(100 - splitValue.value)
-    .div(50);
-  const vinegarPerSec = yourRanker.value.grapes.mul(splitValue.value).div(100);
-
-  const wineDeltaPerSec = winePerSec.sub(vinegarPerSec);
+  const wineDeltaPerSec = winePerSec.value.sub(vinegarPerSec.value);
   const wineMissing = yourRanker.value.vinegar.sub(yourRanker.value.wine);
   const seconds = wineMissing.div(wineDeltaPerSec).ceil();
   const formattedSeconds = useTimeFormatter(seconds.toNumber());
