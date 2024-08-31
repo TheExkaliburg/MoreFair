@@ -246,8 +246,8 @@ export const useLadderStore = defineStore("ladder", () => {
               rankers[j].accountId === yourRanker?.accountId &&
               rankers[j].multi > 1
             ) {
-              state.rankers[j].grapes = Object.freeze(
-                state.rankers[j].grapes.add(ladderUtils.getPassingGrapes()),
+              rankers[j].grapes = Object.freeze(
+                rankers[j].grapes.add(ladderUtils.getPassingGrapes()),
               );
             }
             rankers[j + 1] = rankers[j];
