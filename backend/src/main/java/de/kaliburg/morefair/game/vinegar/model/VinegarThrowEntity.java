@@ -77,7 +77,8 @@ public class VinegarThrowEntity {
 
   public boolean isSuccessful() {
     return successType == VinegarSuccessType.SUCCESS
-        || successType == VinegarSuccessType.DOUBLE_SUCCESS;
+        || successType == VinegarSuccessType.DOUBLE_SUCCESS
+        || successType == VinegarSuccessType.SUCCESS_PLUS;
   }
 
 }

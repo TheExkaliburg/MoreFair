@@ -23,7 +23,6 @@ import de.kaliburg.morefair.chat.services.MessageService;
 import de.kaliburg.morefair.core.concurrency.CriticalRegion;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.data.VinegarData;
-import de.kaliburg.morefair.events.data.VinegarData.VinegarSuccessType;
 import de.kaliburg.morefair.events.types.AccountEventTypes;
 import de.kaliburg.morefair.events.types.LadderEventType;
 import de.kaliburg.morefair.events.types.RoundEventTypes;
@@ -453,9 +452,7 @@ public class LadderEventServiceImpl implements LadderEventService {
           accountService.findById(vinegarThrow.getTargetAccountId()).orElseThrow().getUuid(),
           GrapesController.PRIVATE_VINEGAR_DESTINATION, throwRecordResponse);
 
-      if (data.getSuccess().equals(VinegarSuccessType.SUCCESS)
-          || data.getSuccess().equals(VinegarSuccessType.DOUBLE_SUCCESS)
-          || data.getSuccess().equals(VinegarSuccessType.SUCCESS_PLUS)) {
+      if (vinegarThrow.isSuccessful()) {
         removeMulti(
             new Event<>(LadderEventType.REMOVE_MULTI, vinegarThrow.getTargetAccountId()),
             ladder
