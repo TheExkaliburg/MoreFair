@@ -139,8 +139,10 @@ public class VinegarThrowServiceImpl implements VinegarThrowService {
 
         throwerRanker.setVinegar(throwerVinegar.subtract(thrownVinegar).add(restoredVinegar));
         targetRanker.setVinegar(targetVinegar.subtract(subtractedVinegar));
-        successType = Objects.equals(successType, VinegarSuccessType.SHIELDED)
-            ? VinegarSuccessType.SHIELD_DEFENDED : VinegarSuccessType.DEFENDED;
+        if (passedVinegar.compareTo(BigInteger.ZERO) > 0) {
+          successType = Objects.equals(successType, VinegarSuccessType.SHIELDED)
+              ? VinegarSuccessType.SHIELD_DEFENDED : VinegarSuccessType.DEFENDED;
+        }
       } else {
         // THROW DOWN
 
