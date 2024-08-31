@@ -61,7 +61,7 @@ public class UpgradeUtils {
   }
 
   public BigInteger throwVinegarCost(Integer ladderNum) {
-    return config.getBaseVinegarToThrow().multiply(BigInteger.valueOf(ladderNum - 1));
+    return config.getBaseVinegarToThrow().multiply(BigInteger.valueOf(ladderNum));
   }
 
   public BigInteger buyAutoPromoteCost(RoundEntity round, LadderEntity ladder, Integer rank) {
