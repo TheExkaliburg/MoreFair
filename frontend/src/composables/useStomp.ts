@@ -146,6 +146,11 @@ client.onConnect = (_) => {
     callbacks.onChatEvent.forEach(({ callback }) => callback(body));
   });
 
+  client.subscribe("/topic/user/events", (message) => {
+    const body: OnUserEventBody = JSON.parse(message.body);
+    callbacks.onUserEvent.forEach(({ callback }) => callback(body));
+  });
+
   if (getActivePinia() === undefined) {
     setActivePinia(createPinia());
   }

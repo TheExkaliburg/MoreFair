@@ -5,8 +5,13 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import de.kaliburg.morefair.account.model.AccountEntity;
 import de.kaliburg.morefair.account.model.types.AccountAccessType;
 import de.kaliburg.morefair.account.services.AccountService;
+import de.kaliburg.morefair.account.services.mapper.AccountMapper;
 import de.kaliburg.morefair.account.services.repositories.AccountRepository;
+import de.kaliburg.morefair.api.UserController;
+import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.core.concurrency.CriticalRegion;
+import de.kaliburg.morefair.events.Event;
+import de.kaliburg.morefair.events.types.UserEventType;
 import de.kaliburg.morefair.game.season.services.AchievementsService;
 import de.kaliburg.morefair.security.UserDetailsWithUuid;
 import java.time.Duration;
@@ -39,17 +44,23 @@ public class AccountServiceImpl implements AccountService {
   private final AchievementsService achievementsService;
   private final AccountRepository accountRepository;
   private final PasswordEncoder passwordEncoder;
+  private final AccountMapper accountMapper;
 
   private final LoadingCache<Long, AccountEntity> accountCache;
   private final LoadingCache<String, Long> usernameLookupCache;
   private final LoadingCache<UUID, Long> uuidLookupCache;
+  private final WsUtils wsUtils;
   private Long broadcasterAccountId;
 
+
   public AccountServiceImpl(AchievementsService achievementsService,
-      AccountRepository accountRepository, PasswordEncoder passwordEncoder) {
+      AccountRepository accountRepository, PasswordEncoder passwordEncoder,
+      AccountMapper accountMapper, WsUtils wsUtils) {
     this.achievementsService = achievementsService;
     this.accountRepository = accountRepository;
     this.passwordEncoder = passwordEncoder;
+    this.accountMapper = accountMapper;
+    this.wsUtils = wsUtils;
 
     this.accountCache = Caffeine.newBuilder()
         .expireAfterAccess(ACCOUNT_CACHE_EXPIRE_AFTER_ACCESS_DURATION)
@@ -198,6 +209,13 @@ public class AccountServiceImpl implements AccountService {
     try (var ignored = semaphore.enter()) {
       account = accountRepository.save(account);
       accountCache.put(account.getId(), account);
+
+      var event = new Event<>(UserEventType.UPDATE, accountMapper.mapToUser(account));
+      wsUtils.convertAndSendToTopic(
+          UserController.TOPIC_EVENTS_DESTINATION,
+          event
+      );
+
       return account;
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();

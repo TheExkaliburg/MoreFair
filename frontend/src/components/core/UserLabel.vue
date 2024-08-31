@@ -14,8 +14,8 @@ const props = defineProps({
 
 const userStore = useUserStore();
 
-const user = userStore.getters.getUser(props.accountId);
 const username = computed<string>(
-  () => user.value?.displayName ?? "Mystery Guest",
+  () =>
+    userStore.getters.getUser(props.accountId)?.displayName ?? "Mystery Guest",
 );
 </script>

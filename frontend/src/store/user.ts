@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import { computed, ComputedRef } from "vue";
 import { useAPI } from "~/composables/useAPI";
 import { OnUserEventBody, useStomp } from "~/composables/useStomp";
 import { AccessRole } from "~/store/account";
@@ -28,22 +27,14 @@ export const useUserStore = defineStore("user", () => {
     users: new Map(),
   });
 
-  const userComputedGetters = new Map<number, ComputedRef<User | undefined>>();
   const getters = {
     getUser: (id: number) => {
-      let userComputedGetter = userComputedGetters.get(id);
-      if (!userComputedGetter) {
-        userComputedGetter = computed(() => {
-          const result = state.users.get(id);
-          // Trigger a singular fetch if user is unknown
-          if (isInitialized.value && !result) {
-            fetchUser(id).then();
-          }
-          return result;
-        });
-        userComputedGetters.set(id, userComputedGetter);
+      const result = state.users.get(id);
+      // Trigger a singular fetch if user is unknown
+      if (isInitialized.value && !result) {
+        fetchUser(id).then();
       }
-      return userComputedGetter;
+      return result;
     },
   };
 
