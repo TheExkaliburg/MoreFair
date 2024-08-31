@@ -268,7 +268,7 @@ modifier:
   RAILROAD:
     title: Railroad
     description: Ladders more likely to encourage passing grapes.
-    identifier: RR
+    identifier: RAIL
   FARMER:
     title: Farmer
     description: Ladders more likely to encourage bottom grapes.
@@ -276,6 +276,7 @@ modifier:
   RACE:
     title: Race
     description: Ladders more likely to encourage first promoters.
+    identifier: RACE
   BIG:
     title: Big
     description: This ladder is longer than usual.
