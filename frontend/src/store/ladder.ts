@@ -466,14 +466,15 @@ export const useLadderStore = defineStore("ladder", () => {
       let passedVinegar = vinegarThrown;
       if (
         success === VinegarSuccessType.SHIELDED ||
-        success === VinegarSuccessType.SHIELD_DEFENDED
+        success === VinegarSuccessType.SHIELD_DEFENDED ||
+        success === VinegarSuccessType.DOUBLE_SUCCESS
       ) {
         // SHIELD - DEFENSE
-        getters.yourRanker.wine = Object.freeze(new Decimal(0));
         passedVinegar = Decimal.max(
           passedVinegar.sub(getters.yourRanker.wine),
           new Decimal(0),
         );
+        getters.yourRanker.wine = Object.freeze(new Decimal(0));
       }
 
       let subtractedVinegar = passedVinegar;
