@@ -11,6 +11,7 @@ import {
 } from "~/store/entities/message";
 import { useAccountStore } from "~/store/account";
 import { SOUNDS, useSound } from "~/composables/useSound";
+import { User } from "~/store/user";
 
 export type ChatLogMessageData = MessageData & {
   chatNumber: number;
@@ -27,10 +28,29 @@ export class ChatLogMessage extends Message implements ChatLogMessageData {
   }
 }
 
+export type NameChange = {
+  accountId: number;
+  displayName: string;
+  timestamp: number;
+};
+
+export type UserEvent = {
+  timestamp: number;
+};
+
+export enum SearchType {
+  USERNAME = "USERNAME",
+  ACCOUNT_ID = "ACCOUNT_ID",
+}
+
 export type ModerationState = {
   chatLog: Message[];
-  searchResults: string;
-  altSearchResults: string;
+  usernameSearchInput: string;
+  accountIdSearchInput: string;
+  searchType: SearchType;
+  searchResults: User[];
+  nameChangeLog: NameChange[];
+  userEventLog: UserEvent[];
 };
 
 export const useModerationStore = defineStore("moderation", () => {
@@ -41,8 +61,12 @@ export const useModerationStore = defineStore("moderation", () => {
   const isInitialized = ref<boolean>(false);
   const state = reactive<ModerationState>({
     chatLog: <Message[]>[],
-    searchResults: "",
-    altSearchResults: "",
+    usernameSearchInput: "",
+    accountIdSearchInput: "0",
+    searchType: SearchType.USERNAME,
+    searchResults: [],
+    nameChangeLog: [],
+    userEventLog: [],
   });
   const getters = reactive({
     allMessages: computed<Message[]>(() => {
@@ -113,8 +137,8 @@ export const useModerationStore = defineStore("moderation", () => {
     return api.moderation
       .searchUsername(username)
       .then((res) => {
-        const data: { [key: number]: string } = res.data;
-        state.searchResults = JSON.stringify(data);
+        const data: { users: User[] } = res.data;
+        state.searchResults = data.users;
         return Promise.resolve(res);
       })
       .catch((err) => {
@@ -128,8 +152,8 @@ export const useModerationStore = defineStore("moderation", () => {
     return api.moderation
       .searchAltAccounts(accountId)
       .then((res) => {
-        const data: { [key: number]: string } = res.data;
-        state.altSearchResults = JSON.stringify(data);
+        const data: { users: User[] } = res.data;
+        state.searchResults = data.users;
         return Promise.resolve(res);
       })
       .catch((err) => {
@@ -160,6 +184,18 @@ export const useModerationStore = defineStore("moderation", () => {
     useStomp().wsApi.moderation.mod(accountId);
   }
 
+  function search(type: SearchType) {
+    state.searchType = type;
+    if (type === SearchType.USERNAME) {
+      searchUsername(state.usernameSearchInput).then();
+    } else if (type === SearchType.ACCOUNT_ID) {
+      const accountId = parseInt(state.accountIdSearchInput);
+      if (isNaN(accountId)) return;
+
+      searchAltAccounts(accountId).then();
+    }
+  }
+
   return {
     state,
     getters,
@@ -172,6 +208,7 @@ export const useModerationStore = defineStore("moderation", () => {
       rename,
       free,
       mod,
+      search,
     },
   };
 });

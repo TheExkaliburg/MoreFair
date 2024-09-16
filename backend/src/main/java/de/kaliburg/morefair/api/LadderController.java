@@ -4,7 +4,6 @@ import de.kaliburg.morefair.account.model.AccountEntity;
 import de.kaliburg.morefair.account.services.AccountService;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WsMessage;
-import de.kaliburg.morefair.data.ModServerMessageData;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.LadderEventType;
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
@@ -16,6 +15,7 @@ import de.kaliburg.morefair.game.ranker.services.RankerService;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
 import de.kaliburg.morefair.game.round.services.RoundService;
 import de.kaliburg.morefair.game.round.services.utils.RoundUtilsService;
+import de.kaliburg.morefair.moderation.events.services.UserEventService;
 import de.kaliburg.morefair.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +52,7 @@ public class LadderController {
   private final RoundUtilsService roundUtilsService;
   private final LadderMapper ladderMapper;
   private final RankerService rankerService;
+  private final UserEventService userEventService;
 
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -111,9 +112,7 @@ public class LadderController {
 
       log.info("[L{}] BIAS: {} (#{}) {}", num, account.getDisplayName(), account.getId(),
           wsMessage.getEvent());
-      ModServerMessageData data = new ModServerMessageData(account.getId(), sha.getDestination(),
-          wsMessage.getContent(), wsMessage.getEvent());
-      wsUtils.convertAndSendToTopic(ModerationController.TOPIC_LOG_EVENTS_DESTINATION + num, data);
+      userEventService.record(account.getId(), LadderEventType.BUY_BIAS, wsMessage.getEvent());
       ladderEventService.addEvent(num, new Event<>(LadderEventType.BUY_BIAS, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage(), e);
@@ -137,10 +136,6 @@ public class LadderController {
 
       log.info("[L{}] MULTI: {} (#{}) {}", num, account.getDisplayName(), account.getId(),
           wsMessage.getEvent());
-
-      ModServerMessageData data = new ModServerMessageData(account.getId(), sha.getDestination(),
-          wsMessage.getContent(), wsMessage.getEvent());
-      wsUtils.convertAndSendToTopic(ModerationController.TOPIC_LOG_EVENTS_DESTINATION + num, data);
 
       ladderEventService.addEvent(num,
           new Event<>(LadderEventType.BUY_MULTI, account.getId()));
@@ -172,10 +167,6 @@ public class LadderController {
       log.info("[L{}] VINEGAR: {} (#{}) {}", num, account.getDisplayName(), account.getId(),
           wsMessage.getEvent());
 
-      ModServerMessageData data = new ModServerMessageData(account.getId(), sha.getDestination(),
-          wsMessage.getContent(), wsMessage.getEvent());
-      wsUtils.convertAndSendToTopic(ModerationController.TOPIC_LOG_EVENTS_DESTINATION + num, data);
-
       ladderEventService.addEvent(num,
           new Event<>(LadderEventType.THROW_VINEGAR, account.getId(), percentage));
     } catch (Exception e) {
@@ -202,11 +193,6 @@ public class LadderController {
       log.info("[L{}] PROMOTE: {} (#{}) {}", num, account.getDisplayName(), account.getId(),
           wsMessage.getEvent());
 
-      ModServerMessageData data = new ModServerMessageData(account.getId(),
-          sha.getDestination(),
-          wsMessage.getContent(), wsMessage.getEvent());
-      wsUtils.convertAndSendToTopic(ModerationController.TOPIC_LOG_EVENTS_DESTINATION + num, data);
-
       ladderEventService.addEvent(num, new Event<>(LadderEventType.PROMOTE, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage(), e);
@@ -230,11 +216,6 @@ public class LadderController {
 
       log.info("[L{}] AUTOPROMOTE: {} (#{}) {}", num, account.getDisplayName(), account.getId(),
           wsMessage.getEvent());
-
-      ModServerMessageData data = new ModServerMessageData(account.getId(),
-          sha.getDestination(),
-          wsMessage.getContent(), wsMessage.getEvent());
-      wsUtils.convertAndSendToTopic(ModerationController.TOPIC_LOG_EVENTS_DESTINATION + num, data);
 
       ladderEventService.addEvent(num,
           new Event<>(LadderEventType.BUY_AUTO_PROMOTE, account.getId()));

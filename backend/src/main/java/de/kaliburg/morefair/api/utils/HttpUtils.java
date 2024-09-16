@@ -29,7 +29,7 @@ public class HttpUtils {
    */
   public static Integer getIp(HttpServletRequest request) throws UnknownHostException {
     String ipString = request.getHeader("X-Forwarded-For");
-    if (ipString == null || ipString.length() == 0 || "unknown".equalsIgnoreCase(ipString)) {
+    if (ipString == null || ipString.isEmpty() || "unknown".equalsIgnoreCase(ipString)) {
       ipString = request.getRemoteAddr();
     }
 

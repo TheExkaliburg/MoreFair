@@ -1,8 +1,10 @@
 package de.kaliburg.morefair.api;
 
 import de.kaliburg.morefair.account.model.AccountEntity;
+import de.kaliburg.morefair.account.model.dto.UserListResponse;
 import de.kaliburg.morefair.account.model.types.AccountAccessType;
 import de.kaliburg.morefair.account.services.AccountService;
+import de.kaliburg.morefair.account.services.mapper.AccountMapper;
 import de.kaliburg.morefair.api.utils.HttpUtils;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WsMessage;
@@ -13,11 +15,10 @@ import de.kaliburg.morefair.chat.services.mapper.ChatMapper;
 import de.kaliburg.morefair.data.ModChatDto;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.AccountEventTypes;
+import de.kaliburg.morefair.moderation.events.model.dto.NameChangeListResponse;
+import de.kaliburg.morefair.moderation.events.services.NameChangeService;
 import de.kaliburg.morefair.security.SecurityUtils;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.HttpServerErrorException;
 
 @Controller
 @Log4j2
@@ -48,6 +50,8 @@ public class ModerationController {
   private final WsUtils wsUtils;
   private final MessageService messageService;
   private final ChatMapper chatMapper;
+  private final AccountMapper accountMapper;
+  private final NameChangeService nameChangeService;
 
   @GetMapping("/chat")
   public ResponseEntity<?> getChat(Authentication authentication) {
@@ -241,8 +245,7 @@ public class ModerationController {
   }
 
   @GetMapping(value = "/search/user", produces = "application/json")
-  public ResponseEntity<Map<Long, String>> searchUsername(
-      Authentication authentication,
+  public ResponseEntity<UserListResponse> searchUsername(Authentication authentication,
       @RequestParam("username") String name) {
     try {
 
@@ -253,8 +256,7 @@ public class ModerationController {
       }
       List<AccountEntity> accountsWithName = accountService.findByDisplayName(name);
 
-      Map<Long, String> result = accountsWithName.stream()
-          .collect(Collectors.toMap(AccountEntity::getId, AccountEntity::getDisplayName));
+      UserListResponse result = accountMapper.mapToUserList(accountsWithName);
       return new ResponseEntity<>(result, HttpStatus.OK);
     } catch (Exception e) {
       log.error(e.getMessage(), e);
@@ -274,16 +276,31 @@ public class ModerationController {
       }
       AccountEntity target = accountService.findById(Long.parseLong(accountId)).orElse(null);
       if (target == null) {
-        return new ResponseEntity<>(new HashMap<Long, String>(), HttpStatus.OK);
+        return new ResponseEntity<>(UserListResponse.builder().users(List.of()).build(),
+            HttpStatus.OK);
       }
       List<AccountEntity> accountsWithIp = accountService.searchByIp(target.getLastIp());
-      Map<Long, String> result = accountsWithIp.stream().collect(Collectors.toMap(
-          AccountEntity::getId, AccountEntity::getDisplayName));
+      UserListResponse result = accountMapper.mapToUserList(accountsWithIp);
 
       return new ResponseEntity<>(result, HttpStatus.OK);
     } catch (Exception e) {
       log.error(e.getMessage(), e);
       return ResponseEntity.internalServerError().body(e.getMessage());
     }
+  }
+
+  @GetMapping(value = "/history/name")
+  public NameChangeListResponse findNamingHistory(Authentication authentication,
+      @RequestParam("accountId") String accountId) {
+    AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
+        .orElse(null);
+    if (account == null) {
+      throw new HttpServerErrorException(HttpStatus.FORBIDDEN);
+    }
+
+    // TODO: Implement Endpoint
+
+    return null;
+
   }
 }

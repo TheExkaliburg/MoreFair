@@ -242,7 +242,7 @@ function reset() {
   client.deactivate().then();
 }
 
-function parseEvent(e: Event): string {
+function parseEvent(e: Event): object {
   const serializableEvent = {
     isTrusted: e.isTrusted,
     // @ts-ignore
@@ -251,11 +251,12 @@ function parseEvent(e: Event): string {
     screenY: e.screenY ?? -1,
   };
 
+  console.log(e);
   if (!(e instanceof Event)) {
     serializableEvent.isTrusted = false;
   }
 
-  return JSON.stringify(serializableEvent);
+  return serializableEvent;
 }
 
 const wsApi = (client: Client) => {
