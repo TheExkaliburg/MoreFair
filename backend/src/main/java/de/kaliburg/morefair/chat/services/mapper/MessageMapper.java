@@ -8,7 +8,6 @@ import de.kaliburg.morefair.chat.model.MessageEntity;
 import de.kaliburg.morefair.chat.model.dto.MessageDto;
 import de.kaliburg.morefair.game.season.model.AchievementsEntity;
 import de.kaliburg.morefair.game.season.services.AchievementsService;
-import java.time.ZoneOffset;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -47,7 +46,7 @@ public class MessageMapper {
         .assholePoints(achievements.getAssholePoints())
         .tag(fairConfig.getAssholeTag(achievements.getAssholeLevel()))
         .isMod(account.isMod())
-        .timestamp(message.getCreatedOn().withOffsetSameInstant(ZoneOffset.UTC).toEpochSecond())
+        .timestamp(message.getCreatedOn().toEpochSecond())
         .chatType(chat.getType())
         .ladderNumber(chat.getNumber())
         .build();

@@ -15,8 +15,13 @@ import de.kaliburg.morefair.chat.services.mapper.ChatMapper;
 import de.kaliburg.morefair.data.ModChatDto;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.AccountEventTypes;
+import de.kaliburg.morefair.moderation.events.model.NameChangeEntity;
 import de.kaliburg.morefair.moderation.events.model.dto.NameChangeListResponse;
 import de.kaliburg.morefair.moderation.events.services.NameChangeService;
+import de.kaliburg.morefair.moderation.events.services.mapper.NameChangeMapper;
+import de.kaliburg.morefair.moderation.model.ModSearchType;
+import de.kaliburg.morefair.moderation.model.UserSearchListResponse;
+import de.kaliburg.morefair.moderation.services.mapper.ModerationResultMapper;
 import de.kaliburg.morefair.security.SecurityUtils;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +33,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpServerErrorException;
@@ -52,6 +58,8 @@ public class ModerationController {
   private final ChatMapper chatMapper;
   private final AccountMapper accountMapper;
   private final NameChangeService nameChangeService;
+  private final ModerationResultMapper moderationResultMapper;
+  private final NameChangeMapper nameChangeMapper;
 
   @GetMapping("/chat")
   public ResponseEntity<?> getChat(Authentication authentication) {
@@ -245,7 +253,7 @@ public class ModerationController {
   }
 
   @GetMapping(value = "/search/user", produces = "application/json")
-  public ResponseEntity<UserListResponse> searchUsername(Authentication authentication,
+  public ResponseEntity<UserSearchListResponse> searchUsername(Authentication authentication,
       @RequestParam("username") String name) {
     try {
 
@@ -256,7 +264,7 @@ public class ModerationController {
       }
       List<AccountEntity> accountsWithName = accountService.findByDisplayName(name);
 
-      UserListResponse result = accountMapper.mapToUserList(accountsWithName);
+      UserSearchListResponse result = moderationResultMapper.mapToUserSearchList(accountsWithName);
       return new ResponseEntity<>(result, HttpStatus.OK);
     } catch (Exception e) {
       log.error(e.getMessage(), e);
@@ -280,7 +288,7 @@ public class ModerationController {
             HttpStatus.OK);
       }
       List<AccountEntity> accountsWithIp = accountService.searchByIp(target.getLastIp());
-      UserListResponse result = accountMapper.mapToUserList(accountsWithIp);
+      UserSearchListResponse result = moderationResultMapper.mapToUserSearchList(accountsWithIp);
 
       return new ResponseEntity<>(result, HttpStatus.OK);
     } catch (Exception e) {
@@ -289,18 +297,34 @@ public class ModerationController {
     }
   }
 
-  @GetMapping(value = "/history/name")
-  public NameChangeListResponse findNamingHistory(Authentication authentication,
-      @RequestParam("accountId") String accountId) {
+  @GetMapping(value = "/history/name/{type}")
+  public ResponseEntity<NameChangeListResponse> findNamingHistory(Authentication authentication,
+      @RequestParam(value = "search", defaultValue = "") String searchParam,
+      @PathVariable(name = "type") String typeString) {
+    ModSearchType type;
+    try {
+      type = ModSearchType.valueOf(typeString.toUpperCase());
+      searchParam = searchParam.trim();
+    } catch (IllegalArgumentException | NullPointerException e) {
+      throw new HttpServerErrorException(HttpStatus.BAD_REQUEST);
+    }
+
     AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
         .orElse(null);
-    if (account == null) {
+    if (account == null || !account.isMod()) {
       throw new HttpServerErrorException(HttpStatus.FORBIDDEN);
     }
 
-    // TODO: Implement Endpoint
+    List<NameChangeEntity> nameChangeEntities;
+    if (type == ModSearchType.ACCOUNT_ID) {
+      nameChangeEntities = nameChangeService.listAllNameChangesOf(Long.parseLong(searchParam));
+    } else if (type == ModSearchType.DISPLAY_NAME) {
+      nameChangeEntities = nameChangeService.listAllNameChangesTo(searchParam);
+    } else {
+      throw new HttpServerErrorException(HttpStatus.BAD_REQUEST);
+    }
 
-    return null;
+    return ResponseEntity.ok(nameChangeMapper.mapToNameChangeList(nameChangeEntities));
 
   }
 }

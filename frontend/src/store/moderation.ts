@@ -11,7 +11,6 @@ import {
 } from "~/store/entities/message";
 import { useAccountStore } from "~/store/account";
 import { SOUNDS, useSound } from "~/composables/useSound";
-import { User } from "~/store/user";
 
 export type ChatLogMessageData = MessageData & {
   chatNumber: number;
@@ -31,6 +30,7 @@ export class ChatLogMessage extends Message implements ChatLogMessageData {
 export type NameChange = {
   accountId: number;
   displayName: string;
+  currentName: string;
   timestamp: number;
 };
 
@@ -39,16 +39,22 @@ export type UserEvent = {
 };
 
 export enum SearchType {
-  USERNAME = "USERNAME",
+  DISPLAY_NAME = "DISPLAY_NAME",
   ACCOUNT_ID = "ACCOUNT_ID",
 }
+
+export type UserSearchResult = {
+  accountId: number;
+  displayName: string;
+  lastLogin: number;
+};
 
 export type ModerationState = {
   chatLog: Message[];
   usernameSearchInput: string;
   accountIdSearchInput: string;
   searchType: SearchType;
-  searchResults: User[];
+  searchResults: UserSearchResult[];
   nameChangeLog: NameChange[];
   userEventLog: UserEvent[];
 };
@@ -63,7 +69,7 @@ export const useModerationStore = defineStore("moderation", () => {
     chatLog: <Message[]>[],
     usernameSearchInput: "",
     accountIdSearchInput: "0",
-    searchType: SearchType.USERNAME,
+    searchType: SearchType.DISPLAY_NAME,
     searchResults: [],
     nameChangeLog: [],
     userEventLog: [],
@@ -137,7 +143,7 @@ export const useModerationStore = defineStore("moderation", () => {
     return api.moderation
       .searchUsername(username)
       .then((res) => {
-        const data: { users: User[] } = res.data;
+        const data: { users: UserSearchResult[] } = res.data;
         state.searchResults = data.users;
         return Promise.resolve(res);
       })
@@ -152,8 +158,24 @@ export const useModerationStore = defineStore("moderation", () => {
     return api.moderation
       .searchAltAccounts(accountId)
       .then((res) => {
-        const data: { users: User[] } = res.data;
+        const data: { users: UserSearchResult[] } = res.data;
         state.searchResults = data.users;
+        return Promise.resolve(res);
+      })
+      .catch((err) => {
+        useToasts(err.message, {
+          type: "error",
+        });
+        return Promise.reject(err);
+      });
+  }
+
+  function searchNameHistory(search: string, type: SearchType) {
+    return api.moderation
+      .showNameHistory(search, type)
+      .then((res) => {
+        const data: { list: NameChange[] } = res.data;
+        state.nameChangeLog = data.list;
         return Promise.resolve(res);
       })
       .catch((err) => {
@@ -186,13 +208,18 @@ export const useModerationStore = defineStore("moderation", () => {
 
   function search(type: SearchType) {
     state.searchType = type;
-    if (type === SearchType.USERNAME) {
+    if (type === SearchType.DISPLAY_NAME) {
       searchUsername(state.usernameSearchInput).then();
+      searchNameHistory(
+        state.usernameSearchInput,
+        SearchType.DISPLAY_NAME,
+      ).then();
     } else if (type === SearchType.ACCOUNT_ID) {
       const accountId = parseInt(state.accountIdSearchInput);
       if (isNaN(accountId)) return;
 
       searchAltAccounts(accountId).then();
+      searchNameHistory(String(accountId), SearchType.ACCOUNT_ID).then();
     }
   }
 

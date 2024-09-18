@@ -3,9 +3,7 @@
     <SearchUserInput />
     <TakeModAction />
     <SearchResult />
-    <div class="bg-blue-300 h-full max-h-128">
-      Search Rename History + Table
-    </div>
+    <NamingHistory />
     <ChatLog class="h-full max-h-96 row-span-2" />
     <div class="bg-red-300 h-full max-h-128">Event Log</div>
   </div>
@@ -19,6 +17,7 @@ import { useModerationStore } from "~/store/moderation";
 import SearchResult from "~/components/moderation/SearchResult.vue";
 import TakeModAction from "~/components/moderation/TakeModAction.vue";
 import SearchUserInput from "~/components/moderation/SearchUserInput.vue";
+import NamingHistory from "~/components/moderation/NamingHistory.vue";
 
 useSeoMeta({
   title: "FairGame - Moderation",

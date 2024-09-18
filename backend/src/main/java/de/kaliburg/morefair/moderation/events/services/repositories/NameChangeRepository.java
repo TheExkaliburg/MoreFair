@@ -13,12 +13,23 @@ public interface NameChangeRepository extends JpaRepository<NameChangeEntity, Lo
 
   int NAME_CHANGES_PER_PAGE = 50;
 
-  @Query(value = "SELECT * FROM name_change nc "
-      + "WHERE nc.account_id = :accountId", nativeQuery = true)
+  @Query(nativeQuery = true,
+      value = "SELECT * FROM name_change nc "
+          + "WHERE nc.account_id = :accountId "
+          + "ORDER BY nc.created_on DESC")
   List<NameChangeEntity> findByAccount(@Param("accountId") Long accountId, Pageable pageable);
 
   default List<NameChangeEntity> findByAccount(Long accountId) {
     return findByAccount(accountId, Pageable.ofSize(NAME_CHANGES_PER_PAGE));
   }
 
+  @Query(nativeQuery = true,
+      value = "SELECT * FROM name_change nc "
+          + "WHERE lower( nc.display_name) like concat('%', lower(:displayName), '%') "
+          + "ORDER BY nc.created_on DESC")
+  List<NameChangeEntity> findWithName(@Param("displayName") String displayName, Pageable pageable);
+
+  default List<NameChangeEntity> findWithName(String displayName) {
+    return findWithName(displayName, Pageable.ofSize(NAME_CHANGES_PER_PAGE));
+  }
 }

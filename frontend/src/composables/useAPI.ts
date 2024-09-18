@@ -3,6 +3,7 @@ import Cookies from "js-cookie";
 import { useToasts } from "~/composables/useToasts";
 import { ChatType } from "~/store/chat";
 import { AccountSettings } from "~/store/account";
+import { SearchType } from "~/store/moderation";
 
 const isDevMode = process.env.NODE_ENV !== "production";
 let lastXsrfToken = Cookies.get("XSRF-TOKEN");
@@ -195,6 +196,13 @@ const API = {
       const params = new URLSearchParams();
       params.append("accountId", accountId.toString());
       return axiosInstance.get("/api/moderation/search/alts", { params });
+    },
+    showNameHistory(searchQuery: string, type: SearchType) {
+      const params = new URLSearchParams();
+      params.append("search", searchQuery);
+      return axiosInstance.get(`api/moderation/history/name/${type}`, {
+        params,
+      });
     },
   },
   grapes: {

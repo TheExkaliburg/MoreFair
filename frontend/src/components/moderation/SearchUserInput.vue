@@ -37,7 +37,7 @@ import { SearchType, useModerationStore } from "~/store/moderation";
 const moderationStore = useModerationStore();
 
 function searchUsername() {
-  moderationStore.actions.search(SearchType.USERNAME);
+  moderationStore.actions.search(SearchType.DISPLAY_NAME);
 }
 
 function searchAccountId() {
