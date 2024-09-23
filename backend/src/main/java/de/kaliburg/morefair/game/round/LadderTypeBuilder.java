@@ -145,6 +145,13 @@ public class LadderTypeBuilder {
   public Set<LadderType> build() {
     Set<LadderType> ladderTypes = EnumSet.noneOf(LadderType.class);
 
+    if (roundNumber == 300 && ladderNumber == 1) {
+      return EnumSet.of(LadderType.CHEAP, LadderType.NO_AUTO, LadderType.ASSHOLE,
+          LadderType.GIGANTIC);
+    } else if (roundNumber == 301) {
+      return EnumSet.of(LadderType.END);
+    }
+
     if (roundTypes.contains(RoundType.SPECIAL_100)) {
       return specialRoundBuilder();
     }

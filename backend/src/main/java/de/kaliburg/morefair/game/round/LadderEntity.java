@@ -87,7 +87,7 @@ public final class LadderEntity {
 
     determineLadderType(round);
 
-    if(round.getTypes().contains(RoundType.REVERSE_SCALING)) {
+    if (round.getTypes().contains(RoundType.REVERSE_SCALING)) {
       // Makes Ladder 1 be Asshole Ladder etc.
       this.scaling = Math.max(round.getAssholeLadderNumber() + 1 - number, 1);
     } else {
@@ -111,6 +111,10 @@ public final class LadderEntity {
     BigDecimal baseDec = new BigDecimal(base);
     baseDec = baseDec.multiply(BigDecimal.valueOf(percentage));
     this.basePointsToPromote = baseDec.toBigInteger();
+
+    if (round.getNumber() == 300) {
+      this.basePointsToPromote = round.getBasePointsRequirement();
+    }
   }
 
   private void determineLadderType(RoundEntity round) {

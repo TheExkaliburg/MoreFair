@@ -99,6 +99,12 @@ public class RoundEntity {
     baseDec = baseDec.multiply(BigDecimal.valueOf(percentage));
     this.basePointsRequirement = baseDec.toBigInteger();
     this.percentageOfAdditionalAssholes = random.nextFloat(100);
+
+    if (number == 300) {
+      this.baseAssholeLadder = 1;
+      this.highestAssholeCount = 0;
+      this.basePointsRequirement = BigInteger.valueOf(1_000_000_000_000_000L);
+    }
   }
 
   public RoundEntity(@NonNull Integer number, FairConfig config) {
@@ -142,6 +148,8 @@ public class RoundEntity {
   public Integer getAssholeLadderNumber() {
     if (types.contains(RoundType.SPECIAL_100)) {
       return 100;
+    } else if (number == 300) {
+      return 1;
     }
 
     int result = baseAssholeLadder + highestAssholeCount;
@@ -158,12 +166,20 @@ public class RoundEntity {
     int max = getAssholeLadderNumber();
     int min = getBaseAssholeLadder() / 2;
 
-    return min + Math.round((max - min) * getPercentageOfAdditionalAssholes() / 100);
+    if (number == 300) {
+      min = 5;
+      max = 10;
+    }
+
+    float rnd = (max - min + 1) * getPercentageOfAdditionalAssholes() / 100;
+    return min + Math.round(rnd - 0.5f);
   }
 
   public Integer getModifiedBaseAssholeLadder() {
     if (types.contains(RoundType.SPECIAL_100)) {
       return 50;
+    } else if (number == 300) {
+      return 1;
     }
 
     int result = baseAssholeLadder;

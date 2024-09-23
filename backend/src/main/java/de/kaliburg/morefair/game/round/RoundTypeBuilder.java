@@ -45,8 +45,12 @@ public class RoundTypeBuilder {
   }
 
   public Set<RoundType> build() {
-    if (roundNumber % 100 == 0) {
+    if (roundNumber == 200) {
       return EnumSet.of(RoundType.SPECIAL_100, RoundType.REVERSE_SCALING);
+    } else if (roundNumber == 300) {
+      return EnumSet.of(RoundType.CHAOS);
+    } else if (roundNumber == 301) {
+      return EnumSet.of(RoundType.DEFAULT);
     } else if (roundNumber % 10 == 0) {
       roundSpeedTypeWeights.put(RoundType.FAST, 1.f);
       roundSpeedTypeWeights.put(RoundType.SLOW, 1.f);
