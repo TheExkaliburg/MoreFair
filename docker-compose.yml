@@ -33,7 +33,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: always
   mongo:
-    image: mongo:latest
+    image: mongo:7
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
@@ -44,7 +44,7 @@ services:
       - mongo_config:/data/configdb
     restart: always
   redis:
-    image: redis:7
+    image: redis:latest
     command: /bin/sh -c "redis-server --requirepass $REDIS_PASSWORD"
     environment:
       REDIS_HOST_PASSWORD: ${REDIS_PASSWORD}
