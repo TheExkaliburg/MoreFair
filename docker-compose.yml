@@ -44,7 +44,7 @@ services:
       - mongo_config:/data/configdb
     restart: always
   redis:
-    image: redis:latest
+    image: redis:7
     command: /bin/sh -c "redis-server --requirepass $REDIS_PASSWORD"
     environment:
       REDIS_HOST_PASSWORD: ${REDIS_PASSWORD}
