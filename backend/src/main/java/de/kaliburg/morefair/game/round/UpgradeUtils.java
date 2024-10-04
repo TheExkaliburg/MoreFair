@@ -81,9 +81,15 @@ public class UpgradeUtils {
     if (ladderTypes.contains(LadderType.CHEAP_2)) {
       ladder = ladder.multiply(ladderMulti);
     }
+    if (ladderTypes.contains(LadderType.CHEAP_3)) {
+      ladder = ladder.multiply(ladderMulti);
+    }
 
     BigDecimal result = ladder.add(BigDecimal.ONE).pow(currentUpgrade + 1).multiply(flatMulti);
     if (ladderTypes.contains(LadderType.CHEAP_2)) {
+      result = result.multiply(flatMulti);
+    }
+    if (ladderTypes.contains(LadderType.CHEAP_3)) {
       result = result.multiply(flatMulti);
     }
 

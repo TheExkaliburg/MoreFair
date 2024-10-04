@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public enum LadderType implements Comparable<LadderType> {
-  DEFAULT, TINY, SMALL, BIG, GIGANTIC, FREE_AUTO, NO_AUTO, ASSHOLE, CHEAP, CHEAP_2, EXPENSIVE, END;
+  DEFAULT, TINY, SMALL, BIG, GIGANTIC, FREE_AUTO, NO_AUTO, ASSHOLE, CHEAP, CHEAP_2, CHEAP_3, EXPENSIVE, END;
 
   /**
    * The order of the ladder types when sorted (ordinal is originally used if the priority is the

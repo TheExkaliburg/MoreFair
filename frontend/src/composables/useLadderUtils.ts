@@ -188,12 +188,18 @@ function getNextUpgradeCost(currentUpgrade: number): Decimal {
   if (ladder.state.types.has(LadderType.CHEAP_2)) {
     ladderDec = ladderDec.mul(ladderMulti);
   }
+  if (ladder.state.types.has(LadderType.CHEAP_3)) {
+    ladderDec = ladderDec.mul(ladderMulti);
+  }
 
   let result = ladderDec
     .add(new Decimal(1))
     .pow(currentUpgrade + 1)
     .mul(flatMulti);
   if (ladder.state.types.has(LadderType.CHEAP_2)) {
+    result = result.mul(flatMulti);
+  }
+  if (ladder.state.types.has(LadderType.CHEAP_3)) {
     result = result.mul(flatMulti);
   }
   return result.round().max(new Decimal(1));

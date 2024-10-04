@@ -188,16 +188,39 @@ public class LadderCalculator {
           new Event<>(PROMOTE, rankers.get(0).getAccount().getId()));
     }
 
-    if (ladder.getRound().getNumber() == 300
-        && !ladder.getTypes().contains(LadderType.CHEAP_2)
-        && OffsetDateTime.now().isAfter(ladder.getRound().getCreatedOn().plusWeeks(1))) {
-      // Add CHEAP_2 to ladder
-      ladder.getTypes().add(LadderType.CHEAP_2);
+    if (ladder.getRound().getNumber() == 300) {
 
-      Event<LadderEventTypes> e = new Event<>(LadderEventTypes.UPDATE_TYPES, ladder.getId(),
-          ladder.getTypes());
-      wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
-          ladder.getNumber(), e);
+      var now = OffsetDateTime.now();
+
+      if (!ladder.getTypes().contains(LadderType.CHEAP)
+          && now.isAfter(ladder.getRound().getCreatedOn().plusHours(1))) {
+        ladder.getTypes().add(LadderType.CHEAP);
+
+        Event<LadderEventTypes> e = new Event<>(LadderEventTypes.UPDATE_TYPES, ladder.getId(),
+            ladder.getTypes());
+        wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
+            ladder.getNumber(), e);
+      }
+
+      if (!ladder.getTypes().contains(LadderType.CHEAP_2)
+          && now.isAfter(ladder.getRound().getCreatedOn().plusDays(3))) {
+        ladder.getTypes().add(LadderType.CHEAP_2);
+
+        Event<LadderEventTypes> e = new Event<>(LadderEventTypes.UPDATE_TYPES, ladder.getId(),
+            ladder.getTypes());
+        wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
+            ladder.getNumber(), e);
+      }
+
+      if (!ladder.getTypes().contains(LadderType.CHEAP_3)
+          && now.isAfter(ladder.getRound().getCreatedOn().plusWeeks(1))) {
+        ladder.getTypes().add(LadderType.CHEAP_3);
+
+        Event<LadderEventTypes> e = new Event<>(LadderEventTypes.UPDATE_TYPES, ladder.getId(),
+            ladder.getTypes());
+        wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
+            ladder.getNumber(), e);
+      }
     }
 
   }
