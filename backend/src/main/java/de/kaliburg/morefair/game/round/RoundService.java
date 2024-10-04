@@ -125,6 +125,9 @@ public class RoundService {
       wsUtils.convertAndSendToTopic(RoundController.TOPIC_EVENTS_DESTINATION, new Event<>(
           RoundEventTypes.INCREASE_ASSHOLE_LADDER, account.getId(),
           roundUtils.getAssholeLadderNumber(getCurrentRound())));
+      wsUtils.convertAndSendToTopic(RoundController.TOPIC_EVENTS_DESTINATION, new Event<>(
+          RoundEventTypes.INCREASE_HIGHEST_ASSHOLE_COUNT, account.getId(),
+          assholeCount));
     }
 
     return result;

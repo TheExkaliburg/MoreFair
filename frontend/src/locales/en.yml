@@ -222,6 +222,10 @@ modifier:
     title: Cheap
     description: Multi and bias purchases are cheaper on this ladder.
     identifier: CHEAP
+  CHEAP_2:
+    title: Cheap
+    description: Multi and bias purchases are cheaper on this ladder.
+    identifier: CHEAP
   EXPENSIVE:
     title: Expensive
     description: Multi and bias purchases are more expensive on this ladder.

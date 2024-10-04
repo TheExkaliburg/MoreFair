@@ -7,11 +7,13 @@ import static de.kaliburg.morefair.events.types.LadderEventTypes.PROMOTE;
 import static de.kaliburg.morefair.events.types.LadderEventTypes.THROW_VINEGAR;
 
 import de.kaliburg.morefair.api.FairController;
+import de.kaliburg.morefair.api.LadderController;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.LadderEventTypes;
 import de.kaliburg.morefair.game.round.dto.HeartbeatDto;
 import java.math.BigInteger;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -60,8 +62,8 @@ public class LadderCalculator {
         // Calculate Ladder yourself
         Collection<LadderEntity> ladders = ladderService.getCurrentLadderMap().values();
         List<CompletableFuture<Void>> futures = ladders.stream()
-            .map(ladder -> CompletableFuture.runAsync(
-                () -> calculateLadder(ladder, deltaSec))).toList();
+            .map(ladder -> CompletableFuture.runAsync(() -> calculateLadder(ladder, deltaSec)))
+            .toList();
         try {
           CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get();
         } catch (ExecutionException | InterruptedException e) {
@@ -185,6 +187,19 @@ public class LadderCalculator {
       ladderService.addEvent(ladder.getNumber(),
           new Event<>(PROMOTE, rankers.get(0).getAccount().getId()));
     }
+
+    if (ladder.getRound().getNumber() == 300
+        && !ladder.getTypes().contains(LadderType.CHEAP_2)
+        && OffsetDateTime.now().isAfter(ladder.getRound().getCreatedOn().plusWeeks(1))) {
+      // Add CHEAP_2 to ladder
+      ladder.getTypes().add(LadderType.CHEAP_2);
+
+      Event<LadderEventTypes> e = new Event<>(LadderEventTypes.UPDATE_TYPES, ladder.getId(),
+          ladder.getTypes());
+      wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
+          ladder.getNumber(), e);
+    }
+
   }
 }
 

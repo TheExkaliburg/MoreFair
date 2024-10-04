@@ -1,11 +1,6 @@
 package de.kaliburg.morefair.game.round;
 
 import de.kaliburg.morefair.FairConfig;
-import de.kaliburg.morefair.game.round.LadderEntity;
-import de.kaliburg.morefair.game.round.LadderType;
-import de.kaliburg.morefair.game.round.LadderUtils;
-import de.kaliburg.morefair.game.round.RoundEntity;
-import de.kaliburg.morefair.game.round.RoundType;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -65,20 +60,30 @@ public class UpgradeUtils {
    */
   public BigInteger buyUpgradeCost(Integer ladderNumber, Integer currentUpgrade,
       Set<LadderType> ladderTypes) {
+
     BigDecimal flatMulti = BigDecimal.ONE;
     BigDecimal ladderMulti = BigDecimal.ONE;
     if (ladderTypes.contains(LadderType.CHEAP)) {
-      flatMulti = BigDecimal.ONE.subtract(FLAT_UPGRADE_MULTIPLIER);
-      ladderMulti = BigDecimal.ONE.subtract(LADDER_UPGRADE_MULTIPLIER);
+      flatMulti = flatMulti.subtract(FLAT_UPGRADE_MULTIPLIER);
+      ladderMulti = ladderMulti.subtract(LADDER_UPGRADE_MULTIPLIER);
     }
+
     if (ladderTypes.contains(LadderType.EXPENSIVE)) {
-      flatMulti = BigDecimal.ONE.add(FLAT_UPGRADE_MULTIPLIER);
-      ladderMulti = BigDecimal.ONE.add(LADDER_UPGRADE_MULTIPLIER);
+      flatMulti = flatMulti.add(FLAT_UPGRADE_MULTIPLIER);
+      ladderMulti = ladderMulti.add(LADDER_UPGRADE_MULTIPLIER);
     }
 
     BigDecimal ladder = BigDecimal.valueOf(ladderNumber);
-    ladder = ladder.multiply(ladderMulti).add(BigDecimal.ONE);
-    BigDecimal result = ladder.pow(currentUpgrade + 1).multiply(flatMulti);
+    ladder = ladder.multiply(ladderMulti);
+    if (ladderTypes.contains(LadderType.CHEAP_2)) {
+      ladder = ladder.multiply(ladderMulti);
+    }
+
+    BigDecimal result = ladder.add(BigDecimal.ONE).pow(currentUpgrade + 1).multiply(flatMulti);
+    if (ladderTypes.contains(LadderType.CHEAP_2)) {
+      result = result.multiply(flatMulti);
+    }
+
     // adding 0.5 to round at 0.5, otherwise it would always round down
     // also clamping the lower bound at 1
     return BigInteger.ONE.max(result.add(BigDecimal.valueOf(0.5)).toBigInteger());

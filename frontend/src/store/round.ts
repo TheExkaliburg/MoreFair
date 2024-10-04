@@ -23,12 +23,15 @@ export enum RoundEventType {
   RESET = "RESET",
   INCREASE_ASSHOLE_LADDER = "INCREASE_ASSHOLE_LADDER",
   INCREASE_TOP_LADDER = "INCREASE_TOP_LADDER",
+  INCREASE_HIGHEST_ASSHOLE_COUNT = "INCREASE_HIGHEST_ASSHOLE_COUNT",
   JOIN = "JOIN",
 }
 
 export type RoundData = {
   settings: RoundSettingsData;
+  number: number;
   assholeLadder: number;
+  highestAssholeCount: number;
   autoPromoteLadder: number;
   topLadder: number;
   types: RoundType[];
@@ -41,7 +44,9 @@ export const useRoundStore = defineStore("round", () => {
   const isInitialized = ref<boolean>(false);
   const state = reactive({
     assholeLadder: 20,
+    number: 0,
     autoPromoteLadder: 1,
+    highestAssholeCount: 0,
     types: new Set([RoundType.DEFAULT]),
     topLadder: 1,
     settings: new RoundSettings({}),
@@ -71,6 +76,8 @@ export const useRoundStore = defineStore("round", () => {
         state.types.clear();
         data.types.forEach((t) => state.types.add(t));
         state.assholeLadder = data.assholeLadder;
+        state.highestAssholeCount = data.highestAssholeCount;
+        state.number = data.number;
         state.autoPromoteLadder = data.autoPromoteLadder;
         state.settings = new RoundSettings(data.settings);
         state.topLadder = data.topLadder;
@@ -91,6 +98,12 @@ export const useRoundStore = defineStore("round", () => {
     switch (event) {
       case RoundEventType.INCREASE_ASSHOLE_LADDER:
         state.assholeLadder = Math.max(body.data, state.assholeLadder);
+        break;
+      case RoundEventType.INCREASE_HIGHEST_ASSHOLE_COUNT:
+        state.highestAssholeCount = Math.max(
+          body.data,
+          state.highestAssholeCount,
+        );
         break;
       case RoundEventType.INCREASE_TOP_LADDER:
         state.topLadder = Math.max(body.data, state.topLadder);

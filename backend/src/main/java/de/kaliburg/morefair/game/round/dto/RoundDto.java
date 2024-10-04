@@ -10,16 +10,20 @@ import lombok.Data;
 public class RoundDto {
 
   private RoundSettingsDto settings;
+  private Integer number;
   private Integer assholeLadder;
   private Integer topLadder;
   private Integer autoPromoteLadder;
+  private Integer highestAssholeCount;
   private Set<RoundType> types;
 
   public RoundDto(RoundEntity currentRound, FairConfig config) {
     settings = new RoundSettingsDto(currentRound, config);
+    number = currentRound.getNumber();
     autoPromoteLadder = config.getAutoPromoteLadder();
     topLadder = currentRound.getLadders().size();
     assholeLadder = currentRound.getAssholeLadderNumber();
+    highestAssholeCount = currentRound.getHighestAssholeCount();
     types = currentRound.getTypes();
   }
 

@@ -92,12 +92,30 @@ const canBuyAutoPromote = computed<boolean>(() => {
 
 const getYourBiasCost = computed<Decimal>(() => {
   if (ladder.getters.yourRanker === undefined) return new Decimal(Infinity);
-  return getNextUpgradeCost(ladder.getters.yourRanker.bias);
+  const round = useRoundStore();
+
+  let currentUpgrade = ladder.getters.yourRanker.bias;
+  if (round.state.number === 300) {
+    const ranksBehind =
+      round.state.highestAssholeCount - ladder.getters.yourRanker.assholeCount;
+    currentUpgrade -= ranksBehind;
+  }
+
+  return getNextUpgradeCost(currentUpgrade);
 });
 
 const getYourMultiCost = computed<Decimal>(() => {
   if (ladder.getters.yourRanker === undefined) return new Decimal(Infinity);
-  return getNextUpgradeCost(ladder.getters.yourRanker.multi);
+  const round = useRoundStore();
+
+  let currentUpgrade = ladder.getters.yourRanker.multi;
+  if (round.state.number === 300) {
+    const ranksBehind =
+      round.state.highestAssholeCount - ladder.getters.yourRanker.assholeCount;
+    currentUpgrade -= ranksBehind;
+  }
+
+  return getNextUpgradeCost(currentUpgrade);
 });
 
 const getYourAutoPromoteCost = computed<Decimal>(() => {
@@ -155,17 +173,27 @@ function getNextUpgradeCost(currentUpgrade: number): Decimal {
   let flatMulti = 1;
   let ladderMulti = 1;
   if (ladder.state.types.has(LadderType.CHEAP)) {
-    ladderMulti = 0.5;
-    flatMulti = 0.5;
+    ladderMulti = 1 - 0.5;
+    flatMulti = 1 - 0.5;
   }
   if (ladder.state.types.has(LadderType.EXPENSIVE)) {
-    ladderMulti = 1.5;
-    flatMulti = 1.5;
+    ladderMulti = 1 + 0.5;
+    flatMulti = 1 + 0.5;
   }
 
   let ladderDec = new Decimal(ladder.state.scaling);
-  ladderDec = ladderDec.mul(ladderMulti).add(new Decimal(1));
-  const result = ladderDec.pow(currentUpgrade + 1).mul(flatMulti);
+  ladderDec = ladderDec.mul(ladderMulti);
+  if (ladder.state.types.has(LadderType.CHEAP_2)) {
+    ladderDec = ladderDec.mul(ladderMulti);
+  }
+
+  let result = ladderDec
+    .add(new Decimal(1))
+    .pow(currentUpgrade + 1)
+    .mul(flatMulti);
+  if (ladder.state.types.has(LadderType.CHEAP_2)) {
+    result = result.mul(flatMulti);
+  }
   return result.round().max(new Decimal(1));
 }
 

@@ -26,6 +26,7 @@ export enum LadderType {
   NO_AUTO = "NO_AUTO",
   ASSHOLE = "ASSHOLE",
   CHEAP = "CHEAP",
+  CHEAP_2 = "CHEAP_2",
   EXPENSIVE = "EXPENSIVE",
   END = "END",
 }

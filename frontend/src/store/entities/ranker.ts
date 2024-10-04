@@ -10,6 +10,7 @@ export type RankerData = {
   multi: number;
   growing: boolean;
   assholeTag: string;
+  assholeCount: number;
   assholePoints: number;
   grapes: Decimal;
   vinegar: Decimal;
@@ -26,6 +27,7 @@ export class Ranker implements RankerData {
   multi = 1;
   growing = true;
   assholeTag = "";
+  assholeCount = 0;
   assholePoints = 0;
   grapes: Decimal = new Decimal(0);
   vinegar: Decimal = new Decimal(0);
