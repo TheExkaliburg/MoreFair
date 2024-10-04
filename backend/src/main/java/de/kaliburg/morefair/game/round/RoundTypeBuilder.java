@@ -47,6 +47,8 @@ public class RoundTypeBuilder {
   public Set<RoundType> build() {
     if (roundNumber == 200) {
       return EnumSet.of(RoundType.SPECIAL_100, RoundType.REVERSE_SCALING);
+    } else if (roundNumber == 299) {
+      return EnumSet.of(RoundType.FAST, RoundType.AUTO, RoundType.REVERSE_SCALING);
     } else if (roundNumber == 300) {
       return EnumSet.of(RoundType.CHAOS);
     } else if (roundNumber == 301) {
