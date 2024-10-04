@@ -170,6 +170,8 @@ function getAutoPromoteCost(rank: number): Decimal {
 }
 
 function getNextUpgradeCost(currentUpgrade: number): Decimal {
+  if (currentUpgrade <= 0) currentUpgrade = 0;
+
   let flatMulti = 1;
   let ladderMulti = 1;
   if (ladder.state.types.has(LadderType.CHEAP)) {

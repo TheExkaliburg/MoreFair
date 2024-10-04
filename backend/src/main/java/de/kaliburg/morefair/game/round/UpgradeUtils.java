@@ -60,6 +60,9 @@ public class UpgradeUtils {
    */
   public BigInteger buyUpgradeCost(Integer ladderNumber, Integer currentUpgrade,
       Set<LadderType> ladderTypes) {
+    if (currentUpgrade <= 0) {
+      currentUpgrade = 0;
+    }
 
     BigDecimal flatMulti = BigDecimal.ONE;
     BigDecimal ladderMulti = BigDecimal.ONE;

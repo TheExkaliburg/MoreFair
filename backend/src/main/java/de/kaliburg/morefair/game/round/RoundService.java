@@ -117,17 +117,19 @@ public class RoundService {
         ? getCurrentRound().getBaseAssholeLadder() / 2
         : getCurrentRound().getBaseAssholeLadder();
 
-    if (assholeCount > getCurrentRound().getHighestAssholeCount()
-        && !getCurrentRound().getTypes().contains(RoundType.CHAOS)
-        && ladderService.findInCache(baseAssholeLadderNumber) == null) {
-      getCurrentRound().setHighestAssholeCount(assholeCount);
-      ladderService.setCurrentRound(save(getCurrentRound()));
-      wsUtils.convertAndSendToTopic(RoundController.TOPIC_EVENTS_DESTINATION, new Event<>(
-          RoundEventTypes.INCREASE_ASSHOLE_LADDER, account.getId(),
-          roundUtils.getAssholeLadderNumber(getCurrentRound())));
-      wsUtils.convertAndSendToTopic(RoundController.TOPIC_EVENTS_DESTINATION, new Event<>(
-          RoundEventTypes.INCREASE_HIGHEST_ASSHOLE_COUNT, account.getId(),
-          assholeCount));
+    if (assholeCount > getCurrentRound().getHighestAssholeCount()) {
+      if ((!getCurrentRound().getTypes().contains(RoundType.CHAOS)
+          && ladderService.findInCache(baseAssholeLadderNumber) == null)
+          || getCurrentRound().getNumber() == 300) {
+        getCurrentRound().setHighestAssholeCount(assholeCount);
+        ladderService.setCurrentRound(save(getCurrentRound()));
+        wsUtils.convertAndSendToTopic(RoundController.TOPIC_EVENTS_DESTINATION, new Event<>(
+            RoundEventTypes.INCREASE_ASSHOLE_LADDER, account.getId(),
+            roundUtils.getAssholeLadderNumber(getCurrentRound())));
+        wsUtils.convertAndSendToTopic(RoundController.TOPIC_EVENTS_DESTINATION, new Event<>(
+            RoundEventTypes.INCREASE_HIGHEST_ASSHOLE_COUNT, account.getId(),
+            assholeCount));
+      }
     }
 
     return result;
