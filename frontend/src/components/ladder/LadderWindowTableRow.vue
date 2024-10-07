@@ -110,6 +110,7 @@ import {
   useTableSpace,
   useTableSpaceStyles,
 } from "~/composables/useTableSpace";
+import { useRoundStore } from "~/store/round";
 
 const props = withDefaults(
   defineProps<{
@@ -123,6 +124,7 @@ const props = withDefaults(
   },
 );
 
+const roundStore = useRoundStore();
 const ladderStore = useLadderStore();
 const optionsStore = useOptionsStore();
 const ladderUtils = useLadderUtils();
@@ -186,25 +188,57 @@ const etaToYourRanker = computed<number>(() => {
 
 const canBuyBias = computed<boolean>(() => {
   if (!isVisible) return false;
-  const upgradeCost = ladderUtils.getYourBiasCost.value;
+
+  let currentUpgrade = props.ranker.bias;
+  if (roundStore.state.number === 300) {
+    const ranksBehind =
+      roundStore.state.highestAssholeCount - props.ranker.assholeCount;
+    currentUpgrade -= ranksBehind;
+  }
+
+  const upgradeCost = ladderUtils.getNextUpgradeCost(currentUpgrade);
   return upgradeCost.cmp(props.ranker.points) <= 0;
 });
 
 const canAlmostBuyBias = computed<boolean>(() => {
   if (!isVisible) return false;
-  const upgradeCost = ladderUtils.getYourBiasCost.value;
+
+  let currentUpgrade = props.ranker.bias;
+  if (roundStore.state.number === 300) {
+    const ranksBehind =
+      roundStore.state.highestAssholeCount - props.ranker.assholeCount;
+    currentUpgrade -= ranksBehind;
+  }
+
+  const upgradeCost = ladderUtils.getNextUpgradeCost(currentUpgrade);
   return useEta(props.ranker).toPoints(upgradeCost) < 5 * 60;
 });
 
 const canBuyMulti = computed<boolean>(() => {
   if (!isVisible) return false;
-  const upgradeCost = ladderUtils.getYourMultiCost.value;
+
+  let currentUpgrade = props.ranker.multi;
+  if (roundStore.state.number === 300) {
+    const ranksBehind =
+      roundStore.state.highestAssholeCount - props.ranker.assholeCount;
+    currentUpgrade -= ranksBehind;
+  }
+
+  const upgradeCost = ladderUtils.getNextUpgradeCost(currentUpgrade);
   return upgradeCost.cmp(props.ranker.power) <= 0;
 });
 
 const canAlmostBuyMulti = computed<boolean>(() => {
   if (!isVisible) return false;
-  const upgradeCost = ladderUtils.getYourMultiCost.value;
+
+  let currentUpgrade = props.ranker.multi;
+  if (roundStore.state.number === 300) {
+    const ranksBehind =
+      roundStore.state.highestAssholeCount - props.ranker.assholeCount;
+    currentUpgrade -= ranksBehind;
+  }
+
+  const upgradeCost = ladderUtils.getNextUpgradeCost(currentUpgrade);
   return useEta(props.ranker).toPower(upgradeCost) < 5 * 60;
 });
 
