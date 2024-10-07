@@ -28,6 +28,13 @@ export enum LadderType {
   CHEAP = "CHEAP",
   CHEAP_2 = "CHEAP_2",
   CHEAP_3 = "CHEAP_3",
+  CHEAP_4 = "CHEAP_4",
+  CHEAP_5 = "CHEAP_5",
+  CHEAP_6 = "CHEAP_6",
+  CHEAP_7 = "CHEAP_7",
+  CHEAP_8 = "CHEAP_8",
+  CHEAP_9 = "CHEAP_9",
+  CHEAP_10 = "CHEAP_10",
   EXPENSIVE = "EXPENSIVE",
   END = "END",
 }
@@ -271,7 +278,11 @@ export const useLadderStore = defineStore("ladder", () => {
     for (let i = 0; i < eventsLength; i++) {
       const event = ladderEvents[i];
       let ranker = state.rankers.find((r) => r.accountId === event.accountId);
-      if (ranker === undefined && event.eventType === LadderEventType.JOIN)
+      if (
+        ranker === undefined &&
+        (event.eventType === LadderEventType.JOIN ||
+          event.eventType === LadderEventType.UPDATE_TYPES)
+      )
         ranker = new Ranker({});
       if (ranker === undefined) break;
 

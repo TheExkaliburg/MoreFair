@@ -191,6 +191,27 @@ function getNextUpgradeCost(currentUpgrade: number): Decimal {
   if (ladder.state.types.has(LadderType.CHEAP_3)) {
     ladderDec = ladderDec.mul(ladderMulti);
   }
+  if (ladder.state.types.has(LadderType.CHEAP_4)) {
+    ladderDec = ladderDec.mul(ladderMulti);
+  }
+  if (ladder.state.types.has(LadderType.CHEAP_5)) {
+    ladderDec = ladderDec.mul(ladderMulti);
+  }
+  if (ladder.state.types.has(LadderType.CHEAP_6)) {
+    ladderDec = ladderDec.mul(ladderMulti);
+  }
+  if (ladder.state.types.has(LadderType.CHEAP_7)) {
+    ladderDec = ladderDec.mul(ladderMulti);
+  }
+  if (ladder.state.types.has(LadderType.CHEAP_8)) {
+    ladderDec = ladderDec.mul(ladderMulti);
+  }
+  if (ladder.state.types.has(LadderType.CHEAP_9)) {
+    ladderDec = ladderDec.mul(ladderMulti);
+  }
+  if (ladder.state.types.has(LadderType.CHEAP_10)) {
+    ladderDec = ladderDec.mul(ladderMulti);
+  }
 
   let result = ladderDec
     .add(new Decimal(1))
@@ -200,6 +221,27 @@ function getNextUpgradeCost(currentUpgrade: number): Decimal {
     result = result.mul(flatMulti);
   }
   if (ladder.state.types.has(LadderType.CHEAP_3)) {
+    result = result.mul(flatMulti);
+  }
+  if (ladder.state.types.has(LadderType.CHEAP_4)) {
+    result = result.mul(flatMulti);
+  }
+  if (ladder.state.types.has(LadderType.CHEAP_5)) {
+    result = result.mul(flatMulti);
+  }
+  if (ladder.state.types.has(LadderType.CHEAP_6)) {
+    result = result.mul(flatMulti);
+  }
+  if (ladder.state.types.has(LadderType.CHEAP_7)) {
+    result = result.mul(flatMulti);
+  }
+  if (ladder.state.types.has(LadderType.CHEAP_8)) {
+    result = result.mul(flatMulti);
+  }
+  if (ladder.state.types.has(LadderType.CHEAP_9)) {
+    result = result.mul(flatMulti);
+  }
+  if (ladder.state.types.has(LadderType.CHEAP_10)) {
     result = result.mul(flatMulti);
   }
   return result.round().max(new Decimal(1));

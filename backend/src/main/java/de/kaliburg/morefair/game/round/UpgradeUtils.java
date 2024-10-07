@@ -84,12 +84,54 @@ public class UpgradeUtils {
     if (ladderTypes.contains(LadderType.CHEAP_3)) {
       ladder = ladder.multiply(ladderMulti);
     }
+    if (ladderTypes.contains(LadderType.CHEAP_4)) {
+      ladder = ladder.multiply(ladderMulti);
+    }
+    if (ladderTypes.contains(LadderType.CHEAP_5)) {
+      ladder = ladder.multiply(ladderMulti);
+    }
+    if (ladderTypes.contains(LadderType.CHEAP_6)) {
+      ladder = ladder.multiply(ladderMulti);
+    }
+    if (ladderTypes.contains(LadderType.CHEAP_7)) {
+      ladder = ladder.multiply(ladderMulti);
+    }
+    if (ladderTypes.contains(LadderType.CHEAP_8)) {
+      ladder = ladder.multiply(ladderMulti);
+    }
+    if (ladderTypes.contains(LadderType.CHEAP_9)) {
+      ladder = ladder.multiply(ladderMulti);
+    }
+    if (ladderTypes.contains(LadderType.CHEAP_10)) {
+      ladder = ladder.multiply(ladderMulti);
+    }
 
     BigDecimal result = ladder.add(BigDecimal.ONE).pow(currentUpgrade + 1).multiply(flatMulti);
     if (ladderTypes.contains(LadderType.CHEAP_2)) {
       result = result.multiply(flatMulti);
     }
     if (ladderTypes.contains(LadderType.CHEAP_3)) {
+      result = result.multiply(flatMulti);
+    }
+    if (ladderTypes.contains(LadderType.CHEAP_4)) {
+      result = result.multiply(flatMulti);
+    }
+    if (ladderTypes.contains(LadderType.CHEAP_5)) {
+      result = result.multiply(flatMulti);
+    }
+    if (ladderTypes.contains(LadderType.CHEAP_6)) {
+      result = result.multiply(flatMulti);
+    }
+    if (ladderTypes.contains(LadderType.CHEAP_7)) {
+      result = result.multiply(flatMulti);
+    }
+    if (ladderTypes.contains(LadderType.CHEAP_8)) {
+      result = result.multiply(flatMulti);
+    }
+    if (ladderTypes.contains(LadderType.CHEAP_9)) {
+      result = result.multiply(flatMulti);
+    }
+    if (ladderTypes.contains(LadderType.CHEAP_10)) {
       result = result.multiply(flatMulti);
     }
 

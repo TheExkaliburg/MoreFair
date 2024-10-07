@@ -188,7 +188,7 @@ public class LadderCalculator {
           new Event<>(PROMOTE, rankers.get(0).getAccount().getId()));
     }
 
-    if (ladder.getRound().getNumber() == 300) {
+    if (ladder.getRound().getNumber() == 300 && !rankers.isEmpty()) {
 
       var now = OffsetDateTime.now();
 
@@ -203,7 +203,7 @@ public class LadderCalculator {
       }
 
       if (!ladder.getTypes().contains(LadderType.CHEAP_2)
-          && now.isAfter(ladder.getRound().getCreatedOn().plusDays(3))) {
+          && now.isAfter(ladder.getRound().getCreatedOn().plusDays(1))) {
         ladder.getTypes().add(LadderType.CHEAP_2);
 
         Event<LadderEventTypes> e = new Event<>(LadderEventTypes.UPDATE_TYPES, ladder.getId(),
@@ -213,7 +213,7 @@ public class LadderCalculator {
       }
 
       if (!ladder.getTypes().contains(LadderType.CHEAP_3)
-          && now.isAfter(ladder.getRound().getCreatedOn().plusWeeks(1))) {
+          && now.isAfter(ladder.getRound().getCreatedOn().plusDays(2))) {
         ladder.getTypes().add(LadderType.CHEAP_3);
 
         Event<LadderEventTypes> e = new Event<>(LadderEventTypes.UPDATE_TYPES, ladder.getId(),
@@ -221,6 +221,79 @@ public class LadderCalculator {
         wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
             ladder.getNumber(), e);
       }
+
+      if (!ladder.getTypes().contains(LadderType.CHEAP_4)
+          && now.isAfter(ladder.getRound().getCreatedOn().plusDays(3))) {
+        ladder.getTypes().add(LadderType.CHEAP_4);
+
+        Event<LadderEventTypes> e = new Event<>(LadderEventTypes.UPDATE_TYPES, ladder.getId(),
+            ladder.getTypes());
+        wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
+            ladder.getNumber(), e);
+      }
+
+      if (!ladder.getTypes().contains(LadderType.CHEAP_5)
+          && rankers.get(0).getPoints().compareTo(BigInteger.valueOf(10_000_000_000_000L)) >= 0) {
+        ladder.getTypes().add(LadderType.CHEAP_5);
+
+        Event<LadderEventTypes> e = new Event<>(LadderEventTypes.UPDATE_TYPES, ladder.getId(),
+            ladder.getTypes());
+        wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
+            ladder.getNumber(), e);
+      }
+
+      if (!ladder.getTypes().contains(LadderType.CHEAP_6)
+          && rankers.get(0).getPoints().compareTo(BigInteger.valueOf(100_000_000_000_000L)) >= 0) {
+        ladder.getTypes().add(LadderType.CHEAP_6);
+
+        Event<LadderEventTypes> e = new Event<>(LadderEventTypes.UPDATE_TYPES, ladder.getId(),
+            ladder.getTypes());
+        wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
+            ladder.getNumber(), e);
+      }
+
+      if (!ladder.getTypes().contains(LadderType.CHEAP_7)
+          && rankers.get(0).getPoints().compareTo(BigInteger.valueOf(1_000_000_000_000_000L))
+          >= 0) {
+        ladder.getTypes().add(LadderType.CHEAP_7);
+
+        Event<LadderEventTypes> e = new Event<>(LadderEventTypes.UPDATE_TYPES, ladder.getId(),
+            ladder.getTypes());
+        wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
+            ladder.getNumber(), e);
+      }
+
+      if (!ladder.getTypes().contains(LadderType.CHEAP_8)
+          && now.isAfter(ladder.getRound().getCreatedOn().plusDays(4))) {
+        ladder.getTypes().add(LadderType.CHEAP_8);
+
+        Event<LadderEventTypes> e = new Event<>(LadderEventTypes.UPDATE_TYPES, ladder.getId(),
+            ladder.getTypes());
+        wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
+            ladder.getNumber(), e);
+      }
+
+      if (!ladder.getTypes().contains(LadderType.CHEAP_9)
+          && now.isAfter(ladder.getRound().getCreatedOn().plusDays(5))) {
+        ladder.getTypes().add(LadderType.CHEAP_9);
+
+        Event<LadderEventTypes> e = new Event<>(LadderEventTypes.UPDATE_TYPES, ladder.getId(),
+            ladder.getTypes());
+        wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
+            ladder.getNumber(), e);
+      }
+
+      if (!ladder.getTypes().contains(LadderType.CHEAP_10)
+          && !rankers.get(0).isGrowing()) {
+        ladder.getTypes().add(LadderType.CHEAP_10);
+
+        Event<LadderEventTypes> e = new Event<>(LadderEventTypes.UPDATE_TYPES, ladder.getId(),
+            ladder.getTypes());
+        wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
+            ladder.getNumber(), e);
+      }
+
+
     }
 
   }

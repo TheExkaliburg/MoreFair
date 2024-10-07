@@ -186,25 +186,25 @@ const etaToYourRanker = computed<number>(() => {
 
 const canBuyBias = computed<boolean>(() => {
   if (!isVisible) return false;
-  const upgradeCost = ladderUtils.getNextUpgradeCost(props.ranker.bias);
+  const upgradeCost = ladderUtils.getYourBiasCost.value;
   return upgradeCost.cmp(props.ranker.points) <= 0;
 });
 
 const canAlmostBuyBias = computed<boolean>(() => {
   if (!isVisible) return false;
-  const upgradeCost = ladderUtils.getNextUpgradeCost(props.ranker.bias);
+  const upgradeCost = ladderUtils.getYourBiasCost.value;
   return useEta(props.ranker).toPoints(upgradeCost) < 5 * 60;
 });
 
 const canBuyMulti = computed<boolean>(() => {
   if (!isVisible) return false;
-  const upgradeCost = ladderUtils.getNextUpgradeCost(props.ranker.multi);
+  const upgradeCost = ladderUtils.getYourMultiCost.value;
   return upgradeCost.cmp(props.ranker.power) <= 0;
 });
 
 const canAlmostBuyMulti = computed<boolean>(() => {
   if (!isVisible) return false;
-  const upgradeCost = ladderUtils.getNextUpgradeCost(props.ranker.multi);
+  const upgradeCost = ladderUtils.getYourMultiCost.value;
   return useEta(props.ranker).toPower(upgradeCost) < 5 * 60;
 });
 
