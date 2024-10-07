@@ -17,7 +17,7 @@ const api = {
     useUiStore: () => unpackStore(useUiStore()),
   },
   utils: {
-    useLadderUtils: useLadderUtils(),
+    useLadderUtils: () => useLadderUtils(),
   },
   getHooks: () => useStomp().callbacks,
   addCallback: (
