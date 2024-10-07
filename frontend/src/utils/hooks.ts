@@ -5,6 +5,7 @@ import { useOptionsStore } from "~/store/options";
 import { useAccountStore } from "~/store/account";
 import { useUiStore } from "~/store/ui";
 import { StompCallback, useStomp } from "~/composables/useStomp";
+import { useLadderUtils } from "~/composables/useLadderUtils";
 
 const api = {
   stores: {
@@ -14,6 +15,9 @@ const api = {
     useOptionsStore: () => unpackStore(useOptionsStore()),
     useAccountStore: () => unpackStore(useAccountStore()),
     useUiStore: () => unpackStore(useUiStore()),
+  },
+  utils: {
+    useLadderUtils: () => useLadderUtils(),
   },
   getHooks: () => useStomp().callbacks,
   addCallback: (
