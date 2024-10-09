@@ -4,6 +4,35 @@ description: 'A list of all changes made to the game'
 
 # Changelog
 
+## 3.0.0 [MAJOR]: Season 3 Overhaul
+
+There are a few new features and a lot more small changes/improvements. 
+I'll deliberately stay vague, so the community can figure details out.
+
+### Features:
+
+- A new season approaches! Asshole points will be reset and the round numbers will start again from 1.
+- Players can now choose to devote a portion of their vinegar generation to create wine at a higher rate instead.
+- Players can now choose a percentage of their vinegar to throw, from 50% to 100%, in 1% increments.
+- There is now a log for vinegar throws by/against you.
+- There are a bunch of different ladder/round modifiers that you can encounter.
+- The way asshole points are awarded has been changed.
+  - There is currently a total of 13 AH-Points to earn per round.
+- The progression of the symbols, awarded based on asshole points, have been changed.
+
+### Improvements
+
+- FAST/SLOW doesn't increase the amount of ladders in a round anymore. *This is a buff*.
+- The tutorial has been updated to reflect the modern game and explain the new vinegar mechanics.
+- The amount of players able to become assholes has been changed.
+- Asshole points will no longer have any effect on the number of ladders in a round.
+- Various other improvements and bugfixes, as well as new bugs for you to find.
+
+<br><br><br><br><br><br><br>
+
+<details>
+<summary>Expand for the 2.5.x changelog</summary>
+
 ## 2.5.1 [PATCH]: Some smaller community-improvements
 
 ### Improvements:
@@ -12,11 +41,6 @@ description: 'A list of all changes made to the game'
 
 ### Bugfixes:
 - Manually sending empty metadata won't cause an error for clients anymore
-
-<br><br><br><br><br><br><br>
-
-<details>
-<summary>Expand for the 2.5.x changelog</summary>
 
 ## 2.5.0 [MINOR]: Ignore-List and END ladder modifier
 
