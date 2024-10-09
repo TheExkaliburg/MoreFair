@@ -1,5 +1,6 @@
 package de.kaliburg.morefair.api;
 
+import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.model.AccountEntity;
 import de.kaliburg.morefair.account.services.AccountService;
 import de.kaliburg.morefair.api.utils.WsUtils;
@@ -53,6 +54,7 @@ public class LadderController {
   private final LadderMapper ladderMapper;
   private final RankerService rankerService;
   private final UserEventService userEventService;
+  private final FairConfig fairConfig;
 
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -152,6 +154,8 @@ public class LadderController {
       if (wsMessage.getContent() != null) {
         percentage = Math.round(Float.parseFloat(wsMessage.getContent()));
       }
+
+      percentage = Math.min(Math.max(fairConfig.getMinVinegarPercentageThrown(), percentage), 100);
 
       AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
           .orElse(null);

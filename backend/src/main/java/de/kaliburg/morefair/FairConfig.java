@@ -20,7 +20,7 @@ public class FairConfig {
   private Integer manualPromoteWaitTime = 30;
   private Integer minimumPeopleForPromote = 10;
   private Secrets secrets;
-  private Integer minVinegarPercentageThrown = 50;
+  private Integer minVinegarPercentageThrown = 25;
   private Integer maxVinegarThrown = 100;
   private Authentication auth = new Authentication();
 
