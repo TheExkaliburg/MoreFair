@@ -105,7 +105,8 @@ public class LadderTickServiceImpl implements LadderTickService {
 
           var addedWine = currentRanker.getGrapes()
               .multiply(BigInteger.valueOf(settings.getWineSplit()))
-              .divide(BigInteger.valueOf(50));
+              .multiply(BigInteger.valueOf(3))
+              .divide(BigInteger.valueOf(100));
           currentRanker.addWine(addedWine, delta);
         }
         if (currentRanker.getRank() == 1 && ladderUtilsService.isLadderPromotable(ladder)) {

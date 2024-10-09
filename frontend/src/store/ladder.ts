@@ -276,7 +276,8 @@ export const useLadderStore = defineStore("ladder", () => {
 
         const wineAdded = yourRanker.grapes
           .mul(100 - accountStore.state.settings.vinegarSplit)
-          .div(50);
+          .mul(3)
+          .div(100);
         yourRanker.wine = Object.freeze(
           yourRanker.wine.add(wineAdded.mul(deltaSeconds).floor()),
         );

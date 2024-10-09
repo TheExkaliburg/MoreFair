@@ -122,7 +122,7 @@ public final class LadderEntity {
 
   public int getPassingGrapes() {
     if (types.contains(LadderType.CONSOLATION)) {
-      return 3;
+      return 7;
     } else if (types.contains(LadderType.NO_HANDOUTS)) {
       return 0;
     }
@@ -131,7 +131,7 @@ public final class LadderEntity {
 
   public int getBottomGrapes() {
     if (types.contains(LadderType.BOUNTIFUL)) {
-      return 3;
+      return 5;
     } else if (types.contains(LadderType.DROUGHT)) {
       return 0;
     }
@@ -143,9 +143,9 @@ public final class LadderEntity {
    */
   public int getWinningVinMultiplier() {
     if (types.contains(LadderType.GENEROUS)) {
-      return 15;
+      return 20;
     } else if (types.contains(LadderType.STINGY)) {
-      return 11;
+      return 9;
     }
     return 12;
   }

@@ -80,7 +80,9 @@ public class RoundTypeSetBuilder {
       grapesTypeWeights.put(RoundType.RAILROAD, 1.f);
       grapesTypeWeights.put(RoundType.RACE, 1.f);
       grapesTypeWeights.put(RoundType.DEFAULT, 1.f);
+    }
 
+    if (roundNumber % 5 == 0) {
       scalingTypeWeights.put(RoundType.REVERSE_SCALING, 1.f);
       scalingTypeWeights.put(RoundType.DEFAULT, 1.f);
     }

@@ -170,9 +170,9 @@ public class RankerUtilsServiceImpl implements RankerUtilsService {
 
     float multiplier = 1.f;
     if (ladder.getTypes().contains(LadderType.GENEROUS)) {
-      multiplier = 3.f;
+      multiplier = 10.f;
     } else if (ladder.getTypes().contains(LadderType.STINGY)) {
-      multiplier = .5f;
+      multiplier = .1f;
     }
 
     List<RankerEntity> rankers = rankerService.findAllByLadderId(ladder.getId());
