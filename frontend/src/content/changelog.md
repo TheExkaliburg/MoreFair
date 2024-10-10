@@ -20,7 +20,7 @@ description: 'A list of all changes made to the game'
 <br><br><br><br><br><br><br>
 
 <details>
-<summary>Expand for the 2.5.x changelog</summary>
+<summary>Expand for the 3.0.x changelog</summary>
 
 ## 3.0.0 [MAJOR]: Season 3 Overhaul
 
