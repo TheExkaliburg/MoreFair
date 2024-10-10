@@ -251,7 +251,6 @@ function parseEvent(e: Event): object {
     screenY: e.screenY ?? -1,
   };
 
-  console.log(e);
   if (!(e instanceof Event)) {
     serializableEvent.isTrusted = false;
   }

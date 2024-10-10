@@ -49,15 +49,19 @@ public class LadderTickServiceImpl implements LadderTickService {
   @Scheduled(initialDelay = 1000, fixedRate = 1000)
   public void update() {
     try (var ignored = semaphore.enter()) {
-      ladderEventService.handleEvents();
-
       // Calculate Time passed
       long currentTimeInNanos = System.nanoTime();
-      int deltaInSeconds = (int) Math.round(Math.max(
-          (currentTimeInNanos - lastTickInNanos) / NANOS_IN_SECONDS,
-          1.0f
-      ));
+      int deltaInSeconds = (int) Math.round(
+          (currentTimeInNanos - lastTickInNanos) / NANOS_IN_SECONDS
+      );
+
+      if (deltaInSeconds <= 0) {
+        return;
+      }
+
       lastTickInNanos = currentTimeInNanos;
+
+      ladderEventService.handleEvents();
 
       // Send the tick for everyone
       LadderTickDto tickDto = LadderTickDto.builder()

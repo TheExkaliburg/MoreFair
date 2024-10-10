@@ -189,7 +189,10 @@ const vinegarButtonLabel = computed<string>(() => {
       useFormatter(useGrapesStore().getters.selectedVinegar),
     )}`;
   }
-  return `${lang("vinegar", "0")} (${useTimeFormatter(eta)})`;
+  return `${lang(
+    "vinegar",
+    yourVinegarThrowCostFormatted.value,
+  )} (${useTimeFormatter(eta)})`;
 });
 
 const yourFormattedMulti = computed<string>(() => {

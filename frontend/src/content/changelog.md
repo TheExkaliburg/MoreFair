@@ -4,9 +4,27 @@ description: 'A list of all changes made to the game'
 
 # Changelog
 
+## 3.0.1 [PATCH]: First small fixes
+
+### Improvements
+- Skipping Ticks after big catchup tick
+- Quick-Button for Vinegar-Throw-Percentages now are 25/50/100.
+
+### Bugfixes
+- Eta To VinegarThrow now takes split into account
+- Always showing Vinegar on the Button.
+- Winning rewards are based on current ladder instead of next one
+- Removed console.log()
+- Fixing tooltips that still show 50% as minimum percentage.
+
+<br><br><br><br><br><br><br>
+
+<details>
+<summary>Expand for the 2.5.x changelog</summary>
+
 ## 3.0.0 [MAJOR]: Season 3 Overhaul
 
-There are a few new features and a lot more small changes/improvements. 
+There are a few new features and a lot more small changes/improvements.
 I'll deliberately stay vague, so the community can figure details out.
 
 ### Features:
@@ -28,7 +46,8 @@ I'll deliberately stay vague, so the community can figure details out.
 - Asshole points will no longer have any effect on the number of ladders in a round.
 - Various other improvements and bugfixes, as well as new bugs for you to find.
 
-<br><br><br><br><br><br><br>
+
+</details>
 
 <details>
 <summary>Expand for the 2.5.x changelog</summary>

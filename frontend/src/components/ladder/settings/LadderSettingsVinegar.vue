@@ -123,7 +123,15 @@ const max = computed(() =>
     ? 100
     : roundStore.state.settings.maxVinegarThrown,
 );
-const middle = computed(() => Math.round((max.value + min.value) / 2));
+const middle = computed(() => {
+  let result = (max.value + min.value) / 2;
+  if (result - 50 > 75 - result) {
+    result = 75;
+  } else {
+    result = 50;
+  }
+  return result;
+});
 
 const splitValue = ref<number>(50);
 
@@ -169,7 +177,7 @@ const formattedWineShieldEta = computed<string>(() => {
     return `${formattedSeconds} till Shielded`;
   } else if (wineDeltaPerSec.cmp(0) < 0 && wineMissing.cmp(0) < 0) {
     return `${formattedSeconds} till Unshielded`;
-  } else if (wineDeltaPerSec.cmp(0) > 0 && wineMissing.cmp(0) < 0) {
+  } else if (wineDeltaPerSec.cmp(0) >= 0 && wineMissing.cmp(0) < 0) {
     return "Stay Shielded";
   } else {
     return "Stay Unshielded";

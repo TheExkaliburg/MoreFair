@@ -55,12 +55,12 @@ components:
     result: "?"
     percentageTooltip: Threw %s% of their Vinegar
     results:
-      DOUBLE_SUCCESS: The throw broke through the target's shield and depleted all of their vinegar. (Refunds 50%)
-      SUCCESS: The target had no shield, and the throw depleted all of their vinegar. (Refunds 25%)
+      DOUBLE_SUCCESS: The throw broke through the target's shield and depleted all of their vinegar. (Refunds 25%)
+      SUCCESS: The target had no shield, and the throw depleted all of their vinegar. (Refunds 12.5%)
       DEFENDED: The target had no shield, but the throw did not deplete all of their vinegar.
       SHIELDED: The throw was completely absorbed by the target's shield.
-      SHIELD_DEFENDED: The throw broke through the target's shield, but did not deplete all of their vinegar. (Refunds 25%)
-      SUCCESS_PLUS: The target had no shield, but the throw would have been enough to deplete both their vinegar and wine. (Refunds 50%)
+      SHIELD_DEFENDED: The throw broke through the target's shield, but did not deplete all of their vinegar. (Refunds 12.5%)
+      SUCCESS_PLUS: The target had no shield, but the throw would have been enough to deplete both their vinegar and wine. (Refunds 25%)
 abbreviations:
   round: R
   ladder: L
@@ -220,13 +220,13 @@ tour:
       intro: Another use of Grapes is to generate side-products such as vinegar and wine. You can set the split in the grapes-settings menu.
     throwing:
       title: Throwing Vinegar
-      intro: When you have enough vinegar you can throw between 50% - 100% of your current Vinegar.
+      intro: When you have enough vinegar you can throw between 25% - 100% of your current Vinegar.
     wine:
       title: Wine
       intro: Wine is a 1 time shield, that's active when you have more wine than vinegar. The overflow hits the vinegar of the target.
     refunds:
       title: Refunds
-      intro: When either wine or vinegar hit 0 you get for each of them 25% of your vinegar from before the throw back (up to 50%, which is the minimum amount of vinegar you need to throw)
+      intro: When either wine or vinegar hit 0 you get for each of them 25% of your vinegar from before the throw back (up to 25%, which is the minimum amount of vinegar you need to throw)
   promote:
     top10:
       title: Top10

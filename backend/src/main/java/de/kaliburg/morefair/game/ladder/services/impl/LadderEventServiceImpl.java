@@ -327,16 +327,16 @@ public class LadderEventServiceImpl implements LadderEventService {
           newRanker.setAutoPromote(true);
           newRanker.setVinegar(
               newRanker.getVinegar()
-                  .multiply(BigInteger.valueOf(newLadder.getWinningVinMultiplier()))
+                  .multiply(BigInteger.valueOf(ladder.getWinningVinMultiplier()))
                   .divide(BigInteger.TEN));
           newRanker.setWine(
               newRanker.getWine()
-                  .multiply(BigInteger.valueOf(newLadder.getWinningVinMultiplier()))
+                  .multiply(BigInteger.valueOf(ladder.getWinningVinMultiplier()))
                   .divide(BigInteger.TEN));
         }
 
         newRanker.setGrapes(
-            newRanker.getGrapes().add(rankerUtilsService.getWinningGrapes(newLadder))
+            newRanker.getGrapes().add(rankerUtilsService.getWinningGrapes(ladder))
         );
 
         wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
