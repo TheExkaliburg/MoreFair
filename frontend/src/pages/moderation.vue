@@ -5,7 +5,9 @@
     <SearchResult />
     <NamingHistory />
     <ChatLog class="h-full max-h-96 row-span-2" />
-    <div class="bg-red-300 h-full max-h-128">Event Log</div>
+    <div class="border-1 border-red-300 text-text h-full max-h-128">
+      Event Log Placeholder
+    </div>
   </div>
 </template>
 
