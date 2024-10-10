@@ -128,7 +128,10 @@ const middle = computed(() => Math.round((max.value + min.value) / 2));
 const splitValue = ref<number>(50);
 
 const winePerSec = computed(() =>
-  yourRanker.value.grapes.mul(100 - splitValue.value).div(50),
+  yourRanker.value.grapes
+    .mul(100 - splitValue.value)
+    .mul(3)
+    .div(100),
 );
 const vinegarPerSec = computed(() =>
   yourRanker.value.grapes.mul(splitValue.value).div(100),

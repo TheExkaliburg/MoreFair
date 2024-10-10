@@ -156,10 +156,10 @@ public class VinegarThrowServiceImpl implements VinegarThrowService {
         );
 
         if (!isWineShieldActive) {
-          // If the leftover vinegar had been able to take down the wine as well,
+          // If the leftover vinegar had been able to take down x2 the wine as well,
           // but wine shield was not active
           passedVinegar = passedVinegar.subtract(targetVinegar);
-          if (passedVinegar.compareTo(targetWine) > 0) {
+          if (passedVinegar.compareTo(targetWine.multiply(BigInteger.TWO)) > 0) {
             restoredVinegar = restoredVinegar.add(
                 throwerVinegar
                     .multiply(BigInteger.valueOf(fairConfig.getMinVinegarPercentageThrown()))

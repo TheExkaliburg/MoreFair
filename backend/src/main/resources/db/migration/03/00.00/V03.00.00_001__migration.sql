@@ -336,6 +336,14 @@ $$
     END
 $$;
 
+-- Drop the custom CHEAPS from R300L1
+
+DELETE
+from public.ladder_type lt
+WHERE lt.types IN
+      ('CHEAP_2', 'CHEAP_3', 'CHEAP_4', 'CHEAP_5', 'CHEAP_6', 'CHEAP_7', 'CHEAP_8', 'CHEAP_9',
+       'CHEAP_10');
+
 
 -- Drop All Sequences
 DROP SEQUENCE IF EXISTS public.seq_game;
