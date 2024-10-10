@@ -3,6 +3,7 @@ import { Ranker } from "~/store/entities/ranker";
 import { useLadderStore } from "~/store/ladder";
 import { useLadderUtils } from "~/composables/useLadderUtils";
 import { useStomp } from "~/composables/useStomp";
+import { useGrapesStore } from "~/store/grapes";
 
 const etaRankerCache = new Map<number, Map<number, number>>();
 const etaPointsCache = new Map<number, Map<Decimal, number>>();
@@ -188,9 +189,13 @@ export const useEta = (ranker: Ranker) => {
       ladder.state.rankers.length >= 1
     ) {
       // TODO: When grape modifiers are implemented, acceleration can be changed.
-      const acceleration = 2;
+      const acceleration = ladderUtils.getBottomGrapes();
+
       const a = new Decimal(acceleration).div(2);
-      const b = ranker.grapes.sub(1);
+      const b = ranker.grapes
+        .mul(useGrapesStore().storage.vinegarThrowPercentage)
+        .div(100)
+        .sub(1);
       const c = ranker.vinegar.sub(ladderUtils.getVinegarThrowCost.value);
 
       secondsToVinegar = solveQuadratic(a, b, c);
@@ -199,7 +204,11 @@ export const useEta = (ranker: Ranker) => {
         ladderUtils.getVinegarThrowCost.value.cmp(ranker.vinegar) >= 0
           ? ladderUtils.getVinegarThrowCost.value
               .sub(ranker.vinegar)
-              .div(ranker.grapes)
+              .div(
+                ranker.grapes
+                  .mul(useGrapesStore().storage.vinegarThrowPercentage)
+                  .div(100),
+              )
           : new Decimal(0);
     }
 
