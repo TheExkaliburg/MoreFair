@@ -166,7 +166,7 @@ public class RankerUtilsServiceImpl implements RankerUtilsService {
 
   @Override
   public BigInteger getWinningGrapes(LadderEntity ladder) {
-    var baseGrapeCostForAuto = config.getBaseGrapesToBuyAutoPromote().intValue();
+    int baseGrapeCostForAuto = config.getBaseGrapesToBuyAutoPromote().intValue();
 
     float multiplier = 1.f;
     if (ladder.getTypes().contains(LadderType.GENEROUS)) {
@@ -181,9 +181,11 @@ public class RankerUtilsServiceImpl implements RankerUtilsService {
         .count();
 
     if (place <= 1) {
-      baseGrapeCostForAuto *= 2;
-    } else if (place > 3 && place <= 5) {
+      baseGrapeCostForAuto = config.getBaseGrapesToBuyAutoPromote().intValue();
+    } else if (place <= 3) {
       baseGrapeCostForAuto /= 2;
+    } else if (place <= 5) {
+      baseGrapeCostForAuto /= 5;
     } else if (place <= 10) {
       baseGrapeCostForAuto /= 10;
     } else {
