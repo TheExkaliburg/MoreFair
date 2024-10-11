@@ -4,6 +4,19 @@ description: 'A list of all changes made to the game'
 
 # Changelog
 
+## 3.0.2 [PATCH]: Reward Changes
+
+### Improvements
+- Scaling the Rewards for Winning slightly different.
+
+### Bugfixes
+- You now don't get your rewards downgraded by 1 place when winning.
+
+<br><br><br><br><br><br><br>
+
+<details>
+<summary>Expand for the 3.0.x changelog</summary>
+
 ## 3.0.1 [PATCH]: First small fixes
 
 ### Improvements
@@ -16,11 +29,6 @@ description: 'A list of all changes made to the game'
 - Winning rewards are based on current ladder instead of next one
 - Removed console.log()
 - Fixing tooltips that still show 50% as minimum percentage.
-
-<br><br><br><br><br><br><br>
-
-<details>
-<summary>Expand for the 3.0.x changelog</summary>
 
 ## 3.0.0 [MAJOR]: Season 3 Overhaul
 

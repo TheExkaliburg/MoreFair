@@ -180,7 +180,7 @@ public class RankerUtilsServiceImpl implements RankerUtilsService {
         .filter(r -> !r.isGrowing())
         .count();
 
-    if (place == 1) {
+    if (place <= 1) {
       baseGrapeCostForAuto *= 2;
     } else if (place > 3 && place <= 5) {
       baseGrapeCostForAuto /= 2;
