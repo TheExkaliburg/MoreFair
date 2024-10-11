@@ -11,7 +11,6 @@ import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.AccountEventTypes;
 import de.kaliburg.morefair.game.ladder.services.LadderTickService;
-import de.kaliburg.morefair.moderation.events.model.NameChangeEntity;
 import de.kaliburg.morefair.moderation.events.services.NameChangeService;
 import de.kaliburg.morefair.security.SecurityUtils;
 import de.kaliburg.morefair.statistics.services.StatisticsService;
@@ -109,15 +108,14 @@ public class AccountController {
       log.info("[G] RENAME: {} (#{}) -> {}", account.getDisplayName(), account.getId(),
           displayName);
 
-      NameChangeEntity nameChange = nameChangeService.updateDisplayName(account.getId(),
-          displayName);
+      nameChangeService.updateDisplayName(account.getId(), displayName);
 
       wsUtils.convertAndSendToTopic(AccountController.TOPIC_EVENTS_DESTINATION,
           new Event<>(AccountEventTypes.NAME_CHANGE, account.getId(),
-              nameChange.getDisplayName()));
+              account.getDisplayName()));
 
       Map<String, String> result = new HashMap<>();
-      result.put("displayName", nameChange.getDisplayName());
+      result.put("displayName", account.getDisplayName());
       return ResponseEntity.ok(result);
     } catch (Exception e) {
       log.error(e.getMessage(), e);
