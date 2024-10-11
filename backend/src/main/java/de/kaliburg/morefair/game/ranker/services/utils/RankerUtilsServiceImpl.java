@@ -178,16 +178,16 @@ public class RankerUtilsServiceImpl implements RankerUtilsService {
     List<RankerEntity> rankers = rankerService.findAllByLadderId(ladder.getId());
     long place = rankers.stream()
         .filter(r -> !r.isGrowing())
-        .count() + 1;
+        .count();
 
-    if (place != 1) {
-      if (place <= 3) {
-        baseGrapeCostForAuto /= 2;
-      } else if (place <= 10) {
-        baseGrapeCostForAuto /= 10;
-      } else {
-        baseGrapeCostForAuto = 0;
-      }
+    if (place == 1) {
+      baseGrapeCostForAuto *= 2;
+    } else if (place > 3 && place <= 5) {
+      baseGrapeCostForAuto /= 2;
+    } else if (place <= 10) {
+      baseGrapeCostForAuto /= 10;
+    } else {
+      baseGrapeCostForAuto = 0;
     }
 
     return BigInteger.valueOf(Math.round(baseGrapeCostForAuto * multiplier));
