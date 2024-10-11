@@ -46,6 +46,7 @@ const dateFormatOptions: Intl.DateTimeFormatOptions = {
   hour: "numeric",
   minute: "numeric",
   hourCycle: "h23",
+  year: "2-digit",
 };
 
 function copyIntoSearch(result: UserSearchResult) {

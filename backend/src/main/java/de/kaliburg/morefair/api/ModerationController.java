@@ -319,7 +319,7 @@ public class ModerationController {
     if (type == ModSearchType.ACCOUNT_ID) {
       nameChangeEntities = nameChangeService.listAllNameChangesOf(Long.parseLong(searchParam));
     } else if (type == ModSearchType.DISPLAY_NAME) {
-      nameChangeEntities = nameChangeService.listAllNameChangesTo(searchParam);
+      nameChangeEntities = nameChangeService.listAllNameChangesFrom(searchParam);
     } else {
       throw new HttpServerErrorException(HttpStatus.BAD_REQUEST);
     }

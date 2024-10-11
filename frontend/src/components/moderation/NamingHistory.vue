@@ -4,8 +4,8 @@
       <tr class="text-text-light text-left">
         <th>ID</th>
         <th>Current Name</th>
-        <th>Changed Name</th>
-        <th class="text-right">Last Login</th>
+        <th>Previous Name</th>
+        <th class="text-right">Timestamp</th>
         <th class="text-right"></th>
       </tr>
       <tr
@@ -39,6 +39,7 @@ const dateFormatOptions: Intl.DateTimeFormatOptions = {
   hour: "numeric",
   minute: "numeric",
   hourCycle: "h23",
+  year: "2-digit",
 };
 
 function copyIntoSearch(result: NameChange) {

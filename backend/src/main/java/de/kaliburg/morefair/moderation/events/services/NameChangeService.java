@@ -7,7 +7,7 @@ public interface NameChangeService {
 
   NameChangeEntity updateDisplayName(Long accountId, String displayName);
 
-  List<NameChangeEntity> listAllNameChangesTo(String displayName);
+  List<NameChangeEntity> listAllNameChangesFrom(String displayName);
 
   List<NameChangeEntity> listAllNameChangesOf(Long accountId);
 }

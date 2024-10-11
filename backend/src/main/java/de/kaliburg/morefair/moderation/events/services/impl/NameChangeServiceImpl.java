@@ -22,13 +22,14 @@ public class NameChangeServiceImpl implements NameChangeService {
   public NameChangeEntity updateDisplayName(Long accountId, String displayName) {
     AccountEntity accountEntity = accountService.findById(accountId).orElseThrow();
 
-    accountEntity.setDisplayName(displayName);
-    accountService.save(accountEntity);
-
     NameChangeEntity result = NameChangeEntity.builder()
         .accountId(accountEntity.getId())
-        .displayName(displayName)
+        // Showing previous name since new one is in accountEntity (not having data doubled)
+        .displayName(accountEntity.getDisplayName())
         .build();
+
+    accountEntity.setDisplayName(displayName);
+    accountService.save(accountEntity);
 
     result = nameChangeRepository.save(result);
 
@@ -36,7 +37,7 @@ public class NameChangeServiceImpl implements NameChangeService {
   }
 
   @Override
-  public List<NameChangeEntity> listAllNameChangesTo(String displayName) {
+  public List<NameChangeEntity> listAllNameChangesFrom(String displayName) {
     return nameChangeRepository.findWithName(displayName);
   }
 
