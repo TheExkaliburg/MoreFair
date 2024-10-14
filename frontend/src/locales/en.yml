@@ -318,26 +318,26 @@ modifier:
     title: Bountiful
     description: Bottom grapes are increased.
     identifier: BOUNT
-  DROUGHT:
-    title: Drought
-    description: Bottom grapes are dried out.
-    identifier: DRY
+  LAVA:
+    title: Lava
+    description: The floor is lava, don't stay down there too long.
+    identifier: LAVA
   CONSOLATION:
     title: Consolation
     description: Passing grapes are increased.
     identifier: CONSL
-  NO_HANDOUTS:
-    title: No Handouts
-    description: No passing grapes.
-    identifier: NHAND
+  VIRUS:
+    title: Virus
+    description: A Virus broke out, don't let anyone come to close.
+    identifier: VIRUS
   GENEROUS:
     title: Generous
     description: Ladder winnings are increased.
     identifier: GEN
-  STINGY:
-    title: Stingy
-    description: Ladder winnings are decreased.
-    identifier: STINGY
+  TAXES:
+    title: Taxes
+    description: Taxing the fastest Rankers.
+    identifier: TAX
   REVERSE_SCALING:
     title: Reverse Scaling
     description: Costs and promotion requirements start high, and decrease as the round progresses.

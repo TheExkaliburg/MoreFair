@@ -28,21 +28,28 @@ import {
 
 export enum LadderType {
   DEFAULT = "DEFAULT",
+  // Point Requirements
   TINY = "TINY",
   SMALL = "SMALL",
   BIG = "BIG",
   GIGANTIC = "GIGANTIC",
+  // Auto-promote
   FREE_AUTO = "FREE_AUTO",
   NO_AUTO = "NO_AUTO",
-  ASSHOLE = "ASSHOLE",
+  // Cost of Upgrade
   CHEAP = "CHEAP",
   EXPENSIVE = "EXPENSIVE",
+  // Bottom Grapes
   BOUNTIFUL = "BOUNTIFUL",
-  DROUGHT = "DROUGHT",
+  LAVA = "LAVA",
+  // Passing Grapes
   CONSOLATION = "CONSOLATION",
-  NO_HANDOUTS = "NO_HANDOUTS",
+  VIRUS = "VIRUS",
+  // Winning Prices
   GENEROUS = "GENEROUS",
-  STINGY = "STINGY",
+  TAXES = "TAXES",
+  // End of the Game
+  ASSHOLE = "ASSHOLE",
   END = "END",
 }
 

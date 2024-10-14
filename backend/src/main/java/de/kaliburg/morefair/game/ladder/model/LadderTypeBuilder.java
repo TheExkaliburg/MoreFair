@@ -112,9 +112,9 @@ public class LadderTypeBuilder {
         grapesPositiveTypeWeights.putIfAbsent(LadderType.GENEROUS, 25.f);
         grapesPositiveTypeWeights.putIfAbsent(LadderType.CONSOLATION, 25.f);
         grapesPositiveTypeWeights.putIfAbsent(LadderType.DEFAULT, 25.f);
-        grapesNegativeTypeWeights.putIfAbsent(LadderType.DROUGHT, 25.f);
-        grapesNegativeTypeWeights.putIfAbsent(LadderType.STINGY, 25.f);
-        grapesNegativeTypeWeights.putIfAbsent(LadderType.NO_HANDOUTS, 25.f);
+        grapesNegativeTypeWeights.putIfAbsent(LadderType.LAVA, 25.f);
+        grapesNegativeTypeWeights.putIfAbsent(LadderType.TAXES, 25.f);
+        grapesNegativeTypeWeights.putIfAbsent(LadderType.VIRUS, 25.f);
         grapesNegativeTypeWeights.putIfAbsent(LadderType.DEFAULT, 25.f);
       }
       case SLOW -> {
@@ -131,23 +131,23 @@ public class LadderTypeBuilder {
       case RAILROAD -> {
         grapesPositiveTypeWeights.put(LadderType.CONSOLATION, 75.f);
         grapesPositiveTypeWeights.put(LadderType.DEFAULT, 25.f);
-        grapesNegativeTypeWeights.put(LadderType.DROUGHT, 25.f);
-        grapesNegativeTypeWeights.put(LadderType.STINGY, 25.f);
+        grapesNegativeTypeWeights.put(LadderType.LAVA, 25.f);
+        grapesNegativeTypeWeights.put(LadderType.TAXES, 25.f);
         grapesNegativeTypeWeights.put(LadderType.DEFAULT, 50.f);
         autoTypeWeights.computeIfPresent(LadderType.FREE_AUTO, (k, v) -> v * 2);
       }
       case FARMER -> {
         grapesPositiveTypeWeights.put(LadderType.BOUNTIFUL, 75.f);
         grapesPositiveTypeWeights.put(LadderType.DEFAULT, 25.f);
-        grapesNegativeTypeWeights.put(LadderType.STINGY, 25.f);
-        grapesNegativeTypeWeights.put(LadderType.NO_HANDOUTS, 25.f);
+        grapesNegativeTypeWeights.put(LadderType.TAXES, 25.f);
+        grapesNegativeTypeWeights.put(LadderType.VIRUS, 25.f);
         grapesNegativeTypeWeights.put(LadderType.DEFAULT, 50.f);
       }
       case RACE -> {
         grapesPositiveTypeWeights.put(LadderType.GENEROUS, 75.f);
         grapesPositiveTypeWeights.put(LadderType.DEFAULT, 25.f);
-        grapesNegativeTypeWeights.put(LadderType.DROUGHT, 25.f);
-        grapesNegativeTypeWeights.put(LadderType.NO_HANDOUTS, 25.f);
+        grapesNegativeTypeWeights.put(LadderType.LAVA, 25.f);
+        grapesNegativeTypeWeights.put(LadderType.VIRUS, 25.f);
         grapesNegativeTypeWeights.put(LadderType.DEFAULT, 50.f);
         autoTypeWeights.computeIfPresent(LadderType.NO_AUTO, (k, v) -> v * 2);
       }
@@ -181,7 +181,7 @@ public class LadderTypeBuilder {
     }
 
     if (ladderNumber == 1) {
-      autoTypeWeights.put(LadderType.DROUGHT, 0.f);
+      autoTypeWeights.put(LadderType.LAVA, 0.f);
       sizeTypeWeights.put(LadderType.TINY, 0.f);
       autoTypeWeights.put(LadderType.FREE_AUTO, 0.f);
       autoTypeWeights.put(LadderType.NO_AUTO, 0.f);

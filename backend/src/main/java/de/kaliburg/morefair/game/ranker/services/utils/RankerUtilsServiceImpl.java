@@ -171,7 +171,7 @@ public class RankerUtilsServiceImpl implements RankerUtilsService {
     float multiplier = 1.f;
     if (ladder.getTypes().contains(LadderType.GENEROUS)) {
       multiplier = 5.f;
-    } else if (ladder.getTypes().contains(LadderType.STINGY)) {
+    } else if (ladder.getTypes().contains(LadderType.TAXES)) {
       multiplier = -.5f;
     }
 

@@ -21,15 +21,15 @@ public enum LadderType implements Comparable<LadderType> {
   // Cost of Upgrade
   CHEAP,
   EXPENSIVE,
-  // FARMING Grapes
-  BOUNTIFUL,
-  DROUGHT,
   // Bottom Grapes
+  BOUNTIFUL,
+  LAVA,
+  // Passing Grapes
   CONSOLATION,
-  NO_HANDOUTS,
+  VIRUS,
   // Winning Prices
   GENEROUS,
-  STINGY,
+  TAXES,
   // End of the Game
   ASSHOLE,
   END;
