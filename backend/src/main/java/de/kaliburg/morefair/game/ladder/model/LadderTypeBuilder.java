@@ -20,7 +20,8 @@ public class LadderTypeBuilder {
   private final Map<LadderType, Float> sizeTypeWeights = new EnumMap<>(LadderType.class);
   private final Map<LadderType, Float> autoTypeWeights = new EnumMap<>(LadderType.class);
   private final Map<LadderType, Float> costTypeWeights = new EnumMap<>(LadderType.class);
-  private final Map<LadderType, Float> grapesTypeWeights = new EnumMap<>(LadderType.class);
+  private final Map<LadderType, Float> grapesPositiveTypeWeights = new EnumMap<>(LadderType.class);
+  private final Map<LadderType, Float> grapesNegativeTypeWeights = new EnumMap<>(LadderType.class);
   @Setter
   @Accessors(chain = true)
   private Set<RoundType> roundTypes = EnumSet.noneOf(RoundType.class);
@@ -52,7 +53,8 @@ public class LadderTypeBuilder {
     costTypeWeights.put(LadderType.EXPENSIVE, 10.f);
     costTypeWeights.put(LadderType.DEFAULT, 100.f);
 
-    grapesTypeWeights.put(LadderType.DEFAULT, 1.f);
+    grapesPositiveTypeWeights.put(LadderType.DEFAULT, 1.f);
+    grapesNegativeTypeWeights.put(LadderType.DEFAULT, 1.f);
   }
 
   public static LadderTypeBuilder builder() {
@@ -65,7 +67,8 @@ public class LadderTypeBuilder {
       sizeTypeWeights.computeIfPresent(ladderType, (k, v) -> v / 2);
       autoTypeWeights.computeIfPresent(ladderType, (k, v) -> v / 2);
       costTypeWeights.computeIfPresent(ladderType, (k, v) -> v / 2);
-      grapesTypeWeights.computeIfPresent(ladderType, (k, v) -> v / 2);
+      grapesPositiveTypeWeights.computeIfPresent(ladderType, (k, v) -> v / 2);
+      grapesNegativeTypeWeights.computeIfPresent(ladderType, (k, v) -> v / 2);
       return;
     }
 
@@ -105,13 +108,14 @@ public class LadderTypeBuilder {
         costTypeWeights.put(LadderType.CHEAP, 1.f);
         costTypeWeights.put(LadderType.EXPENSIVE, 1.f);
         costTypeWeights.put(LadderType.DEFAULT, 1.f);
-        grapesTypeWeights.computeIfPresent(LadderType.BOUNTIFUL, (k, v) -> 1.f);
-        grapesTypeWeights.computeIfPresent(LadderType.DROUGHT, (k, v) -> 1.f);
-        grapesTypeWeights.computeIfPresent(LadderType.STINGY, (k, v) -> 1.f);
-        grapesTypeWeights.computeIfPresent(LadderType.CONSOLATION, (k, v) -> 1.f);
-        grapesTypeWeights.computeIfPresent(LadderType.NO_HANDOUTS, (k, v) -> 1.f);
-        grapesTypeWeights.computeIfPresent(LadderType.GENEROUS, (k, v) -> 1.f);
-        grapesTypeWeights.computeIfPresent(LadderType.DEFAULT, (k, v) -> 0.f);
+        grapesPositiveTypeWeights.putIfAbsent(LadderType.BOUNTIFUL, 25.f);
+        grapesPositiveTypeWeights.putIfAbsent(LadderType.GENEROUS, 25.f);
+        grapesPositiveTypeWeights.putIfAbsent(LadderType.CONSOLATION, 25.f);
+        grapesPositiveTypeWeights.putIfAbsent(LadderType.DEFAULT, 25.f);
+        grapesNegativeTypeWeights.putIfAbsent(LadderType.DROUGHT, 25.f);
+        grapesNegativeTypeWeights.putIfAbsent(LadderType.STINGY, 25.f);
+        grapesNegativeTypeWeights.putIfAbsent(LadderType.NO_HANDOUTS, 25.f);
+        grapesNegativeTypeWeights.putIfAbsent(LadderType.DEFAULT, 25.f);
       }
       case SLOW -> {
         sizeTypeWeights.put(LadderType.TINY, 0.f);
@@ -119,28 +123,33 @@ public class LadderTypeBuilder {
         sizeTypeWeights.computeIfPresent(LadderType.DEFAULT, (k, v) -> v / 5);
         sizeTypeWeights.computeIfPresent(LadderType.GIGANTIC, (k, v) -> v * 2);
         autoTypeWeights.put(LadderType.NO_AUTO, 0.f);
-        sizeTypeWeights.computeIfPresent(LadderType.FREE_AUTO, (k, v) -> v * 2);
-        sizeTypeWeights.computeIfPresent(LadderType.CHEAP, (k, v) -> v / 2);
-        sizeTypeWeights.computeIfPresent(LadderType.EXPENSIVE, (k, v) -> v * 2);
+        autoTypeWeights.computeIfPresent(LadderType.FREE_AUTO, (k, v) -> v * 2);
+        costTypeWeights.computeIfPresent(LadderType.CHEAP, (k, v) -> v / 2);
+        costTypeWeights.computeIfPresent(LadderType.EXPENSIVE, (k, v) -> v * 2);
       }
       //The main ladder type becomes the default ladder type for ladderGrapesType rounds.
       case RAILROAD -> {
-        grapesTypeWeights.put(LadderType.CONSOLATION, 100.f);
-        grapesTypeWeights.put(LadderType.DROUGHT, 25.f);
-        grapesTypeWeights.put(LadderType.STINGY, 25.f);
-        grapesTypeWeights.put(LadderType.DEFAULT, 0.f);
+        grapesPositiveTypeWeights.put(LadderType.CONSOLATION, 75.f);
+        grapesPositiveTypeWeights.put(LadderType.DEFAULT, 25.f);
+        grapesNegativeTypeWeights.put(LadderType.DROUGHT, 25.f);
+        grapesNegativeTypeWeights.put(LadderType.STINGY, 25.f);
+        grapesNegativeTypeWeights.put(LadderType.DEFAULT, 50.f);
+        autoTypeWeights.computeIfPresent(LadderType.FREE_AUTO, (k, v) -> v * 2);
       }
       case FARMER -> {
-        grapesTypeWeights.put(LadderType.BOUNTIFUL, 100.f);
-        grapesTypeWeights.put(LadderType.STINGY, 25.f);
-        grapesTypeWeights.put(LadderType.NO_HANDOUTS, 25.f);
-        grapesTypeWeights.put(LadderType.DEFAULT, 0.f);
+        grapesPositiveTypeWeights.put(LadderType.BOUNTIFUL, 75.f);
+        grapesPositiveTypeWeights.put(LadderType.DEFAULT, 25.f);
+        grapesNegativeTypeWeights.put(LadderType.STINGY, 25.f);
+        grapesNegativeTypeWeights.put(LadderType.NO_HANDOUTS, 25.f);
+        grapesNegativeTypeWeights.put(LadderType.DEFAULT, 50.f);
       }
       case RACE -> {
-        grapesTypeWeights.put(LadderType.GENEROUS, 100.f);
-        grapesTypeWeights.put(LadderType.DROUGHT, 25.f);
-        grapesTypeWeights.put(LadderType.NO_HANDOUTS, 25.f);
-        grapesTypeWeights.put(LadderType.DEFAULT, 0.f);
+        grapesPositiveTypeWeights.put(LadderType.GENEROUS, 75.f);
+        grapesPositiveTypeWeights.put(LadderType.DEFAULT, 25.f);
+        grapesNegativeTypeWeights.put(LadderType.DROUGHT, 25.f);
+        grapesNegativeTypeWeights.put(LadderType.NO_HANDOUTS, 25.f);
+        grapesNegativeTypeWeights.put(LadderType.DEFAULT, 50.f);
+        autoTypeWeights.computeIfPresent(LadderType.NO_AUTO, (k, v) -> v * 2);
       }
       default -> {
         // do nothing
@@ -190,7 +199,8 @@ public class LadderTypeBuilder {
     ladderTypes.add(getRandomLadderType(sizeTypeWeights, "Size"));
     ladderTypes.add(getRandomLadderType(autoTypeWeights, "Auto"));
     ladderTypes.add(getRandomLadderType(costTypeWeights, "Cost"));
-    ladderTypes.add(getRandomLadderType(grapesTypeWeights, "Grapes"));
+    ladderTypes.add(getRandomLadderType(grapesPositiveTypeWeights, "GrapesPositive"));
+    ladderTypes.add(getRandomLadderType(grapesNegativeTypeWeights, "GrapesNegative"));
     if (ladderTypes.size() > 1) {
       ladderTypes.remove(LadderType.DEFAULT);
     }

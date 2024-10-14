@@ -128,7 +128,10 @@ public class LadderTickServiceImpl implements LadderTickService {
             RankerEntity temp = rankers.get(j);
             temp.setRank(j + 2);
             if (temp.isGrowing() && temp.getMultiplier() > 1) {
-              temp.setGrapes(temp.getGrapes().add(BigInteger.valueOf(ladder.getPassingGrapes())));
+              temp.setGrapes(temp.getGrapes()
+                  .add(BigInteger.valueOf(ladder.getPassingGrapes()))
+                  .max(BigInteger.ZERO)
+              );
             }
             rankers.set(j + 1, temp);
 

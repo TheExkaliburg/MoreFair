@@ -131,7 +131,8 @@ public class RankerEntity {
   }
 
   public void addGrapes(BigInteger grapes, int deltaSeconds) {
-    this.grapes = this.grapes.add(grapes.multiply(BigInteger.valueOf(deltaSeconds)));
+    this.grapes = this.grapes.add(grapes.multiply(BigInteger.valueOf(deltaSeconds)))
+        .max(BigInteger.ZERO);
   }
 
 

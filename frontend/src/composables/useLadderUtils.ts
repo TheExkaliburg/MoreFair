@@ -171,9 +171,9 @@ function getNextUpgradeCost(currentUpgrade: number): Decimal {
 
 function getPassingGrapes() {
   if (ladder.state.types.has(LadderType.CONSOLATION)) {
-    return 7;
+    return 5;
   } else if (ladder.state.types.has(LadderType.NO_HANDOUTS)) {
-    return 0;
+    return -1;
   }
   return 1;
 }
@@ -182,7 +182,7 @@ function getBottomGrapes() {
   if (ladder.state.types.has(LadderType.BOUNTIFUL)) {
     return 5;
   } else if (ladder.state.types.has(LadderType.DROUGHT)) {
-    return 0;
+    return -1;
   }
   return 1;
 }
@@ -190,16 +190,18 @@ function getBottomGrapes() {
 function getWinningGrapes(place: number, baseGrapeCostForAuto: number) {
   let multiplier = 1;
   if (ladder.state.types.has(LadderType.GENEROUS)) {
-    multiplier = 10;
+    multiplier = 5;
   } else if (ladder.state.types.has(LadderType.STINGY)) {
-    multiplier = 0.1;
+    multiplier = -0.5;
   }
 
-  if (place === 1) {
+  if (place <= 1) {
     return Math.round(baseGrapeCostForAuto * multiplier);
-  } else if (place < 4) {
+  } else if (place <= 3) {
     return Math.round((baseGrapeCostForAuto / 2) * multiplier);
-  } else if (place < 11) {
+  } else if (place <= 5) {
+    return Math.round((baseGrapeCostForAuto / 5) * multiplier);
+  } else if (place <= 10) {
     return Math.round((baseGrapeCostForAuto / 10) * multiplier);
   }
   return 0;
@@ -209,7 +211,7 @@ function getWinningVinMultiplier() {
   if (ladder.state.types.has(LadderType.GENEROUS)) {
     return 20;
   } else if (ladder.state.types.has(LadderType.STINGY)) {
-    return 9;
+    return 8;
   }
   return 12;
 }

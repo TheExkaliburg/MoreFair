@@ -4,6 +4,29 @@ description: 'A list of all changes made to the game'
 
 # Changelog
 
+## 3.0.3 [PATCH]: Vinegar Round Modifier Adjustments
+
+### Features
+- Can now roll positive and negative Vinegar Ladder-Mods onto the same ladder.
+
+### Improvements
+- CHAOS allows all Vinegar Ladder-Mods
+- First Person out of AH, gets the 2AH-Points for throwing on AH-Ladder for free.
+
+### Balancing
+- CONSOLATION and GENEROUS rewards decreased and brought into line with BOUNTIFUL.
+- STINGY/DROUGHT/NO_HANDOUTS modifiers buffed and renamed to TAX/LAVA/VIRUS to better reflect their changed behaviour
+
+### Bugfixes
+- You now don't get your rewards downgraded by 1 place when winning.
+- Last Person to promote from AH, now gets their promotedOn flag set correctly.
+
+
+<br><br><br><br><br><br><br>
+
+<details>
+<summary>Expand for the 3.0.x changelog</summary>
+
 ## 3.0.2 [PATCH]: Reward Changes
 
 ### Improvements
@@ -12,10 +35,6 @@ description: 'A list of all changes made to the game'
 ### Bugfixes
 - You now don't get your rewards downgraded by 1 place when winning.
 
-<br><br><br><br><br><br><br>
-
-<details>
-<summary>Expand for the 3.0.x changelog</summary>
 
 ## 3.0.1 [PATCH]: First small fixes
 

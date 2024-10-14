@@ -247,7 +247,7 @@ export const useLadderStore = defineStore("ladder", () => {
               rankers[j].multi > 1
             ) {
               rankers[j].grapes = Object.freeze(
-                rankers[j].grapes.add(ladderUtils.getPassingGrapes()),
+                rankers[j].grapes.add(ladderUtils.getPassingGrapes()).max(0),
               );
             }
             rankers[j + 1] = rankers[j];
@@ -298,7 +298,9 @@ export const useLadderStore = defineStore("ladder", () => {
 
       if (yourRanker.rank === rankers.length && rankers.length >= 1) {
         yourRanker.grapes = Object.freeze(
-          yourRanker.grapes.add(new Decimal(ladderUtils.getBottomGrapes())),
+          yourRanker.grapes
+            .add(new Decimal(ladderUtils.getBottomGrapes()))
+            .max(0),
         );
       }
     }

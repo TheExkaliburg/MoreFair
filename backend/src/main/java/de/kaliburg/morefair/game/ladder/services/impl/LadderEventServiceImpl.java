@@ -336,7 +336,9 @@ public class LadderEventServiceImpl implements LadderEventService {
         }
 
         newRanker.setGrapes(
-            newRanker.getGrapes().add(rankerUtilsService.getWinningGrapes(ladder))
+            newRanker.getGrapes()
+                .add(rankerUtilsService.getWinningGrapes(ladder))
+                .max(BigInteger.ZERO)
         );
 
         wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,

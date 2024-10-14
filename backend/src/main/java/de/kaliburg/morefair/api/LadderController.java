@@ -138,7 +138,7 @@ public class LadderController {
 
       log.info("[L{}] MULTI: {} (#{}) {}", num, account.getDisplayName(), account.getId(),
           wsMessage.getEvent());
-
+      userEventService.record(account.getId(), LadderEventType.BUY_MULTI, wsMessage.getEvent());
       ladderEventService.addEvent(num,
           new Event<>(LadderEventType.BUY_MULTI, account.getId()));
     } catch (Exception e) {
@@ -171,6 +171,7 @@ public class LadderController {
       log.info("[L{}] VINEGAR: {} (#{}) {}", num, account.getDisplayName(), account.getId(),
           wsMessage.getEvent());
 
+      userEventService.record(account.getId(), LadderEventType.THROW_VINEGAR, wsMessage.getEvent());
       ladderEventService.addEvent(num,
           new Event<>(LadderEventType.THROW_VINEGAR, account.getId(), percentage));
     } catch (Exception e) {
@@ -197,6 +198,7 @@ public class LadderController {
       log.info("[L{}] PROMOTE: {} (#{}) {}", num, account.getDisplayName(), account.getId(),
           wsMessage.getEvent());
 
+      userEventService.record(account.getId(), LadderEventType.PROMOTE, wsMessage.getEvent());
       ladderEventService.addEvent(num, new Event<>(LadderEventType.PROMOTE, account.getId()));
     } catch (Exception e) {
       log.error(e.getMessage(), e);
@@ -221,6 +223,8 @@ public class LadderController {
       log.info("[L{}] AUTOPROMOTE: {} (#{}) {}", num, account.getDisplayName(), account.getId(),
           wsMessage.getEvent());
 
+      userEventService.record(account.getId(), LadderEventType.BUY_AUTO_PROMOTE,
+          wsMessage.getEvent());
       ladderEventService.addEvent(num,
           new Event<>(LadderEventType.BUY_AUTO_PROMOTE, account.getId()));
     } catch (Exception e) {

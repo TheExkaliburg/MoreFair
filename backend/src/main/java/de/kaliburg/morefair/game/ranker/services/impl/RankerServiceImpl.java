@@ -106,6 +106,8 @@ public class RankerServiceImpl implements RankerService {
 
   @Override
   public void reloadRankers() {
+    ladderService.findAllByRound(roundService.getCurrentRound())
+        .forEach(l -> updateRankersOfLadder(l, rankerCache.get(l.getId())));
     try (var ignored = semaphore.enter()) {
       rankerCache.invalidateAll();
       highestRankerCache.invalidateAll();

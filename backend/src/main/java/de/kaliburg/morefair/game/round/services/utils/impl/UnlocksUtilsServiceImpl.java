@@ -2,13 +2,17 @@ package de.kaliburg.morefair.game.round.services.utils.impl;
 
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.services.LadderService;
+import de.kaliburg.morefair.game.ranker.model.RankerEntity;
+import de.kaliburg.morefair.game.ranker.services.RankerService;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
 import de.kaliburg.morefair.game.round.model.UnlocksEntity;
 import de.kaliburg.morefair.game.round.services.RoundService;
 import de.kaliburg.morefair.game.round.services.utils.UnlocksUtilsService;
 import de.kaliburg.morefair.game.vinegar.model.VinegarThrowEntity;
 import de.kaliburg.morefair.game.vinegar.services.VinegarThrowService;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +23,7 @@ public class UnlocksUtilsServiceImpl implements UnlocksUtilsService {
   private final VinegarThrowService vinegarThrowService;
   private final LadderService ladderService;
   private final RoundService roundService;
+  private final RankerService rankerService;
 
   @Override
   public int calculateAssholePoints(UnlocksEntity unlocks) {
@@ -38,6 +43,17 @@ public class UnlocksUtilsServiceImpl implements UnlocksUtilsService {
         .map(LadderEntity::getId)
         .orElse(null);
 
+    boolean wasFirst = false;
+    if (unlocks.getReachedAssholeLadder()) {
+      Optional<RankerEntity> firstRanker = rankerService.findAllByLadderId(assholeLadderId).stream()
+          .filter(r -> !r.isGrowing())
+          .max(Comparator.comparingInt(RankerEntity::getRank));
+
+      if (firstRanker.isPresent() && firstRanker.get().getAccountId().equals(accountId)) {
+        wasFirst = true;
+      }
+    }
+
     List<VinegarThrowEntity> vinThrows = vinegarThrowService
         .findVinegarThrowsOfCurrentRound(accountId).stream()
         .filter(vt -> vt.getThrowerAccountId().equals(accountId))
@@ -56,7 +72,7 @@ public class UnlocksUtilsServiceImpl implements UnlocksUtilsService {
         .filter(t -> t.getLadderId().equals(assholeLadderId))
         .count();
 
-    if (assholeThrows > 0) {
+    if (assholeThrows > 0 || wasFirst) {
       result += 1;
     }
 
@@ -65,7 +81,7 @@ public class UnlocksUtilsServiceImpl implements UnlocksUtilsService {
         .filter(VinegarThrowEntity::isSuccessful)
         .count();
 
-    if (successAssholeThrows > 0) {
+    if (successAssholeThrows > 0 || wasFirst) {
       result += 1;
     }
 
