@@ -18,7 +18,6 @@ description: 'A list of all changes made to the game'
 - STINGY/DROUGHT/NO_HANDOUTS modifiers buffed and renamed to TAX/LAVA/VIRUS to better reflect their changed behaviour
 
 ### Bugfixes
-- You now don't get your rewards downgraded by 1 place when winning.
 - Last Person to promote from AH, now gets their promotedOn flag set correctly.
 - SLOW not appropriately affecting all kinda modifiers (f.e. NO_AUTO)
 
