@@ -324,7 +324,9 @@ public class LadderEventServiceImpl implements LadderEventService {
         List<RankerEntity> newRankers =
             rankerService.findAllByLadderId(newLadder.getId());
         if (newRankers.size() <= 1) {
-          newRanker.setAutoPromote(true);
+          if (!ladder.getTypes().contains(LadderType.TAXES)) {
+            newRanker.setAutoPromote(true);
+          }
           newRanker.setVinegar(
               newRanker.getVinegar()
                   .multiply(BigInteger.valueOf(ladder.getWinningVinMultiplier()))

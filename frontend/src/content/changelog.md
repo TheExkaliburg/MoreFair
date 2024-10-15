@@ -15,7 +15,7 @@ description: 'A list of all changes made to the game'
 
 ### Balancing
 - CONSOLATION and GENEROUS rewards decreased and brought into line with BOUNTIFUL.
-- STINGY/DROUGHT/NO_HANDOUTS modifiers buffed and renamed to TAX/LAVA/VIRUS to better reflect their changed behaviour
+- STINGY/DROUGHT/NO_HANDOUTS modifiers buffed and renamed to TAX/LAVA/VIRUS to better reflect their changed behaviour.
 
 ### Bugfixes
 - Last Person to promote from AH, now gets their promotedOn flag set correctly.

@@ -1,4 +1,4 @@
--- Creating a new Season
+-- Creating a new Account
 
 DO
 $$
@@ -10,6 +10,5 @@ $$
         INSERT INTO public.account (last_login, legacy_asshole_points, display_name, username,
                                     access_role, password, guest)
         VALUES (now(), 0, 'Mystery Guest', var_username, 'PLAYER', var_password, true);
-
     END
 $$
