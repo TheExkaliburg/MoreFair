@@ -201,10 +201,26 @@ public class LadderTypeBuilder {
     ladderTypes.add(getRandomLadderType(costTypeWeights, "Cost"));
     ladderTypes.add(getRandomLadderType(grapesPositiveTypeWeights, "GrapesPositive"));
     ladderTypes.add(getRandomLadderType(grapesNegativeTypeWeights, "GrapesNegative"));
+
+    postProcess(ladderTypes);
+
+    return ladderTypes;
+  }
+
+  private void postProcess(Set<LadderType> ladderTypes) {
+    if (ladderTypes.containsAll(EnumSet.of(LadderType.BOUNTIFUL, LadderType.LAVA))) {
+      ladderTypes.remove(LadderType.LAVA);
+    }
+    if (ladderTypes.containsAll(EnumSet.of(LadderType.CONSOLATION, LadderType.VIRUS))) {
+      ladderTypes.remove(LadderType.VIRUS);
+    }
+    if (ladderTypes.containsAll(EnumSet.of(LadderType.GENEROUS, LadderType.TAXES))) {
+      ladderTypes.remove(LadderType.TAXES);
+    }
+
     if (ladderTypes.size() > 1) {
       ladderTypes.remove(LadderType.DEFAULT);
     }
-    return ladderTypes;
   }
 
   private Map<Float, LadderType> createInverseLookupTable(Map<LadderType, Float> weights) {
