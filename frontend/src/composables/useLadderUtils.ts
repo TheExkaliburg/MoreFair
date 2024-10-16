@@ -182,7 +182,7 @@ function getBottomGrapes() {
   if (ladder.state.types.has(LadderType.BOUNTIFUL)) {
     return 5;
   } else if (ladder.state.types.has(LadderType.LAVA)) {
-    return -1;
+    return 0;
   }
   return 1;
 }

@@ -133,7 +133,7 @@ public final class LadderEntity {
     if (types.contains(LadderType.BOUNTIFUL)) {
       return 5;
     } else if (types.contains(LadderType.LAVA)) {
-      return -1;
+      return 0;
     }
     return 1;
   }

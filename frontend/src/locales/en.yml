@@ -320,7 +320,7 @@ modifier:
     identifier: BOUNT
   LAVA:
     title: Lava
-    description: The floor is lava, don't stay down there too long.
+    description: The floor is lava, don't stay down there too long. (currently disabled; 0 BottomGrapes)
     identifier: LAVA
   CONSOLATION:
     title: Consolation

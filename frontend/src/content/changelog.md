@@ -4,6 +4,17 @@ description: 'A list of all changes made to the game'
 
 # Changelog
 
+## 3.0.4 [PATCH]: Lava Hotfix
+
+### Improvement:
+- Disabling LAVA to its previous form (0 FloorGrapes). I would like to bring it back as a negative modifier later, but first I need time to implement a solution.
+- Also, it can still roll but behaves as DROUGHT before.
+
+<br><br><br><br><br><br><br>
+
+<details>
+<summary>Expand for the 3.0.x changelog</summary>
+
 ## 3.0.3 [PATCH]: Vinegar Round Modifier Adjustments
 
 ### Features
@@ -21,12 +32,6 @@ description: 'A list of all changes made to the game'
 - Last Person to promote from AH, now gets their promotedOn flag set correctly.
 - SLOW not appropriately affecting all kinda modifiers (f.e. NO_AUTO)
 
-
-<br><br><br><br><br><br><br>
-
-<details>
-<summary>Expand for the 3.0.x changelog</summary>
-
 ## 3.0.2 [PATCH]: Reward Changes
 
 ### Improvements
@@ -34,7 +39,6 @@ description: 'A list of all changes made to the game'
 
 ### Bugfixes
 - You now don't get your rewards downgraded by 1 place when winning.
-
 
 ## 3.0.1 [PATCH]: First small fixes
 
