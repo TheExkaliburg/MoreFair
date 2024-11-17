@@ -4,16 +4,24 @@ description: 'A list of all changes made to the game'
 
 # Changelog
 
-## 3.0.4 [PATCH]: Lava Hotfix
+## 3.0.5 [PATCH]: L1 Lave Hotfix
 
-### Improvement:
-- Disabling LAVA to its previous form (0 FloorGrapes). I would like to bring it back as a negative modifier later, but first I need time to implement a solution.
-- Also, it can still roll but behaves as DROUGHT before.
+### Bugfixes
+- LAVA cannot roll on L1 anymore.
+
+### Improvements
+- Adding Tuna to the Mod-List in Rules.
 
 <br><br><br><br><br><br><br>
 
 <details>
 <summary>Expand for the 3.0.x changelog</summary>
+
+## 3.0.4 [PATCH]: Lava Hotfix
+
+### Improvement:
+- Disabling LAVA to its previous form (0 FloorGrapes). I would like to bring it back as a negative modifier later, but first I need time to implement a solution.
+- Also, it can still roll but behaves as DROUGHT before.
 
 ## 3.0.3 [PATCH]: Vinegar Round Modifier Adjustments
 

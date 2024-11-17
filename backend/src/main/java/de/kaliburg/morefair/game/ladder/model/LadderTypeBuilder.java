@@ -181,7 +181,7 @@ public class LadderTypeBuilder {
     }
 
     if (ladderNumber == 1) {
-      autoTypeWeights.put(LadderType.LAVA, 0.f);
+      grapesNegativeTypeWeights.put(LadderType.LAVA, 0.f);
       sizeTypeWeights.put(LadderType.TINY, 0.f);
       autoTypeWeights.put(LadderType.FREE_AUTO, 0.f);
       autoTypeWeights.put(LadderType.NO_AUTO, 0.f);
