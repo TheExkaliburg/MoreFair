@@ -69,7 +69,7 @@ onMounted(() => {
   let wasScrolledDown = true;
   if (parent) {
     wasScrolledDown =
-      parent.scrollTop + parent.clientHeight >= parent.scrollHeight - 10;
+      parent.scrollTop + parent.clientHeight >= parent.scrollHeight - 300;
   }
 
   if (isLastMessage.value && wasScrolledDown) {
