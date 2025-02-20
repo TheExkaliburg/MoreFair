@@ -4,6 +4,13 @@ description: 'A list of all changes made to the game'
 
 # Changelog
 
+## 3.0.6 [PATCH]: Untitled
+
+<br><br><br><br><br><br><br>
+
+<details>
+<summary>Expand for the 3.0.x changelog</summary>
+
 ## 3.0.5 [PATCH]: L1 Lave Hotfix
 
 ### Bugfixes
@@ -11,11 +18,6 @@ description: 'A list of all changes made to the game'
 
 ### Improvements
 - Adding Tuna to the Mod-List in Rules.
-
-<br><br><br><br><br><br><br>
-
-<details>
-<summary>Expand for the 3.0.x changelog</summary>
 
 ## 3.0.4 [PATCH]: Lava Hotfix
 
