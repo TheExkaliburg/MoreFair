@@ -69,7 +69,11 @@ export const useEta = (ranker: Ranker) => {
     const speedDiff = targetSpeed.sub(rankerSpeed);
     // Calculating the current distance between the two players
     const pointsDiff = target.points.sub(ranker.points);
-    const result = solveQuadratic(accDiff, speedDiff, pointsDiff).toNumber();
+    const result = solveQuadratic(
+      accDiff.div(new Decimal(2)),
+      speedDiff,
+      pointsDiff
+    ).toNumber();
 
     // saving the value in both maps (target -> ranker and ranker -> target)
     cachedMap.set(target.accountId, result);
@@ -117,7 +121,11 @@ export const useEta = (ranker: Ranker) => {
     const accDiff = getPowerGainDifferenceToRank(ranker, targetRank).negate();
     const speedDiff = ranker.growing ? ranker.power.negate() : new Decimal(0);
     const pointsDiff = target.sub(ranker.points);
-    const result = solveQuadratic(accDiff, speedDiff, pointsDiff).toNumber();
+    const result = solveQuadratic(
+      accDiff.div(new Decimal(2)),
+      speedDiff,
+      pointsDiff
+    ).toNumber();
     cachedMap.set(target, result);
     return result;
   }
