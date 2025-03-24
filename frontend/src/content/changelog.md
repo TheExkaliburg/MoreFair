@@ -4,7 +4,13 @@ description: 'A list of all changes made to the game'
 
 # Changelog
 
-## 3.0.6 [PATCH]: Untitled
+## 3.0.6 [PATCH]: ETA fixes
+
+### Improvements
+- Scrolling down chat if scrolled up at least a message
+
+### Bugfixes
+- Fixing ETA (Thanks bkc & SOBEX)
 
 <br><br><br><br><br><br><br>
 
