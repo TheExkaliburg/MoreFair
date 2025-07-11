@@ -1,6 +1,6 @@
 # Impressum
 
-Tobias Schmidt
+Jade Schmidt
 
 c/o Block Services
 
