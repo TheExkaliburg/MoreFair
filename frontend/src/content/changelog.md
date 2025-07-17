@@ -4,6 +4,19 @@ description: 'A list of all changes made to the game'
 
 # Changelog
 
+## 3.0.7 [PATCH]: Global Ladder Numbers
+
+### Features
+- Adding the Ladder Number of the Ranker to the message in GLOBAL Chat
+
+### Bugfixes
+- Privacy Policy and Rules should be available again without logging in.
+
+<br><br><br><br><br><br><br>
+
+<details>
+<summary>Expand for the 3.0.x changelog</summary>
+
 ## 3.0.6 [PATCH]: ETA fixes
 
 ### Improvements
@@ -12,10 +25,6 @@ description: 'A list of all changes made to the game'
 ### Bugfixes
 - Fixing ETA (Thanks bkc & SOBEX)
 
-<br><br><br><br><br><br><br>
-
-<details>
-<summary>Expand for the 3.0.x changelog</summary>
 
 ## 3.0.5 [PATCH]: L1 Lave Hotfix
 
