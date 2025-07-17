@@ -72,7 +72,7 @@ export const useEta = (ranker: Ranker) => {
     const result = solveQuadratic(
       accDiff.div(new Decimal(2)),
       speedDiff,
-      pointsDiff
+      pointsDiff,
     ).toNumber();
 
     // saving the value in both maps (target -> ranker and ranker -> target)
@@ -124,7 +124,7 @@ export const useEta = (ranker: Ranker) => {
     const result = solveQuadratic(
       accDiff.div(new Decimal(2)),
       speedDiff,
-      pointsDiff
+      pointsDiff,
     ).toNumber();
     cachedMap.set(target, result);
     return result;
