@@ -107,7 +107,7 @@ Controller for the purposes of the General Data Protection Regulation (GDPR), ot
 Member states of the European Union and other provisions related to data protection is:
 
 ```
-Tobias Schmidt
+Jade Schmidt
 c/o Block Services
 Stuttgarter Str. 106
 70736 Fellbach

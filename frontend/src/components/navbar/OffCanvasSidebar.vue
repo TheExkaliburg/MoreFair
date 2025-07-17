@@ -61,11 +61,7 @@
             </template>
           </SidebarButton>
         </NuxtLink>
-        <NuxtLink
-          v-if="accountStore.getters.isMod"
-          to="/moderation"
-          @click="close"
-        >
+        <NuxtLink v-if="isMod" to="/moderation" @click="close">
           <SidebarButton
             :label="lang('moderation')"
             aria-label="Goto Moderation Page"
@@ -114,8 +110,8 @@ import { NuxtLink } from "#components";
 import { useUiStore } from "~/store/ui";
 import { useLang } from "~/composables/useLang";
 import { useAccountStore } from "~/store/account";
+import { useAuthStore } from "~/store/authentication";
 
-const accountStore = useAccountStore();
 const uiStore = useUiStore();
 const offCanvas = ref<MaybeElement>();
 
@@ -124,6 +120,13 @@ const optionsLabel = computed<string>(() => lang("options"));
 const discordLabel = computed<string>(() => lang("discord"));
 const privacyLabel = computed<string>(() => lang("privacy"));
 const impressumLabel = computed<string>(() => lang("impressum"));
+
+const isMod = computed<boolean>(() => {
+  if (useAuthStore().state.authenticationStatus) {
+    return useAccountStore().getters.isMod;
+  }
+  return false;
+});
 
 onClickOutside(offCanvas.value, () => {
   close();

@@ -69,7 +69,7 @@
             </SidebarButton>
           </NuxtLink>
           <NuxtLink
-            v-if="accountStore.getters.isMod"
+            v-if="isMod"
             v-tippy="{ content: lang('moderation'), placement: 'right' }"
             aria-label="Goto Moderation Page"
             to="/moderation"
@@ -110,8 +110,14 @@ import {
 import { useLang } from "~/composables/useLang";
 import SidebarButton from "~/components/navbar/SidebarButton.vue";
 import { useAccountStore } from "~/store/account";
+import { useAuthStore } from "~/store/authentication";
 
-const accountStore = useAccountStore();
+const isMod = computed<boolean>(() => {
+  if (useAuthStore().state.authenticationStatus) {
+    return useAccountStore().getters.isMod;
+  }
+  return false;
+});
 
 const classesForSize = "min-w-12 w-12 max-w-12 px-2 py-2";
 const lang = useLang("components.navbar.sidebar");
