@@ -13,6 +13,8 @@ import de.kaliburg.morefair.chat.services.MessageService;
 import de.kaliburg.morefair.chat.services.mapper.MessageMapper;
 import de.kaliburg.morefair.chat.services.repositories.MessageRepository;
 import de.kaliburg.morefair.core.concurrency.CriticalRegion;
+import de.kaliburg.morefair.game.ranker.model.RankerEntity;
+import de.kaliburg.morefair.game.ranker.services.RankerService;
 import de.kaliburg.morefair.utils.FormattingUtils;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -34,11 +36,13 @@ public class MessageServiceImpl implements MessageService {
   private final WsUtils wsUtils;
   private final LoadingCache<Long, List<MessageEntity>> messagesChatIdCache;
   private final MessageMapper messageMapper;
+  private final RankerService rankerService;
 
   public MessageServiceImpl(MessageRepository messageRepository, ChatService chatService,
-      WsUtils wsUtils, MessageMapper messageMapper) {
+      WsUtils wsUtils, MessageMapper messageMapper, RankerService rankerService) {
     this.messageRepository = messageRepository;
     this.chatService = chatService;
+    this.rankerService = rankerService;
     this.wsUtils = wsUtils;
     this.messageMapper = messageMapper;
 
@@ -76,6 +80,10 @@ public class MessageServiceImpl implements MessageService {
     if (metadata != null && !metadata.isBlank()) {
       result.setMetadata(metadata);
     }
+
+    rankerService.findHighestActiveRankerOfAccount(account)
+        .map(RankerEntity::getLadderId)
+        .ifPresent(result::setSentInLadderId);
 
     try (var ignored = semaphore.enter()) {
       result = save(result);

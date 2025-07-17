@@ -99,7 +99,10 @@ export class Message implements MessageData {
   getChatTypeIdentifier(): string {
     const lang = useLang("chat");
     let result = lang(this.chatType.toUpperCase() + ".identifier");
-    if (this.chatType === ChatType.LADDER) {
+    if (
+      this.chatType === ChatType.LADDER ||
+      (this.chatType === ChatType.GLOBAL && this.ladderNumber !== 0)
+    ) {
       result += this.ladderNumber;
     }
     return result;

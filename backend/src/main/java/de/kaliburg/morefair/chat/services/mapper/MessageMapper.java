@@ -6,8 +6,11 @@ import de.kaliburg.morefair.account.services.AccountService;
 import de.kaliburg.morefair.chat.model.ChatEntity;
 import de.kaliburg.morefair.chat.model.MessageEntity;
 import de.kaliburg.morefair.chat.model.dto.MessageDto;
+import de.kaliburg.morefair.game.ladder.model.LadderEntity;
+import de.kaliburg.morefair.game.ladder.services.LadderService;
 import de.kaliburg.morefair.game.season.model.AchievementsEntity;
 import de.kaliburg.morefair.game.season.services.AchievementsService;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +23,7 @@ public class MessageMapper {
 
   private final AccountService accountService;
   private final AchievementsService achievementsService;
+  private final LadderService ladderService;
   private final FairConfig fairConfig;
 
   /**
@@ -38,6 +42,11 @@ public class MessageMapper {
     AchievementsEntity achievements =
         achievementsService.findOrCreateByAccountInCurrentSeason(account.getId());
 
+    Integer ladderNumber = Optional.ofNullable(message.getSentInLadderId())
+        .flatMap(ladderService::findLadderById)
+        .map(LadderEntity::getNumber)
+        .orElse(0);
+
     return MessageDto.builder()
         .message(message.getMessage())
         .metadata(message.getMetadata())
@@ -48,7 +57,7 @@ public class MessageMapper {
         .isMod(account.isMod())
         .timestamp(message.getCreatedOn().toEpochSecond())
         .chatType(chat.getType())
-        .ladderNumber(chat.getNumber())
+        .ladderNumber(chat.getType().isParameterized() ? chat.getNumber() : ladderNumber)
         .build();
   }
 }

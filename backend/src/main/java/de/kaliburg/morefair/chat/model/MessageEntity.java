@@ -1,5 +1,6 @@
 package de.kaliburg.morefair.chat.model;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -46,6 +47,9 @@ public class MessageEntity implements Comparable<MessageEntity> {
   @NonNull
   @Column(name = "chat_id", nullable = false)
   private Long chatId;
+  @Nullable
+  @Column(name = "sent_in_ladder_id")
+  private Long sentInLadderId;
 
   @NonNull
   @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
