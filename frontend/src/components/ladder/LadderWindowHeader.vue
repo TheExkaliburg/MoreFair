@@ -23,7 +23,7 @@
           </div>
           <br />
           <div class="whitespace-nowrap">
-            Round:
+            Round {{ roundStore.state.number }}:
             <TypeInformation
               :types="roundStore.state.types"
               placement="bottom"
@@ -61,7 +61,7 @@
         </div>
         <div class="flex flex-col -sm:hidden">
           <div class="whitespace-nowrap">
-            Round:
+            Round {{ roundStore.state.number }}:
             <TypeInformation
               :types="roundStore.state.types"
               placement="bottom"

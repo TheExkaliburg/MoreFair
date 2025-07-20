@@ -37,6 +37,7 @@ export type RoundData = {
   autoPromoteLadder: number;
   topLadder: number;
   types: RoundType[];
+  number: number;
 };
 
 export const useRoundStore = defineStore("round", () => {
@@ -50,6 +51,7 @@ export const useRoundStore = defineStore("round", () => {
     types: new Set([RoundType.DEFAULT]),
     topLadder: 1,
     settings: new RoundSettings({}),
+    number: 1,
   });
   const getters = reactive({
     formattedTypes: computed(() => {
@@ -81,6 +83,7 @@ export const useRoundStore = defineStore("round", () => {
         state.autoPromoteLadder = data.autoPromoteLadder;
         state.settings = new RoundSettings(data.settings);
         state.topLadder = data.topLadder;
+        state.number = data.number;
 
         stomp.addCallback(
           stomp.callbacks.onRoundEvent,

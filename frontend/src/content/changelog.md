@@ -14,6 +14,7 @@ description: 'A list of all changes made to the game'
 
 ### Improvements
 - Show all Rankers is enabled by default
+- Show Round Number in UI
 
 ### Bugfixes
 - Privacy Policy and Rules should be available again without logging in.

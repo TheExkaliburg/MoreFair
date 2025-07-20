@@ -49,6 +49,7 @@ public class RoundMapper {
                 .maxVinegarThrown(fairConfig.getMaxVinegarThrown())
                 .build()
         )
+        .number(round.getNumber())
         .build();
   }
 }

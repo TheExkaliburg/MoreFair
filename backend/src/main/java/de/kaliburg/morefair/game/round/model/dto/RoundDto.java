@@ -16,6 +16,7 @@ public class RoundDto {
   private Integer topLadder;
   private Integer autoPromoteLadder;
   private Set<RoundType> types;
+  private Integer number;
 
   @Data
   @Builder
