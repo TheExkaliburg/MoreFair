@@ -4,7 +4,7 @@ description: 'A list of all changes made to the game'
 
 # Changelog
 
-## 3.0.7 [PATCH]: Global Ladder Numbers
+## 3.0.7 [PATCH]: Global Ladder Numbers in Chad
 
 ### Features
 - Adding the Ladder Number of the Ranker to the message in GLOBAL Chat
