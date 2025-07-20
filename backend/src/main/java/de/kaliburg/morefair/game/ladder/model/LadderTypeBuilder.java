@@ -289,11 +289,18 @@ public class LadderTypeBuilder {
     if ((ladderNumber % 10 == 0 && ladderNumber != 90) || ladderNumber == 1) {
       result.add(LadderType.GIGANTIC);
       result.add(LadderType.CHEAP);
+      result.add(LadderType.GENEROUS);
     } else {
       if (ladderNumber > 60 && ladderNumber < 70) {
         result.add(LadderType.SMALL);
+        result.add(LadderType.CONSOLATION);
+        result.add(LadderType.LAVA);
+        result.add(LadderType.TAXES);
       } else if (ladderNumber >= 91) {
         int modulo = (ladderNumber - 1) % 5;
+        result.add(LadderType.TAXES);
+        result.add(LadderType.VIRUS);
+        result.add(LadderType.LAVA);
         switch (modulo) {
           case 1:
             result.add(LadderType.SMALL);
@@ -314,6 +321,8 @@ public class LadderTypeBuilder {
         }
       } else {
         result.add(LadderType.TINY);
+        result.add(LadderType.EXPENSIVE);
+        result.add(LadderType.BOUNTIFUL);
       }
 
     }
