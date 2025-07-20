@@ -2,8 +2,8 @@ import { defineStore } from "pinia";
 import axios from "axios";
 import {
   BooleanOption,
-  EditableMentionsOption,
   EditableIgnoreOption,
+  EditableMentionsOption,
   EditableThemeURLOption,
   EnumOption,
   IntegerOption,
@@ -35,7 +35,7 @@ const defaultValues = {
     showBiasAndMulti: new BooleanOption(true),
     showPowerGain: new BooleanOption(true),
     followOwnRanker: new BooleanOption(false),
-    showAllRankers: new BooleanOption(false),
+    showAllRankers: new BooleanOption(true),
     showTopRankers: new IntegerOption(10).setIsActive(() => {
       return !optionsStorage.value.ladder.showAllRankers.value;
     }),
