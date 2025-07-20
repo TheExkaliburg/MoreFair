@@ -46,6 +46,10 @@ public class RoundUtilsServiceImpl implements RoundUtilsService {
     int baseAsshole;
     int additionalLadders;
 
+    if (types.contains(RoundType.SPECIAL_100)) {
+      return 100;
+    }
+
     if (types.contains(RoundType.CHAOS)) {
       if (types.contains(RoundType.SHORT)) {
         baseAsshole = 5;

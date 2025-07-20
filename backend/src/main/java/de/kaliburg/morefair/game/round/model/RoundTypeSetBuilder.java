@@ -61,6 +61,10 @@ public class RoundTypeSetBuilder {
   }
 
   public Set<RoundType> build() {
+    if (roundNumber == 100) {
+      return EnumSet.of(RoundType.SPECIAL_100, RoundType.REVERSE_SCALING);
+    }
+
     if (roundNumber % 10 == 0) {
       speedTypeWeights.put(RoundType.FAST, 1.f);
       speedTypeWeights.put(RoundType.SLOW, 1.f);

@@ -305,6 +305,36 @@ public class LadderEventServiceImpl implements LadderEventService {
               autoLadder.getNumber(), e);
         }
 
+        // Special_100 Logic for moving the Ladder to 50 after finishing Ladder 100
+        if (currentRound.getTypes().contains(RoundType.SPECIAL_100)
+            && newLadder.getTypes().contains(LadderType.END)) {
+          LadderEntity assholeLadder =
+              ladderService.findCurrentLadderWithNumber(50).orElseThrow();
+
+          assholeLadder.getTypes().remove(LadderType.DEFAULT);
+          assholeLadder.getTypes().add(LadderType.ASSHOLE);
+
+          List<RankerEntity> assholeRankers = rankerService.findAllByLadderId(
+              assholeLadder.getId());
+          assholeRankers.forEach(r -> {
+            var a = achievementsService.findOrCreateByAccountInCurrentSeason(r.getAccountId());
+            var u = unlocksService.findOrCreateByAccountInCurrentRound(r.getAccountId());
+            if (!r.isGrowing()) {
+              a.setPressedAssholeButtons(a.getPressedAssholeButtons() + 1);
+              u.setPressedAssholeButton(true);
+            }
+            u.setReachedAssholeLadder(true);
+
+            unlocksService.save(u);
+            achievementsService.save(a);
+          });
+
+          Event<LadderEventType> e = new Event<>(LadderEventType.UPDATE_TYPES, account.getId(),
+              assholeLadder.getTypes());
+          wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
+              assholeLadder.getNumber(), e);
+        }
+
         UnlocksEntity unlocks = unlocksService.findOrCreateByAccountInCurrentRound(account.getId());
         AchievementsEntity achievements =
             achievementsService.findOrCreateByAccountInCurrentSeason(account.getId());
