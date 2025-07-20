@@ -9,6 +9,12 @@ description: 'A list of all changes made to the game'
 ### Features
 - Adding the Ladder Number of the Ranker to the message in GLOBAL Chat
 
+### Balancing
+- Minimum People To Promote is fixed at 10 for now.
+
+### Improvements
+- Show all Rankers is enabled by default
+
 ### Bugfixes
 - Privacy Policy and Rules should be available again without logging in.
 
