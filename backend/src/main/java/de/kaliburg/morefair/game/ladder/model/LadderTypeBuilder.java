@@ -279,7 +279,8 @@ public class LadderTypeBuilder {
     Set<LadderType> result = EnumSet.noneOf(LadderType.class);
 
     if (ladderNumber > 100) {
-      return EnumSet.of(LadderType.END);
+      return EnumSet.of(LadderType.END, LadderType.CONSOLATION, LadderType.BOUNTIFUL,
+          LadderType.GENEROUS, LadderType.CHEAP);
     }
 
     if (ladderNumber == 50 || ladderNumber == 100) {
