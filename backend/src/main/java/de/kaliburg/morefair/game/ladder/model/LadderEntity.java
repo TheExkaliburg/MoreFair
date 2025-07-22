@@ -24,6 +24,8 @@ import java.util.EnumSet;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -41,8 +43,10 @@ import org.hibernate.annotations.FetchMode;
 })
 @Getter
 @Setter
+@Builder
 @Accessors(chain = true)
 @NoArgsConstructor
+@AllArgsConstructor
 @SequenceGenerator(name = "seq_ladder", sequenceName = "seq_ladder", allocationSize = 1)
 public final class LadderEntity {
 
@@ -52,6 +56,7 @@ public final class LadderEntity {
   private Long id;
   @NonNull
   @Column(nullable = false)
+  @Builder.Default
   private UUID uuid = UUID.randomUUID();
   @NonNull
   @Column(nullable = false)
@@ -64,7 +69,9 @@ public final class LadderEntity {
   @Enumerated(EnumType.STRING)
   @Fetch(FetchMode.SELECT)
   private Set<LadderType> types = EnumSet.noneOf(LadderType.class);
+  @NonNull
   @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
+  @Builder.Default
   private OffsetDateTime createdOn = OffsetDateTime.now(ZoneOffset.UTC);
   @NonNull
   @Column(nullable = false, precision = 1000)
