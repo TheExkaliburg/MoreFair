@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.model.AccountEntity;
+import de.kaliburg.morefair.account.model.types.AccountAccessType;
 import de.kaliburg.morefair.account.services.AccountService;
 import de.kaliburg.morefair.api.utils.HttpUtils;
 import de.kaliburg.morefair.api.utils.RequestThrottler;
@@ -17,6 +18,7 @@ import java.net.URI;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -118,6 +120,16 @@ public class AuthController {
       if (!requestThrottler.canCreateAccount(ip)) {
         return HttpUtils.buildErrorMessage(HttpStatus.TOO_MANY_REQUESTS,
             "Too many requests");
+      }
+
+      List<AccountEntity> bannedAltAccounts = accountService.searchByIp(ip).stream()
+          .filter(a -> a.getAccessRole().equals(AccountAccessType.BANNED_PLAYER))
+          .filter(a -> a.getLastLogin().isAfter(OffsetDateTime.now(ZoneOffset.UTC).minusYears(1)))
+          .toList();
+
+      if (bannedAltAccounts.size() > 2) {
+        return HttpUtils.buildErrorMessage(HttpStatus.TOO_MANY_REQUESTS,
+            "Too many banned Accounts from this IP");
       }
 
       String confirmToken = UUID.randomUUID().toString();
@@ -318,6 +330,16 @@ public class AuthController {
       if (!requestThrottler.canCreateAccount(ip)) {
         return HttpUtils.buildErrorMessage(HttpStatus.TOO_MANY_REQUESTS,
             "Too many requests");
+      }
+
+      List<AccountEntity> bannedAltAccounts = accountService.searchByIp(ip).stream()
+          .filter(a -> a.getAccessRole().equals(AccountAccessType.BANNED_PLAYER))
+          .filter(a -> a.getLastLogin().isAfter(OffsetDateTime.now(ZoneOffset.UTC).minusYears(1)))
+          .toList();
+
+      if (bannedAltAccounts.size() > 2) {
+        return HttpUtils.buildErrorMessage(HttpStatus.TOO_MANY_REQUESTS,
+            "Too many banned Accounts from this IP");
       }
 
       UUID uuid = UUID.randomUUID();
