@@ -4,7 +4,6 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.model.AccountEntity;
-import de.kaliburg.morefair.account.model.types.AccountAccessType;
 import de.kaliburg.morefair.account.services.AccountService;
 import de.kaliburg.morefair.api.utils.HttpUtils;
 import de.kaliburg.morefair.api.utils.RequestThrottler;
@@ -123,7 +122,7 @@ public class AuthController {
       }
 
       List<AccountEntity> bannedAltAccounts = accountService.searchByIp(ip).stream()
-          .filter(a -> a.getAccessRole().equals(AccountAccessType.BANNED_PLAYER))
+          .filter(AccountEntity::isBanned)
           .filter(a -> a.getLastLogin().isAfter(OffsetDateTime.now(ZoneOffset.UTC).minusYears(1)))
           .toList();
 
@@ -333,7 +332,7 @@ public class AuthController {
       }
 
       List<AccountEntity> bannedAltAccounts = accountService.searchByIp(ip).stream()
-          .filter(a -> a.getAccessRole().equals(AccountAccessType.BANNED_PLAYER))
+          .filter(AccountEntity::isBanned)
           .filter(a -> a.getLastLogin().isAfter(OffsetDateTime.now(ZoneOffset.UTC).minusYears(1)))
           .toList();
 

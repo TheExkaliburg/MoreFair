@@ -99,6 +99,10 @@ public class AccountController {
       AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
           .orElseThrow();
 
+      if (account.isMuted()) {
+        return HttpUtils.buildErrorMessage(HttpStatus.UNAUTHORIZED, "Account is banned");
+      }
+
       if (displayName.equals(account.getDisplayName())) {
         Map<String, String> result = new HashMap<>();
         result.put("displayName", displayName);
