@@ -54,8 +54,10 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -95,6 +97,7 @@ public class LadderEventServiceImpl implements LadderEventService {
 
       for (int i = 1; i <= ladderService.findAllByRound(currentRound).size(); i++) {
         LadderEntity ladder = ladderService.findCurrentLadderWithNumber(i).orElseThrow();
+        Set<Long> dethronedTargetAccountIds = new HashSet<>();
         List<Event<LadderEventType>> events =
             eventMap.computeIfAbsent(ladder.getNumber(), k -> new ArrayList<>());
         List<Event<LadderEventType>> eventsToBeRemoved = new ArrayList<>();
@@ -112,7 +115,7 @@ public class LadderEventServiceImpl implements LadderEventService {
               eventsToBeRemoved.add(e);
             }
           } else if (THROW_VINEGAR.equals(e.getEventType())) {
-            if (!throwVinegar(e, ladder)) {
+            if (!throwVinegar(e, ladder, dethronedTargetAccountIds)) {
               eventsToBeRemoved.add(e);
             }
           } else if (BUY_AUTO_PROMOTE.equals(e.getEventType())) {
@@ -465,8 +468,19 @@ public class LadderEventServiceImpl implements LadderEventService {
    * @param ladder the ladder the ranker is on
    * @return if the ranker can throw vinegar at the rank-1-ranker
    */
-  boolean throwVinegar(Event<LadderEventType> event, LadderEntity ladder) {
+  boolean throwVinegar(Event<LadderEventType> event, LadderEntity ladder,
+      Set<Long> dethronedTargetAccountIds) {
     try {
+      List<RankerEntity> rankers = rankerService.findAllByLadderId(ladder.getId());
+      if (rankers.isEmpty()) {
+        return false;
+      }
+
+      Long currentTopAccountId = rankers.get(0).getAccountId();
+      if (dethronedTargetAccountIds.contains(currentTopAccountId)) {
+        return false;
+      }
+
       var optional = vinegarThrowService.throwVinegar(event);
       if (optional.isEmpty()) {
         return false;
@@ -500,6 +514,7 @@ public class LadderEventServiceImpl implements LadderEventService {
           GrapesController.PRIVATE_VINEGAR_DESTINATION, throwRecordResponse);
 
       if (vinegarThrow.isSuccessful()) {
+        dethronedTargetAccountIds.add(vinegarThrow.getTargetAccountId());
         removeMulti(
             new Event<>(LadderEventType.REMOVE_MULTI, vinegarThrow.getTargetAccountId()),
             ladder
