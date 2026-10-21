@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -31,7 +32,7 @@ public class SeasonServiceImpl implements SeasonService {
    * @return the newest season
    */
   @Override
-  @Transactional
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public SeasonEntity findNewestSeason() {
     try (var ignored = semaphore.enter()) {
       List<SeasonEntity> openSeasons = seasonRepository.findAllOpenSeasonsOrderedByNewestFirst();
@@ -57,7 +58,7 @@ public class SeasonServiceImpl implements SeasonService {
   }
 
   @Override
-  @Transactional
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public SeasonEntity getCurrentSeason() {
     try (var ignored = semaphore.enter()) {
       if (currentSeason == null) {

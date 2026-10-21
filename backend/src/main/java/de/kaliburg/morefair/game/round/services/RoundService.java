@@ -44,17 +44,20 @@ public class RoundService {
   private final WsUtils wsUtils;
   private final RoundUtilsService roundUtilsService;
   private final FairConfig fairConfig;
+  private final RoundInitializationService roundInitializationService;
   private final LoadingCache<Long, RoundEntity> roundCache;
   private Long currentRoundId;
 
   public RoundService(RoundRepository roundRepository, SeasonService seasonService,
       WsUtils wsUtils,
-      RoundUtilsService roundUtilsService, FairConfig fairConfig) {
+      RoundUtilsService roundUtilsService, FairConfig fairConfig,
+      RoundInitializationService roundInitializationService) {
     this.roundRepository = roundRepository;
     this.seasonService = seasonService;
     this.wsUtils = wsUtils;
     this.roundUtilsService = roundUtilsService;
     this.fairConfig = fairConfig;
+    this.roundInitializationService = roundInitializationService;
 
     this.roundCache = Caffeine.newBuilder()
         .expireAfterWrite(Duration.of(30, ChronoUnit.MINUTES))
@@ -62,7 +65,6 @@ public class RoundService {
   }
 
 
-  @Transactional
   public RoundEntity getCurrentRound() {
     try (var ignored = semaphore.enter()) {
       if (currentRoundId == null) {
@@ -197,6 +199,6 @@ public class RoundService {
         .types(types)
         .build();
 
-    return Optional.of(roundRepository.save(result));
+    return Optional.of(roundInitializationService.create(result));
   }
 }
