@@ -8,13 +8,16 @@ import static org.mockito.Mockito.when;
 import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.model.AccountEntity;
 import de.kaliburg.morefair.api.utils.WsUtils;
+import de.kaliburg.morefair.game.UpgradeUtils;
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.model.LadderType;
 import de.kaliburg.morefair.game.ladder.model.generation.LadderGenerationService;
 import de.kaliburg.morefair.game.ladder.services.impl.LadderServiceImpl;
 import de.kaliburg.morefair.game.ladder.services.repositories.LadderRepository;
+import de.kaliburg.morefair.game.ladder.services.utils.LadderUtilsServiceImpl;
 import de.kaliburg.morefair.game.ranker.model.RankerEntity;
 import de.kaliburg.morefair.game.ranker.services.repositories.RankerRepository;
+import de.kaliburg.morefair.game.ranker.services.utils.RankerUtilsServiceImpl;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
 import de.kaliburg.morefair.game.round.model.type.RoundType;
 import de.kaliburg.morefair.game.round.services.RoundInitializationService;
@@ -25,8 +28,11 @@ import de.kaliburg.morefair.game.season.services.AchievementsService;
 import java.math.BigInteger;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -49,6 +55,7 @@ class RankerServiceImplTest {
   private RankerRepository rankerRepository;
   private LadderServiceImpl ladderService;
   private RankerServiceImpl rankerService;
+  private RoundService roundService;
   private RoundEntity round;
   private AccountEntity account;
 
@@ -65,7 +72,7 @@ class RankerServiceImplTest {
         .percentageOfAdditionalAssholes(50.f)
         .types(EnumSet.of(RoundType.DEFAULT))
         .build());
-    RoundService roundService = mock(RoundService.class);
+    roundService = mock(RoundService.class);
     when(roundService.getCurrentRound()).thenReturn(round);
     LadderGenerationService generator = new LadderGenerationService(List.of());
     ladderService = new LadderServiceImpl(ladderRepository, roundService,
@@ -126,6 +133,28 @@ class RankerServiceImplTest {
         .containsExactly(LadderType.VOID);
     assertThat(rankerRepository.findByLadderId(first.getLadderId())).hasSize(2);
     assertThat(ladderRepository.count()).isEqualTo(2);
+  }
+
+  @ParameterizedTest
+  @EnumSource(value = LadderType.class, names = {"DEFAULT", "END", "VOID"})
+  void onlyNonterminalLaddersAllowOtherwiseEligiblePlayersToPromote(LadderType type) {
+    round.setTypes(EnumSet.of(RoundType.RACE));
+    when(roundService.findById(round.getId())).thenReturn(Optional.of(round));
+    LadderEntity ladder = saveLadder(2, type);
+    RankerEntity ranker = rankerService.createRankerOnLadder(account, 2).orElseThrow();
+    ranker.setPoints(BigInteger.valueOf(1_000_000));
+    ranker.setAutoPromote(true);
+    FairConfig config = new FairConfig();
+    LadderUtilsServiceImpl ladderUtils =
+        new LadderUtilsServiceImpl(config, rankerService, roundService);
+    RankerUtilsServiceImpl rankerUtils = new RankerUtilsServiceImpl(
+        ladderService, rankerService, new UpgradeUtils(config, ladderUtils), roundService,
+        ladderUtils, config);
+
+    assertThat(rankerUtils.canPromote(ranker)).isEqualTo(type == LadderType.DEFAULT);
+    assertThat(ladder.hasType(LadderType.END)).isEqualTo(type != LadderType.DEFAULT);
+    assertThat(ladder.hasType(LadderType.VOID)).isEqualTo(type == LadderType.VOID);
+    assertThat(ladder.getTypes().contains(LadderType.END)).isEqualTo(type == LadderType.END);
   }
 
   private LadderEntity saveLadder(int number, LadderType type) {

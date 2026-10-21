@@ -133,6 +133,10 @@ public final class LadderEntity {
     types = builder.build();
   }
 
+  public boolean hasType(LadderType requested) {
+    return types.stream().anyMatch(type -> type.matches(requested));
+  }
+
   public int getPassingGrapes() {
     if (types.contains(LadderType.CONSOLATION)) {
       return 5;

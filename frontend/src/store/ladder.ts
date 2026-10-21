@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { computed, reactive, ref } from "vue";
 import Decimal from "break_infinity.js";
+import { LadderType } from "./entities/ladderType";
 import { Ranker, RankerData } from "./entities/ranker";
 import {
   OnLadderEventBody,
@@ -26,33 +27,7 @@ import {
   useVinegarTour,
 } from "~/composables/useTour";
 
-export enum LadderType {
-  DEFAULT = "DEFAULT",
-  // Point Requirements
-  TINY = "TINY",
-  SMALL = "SMALL",
-  BIG = "BIG",
-  GIGANTIC = "GIGANTIC",
-  // Auto-promote
-  FREE_AUTO = "FREE_AUTO",
-  NO_AUTO = "NO_AUTO",
-  // Cost of Upgrade
-  CHEAP = "CHEAP",
-  EXPENSIVE = "EXPENSIVE",
-  // Bottom Grapes
-  BOUNTIFUL = "BOUNTIFUL",
-  LAVA = "LAVA",
-  // Passing Grapes
-  CONSOLATION = "CONSOLATION",
-  VIRUS = "VIRUS",
-  // Winning Prices
-  GENEROUS = "GENEROUS",
-  TAXES = "TAXES",
-  // End of the Game
-  ASSHOLE = "ASSHOLE",
-  END = "END",
-  VOID = "VOID",
-}
+export { hasLadderType, LadderType } from "./entities/ladderType";
 
 export enum LadderEventType {
   BUY_BIAS = "BUY_BIAS",

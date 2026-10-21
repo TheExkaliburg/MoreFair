@@ -123,7 +123,7 @@ import { LockClosedIcon } from "@heroicons/vue/24/outline";
 import FairButton from "../../components/interactables/FairButton.vue";
 import { useLang } from "~/composables/useLang";
 import { useOptionsStore } from "~/store/options";
-import { LadderType, useLadderStore } from "~/store/ladder";
+import { hasLadderType, LadderType, useLadderStore } from "~/store/ladder";
 import { Ranker } from "~/store/entities/ranker";
 import { useFormatter, useTimeFormatter } from "~/composables/useFormatter";
 import { useLadderUtils } from "~/composables/useLadderUtils";
@@ -290,7 +290,8 @@ const canPromote = computed<boolean>(() => {
   );
 });
 const promoteLabel = computed<string>(() => {
-  if (ladderStore.state.types.has(LadderType.END)) return lang("wait");
+  if (hasLadderType(ladderStore.state.types, LadderType.END))
+    return lang("wait");
   if (ladderStore.state.types.has(LadderType.ASSHOLE)) return lang("asshole");
   return lang("promote");
 });

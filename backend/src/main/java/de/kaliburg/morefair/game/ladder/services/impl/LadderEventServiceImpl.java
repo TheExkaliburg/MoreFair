@@ -310,6 +310,7 @@ public class LadderEventServiceImpl implements LadderEventService {
         }
 
         // Special_100 Logic for moving the Ladder to 50 after finishing Ladder 100
+        // Match END exactly: VOID must not trigger successful completion.
         if (currentRound.getTypes().contains(RoundType.SPECIAL_100)
             && newLadder.getTypes().contains(LadderType.END)) {
           LadderEntity assholeLadder =

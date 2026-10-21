@@ -47,7 +47,7 @@ public class LadderUtilsServiceImpl implements LadderUtilsService {
   }
 
   public boolean isLadderUnlocked(@NonNull LadderEntity ladder) {
-    if (ladder.getTypes().contains(LadderType.END)) {
+    if (ladder.hasType(LadderType.END)) {
       return false;
     }
     List<RankerEntity> rankers = rankerService.findAllByLadderId(ladder.getId());
