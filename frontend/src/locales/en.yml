@@ -354,6 +354,10 @@ modifier:
     title: The End
     description: There is nowhere else to go. Or is there?
     identifier: END
+  VOID:
+    title: Void
+    description: How did you get here?
+    identifier: VOID
 chat:
   GLOBAL:
     identifier: G

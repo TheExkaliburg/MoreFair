@@ -278,6 +278,7 @@ public class LadderEventServiceImpl implements LadderEventService {
       }
 
       if (rankerUtilsService.canPromote(ranker)) {
+        // TODO: Resolve the destination/VOID first and make promotion atomic, including cached state.
         RoundEntity currentRound = roundService.getCurrentRound();
         statisticsService.recordPromote(ranker, ladder, currentRound);
         log.info("[L{}] Promotion for {} (#{})", ladder.getNumber(), account.getDisplayName(),
@@ -309,6 +310,7 @@ public class LadderEventServiceImpl implements LadderEventService {
         }
 
         // Special_100 Logic for moving the Ladder to 50 after finishing Ladder 100
+        // Match END exactly: VOID must not trigger successful completion.
         if (currentRound.getTypes().contains(RoundType.SPECIAL_100)
             && newLadder.getTypes().contains(LadderType.END)) {
           LadderEntity assholeLadder =

@@ -1,13 +1,12 @@
 package de.kaliburg.morefair.game.ladder.model;
 
+import java.util.Set;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 /**
  * The different types of ladders with their order.
  */
 @Getter
-@NoArgsConstructor
 public enum LadderType implements Comparable<LadderType> {
   DEFAULT,
   // Point Requirements
@@ -32,7 +31,18 @@ public enum LadderType implements Comparable<LadderType> {
   TAXES,
   // End of the Game
   ASSHOLE,
-  END;
+  END,
+  VOID(END);
+
+  private final Set<LadderType> impliedTypes;
+
+  LadderType(LadderType... impliedTypes) {
+    this.impliedTypes = Set.of(impliedTypes);
+  }
+
+  public boolean matches(LadderType requested) {
+    return this == requested || impliedTypes.contains(requested);
+  }
 
   /**
    * The order of the ladder types when sorted (ordinal is originally used if the priority is the
@@ -58,5 +68,3 @@ public enum LadderType implements Comparable<LadderType> {
     }
   }
 }
-
-

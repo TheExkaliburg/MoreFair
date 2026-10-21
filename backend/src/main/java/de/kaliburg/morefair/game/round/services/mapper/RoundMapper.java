@@ -37,6 +37,7 @@ public class RoundMapper {
       assholeNumber = 100;
     }
 
+    // TODO: Track reached ladders separately from pre-generated ladders.
     return RoundDto.builder()
         .autoPromoteLadder(fairConfig.getAutoPromoteLadder())
         .topLadder(ladders.size())

@@ -14,6 +14,7 @@ import de.kaliburg.morefair.events.data.JoinData;
 import de.kaliburg.morefair.events.types.LadderEventType;
 import de.kaliburg.morefair.events.types.RoundEventTypes;
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
+import de.kaliburg.morefair.game.ladder.model.generation.LadderGenerationService;
 import de.kaliburg.morefair.game.ladder.services.LadderService;
 import de.kaliburg.morefair.game.ranker.model.RankerEntity;
 import de.kaliburg.morefair.game.ranker.services.RankerService;
@@ -44,6 +45,7 @@ public class RankerServiceImpl implements RankerService {
   private final CriticalRegion semaphore = new CriticalRegion(1);
   private final RankerRepository rankerRepository;
   private final LadderService ladderService;
+  private final LadderGenerationService ladderGenerationService;
   private final RoundService roundService;
   private final AchievementsService achievementsService;
   private final WsUtils wsUtils;
@@ -53,11 +55,12 @@ public class RankerServiceImpl implements RankerService {
    * Default Constructor.
    */
   public RankerServiceImpl(RankerRepository rankerRepository, LadderService ladderService,
-      RoundService roundService,
+      LadderGenerationService ladderGenerationService, RoundService roundService,
       AchievementsService achievementsService, WsUtils wsUtils,
       FairConfig fairConfig) {
     this.rankerRepository = rankerRepository;
     this.ladderService = ladderService;
+    this.ladderGenerationService = ladderGenerationService;
     this.roundService = roundService;
     this.achievementsService = achievementsService;
     this.wsUtils = wsUtils;
@@ -162,9 +165,15 @@ public class RankerServiceImpl implements RankerService {
 
   @Override
   public Optional<RankerEntity> createRankerOnLadder(AccountEntity account, int ladderNumber) {
-    LadderEntity ladder = ladderService.findCurrentLadderWithNumber(ladderNumber)
-        .orElseGet(() -> ladderService.createCurrentLadder(ladderNumber));
     try (var ignored = semaphore.enter()) {
+      LadderEntity ladder = ladderService.findCurrentLadderWithNumber(ladderNumber)
+          .orElseGet(() -> {
+            RoundEntity round = roundService.getCurrentRound();
+            log.error("Missing ladder {} in round {}; creating VOID fallback", ladderNumber,
+                round.getId());
+            return ladderService.save(
+                ladderGenerationService.generateFallbackLadder(round, ladderNumber));
+          });
       List<RankerEntity> rankers = new ArrayList<>(rankerCache.get(ladder.getId()));
       Optional<RankerEntity> optionalRanker = rankers.stream()
           .filter(r -> r.getAccountId().equals(account.getId()))

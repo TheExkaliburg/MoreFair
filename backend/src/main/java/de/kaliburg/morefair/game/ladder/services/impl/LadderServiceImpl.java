@@ -2,31 +2,22 @@ package de.kaliburg.morefair.game.ladder.services.impl;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import de.kaliburg.morefair.api.RoundController;
-import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.chat.services.MessageService;
 import de.kaliburg.morefair.chat.services.impl.ChatServiceImpl;
 import de.kaliburg.morefair.core.concurrency.CriticalRegion;
-import de.kaliburg.morefair.events.Event;
-import de.kaliburg.morefair.events.types.RoundEventTypes;
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
-import de.kaliburg.morefair.game.ladder.model.LadderType;
 import de.kaliburg.morefair.game.ladder.services.LadderService;
 import de.kaliburg.morefair.game.ladder.services.repositories.LadderRepository;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
-import de.kaliburg.morefair.game.round.model.type.RoundType;
+import de.kaliburg.morefair.game.round.services.RoundInitializationService;
 import de.kaliburg.morefair.game.round.services.RoundService;
-import de.kaliburg.morefair.utils.DateUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.Collection;
 import java.util.Comparator;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -47,13 +38,13 @@ public class LadderServiceImpl implements LadderService {
   private final LoadingCache<Integer, Long> currentLadderNumberLookup;
   private final LadderRepository ladderRepository;
   private final RoundService roundService;
-  private final WsUtils wsUtils;
+  private final RoundInitializationService roundInitializationService;
 
   public LadderServiceImpl(LadderRepository ladderRepository, RoundService roundService,
-      WsUtils wsUtils) {
+      RoundInitializationService roundInitializationService) {
     this.ladderRepository = ladderRepository;
     this.roundService = roundService;
-    this.wsUtils = wsUtils;
+    this.roundInitializationService = roundInitializationService;
 
     this.ladderCache = Caffeine.newBuilder()
         .expireAfterAccess(Duration.of(10, ChronoUnit.MINUTES))
@@ -79,12 +70,14 @@ public class LadderServiceImpl implements LadderService {
   public void reloadLadders() {
     try (var ignored = semaphore.enter()) {
       RoundEntity currentRound = roundService.getCurrentRound();
+      var ladders = ladderRepository.findByRound(currentRound.getId());
+      roundInitializationService.validateLadders(currentRound, ladders);
+      ladderCache.invalidateAll();
       currentLadderNumberLookup.invalidateAll();
-      Set<Integer> currentLadders = ladderRepository.findByRound(currentRound.getId()).stream()
-          .map(LadderEntity::getNumber)
-          .collect(Collectors.toSet());
-
-      currentLadderNumberLookup.getAll(currentLadders);
+      ladders.forEach(ladder -> {
+        ladderCache.put(ladder.getId(), ladder);
+        currentLadderNumberLookup.put(ladder.getNumber(), ladder.getId());
+      });
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       throw new RuntimeException(e);
@@ -116,17 +109,9 @@ public class LadderServiceImpl implements LadderService {
   @Override
   public List<LadderEntity> findAllByRound(RoundEntity round) {
     try (var ignored = semaphore.enter()) {
-      if (roundService.getCurrentRound().getId().equals(round.getId())) {
-        Collection<Long> ids = currentLadderNumberLookup.asMap().values();
-        Collection<LadderEntity> all = ladderCache.getAll(ids).values();
-
-        return all.stream()
-            .sorted(Comparator.comparingInt(LadderEntity::getNumber))
-            .collect(Collectors.toList());
-      }
-
-      // The Reason we don't cache this, is because it's not the stuff of the current Round
-      return ladderRepository.findByRound(round.getId()).stream().toList();
+      return ladderRepository.findByRound(round.getId()).stream()
+          .sorted(Comparator.comparingInt(LadderEntity::getNumber))
+          .collect(Collectors.toList());
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       throw new RuntimeException(e);
@@ -134,54 +119,11 @@ public class LadderServiceImpl implements LadderService {
   }
 
   @Override
-  @Transactional
   public LadderEntity createCurrentLadder(int ladderNumber) {
-    try (var ignored = semaphore.enter()) {
-      if (currentLadderNumberLookup.get(ladderNumber) != null) {
-        return null;
-      }
-
-      LadderEntity previousLadder =
-          Optional.ofNullable(currentLadderNumberLookup.get(ladderNumber - 1))
-              .map(ladderCache::get)
-              .orElse(null);
-
-      RoundEntity currentRound = roundService.getCurrentRound();
-      LadderEntity result =
-          new LadderEntity(ladderNumber, currentRound, previousLadder);
-
-      // If april fools but round type not anything special then schedule AH
-      if (DateUtils.isAprilFoolsDay()
-          && !currentRound.getTypes().contains(RoundType.APRIL_FOOLS)
-          && !currentRound.getTypes().contains(RoundType.SPECIAL_100)) {
-        if (previousLadder != null && previousLadder.getTypes().contains(LadderType.ASSHOLE)) {
-          result.setTypes(EnumSet.of(LadderType.END));
-        } else {
-          result.setTypes(EnumSet.of(LadderType.ASSHOLE, LadderType.NO_AUTO, LadderType.SMALL,
-              LadderType.CHEAP));
-
-          currentRound.setAssholeLadderNumber(ladderNumber);
-          roundService.save(currentRound);
-
-          Event<RoundEventTypes> topLadderEvent = new Event<>(
-              RoundEventTypes.INCREASE_ASSHOLE_LADDER);
-          topLadderEvent.setData(ladderNumber);
-          wsUtils.convertAndSendToTopic(RoundController.TOPIC_EVENTS_DESTINATION, topLadderEvent);
-        }
-      }
-
-      result = this.save(result);
-
-      Event<RoundEventTypes> topLadderEvent = new Event<>(RoundEventTypes.INCREASE_TOP_LADDER);
-      topLadderEvent.setData(ladderNumber);
-      wsUtils.convertAndSendToTopic(RoundController.TOPIC_EVENTS_DESTINATION, topLadderEvent);
-
-      ladderCache.put(result.getId(), result);
-      return result;
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      throw new RuntimeException(e);
-    }
+    // TODO: Replace this legacy fallback with explicit VOID recovery before enabling migration.
+    throw new UnsupportedOperationException(
+        "On-demand ladder generation is disabled; VOID recovery is not implemented (ladder "
+            + ladderNumber + ").");
   }
 
 

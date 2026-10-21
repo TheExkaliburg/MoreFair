@@ -11,6 +11,7 @@ public interface LadderService {
 
   List<LadderEntity> findAllByRound(RoundEntity round);
 
+  // TODO: Remove this legacy API/implementation once callers resolve destinations with VOID recovery.
   LadderEntity createCurrentLadder(int ladderNumber);
 
   Optional<LadderEntity> findLadderById(long ladderId);

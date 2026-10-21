@@ -1,6 +1,7 @@
 import Decimal from "break_infinity.js";
 import { computed } from "vue";
-import { LadderType, useLadderStore } from "~/store/ladder";
+import { useLadderStore } from "~/store/ladder";
+import { hasLadderType, LadderType } from "~/store/entities/ladderType";
 import { RoundType, useRoundStore } from "~/store/round";
 import { Ranker } from "~/store/entities/ranker";
 
@@ -60,7 +61,7 @@ const getYourPointsNeededToPromote = computed<Decimal>(() => {
 });
 
 const isLadderUnlocked = computed<boolean>(() => {
-  if (ladder.state.types.has(LadderType.END)) return false;
+  if (hasLadderType(ladder.state.types, LadderType.END)) return false;
 
   return ladder.state.rankers.length >= getMinimumPeopleForPromote.value;
 });
