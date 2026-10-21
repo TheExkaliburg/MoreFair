@@ -51,6 +51,7 @@ export enum LadderType {
   // End of the Game
   ASSHOLE = "ASSHOLE",
   END = "END",
+  VOID = "VOID",
 }
 
 export enum LadderEventType {

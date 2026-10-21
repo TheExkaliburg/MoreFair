@@ -1,9 +1,12 @@
 package de.kaliburg.morefair.game.ladder.model.generation;
 
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
+import de.kaliburg.morefair.game.ladder.model.LadderType;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
 import de.kaliburg.morefair.game.round.model.type.RoundType;
 import jakarta.annotation.PostConstruct;
+import java.math.BigInteger;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -39,12 +42,27 @@ public class LadderGenerationService {
     });
   }
 
+  // TODO: Calculate point requirements after scaling/types, including size modifiers and variation.
+  // TODO: Complete the SPECIAL_100 ladder sequence and add dedicated APRIL_FOOLS generation.
+  // TODO: Preserve the date-triggered April Fools early-ending behavior.
+  // TODO: Clamp reverse scaling to at least 1, including the END ladder.
+  // TODO: Match modifier priorities, incompatible grape-type cleanup, and size/back-to-back rules.
   public List<LadderEntity> generateLaddersForRound(RoundEntity round) {
     LadderGenerationContext context = new LadderGenerationContext(round);
 
     var generator = getGenerator(round.getTypes());
 
     return generator.generateLadders(context);
+  }
+
+  public LadderEntity generateFallbackLadder(RoundEntity round, int ladderNumber) {
+    return LadderEntity.builder()
+        .roundId(round.getId())
+        .number(ladderNumber)
+        .scaling(ladderNumber)
+        .basePointsToPromote(BigInteger.ZERO)
+        .types(EnumSet.of(LadderType.VOID))
+        .build();
   }
 
   private LadderGenerator getGenerator(Set<RoundType> types) {

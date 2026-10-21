@@ -32,7 +32,9 @@ public enum LadderType implements Comparable<LadderType> {
   TAXES,
   // End of the Game
   ASSHOLE,
-  END;
+  END,
+  // TODO: Make VOID unpromotable like END.
+  VOID;
 
   /**
    * The order of the ladder types when sorted (ordinal is originally used if the priority is the
@@ -58,5 +60,4 @@ public enum LadderType implements Comparable<LadderType> {
     }
   }
 }
-
 

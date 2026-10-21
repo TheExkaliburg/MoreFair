@@ -80,6 +80,8 @@ public final class LadderEntity {
   @Column(nullable = false)
   private Integer scaling;
 
+  // TODO: Retire this generation constructor, determineLadderType, and LadderTypeBuilder once
+  // generation-rule migration and VOID recovery are complete and legacy callers are removed.
   public LadderEntity(@NonNull Integer number, @NonNull RoundEntity round,
       LadderEntity previousLadder) {
     this.number = number;
