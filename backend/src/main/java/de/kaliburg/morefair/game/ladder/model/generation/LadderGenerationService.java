@@ -42,9 +42,7 @@ public class LadderGenerationService {
     });
   }
 
-  // TODO: Complete the SPECIAL_100 ladder sequence and add dedicated APRIL_FOOLS generation.
   // TODO: Preserve the date-triggered April Fools early-ending behavior.
-  // TODO: Clamp reverse scaling to at least 1, including the END ladder.
   // TODO: Match modifier priorities, incompatible grape-type cleanup, and size/back-to-back rules.
   public List<LadderEntity> generateLaddersForRound(RoundEntity round) {
     LadderGenerationContext context = new LadderGenerationContext(round);

@@ -18,7 +18,7 @@ public class Special100LadderGenerator implements LadderGenerator {
   @Override
   public List<LadderGenerationStep> getGenerationSteps() {
     return List.of(
-        new ContextPopulationStep(),
+        new ContextPopulationStep(100),
         new CreateLaddersStep(),
         new Special100Step(),
         new ReverseScalingStep(),

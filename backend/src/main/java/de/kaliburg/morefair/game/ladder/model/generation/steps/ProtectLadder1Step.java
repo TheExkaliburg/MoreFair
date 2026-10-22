@@ -15,7 +15,7 @@ public class ProtectLadder1Step implements LadderGenerationStep {
       return ladders;
     }
 
-    LadderEntity firstLadder = ladders.get(0);
+    LadderEntity firstLadder = ladders.getFirst();
 
     firstLadder.getTypes().remove(LadderType.FREE_AUTO);
     firstLadder.getTypes().remove(LadderType.NO_AUTO);
