@@ -20,6 +20,6 @@ public class LadderResultsDto {
   @Builder.Default
   private Set<LadderType> ladderTypes = EnumSet.noneOf(LadderType.class);
   private String basePointsToPromote;
-  private String createdOn;
+  private String firstReachedOn;
 
 }

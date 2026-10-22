@@ -31,16 +31,20 @@ public class RoundMapper {
    */
   public RoundDto mapToRoundDto(RoundEntity round) {
     List<LadderEntity> ladders = ladderService.findAllByRound(round);
+    int topLadder = ladders.stream()
+        .filter(LadderEntity::isReached)
+        .mapToInt(LadderEntity::getNumber)
+        .max()
+        .orElse(1);
 
     int assholeNumber = round.getAssholeLadderNumber();
     if (round.getTypes().contains(RoundType.APRIL_FOOLS)) {
       assholeNumber = 100;
     }
 
-    // TODO: Track reached ladders separately from pre-generated ladders.
     return RoundDto.builder()
         .autoPromoteLadder(fairConfig.getAutoPromoteLadder())
-        .topLadder(ladders.size())
+        .topLadder(topLadder)
         .assholeLadder(assholeNumber)
         .types(round.getTypes())
         .settings(

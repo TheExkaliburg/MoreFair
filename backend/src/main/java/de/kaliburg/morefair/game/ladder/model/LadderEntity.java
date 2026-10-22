@@ -19,8 +19,8 @@ import jakarta.persistence.UniqueConstraint;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.EnumSet;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
@@ -69,10 +69,8 @@ public final class LadderEntity {
   @Enumerated(EnumType.STRING)
   @Fetch(FetchMode.SELECT)
   private Set<LadderType> types = EnumSet.noneOf(LadderType.class);
-  @NonNull
-  @Column(nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
-  @Builder.Default
-  private OffsetDateTime createdOn = OffsetDateTime.now(ZoneOffset.UTC);
+  @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
+  private OffsetDateTime firstReachedOn;
   @NonNull
   @Column(nullable = false, precision = 1000)
   private BigInteger basePointsToPromote;
@@ -135,6 +133,10 @@ public final class LadderEntity {
 
   public boolean hasType(LadderType requested) {
     return types.stream().anyMatch(type -> type.matches(requested));
+  }
+
+  public boolean isReached() {
+    return Optional.ofNullable(firstReachedOn).isPresent();
   }
 
   public int getPassingGrapes() {

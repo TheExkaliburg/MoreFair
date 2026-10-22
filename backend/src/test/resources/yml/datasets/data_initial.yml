@@ -29,7 +29,7 @@ game:
 ladder:
   - id: 1
     uuid: b09777c8-d0a8-4277-a0f0-a5886bc43d38
-    created_on: "[DAY,NOW]"
+    first_reached_on: "[DAY,NOW]"
     base_points_to_promote: 506
     number: 1
     round_id: 1

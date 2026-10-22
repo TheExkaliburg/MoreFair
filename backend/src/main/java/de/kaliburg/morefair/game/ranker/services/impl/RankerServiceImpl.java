@@ -188,6 +188,15 @@ public class RankerServiceImpl implements RankerService {
       rankers.add(result);
       rankerCache.put(ladder.getId(), rankers);
 
+      if (!ladder.isReached()) {
+        ladder.setFirstReachedOn(result.getCreatedOn());
+        ladderService.save(ladder);
+
+        Event<RoundEventTypes> reachedEvent = new Event<>(RoundEventTypes.INCREASE_TOP_LADDER);
+        reachedEvent.setData(ladder.getNumber());
+        wsUtils.convertAndSendToTopic(RoundController.TOPIC_EVENTS_DESTINATION, reachedEvent);
+      }
+
       if (ladder.getNumber() == 1) {
         Event<RoundEventTypes> joinEvent = new Event<>(RoundEventTypes.JOIN, account.getId());
         joinEvent.setData(new SuggestionDto(account.getId(), account.getDisplayName()));

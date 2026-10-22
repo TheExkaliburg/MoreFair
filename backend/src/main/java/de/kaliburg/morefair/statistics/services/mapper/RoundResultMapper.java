@@ -14,6 +14,7 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -80,9 +81,10 @@ public class RoundResultMapper {
     return LadderResultsDto.builder()
         .basePointsToPromote(ladder.getBasePointsToPromote().toString())
         .ladderTypes(ladder.getTypes())
-        .createdOn(ladder.getCreatedOn().atZoneSameInstant(ZoneOffset.UTC)
-            .format(DateTimeFormatter.ISO_DATE_TIME)
-        )
+        .firstReachedOn(Optional.ofNullable(ladder.getFirstReachedOn())
+            .map(firstReachedOn -> firstReachedOn.atZoneSameInstant(ZoneOffset.UTC)
+                .format(DateTimeFormatter.ISO_DATE_TIME))
+            .orElse(null))
         .rankers(
             rankerService.findAllByLadderId(ladder.getId()).stream()
                 .map(rankerMapper::mapToPrivateDto)
