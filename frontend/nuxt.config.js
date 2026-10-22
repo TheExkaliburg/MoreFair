@@ -1,6 +1,7 @@
 import { defineNuxtConfig } from "nuxt/config";
 
 export default defineNuxtConfig({
+  compatibilityDate: "2024-04-03",
   css: [
     "~/assets/scss/styles.scss",
     "@fortawesome/fontawesome-svg-core/styles.css",
@@ -46,6 +47,9 @@ export default defineNuxtConfig({
     ],
     defaultLocale: "en",
     restructureDir: false,
+    bundle: {
+      optimizeTranslationDirective: false,
+    },
     langDir: "locales/",
     vueI18n: "./i18n.config.ts",
   },
