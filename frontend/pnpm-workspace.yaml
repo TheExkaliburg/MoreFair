@@ -2,7 +2,12 @@ overrides:
   parse-url@<8.1.0: '>=8.1.0'
   loader-utils@>=2.0.0 <2.0.3: '>=2.0.3'
   loader-utils@>=2.0.0 <2.0.4: '>=2.0.4'
-shamefullyHoist: true
+# TODO: Migrate @nuxt/content v2 -> v3 after the Nuxt 4 upgrade. v2 pulls unhead v1 via @vueuse/head
+# while Nuxt uses unhead v2; after that the unhead exclusions below can be removed.
+publicHoistPattern: 
+  - '*'
+  - '!unhead'
+  - '!@unhead/*'
 autoInstallPeers: true
 strictPeerDependencies: false
 allowBuilds:
