@@ -33,7 +33,7 @@ public class PopulatePointRequirementsStep implements LadderGenerationStep {
   }
 
   private BigInteger calculate(BigInteger base, int scaling, Set<LadderType> types) {
-      double percentage = random.nextDouble(0.8, 1.2);
+      double percentage = random.nextDouble(0.8, Math.nextUp(1.2));
       BigDecimal baseDec = new BigDecimal(base);
       baseDec = baseDec
               .multiply(BigDecimal.valueOf(scaling))
