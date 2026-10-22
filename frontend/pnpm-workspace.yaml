@@ -1,0 +1,14 @@
+overrides:
+  parse-url@<8.1.0: '>=8.1.0'
+  loader-utils@>=2.0.0 <2.0.3: '>=2.0.3'
+  loader-utils@>=2.0.0 <2.0.4: '>=2.0.4'
+shamefullyHoist: true
+autoInstallPeers: true
+strictPeerDependencies: false
+allowBuilds:
+  '@intlify/vue-i18n-bridge': true
+  '@intlify/vue-router-bridge': true
+  '@parcel/watcher': true
+  esbuild: true
+  unrs-resolver: true
+  vue-demi: true

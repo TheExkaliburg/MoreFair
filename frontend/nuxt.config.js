@@ -15,7 +15,7 @@ export default defineNuxtConfig({
     "@vueuse/nuxt",
     "@nuxt/content",
     "@nuxtjs/i18n",
-    "nuxt-vitest",
+    "@nuxt/test-utils/module",
   ],
   srcDir: "src/",
   content: {

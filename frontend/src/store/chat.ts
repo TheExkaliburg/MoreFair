@@ -6,6 +6,7 @@ import {
   MentionMeta,
   Message,
   MessageData,
+  ChatType,
 } from "./entities/message";
 import { OnChatEventBody, useStomp } from "~/composables/useStomp";
 import { useAPI } from "~/composables/useAPI";
@@ -13,12 +14,7 @@ import { useAccountStore } from "~/store/account";
 import { SOUNDS, useSound } from "~/composables/useSound";
 import { useOptionsStore } from "~/store/options";
 
-export enum ChatType {
-  GLOBAL = "GLOBAL",
-  LADDER = "LADDER",
-  SYSTEM = "SYSTEM",
-  MOD = "MOD",
-}
+export { ChatType };
 
 export type Suggestion = { accountId: number; displayName: string };
 

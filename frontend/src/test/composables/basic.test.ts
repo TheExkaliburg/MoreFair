@@ -1,8 +1,11 @@
 import { describe, expect, test } from "vitest";
+import { createPinia, setActivePinia } from "pinia";
 import Decimal from "break_infinity.js";
 import { useEta } from "~/composables/useEta";
 import { useLadderStore } from "~/store/ladder";
 import { Ranker } from "~/store/entities/ranker";
+
+setActivePinia(createPinia());
 
 describe("a 2 person ladder", () => {
   const ladderStore = useLadderStore();

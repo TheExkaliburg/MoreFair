@@ -67,7 +67,7 @@
     </parent>
 
     <properties>
-        <node.version>v18.16.0</node.version>
-        <pnpm.version>8.6.5</pnpm.version>
+        <node.version>v22.23.1</node.version>
+        <pnpm.version>12.15.0</pnpm.version>
     </properties>
 </project>

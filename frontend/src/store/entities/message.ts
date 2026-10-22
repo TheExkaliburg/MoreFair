@@ -1,6 +1,12 @@
-import { ChatType } from "~/store/chat";
 import { useLang } from "~/composables/useLang";
 import { useDateFormatter } from "~/composables/useFormatter";
+
+export enum ChatType {
+  GLOBAL = "GLOBAL",
+  LADDER = "LADDER",
+  SYSTEM = "SYSTEM",
+  MOD = "MOD",
+}
 
 export enum MessagePartType {
   plain,
