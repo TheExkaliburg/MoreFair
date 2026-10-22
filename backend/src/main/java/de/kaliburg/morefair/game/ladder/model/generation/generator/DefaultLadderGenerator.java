@@ -2,11 +2,7 @@ package de.kaliburg.morefair.game.ladder.model.generation.generator;
 
 import de.kaliburg.morefair.game.ladder.model.generation.LadderGenerationStep;
 import de.kaliburg.morefair.game.ladder.model.generation.LadderGenerator;
-import de.kaliburg.morefair.game.ladder.model.generation.steps.ContextPopulationStep;
-import de.kaliburg.morefair.game.ladder.model.generation.steps.CreateLaddersStep;
-import de.kaliburg.morefair.game.ladder.model.generation.steps.ProtectLadder1Step;
-import de.kaliburg.morefair.game.ladder.model.generation.steps.ReverseScalingStep;
-import de.kaliburg.morefair.game.ladder.model.generation.steps.SetupEndingStep;
+import de.kaliburg.morefair.game.ladder.model.generation.steps.*;
 import de.kaliburg.morefair.game.ladder.model.generation.steps.types.AutoTypeStep;
 import de.kaliburg.morefair.game.ladder.model.generation.steps.types.CostTypeStep;
 import de.kaliburg.morefair.game.ladder.model.generation.steps.types.DefaultTypeStep;
@@ -40,7 +36,9 @@ public class DefaultLadderGenerator implements LadderGenerator {
         new GrapesNegativeTypeStep(),
         new ProtectLadder1Step(),
         new SetupEndingStep(),
-        new DefaultTypeStep()
+        new DefaultTypeStep(),
+        // Population of stats
+        new PopulatePointRequirementsStep()
     );
   }
 

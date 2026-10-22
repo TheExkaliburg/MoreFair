@@ -42,7 +42,6 @@ public class LadderGenerationService {
     });
   }
 
-  // TODO: Calculate point requirements after scaling/types, including size modifiers and variation.
   // TODO: Complete the SPECIAL_100 ladder sequence and add dedicated APRIL_FOOLS generation.
   // TODO: Preserve the date-triggered April Fools early-ending behavior.
   // TODO: Clamp reverse scaling to at least 1, including the END ladder.

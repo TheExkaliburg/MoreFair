@@ -15,7 +15,7 @@ public class ReverseScalingStep implements LadderGenerationStep {
     }
 
     for (LadderEntity ladder : ladders) {
-      ladder.setScaling(context.getAssholeLadderNumber() - ladder.getScaling() + 1);
+      ladder.setScaling(Math.max(1, context.getAssholeLadderNumber() - ladder.getScaling() + 1));
     }
     return ladders;
   }
