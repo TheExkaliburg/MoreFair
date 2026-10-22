@@ -6,25 +6,29 @@
         : "Alt-Accounts:"
     }}
     <table class="w-full text-text table-auto">
-      <tr class="text-text-light text-left">
-        <th>ID</th>
-        <th>DisplayName</th>
-        <th class="text-right">Last Login</th>
-        <th class="text-right"></th>
-      </tr>
-      <tr
-        v-for="result in moderationStore.state.searchResults"
-        :key="result.accountId"
-      >
-        <td>{{ result.accountId }}</td>
-        <td>{{ result.displayName }}</td>
-        <td class="text-right">
-          {{ useDateFormatter(result.lastLogin, dateFormatOptions) }}
-        </td>
-        <td class="text-center hover:text-text-light active:text-text-dark">
-          <button @click="copyIntoSearch(result)">Copy</button>
-        </td>
-      </tr>
+      <thead>
+        <tr class="text-text-light text-left">
+          <th>ID</th>
+          <th>DisplayName</th>
+          <th class="text-right">Last Login</th>
+          <th class="text-right"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          v-for="result in moderationStore.state.searchResults"
+          :key="result.accountId"
+        >
+          <td>{{ result.accountId }}</td>
+          <td>{{ result.displayName }}</td>
+          <td class="text-right">
+            {{ useDateFormatter(result.lastLogin, dateFormatOptions) }}
+          </td>
+          <td class="text-center hover:text-text-light active:text-text-dark">
+            <button @click="copyIntoSearch(result)">Copy</button>
+          </td>
+        </tr>
+      </tbody>
     </table>
   </div>
 </template>

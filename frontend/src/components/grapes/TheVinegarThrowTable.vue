@@ -1,25 +1,29 @@
 <template>
   <div class="w-full">
     <table class="w-full">
-      <tr class="text-text-light">
-        <th class="text-left">
-          {{ abbreviation("round")
-          }}<span class="text-sm text-text-dark">x</span
-          >{{ abbreviation("ladder")
-          }}<span class="text-sm text-text-dark">x</span>
-        </th>
-        <th class="text-left">{{ lang("time") }}</th>
-        <th class="text-left">{{ lang("users") }}</th>
-        <th class="text-right">{{ lang("amount") }}</th>
-        <th class="text-right">{{ lang("result") }}</th>
-      </tr>
-      <VinegarThrowTableRow
-        v-for="(vinThrow, index) in shownThrows"
-        :key="index"
-        :vin-throw="vinThrow"
-        class="border-text"
-        :class="{ 'border-b-1': index < shownThrows.length - 1 }"
-      />
+      <thead>
+        <tr class="text-text-light">
+          <th class="text-left">
+            {{ abbreviation("round")
+            }}<span class="text-sm text-text-dark">x</span
+            >{{ abbreviation("ladder")
+            }}<span class="text-sm text-text-dark">x</span>
+          </th>
+          <th class="text-left">{{ lang("time") }}</th>
+          <th class="text-left">{{ lang("users") }}</th>
+          <th class="text-right">{{ lang("amount") }}</th>
+          <th class="text-right">{{ lang("result") }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <VinegarThrowTableRow
+          v-for="(vinThrow, index) in shownThrows"
+          :key="index"
+          :vin-throw="vinThrow"
+          class="border-text"
+          :class="{ 'border-b-1': index < shownThrows.length - 1 }"
+        />
+      </tbody>
     </table>
   </div>
 </template>
