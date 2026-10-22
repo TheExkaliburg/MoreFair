@@ -26,26 +26,8 @@ public class RoundInitializationService {
   public RoundEntity create(RoundEntity round) {
     RoundEntity savedRound = roundRepository.saveAndFlush(round);
     var ladders = ladderGenerationService.generateLaddersForRound(savedRound);
-    validateLadders(savedRound, ladders);
     ladderRepository.saveAllAndFlush(ladders);
     return savedRound;
   }
 
-  public void validateLadders(RoundEntity round, Collection<LadderEntity> ladders) {
-    int expectedCount = round.getAssholeLadderNumber() + 1;
-    Set<Integer> numbers = ladders.stream()
-        .map(LadderEntity::getNumber)
-        .collect(Collectors.toSet());
-
-    if (ladders.size() != expectedCount
-        || numbers.size() != expectedCount
-        || !IntStream.rangeClosed(1, expectedCount).allMatch(numbers::contains)
-        || ladders.stream().anyMatch(ladder -> !round.getId().equals(ladder.getRoundId()))) {
-      // TODO: Add explicit migration/repair for existing incomplete rounds; never reroll on reload.
-      throw new IllegalStateException(
-          "Incomplete ladder set for round " + round.getId() + ": expected ladders 1-"
-              + expectedCount + ", found " + numbers
-              + ". Automatic migration/repair is not implemented.");
-    }
-  }
 }

@@ -22,6 +22,7 @@ import de.kaliburg.morefair.game.ranker.services.repositories.RankerRepository;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
 import de.kaliburg.morefair.game.round.services.RoundService;
 import de.kaliburg.morefair.game.season.services.AchievementsService;
+import de.kaliburg.morefair.utils.DateUtils;
 import jakarta.annotation.PostConstruct;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -190,7 +191,11 @@ public class RankerServiceImpl implements RankerService {
 
       if (!ladder.isReached()) {
         ladder.setFirstReachedOn(result.getCreatedOn());
-        ladderService.save(ladder);
+        ladder = ladderService.save(ladder);
+
+        if(DateUtils.isAprilFoolsDay()) {
+          ladderService.prepareEarlyAprilFoolsEnding(ladder);
+        }
 
         Event<RoundEventTypes> reachedEvent = new Event<>(RoundEventTypes.INCREASE_TOP_LADDER);
         reachedEvent.setData(ladder.getNumber());

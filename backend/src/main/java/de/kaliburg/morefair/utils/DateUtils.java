@@ -7,7 +7,10 @@ import java.time.ZoneOffset;
 public class DateUtils {
 
   public static boolean isAprilFoolsDay() {
-    LocalDate todayUtc = LocalDate.now(ZoneOffset.UTC);
-    return todayUtc.getMonth() == Month.APRIL && todayUtc.getDayOfMonth() == 1;
+    return isAprilFoolsDay(LocalDate.now(ZoneOffset.UTC));
+  }
+
+  public static boolean isAprilFoolsDay(LocalDate date) {
+    return date.getMonth() == Month.APRIL && date.getDayOfMonth() == 1;
   }
 }

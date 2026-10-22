@@ -296,6 +296,7 @@ public class LadderEventServiceImpl implements LadderEventService {
             rankerService.findAllByLadderId(newLadder.getId());
 
         // Auto-Ladder
+        // TODO: Move this logic to the ladder Service (similar to April Fools Logic) -> we don't need to expose ladderService.save afterwards
         int number = Math.floorDiv(newLadder.getNumber(), 2) - 2;
         LadderEntity autoLadder = ladderService.findCurrentLadderWithNumber(number)
             .orElse(null);
@@ -344,6 +345,7 @@ public class LadderEventServiceImpl implements LadderEventService {
         // Needs to be here instead of the LadderService because otherwise we cannot send a message
         if (DateUtils.isAprilFoolsDay()
             && !currentRound.getTypes().contains(RoundType.APRIL_FOOLS)
+            && !currentRound.getTypes().contains(RoundType.SPECIAL_100)
             && newLadder.getTypes().contains(LadderType.ASSHOLE)
             && newRankers.size() <= 1) {
           accountService.findBroadcaster().ifPresent(broadCaster ->

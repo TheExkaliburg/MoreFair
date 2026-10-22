@@ -42,7 +42,6 @@ public class LadderGenerationService {
     });
   }
 
-  // TODO: Preserve the date-triggered April Fools early-ending behavior.
   // TODO: Match modifier priorities, incompatible grape-type cleanup, and size/back-to-back rules.
   public List<LadderEntity> generateLaddersForRound(RoundEntity round) {
     LadderGenerationContext context = new LadderGenerationContext(round);
