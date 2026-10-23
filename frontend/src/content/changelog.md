@@ -7,7 +7,7 @@ description: 'A list of all changes made to the game'
 ## 3.1.0 [MINOR]: New Ladder Generation Logic.
 
 ### Balancing
-- NO_AUTO will never be twice in a row, unless CHAOS/SLOW.
+- NO_AUTO will never be twice in a row, unless in CHAOS/SLOW rounds.
 - Some modifiers are now slightly less likely to appear in CHAOS. (FARMER, RAILROAD, RACE, LAVA, VIRUS, TAXES, DEFAULT)
 
 ### Improvements
