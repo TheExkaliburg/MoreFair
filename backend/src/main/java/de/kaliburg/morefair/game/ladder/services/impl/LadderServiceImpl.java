@@ -2,12 +2,14 @@ package de.kaliburg.morefair.game.ladder.services.impl;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import de.kaliburg.morefair.api.LadderController;
 import de.kaliburg.morefair.api.RoundController;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.chat.services.MessageService;
 import de.kaliburg.morefair.chat.services.impl.ChatServiceImpl;
 import de.kaliburg.morefair.core.concurrency.CriticalRegion;
 import de.kaliburg.morefair.events.Event;
+import de.kaliburg.morefair.events.types.LadderEventType;
 import de.kaliburg.morefair.events.types.RoundEventTypes;
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.model.LadderType;
@@ -165,8 +167,10 @@ public class LadderServiceImpl implements LadderService {
       Optional.ofNullable(currentLadderNumberLookup.get(ladder.getNumber() + 1))
               .map(ladderCache::get)
               .map(l -> l.setTypes(EnumSet.of(LadderType.END)))
-              .ifPresent(this::save);
+              .map(this::save)
+              .ifPresent(this::sendTypesUpdate);
       this.save(ladder);
+      sendTypesUpdate(ladder);
 
       Event<RoundEventTypes> topLadderEvent =
               new Event<>(RoundEventTypes.INCREASE_ASSHOLE_LADDER);
@@ -177,5 +181,12 @@ public class LadderServiceImpl implements LadderService {
       Thread.currentThread().interrupt();
       throw new RuntimeException(e);
     }
+  }
+
+  private void sendTypesUpdate(LadderEntity ladder) {
+    Event<LadderEventType> event = new Event<>(LadderEventType.UPDATE_TYPES);
+    event.setData(ladder.getTypes());
+    wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
+        ladder.getNumber(), event);
   }
 }
