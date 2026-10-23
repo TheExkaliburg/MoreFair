@@ -60,6 +60,15 @@ public class SizeTypeStep extends AbstractWeightedLadderTypeStep {
   }
 
   @Override
+  protected void handleExistingLadder(LadderEntity ladder, Map<LadderType, Double> weights) {
+    super.handleExistingLadder(ladder, weights);
+
+    if (ladder.getScaling() >= 25) {
+      weights.remove(LadderType.GIGANTIC);
+    }
+  }
+
+  @Override
   protected void handlePreviousLadder(LadderEntity previousLadder,
       Map<LadderType, Double> weights,
       LadderGenerationContext context) {

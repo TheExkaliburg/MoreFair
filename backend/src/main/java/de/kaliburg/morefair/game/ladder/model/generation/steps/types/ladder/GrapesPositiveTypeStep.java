@@ -22,7 +22,7 @@ public class GrapesPositiveTypeStep extends AbstractWeightedLadderTypeStep {
         weights.putIfAbsent(LadderType.BOUNTIFUL, 25.d);
         weights.putIfAbsent(LadderType.GENEROUS, 25.d);
         weights.putIfAbsent(LadderType.CONSOLATION, 25.d);
-        weights.putIfAbsent(LadderType.DEFAULT, 25.d);
+        weights.put(LadderType.DEFAULT, 25.d);
       }
       case RAILROAD -> {
         weights.put(LadderType.CONSOLATION, 75.d);
