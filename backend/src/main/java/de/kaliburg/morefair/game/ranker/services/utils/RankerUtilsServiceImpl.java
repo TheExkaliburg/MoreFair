@@ -74,7 +74,7 @@ public class RankerUtilsServiceImpl implements RankerUtilsService {
   }
 
   /**
-   * If following conditions are given the ranker can promote.
+   * If the following conditions are given the ranker can promote.
    * <ul>
    * <li>Ranker is #1 </li>
    * <li>There are enough people to promote</li>
