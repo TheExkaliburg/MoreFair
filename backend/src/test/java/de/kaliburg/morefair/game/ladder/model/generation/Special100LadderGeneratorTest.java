@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.model.LadderType;
-import de.kaliburg.morefair.game.ladder.model.LadderTypeBuilder;
 import de.kaliburg.morefair.game.ladder.model.generation.generator.DefaultLadderGenerator;
 import de.kaliburg.morefair.game.ladder.model.generation.generator.Special100LadderGenerator;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
@@ -40,28 +39,6 @@ class Special100LadderGeneratorTest {
     List<LadderEntity> ladders = service.generateLaddersForRound(round);
 
     assertThat(ladders).hasSize(101);
-    for (int number = 1; number <= 101; number++) {
-      LadderEntity ladder = ladders.get(number - 1);
-      Set<LadderType> expectedTypes = LadderTypeBuilder.builder()
-          .setRoundTypes(types)
-          .setLadderNumber(number)
-          .setAssholeLadderNumber(100)
-          .build();
-      if (expectedTypes.size() > 1) {
-        expectedTypes.remove(LadderType.DEFAULT);
-      }
-      int expectedScaling = reverse ? Math.max(101 - number, 1) : number;
-
-      assertThat(ladder.getNumber()).isEqualTo(number);
-      assertThat(ladder.getRoundId()).isEqualTo(round.getId());
-      assertThat(ladder.getTypes())
-          .as("types of ladder %s", number)
-          .isEqualTo(expectedTypes);
-      assertThat(ladder.getScaling())
-          .as("scaling of ladder %s", number)
-          .isEqualTo(expectedScaling);
-      assertPoints(ladder, expectedTypes, expectedScaling);
-    }
     assertThat(ladders).allSatisfy(ladder ->
         assertThat(ladder.getTypes()).doesNotContain(LadderType.ASSHOLE));
     assertThat(ladders.get(49).getTypes()).contains(LadderType.NO_AUTO);

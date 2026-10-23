@@ -78,59 +78,6 @@ public final class LadderEntity {
   @Column(nullable = false)
   private Integer scaling;
 
-  // TODO: Retire this generation constructor, determineLadderType, and LadderTypeBuilder once
-  // generation-rule migration and VOID recovery are complete and legacy callers are removed.
-  public LadderEntity(@NonNull Integer number, @NonNull RoundEntity round,
-      LadderEntity previousLadder) {
-    this.number = number;
-    this.roundId = round.getId();
-
-    determineLadderType(round, previousLadder);
-
-    if (round.getTypes().contains(RoundType.REVERSE_SCALING)) {
-      // Makes Ladder 1 be Asshole Ladder Scaling etc.
-      if (round.getTypes().contains(RoundType.APRIL_FOOLS)) {
-        this.scaling = Math.max(100 + 1 - number, 1);
-      } else {
-        this.scaling = Math.max(round.getAssholeLadderNumber() + 1 - number, 1);
-      }
-    } else {
-      this.scaling = number;
-    }
-
-    // getting the pointRequirement based on the type
-    BigInteger base = round.getBasePointsRequirement().multiply(BigInteger.valueOf(scaling));
-    if (types.contains(LadderType.TINY)) {
-      base = BigInteger.ZERO;
-    } else if (types.contains(LadderType.SMALL)) {
-      base = base.divide(BigInteger.valueOf(10));
-    } else if (types.contains(LadderType.BIG)) {
-      base = base.multiply(BigInteger.valueOf(3));
-    } else if (types.contains(LadderType.GIGANTIC)) {
-      base = base.multiply(BigInteger.valueOf(10));
-    }
-    double percentage = random.nextDouble(0.8, 1.2);
-
-    BigDecimal baseDec = new BigDecimal(base);
-    baseDec = baseDec.multiply(BigDecimal.valueOf(percentage));
-    this.basePointsToPromote = baseDec.toBigInteger();
-  }
-
-  private void determineLadderType(RoundEntity round, LadderEntity previousLadder) {
-    types.clear();
-
-    Set<LadderType> previousLadderTypes = previousLadder != null
-        ? previousLadder.getTypes()
-        : EnumSet.noneOf(LadderType.class);
-    LadderTypeBuilder builder = new LadderTypeBuilder();
-    builder.setLadderNumber(number);
-    builder.setRoundNumber(round.getNumber());
-    builder.setAssholeLadderNumber(round.getAssholeLadderNumber());
-    builder.setRoundTypes(round.getTypes());
-    builder.setPreviousLadderType(previousLadderTypes);
-    types = builder.build();
-  }
-
   public boolean hasType(LadderType requested) {
     return types.stream().anyMatch(type -> type.matches(requested));
   }

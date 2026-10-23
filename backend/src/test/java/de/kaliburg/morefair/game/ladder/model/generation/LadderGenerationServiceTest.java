@@ -13,7 +13,10 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @FairTest
@@ -23,6 +26,37 @@ class LadderGenerationServiceTest {
   FairConfig fairConfig;
   @Autowired
   private LadderGenerationService ladderGenerationService;
+
+  @ParameterizedTest
+  @MethodSource("normalRoundTypes")
+  void generateLadders_allRoundTypes_defaultOnlyAlone(Set<RoundType> roundTypes) {
+    RoundEntity round = generateRound(roundTypes);
+    round.setAssholeLadderNumber(100);
+
+    List<LadderEntity> ladders = ladderGenerationService.generateLaddersForRound(round);
+
+    assertThat(ladders).allSatisfy(ladder -> {
+      if (ladder.getTypes().size() > 1) {
+        assertThat(ladder.getTypes())
+            .as("types of ladder %s", ladder.getNumber())
+            .doesNotContain(LadderType.DEFAULT);
+      }
+    });
+  }
+
+  @ParameterizedTest
+  @MethodSource("fastRoundTypes")
+  void generateLadders_fastRounds_noBigOrGigantic(Set<RoundType> roundTypes) {
+    RoundEntity round = generateRound(roundTypes);
+    round.setAssholeLadderNumber(100);
+
+    List<LadderEntity> ladders = ladderGenerationService.generateLaddersForRound(round);
+
+    assertThat(ladders).allSatisfy(ladder ->
+        assertThat(ladder.getTypes())
+            .as("types of ladder %s", ladder.getNumber())
+            .doesNotContain(LadderType.BIG, LadderType.GIGANTIC));
+  }
 
   @Test
   void generateLadder_defaultRound_correctLadderList() {
@@ -37,18 +71,18 @@ class LadderGenerationServiceTest {
           .doesNotContain(Set.of(LadderType.BOUNTIFUL, LadderType.LAVA, LadderType.CONSOLATION,
               LadderType.VIRUS, LadderType.GENEROUS, LadderType.TAXES));
 
-      assertThat(list.get(0).getTypes())
+      assertThat(list.getFirst().getTypes())
           .doesNotContain(LadderType.LAVA, LadderType.TINY, LadderType.FREE_AUTO,
               LadderType.NO_AUTO);
       assertThat(list.get(list.size() - 2).getTypes())
           .contains(LadderType.ASSHOLE, LadderType.NO_AUTO)
           .doesNotContain(LadderType.DEFAULT, LadderType.FREE_AUTO);
-      assertThat(list.get(list.size() - 1).getTypes())
+      assertThat(list.getLast().getTypes())
           .containsExactly(LadderType.END)
           .doesNotContain(LadderType.DEFAULT);
 
       // Check Scaling
-      assertThat(list.get(0).getScaling()).isEqualTo(1);
+      assertThat(list.getFirst().getScaling()).isEqualTo(1);
       assertThat(list.get(list.size() - 2).getScaling()).isEqualTo(round.getAssholeLadderNumber());
     }
   }
@@ -64,13 +98,46 @@ class LadderGenerationServiceTest {
     assertThat(list.get(list.size() - 2).getTypes())
         .contains(LadderType.NO_AUTO)
         .doesNotContain(LadderType.ASSHOLE, LadderType.DEFAULT);
-    assertThat(list.get(list.size() - 1).getTypes())
+    assertThat(list.getLast().getTypes())
         .contains(LadderType.END)
         .doesNotContain(LadderType.DEFAULT);
 
     // Check Scaling
-    assertThat(list.get(0).getScaling()).isEqualTo(100);
+    assertThat(list.getFirst().getScaling()).isEqualTo(100);
     assertThat(list.get(list.size() - 2).getScaling()).isEqualTo(1);
+  }
+
+  private static Stream<Set<RoundType>> normalRoundTypes() {
+    return Stream.of(
+        EnumSet.of(RoundType.DEFAULT),
+        EnumSet.of(RoundType.FAST),
+        EnumSet.of(RoundType.SLOW),
+        EnumSet.of(RoundType.AUTO),
+        EnumSet.of(RoundType.CHAOS),
+        EnumSet.of(RoundType.FAST, RoundType.AUTO),
+        EnumSet.of(RoundType.FAST, RoundType.CHAOS),
+        EnumSet.of(RoundType.SLOW, RoundType.AUTO),
+        EnumSet.of(RoundType.SLOW, RoundType.CHAOS),
+        EnumSet.of(RoundType.AUTO, RoundType.CHAOS),
+        EnumSet.of(RoundType.SLOW, RoundType.AUTO, RoundType.CHAOS),
+        EnumSet.of(RoundType.FAST, RoundType.AUTO, RoundType.CHAOS),
+        EnumSet.of(RoundType.RACE),
+        EnumSet.of(RoundType.FARMER),
+        EnumSet.of(RoundType.RAILROAD),
+        EnumSet.of(RoundType.RACE, RoundType.AUTO),
+        EnumSet.of(RoundType.FARMER, RoundType.AUTO),
+        EnumSet.of(RoundType.RAILROAD, RoundType.AUTO),
+        EnumSet.of(RoundType.RACE, RoundType.CHAOS),
+        EnumSet.of(RoundType.FARMER, RoundType.CHAOS),
+        EnumSet.of(RoundType.RAILROAD, RoundType.CHAOS),
+        EnumSet.of(RoundType.RACE, RoundType.AUTO, RoundType.CHAOS),
+        EnumSet.of(RoundType.FARMER, RoundType.AUTO, RoundType.CHAOS),
+        EnumSet.of(RoundType.RAILROAD, RoundType.AUTO, RoundType.CHAOS)
+    );
+  }
+
+  private static Stream<Set<RoundType>> fastRoundTypes() {
+    return normalRoundTypes().filter(types -> types.contains(RoundType.FAST));
   }
 
   private RoundEntity generateRound(Set<RoundType> types) {
