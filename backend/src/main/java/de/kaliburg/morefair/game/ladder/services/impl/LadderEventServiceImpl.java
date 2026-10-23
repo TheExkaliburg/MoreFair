@@ -278,15 +278,14 @@ public class LadderEventServiceImpl implements LadderEventService {
       }
 
       if (rankerUtilsService.canPromote(ranker)) {
-        // TODO: Resolve the destination/VOID first and make promotion atomic, including cached state.
+        // TODO: Make promotion atomic, including cached state.
         RoundEntity currentRound = roundService.getCurrentRound();
         statisticsService.recordPromote(ranker, ladder, currentRound);
         log.info("[L{}] Promotion for {} (#{})", ladder.getNumber(), account.getDisplayName(),
             account.getId());
-        ranker.setPromotedOn(OffsetDateTime.now(ZoneOffset.UTC));
-
         RankerEntity newRanker = rankerService.createRankerOnLadder(account, ladder.getNumber() + 1)
             .orElseThrow();
+        ranker.setPromotedOn(OffsetDateTime.now(ZoneOffset.UTC));
         newRanker.setVinegar(ranker.getVinegar());
         newRanker.setWine(ranker.getWine());
         newRanker.setGrapes(ranker.getGrapes());
