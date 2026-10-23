@@ -77,6 +77,8 @@ public class RoundService {
         // if closed -> create next Round of that Season
         if (round == null || round.isClosed()) {
           round = create(round).orElseThrow();
+        } else {
+          roundInitializationService.backfillLadders(round);
         }
         currentRoundId = round.getId();
       }
