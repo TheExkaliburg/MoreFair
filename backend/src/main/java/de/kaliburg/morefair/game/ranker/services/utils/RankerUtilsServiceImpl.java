@@ -99,7 +99,7 @@ public class RankerUtilsServiceImpl implements RankerUtilsService {
 
     List<RankerEntity> rankers = rankerService.findAllByLadderId(ladder.getId());
 
-    return ranker.getRank() == 1 && rankers.get(0).getUuid().equals(ranker.getUuid())
+    return ranker.getRank() == 1 && rankers.getFirst().getUuid().equals(ranker.getUuid())
         && ranker.isGrowing()
         && (ranker.isAutoPromote() || ladder.getTypes().contains(LadderType.FREE_AUTO)
         || ranker.getPoints().compareTo(getPointsForPromoteWithLead(ranker)) >= 0);

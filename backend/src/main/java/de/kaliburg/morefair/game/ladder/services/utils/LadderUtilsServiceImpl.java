@@ -58,7 +58,7 @@ public class LadderUtilsServiceImpl implements LadderUtilsService {
     List<RankerEntity> rankers = rankerService.findAllByLadderId(ladder.getId());
 
     return isLadderUnlocked(ladder)
-        && rankers.get(0).getPoints().compareTo(ladder.getBasePointsToPromote()) >= 0;
+        && rankers.getFirst().getPoints().compareTo(ladder.getBasePointsToPromote()) >= 0;
   }
 
   @Override
