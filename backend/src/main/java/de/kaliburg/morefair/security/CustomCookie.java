@@ -19,13 +19,11 @@ public class CustomCookie extends Cookie {
 
   public static CustomCookie fromCookie(Cookie cookie) {
     CustomCookie customCookie = new CustomCookie(cookie.getName(), cookie.getValue());
-    customCookie.setComment(cookie.getComment());
     customCookie.setDomain(cookie.getDomain());
     customCookie.setHttpOnly(cookie.isHttpOnly());
     customCookie.setMaxAge(cookie.getMaxAge());
     customCookie.setPath(cookie.getPath());
     customCookie.setSecure(cookie.getSecure());
-    customCookie.setVersion(cookie.getVersion());
     return customCookie;
   }
 

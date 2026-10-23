@@ -1,5 +1,5 @@
 # Create new Stage for running the application
-FROM eclipse-temurin:17-jdk-alpine
+FROM eclipse-temurin:21-jdk-alpine
 
 MAINTAINER kaliburg.de
 

@@ -1,5 +1,5 @@
 # Use official Maven image as the build base
-FROM maven:3.8.4-openjdk-17-slim AS build
+FROM maven:3.9-eclipse-temurin-21 AS build
 
 MAINTAINER kaliburg.de
 
@@ -22,7 +22,7 @@ RUN mvn package -DskipTests
 
 
 # Create new Stage for running the application
-FROM eclipse-temurin:17-jdk-alpine
+FROM eclipse-temurin:21-jdk-alpine
 
 # Set the working directory in the container
 WORKDIR /app
@@ -34,4 +34,4 @@ COPY --from=build /app/target/fairgame.jar .
 EXPOSE 8080
 
 # Set the entry point for running the application
-ENTRYPOINT ["java", "-jar", "/fairgame.jar"]
+ENTRYPOINT ["java", "-jar", "fairgame.jar"]

@@ -36,7 +36,7 @@ public class RedisTokenRepositoryImpl implements PersistentTokenRepository {
   private static final String NAME_SPACE = "rememberMe";
   private final RedisTemplate<String, String> redisTemplate;
 
-  @Value("${spring.session.redis.namespace}")
+  @Value("${spring.session.data.redis.namespace}")
   private String redisNamespace;
 
   private String generateKey(String series) {

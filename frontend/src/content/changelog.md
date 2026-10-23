@@ -12,6 +12,7 @@ description: 'A list of all changes made to the game'
 
 ### Improvements
 - Ladder Generation has been reworked to be generated at the start of the round, instead of 1 by 1.
+- Updating some dependencies/frameworks to fix some security issues. This causes everyone to be logged out and require a new login.
 
 ### Bugfixes
 - Ordering of the promotion flag vs creating your ranker.

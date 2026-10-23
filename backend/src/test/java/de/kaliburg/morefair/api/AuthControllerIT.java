@@ -1,5 +1,6 @@
 package de.kaliburg.morefair.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -20,6 +21,7 @@ import de.kaliburg.morefair.utils.FairTest;
 import de.kaliburg.morefair.utils.ITUtils;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.Cookie;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -28,6 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -75,6 +79,114 @@ public class AuthControllerIT {
 
     String session = login(email, password, ip, xsrfToken);
     assertTrue(getAuthenticationStatus(session));
+  }
+
+  @ParameterizedTest
+  @ValueSource(booleans = {false, true})
+  public void login_preservesSessionRememberMeAndCsrfCookies(boolean iframed) throws Exception {
+    String ip = ITUtils.randomIp();
+    String xsrfToken = getXsrfToken();
+    String uuid = registerGuest(ip, xsrfToken);
+    String originalSession = login(uuid, uuid, ip, xsrfToken);
+
+    MockHttpServletResponse response = mockMvc.perform(post("/api/auth/login").secure(true)
+            .header("is-iframed", Boolean.toString(iframed))
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("username", uuid)
+            .param("password", uuid)
+            .param("remember-me", "true")
+            .cookie(new Cookie("SESSION", originalSession), new Cookie("XSRF-TOKEN", xsrfToken))
+            .header("X-XSRF-TOKEN", xsrfToken))
+        .andExpect(status().isOk())
+        .andExpect(content().string(""))
+        .andReturn().getResponse();
+
+    Cookie session = response.getCookie("SESSION");
+    Cookie rememberMe = response.getCookie("remember-me");
+    Cookie csrf = Arrays.stream(response.getCookies())
+        .filter(cookie -> "XSRF-TOKEN".equals(cookie.getName())).toList().getLast();
+    assertThat(session).isNotNull();
+    assertThat(rememberMe).isNotNull();
+    assertThat(csrf).isNotNull();
+    assertThat(session.getValue()).isNotEqualTo(originalSession);
+    assertThat(csrf.getValue()).isNotBlank().isNotEqualTo(xsrfToken);
+    assertThat(session.getSecure()).isTrue();
+    assertThat(session.isHttpOnly()).isTrue();
+    assertThat(rememberMe.getSecure()).isTrue();
+    assertThat(rememberMe.isHttpOnly()).isTrue();
+    assertThat(csrf.getSecure()).isTrue();
+    assertThat(csrf.isHttpOnly()).isFalse();
+    assertThat(session.getAttribute("SameSite"))
+        .isEqualToIgnoringCase(iframed ? "None" : "Strict");
+    assertThat(csrf.getAttribute("SameSite"))
+        .isEqualToIgnoringCase(iframed ? "None" : "Strict");
+    assertThat(rememberMe.getAttribute("SameSite"))
+        .isEqualToIgnoringCase(iframed ? "None" : "Lax");
+    assertThat(response.getHeader("Content-Security-Policy"))
+        .isEqualTo("frame-ancestors 'self' https://galaxy.click");
+    assertThat(response.getHeader("X-Frame-Options")).isNull();
+    assertFalse(getAuthenticationStatus(originalSession));
+    assertTrue(getAuthenticationStatus(session.getValue()));
+
+    MockHttpServletResponse remembered = mockMvc.perform(get("/api/auth").secure(true)
+            .header("is-iframed", Boolean.toString(iframed))
+            .cookie(rememberMe))
+        .andExpect(status().isOk())
+        .andExpect(content().string("true"))
+        .andReturn().getResponse();
+    Cookie rememberedSession = remembered.getCookie("SESSION");
+    Cookie rememberedCsrf = remembered.getCookie("XSRF-TOKEN");
+    assertThat(rememberedSession).isNotNull();
+    assertThat(rememberedCsrf).isNotNull();
+
+    mockMvc.perform(post("/api/auth/logout").secure(true)
+            .cookie(rememberedSession, rememberedCsrf, rememberMe)
+            .header("X-XSRF-TOKEN", rememberedCsrf.getValue()))
+        .andExpect(status().isOk());
+    assertFalse(getAuthenticationStatus(rememberedSession.getValue()));
+    mockMvc.perform(get("/api/auth").cookie(rememberMe))
+        .andExpect(status().isOk())
+        .andExpect(content().string("false"));
+  }
+
+  @Test
+  public void login_rejectsMissingCsrfAndInvalidCredentials() throws Exception {
+    mockMvc.perform(post("/api/auth/login")
+            .param("username", "unknown")
+            .param("password", "invalid"))
+        .andExpect(status().isForbidden());
+    String xsrfToken = getXsrfToken();
+    mockMvc.perform(post("/api/auth/login")
+            .param("username", "unknown")
+            .param("password", "invalid")
+            .cookie(new Cookie("XSRF-TOKEN", xsrfToken))
+            .header("X-XSRF-TOKEN", xsrfToken))
+        .andExpect(status().isUnauthorized());
+    mockMvc.perform(get("/api/account"))
+        .andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  public void accountSettings_singleObjectJson_required() throws Exception {
+    String ip = ITUtils.randomIp();
+    String xsrfToken = getXsrfToken();
+    String uuid = registerGuest(ip, xsrfToken);
+    String session = login(uuid, uuid, ip, xsrfToken);
+
+    mockMvc.perform(patch("/api/account/settings")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"vinegarSplit\":25}")
+            .header("X-XSRF-TOKEN", xsrfToken)
+            .cookie(new Cookie("XSRF-TOKEN", xsrfToken), new Cookie("SESSION", session)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.vinegarSplit").value(25));
+
+    mockMvc.perform(patch("/api/account/settings")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"vinegarSplit\":75} {\"ignored\":true}")
+            .header("X-XSRF-TOKEN", xsrfToken)
+            .cookie(new Cookie("XSRF-TOKEN", xsrfToken), new Cookie("SESSION", session)))
+        .andExpect(status().isBadRequest());
   }
 
   @Test

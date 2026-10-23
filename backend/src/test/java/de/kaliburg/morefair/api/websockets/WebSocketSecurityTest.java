@@ -10,8 +10,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.kaliburg.morefair.FairConfig;
 import de.kaliburg.morefair.account.services.AccountService;
 import de.kaliburg.morefair.api.AuthController;
@@ -59,6 +57,8 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.StompWebSocketEndpointRegistration;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 import org.springframework.web.socket.server.support.OriginHandshakeInterceptor;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 class WebSocketSecurityTest {
 
@@ -82,14 +82,14 @@ class WebSocketSecurityTest {
     when(registry.addEndpoint("/socket/fair")).thenReturn(endpoint);
     config.configureStompEndpoints(registry);
 
-    ArgumentCaptor<String> origins = ArgumentCaptor.forClass(String.class);
+    ArgumentCaptor<String[]> origins = ArgumentCaptor.forClass(String[].class);
     verify(endpoint).setAllowedOrigins(origins.capture());
-    allowedOrigins = origins.getAllValues();
-    ArgumentCaptor<HandshakeInterceptor> handshakes =
-        ArgumentCaptor.forClass(HandshakeInterceptor.class);
+    allowedOrigins = List.of(origins.getValue());
+    ArgumentCaptor<HandshakeInterceptor[]> handshakes =
+        ArgumentCaptor.forClass(HandshakeInterceptor[].class);
     verify(endpoint).addInterceptors(handshakes.capture());
-    assertThat(handshakes.getAllValues()).hasSize(1);
-    handshakeInterceptor = CsrfTokenHandshakeInterceptor.class.cast(handshakes.getValue());
+    assertThat(handshakes.getValue()).hasSize(1);
+    handshakeInterceptor = CsrfTokenHandshakeInterceptor.class.cast(handshakes.getValue()[0]);
 
     channelRegistration = new TestChannelRegistration();
     config.configureClientInboundChannel(channelRegistration);

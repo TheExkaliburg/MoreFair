@@ -3,6 +3,7 @@ package de.kaliburg.morefair.security;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
+import org.jspecify.annotations.NonNull;
 import org.springframework.boot.web.server.Cookie.SameSite;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
@@ -32,10 +33,6 @@ public class CustomPersistentTokenBasedRememberMeServices extends
     if (this.cookieDomain != null) {
       cookie.setDomain(this.cookieDomain);
     }
-    if (maxAge < 1) {
-      cookie.setVersion(1);
-    }
-
     cookie.setSecure(this.useSecureCookie != null ? this.useSecureCookie : request.isSecure());
     cookie.setHttpOnly(true);
     cookie.setSameSite(SameSite.LAX);
@@ -44,11 +41,11 @@ public class CustomPersistentTokenBasedRememberMeServices extends
 
   protected String getCookiePath(HttpServletRequest request) {
     String contextPath = request.getContextPath();
-    return contextPath.length() > 0 ? contextPath : "/";
+    return !contextPath.isEmpty() ? contextPath : "/";
   }
 
   @Override
-  public void setCookieDomain(String cookieDomain) {
+  public void setCookieDomain(@NonNull String cookieDomain) {
     super.setCookieDomain(cookieDomain);
     this.cookieDomain = cookieDomain;
   }
