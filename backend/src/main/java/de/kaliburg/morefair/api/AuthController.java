@@ -27,12 +27,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -74,6 +76,11 @@ public class AuthController {
   @GetMapping
   public ResponseEntity<?> getAuthenticationStatus(Authentication authentication) {
     return ResponseEntity.ok(authentication != null && authentication.isAuthenticated());
+  }
+
+  @GetMapping("/csrf")
+  public ResponseEntity<CsrfToken> getCsrfToken(CsrfToken csrfToken) {
+    return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(csrfToken);
   }
 
   @PostMapping(value = "/login")
@@ -454,4 +461,3 @@ public class AuthController {
     private String email;
   }
 }
-

@@ -27,6 +27,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
+import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.session.web.http.CookieSerializer;
@@ -95,7 +96,7 @@ public class SecurityConfig {
     );
     http.headers().frameOptions().disable()
         .contentSecurityPolicy("frame-ancestors 'self' https://galaxy.click");
-    http.addFilterAfter(cookieSameSiteFilter, RememberMeAuthenticationFilter.class);
+    http.addFilterBefore(cookieSameSiteFilter, CsrfFilter.class);
     http.exceptionHandling()
         .authenticationEntryPoint(authenticationEntryPoint());
 

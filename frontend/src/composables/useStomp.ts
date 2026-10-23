@@ -8,6 +8,8 @@ import { LadderEventType } from "~/store/ladder";
 import { ChatLogMessageData } from "~/store/moderation";
 import { User } from "~/store/user";
 import { VinegarThrow } from "~/store/grapes";
+import { axiosInstance } from "~/composables/useAPI";
+import { useToasts } from "~/composables/useToasts";
 
 export type OnTickBody = {
   delta: number;
@@ -107,6 +109,21 @@ const subscribedChannel = {
 
 const client = new Client({
   brokerURL: connection,
+  beforeConnect: async () => {
+    try {
+      const { data } = await axiosInstance.get<{
+        headerName: string;
+        token: string;
+      }>("/api/auth/csrf", { timeout: 10000 });
+      client.connectHeaders = { [data.headerName]: data.token };
+    } catch {
+      await client.deactivate();
+      useToasts(
+        "Could not establish a secure game connection. Please reload the page to try again.",
+        { type: "error" },
+      );
+    }
+  },
   debug: (_) => {
     // if (isDevMode) console.debug(_);
   },

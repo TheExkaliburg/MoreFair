@@ -6,6 +6,8 @@ import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.security.messaging.web.csrf.XorCsrfChannelInterceptor;
+import org.springframework.security.messaging.web.socket.server.CsrfTokenHandshakeInterceptor;
 import org.springframework.session.Session;
 import org.springframework.session.web.socket.config.annotation.AbstractSessionWebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -27,11 +29,15 @@ public class WebSocketConfig extends AbstractSessionWebSocketMessageBrokerConfig
 
   @Override
   protected void configureStompEndpoints(StompEndpointRegistry registry) {
-    registry.addEndpoint("/socket/fair").setAllowedOriginPatterns("*");
+    registry.addEndpoint("/socket/fair")
+        .setAllowedOrigins("https://fair.kaliburg.de", "https://fairtest.kaliburg.de",
+            "http://localhost:3000", "http://localhost:8080")
+        .addInterceptors(new CsrfTokenHandshakeInterceptor());
   }
 
   @Override
   public void configureClientInboundChannel(ChannelRegistration registration) {
+    registration.interceptors(new XorCsrfChannelInterceptor());
     super.configureClientInboundChannel(registration);
     registration.interceptors(channelInterceptor);
   }

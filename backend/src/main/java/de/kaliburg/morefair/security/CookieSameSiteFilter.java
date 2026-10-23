@@ -7,6 +7,7 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponseWrapper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,21 +32,35 @@ public class CookieSameSiteFilter implements Filter {
       Collection<String> setCookieStrings = httpServletResponse.getHeaders("Set-Cookie");
       List<String> newCookies = new ArrayList<>();
 
-      if (setCookieStrings.size() > 0) {
+      if (!setCookieStrings.isEmpty()) {
         for (String setCookieString : setCookieStrings) {
           newCookies.add(removeSameSite(setCookieString));
         }
 
-        httpServletResponse.setHeader("Set-Cookie", newCookies.get(0));
+        httpServletResponse.setHeader("Set-Cookie", newCookies.getFirst());
         for (int i = 1; i < newCookies.size(); i++) {
           httpServletResponse.addHeader("Set-Cookie", newCookies.get(i));
         }
         log.trace("Set-Cookie header changed to: " + newCookies.toString());
       }
+
+      httpServletResponse = new HttpServletResponseWrapper(httpServletResponse) {
+        @Override
+        public void addHeader(String name, String value) {
+          super.addHeader(name, "Set-Cookie".equalsIgnoreCase(name) && value != null
+              ? removeSameSite(value) : value);
+        }
+
+        @Override
+        public void setHeader(String name, String value) {
+          super.setHeader(name, "Set-Cookie".equalsIgnoreCase(name) && value != null
+              ? removeSameSite(value) : value);
+        }
+      };
     }
 
-    if(filterChain != null) {
-      filterChain.doFilter(servletRequest, servletResponse);
+    if (filterChain != null) {
+      filterChain.doFilter(servletRequest, httpServletResponse);
     }
   }
 
