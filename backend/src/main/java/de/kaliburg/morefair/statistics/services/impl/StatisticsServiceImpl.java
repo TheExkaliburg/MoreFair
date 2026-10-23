@@ -1,10 +1,5 @@
 package de.kaliburg.morefair.statistics.services.impl;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import de.kaliburg.morefair.account.model.AccountEntity;
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.services.LadderService;
@@ -34,25 +29,16 @@ import de.kaliburg.morefair.statistics.results.ActivityAnalysisRepository;
 import de.kaliburg.morefair.statistics.results.RoundStatisticsEntity;
 import de.kaliburg.morefair.statistics.results.RoundStatisticsRepository;
 import de.kaliburg.morefair.statistics.services.StatisticsService;
-import jakarta.annotation.PostConstruct;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
 @RequiredArgsConstructor
 @Service
-@Slf4j
 @Transactional
 public class StatisticsServiceImpl implements StatisticsService {
 
@@ -70,19 +56,6 @@ public class StatisticsServiceImpl implements StatisticsService {
   private final RankerService rankerService;
   private final LadderService ladderService;
   private final SeasonService seasonService;
-
-  private final LoadingCache<Long, Boolean> hasStartedStatisticsJobRecently =
-      Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build(number -> false);
-
-  @Value("${spring.profiles.active}")
-  private String activeProfile;
-  @Value("${spring.datasource.password}")
-  private String sqlPassword;
-  @Value("${spring.datasource.username}")
-  private String sqlUsername;
-
-  @Value("${fair.spark.master-url}")
-  private String sparkMasterUrl = "";
 
   public void recordLogin(AccountEntity account) {
     loginRecordRepository.save(new LoginRecordEntity(account));
@@ -187,95 +160,6 @@ public class StatisticsServiceImpl implements StatisticsService {
             roundRecord));
   }
 
-  /**
-   * Sends a request to start the General Analytics for the Server.
-   */
-  @PostConstruct
-  @Scheduled(fixedRate = 24 * 60 * 60 * 1000)
-  public void startGeneralAnalytics() {
-    startAnalytics("GeneralAnalytics", null);
-  }
-
-  /**
-   * Sends a request to start the Round Statistics for the Server.
-   */
-  public void startRoundStatistics(long roundId) {
-    Boolean request = hasStartedStatisticsJobRecently.get(roundId);
-    if (request != null && !request) {
-      log.info("Starting RoundStatistics for roundId: {}", roundId);
-      startAnalytics("RoundStatistics", roundId);
-    }
-    hasStartedStatisticsJobRecently.put(roundId, true);
-  }
-
-  /**
-   * Sends a Request to the local spark-master to start a new job. Sends the html request as a
-   * completable future, so it doesn't block the thread.
-   *
-   * @param mainClass the main Class of the Spark Application that should be run on the cluster
-   */
-  public void startAnalytics(String mainClass, @Nullable Long currentRoundId) {
-    try {
-      // Create a JSON object for the request body
-      JsonObject jsonBody = new JsonObject();
-      jsonBody.addProperty("action", "CreateSubmissionRequest");
-
-      // Add the "sparkProperties" property
-      JsonObject sparkProperties = new JsonObject();
-      sparkProperties.addProperty("spark.master", "spark://master:7077");
-      sparkProperties.addProperty("spark.app.name", "Spark Live Test");
-      sparkProperties.addProperty("spark.executor.memory", "8g");
-      sparkProperties.addProperty("spark.driver.memory", "8g");
-      sparkProperties.addProperty("spark.driver.cores", "2");
-      jsonBody.add("sparkProperties", sparkProperties);
-
-      // Add the other properties
-      String host = "";
-      if (activeProfile.equals("prod")) {
-        host = "https://fair.kaliburg.de";
-      } else if (activeProfile.equals("staging")) {
-        host = "https://fairtest.kaliburg.de";
-      }
-
-      jsonBody.addProperty("appResource", host + "/spark.jar");
-      jsonBody.addProperty("clientSparkVersion", "3.4.1");
-      jsonBody.addProperty("mainClass", mainClass);
-
-      // Add the "environmentVariables" property
-      JsonObject environmentVariables = new JsonObject();
-      environmentVariables.addProperty("SPARK_ENV_LOADED", "1");
-      environmentVariables.addProperty("SQL_USERNAME", sqlUsername);
-      environmentVariables.addProperty("SQL_PASSWORD", sqlPassword);
-      environmentVariables.addProperty("PROFILE", activeProfile);
-      jsonBody.add("environmentVariables", environmentVariables);
-
-      // Add the "appArgs" property
-      JsonArray appArgs = new JsonArray();
-      if (currentRoundId != null) {
-        appArgs.add(currentRoundId);
-      }
-      jsonBody.add("appArgs", appArgs);
-
-      // Convert the JSON object to a string
-      Gson gson = new Gson();
-      String jsonString = gson.toJson(jsonBody);
-
-      RestTemplate restTemplate = new RestTemplate();
-      String url = sparkMasterUrl + "/api/v1/submissions/create";
-
-      // Send the request and get the response
-      CompletableFuture.runAsync(() -> {
-        try {
-          restTemplate.postForObject(url, jsonString, String.class);
-        } catch (Exception e) {
-          log.error(e.getMessage());
-        }
-      });
-    } catch (Exception e) {
-      log.error(e.getMessage(), e);
-    }
-  }
-
   public RoundStatisticsEntity getRoundStatistics(Integer number) {
     SeasonEntity currentSeason = seasonService.getCurrentSeason();
     Optional<RoundEntity> round = roundService.findBySeasonAndNumber(currentSeason, number);
@@ -285,10 +169,6 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     Optional<RoundStatisticsEntity> statistics = roundStatisticsRepository.findByRoundId(
         round.get().getId());
-    if (statistics.isEmpty()) {
-      startRoundStatistics(round.get().getId());
-    }
-
     return statistics.orElse(null);
   }
 

@@ -10,7 +10,6 @@ WORKDIR /app
 COPY pom.xml .
 COPY backend/pom.xml ./backend/
 COPY frontend/pom.xml ./frontend/
-COPY spark/pom.xml ./spark/
 
 # Download the project dependencies
 RUN mvn dependency:go-offline -B

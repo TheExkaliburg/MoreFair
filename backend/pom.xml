@@ -268,28 +268,18 @@
             <id>copy-frontend-content</id>
             <phase>process-resources</phase>
           </execution>
-          <execution>
-            <configuration>
-              <outputDirectory>target/classes/static</outputDirectory>
-              <overwrite>false</overwrite>
-              <resources>
-                <resource>
-                  <directory>${project.parent.basedir}/spark/target</directory>
-                  <includes>
-                    <include>spark.jar</include>
-                  </includes>
-                </resource>
-              </resources>
-            </configuration>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <id>copy-spark-jar</id>
-            <phase>process-resources</phase>
-          </execution>
         </executions>
         <groupId>org.apache.maven.plugins</groupId>
         <version>3.2.0</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>static/spark.jar</exclude>
+          </excludes>
+        </configuration>
+        <groupId>org.apache.maven.plugins</groupId>
       </plugin>
       <!-- Copy Artifact to Parent Target Folder -->
       <plugin>
@@ -317,7 +307,6 @@
     </plugins>
   </build>
 </project>
-
 
 
 
