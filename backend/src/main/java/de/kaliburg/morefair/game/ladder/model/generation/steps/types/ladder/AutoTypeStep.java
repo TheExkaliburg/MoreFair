@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.game.ladder.model.generation.steps.types;
+package de.kaliburg.morefair.game.ladder.model.generation.steps.types.ladder;
 
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.model.LadderType;
@@ -6,6 +6,7 @@ import de.kaliburg.morefair.game.ladder.model.generation.LadderGenerationContext
 import de.kaliburg.morefair.game.round.model.type.RoundType;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The AutoTypeStep class extends {@link AbstractWeightedLadderTypeStep} to define specific behavior
@@ -51,7 +52,8 @@ public class AutoTypeStep extends AbstractWeightedLadderTypeStep {
       Map<LadderType, Double> weights,
       LadderGenerationContext context) {
     super.handlePreviousLadder(previousLadder, weights, context);
-    if (previousLadder == null || context.getRoundEntity().getTypes().contains(RoundType.SLOW)) {
+    Set<RoundType> roundTypes = context.getRoundEntity().getTypes();
+    if (previousLadder == null || roundTypes.contains(RoundType.SLOW) || roundTypes.contains(RoundType.CHAOS)) {
       return;
     }
 

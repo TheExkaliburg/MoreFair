@@ -1,6 +1,5 @@
-package de.kaliburg.morefair.game.ladder.model.generation.steps.types;
+package de.kaliburg.morefair.game.ladder.model.generation.steps.types.ladder;
 
-import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.model.LadderType;
 import de.kaliburg.morefair.game.round.model.type.RoundType;
 import java.util.EnumMap;

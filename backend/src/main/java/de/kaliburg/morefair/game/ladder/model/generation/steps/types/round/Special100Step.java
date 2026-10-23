@@ -1,4 +1,4 @@
-package de.kaliburg.morefair.game.ladder.model.generation.steps;
+package de.kaliburg.morefair.game.ladder.model.generation.steps.types.round;
 
 import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.model.LadderType;

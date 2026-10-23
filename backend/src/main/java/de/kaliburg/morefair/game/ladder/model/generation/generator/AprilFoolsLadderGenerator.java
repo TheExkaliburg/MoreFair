@@ -2,11 +2,11 @@ package de.kaliburg.morefair.game.ladder.model.generation.generator;
 
 import de.kaliburg.morefair.game.ladder.model.generation.LadderGenerationStep;
 import de.kaliburg.morefair.game.ladder.model.generation.LadderGenerator;
-import de.kaliburg.morefair.game.ladder.model.generation.steps.AprilFoolsTypesStep;
+import de.kaliburg.morefair.game.ladder.model.generation.steps.types.round.AprilFoolsTypesStep;
 import de.kaliburg.morefair.game.ladder.model.generation.steps.ContextPopulationStep;
 import de.kaliburg.morefair.game.ladder.model.generation.steps.CreateLaddersStep;
 import de.kaliburg.morefair.game.ladder.model.generation.steps.PopulatePointRequirementsStep;
-import de.kaliburg.morefair.game.ladder.model.generation.steps.ReverseScalingStep;
+import de.kaliburg.morefair.game.ladder.model.generation.steps.types.round.ReverseScalingStep;
 import de.kaliburg.morefair.game.round.model.type.RoundType;
 import java.util.List;
 import org.springframework.stereotype.Component;
