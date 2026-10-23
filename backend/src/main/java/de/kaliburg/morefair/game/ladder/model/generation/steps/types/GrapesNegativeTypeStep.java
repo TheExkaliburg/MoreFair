@@ -1,5 +1,6 @@
 package de.kaliburg.morefair.game.ladder.model.generation.steps.types;
 
+import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.model.LadderType;
 import de.kaliburg.morefair.game.round.model.type.RoundType;
 import java.util.EnumMap;
@@ -35,6 +36,28 @@ public class GrapesNegativeTypeStep extends AbstractWeightedLadderTypeStep {
       case RACE -> {
         weights.put(LadderType.VIRUS, 25.d);
         weights.put(LadderType.LAVA, 25.d);
+      }
+      default -> {
+        // do nothing
+      }
+    }
+  }
+
+  @Override
+  protected void handleExistingLadderType(LadderType ladderType, Map<LadderType, Double> weights) {
+    super.handleExistingLadderType(ladderType, weights);
+    switch (ladderType) {
+      case BOUNTIFUL -> {
+        weights.computeIfPresent(LadderType.DEFAULT, (k, v) -> v + weights.getOrDefault(LadderType.LAVA, 0.d));
+        weights.put(LadderType.LAVA, 0.d);
+      }
+      case CONSOLATION -> {
+        weights.computeIfPresent(LadderType.DEFAULT, (k, v) -> v + weights.getOrDefault(LadderType.VIRUS, 0.d));
+        weights.put(LadderType.VIRUS, 0.d);
+      }
+      case GENEROUS -> {
+        weights.computeIfPresent(LadderType.DEFAULT, (k, v) -> v + weights.getOrDefault(LadderType.TAXES, 0.d));
+        weights.put(LadderType.TAXES, 0.d);
       }
       default -> {
         // do nothing

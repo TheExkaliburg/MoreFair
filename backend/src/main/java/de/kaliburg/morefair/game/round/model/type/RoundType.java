@@ -32,6 +32,11 @@ public enum RoundType {
     this.priority = priority;
   }
 
+
+  public static RoundType.Comparator comparator() {
+    return new RoundType.Comparator();
+  }
+
   /**
    * Lets the higher Priority get handled first.
    */

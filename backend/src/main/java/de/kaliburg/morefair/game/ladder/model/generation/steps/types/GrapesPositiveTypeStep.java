@@ -41,4 +41,26 @@ public class GrapesPositiveTypeStep extends AbstractWeightedLadderTypeStep {
       }
     }
   }
+
+  @Override
+  protected void handleExistingLadderType(LadderType ladderType, Map<LadderType, Double> weights) {
+    super.handleExistingLadderType(ladderType, weights);
+    switch (ladderType) {
+      case LAVA -> {
+        weights.computeIfPresent(LadderType.DEFAULT, (k, v) -> v + weights.getOrDefault(LadderType.BOUNTIFUL, 0.d));
+        weights.put(LadderType.BOUNTIFUL, 0.d);
+      }
+      case TAXES -> {
+        weights.computeIfPresent(LadderType.DEFAULT, (k, v) -> v + weights.getOrDefault(LadderType.GENEROUS, 0.d));
+        weights.put(LadderType.GENEROUS, 0.d);
+      }
+      case VIRUS -> {
+        weights.computeIfPresent(LadderType.DEFAULT, (k, v) -> v + weights.getOrDefault(LadderType.CONSOLATION, 0.d));
+        weights.put(LadderType.CONSOLATION, 0.d);
+      }
+      default -> {
+        // do nothing
+      }
+    }
+  }
 }

@@ -22,9 +22,10 @@ import java.util.Set;
  * of ladder generation by overriding
  * {@link AbstractWeightedLadderTypeStep#handleRoundTypes(RoundType, Map)},
  * {@link AbstractWeightedLadderTypeStep#handlePreviousLadder(LadderEntity, Map,
- * LadderGenerationContext)}, and
+ * LadderGenerationContext)},
  * {@link AbstractWeightedLadderTypeStep#handlePreviousLadderType(LadderType, Map,
- * LadderGenerationContext)}.
+ * LadderGenerationContext)} and
+ * {@link AbstractWeightedLadderTypeStep#handleExistingLadderTypes(LadderEntity, Map)}.
  */
 public abstract class AbstractWeightedLadderTypeStep implements LadderGenerationStep {
 
@@ -43,13 +44,14 @@ public abstract class AbstractWeightedLadderTypeStep implements LadderGeneration
 
     Map<LadderType, Double> baseWeights = new EnumMap<>(getWeights());
     context.getRoundEntity().getTypes().stream()
-        .sorted()
+        .sorted(RoundType.comparator())
         .forEach(type -> handleRoundTypes(type, baseWeights));
 
     LadderEntity lastLadder = null;
     for (LadderEntity ladder : ladders) {
       var weights = new EnumMap<>(baseWeights);
       handlePreviousLadder(lastLadder, weights, context);
+      handleExistingLadder(ladder, weights);
 
       LadderType ladderType = RandomUtils.rollFromLookupTable(weights);
       ladder.getTypes().add(ladderType);
@@ -70,6 +72,38 @@ public abstract class AbstractWeightedLadderTypeStep implements LadderGeneration
    */
   protected void handleRoundTypes(RoundType roundType, final Map<LadderType, Double> weights) {
     // Do nothing by default
+  }
+
+  /**
+   * Handles adjustments or custom behavior for processing {@link LadderType LadderTypes} that already exist.
+   * For example, from a previous generation step.
+   * This method is designed to be overridden by subclasses to modify the default behavior.
+   *
+   * @param ladderType the {@link LadderType}
+   * @param weights a map containing {@link LadderType} as keys and their associated adjustment weights as values
+   */
+  protected void handleExistingLadderType(LadderType ladderType, final Map<LadderType, Double> weights) {
+    // Do nothing by default
+  }
+
+  /**
+   * Handles adjustments or custom behavior for processing a given ladder entity and its associated
+   * types. For example, from a previous generation step.
+   * This method is designed to be overridden by subclasses to modify the default behavior.
+   *
+   * @param ladder  the {@link LadderEntity} instance to process, which may contain associated
+   *                ladder types; if null, the method performs no operation
+   * @param weights a map containing {@link LadderType} as keys and their associated adjustment
+   *                weights as values; used to manage or influence behavior for the ladder types
+   */
+  protected void handleExistingLadder(LadderEntity ladder, final Map<LadderType, Double> weights) {
+    if (ladder == null || weights == null) {
+      return;
+    }
+
+    ladder.getTypes().stream()
+        .sorted()
+        .forEach(type -> handleExistingLadderType(type, weights));
   }
 
   /**
