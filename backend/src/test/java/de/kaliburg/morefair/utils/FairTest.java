@@ -8,7 +8,6 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import org.springframework.beans.BeansException;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -30,15 +29,10 @@ public @interface FairTest {
   class GreenMailCleanupListener extends AbstractTestExecutionListener {
 
     @Override
-    public void afterTestClass(TestContext testContext) {
-      try {
-        System.out.println("Shutting down GreenMailBean GREENSTOP");
-        GreenMailBean greenMailBean = testContext.getApplicationContext()
-            .getBean(GreenMailBean.class);
-        greenMailBean.stop();
-      } catch (BeansException be) {
-        // ignore
-      }
+    public void beforeTestMethod(TestContext testContext) throws Exception {
+      GreenMailBean greenMailBean = testContext.getApplicationContext()
+          .getBean(GreenMailBean.class);
+      greenMailBean.getGreenMail().purgeEmailFromAllMailboxes();
     }
   }
 
