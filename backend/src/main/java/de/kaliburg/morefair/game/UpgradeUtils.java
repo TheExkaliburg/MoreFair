@@ -5,6 +5,7 @@ import de.kaliburg.morefair.game.ladder.model.LadderEntity;
 import de.kaliburg.morefair.game.ladder.model.LadderType;
 import de.kaliburg.morefair.game.ladder.services.utils.LadderUtilsService;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
+import de.kaliburg.morefair.game.round.model.type.RoundType;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -60,7 +61,19 @@ public class UpgradeUtils {
     return BigInteger.ONE.max(result.add(BigDecimal.valueOf(0.5)).toBigInteger());
   }
 
-  public BigInteger throwVinegarCost(Integer ladderNum) {
+  /**
+   * Calculates the cost to throw vinegar, based on the round type and the given ladder number. If
+   * the round contains the APRIL_FOOLS type, it returns a fixed base cost. Otherwise, it multiplies
+   * the base vinegar cost by the specified ladder number.
+   *
+   * @param round     the round entity containing details about the current game round
+   * @param ladderNum the number of the ladder for which the vinegar cost is being calculated
+   * @return the total vinegar cost as a BigInteger
+   */
+  public BigInteger throwVinegarCost(RoundEntity round, Integer ladderNum) {
+    if (round.getTypes().contains(RoundType.APRIL_FOOLS)) {
+      return config.getBaseVinegarToThrow();
+    }
     return config.getBaseVinegarToThrow().multiply(BigInteger.valueOf(ladderNum));
   }
 

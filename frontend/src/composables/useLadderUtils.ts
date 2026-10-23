@@ -39,6 +39,10 @@ const getMinimumPeopleForPromote = computed<number>(() => {
 });
 
 const getVinegarThrowCost = computed<Decimal>(() => {
+  if (round.state.types.has(RoundType.APRIL_FOOLS)) {
+    return round.state.settings.baseVinegarNeededToThrow;
+  }
+
   return round.state.settings.baseVinegarNeededToThrow.mul(
     new Decimal(ladder.state.scaling),
   );
