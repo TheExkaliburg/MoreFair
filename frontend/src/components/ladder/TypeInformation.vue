@@ -11,7 +11,7 @@
 
 <script lang="ts" setup>
 import { LadderType } from "~/store/ladder";
-import { RoundType } from "~/store/round";
+import { RoundType, useRoundStore } from "~/store/round";
 import TypeInformationPart from "~/components/ladder/TypeInformationPart.vue";
 
 const props = defineProps<{
@@ -19,7 +19,13 @@ const props = defineProps<{
   placement: "top" | "bottom";
 }>();
 
+const roundStore = useRoundStore();
+
 const typeArray = computed<LadderType[] | RoundType[]>(() => {
+  if (roundStore.state.types.has(RoundType.APRIL_FOOLS)) {
+    return [RoundType.APRIL_FOOLS];
+  }
+
   return Array.from<LadderType | RoundType>(props.types) as
     | LadderType[]
     | RoundType[];
