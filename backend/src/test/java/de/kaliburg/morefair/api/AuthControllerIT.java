@@ -644,7 +644,7 @@ public class AuthControllerIT {
     allAccounts.sort(Comparator.comparing(AccountEntity::getId));
 
     assertEquals(allAccountsBefore.size(), allAccounts.size());
-    assertEquals(allAccounts.get(allAccounts.size() - 1).getUsername(), uuid);
+    assertEquals(allAccounts.getLast().getUsername(), uuid);
   }
 
   @Test

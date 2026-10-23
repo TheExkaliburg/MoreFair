@@ -88,6 +88,6 @@ public class RequestThrottler {
     }
 
     cache.put(key, requests + 1);
-    return requests <= maxRequests;
+    return requests < maxRequests;
   }
 }
