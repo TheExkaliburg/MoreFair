@@ -4,6 +4,23 @@ description: 'A list of all changes made to the game'
 
 # Changelog
 
+## 3.1.0 [MINOR]: New Ladder Generation Logic.
+
+### Balancing
+- NO_AUTO will never be twice in a row, unless CHAOS/SLOW.
+- Some modifiers are now slightly less likely to appear in CHAOS. (FARMER, RAILROAD, RACE, LAVA, VIRUS, TAXES, DEFAULT)
+
+### Improvements
+- Ladder Generation has been reworked to be generated at the start of the round, instead of 1 by 1.
+
+### Bugfixes
+- Ordering of the promotion flag vs creating your ranker.
+
+<br><br><br><br><br><br><br>
+
+<details>
+<summary>Expand for the 3.0.x changelog</summary>
+
 ## 3.0.10 [PATCH]: Empty Patch
 
 - Nothing new really, Or is it?
@@ -19,12 +36,6 @@ description: 'A list of all changes made to the game'
 
 ### Balancing
 - Revert Minimum People To Promote change back to scaling with ladders
-
-<br><br><br><br><br><br><br>
-
-<details>
-<summary>Expand for the 3.0.x changelog</summary>
-
 
 ## 3.0.7 [PATCH]: Global Ladder Numbers in Chad
 
