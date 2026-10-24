@@ -52,9 +52,9 @@
       <groupId>org.springframework.session</groupId>
     </dependency>
     <dependency>
-      <artifactId>bcpkix-jdk15on</artifactId>
+      <artifactId>bcprov-jdk18on</artifactId>
       <groupId>org.bouncycastle</groupId>
-      <version>1.70</version>
+      <version>1.86</version>
     </dependency>
     <!-- Caching -->
     <dependency>
@@ -151,7 +151,7 @@
     <dependency>
       <artifactId>commons-validator</artifactId>
       <groupId>commons-validator</groupId>
-      <version>1.7</version>
+      <version>1.11.0</version>
     </dependency>
     <dependency>
       <artifactId>commons-text</artifactId>
@@ -171,12 +171,6 @@
       <scope>test</scope>
     </dependency>
     <!-- Database Mocks -->
-    <dependency>
-      <artifactId>rider-core</artifactId>
-      <groupId>com.github.database-rider</groupId>
-      <scope>compile</scope>
-      <version>1.36.0</version>
-    </dependency>
     <dependency>
       <artifactId>embedded-redis</artifactId>
       <groupId>it.ozimov</groupId>

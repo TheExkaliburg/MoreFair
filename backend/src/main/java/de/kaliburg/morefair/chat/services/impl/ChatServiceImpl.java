@@ -10,10 +10,10 @@ import jakarta.annotation.Nullable;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
-import lombok.NonNull;
+
 import lombok.extern.slf4j.Slf4j;
 import org.javatuples.Pair;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,7 +41,7 @@ public class ChatServiceImpl implements ChatService {
   }
 
   @Override
-  public ChatEntity find(@NotNull Long id) {
+  public ChatEntity find(@NonNull Long id) {
     return chatCache.get(id);
   }
 

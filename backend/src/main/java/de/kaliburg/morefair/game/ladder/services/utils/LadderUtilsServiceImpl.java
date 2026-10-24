@@ -10,8 +10,7 @@ import de.kaliburg.morefair.game.round.model.type.RoundType;
 import de.kaliburg.morefair.game.round.services.RoundService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -42,8 +41,9 @@ public class LadderUtilsServiceImpl implements LadderUtilsService {
       return config.getMinimumPeopleForPromote();
     }
 
-    return Math.min(Math.max(config.getMinimumPeopleForPromote(), ladder.getScaling()),
-        config.getMaximumPeopleForPromote());
+    return Math.clamp(ladder.getScaling(),
+            config.getMinimumPeopleForPromote(),
+            config.getMaximumPeopleForPromote());
   }
 
   public boolean isLadderUnlocked(@NonNull LadderEntity ladder) {
@@ -62,7 +62,7 @@ public class LadderUtilsServiceImpl implements LadderUtilsService {
   }
 
   @Override
-  public Integer getBottomGrapes(@NotNull LadderEntity ladder) {
+  public Integer getBottomGrapes(@NonNull LadderEntity ladder) {
     RoundEntity round = roundService.findById(ladder.getRoundId())
         .orElseThrow();
 

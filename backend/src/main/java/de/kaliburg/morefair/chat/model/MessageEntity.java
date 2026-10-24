@@ -18,7 +18,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import org.jetbrains.annotations.NotNull;
 
 @Entity
 @Table(name = "message", uniqueConstraints = @UniqueConstraint(name = "message_uk_uuid", columnNames = "uuid"))
@@ -62,7 +61,7 @@ public class MessageEntity implements Comparable<MessageEntity> {
   }
 
   @Override
-  public int compareTo(@NotNull MessageEntity o) {
+  public int compareTo(@org.jspecify.annotations.NonNull MessageEntity o) {
     return o.getCreatedOn().compareTo(this.getCreatedOn());
   }
 }
