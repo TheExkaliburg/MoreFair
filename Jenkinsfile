@@ -19,7 +19,8 @@ pipeline {
         stage('Build/Test') {
             steps {
                 // git branch: 'main', credentialsId: 'github', url: 'https://github.com/TheExkaliburg/MoreFair.git'
-                sh 'mvn -Dmaven.test.failure.ignore=true clean package'
+                // sh 'mvn -Dmaven.test.failure.ignore=true clean package'
+                sh 'mvn clean package'
             }
 
             post {

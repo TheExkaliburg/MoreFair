@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 
 import de.kaliburg.morefair.account.model.AccountEntity;
 import de.kaliburg.morefair.account.services.AccountService;
+import de.kaliburg.morefair.api.LadderController;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.LadderEventType;
@@ -63,6 +64,8 @@ class LadderEventServiceTest {
   private UpgradeUtils upgradeUtils;
   @Mock
   private UserEventService userEventService;
+  @Mock
+  private WsUtils wsUtils;
   @Mock
   private UnlocksService unlocksService;
   @Mock
@@ -194,16 +197,20 @@ class LadderEventServiceTest {
       verify(rankerService, never()).createRankerOnLadder(any(), anyInt());
       return null;
     }).when(userEventService).record(7L, LadderEventType.PROMOTE, metadata);
+    Event<LadderEventType> event = new Event<>(LadderEventType.PROMOTE, 7L);
     if (userAction) {
-      service.addEvent(1, new Event<>(LadderEventType.PROMOTE, 7L), METADATA);
+      service.addEvent(1, event, METADATA);
     } else {
-      service.addEvent(1, new Event<>(LadderEventType.PROMOTE, 7L));
+      service.addEvent(1, event);
     }
 
     service.handleEvents();
 
     assertThat(ranker.isPromoted()).isTrue();
     verify(userEventService).record(7L, LadderEventType.PROMOTE, metadata);
+    verify(wsUtils).convertAndSendToTopicWithNumber(
+        LadderController.TOPIC_EVENTS_DESTINATION, ladder.getNumber(), event);
+    verify(accountService).save(account);
   }
 
   @Test
