@@ -1,0 +1,73 @@
+name: Dependency Security
+
+on:
+  push:
+    branches: [develop, main]
+    paths:
+      - pom.xml
+      - backend/pom.xml
+      - frontend/pom.xml
+      - .github/workflows/dependency-security.yml
+  pull_request:
+    branches: [develop, main]
+  schedule:
+    - cron: '35 7 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Review newly introduced vulnerabilities
+        uses: actions/dependency-review-action@v5
+        with:
+          fail-on-severity: high
+          fail-on-scopes: runtime, development, unknown
+          license-check: false
+
+  maven-dependencies:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Setup Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+      - name: Submit resolved Maven dependencies
+        uses: advanced-security/maven-dependency-submission-action@v6.0.1
+        with:
+          maven-args: -Pdebug -Dmaven.test.skip=true
+
+  frontend-audit:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22.23.4'
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          package_json_file: frontend/package.json
+      - name: Install locked frontend dependencies without lifecycle scripts
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Audit all frontend dependencies, including development tooling
+        run: pnpm audit --audit-level=high --registry=https://registry.npmjs.org/

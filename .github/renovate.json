@@ -1,0 +1,43 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "enabledManagers": [
+    "npm",
+    "maven",
+    "github-actions",
+    "dockerfile",
+    "docker-compose"
+  ],
+  "ignorePaths": [
+    "**/node_modules/**",
+    "**/bower_components/**",
+    "**/vendor/**",
+    "spark/**"
+  ],
+  "schedule": ["* 4-6 * * 1"],
+  "automerge": false,
+  "vulnerabilityAlerts": {
+    "enabled": true
+  },
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["@tiptap/**"],
+      "groupName": "Tiptap packages"
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["pinia", "@pinia/**"],
+      "groupName": "Pinia packages"
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["@nuxtjs/i18n", "vue-i18n"],
+      "groupName": "Vue i18n packages"
+    }
+  ]
+}

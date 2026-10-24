@@ -4,10 +4,10 @@ on:
   push:
     branches: [ develop, main ]
   pull_request:
-    # The branches below must be a subset of the branches above
-    branches: [ develop ]
+    branches: [ develop, main ]
   schedule:
     - cron: '15 19 * * 6'
+  workflow_dispatch:
 
 jobs:
   analyze:
@@ -18,21 +18,21 @@ jobs:
       contents: read
       security-events: write
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         language: [ 'java', 'javascript' ]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
 
       - name: Setup Java
         if: matrix.language == 'java'
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
           java-version: 21
@@ -46,7 +46,7 @@ jobs:
 
       - name: Setup pnpm
         if: matrix.language == 'javascript'
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
           package_json_file: frontend/package.json
 
@@ -58,8 +58,8 @@ jobs:
         if: matrix.language == 'javascript'
         run: |
           cd frontend
-          pnpm install
+          pnpm install --frozen-lockfile
           pnpm run generate
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v4
