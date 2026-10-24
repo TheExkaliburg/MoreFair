@@ -61,6 +61,11 @@ public class ModerationController {
   private final ModerationResultMapper moderationResultMapper;
   private final NameChangeMapper nameChangeMapper;
 
+  // TODO: Like easy way to fetch chat logs/filter them.
+  // TODO: Or temporary mutes/bans.
+  // TODO: A way to enable all ladder chats while playing normally
+  // TODO: A way to mute/ban someone from their chat massage
+
   @GetMapping("/chat")
   public ResponseEntity<?> getChat(Authentication authentication) {
     try {
