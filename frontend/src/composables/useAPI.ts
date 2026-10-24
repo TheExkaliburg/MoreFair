@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosRequestConfig } from "axios";
+import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { useToasts } from "~/composables/useToasts";
 import { ChatType } from "~/store/chat";
@@ -15,7 +15,7 @@ export const axiosInstance = axios.create({
 axiosInstance.defaults.withCredentials = true;
 
 axiosInstance.interceptors.request.use(
-  function (config: AxiosRequestConfig) {
+  function (config) {
     if (isDevMode) {
       config.baseURL = "http://localhost:8080";
     }
@@ -24,18 +24,11 @@ axiosInstance.interceptors.request.use(
     lastXsrfToken = xsrfToken;
 
     if (xsrfToken) {
-      config.headers = {
-        ...config.headers,
-        "X-XSRF-TOKEN": xsrfToken,
-      };
+      config.headers.set("X-XSRF-TOKEN", xsrfToken);
     }
 
     if (window.self !== window.top) {
-      config.headers = {
-        ...config.headers,
-        // @ts-ignore
-        "is-iframed": true,
-      };
+      config.headers.set("is-iframed", "true");
     }
 
     return config;
@@ -49,7 +42,7 @@ axiosInstance.interceptors.response.use(
     // if 401 unauthorized -> redirect to login
     if (
       error.response?.status === 401 &&
-      error.config.url !== "/api/auth/login"
+      error.config?.url !== "/api/auth/login"
     ) {
       window.location.href = "/login";
       return Promise.reject(error);
@@ -66,18 +59,14 @@ axiosInstance.interceptors.response.use(
         return Promise.reject(error);
       }
 
-      const headers = error.config?.headers;
-      if (headers === undefined) return Promise.reject(error);
-      const isRetry = Boolean(headers["X-RETRY"]);
+      const config = error.config;
+      if (config === undefined) return Promise.reject(error);
+      const isRetry = Boolean(config.headers.get("X-RETRY"));
       if (!isRetry) {
         const xsrfToken = Cookies.get("XSRF-TOKEN");
         if (xsrfToken) {
-          const config = error.config as AxiosRequestConfig;
-          config.headers = {
-            ...config.headers,
-            "X-RETRY": true,
-          };
-          return axiosInstance.request(config as AxiosRequestConfig);
+          config.headers.set("X-RETRY", "true");
+          return axiosInstance.request(config);
         }
       }
     }

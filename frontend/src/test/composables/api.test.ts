@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import {
   afterAll,
+  afterEach,
   beforeAll,
   beforeEach,
   describe,
@@ -9,7 +10,7 @@ import {
   vi,
 } from "vitest";
 import axios, { AxiosError } from "axios";
-import type { AxiosInstance, AxiosRequestConfig } from "axios";
+import type { AxiosInstance, InternalAxiosRequestConfig } from "axios";
 import type { useAPI } from "~/composables/useAPI";
 
 const mocks = vi.hoisted(() => ({
@@ -21,15 +22,16 @@ vi.mock("js-cookie", () => ({ default: { get: mocks.cookie } }));
 vi.mock("~/composables/useToasts", () => ({ useToasts: mocks.notify }));
 vi.mock("~/store/chat", () => ({ ChatType: { GLOBAL: "GLOBAL" } }));
 
-function response(config: AxiosRequestConfig, status = 200) {
+function response(config: InternalAxiosRequestConfig, status = 200) {
   return { config, status, statusText: "", headers: {}, data: {} };
 }
 
 describe("Axios API compatibility", () => {
-  const adapter = vi.fn((config: AxiosRequestConfig) =>
+  const adapter = vi.fn((config: InternalAxiosRequestConfig) =>
     Promise.resolve(response(config)),
   );
   const originalAdapter = axios.defaults.adapter;
+  const originalUrl = window.location.href;
   let client: AxiosInstance;
   let api: ReturnType<typeof useAPI>;
 
@@ -43,6 +45,11 @@ describe("Axios API compatibility", () => {
 
   afterAll(() => {
     axios.defaults.adapter = originalAdapter;
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    window.location.href = originalUrl;
   });
 
   beforeEach(() => {
@@ -144,5 +151,76 @@ describe("Axios API compatibility", () => {
     expect(config.url).toBe("https://themes.example/theme.css");
     expect(config.withCredentials).not.toBe(true);
     expect(config.headers?.["X-XSRF-TOKEN"]).toBeUndefined();
+  });
+
+  test("sends the iframe header without replacing other request headers", async () => {
+    vi.spyOn(window, "top", "get").mockReturnValue(null);
+    mocks.cookie.mockReturnValue("csrf-token");
+
+    await client.get("/api/account", { headers: { "X-Custom": "preserved" } });
+
+    const headers = adapter.mock.calls[0][0].headers;
+    expect(headers.get("is-iframed")).toBe("true");
+    expect(headers.get("X-Custom")).toBe("preserved");
+    expect(headers.get("X-XSRF-TOKEN")).toBe("csrf-token");
+  });
+
+  test("does not redirect failed login requests", async () => {
+    adapter.mockImplementation((config) =>
+      Promise.reject(
+        new AxiosError(
+          "Unauthorized",
+          "ERR_BAD_REQUEST",
+          config,
+          undefined,
+          response(config, 401),
+        ),
+      ),
+    );
+
+    await expect(
+      api.auth.login("Player", "wrong-password"),
+    ).rejects.toMatchObject({
+      response: { status: 401 },
+    });
+    expect(window.location.href).toBe(originalUrl);
+  });
+
+  test("redirects other unauthorized requests to login", async () => {
+    adapter.mockImplementation((config) =>
+      Promise.reject(
+        new AxiosError(
+          "Unauthorized",
+          "ERR_BAD_REQUEST",
+          config,
+          undefined,
+          response(config, 401),
+        ),
+      ),
+    );
+
+    await expect(client.get("/api/account")).rejects.toMatchObject({
+      response: { status: 401 },
+    });
+    expect(window.location.pathname).toBe("/login");
+  });
+
+  test("preserves logout credentials without inventing a CSRF token", async () => {
+    await api.auth.logout();
+
+    const config = adapter.mock.calls[0][0];
+    expect(config.url).toBe("/api/auth/logout");
+    expect(config.method).toBe("post");
+    expect(config.withCredentials).toBe(true);
+    expect(config.headers.has("X-XSRF-TOKEN")).toBe(false);
+    expect(config.headers.has("is-iframed")).toBe(false);
+  });
+
+  test("propagates network errors without a request configuration", async () => {
+    const error = new AxiosError("Network error", "ERR_NETWORK");
+    adapter.mockRejectedValue(error);
+
+    await expect(client.get("/api/account")).rejects.toBe(error);
+    expect(adapter).toHaveBeenCalledOnce();
   });
 });
