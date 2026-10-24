@@ -19,7 +19,8 @@ import de.kaliburg.morefair.game.vinegar.model.VinegarThrowEntity;
 import de.kaliburg.morefair.game.vinegar.model.VinegarThrowEntity.VinegarThrowEntityBuilder;
 import de.kaliburg.morefair.game.vinegar.services.VinegarThrowService;
 import de.kaliburg.morefair.game.vinegar.services.repositories.VinegarThrowRepository;
-import de.kaliburg.morefair.statistics.services.StatisticsService;
+import de.kaliburg.morefair.moderation.events.model.UserEventMetadata;
+import de.kaliburg.morefair.moderation.events.services.UserEventService;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Objects;
@@ -40,11 +41,12 @@ public class VinegarThrowServiceImpl implements VinegarThrowService {
   private final AccountService accountService;
   private final RankerService rankerService;
   private final RankerUtilsService rankerUtilsService;
-  private final StatisticsService statisticsService;
+  private final UserEventService userEventService;
   private final FairConfig fairConfig;
 
   @Override
-  public Optional<VinegarThrowEntity> throwVinegar(Event<LadderEventType> event) {
+  public Optional<VinegarThrowEntity> throwVinegar(Event<LadderEventType> event,
+      UserEventMetadata metadata) {
     if (!event.getEventType().equals(LadderEventType.THROW_VINEGAR)) {
       throw new IllegalArgumentException(
           "Can only run if the Event Type is THROW_VINEGAR and not " + event.getEventType() + "."
@@ -72,10 +74,7 @@ public class VinegarThrowServiceImpl implements VinegarThrowService {
     }
 
     if (rankerUtilsService.canThrowVinegarAt(throwerRanker, targetRanker, percentage)) {
-      statisticsService.recordVinegarThrow(
-          throwerRanker, targetRanker, ladder, roundService.getCurrentRound()
-      );
-
+      userEventService.record(throwerAccount.getId(), event.getEventType(), metadata);
       BigInteger throwerVinegar = throwerRanker.getVinegar();
       BigInteger thrownVinegar = throwerVinegar
           .multiply(BigInteger.valueOf(percentage))

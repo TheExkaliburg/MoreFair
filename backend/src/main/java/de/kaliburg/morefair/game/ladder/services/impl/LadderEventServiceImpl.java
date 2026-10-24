@@ -46,7 +46,8 @@ import de.kaliburg.morefair.game.vinegar.model.VinegarThrowEntity;
 import de.kaliburg.morefair.game.vinegar.model.dto.ThrowRecordResponse;
 import de.kaliburg.morefair.game.vinegar.services.VinegarThrowService;
 import de.kaliburg.morefair.game.vinegar.services.mapper.VinegarThrowMapper;
-import de.kaliburg.morefair.statistics.services.StatisticsService;
+import de.kaliburg.morefair.moderation.events.model.UserEventMetadata;
+import de.kaliburg.morefair.moderation.events.services.UserEventService;
 import de.kaliburg.morefair.utils.DateUtils;
 import de.kaliburg.morefair.utils.FormattingUtils;
 import java.math.BigInteger;
@@ -80,13 +81,16 @@ public class LadderEventServiceImpl implements LadderEventService {
   private final AchievementsService achievementsService;
   private final VinegarThrowService vinegarThrowService;
   private final VinegarThrowMapper vinegarThrowMapper;
-  private final StatisticsService statisticsService;
+  private final UserEventService userEventService;
   private final WsUtils wsUtils;
   private final UpgradeUtils upgradeUtils;
   private final FairConfig fairConfig;
   private final Gson gson;
   private final CriticalRegion semaphore = new CriticalRegion(1);
-  private final Map<Integer, List<Event<LadderEventType>>> eventMap = new HashMap<>();
+  private final Map<Integer, List<QueuedEvent>> eventMap = new HashMap<>();
+
+  private record QueuedEvent(Event<LadderEventType> event, UserEventMetadata metadata) {
+  }
 
   @Override
   public void handleEvents() throws InterruptedException {
@@ -95,33 +99,34 @@ public class LadderEventServiceImpl implements LadderEventService {
 
       for (int i = 1; i <= ladderService.findAllByRound(currentRound).size(); i++) {
         LadderEntity ladder = ladderService.findCurrentLadderWithNumber(i).orElseThrow();
-        List<Event<LadderEventType>> events =
+        List<QueuedEvent> events =
             eventMap.computeIfAbsent(ladder.getNumber(), k -> new ArrayList<>());
-        List<Event<LadderEventType>> eventsToBeRemoved = new ArrayList<>();
-        for (Event<LadderEventType> e : events) {
+        List<QueuedEvent> eventsToBeRemoved = new ArrayList<>();
+        for (QueuedEvent queued : events) {
+          Event<LadderEventType> e = queued.event();
           if (BUY_BIAS.equals(e.getEventType())) {
-            if (!buyBias(e, ladder)) {
-              eventsToBeRemoved.add(e);
+            if (!buyBias(e, ladder, queued.metadata())) {
+              eventsToBeRemoved.add(queued);
             }
           } else if (BUY_MULTI.equals(e.getEventType())) {
-            if (!buyMulti(e, ladder)) {
-              eventsToBeRemoved.add(e);
+            if (!buyMulti(e, ladder, queued.metadata())) {
+              eventsToBeRemoved.add(queued);
             }
           } else if (PROMOTE.equals(e.getEventType())) {
-            if (!promote(e, ladder)) {
-              eventsToBeRemoved.add(e);
+            if (!promote(e, ladder, queued.metadata())) {
+              eventsToBeRemoved.add(queued);
             }
           } else if (THROW_VINEGAR.equals(e.getEventType())) {
-            if (!throwVinegar(e, ladder)) {
-              eventsToBeRemoved.add(e);
+            if (!throwVinegar(e, ladder, queued.metadata())) {
+              eventsToBeRemoved.add(queued);
             }
           } else if (BUY_AUTO_PROMOTE.equals(e.getEventType())) {
-            if (!buyAutoPromote(e, ladder)) {
-              eventsToBeRemoved.add(e);
+            if (!buyAutoPromote(e, ladder, queued.metadata())) {
+              eventsToBeRemoved.add(queued);
             }
           }
         }
-        for (Event<LadderEventType> e : eventsToBeRemoved) {
+        for (QueuedEvent e : eventsToBeRemoved) {
           events.remove(e);
         }
       }
@@ -135,16 +140,16 @@ public class LadderEventServiceImpl implements LadderEventService {
    *
    * @param event the event that gets added to the eventMap
    */
-  public void addEvent(int ladderNumber, Event<LadderEventType> event) {
+  @Override
+  public void addEvent(int ladderNumber, Event<LadderEventType> event, UserEventMetadata metadata) {
     try (var ignored = semaphore.enter()) {
-      List<Event<LadderEventType>> events =
+      List<QueuedEvent> events =
           eventMap.computeIfAbsent(ladderNumber, k -> new ArrayList<>());
-      events.add(event);
+      events.add(new QueuedEvent(event, metadata));
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
   }
-
 
   /**
    * Buy Bias for the active ranker of an account on a specific ladder.
@@ -153,7 +158,8 @@ public class LadderEventServiceImpl implements LadderEventService {
    * @param ladder the ladder the ranker is on
    * @return if the ranker can buy bias
    */
-  private boolean buyBias(Event<LadderEventType> event, LadderEntity ladder) {
+  private boolean buyBias(Event<LadderEventType> event, LadderEntity ladder,
+      UserEventMetadata metadata) {
     try {
       AccountEntity account = accountService.findById(event.getAccountId())
           .orElseThrow();
@@ -167,7 +173,7 @@ public class LadderEventServiceImpl implements LadderEventService {
       BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getScaling(), ranker.getBias(),
           ladder.getTypes());
       if (ranker.getPoints().compareTo(cost) >= 0) {
-        statisticsService.recordBias(ranker, ladder, roundService.getCurrentRound());
+        userEventService.record(event.getAccountId(), event.getEventType(), metadata);
         ranker.setPoints(BigInteger.ZERO);
         ranker.setBias(ranker.getBias() + 1);
         wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
@@ -187,7 +193,8 @@ public class LadderEventServiceImpl implements LadderEventService {
    * @param ladder the ladder the ranker is on
    * @return if the ranker can buy multi
    */
-  private boolean buyMulti(Event<LadderEventType> event, LadderEntity ladder) {
+  private boolean buyMulti(Event<LadderEventType> event, LadderEntity ladder,
+      UserEventMetadata metadata) {
     try {
       AccountEntity account = accountService.findById(event.getAccountId())
           .orElseThrow();
@@ -201,7 +208,7 @@ public class LadderEventServiceImpl implements LadderEventService {
       BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getScaling(), ranker.getMultiplier(),
           ladder.getTypes());
       if (ranker.getPower().compareTo(cost) >= 0) {
-        statisticsService.recordMulti(ranker, ladder, roundService.getCurrentRound());
+        userEventService.record(event.getAccountId(), event.getEventType(), metadata);
         ranker.setPoints(BigInteger.ZERO);
         ranker.setPower(BigInteger.ZERO);
         ranker.setBias(0);
@@ -223,7 +230,8 @@ public class LadderEventServiceImpl implements LadderEventService {
    * @param ladder the ladder the ranker is on
    * @return if the ranker can buy auto-promote
    */
-  boolean buyAutoPromote(Event<LadderEventType> event, LadderEntity ladder) {
+  boolean buyAutoPromote(Event<LadderEventType> event, LadderEntity ladder,
+      UserEventMetadata metadata) {
     try {
       AccountEntity account = accountService.findById(event.getAccountId())
           .orElseThrow();
@@ -237,6 +245,7 @@ public class LadderEventServiceImpl implements LadderEventService {
       BigInteger cost = upgradeUtils.buyAutoPromoteCost(roundService.getCurrentRound(), ladder,
           ranker.getRank());
       if (ladder.getTypes().contains(LadderType.FREE_AUTO)) {
+        userEventService.record(event.getAccountId(), event.getEventType(), metadata);
         ranker.setAutoPromote(true);
 
         wsUtils.convertAndSendToUser(account.getUuid(), LadderController.PRIVATE_EVENTS_DESTINATION,
@@ -246,7 +255,7 @@ public class LadderEventServiceImpl implements LadderEventService {
       }
 
       if (rankerUtilsService.canBuyAutoPromote(ranker)) {
-        statisticsService.recordAutoPromote(ranker, ladder, roundService.getCurrentRound());
+        userEventService.record(event.getAccountId(), event.getEventType(), metadata);
         ranker.setGrapes(ranker.getGrapes().subtract(cost));
         ranker.setAutoPromote(true);
         wsUtils.convertAndSendToUser(account.getUuid(), LadderController.PRIVATE_EVENTS_DESTINATION,
@@ -266,7 +275,7 @@ public class LadderEventServiceImpl implements LadderEventService {
    * @param ladder the ladder the ranker is on
    * @return if the ranker can promote
    */
-  boolean promote(Event<LadderEventType> event, LadderEntity ladder) {
+  boolean promote(Event<LadderEventType> event, LadderEntity ladder, UserEventMetadata metadata) {
     try {
       AccountEntity account = accountService.findById(event.getAccountId())
           .orElseThrow();
@@ -280,7 +289,7 @@ public class LadderEventServiceImpl implements LadderEventService {
       if (rankerUtilsService.canPromote(ranker)) {
         // TODO: Make promotion atomic, including cached state.
         RoundEntity currentRound = roundService.getCurrentRound();
-        statisticsService.recordPromote(ranker, ladder, currentRound);
+        userEventService.record(event.getAccountId(), event.getEventType(), metadata);
         log.info("[L{}] Promotion for {} (#{})", ladder.getNumber(), account.getDisplayName(),
             account.getId());
         RankerEntity newRanker = rankerService.createRankerOnLadder(account, ladder.getNumber() + 1)
@@ -468,9 +477,10 @@ public class LadderEventServiceImpl implements LadderEventService {
    * @param ladder the ladder the ranker is on
    * @return if the ranker can throw vinegar at the rank-1-ranker
    */
-  boolean throwVinegar(Event<LadderEventType> event, LadderEntity ladder) {
+  boolean throwVinegar(Event<LadderEventType> event, LadderEntity ladder,
+      UserEventMetadata metadata) {
     try {
-      var optional = vinegarThrowService.throwVinegar(event);
+      var optional = vinegarThrowService.throwVinegar(event, metadata);
       if (optional.isEmpty()) {
         return false;
       }

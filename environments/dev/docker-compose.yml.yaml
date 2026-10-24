@@ -12,17 +12,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: always
-  mongo:
-    image: mongo:7
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: 11235813
-    ports:
-      - "10002:27017"
-    volumes:
-      - mongo_data:/data/db
-      - mongo_config:/data/configdb
-    restart: always
   redis:
     image: redis:latest
     command: /bin/sh -c "redis-server --requirepass 11235813"
@@ -36,6 +25,4 @@ services:
 
 volumes:
   postgres_data:
-  mongo_data:
-  mongo_config:
   redis_data:

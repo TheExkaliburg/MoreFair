@@ -14,6 +14,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Data
 @AllArgsConstructor
@@ -37,14 +39,15 @@ public class UserEventEntity {
   @NonNull
   @Column(name = "event_type", nullable = false)
   private String eventType;
-  @NonNull
-  @Column(name = "is_trusted", nullable = false)
-  private Boolean isTrusted;
-  @NonNull
-  @Column(name = "screen_x", nullable = false)
-  private Integer screenX;
-  @NonNull
-  @Column(name = "screen_y", nullable = false)
-  private Integer screenY;
+  @Column(name = "metadata_version")
+  private Integer metadataVersion;
+  @JdbcTypeCode(SqlTypes.JSON)
+  @Column(name = "metadata")
+  private UserEventMetadata metadata;
+  @Column(name = "snapshot_version")
+  private Integer snapshotVersion;
+  @JdbcTypeCode(SqlTypes.JSON)
+  @Column(name = "snapshot")
+  private UserEventSnapshot snapshot;
 
 }

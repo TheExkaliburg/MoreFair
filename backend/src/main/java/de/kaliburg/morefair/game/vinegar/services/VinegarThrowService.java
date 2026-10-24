@@ -3,12 +3,14 @@ package de.kaliburg.morefair.game.vinegar.services;
 import de.kaliburg.morefair.events.Event;
 import de.kaliburg.morefair.events.types.LadderEventType;
 import de.kaliburg.morefair.game.vinegar.model.VinegarThrowEntity;
+import de.kaliburg.morefair.moderation.events.model.UserEventMetadata;
 import java.util.List;
 import java.util.Optional;
 
 public interface VinegarThrowService {
 
-  Optional<VinegarThrowEntity> throwVinegar(Event<LadderEventType> event);
+  Optional<VinegarThrowEntity> throwVinegar(Event<LadderEventType> event,
+      UserEventMetadata metadata);
 
   List<VinegarThrowEntity> findVinegarThrowsOfCurrentSeason(Long accountId);
 

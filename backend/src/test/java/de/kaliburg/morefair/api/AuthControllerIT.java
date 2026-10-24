@@ -16,11 +16,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.icegreen.greenmail.spring.GreenMailBean;
 import de.kaliburg.morefair.account.model.AccountEntity;
 import de.kaliburg.morefair.account.services.repositories.AccountRepository;
+import de.kaliburg.morefair.events.types.LadderEventType;
+import de.kaliburg.morefair.moderation.events.model.UserEventEntity;
+import de.kaliburg.morefair.moderation.events.model.UserEventMetadata;
+import de.kaliburg.morefair.moderation.events.model.UserEventSnapshot;
+import de.kaliburg.morefair.moderation.events.model.dto.UserEventRequest;
+import de.kaliburg.morefair.moderation.events.services.UserEventService;
+import de.kaliburg.morefair.moderation.events.services.repositories.UserEventRepository;
 import de.kaliburg.morefair.security.SecurityUtils;
+import de.kaliburg.morefair.statistics.records.model.LadderRecord;
+import de.kaliburg.morefair.statistics.records.model.RankerRecord;
+import de.kaliburg.morefair.statistics.records.model.RoundRecord;
 import de.kaliburg.morefair.utils.FairTest;
 import de.kaliburg.morefair.utils.ITUtils;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.Cookie;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -53,6 +64,10 @@ public class AuthControllerIT {
   private MockMvc mockMvc;
   @Autowired
   private AccountRepository accountRepository;
+  @Autowired
+  private UserEventService userEventService;
+  @Autowired
+  private UserEventRepository userEventRepository;
 
   @BeforeAll
   public static void beforeAll() {
@@ -63,6 +78,72 @@ public class AuthControllerIT {
   @AfterAll
   public static void afterAll() {
     redisServer.stop();
+  }
+
+  @Test
+  public void accountDetailsAndUserEvents_workWithoutMongo() throws Exception {
+    String ip = ITUtils.randomIp();
+    String xsrfToken = getXsrfToken();
+    String uuid = registerGuest(ip, xsrfToken);
+    String session = login(uuid, uuid, ip, xsrfToken);
+    AccountEntity account = accountRepository.findByUsername(uuid).orElseThrow();
+
+    mockMvc.perform(get("/api/account").secure(true)
+            .cookie(new Cookie("SESSION", session)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.uuid").value(account.getUuid().toString()))
+        .andExpect(jsonPath("$.accountId").value(account.getId()));
+
+    UserEventRequest request = new UserEventRequest();
+    request.setIsTrusted(true);
+    request.setScreenX(120);
+    request.setScreenY(240);
+    for (LadderEventType type : List.of(LadderEventType.BUY_BIAS, LadderEventType.BUY_MULTI,
+        LadderEventType.BUY_AUTO_PROMOTE, LadderEventType.PROMOTE, LadderEventType.THROW_VINEGAR)) {
+      var recorded = userEventService.record(account.getId(), type, new UserEventMetadata(request));
+      var persisted = userEventRepository.findById(recorded.getId()).orElseThrow();
+
+      assertThat(persisted.getAccountId()).isEqualTo(account.getId());
+      assertThat(persisted.getEventType()).isEqualTo(type.toString());
+      assertThat(persisted.getCreatedOn()).isNotNull();
+      assertThat(persisted.getMetadataVersion()).isEqualTo(1);
+      assertThat(persisted.getMetadata().isTrusted()).isTrue();
+      assertThat(persisted.getMetadata().screenX()).isEqualTo(120);
+      assertThat(persisted.getMetadata().screenY()).isEqualTo(240);
+      assertThat(persisted.getSnapshotVersion()).isNull();
+      assertThat(persisted.getSnapshot()).isNull();
+    }
+  }
+
+  @ParameterizedTest
+  @ValueSource(booleans = {true, false})
+  public void userEventSnapshot_roundTripsNestedStateAndLargeGameValues(boolean userAction)
+      throws Exception {
+    String username = registerGuest(ITUtils.randomIp(), getXsrfToken());
+    AccountEntity account = accountRepository.findByUsername(username).orElseThrow();
+    String points = BigInteger.TEN.pow(999).add(BigInteger.ONE).toString();
+    RankerRecord ranker = new RankerRecord(account.getId(), 2, 4, 3, points, "500000", "120",
+        "40", false);
+    LadderRecord ladder = new LadderRecord(3, 2, 40, 15);
+    UserEventSnapshot snapshot = new UserEventSnapshot(ranker, ladder,
+        new RoundRecord(45L, 2L, 7, new LadderRecord(1, 1, 100, 60)), ranker, ranker);
+    UserEventMetadata metadata = userAction ? new UserEventMetadata(true, 120, 240) : null;
+    UserEventEntity saved = userEventRepository.saveAndFlush(UserEventEntity.builder()
+        .accountId(account.getId())
+        .eventType((userAction ? LadderEventType.THROW_VINEGAR : LadderEventType.PROMOTE).toString())
+        .metadataVersion(userAction ? 1 : null)
+        .metadata(metadata)
+        .snapshotVersion(1)
+        .snapshot(snapshot)
+        .build());
+
+    UserEventEntity persisted = userEventRepository.findById(saved.getId()).orElseThrow();
+
+    assertThat(persisted.getSnapshotVersion()).isEqualTo(1);
+    assertThat(persisted.getSnapshot()).isEqualTo(snapshot);
+    assertThat(persisted.getSnapshot().ranker().points()).isEqualTo(points);
+    assertThat(persisted.getMetadataVersion()).isEqualTo(userAction ? 1 : null);
+    assertThat(persisted.getMetadata()).isEqualTo(metadata);
   }
 
   @Test

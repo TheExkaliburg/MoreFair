@@ -15,7 +15,7 @@ import de.kaliburg.morefair.game.ranker.services.RankerService;
 import de.kaliburg.morefair.game.round.model.RoundEntity;
 import de.kaliburg.morefair.game.round.services.RoundService;
 import de.kaliburg.morefair.game.round.services.utils.RoundUtilsService;
-import de.kaliburg.morefair.moderation.events.services.UserEventService;
+import de.kaliburg.morefair.moderation.events.model.UserEventMetadata;
 import de.kaliburg.morefair.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +51,6 @@ public class LadderController {
   private final RoundUtilsService roundUtilsService;
   private final LadderMapper ladderMapper;
   private final RankerService rankerService;
-  private final UserEventService userEventService;
   private final FairConfig fairConfig;
 
 
@@ -112,8 +111,8 @@ public class LadderController {
 
       log.info("[L{}] BIAS: {} (#{}) {}", num, account.getDisplayName(), account.getId(),
           wsMessage.getEvent());
-      userEventService.record(account.getId(), LadderEventType.BUY_BIAS, wsMessage.getEvent());
-      ladderEventService.addEvent(num, new Event<>(LadderEventType.BUY_BIAS, account.getId()));
+      ladderEventService.addEvent(num, new Event<>(LadderEventType.BUY_BIAS, account.getId()),
+          new UserEventMetadata(wsMessage.getEvent()));
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
@@ -136,9 +135,9 @@ public class LadderController {
 
       log.info("[L{}] MULTI: {} (#{}) {}", num, account.getDisplayName(), account.getId(),
           wsMessage.getEvent());
-      userEventService.record(account.getId(), LadderEventType.BUY_MULTI, wsMessage.getEvent());
       ladderEventService.addEvent(num,
-          new Event<>(LadderEventType.BUY_MULTI, account.getId()));
+          new Event<>(LadderEventType.BUY_MULTI, account.getId()),
+          new UserEventMetadata(wsMessage.getEvent()));
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
@@ -169,9 +168,9 @@ public class LadderController {
       log.info("[L{}] VINEGAR: {} (#{}) {}", num, account.getDisplayName(), account.getId(),
           wsMessage.getEvent());
 
-      userEventService.record(account.getId(), LadderEventType.THROW_VINEGAR, wsMessage.getEvent());
       ladderEventService.addEvent(num,
-          new Event<>(LadderEventType.THROW_VINEGAR, account.getId(), percentage));
+          new Event<>(LadderEventType.THROW_VINEGAR, account.getId(), percentage),
+          new UserEventMetadata(wsMessage.getEvent()));
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
@@ -196,8 +195,8 @@ public class LadderController {
       log.info("[L{}] PROMOTE: {} (#{}) {}", num, account.getDisplayName(), account.getId(),
           wsMessage.getEvent());
 
-      userEventService.record(account.getId(), LadderEventType.PROMOTE, wsMessage.getEvent());
-      ladderEventService.addEvent(num, new Event<>(LadderEventType.PROMOTE, account.getId()));
+      ladderEventService.addEvent(num, new Event<>(LadderEventType.PROMOTE, account.getId()),
+          new UserEventMetadata(wsMessage.getEvent()));
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
@@ -221,10 +220,9 @@ public class LadderController {
       log.info("[L{}] AUTOPROMOTE: {} (#{}) {}", num, account.getDisplayName(), account.getId(),
           wsMessage.getEvent());
 
-      userEventService.record(account.getId(), LadderEventType.BUY_AUTO_PROMOTE,
-          wsMessage.getEvent());
       ladderEventService.addEvent(num,
-          new Event<>(LadderEventType.BUY_AUTO_PROMOTE, account.getId()));
+          new Event<>(LadderEventType.BUY_AUTO_PROMOTE, account.getId()),
+          new UserEventMetadata(wsMessage.getEvent()));
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }

@@ -6,9 +6,6 @@ services:
       SPRING_PROFILE: ${PROFILE}
       POSTGRES_URL: jdbc:postgresql://postgres:5432/FairGameStaging
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      MONGO_URL: mongodb://root:${MONGO_PASSWORD}@mongo:27017/FairGameStaging?authMechanism=DEFAULT
-      MONGO_HOST: mongo
-      MONGO_PASSWORD: ${MONGO_PASSWORD}
       REDIS_HOST: redis
       REDIS_PASSWORD: ${REDIS_PASSWORD}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
@@ -18,7 +15,6 @@ services:
     depends_on:
       - postgres
       - redis
-      - mongo
     restart: unless-stopped
   postgres:
     image: postgres:15
@@ -30,17 +26,6 @@ services:
       - "10101:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    restart: always
-  mongo:
-    image: mongo:7
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
-    ports:
-      - "10102:27017"
-    volumes:
-      - mongo_data:/data/db
-      - mongo_config:/data/configdb
     restart: always
   redis:
     image: redis:latest
@@ -55,6 +40,4 @@ services:
 
 volumes:
   postgres_data:
-  mongo_data:
-  mongo_config:
   redis_data:

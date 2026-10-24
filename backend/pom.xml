@@ -106,11 +106,6 @@
       <artifactId>postgresql</artifactId>
       <groupId>org.postgresql</groupId>
     </dependency>
-    <!-- MongoDB -->
-    <dependency>
-      <artifactId>spring-boot-starter-data-mongodb</artifactId>
-      <groupId>org.springframework.boot</groupId>
-    </dependency>
     <dependency>
       <artifactId>reactor-core</artifactId>
       <groupId>io.projectreactor</groupId>

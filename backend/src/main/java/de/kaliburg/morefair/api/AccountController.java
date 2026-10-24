@@ -13,7 +13,6 @@ import de.kaliburg.morefair.events.types.AccountEventTypes;
 import de.kaliburg.morefair.game.ladder.services.LadderTickService;
 import de.kaliburg.morefair.moderation.events.services.NameChangeService;
 import de.kaliburg.morefair.security.SecurityUtils;
-import de.kaliburg.morefair.statistics.services.StatisticsService;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +44,6 @@ public class AccountController {
   private final WsUtils wsUtils;
   private final AccountMapper accountMapper;
   private final AccountSettingsMapper accountSettingsMapper;
-  private final StatisticsService statisticsService;
   private final LadderTickService ladderTickService;
   private final NameChangeService nameChangeService;
 
@@ -60,8 +58,6 @@ public class AccountController {
     try (var ignored = ladderTickService.getSemaphore().enter()) {
       AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
           .orElseThrow();
-
-      statisticsService.recordLogin(account);
 
       return ResponseEntity.ok(accountMapper.mapToAccountDetailsDto(account));
     } catch (Exception e) {
