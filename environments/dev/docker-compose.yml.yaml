@@ -8,17 +8,17 @@ services:
       POSTGRES_PASSWORD: 11235813
       POSTGRES_DB: FairGame
     ports:
-      - "10001:5432"
+      - "127.0.0.1:10001:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: always
   redis:
-    image: redis:latest
+    image: redis:8.10
     command: /bin/sh -c "redis-server --requirepass 11235813"
     environment:
       REDIS_HOST_PASSWORD: 11235813
     ports:
-      - "10003:6379"
+      - "127.0.0.1:10003:6379"
     volumes:
       - redis_data:/data
     restart: always
