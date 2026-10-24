@@ -84,7 +84,6 @@ public class LadderEventServiceImpl implements LadderEventService {
   private final UserEventService userEventService;
   private final WsUtils wsUtils;
   private final UpgradeUtils upgradeUtils;
-  private final FairConfig fairConfig;
   private final Gson gson;
   private final CriticalRegion semaphore = new CriticalRegion(1);
   private final Map<Integer, List<QueuedEvent>> eventMap = new HashMap<>();
@@ -104,27 +103,34 @@ public class LadderEventServiceImpl implements LadderEventService {
         List<QueuedEvent> eventsToBeRemoved = new ArrayList<>();
         for (QueuedEvent queued : events) {
           Event<LadderEventType> e = queued.event();
-          if (BUY_BIAS.equals(e.getEventType())) {
-            if (!buyBias(e, ladder, queued.metadata())) {
-              eventsToBeRemoved.add(queued);
+            switch (e.getEventType()) {
+                case LadderEventType.BUY_BIAS -> {
+                    if (!buyBias(e, ladder, queued.metadata())) {
+                        eventsToBeRemoved.add(queued);
+                    }
+                }
+                case LadderEventType.BUY_MULTI -> {
+                    if (!buyMulti(e, ladder, queued.metadata())) {
+                        eventsToBeRemoved.add(queued);
+                    }
+                }
+                case LadderEventType.PROMOTE -> {
+                    if (!promote(e, ladder, queued.metadata())) {
+                        eventsToBeRemoved.add(queued);
+                    }
+                }
+                case LadderEventType.THROW_VINEGAR -> {
+                    if (!throwVinegar(e, ladder, queued.metadata())) {
+                        eventsToBeRemoved.add(queued);
+                    }
+                }
+                case LadderEventType.BUY_AUTO_PROMOTE -> {
+                    if (!buyAutoPromote(e, ladder, queued.metadata())) {
+                        eventsToBeRemoved.add(queued);
+                    }
+                }
+                default -> throw new IllegalStateException("Unexpected value: " + e.getEventType());
             }
-          } else if (BUY_MULTI.equals(e.getEventType())) {
-            if (!buyMulti(e, ladder, queued.metadata())) {
-              eventsToBeRemoved.add(queued);
-            }
-          } else if (PROMOTE.equals(e.getEventType())) {
-            if (!promote(e, ladder, queued.metadata())) {
-              eventsToBeRemoved.add(queued);
-            }
-          } else if (THROW_VINEGAR.equals(e.getEventType())) {
-            if (!throwVinegar(e, ladder, queued.metadata())) {
-              eventsToBeRemoved.add(queued);
-            }
-          } else if (BUY_AUTO_PROMOTE.equals(e.getEventType())) {
-            if (!buyAutoPromote(e, ladder, queued.metadata())) {
-              eventsToBeRemoved.add(queued);
-            }
-          }
         }
         for (QueuedEvent e : eventsToBeRemoved) {
           events.remove(e);

@@ -82,11 +82,11 @@ class LadderControllerTest {
     when(ladderService.findLadderById(12L)).thenReturn(Optional.of(ladder));
 
     switch (type) {
-      case BUY_BIAS -> controller.buyBias(null, authentication, message);
-      case BUY_MULTI -> controller.buyMulti(null, authentication, message);
-      case BUY_AUTO_PROMOTE -> controller.buyAutoPromote(null, authentication, message);
-      case PROMOTE -> controller.promote(null, authentication, message);
-      case THROW_VINEGAR -> controller.throwVinegar(null, authentication, message);
+      case BUY_BIAS -> controller.buyBias(authentication, message);
+      case BUY_MULTI -> controller.buyMulti(authentication, message);
+      case BUY_AUTO_PROMOTE -> controller.buyAutoPromote(authentication, message);
+      case PROMOTE -> controller.promote(authentication, message);
+      case THROW_VINEGAR -> controller.throwVinegar(authentication, message);
       default -> throw new IllegalArgumentException("Unexpected test event: " + type);
     }
 

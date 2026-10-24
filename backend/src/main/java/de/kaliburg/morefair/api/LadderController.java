@@ -23,7 +23,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -95,8 +94,7 @@ public class LadderController {
   }
 
   @MessageMapping(APP_BIAS_DESTINATION)
-  public void buyBias(SimpMessageHeaderAccessor sha, Authentication authentication,
-      WsMessage wsMessage) {
+  public void buyBias(Authentication authentication, WsMessage wsMessage) {
     try {
       AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
           .orElse(null);
@@ -119,8 +117,7 @@ public class LadderController {
   }
 
   @MessageMapping(APP_MULTI_DESTINATION)
-  public void buyMulti(SimpMessageHeaderAccessor sha, Authentication authentication,
-      WsMessage wsMessage) {
+  public void buyMulti(Authentication authentication, WsMessage wsMessage) {
     try {
       AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
           .orElse(null);
@@ -144,15 +141,14 @@ public class LadderController {
   }
 
   @MessageMapping(APP_VINEGAR_DESTINATION)
-  public void throwVinegar(SimpMessageHeaderAccessor sha, Authentication authentication,
-      WsMessage wsMessage) {
+  public void throwVinegar(Authentication authentication, WsMessage wsMessage) {
     try {
       int percentage = 100;
       if (wsMessage.getContent() != null) {
         percentage = Math.round(Float.parseFloat(wsMessage.getContent()));
       }
 
-      percentage = Math.min(Math.max(fairConfig.getMinVinegarPercentageThrown(), percentage), 100);
+      percentage = Math.clamp(percentage, fairConfig.getMinVinegarPercentageThrown(), 100);
 
       AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
           .orElse(null);
@@ -177,8 +173,7 @@ public class LadderController {
   }
 
   @MessageMapping(APP_PROMOTE_DESTINATION)
-  public void promote(SimpMessageHeaderAccessor sha, Authentication authentication,
-      WsMessage wsMessage) {
+  public void promote(Authentication authentication, WsMessage wsMessage) {
     try {
 
       AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
@@ -203,8 +198,7 @@ public class LadderController {
   }
 
   @MessageMapping(APP_AUTOPROMOTE_DESTINATION)
-  public void buyAutoPromote(SimpMessageHeaderAccessor sha, Authentication authentication,
-      WsMessage wsMessage) {
+  public void buyAutoPromote(Authentication authentication, WsMessage wsMessage) {
     try {
       AccountEntity account = accountService.findByUuid(SecurityUtils.getUuid(authentication))
           .orElse(null);

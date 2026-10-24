@@ -64,8 +64,6 @@ class LadderEventServiceTest {
   @Mock
   private UserEventService userEventService;
   @Mock
-  private WsUtils wsUtils;
-  @Mock
   private UnlocksService unlocksService;
   @Mock
   private AchievementsService achievementsService;
