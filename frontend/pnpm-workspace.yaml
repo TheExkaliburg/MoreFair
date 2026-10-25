@@ -2,21 +2,15 @@ overrides:
   parse-url@<8.1.0: '>=8.1.0'
   loader-utils@>=2.0.0 <2.0.3: '>=2.0.3'
   loader-utils@>=2.0.0 <2.0.4: '>=2.0.4'
-# TODO: Migrate @nuxt/content v2 -> v3 after the Nuxt 4 upgrade. v2 pulls unhead v1 via @vueuse/head
-# while Nuxt uses unhead v2; after that the unhead exclusions below can be removed.
-# TODO: During that Nuxt/Content upgrade, align TypeScript and vue-tsc with Nuxt, add a
-# repeatable Vue-aware type check (pnpm exec nuxt typecheck), and resolve its diagnostics.
-# TypeScript 4.9 cannot parse the current Nuxt-generated compiler options and dependency types.
 publicHoistPattern: 
   - '*'
-  - '!unhead'
-  - '!@unhead/*'
 autoInstallPeers: true
 strictPeerDependencies: false
 allowBuilds:
   '@intlify/vue-i18n-bridge': true
   '@intlify/vue-router-bridge': true
   '@parcel/watcher': true
+  better-sqlite3: true
   esbuild: true
   unrs-resolver: true
   vue-demi: true

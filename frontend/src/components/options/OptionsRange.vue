@@ -57,7 +57,7 @@ const emit = defineEmits<{
 
 function change(e: Event) {
   if (!isActive.value) return;
-  emit("update", e.target.valueAsNumber);
+  emit("update", getInputTarget(e).valueAsNumber);
 }
 </script>
 

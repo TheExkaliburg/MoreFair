@@ -201,39 +201,41 @@ export const useLadderStore = defineStore("ladder", () => {
     rankers.sort((a, b) => b.points.cmp(a.points));
 
     for (let i = 0; i < rankers.length; i++) {
-      rankers[i].rank = i + 1;
+      const ranker = rankers[i]!;
+      ranker.rank = i + 1;
 
       // If ranker still on ladder
-      if (rankers[i].growing) {
+      if (ranker.growing) {
         // Power & Points
-        if (rankers[i].rank !== 1) {
-          rankers[i].power = Object.freeze(
-            rankers[i].power
-              .add(rankers[i].getPowerPerSecond().mul(delta))
-              .floor(),
+        if (ranker.rank !== 1) {
+          ranker.power = Object.freeze(
+            ranker.power.add(ranker.getPowerPerSecond().mul(delta)).floor(),
           );
         }
-        rankers[i].points = Object.freeze(
-          rankers[i].points.add(rankers[i].power.mul(delta).floor()),
+        ranker.points = Object.freeze(
+          ranker.points.add(ranker.power.mul(delta).floor()),
         );
 
         for (let j = i - 1; j >= 0; j--) {
-          const currentRanker = rankers[j + 1];
-          if (currentRanker.points.cmp(rankers[j].points) > 0) {
+          const currentRanker = rankers[j + 1]!;
+          const previousRanker = rankers[j]!;
+          if (currentRanker.points.cmp(previousRanker.points) > 0) {
             // Move 1 position up and move the ranker there 1 Position down
 
             // Move other Ranker 1 Place down
-            rankers[j].rank = j + 2;
+            previousRanker.rank = j + 2;
             if (
-              rankers[j].growing &&
-              rankers[j].accountId === yourRanker?.accountId &&
-              rankers[j].multi > 1
+              previousRanker.growing &&
+              previousRanker.accountId === yourRanker?.accountId &&
+              previousRanker.multi > 1
             ) {
-              rankers[j].grapes = Object.freeze(
-                rankers[j].grapes.add(ladderUtils.getPassingGrapes()).max(0),
+              previousRanker.grapes = Object.freeze(
+                previousRanker.grapes
+                  .add(ladderUtils.getPassingGrapes())
+                  .max(0),
               );
             }
-            rankers[j + 1] = rankers[j];
+            rankers[j + 1] = previousRanker;
 
             // Move current Ranker 1 Place up
             currentRanker.rank = j + 1;
@@ -310,7 +312,7 @@ export const useLadderStore = defineStore("ladder", () => {
       !tour.flags.value.shownAutoPromote &&
       tour.flags.value.shownMultied &&
       yourRanker &&
-      yourRanker.points.mul(100).cmp(rankers[0].points) > 0
+      yourRanker.points.mul(100).cmp(rankers[0]!.points) > 0
     ) {
       tour.start();
     }
@@ -320,16 +322,14 @@ export const useLadderStore = defineStore("ladder", () => {
       !tour.flags.value.shownVinegar &&
       tour.flags.value.shownAutoPromote &&
       yourRanker &&
-      yourRanker.points.mul(10).cmp(rankers[0].points) > 0
+      yourRanker.points.mul(10).cmp(rankers[0]!.points) > 0
     ) {
       tour.start();
     }
   }
 
   function handleEvents() {
-    const eventsLength = ladderEvents.length;
-    for (let i = 0; i < eventsLength; i++) {
-      const event = ladderEvents[i];
+    for (const event of ladderEvents.slice()) {
       let ranker = state.rankers.find((r) => r.accountId === event.accountId);
       if (ranker === undefined && event.eventType === LadderEventType.JOIN)
         ranker = new Ranker({});

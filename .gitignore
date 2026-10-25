@@ -244,6 +244,8 @@ out
 # Nuxt.js build / generate output
 .nuxt
 dist
+/frontend/.output/
+/frontend/.data/
 
 # Gatsby files
 .cache/

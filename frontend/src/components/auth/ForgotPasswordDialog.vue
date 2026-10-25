@@ -32,7 +32,7 @@
     :class="{ 'cursor-wait': isWaiting }"
     :description="lang('description2')"
     :title="lang('title')"
-    click-outside-to-close="false"
+    :click-outside-to-close="false"
     @close="close"
   >
     <form class="flex flex-col items-start" @submit.prevent>

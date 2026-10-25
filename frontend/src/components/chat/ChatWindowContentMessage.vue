@@ -49,14 +49,14 @@
 
 <script lang="ts" setup>
 import ChatWindowContentMessageBody from "../../components/chat/ChatWindowContentMessageBody.vue";
-import { Message } from "~/store/entities/message";
+import type { MessageView } from "~/store/entities/message";
 import { useOptionsStore } from "~/store/options";
 import { ChatType, useChatStore } from "~/store/chat";
 
 const optionsStore = useOptionsStore();
 const chatStore = useChatStore();
 
-const props = defineProps<{ message: Message; index: number }>();
+const props = defineProps<{ message: MessageView; index: number }>();
 
 const el = ref<null | HTMLElement>(null);
 
@@ -94,11 +94,12 @@ function mention() {
     { type: "text", text: " " },
   ];
   const baseContentArray = chatStore.state.input.content;
-  if (baseContentArray && baseContentArray.length === 1) {
-    if (baseContentArray[0].content === undefined) {
-      baseContentArray[0].content = content;
+  const paragraph = baseContentArray?.[0];
+  if (baseContentArray?.length === 1 && paragraph) {
+    if (paragraph.content === undefined) {
+      paragraph.content = content;
     } else {
-      baseContentArray[0].content.push(...content);
+      paragraph.content.push(...content);
     }
   }
 

@@ -64,7 +64,7 @@ describe("Axios API compatibility", () => {
 
     await api.auth.login("Player", "password", true);
 
-    const config = adapter.mock.calls[0][0];
+    const config = adapter.mock.calls[0]![0];
     expect(config.url).toBe("/api/auth/login");
     expect(config.withCredentials).toBe(true);
     expect(config.headers?.["X-XSRF-TOKEN"]).toBe("csrf-token");
@@ -94,7 +94,7 @@ describe("Axios API compatibility", () => {
     await client.get("/api/account");
 
     expect(adapter).toHaveBeenCalledTimes(2);
-    const retry = adapter.mock.calls[1][0];
+    const retry = adapter.mock.calls[1]![0];
     expect(retry.headers?.["X-XSRF-TOKEN"]).toBe("new-token");
     expect(retry.headers?.["X-RETRY"]).toBe("true");
   });
@@ -147,7 +147,7 @@ describe("Axios API compatibility", () => {
 
     await axios.get("https://themes.example/theme.css");
 
-    const config = adapter.mock.calls[0][0];
+    const config = adapter.mock.calls[0]![0];
     expect(config.url).toBe("https://themes.example/theme.css");
     expect(config.withCredentials).not.toBe(true);
     expect(config.headers?.["X-XSRF-TOKEN"]).toBeUndefined();
@@ -159,7 +159,7 @@ describe("Axios API compatibility", () => {
 
     await client.get("/api/account", { headers: { "X-Custom": "preserved" } });
 
-    const headers = adapter.mock.calls[0][0].headers;
+    const headers = adapter.mock.calls[0]![0].headers;
     expect(headers.get("is-iframed")).toBe("true");
     expect(headers.get("X-Custom")).toBe("preserved");
     expect(headers.get("X-XSRF-TOKEN")).toBe("csrf-token");
@@ -208,7 +208,7 @@ describe("Axios API compatibility", () => {
   test("preserves logout credentials without inventing a CSRF token", async () => {
     await api.auth.logout();
 
-    const config = adapter.mock.calls[0][0];
+    const config = adapter.mock.calls[0]![0];
     expect(config.url).toBe("/api/auth/logout");
     expect(config.method).toBe("post");
     expect(config.withCredentials).toBe(true);

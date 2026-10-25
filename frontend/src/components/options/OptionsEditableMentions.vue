@@ -9,10 +9,9 @@
     >
       <div class="flex flex-row">
         <input
+          v-model="input"
           :disabled="!isActive"
-          :value="input"
           class="bg-transparent border-button-border border-r-0 border-1 border-dashed w-32 px-1"
-          @input="input = $event.target.value"
           @keydown.enter="add"
         />
         <button
@@ -59,11 +58,9 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue";
 import { useLang } from "~/composables/useLang";
+import type { EditableMentionsOption } from "~/store/entities/option";
 
-const props = defineProps({
-  option: { type: Object, required: true },
-  label: { type: String, required: true },
-});
+const props = defineProps<{ option: EditableMentionsOption; label: string }>();
 
 const lang = useLang("options");
 

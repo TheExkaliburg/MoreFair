@@ -152,7 +152,9 @@ export const useEta = (ranker: Ranker) => {
   }
 
   function toRank(rank: number): number {
-    return toRanker(ladder.state.rankers[rank - 1]);
+    const target = ladder.state.rankers[rank - 1];
+    if (!target) throw new RangeError(`No ranker at rank ${rank}`);
+    return toRanker(target);
   }
 
   function toFirst(): number {
@@ -178,7 +180,7 @@ export const useEta = (ranker: Ranker) => {
 
     // If no one hit the base points requirement already then we show the eta to the requirement.
     if (
-      ladder.state.rankers[0].points.cmp(ladder.state.basePointsToPromote) < 0
+      ladder.state.rankers[0]!.points.cmp(ladder.state.basePointsToPromote) < 0
     ) {
       return etaRequirement;
     }

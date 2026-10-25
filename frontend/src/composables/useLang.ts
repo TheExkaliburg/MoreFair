@@ -24,7 +24,7 @@ function ct(key: string, ...args: string[]) {
 
   i = 0;
   while (result.includes(STRING_PLACEHOLDER) && i < args.length) {
-    result = result.replace(STRING_PLACEHOLDER, args[i]);
+    result = result.replace(STRING_PLACEHOLDER, args[i]!);
     i++;
   }
 

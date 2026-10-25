@@ -24,7 +24,7 @@
       <input
         type="range"
         :value="splitValue"
-        @input="(event) => setSplit(event.target.valueAsNumber)"
+        @input="(event) => setSplit(getInputTarget(event).valueAsNumber)"
       />
       <div class="flex flex-row-reverse justify-between pb-4">
         <FairButton
@@ -66,7 +66,9 @@
         :max="max"
         :min="min"
         :value="grapesStore.storage.vinegarThrowPercentage"
-        @input="(event) => setVinegarPercentage(event.target.valueAsNumber)"
+        @input="
+          (event) => setVinegarPercentage(getInputTarget(event).valueAsNumber)
+        "
       />
       <div class="flex flex-row-reverse">
         ({{ grapesStore.storage.vinegarThrowPercentage }}%)

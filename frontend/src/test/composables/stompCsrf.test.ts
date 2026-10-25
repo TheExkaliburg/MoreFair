@@ -35,14 +35,14 @@ describe("STOMP CSRF connection headers", () => {
   beforeEach(() => {
     mocks.get.mockReset();
     mocks.notify.mockClear();
-    mocks.clients[0].connectHeaders = {};
+    mocks.clients[0]!.connectHeaders = {};
   });
 
   test("fetches and sends the server-provided masked token", async () => {
     mocks.get.mockResolvedValue({
       data: { headerName: "X-XSRF-TOKEN", token: "masked-token" },
     });
-    const client = mocks.clients[0];
+    const client = mocks.clients[0]!;
 
     await client.beforeConnect(client);
 
@@ -60,7 +60,7 @@ describe("STOMP CSRF connection headers", () => {
       .mockResolvedValueOnce({
         data: { headerName: "X-XSRF-TOKEN", token: "second-token" },
       });
-    const client = mocks.clients[0];
+    const client = mocks.clients[0]!;
 
     await client.beforeConnect(client);
     expect(client.connectHeaders).toEqual({ "X-XSRF-TOKEN": "first-token" });
@@ -70,8 +70,10 @@ describe("STOMP CSRF connection headers", () => {
 
   test("stops connecting and notifies the player if token fetching fails", async () => {
     mocks.get.mockRejectedValue(new Error("Network error"));
-    const client = mocks.clients[0];
-    const deactivate = vi.spyOn(client, "deactivate").mockResolvedValue();
+    const client = mocks.clients[0]!;
+    const deactivate = vi
+      .spyOn(client, "deactivate")
+      .mockResolvedValue(undefined);
 
     await client.beforeConnect(client);
 

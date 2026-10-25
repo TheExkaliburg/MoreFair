@@ -1,6 +1,6 @@
 <template>
   <div>
-    <template v-for="part in messageParts" :key="part">
+    <template v-for="(part, index) in messageParts" :key="index">
       <span v-if="part.is(MessagePartType.plain)">{{ part.text }}</span>
       <span
         v-else-if="part.is(MessagePartType.mentionUser)"
@@ -26,17 +26,12 @@
 <script lang="ts" setup>
 import { computed } from "vue";
 import {
-  Message,
+  type MessageView,
   MessagePart,
   MessagePartType,
 } from "../../store/entities/message";
 
-const props = defineProps({
-  message: {
-    type: Message,
-    required: true,
-  },
-});
+const props = defineProps<{ message: MessageView }>();
 
 const messageParts = computed<MessagePart[]>(() => {
   return props.message.getMessageParts();

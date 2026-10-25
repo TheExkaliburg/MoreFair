@@ -69,8 +69,8 @@
         </FairDialog>
       </div>
       <div v-if="false" class="text-text">
-        Logged in: {{ authStore.state.authenticationStatus }} Guest:
-        {{ authStore.getters.isGuest }}
+        Logged in: {{ useAuthStore().state.authenticationStatus }} Guest:
+        {{ useAuthStore().getters.isGuest }}
       </div>
       <div class="text-text"></div>
       <TheAuthenticationDialog

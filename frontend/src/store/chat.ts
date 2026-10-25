@@ -6,6 +6,7 @@ import {
   MentionMeta,
   Message,
   MessageData,
+  MessageView,
   ChatType,
 } from "./entities/message";
 import { OnChatEventBody, useStomp } from "~/composables/useStomp";
@@ -52,9 +53,9 @@ export const useChatStore = defineStore("chat", () => {
   });
 
   const getters = reactive({
-    allMessages: computed<Message[]>(() => {
+    allMessages: computed<MessageView[]>(() => {
       const keys = Object.keys(ChatType) as ChatType[];
-      const result: Message[] = [];
+      const result: MessageView[] = [];
 
       keys.forEach((key) => {
         const messages = state.messages.get(key) ?? [];

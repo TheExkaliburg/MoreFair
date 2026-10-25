@@ -165,3 +165,5 @@ export class Message implements MessageData {
     return result;
   }
 }
+
+export type MessageView = Pick<Message, keyof Message>;

@@ -4,12 +4,13 @@ import { defineVitestConfig } from "@nuxt/test-utils/config";
 export default defineVitestConfig({
   resolve: {
     alias: {
-      "~": resolve(__dirname, "src"),
+      "~": resolve(import.meta.dirname, "src"),
     },
   },
   test: {
     root: "./",
     environment: "nuxt",
+    include: ["src/test/**/*.test.ts"],
     includeSource: ["src/**/*.{vue,ts}"],
     globals: true,
   },

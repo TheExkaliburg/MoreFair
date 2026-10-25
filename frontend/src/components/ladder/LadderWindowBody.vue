@@ -276,7 +276,7 @@ const canThrowVinegar = computed<boolean>(() => {
       useGrapesStore().getters.selectedVinegar,
     ) <= 0 &&
     ladderStore.state.rankers.length > 0 &&
-    ladderStore.state.rankers[0].growing &&
+    ladderStore.state.rankers[0]?.growing === true &&
     ladderUtils.isLadderPromotable.value
   );
 });

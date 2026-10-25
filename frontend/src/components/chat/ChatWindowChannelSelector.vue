@@ -48,7 +48,7 @@
               type="checkbox"
               :checked="!chatStore.state.ignoredChatTypes.has(type)"
               @click.stop
-              @input="setIgnoredChatType(type, $event.target.checked)"
+              @input="setIgnoredChatType(type, getInputTarget($event).checked)"
             />
           </li>
         </ListboxOption>

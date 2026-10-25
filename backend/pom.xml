@@ -235,7 +235,7 @@
               <overwrite>true</overwrite>
               <resources>
                 <resource>
-                  <directory>${project.parent.basedir}/frontend/dist</directory>
+                  <directory>${project.parent.basedir}/frontend/.output/public</directory>
                 </resource>
               </resources>
             </configuration>

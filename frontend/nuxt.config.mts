@@ -18,10 +18,15 @@ export default defineNuxtConfig({
     "@nuxtjs/i18n",
     "@nuxt/test-utils/module",
   ],
+  // TODO (low priority): Evaluate adopting Nuxt's default app/ structure
+  // to reduce path configuration, separately from dependency modernization.
   srcDir: "src/",
+  dir: {
+    public: "src/public",
+  },
   content: {
     experimental: {
-      clientDB: true,
+      sqliteConnector: "better-sqlite3",
     },
   },
   build: {
@@ -37,6 +42,16 @@ export default defineNuxtConfig({
     ],
   },
   ssr: false,
+  typescript: {
+    nodeTsConfig: {
+      include: ["../test/**/*.ts", "../vitest*.mts", "../content.config.ts"],
+    },
+    tsConfig: {
+      compilerOptions: {
+        verbatimModuleSyntax: false,
+      },
+    },
+  },
   i18n: {
     locales: [
       {
@@ -46,11 +61,8 @@ export default defineNuxtConfig({
       },
     ],
     defaultLocale: "en",
-    restructureDir: false,
-    bundle: {
-      optimizeTranslationDirective: false,
-    },
-    langDir: "locales/",
+    restructureDir: ".",
+    langDir: "src/locales/",
     vueI18n: "./i18n.config.ts",
   },
   vite: {

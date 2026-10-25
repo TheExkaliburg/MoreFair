@@ -137,7 +137,10 @@ export const useTableSpace: () => ComputedRef<TableSpace> = () => {
   return computedTableSpace;
 };
 
-function convertTotalWeightsToColumns(weights: number[]): number[] {
+function convertTotalWeightsToColumns<const T extends readonly number[]>(
+  weights: T,
+): { -readonly [K in keyof T]: number };
+function convertTotalWeightsToColumns(weights: readonly number[]): number[] {
   const total = weights.reduce((a, b) => a + b, 0);
   const multi = TOTAL_COLUMNS / total;
 
@@ -148,7 +151,7 @@ function convertTotalWeightsToColumns(weights: number[]): number[] {
   while (newTotal < TOTAL_COLUMNS) {
     const nonNullResults = result.filter((_, i) => weights[i] !== 0);
     const smallestIndex = result.indexOf(Math.min(...nonNullResults));
-    result[smallestIndex]++;
+    result[smallestIndex] = result[smallestIndex]! + 1;
     newTotal++;
   }
 
@@ -156,7 +159,7 @@ function convertTotalWeightsToColumns(weights: number[]): number[] {
   while (newTotal > TOTAL_COLUMNS) {
     const nonNullResults = result.filter((_, i) => weights[i] !== 0);
     const biggestIndex = result.indexOf(Math.max(...nonNullResults));
-    result[biggestIndex]--;
+    result[biggestIndex] = result[biggestIndex]! - 1;
     newTotal--;
   }
 

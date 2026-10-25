@@ -86,7 +86,7 @@ const defaultValues = {
         if (value.length < oldValue.length) {
           // figure out which index was removed from the array
           const removed = oldValue.filter((x) => !value.includes(x));
-          const last = removed[removed.length - 1];
+          const last = removed[removed.length - 1]!;
           const index = oldValue.indexOf(last) + 2;
           // remove that index from the selector array
           optionsStorage.value.theme.themeSelector.transient.options =
@@ -109,7 +109,7 @@ const defaultValues = {
           }
         } else {
           // figure out which entry was added into the array
-          const last = value[value.length - 1];
+          const last = value[value.length - 1]!;
           loadTheme(last);
         }
       },
@@ -139,7 +139,7 @@ function loadTheme(url: string) {
     const style = document.createElement("style");
     style.type = "text/css";
     style.innerHTML = css;
-    document.getElementsByTagName("head")[0].appendChild(style);
+    document.head.appendChild(style);
     optionsStorage.value.theme.themeSelector.transient.options =
       getThemeNames();
 

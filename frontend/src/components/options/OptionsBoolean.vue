@@ -14,7 +14,7 @@
       :disabled="!isActive"
       :checked="option.value"
       type="checkbox"
-      @input="$emit('update', $event.target.checked)"
+      @input="$emit('update', getInputTarget($event).checked)"
     />
   </div>
 </template>

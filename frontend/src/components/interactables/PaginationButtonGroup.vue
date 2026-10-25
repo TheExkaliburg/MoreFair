@@ -106,7 +106,7 @@ defineProps({
 });
 
 const emit = defineEmits<{
-  (e: "change", value: Number): void;
+  (e: "change", value: number): void;
 }>();
 </script>
 
