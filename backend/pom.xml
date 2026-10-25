@@ -177,7 +177,18 @@
       <artifactId>greenmail-spring</artifactId>
       <groupId>com.icegreen</groupId>
       <scope>test</scope>
-      <version>2.0.0</version>
+      <version>2.1.3</version>
+      <exclusions>
+        <!-- Reuse Spring Boot's mail API and provider instead of the bundled implementation. -->
+        <exclusion>
+          <groupId>org.eclipse.angus</groupId>
+          <artifactId>jakarta.mail</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.eclipse.angus</groupId>
+          <artifactId>angus-activation</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 
