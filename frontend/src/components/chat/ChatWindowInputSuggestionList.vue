@@ -18,7 +18,7 @@
               :class="{ 'bg-white': index === selectedIndex }"
               class="w-full pr-4 px-2 py-0.5 text-left text-text-light hover:text-button-text-hover hover:bg-button-bg-hover whitespace-nowrap"
               href="#"
-              @click="selectItem(index)"
+              @click.prevent="selectItem(index)"
               @keydown="onKeyDown"
               >{{ item }}</a
             >
@@ -57,6 +57,7 @@ watch(formattedItemsArray, (value, oldValue) => {
 });
 
 function onKeyDown(event: KeyboardEvent) {
+  if (props.items.length === 0) return false;
   if (event.key === "Escape") {
     event.preventDefault();
     return false;

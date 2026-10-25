@@ -10,9 +10,7 @@
         :editor="editor"
         class="justify-center items-center w-full border-1 border-l-0 h-8 border-button-border p-1 w-full max-w-full outline-0 overflow-x-hidden text-text caret-text whitespace-nowrap overflow-y-hidden"
         spellcheck="false"
-        @keydown.enter.prevent="sendMessage"
-        @keydown.tab="wasSuggestionOpen = false"
-        @keydown.ctrl.space="wasSuggestionOpen = false"
+        @keydown.enter="sendMessage"
       ></EditorContent>
       <button
         class="w-1/4 max-w-xs rounded-r-md h-8 border-l-0 border-1 border-button-border py-1 text-button-text hover:text-button-text-hover hover:bg-button-bg-hover"
@@ -34,17 +32,18 @@
 
 <script lang="ts" setup>
 import { EditorContent, Node, useEditor } from "@tiptap/vue-3";
+import type { Attributes, JSONContent } from "@tiptap/core";
 import { Paragraph } from "@tiptap/extension-paragraph";
 import { Text } from "@tiptap/extension-text";
-import { Mention } from "@tiptap/extension-mention";
-import { CharacterCount } from "@tiptap/extension-character-count";
-import { Placeholder } from "@tiptap/extension-placeholder";
+import { Mention, type MentionOptions } from "@tiptap/extension-mention";
+import { CharacterCount, Placeholder } from "@tiptap/extensions";
 import ChatWindowChannelSelector from "./ChatWindowChannelSelector.vue";
-import { ChatType, useChatStore } from "~/store/chat";
+import { ChatType, useChatStore, type Suggestion } from "~/store/chat";
 import {
   useEmojiSuggestion,
   useGroupSuggestion,
   useUserSuggestion,
+  type EmojiDataEntry,
 } from "~/composables/useSuggestion";
 import { useLang } from "~/composables/useLang";
 import { useAccountStore } from "~/store/account";
@@ -52,6 +51,25 @@ import { useAccountStore } from "~/store/account";
 const chatStore = useChatStore();
 
 const characterLimit = 280;
+
+const ChatMention = Mention.extend({
+  addAttributes() {
+    const attributes: Attributes = this.parent?.() ?? {};
+    return {
+      ...attributes,
+      mentionSuggestionChar: {
+        ...attributes?.mentionSuggestionChar,
+        default: this.options.suggestion.char ?? "@",
+      },
+    };
+  },
+}).configure({
+  renderHTML: (props) => [
+    "span",
+    props.options.HTMLAttributes,
+    props.options.renderText(props),
+  ],
+});
 
 const editor = useEditor({
   extensions: [
@@ -66,34 +84,40 @@ const editor = useEditor({
         class: "my-0 whitespace-pre",
       },
     }),
-    CharacterCount.configure({ limit: characterLimit }),
+    CharacterCount.configure({ limit: characterLimit, autoTrim: false }),
     Placeholder.configure({
       placeholder: "Chad is listening...",
     }),
-    Mention.extend({ name: "userMention" }).configure({
+    ChatMention.extend<MentionOptions<Suggestion, { id: Suggestion }>>({
+      name: "userMention",
+    }).configure({
       HTMLAttributes: {
         class: "mention",
       },
       suggestion: useUserSuggestion(),
-      renderLabel: ({ node }) => {
+      renderText: ({ node }) => {
         return `@${node.attrs.id.displayName}#${node.attrs.id.accountId}`;
       },
     }),
-    Mention.extend({ name: "emojiMention" }).configure({
+    ChatMention.extend<MentionOptions<EmojiDataEntry, { id: EmojiDataEntry }>>({
+      name: "emojiMention",
+    }).configure({
       HTMLAttributes: {
         class: "mention",
       },
       suggestion: useEmojiSuggestion(),
-      renderLabel: ({ node }) => {
+      renderText: ({ node }) => {
         return `${node.attrs.id.emoji}`;
       },
     }),
-    Mention.extend({ name: "groupMention" }).configure({
+    ChatMention.extend<MentionOptions<string, { id: string }>>({
+      name: "groupMention",
+    }).configure({
       HTMLAttributes: {
         class: "mention",
       },
       suggestion: useGroupSuggestion(),
-      renderLabel: ({ node }) => {
+      renderText: ({ node }) => {
         return `$${node.attrs.label ?? node.attrs.id}$`;
       },
     }),
@@ -105,15 +129,14 @@ const editor = useEditor({
 
 const lang = useLang("chat");
 
-// TODO: this is kinda hacky, there must be a better way to prevent the enter from autocompletion to also send the message
-let isSuggestionOpen = false;
-let wasSuggestionOpen = false;
 watch(
   () => chatStore.state.input,
   (newValue) => {
+    const currentEditor = editor.value;
+    if (!currentEditor) return;
     if (
-      editor.value?.getText().trimStart().startsWith("/") &&
-      editor.value?.getText().endsWith(" ")
+      currentEditor.getText().trimStart().startsWith("/") &&
+      currentEditor.getText().endsWith(" ")
     ) {
       const channel = editor.value?.getText().trim().slice(1).toUpperCase();
       switch (channel) {
@@ -121,50 +144,46 @@ watch(
         case lang(ChatType.MOD + ".identifier"):
           if (useAccountStore().getters.isMod) {
             useChatStore().state.selectedChatType = ChatType.MOD;
-            editor.value.commands.clearContent(true);
+            currentEditor.commands.clearContent(true);
+            return;
           }
           break;
         case ChatType.LADDER:
         case lang(ChatType.LADDER + ".identifier"):
         case "LOCAL":
           useChatStore().state.selectedChatType = ChatType.LADDER;
-          editor.value.commands.clearContent(true);
-          break;
+          currentEditor.commands.clearContent(true);
+          return;
         case ChatType.GLOBAL:
         case lang(ChatType.GLOBAL + ".identifier"):
         case "GENERAL":
           useChatStore().state.selectedChatType = ChatType.GLOBAL;
-          editor.value.commands.clearContent(true);
-          break;
+          currentEditor.commands.clearContent(true);
+          return;
         default:
           break;
       }
     }
 
-    const caretStart: number =
-      editor.value?.state.selection.from ?? newValue.length;
-    editor.value?.commands.setContent(newValue);
-    editor.value?.commands.setTextSelection(caretStart);
-
-    // check if autocomplete is/was open
-    const suggestionElements =
-      document.getElementsByClassName("tippy-suggestion");
-    wasSuggestionOpen = isSuggestionOpen;
-    isSuggestionOpen = suggestionElements.length > 0;
+    if (
+      !currentEditor.schema.nodeFromJSON(newValue).eq(currentEditor.state.doc)
+    ) {
+      const caretStart = currentEditor.state.selection.from;
+      currentEditor.commands.setContent(newValue, { emitUpdate: false });
+      currentEditor.commands.setTextSelection(caretStart);
+    }
   },
   { deep: true },
 );
 
 function sendMessage(e: KeyboardEvent | MouseEvent) {
-  if (e instanceof KeyboardEvent && (e.key === "Enter" || e.key === "Tab")) {
-    if (wasSuggestionOpen) {
-      wasSuggestionOpen = false;
-      return;
-    }
+  if (e instanceof KeyboardEvent) {
+    if (e.isComposing) return;
+    e.preventDefault();
   }
 
   if (!editor?.value) return;
-  const messageJson = editor.value.getJSON();
+  const messageJson: JSONContent = editor.value.getJSON();
   if (!messageJson?.content) return;
   const textNodes = messageJson.content[0]?.content;
 

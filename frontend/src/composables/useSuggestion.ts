@@ -1,6 +1,10 @@
 import { VueRenderer } from "@tiptap/vue-3";
 import { tippy } from "vue-tippy";
-import { PluginKey } from "prosemirror-state";
+import { PluginKey } from "@tiptap/pm/state";
+import type {
+  SuggestionKeyDownProps,
+  SuggestionProps,
+} from "@tiptap/suggestion";
 import ChatWindowInputUserMentionList from "../components/chat/ChatWindowInputSuggestionList.vue";
 import { useOptionsStore } from "~/store/options";
 import { Suggestion, useChatStore } from "~/store/chat";
@@ -17,21 +21,32 @@ export type EmojiDataEntry = {
   ios_version: string;
 };
 
-const render = (format: Function) => () => {
-  let component: any;
-  let popup: any;
-  return {
-    onStart: (props: any) => {
-      component = new VueRenderer(ChatWindowInputUserMentionList, {
-        props: { ...props, format },
-        editor: props.editor,
-      });
-      if (!props.clientRect) {
+const render =
+  <T>(format: (item: T) => string) =>
+  () => {
+    let component: VueRenderer | undefined;
+    let popup: ReturnType<typeof tippy>[number] | undefined;
+
+    const destroy = () => {
+      popup?.destroy();
+      popup = undefined;
+      component?.destroy();
+      component = undefined;
+    };
+    const updatePopup = (props: SuggestionProps<T, { id: T }>) => {
+      const rect = props.clientRect?.();
+      if (!rect || !component?.element) {
+        popup?.hide();
         return;
       }
-
-      popup = tippy("body", {
-        getReferenceClientRect: props.clientRect,
+      const getReferenceClientRect = () => props.clientRect?.() ?? rect;
+      if (popup) {
+        popup.setProps({ getReferenceClientRect });
+        popup.show();
+        return;
+      }
+      [popup] = tippy("body", {
+        getReferenceClientRect,
         appendTo: () => document.body,
         content: component.element,
         showOnCreate: true,
@@ -40,35 +55,45 @@ const render = (format: Function) => () => {
         placement: "top-start",
         arrow: false,
         onShow(instance) {
-          const tippyBox = instance.popper.querySelector(".tippy-box");
-          if (tippyBox === null) return;
-          tippyBox.classList.add("tippy-suggestion");
+          instance.popper
+            .querySelector(".tippy-box")
+            ?.classList.add("tippy-suggestion");
         },
       });
-    },
-    onUpdate(props: any) {
-      component.updateProps(props);
-      if (!props.clientRect) {
-        return;
-      }
-      popup[0].setProps({
-        getReferenceClientRect: props.clientRect,
-      });
-    },
-    onKeyDown(props: any) {
-      if (props.event.key === "Escape") {
-        popup[0].hide();
-        return true;
-      }
+    };
 
-      return component.ref?.onKeyDown(props.event);
-    },
-    onExit() {
-      popup[0].destroy();
-      component.destroy();
-    },
+    return {
+      onStart: (props: SuggestionProps<T, { id: T }>) => {
+        destroy();
+        if (props.editor.isDestroyed) return;
+        component = new VueRenderer(ChatWindowInputUserMentionList, {
+          props: { ...props, format },
+          editor: props.editor,
+        });
+        updatePopup(props);
+      },
+      onUpdate(props: SuggestionProps<T, { id: T }>) {
+        if (!component) return;
+        component.updateProps(props);
+        updatePopup(props);
+      },
+      onKeyDown(props: SuggestionKeyDownProps): boolean {
+        if (props.event.key === "Escape") {
+          const wasOpen = popup !== undefined;
+          popup?.hide();
+          return wasOpen;
+        }
+        const list:
+          { onKeyDown?: (event: KeyboardEvent) => boolean } | undefined =
+          component?.ref;
+        const handled = list?.onKeyDown?.(props.event) ?? false;
+        // Accepting a suggestion must not bubble into the chat's Enter-to-send.
+        if (handled) props.event.stopPropagation();
+        return handled;
+      },
+      onExit: destroy,
+    };
   };
-};
 
 export const useUserSuggestion = () => {
   return {
