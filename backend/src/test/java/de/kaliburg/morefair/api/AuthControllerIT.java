@@ -31,6 +31,7 @@ import de.kaliburg.morefair.utils.FairTest;
 import de.kaliburg.morefair.utils.ITUtils;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.Cookie;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -70,14 +71,16 @@ public class AuthControllerIT {
   private UserEventRepository userEventRepository;
 
   @BeforeAll
-  public static void beforeAll() {
-    redisServer = RedisServer.builder().port(6370).setting("maxmemory 128M").build();
+  public static void beforeAll() throws IOException {
+    redisServer = RedisServer.newRedisServer().port(6370).setting("maxmemory 128M").build();
     redisServer.start();
   }
 
   @AfterAll
-  public static void afterAll() {
-    redisServer.stop();
+  public static void afterAll() throws IOException {
+    if (redisServer != null) {
+      redisServer.stop();
+    }
   }
 
   @Test

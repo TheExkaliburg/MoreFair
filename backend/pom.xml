@@ -168,9 +168,9 @@
     <!-- Database Mocks -->
     <dependency>
       <artifactId>embedded-redis</artifactId>
-      <groupId>it.ozimov</groupId>
+      <groupId>com.github.codemonstur</groupId>
       <scope>test</scope>
-      <version>0.7.3</version>
+      <version>1.4.4</version>
     </dependency>
     <!-- Email Mocks -->
     <dependency>
@@ -182,6 +182,7 @@
   </dependencies>
 
   <build>
+    <finalName>${project.parent.artifactId}</finalName>
     <plugins>
       <!-- Annotation Processing-->
       <plugin>
@@ -245,6 +246,26 @@
             <id>copy-frontend-content</id>
             <phase>process-resources</phase>
           </execution>
+          <execution>
+            <id>copy-backend-artifact</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.parent.basedir}/target</outputDirectory>
+              <overwrite>true</overwrite>
+              <resources>
+                <resource>
+                  <directory>${project.build.directory}</directory>
+                  <filtering>false</filtering>
+                  <includes>
+                    <include>${project.build.finalName}.jar</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
         </executions>
         <groupId>org.apache.maven.plugins</groupId>
       </plugin>
@@ -256,29 +277,6 @@
           </excludes>
         </configuration>
         <groupId>org.apache.maven.plugins</groupId>
-      </plugin>
-      <!-- Copy Artifact to Parent Target Folder -->
-      <plugin>
-        <artifactId>copy-rename-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <configuration>
-              <destinationFile>
-                ${project.parent.basedir}/target/${project.parent.artifactId}.jar
-              </destinationFile>
-              <sourceFile>
-                ${project.basedir}/target/${project.artifactId}-${project.parent.version}.jar
-              </sourceFile>
-            </configuration>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <id>copy-jar-after-package</id>
-            <phase>package</phase>
-          </execution>
-        </executions>
-        <groupId>com.coderplus.maven.plugins</groupId>
-        <version>1.0.1</version>
       </plugin>
     </plugins>
   </build>

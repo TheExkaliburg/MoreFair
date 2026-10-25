@@ -50,9 +50,6 @@ jobs:
         run: |
           set +e
           pnpm exec eslint src/ \
-            --config .eslintrc.js \
-            --ignore-path .eslintignore \
-            --ext .js,.jsx,.ts,.tsx,.vue \
             --format @microsoft/eslint-formatter-sarif \
             --output-file eslint-results.sarif
           status=$?
