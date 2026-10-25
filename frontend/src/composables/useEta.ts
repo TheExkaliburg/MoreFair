@@ -198,7 +198,6 @@ export const useEta = (ranker: Ranker) => {
       ranker.rank === ladder.state.rankers.length &&
       ladder.state.rankers.length >= 1
     ) {
-      // TODO: When grape modifiers are implemented, acceleration can be changed.
       const acceleration = ladderUtils.getBottomGrapes();
 
       const a = new Decimal(acceleration).div(2);

@@ -42,7 +42,6 @@ public class LadderGenerationService {
     });
   }
 
-  // TODO: Match modifier priorities, incompatible grape-type cleanup, and size/back-to-back rules.
   public List<LadderEntity> generateLaddersForRound(RoundEntity round) {
     LadderGenerationContext context = new LadderGenerationContext(round);
 
