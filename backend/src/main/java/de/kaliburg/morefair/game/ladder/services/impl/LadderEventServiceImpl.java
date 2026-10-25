@@ -216,7 +216,7 @@ public class LadderEventServiceImpl implements LadderEventService {
       if (ranker.getPower().compareTo(cost) >= 0) {
         userEventService.record(event.getAccountId(), event.getEventType(), metadata);
         ranker.setPoints(BigInteger.ZERO);
-        ranker.setPower(BigInteger.ZERO);
+        ranker.setPower(BigInteger.ONE);
         ranker.setBias(0);
         ranker.setMultiplier(ranker.getMultiplier() + 1);
         wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
