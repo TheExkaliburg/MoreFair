@@ -4,7 +4,7 @@ description: 'A list of all changes made to the game'
 
 # Changelog
 
-## 3.1.0 [MINOR]: New Ladder Generation Logic.
+## 3.1.0 [MINOR]: Refactorings, Migrations and Security Fixes.
 
 ### Balancing
 
@@ -14,14 +14,14 @@ description: 'A list of all changes made to the game'
 
 ### Improvements
 
-- Ladder Generation has been reworked to be generated at the start of the round, instead of 1 by 1.
 - Updating some dependencies/frameworks to fix some security issues. This causes everyone to be
   logged out and require a new login.
+- Ladder Generation has been reworked to be generated at the start of the round, instead of 1 by 1.
 - Small improvement to the eta at first place, thanks to ckb625.
 
 ### Bugfixes
 
-- Ordering of the promotion flag vs creating your ranker.
+- Ordering of setting the promotion flag vs. creating your ranker.
 
 <br><br><br><br><br><br><br>
 
@@ -148,7 +148,7 @@ I'll deliberately stay vague, so the community can figure details out.
 ### Features:
 
 - A new season approaches! Asshole points will be reset and the round numbers will start again from
-  1.
+    1.
 - Players can now choose to devote a portion of their vinegar generation to create wine at a higher
   rate instead.
 - Players can now choose a percentage of their vinegar to throw, from 50% to 100%, in 1% increments.
