@@ -145,7 +145,7 @@ class LadderEventServiceTest {
       assertThat(ranker.getBias()).isEqualTo(1);
     } else {
       assertThat(ranker.getMultiplier()).isEqualTo(2);
-      assertThat(ranker.getPower()).isEqualTo(BigInteger.ZERO);
+      assertThat(ranker.getPower()).isEqualTo(BigInteger.ONE);
     }
   }
 
