@@ -23,7 +23,7 @@ function resetCache() {
 
 function getPowerGainDifferenceToRank(ranker: Ranker, targetRank = 1): Decimal {
   const rank = ranker.rank;
-  if (rank < 1 || !isFinite(rank)) return new Decimal(0);
+  if (rank <= 1 || !isFinite(rank)) return new Decimal(0);
 
   const powerGainAtStart = ranker.getPowerPerSecond(rank);
   const powerGainAtEnd = ranker.getPowerPerSecond(targetRank + 1);
