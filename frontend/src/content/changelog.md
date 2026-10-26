@@ -7,7 +7,9 @@ description: 'A list of all changes made to the game'
 ## 3.1.2 [PATCH]: Frontend Performance Improvements
 
 ### Improvements
-- Only formatting/calculating eta for rankers when visible on the screen. This should improve client side performance, especially on ladders with a lot of rankers.
+- Only rendering rankers when visible on the screen. This should improve client side performance, especially on ladders with a lot of rankers.
+- The Follow Ranker option now disables manual scrolling.
+- Some very slight improvements/fixes for the formatting of etas.
 
 ## 3.1.1 [PATCH]: Performance + Cache Control Hotfix.
 

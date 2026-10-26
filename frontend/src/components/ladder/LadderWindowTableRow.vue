@@ -258,36 +258,6 @@ const etaPercentage = computed<number>(() => {
 
   return -gradientPercent;
 });
-
-onMounted(() => {
-  if (
-    isYou.value &&
-    optionsStore.state.ladder.followOwnRanker.value &&
-    el.value &&
-    props.container
-  ) {
-    requestAnimationFrame(() => {
-      if (el.value && props.container) {
-        scrollToCenter(el.value, props.container);
-      }
-    });
-  }
-});
-
-onUpdated(() => {
-  if (
-    isYou.value &&
-    optionsStore.state.ladder.followOwnRanker.value &&
-    el.value &&
-    props.container
-  ) {
-    requestAnimationFrame(() => {
-      if (el.value && props.container) {
-        scrollToCenter(el.value, props.container);
-      }
-    });
-  }
-});
 </script>
 
 <style lang="scss" scoped>
