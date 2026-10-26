@@ -21,6 +21,29 @@ function resetCache() {
   computedTrigger.value = 1 - computedTrigger.value;
 }
 
+function findFirstRankerBelowPoints(
+  rankers: readonly Ranker[],
+  target: Decimal,
+): Ranker | undefined {
+  const firstRanker = rankers[0];
+  if (firstRanker === undefined) return undefined;
+  // Promotion targets usually exceed the leader's points.
+  if (firstRanker.points.cmp(target) < 0) return firstRanker;
+
+  // Rankers are ordered by descending points.
+  let low = 1;
+  let high = rankers.length;
+  while (low < high) {
+    const mid = Math.floor((low + high) / 2);
+    if (rankers[mid]!.points.cmp(target) < 0) {
+      high = mid;
+    } else {
+      low = mid + 1;
+    }
+  }
+  return rankers[low];
+}
+
 function getPowerGainDifferenceToRank(ranker: Ranker, targetRank = 1): Decimal {
   const rank = ranker.rank;
   if (rank <= 1 || !isFinite(rank)) return new Decimal(0);
@@ -107,8 +130,9 @@ export const useEta = (ranker: Ranker) => {
     // this theoretically shouldn't be the case since we check if the points are under us already, but typescripts needs it explicitly
     let targetRank = 1;
     if (ladder.state.rankers.length > 0) {
-      const pseudoRanker = ladder.state.rankers.find(
-        (r) => r.points.cmp(target) < 0,
+      const pseudoRanker = findFirstRankerBelowPoints(
+        ladder.state.rankers,
+        target,
       );
 
       if (pseudoRanker === undefined || pseudoRanker.rank >= ranker.rank) {
