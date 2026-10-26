@@ -4,6 +4,13 @@ description: 'A list of all changes made to the game'
 
 # Changelog
 
+## 3.1.1 [PATCH]: Performance + Cache Control Hotfix.
+
+### Improvements
+- optimized the handleEvents() logic, to reduce the time between sending an event and having it processed by the client.
+- Added cache-control headers to the static files, to reduce the amount of requests made by the client.
+
+
 ## 3.1.0 [MINOR]: Refactorings, Migrations and Security Fixes.
 
 ### Balancing
