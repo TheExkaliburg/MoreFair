@@ -7,16 +7,20 @@ description: 'A list of all changes made to the game'
 ## 3.1.2 [PATCH]: Frontend Performance Improvements
 
 ### Improvements
-- Only rendering rankers when visible on the screen. This should improve client side performance, especially on ladders with a lot of rankers.
+
+- Only rendering rankers when visible on the screen. This should improve client side performance,
+  especially on ladders with a lot of rankers.
 - The Follow Ranker option now disables manual scrolling.
-- Some very slight improvements/fixes for the formatting of etas.
+- Improvements and fixes for the formatting of etas, especially for very big values.
 
 ## 3.1.1 [PATCH]: Performance + Cache Control Hotfix.
 
 ### Improvements
-- optimized the handleEvents() logic, to reduce the time between sending an event and having it processed by the client.
-- Added cache-control headers to the static files, to reduce the amount of requests made by the client.
 
+- optimized the handleEvents() logic, to reduce the time between sending an event and having it
+  processed by the client.
+- Added cache-control headers to the static files, to reduce the amount of requests made by the
+  client.
 
 ## 3.1.0 [MINOR]: Refactorings, Migrations and Security Fixes.
 
