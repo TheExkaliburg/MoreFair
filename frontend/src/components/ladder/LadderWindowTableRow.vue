@@ -75,20 +75,20 @@
       ><span v-if="optionsStore.state.ladder.showBiasAndMulti.value"
         >[<span
           :class="{
-            'text-eta-best': canBuyBias && showMultiBiasColor,
+            'text-eta-best': showMultiBiasColor && canBuyBias,
             'text-eta-mid':
-              !canBuyBias && canAlmostBuyBias && showMultiBiasColor,
+              showMultiBiasColor && !canBuyBias && canAlmostBuyBias,
             'text-eta-worst':
-              !canBuyBias && !canAlmostBuyBias && showMultiBiasColor,
+              showMultiBiasColor && !canBuyBias && !canAlmostBuyBias,
           }"
           >+{{ formattedBias }}</span
         ><span
           :class="{
-            'text-eta-best': canBuyMulti && showMultiBiasColor,
+            'text-eta-best': showMultiBiasColor && canBuyMulti,
             'text-eta-mid':
-              !canBuyMulti && canAlmostBuyMulti && showMultiBiasColor,
+              showMultiBiasColor && !canBuyMulti && canAlmostBuyMulti,
             'text-eta-worst':
-              !canBuyMulti && !canAlmostBuyMulti && showMultiBiasColor,
+              showMultiBiasColor && !canBuyMulti && !canAlmostBuyMulti,
           }"
         >
           x{{ formattedMulti }}</span
@@ -127,8 +127,11 @@ const ladderStore = useLadderStore();
 const optionsStore = useOptionsStore();
 const ladderUtils = useLadderUtils();
 
-const el = ref<HTMLElement | null>();
-const isVisible = useElementVisibility(el.value);
+const el = ref<HTMLElement | null>(null);
+const isVisible = useElementVisibility(el, {
+  scrollTarget: computed(() => props.container),
+  rootMargin: "200px 0px",
+});
 
 const isYou = computed(
   () => props.ranker.accountId === ladderStore.getters.yourRanker?.accountId,
@@ -141,80 +144,83 @@ const tableSpaceStyles = useTableSpaceStyles();
 const tableSpace = useTableSpace();
 
 const formattedPowerPerSec = computed<string>(() => {
-  if (!isVisible) return "";
+  if (!isVisible.value) return "";
   if (!props.ranker.growing) return "";
   return `(+${useFormatter(props.ranker.getPowerPerSecond())}/s) `;
 });
 
 const formattedBias = computed<string>(() => {
-  if (!isVisible) return "";
+  if (!isVisible.value) return "";
   return props.ranker.bias.toString().padStart(2, "0");
 });
 
 const formattedMulti = computed<string>(() => {
-  if (!isVisible) return "";
+  if (!isVisible.value) return "";
   return props.ranker.multi.toString().padStart(2, "0");
 });
 
 const formattedPower = computed<string>(() => {
-  if (!isVisible) return "";
+  if (!isVisible.value) return "";
   return useFormatter(props.ranker.power);
 });
 const formattedPoints = computed<string>(() => {
-  if (!isVisible) return "";
+  if (!isVisible.value) return "";
   return useFormatter(props.ranker.points);
 });
 
 const etaToNextLadderFormatted = computed<string>(() => {
-  if (!isVisible) return "";
+  if (!isVisible.value) return "";
   return useTimeFormatter(etaToNextLadder.value);
 });
 
 const etaToNextLadder = computed<number>(() => {
+  if (!isVisible.value) return Infinity;
   return useEta(props.ranker).toPromote();
 });
 
 const etaToYourRankerFormatted = computed<string>(() => {
-  if (!isVisible) return "";
+  if (!isVisible.value) return "";
   return useTimeFormatter(etaToYourRanker.value);
 });
 
 const etaToYourRanker = computed<number>(() => {
+  if (!isVisible.value) return Infinity;
   if (ladderStore.getters.yourRanker === undefined) return Infinity;
   return useEta(props.ranker).toRanker(ladderStore.getters.yourRanker);
 });
 
 const canBuyBias = computed<boolean>(() => {
-  if (!isVisible) return false;
+  if (!isVisible.value) return false;
   const upgradeCost = ladderUtils.getNextUpgradeCost(props.ranker.bias);
   return upgradeCost.cmp(props.ranker.points) <= 0;
 });
 
 const canAlmostBuyBias = computed<boolean>(() => {
-  if (!isVisible) return false;
+  if (!isVisible.value) return false;
   const upgradeCost = ladderUtils.getNextUpgradeCost(props.ranker.bias);
   return useEta(props.ranker).toPoints(upgradeCost) < 5 * 60;
 });
 
 const canBuyMulti = computed<boolean>(() => {
-  if (!isVisible) return false;
+  if (!isVisible.value) return false;
   const upgradeCost = ladderUtils.getNextUpgradeCost(props.ranker.multi);
   return upgradeCost.cmp(props.ranker.power) <= 0;
 });
 
 const canAlmostBuyMulti = computed<boolean>(() => {
-  if (!isVisible) return false;
+  if (!isVisible.value) return false;
   const upgradeCost = ladderUtils.getNextUpgradeCost(props.ranker.multi);
   return useEta(props.ranker).toPower(upgradeCost) < 5 * 60;
 });
 
 const showMultiBiasColor = computed<boolean>(() => {
-  return optionsStore.state.ladder.biasMultiColors.value;
+  return isVisible.value && optionsStore.state.ladder.biasMultiColors.value;
 });
 
 // should return the value from fastest (0%) to as long as it takes for the top (50%) to double as long (100%)
 // as a negative, because the animation-delay only sets the start value if the delay is negative, otherwise it's an actual delay
 const etaPercentage = computed<number>(() => {
+  if (!isVisible.value) return 1;
   if (optionsStore.state.ladder.etaColors.value === EtaColorType.OFF) return 1;
   if (!props.ranker.growing) return 1;
   if (isYou.value) return 1;
@@ -285,6 +291,11 @@ onUpdated(() => {
 </script>
 
 <style lang="scss" scoped>
+.grid {
+  // Keep empty offscreen grid rows at the text-sm line height.
+  grid-auto-rows: minmax(1.25rem, auto);
+}
+
 @keyframes etaProgress {
   0% {
     color: var(--eta-best-color);

@@ -5,6 +5,7 @@ import Decimal from "break_infinity.js";
 import { useEta } from "~/composables/useEta";
 import { useLadderStore } from "~/store/ladder";
 import { Ranker } from "~/store/entities/ranker";
+import { useTimeFormatter } from "~/composables/useFormatter";
 
 vi.mock("~/store/ladder", async () => {
   const { defineStore } = await import("pinia");
@@ -49,5 +50,13 @@ describe("a 2 person ladder", () => {
   test("example", () => {
     const eta = useEta(ladderStore.state.rankers[0]!);
     expect(eta.toPoints(new Decimal(6))).toBe(4);
+  });
+
+  test("formats a large finite points ETA without exceeding Date limits", () => {
+    const eta = useEta(ladderStore.state.rankers[0]!);
+    const seconds = eta.toPoints(new Decimal(1e40));
+    expect(Number.isFinite(seconds)).toBe(true);
+    expect(seconds).toBeGreaterThan(8_640_000_000_000);
+    expect(() => useTimeFormatter(seconds)).not.toThrow();
   });
 });

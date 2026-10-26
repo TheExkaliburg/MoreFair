@@ -4,6 +4,11 @@ description: 'A list of all changes made to the game'
 
 # Changelog
 
+## 3.1.2 [PATCH]: Frontend Performance Improvements
+
+### Improvements
+- Only formatting/calculating eta for rankers when visible on the screen. This should improve client side performance, especially on ladders with a lot of rankers.
+
 ## 3.1.1 [PATCH]: Performance + Cache Control Hotfix.
 
 ### Improvements

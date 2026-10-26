@@ -7,6 +7,7 @@ export enum NumberFormatterType {
   SMALL,
 }
 
+const defaultMinSuffix = 1e6;
 const numberFormatterMap = new Map<NumberFormatterType, any>();
 numberFormatterMap.set(
   NumberFormatterType.DEFAULT,
@@ -16,7 +17,7 @@ numberFormatterMap.set(
     format: "hybrid",
     sigfigs: 5,
     flavor: "short",
-    minSuffix: 1e6,
+    minSuffix: defaultMinSuffix,
     maxSmall: 0,
     default: 0,
   }),
@@ -68,15 +69,34 @@ export const useFormatter = (
 };
 
 export const useTimeFormatter = (seconds: number) => {
+  if (Number.isNaN(seconds)) {
+    console.error("Cannot format a NaN duration", seconds);
+    return "?";
+  }
   seconds = Math.ceil(seconds);
   if (seconds === Infinity) return "∞";
   if (seconds < 1) return "<1s";
   if (seconds < 60) return seconds + "s";
-  if (seconds < 3600)
-    return new Date(seconds * 1000).toISOString().substring(14, 19);
 
-  const hours = (seconds - (seconds % 3600)) / 3600;
-  return hours + ":" + new Date(seconds * 1000).toISOString().substring(14, 19);
+  const minutes = Math.floor((seconds % 3600) / 60)
+    .toString()
+    .padStart(2, "0");
+  const remainingSeconds = (seconds % 60).toString().padStart(2, "0");
+  const minutesAndSeconds = `${minutes}:${remainingSeconds}`;
+  if (seconds < 3600) return minutesAndSeconds;
+
+  const hours = Math.floor((seconds % 86400) / 3600);
+  if (seconds < 86400) return `${hours}:${minutesAndSeconds}`;
+
+  const secondsPerYear = 365 * 86400;
+  const days = Math.floor((seconds % secondsPerYear) / 86400);
+  const daysAndTime = `${days}d ${hours.toString().padStart(2, "0")}:${minutesAndSeconds}`;
+  if (seconds < secondsPerYear) return daysAndTime;
+
+  const years = Math.floor(seconds / secondsPerYear);
+  const formattedYears = useFormatter(years);
+  if (years >= defaultMinSuffix) return `${formattedYears} years`;
+  return `${formattedYears}y ${days}d`;
 };
 
 export const useDateFormatter = (
