@@ -6,8 +6,8 @@ import { useStomp } from "~/composables/useStomp";
 import { useGrapesStore } from "~/store/grapes";
 
 const etaRankerCache = new Map<number, Map<number, number>>();
-const etaPointsCache = new Map<number, Map<Decimal, number>>();
-const etaPowerCache = new Map<number, Map<Decimal, number>>();
+const etaPointsCache = new Map<number, Map<string, number>>();
+const etaPowerCache = new Map<number, Map<string, number>>();
 
 const computedTrigger = ref<number>(0);
 
@@ -19,6 +19,11 @@ function resetCache() {
   etaPointsCache.clear();
   etaPowerCache.clear();
   computedTrigger.value = 1 - computedTrigger.value;
+}
+
+function getTargetCacheKey(target: Decimal): string {
+  // Preserve Decimal precision and range without converting to a native number.
+  return `${target.mantissa}:${target.exponent}`;
 }
 
 function findFirstRankerBelowPoints(
@@ -115,12 +120,13 @@ export const useEta = (ranker: Ranker) => {
       console.error("toPoints", ranker, target);
     if (target.cmp(ranker.points) <= 0) return 0;
 
+    const targetKey = getTargetCacheKey(target);
     let cachedMap = etaPointsCache.get(ranker.accountId);
     if (cachedMap !== undefined) {
-      const cachedValue = cachedMap.get(target);
+      const cachedValue = cachedMap.get(targetKey);
       if (cachedValue !== undefined) return cachedValue;
     } else {
-      cachedMap = new Map<Decimal, number>();
+      cachedMap = new Map<string, number>();
       etaPointsCache.set(ranker.accountId, cachedMap);
     }
 
@@ -150,7 +156,7 @@ export const useEta = (ranker: Ranker) => {
       speedDiff,
       pointsDiff,
     ).toNumber();
-    cachedMap.set(target, result);
+    cachedMap.set(targetKey, result);
     return result;
   }
 
@@ -158,12 +164,13 @@ export const useEta = (ranker: Ranker) => {
     // To make the computed always check this value, so it recalculates after a tick
     if (computedTrigger.value === Infinity)
       console.error("toPoints", ranker, target);
+    const targetKey = getTargetCacheKey(target);
     let cachedMap = etaPowerCache.get(ranker.accountId);
     if (cachedMap !== undefined) {
-      const cachedValue = cachedMap.get(target);
+      const cachedValue = cachedMap.get(targetKey);
       if (cachedValue !== undefined) return cachedValue;
     } else {
-      cachedMap = new Map<Decimal, number>();
+      cachedMap = new Map<string, number>();
       etaPowerCache.set(ranker.accountId, cachedMap);
     }
 
@@ -171,7 +178,7 @@ export const useEta = (ranker: Ranker) => {
       .sub(ranker.power)
       .div(ranker.getPowerPerSecond())
       .toNumber();
-    cachedMap.set(target, result);
+    cachedMap.set(targetKey, result);
     return result;
   }
 

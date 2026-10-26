@@ -24,6 +24,7 @@
     "clean-install::win": "pnpm run clean::win & pnpm install",
     "test": "vitest",
     "test:run": "vitest --run",
+    "test:bench": "vitest run --config vitest.bench.config.mts",
     "test:e2e": "vitest --run --config vitest.e2e.config.mts"
   },
   "devDependencies": {
