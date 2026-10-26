@@ -4,22 +4,20 @@ import { useLadderStore } from "~/store/ladder";
 import { useLadderUtils } from "~/composables/useLadderUtils";
 import { useStomp } from "~/composables/useStomp";
 import { useGrapesStore } from "~/store/grapes";
-
-const etaRankerCache = new Map<number, Map<number, number>>();
-const etaPointsCache = new Map<number, Map<string, number>>();
-const etaPowerCache = new Map<number, Map<string, number>>();
-
-const computedTrigger = ref<number>(0);
+import {
+  computedTrigger,
+  etaRankerCache,
+  etaPointsCache,
+  etaPowerCache,
+  resetEtaCache,
+} from "~/utils/etaCache";
 
 const stomp = useStomp();
-stomp.addCallback(stomp.callbacks.onTick, "fair_eta_cache_reset", resetCache);
-
-function resetCache() {
-  etaRankerCache.clear();
-  etaPointsCache.clear();
-  etaPowerCache.clear();
-  computedTrigger.value = 1 - computedTrigger.value;
-}
+stomp.addCallback(
+  stomp.callbacks.onTick,
+  "fair_eta_cache_reset",
+  resetEtaCache,
+);
 
 function getTargetCacheKey(target: Decimal): string {
   // Preserve Decimal precision and range without converting to a native number.

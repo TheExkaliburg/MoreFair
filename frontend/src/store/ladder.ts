@@ -18,6 +18,7 @@ import { SOUNDS, useSound } from "~/composables/useSound";
 import { useOptionsStore } from "~/store/options";
 import { useRoundStore } from "~/store/round";
 import { VinegarSuccessType } from "~/store/grapes";
+import { resetEtaCache } from "~/utils/etaCache";
 import {
   useAutoPromoteTour,
   useBiasedTour,
@@ -152,6 +153,7 @@ export const useLadderStore = defineStore("ladder", () => {
         state.number = data.number;
         state.scaling = data.scaling;
         state.basePointsToPromote = new Decimal(data.basePointsToPromote);
+        resetEtaCache();
 
         stomp.addCallback(
           stomp.callbacks.onLadderEvent,
