@@ -57,6 +57,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -86,6 +88,7 @@ public class LadderEventServiceImpl implements LadderEventService {
   private final UpgradeUtils upgradeUtils;
   private final Gson gson;
   private final CriticalRegion semaphore = new CriticalRegion(1);
+  private static final int MAX_PASSES_PER_TICK = 3;
   private final Map<Integer, List<QueuedEvent>> eventMap = new HashMap<>();
 
   private record QueuedEvent(Event<LadderEventType> event, UserEventMetadata metadata) {
@@ -93,50 +96,52 @@ public class LadderEventServiceImpl implements LadderEventService {
 
   @Override
   public void handleEvents() throws InterruptedException {
-    try (var ignored = semaphore.enter()) {
-      RoundEntity currentRound = roundService.getCurrentRound();
-
-      for (int i = 1; i <= ladderService.findAllByRound(currentRound).size(); i++) {
-        LadderEntity ladder = ladderService.findCurrentLadderWithNumber(i).orElseThrow();
-        List<QueuedEvent> events =
-            eventMap.computeIfAbsent(ladder.getNumber(), k -> new ArrayList<>());
-        List<QueuedEvent> eventsToBeRemoved = new ArrayList<>();
-        for (QueuedEvent queued : events) {
-          Event<LadderEventType> e = queued.event();
-            switch (e.getEventType()) {
-                case LadderEventType.BUY_BIAS -> {
-                    if (!buyBias(e, ladder, queued.metadata())) {
-                        eventsToBeRemoved.add(queued);
-                    }
-                }
-                case LadderEventType.BUY_MULTI -> {
-                    if (!buyMulti(e, ladder, queued.metadata())) {
-                        eventsToBeRemoved.add(queued);
-                    }
-                }
-                case LadderEventType.PROMOTE -> {
-                    if (!promote(e, ladder, queued.metadata())) {
-                        eventsToBeRemoved.add(queued);
-                    }
-                }
-                case LadderEventType.THROW_VINEGAR -> {
-                    if (!throwVinegar(e, ladder, queued.metadata())) {
-                        eventsToBeRemoved.add(queued);
-                    }
-                }
-                case LadderEventType.BUY_AUTO_PROMOTE -> {
-                    if (!buyAutoPromote(e, ladder, queued.metadata())) {
-                        eventsToBeRemoved.add(queued);
-                    }
-                }
-                default -> throw new IllegalStateException("Unexpected value: " + e.getEventType());
-            }
-        }
-        for (QueuedEvent e : eventsToBeRemoved) {
-          events.remove(e);
-        }
+    // The queue is only locked while copying it, so new events can be added while a batch is
+    // handled. Late events are picked up by the next pass, which keeps them in the current tick.
+    for (int pass = 0; pass < MAX_PASSES_PER_TICK; pass++) {
+      Map<Integer, List<QueuedEvent>> batch = drainQueue();
+      if (batch.isEmpty()) {
+        return;
       }
-      eventMap.values().forEach(List::clear);
+      handleBatch(batch);
+    }
+  }
+
+  private Map<Integer, List<QueuedEvent>> drainQueue() throws InterruptedException {
+    try (var ignored = semaphore.enter()) {
+      Map<Integer, List<QueuedEvent>> batch = new TreeMap<>();
+      eventMap.forEach((ladderNumber, events) -> {
+        if (!events.isEmpty()) {
+          batch.put(ladderNumber, new ArrayList<>(events));
+          events.clear();
+        }
+      });
+      return batch;
+    }
+  }
+
+  private void handleBatch(Map<Integer, List<QueuedEvent>> batch) {
+    batch.forEach((ladderNumber, events) -> {
+      Optional<LadderEntity> ladder = ladderService.findCurrentLadderWithNumber(ladderNumber);
+      if (ladder.isEmpty()) {
+        log.warn("[L{}] Dropping {} events for a missing ladder", ladderNumber, events.size());
+        return;
+      }
+      for (QueuedEvent queued : events) {
+        handleEvent(queued, ladder.get());
+      }
+    });
+  }
+
+  private void handleEvent(QueuedEvent queued, LadderEntity ladder) {
+    Event<LadderEventType> e = queued.event();
+    switch (e.getEventType()) {
+      case LadderEventType.BUY_BIAS -> buyBias(e, ladder, queued.metadata());
+      case LadderEventType.BUY_MULTI -> buyMulti(e, ladder, queued.metadata());
+      case LadderEventType.PROMOTE -> promote(e, ladder, queued.metadata());
+      case LadderEventType.THROW_VINEGAR -> throwVinegar(e, ladder, queued.metadata());
+      case LadderEventType.BUY_AUTO_PROMOTE -> buyAutoPromote(e, ladder, queued.metadata());
+      default -> throw new IllegalStateException("Unexpected value: " + e.getEventType());
     }
   }
 
@@ -179,7 +184,7 @@ public class LadderEventServiceImpl implements LadderEventService {
       BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getScaling(), ranker.getBias(),
           ladder.getTypes());
       if (ranker.getPoints().compareTo(cost) >= 0) {
-        userEventService.record(event.getAccountId(), event.getEventType(), metadata);
+        userEventService.recordAsync(event.getAccountId(), event.getEventType(), metadata);
         ranker.setPoints(BigInteger.ZERO);
         ranker.setBias(ranker.getBias() + 1);
         wsUtils.convertAndSendToTopicWithNumber(LadderController.TOPIC_EVENTS_DESTINATION,
@@ -214,7 +219,7 @@ public class LadderEventServiceImpl implements LadderEventService {
       BigInteger cost = upgradeUtils.buyUpgradeCost(ladder.getScaling(), ranker.getMultiplier(),
           ladder.getTypes());
       if (ranker.getPower().compareTo(cost) >= 0) {
-        userEventService.record(event.getAccountId(), event.getEventType(), metadata);
+        userEventService.recordAsync(event.getAccountId(), event.getEventType(), metadata);
         ranker.setPoints(BigInteger.ZERO);
         ranker.setPower(BigInteger.ONE);
         ranker.setBias(0);
@@ -251,7 +256,7 @@ public class LadderEventServiceImpl implements LadderEventService {
       BigInteger cost = upgradeUtils.buyAutoPromoteCost(roundService.getCurrentRound(), ladder,
           ranker.getRank());
       if (ladder.getTypes().contains(LadderType.FREE_AUTO)) {
-        userEventService.record(event.getAccountId(), event.getEventType(), metadata);
+        userEventService.recordAsync(event.getAccountId(), event.getEventType(), metadata);
         ranker.setAutoPromote(true);
 
         wsUtils.convertAndSendToUser(account.getUuid(), LadderController.PRIVATE_EVENTS_DESTINATION,
@@ -261,7 +266,7 @@ public class LadderEventServiceImpl implements LadderEventService {
       }
 
       if (rankerUtilsService.canBuyAutoPromote(ranker)) {
-        userEventService.record(event.getAccountId(), event.getEventType(), metadata);
+        userEventService.recordAsync(event.getAccountId(), event.getEventType(), metadata);
         ranker.setGrapes(ranker.getGrapes().subtract(cost));
         ranker.setAutoPromote(true);
         wsUtils.convertAndSendToUser(account.getUuid(), LadderController.PRIVATE_EVENTS_DESTINATION,
@@ -295,7 +300,7 @@ public class LadderEventServiceImpl implements LadderEventService {
       if (rankerUtilsService.canPromote(ranker)) {
         // TODO: Make promotion atomic, including cached state.
         RoundEntity currentRound = roundService.getCurrentRound();
-        userEventService.record(event.getAccountId(), event.getEventType(), metadata);
+        userEventService.recordAsync(event.getAccountId(), event.getEventType(), metadata);
         log.info("[L{}] Promotion for {} (#{})", ladder.getNumber(), account.getDisplayName(),
             account.getId());
         RankerEntity newRanker = rankerService.createRankerOnLadder(account, ladder.getNumber() + 1)

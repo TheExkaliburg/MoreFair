@@ -5,7 +5,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -90,8 +92,7 @@ class LadderEventServiceTest {
     round = new RoundEntity();
     round.setId(20L);
 
-    when(roundService.getCurrentRound()).thenReturn(round);
-    when(ladderService.findAllByRound(round)).thenReturn(List.of(ladder));
+    lenient().when(roundService.getCurrentRound()).thenReturn(round);
     when(ladderService.findCurrentLadderWithNumber(1)).thenReturn(Optional.of(ladder));
   }
 
@@ -134,12 +135,12 @@ class LadderEventServiceTest {
       assertThat(ranker.getBias()).isZero();
       assertThat(ranker.getMultiplier()).isEqualTo(1);
       return null;
-    }).when(userEventService).record(7L, type, METADATA);
+    }).when(userEventService).recordAsync(7L, type, METADATA);
 
     service.handleEvents();
     service.handleEvents();
 
-    verify(userEventService).record(7L, type, METADATA);
+    verify(userEventService).recordAsync(7L, type, METADATA);
     assertThat(ranker.getPoints()).isEqualTo(BigInteger.ZERO);
     if (type == LadderEventType.BUY_BIAS) {
       assertThat(ranker.getBias()).isEqualTo(1);
@@ -164,12 +165,12 @@ class LadderEventServiceTest {
       assertThat(ranker.isAutoPromote()).isFalse();
       assertThat(ranker.getGrapes()).isEqualTo(BigInteger.valueOf(100));
       return null;
-    }).when(userEventService).record(7L, LadderEventType.BUY_AUTO_PROMOTE, METADATA);
+    }).when(userEventService).recordAsync(7L, LadderEventType.BUY_AUTO_PROMOTE, METADATA);
     service.addEvent(1, new Event<>(LadderEventType.BUY_AUTO_PROMOTE, 7L), METADATA);
 
     service.handleEvents();
 
-    verify(userEventService).record(7L, LadderEventType.BUY_AUTO_PROMOTE, METADATA);
+    verify(userEventService).recordAsync(7L, LadderEventType.BUY_AUTO_PROMOTE, METADATA);
     assertThat(ranker.isAutoPromote()).isTrue();
     assertThat(ranker.getGrapes()).isEqualTo(BigInteger.valueOf(free ? 100 : 90));
   }
@@ -196,7 +197,7 @@ class LadderEventServiceTest {
       assertThat(ranker.isPromoted()).isFalse();
       verify(rankerService, never()).createRankerOnLadder(any(), anyInt());
       return null;
-    }).when(userEventService).record(7L, LadderEventType.PROMOTE, metadata);
+    }).when(userEventService).recordAsync(7L, LadderEventType.PROMOTE, metadata);
     Event<LadderEventType> event = new Event<>(LadderEventType.PROMOTE, 7L);
     if (userAction) {
       service.addEvent(1, event, METADATA);
@@ -207,7 +208,7 @@ class LadderEventServiceTest {
     service.handleEvents();
 
     assertThat(ranker.isPromoted()).isTrue();
-    verify(userEventService).record(7L, LadderEventType.PROMOTE, metadata);
+    verify(userEventService).recordAsync(7L, LadderEventType.PROMOTE, metadata);
     verify(wsUtils).convertAndSendToTopicWithNumber(
         LadderController.TOPIC_EVENTS_DESTINATION, ladder.getNumber(), event);
     verify(accountService).save(account);
@@ -223,5 +224,38 @@ class LadderEventServiceTest {
 
     verify(vinegarThrowService).throwVinegar(event, METADATA);
     verifyNoInteractions(userEventService);
+  }
+
+  @Test
+  void eventsAddedWhileHandlingAreHandledInTheSameCall() throws Exception {
+    Event<LadderEventType> first = new Event<>(LadderEventType.THROW_VINEGAR, 7L, 50);
+    Event<LadderEventType> late = new Event<>(LadderEventType.THROW_VINEGAR, 8L, 50);
+    service.addEvent(1, first, METADATA);
+    when(vinegarThrowService.throwVinegar(first, METADATA)).thenAnswer(invocation -> {
+      service.addEvent(1, late, METADATA);
+      return Optional.empty();
+    });
+    when(vinegarThrowService.throwVinegar(late, METADATA)).thenReturn(Optional.empty());
+
+    service.handleEvents();
+
+    verify(vinegarThrowService).throwVinegar(first, METADATA);
+    verify(vinegarThrowService).throwVinegar(late, METADATA);
+  }
+
+  @Test
+  void handledEventsAreNotHandledAgainAndLateEventsAreCappedToThreePasses() throws Exception {
+    Event<LadderEventType> event = new Event<>(LadderEventType.THROW_VINEGAR, 7L, 50);
+    service.addEvent(1, event, METADATA);
+    when(vinegarThrowService.throwVinegar(event, METADATA)).thenAnswer(invocation -> {
+      service.addEvent(1, event, METADATA);
+      return Optional.empty();
+    });
+
+    service.handleEvents();
+    verify(vinegarThrowService, times(3)).throwVinegar(event, METADATA);
+
+    service.handleEvents();
+    verify(vinegarThrowService, times(6)).throwVinegar(event, METADATA);
   }
 }

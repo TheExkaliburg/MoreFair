@@ -2,6 +2,8 @@ package de.kaliburg.morefair.moderation.events.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.kaliburg.morefair.account.model.AccountEntity;
@@ -42,8 +44,14 @@ class UserEventServiceTest {
   private LadderService ladderService;
   @Mock
   private RoundService roundService;
-  @InjectMocks
+  private final List<Runnable> submitted = new java.util.ArrayList<>();
   private UserEventServiceImpl service;
+
+  @org.junit.jupiter.api.BeforeEach
+  void setUp() {
+    service = new UserEventServiceImpl(repository, accountService, rankerService, ladderService,
+        roundService, submitted::add);
+  }
 
   @ParameterizedTest
   @CsvSource({
@@ -136,5 +144,52 @@ class UserEventServiceTest {
     request.setScreenX(120);
     request.setScreenY(240);
     return request;
+  }
+
+  @Test
+  void recordAsync_capturesSnapshotBeforeReturningAndPersistsViaTheExecutor() {
+    AccountEntity account = new AccountEntity();
+    account.setId(7L);
+    RankerEntity ranker = RankerEntity.builder()
+        .accountId(7L).ladderId(12L).rank(2).bias(4).build();
+    LadderEntity ladder = LadderEntity.builder().id(12L).roundId(20L).number(1).scaling(3)
+        .basePointsToPromote(BigInteger.ONE).build();
+    RoundEntity round = RoundEntity.builder().id(20L).seasonId(3L).number(5)
+        .assholeLadderNumber(100).basePointsRequirement(BigInteger.ONE)
+        .percentageOfAdditionalAssholes(0F).build();
+    when(accountService.findById(7L)).thenReturn(Optional.of(account));
+    when(rankerService.findHighestActiveRankerOfAccount(account)).thenReturn(Optional.of(ranker));
+    when(roundService.getCurrentRound()).thenReturn(round);
+    when(ladderService.findLadderById(12L)).thenReturn(Optional.of(ladder));
+    when(rankerService.findAllByLadderId(12L)).thenReturn(List.of(ranker));
+    when(repository.save(any(UserEventEntity.class)))
+        .thenAnswer(invocation -> invocation.getArgument(0));
+
+    service.recordAsync(7L, LadderEventType.BUY_BIAS, new UserEventMetadata(request()));
+    ranker.setBias(5);
+
+    verify(repository, never()).save(any());
+    assertThat(submitted).hasSize(1);
+    submitted.getFirst().run();
+    var captor = org.mockito.ArgumentCaptor.forClass(UserEventEntity.class);
+    verify(repository).save(captor.capture());
+    assertThat(captor.getValue().getSnapshot().ranker().bias()).isEqualTo(4);
+    assertThat(captor.getValue().getEventType()).isEqualTo("BUY_BIAS");
+  }
+
+  @Test
+  void recordAsync_doesNotThrowWhenTheExecutorRejects() {
+    AccountEntity account = new AccountEntity();
+    account.setId(7L);
+    when(accountService.findById(7L)).thenReturn(Optional.of(account));
+    when(rankerService.findHighestActiveRankerOfAccount(account)).thenReturn(Optional.empty());
+    var rejecting = new UserEventServiceImpl(repository, accountService, rankerService,
+        ladderService, roundService, r -> {
+          throw new java.util.concurrent.RejectedExecutionException("full");
+        });
+
+    rejecting.recordAsync(7L, LadderEventType.BUY_BIAS, null);
+
+    verify(repository, never()).save(any());
   }
 }

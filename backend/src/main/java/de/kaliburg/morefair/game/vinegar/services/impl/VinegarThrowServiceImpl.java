@@ -74,7 +74,7 @@ public class VinegarThrowServiceImpl implements VinegarThrowService {
     }
 
     if (rankerUtilsService.canThrowVinegarAt(throwerRanker, targetRanker, percentage)) {
-      userEventService.record(throwerAccount.getId(), event.getEventType(), metadata);
+      userEventService.recordAsync(throwerAccount.getId(), event.getEventType(), metadata);
       BigInteger throwerVinegar = throwerRanker.getVinegar();
       BigInteger thrownVinegar = throwerVinegar
           .multiply(BigInteger.valueOf(percentage))

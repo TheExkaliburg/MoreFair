@@ -111,13 +111,13 @@ class VinegarThrowServiceTest {
       assertThat(thrower.getVinegar()).isEqualTo(BigInteger.valueOf(100));
       assertThat(target.getVinegar()).isEqualTo(BigInteger.valueOf(500));
       return null;
-    }).when(userEventService).record(7L, LadderEventType.THROW_VINEGAR, METADATA);
+    }).when(userEventService).recordAsync(7L, LadderEventType.THROW_VINEGAR, METADATA);
 
     var result = service.throwVinegar(new Event<>(LadderEventType.THROW_VINEGAR, 7L, 100), METADATA);
 
     assertThat(result).isPresent();
     assertThat(result.get().getSuccessType()).isEqualTo(VinegarSuccessType.DEFENDED);
-    verify(userEventService).record(7L, LadderEventType.THROW_VINEGAR, METADATA);
+    verify(userEventService).recordAsync(7L, LadderEventType.THROW_VINEGAR, METADATA);
     assertThat(thrower.getVinegar()).isEqualTo(BigInteger.ZERO);
     assertThat(target.getVinegar()).isEqualTo(BigInteger.valueOf(400));
   }

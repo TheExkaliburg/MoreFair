@@ -26,6 +26,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
@@ -116,6 +118,17 @@ public class LadderServiceImpl implements LadderService {
   @Override
   public List<LadderEntity> findAllByRound(RoundEntity round) {
     try (var ignored = semaphore.enter()) {
+      if (round.getId().equals(roundService.getCurrentRound().getId())) {
+        // The lookup is filled for every ladder of the current round by reloadLadders and save
+        List<LadderEntity> cached = currentLadderNumberLookup.asMap().entrySet().stream()
+            .sorted(Map.Entry.comparingByKey())
+            .map(e -> ladderCache.get(e.getValue()))
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+        if (!cached.isEmpty()) {
+          return cached;
+        }
+      }
       return ladderRepository.findByRound(round.getId()).stream()
           .sorted(Comparator.comparingInt(LadderEntity::getNumber))
           .collect(Collectors.toList());

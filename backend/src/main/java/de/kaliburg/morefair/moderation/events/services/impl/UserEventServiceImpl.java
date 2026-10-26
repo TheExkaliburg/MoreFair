@@ -8,6 +8,7 @@ import de.kaliburg.morefair.game.round.services.RoundService;
 import de.kaliburg.morefair.moderation.events.model.UserEventEntity;
 import de.kaliburg.morefair.moderation.events.model.UserEventMetadata;
 import de.kaliburg.morefair.moderation.events.model.UserEventSnapshot;
+import de.kaliburg.morefair.moderation.events.services.UserEventPersistConfig;
 import de.kaliburg.morefair.moderation.events.services.UserEventService;
 import de.kaliburg.morefair.moderation.events.services.repositories.UserEventRepository;
 import de.kaliburg.morefair.statistics.records.model.LadderRecord;
@@ -16,13 +17,15 @@ import de.kaliburg.morefair.statistics.records.model.RoundRecord;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
-@RequiredArgsConstructor
 @Service
 @Slf4j
 public class UserEventServiceImpl implements UserEventService {
@@ -32,14 +35,48 @@ public class UserEventServiceImpl implements UserEventService {
   private final RankerService rankerService;
   private final LadderService ladderService;
   private final RoundService roundService;
+  private final Executor persistExecutor;
+
+  public UserEventServiceImpl(UserEventRepository userEventRepository,
+      AccountService accountService, RankerService rankerService, LadderService ladderService,
+      RoundService roundService,
+      @Qualifier(UserEventPersistConfig.EXECUTOR_NAME) Executor persistExecutor) {
+    this.userEventRepository = userEventRepository;
+    this.accountService = accountService;
+    this.rankerService = rankerService;
+    this.ladderService = ladderService;
+    this.roundService = roundService;
+    this.persistExecutor = persistExecutor;
+  }
 
   @Override
   @Transactional
   public UserEventEntity record(Long accountId, Enum<?> eventType, UserEventMetadata metadata) {
+    return userEventRepository.save(buildEvent(accountId, eventType, metadata));
+  }
+
+  @Override
+  public void recordAsync(Long accountId, Enum<?> eventType, UserEventMetadata metadata) {
+    UserEventEntity event = buildEvent(accountId, eventType, metadata);
+    try {
+      CompletableFuture.runAsync(() -> userEventRepository.save(event), persistExecutor)
+          .exceptionally(e -> {
+            log.error("Could not persist UserEvent (#{}): {}", accountId, eventType, e);
+            return null;
+          });
+    } catch (RejectedExecutionException e) {
+      // Recording must never block the game action that triggered it
+      log.error("UserEvent queue is full, dropping UserEvent (#{}): {}", accountId, eventType, e);
+    }
+  }
+
+  private UserEventEntity buildEvent(Long accountId, Enum<?> eventType,
+      UserEventMetadata metadata) {
     OffsetDateTime createdOn = OffsetDateTime.now(ZoneOffset.UTC);
     log.info("UserEvent (#{}): {} - {}", accountId, eventType.toString(), metadata);
     UserEventSnapshot snapshot = captureSnapshot(accountId, eventType);
-    UserEventEntity result = UserEventEntity.builder()
+    // TODO: Send to ModPage via WS
+    return UserEventEntity.builder()
         .eventType(eventType.toString())
         .accountId(accountId)
         .createdOn(createdOn)
@@ -48,11 +85,6 @@ public class UserEventServiceImpl implements UserEventService {
         .snapshotVersion(snapshot == null ? null : 1)
         .snapshot(snapshot)
         .build();
-
-    // TODO: Send to ModPage via WS
-    result = userEventRepository.save(result);
-
-    return result;
   }
 
   private UserEventSnapshot captureSnapshot(Long accountId, Enum<?> eventType) {
