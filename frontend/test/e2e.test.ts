@@ -208,6 +208,48 @@ async function openChatPage() {
 }
 
 describe("Chat editor against generated static files and mocked transports", () => {
+  test("preserves responsive game proportions and sidebar visibility", async () => {
+    const { page, errors, unexpectedRequests } = await openChatPage();
+    try {
+      const ladder = page.locator('[class~="lg:w-[70%]"]');
+      const chat = page.locator('[class~="lg:w-[30%]"]');
+      const sidebar = page.locator('[class~="max-[640px]:hidden"]').first();
+      const ladderDetails = page.locator('[class~="max-[1280px]:hidden"]');
+      for (const width of [375, 640, 641, 1024, 1280, 1281]) {
+        await page.setViewportSize({ width, height: 900 });
+        const ladderBox = await ladder.boundingBox();
+        const chatBox = await chat.boundingBox();
+        if (!ladderBox || !chatBox) throw new Error("Missing game panels");
+        if (width < 1024) {
+          expect(ladderBox.width).toBeCloseTo(chatBox.width, 0);
+          expect(chatBox.y).toBeCloseTo(ladderBox.y + ladderBox.height, 0);
+        } else {
+          expect(ladderBox.width / chatBox.width).toBeCloseTo(7 / 3, 2);
+          expect(chatBox.x).toBeCloseTo(ladderBox.x + ladderBox.width, 0);
+        }
+        expect(
+          await sidebar.evaluate(
+            (element) => getComputedStyle(element).display,
+          ),
+        ).toBe(width <= 640 ? "none" : "block");
+        expect(
+          await ladderDetails.evaluate(
+            (element) => getComputedStyle(element).display,
+          ),
+        ).toBe(width <= 1280 ? "none" : "flex");
+        expect(
+          await page
+            .locator('[class~="lg:h-[3.25rem]"]')
+            .evaluate((element) => getComputedStyle(element).height),
+        ).toBe(width < 1024 ? "48px" : "52px");
+      }
+      expect(errors).toEqual([]);
+      expect(unexpectedRequests).toEqual([]);
+    } finally {
+      await page.close();
+    }
+  });
+
   test.each(["Enter", "Tab", "Control+Space", "click"])(
     "accepts a user mention with %s without sending it prematurely",
     async (selection) => {
@@ -367,7 +409,7 @@ describe("Frontend end-to-end smoke tests against generated files", () => {
     }
   });
 
-  test("serves public assets and preserves Windi theme/layout utilities", async () => {
+  test("serves public assets and preserves Tailwind theme/layout utilities", async () => {
     const page = await openPage();
     try {
       await page.goto(`${origin}/rules`);
@@ -383,7 +425,7 @@ describe("Frontend end-to-end smoke tests against generated files", () => {
       const styles = await page.evaluate(() => {
         const button = document.createElement("button");
         button.className =
-          "border-1 border-solid h-8 bg-button-bg text-button-text";
+          "border border-solid h-8 bg-button-bg text-button-text";
         document.body.appendChild(button);
         const style = getComputedStyle(button);
         return {
@@ -407,6 +449,22 @@ describe("Frontend end-to-end smoke tests against generated files", () => {
       expect(
         (await page.locator("main .w-reader").boundingBox())?.width,
       ).toBeLessThanOrEqual(375);
+      expect(
+        await page.locator("main h1").evaluate((element) => {
+          const style = getComputedStyle(element);
+          return {
+            fontSize: style.fontSize,
+            fontWeight: style.fontWeight,
+            marginTop: style.marginTop,
+          };
+        }),
+      ).toEqual({ fontSize: "32px", fontWeight: "700", marginTop: "21.44px" });
+      expect(
+        await page
+          .locator("main ol")
+          .first()
+          .evaluate((element) => getComputedStyle(element).listStyleType),
+      ).toBe("decimal");
     } finally {
       await page.close();
     }

@@ -79,7 +79,6 @@
     "js-cookie": "^3.0.1",
     "lint-staged": "^13.0.3",
     "nuxt": "^4.6.2",
-    "nuxt-windicss": "^3.0.1",
     "pinia": "^4.1.0",
     "playwright": "^1.58.2",
     "postcss": "^8.4.31",

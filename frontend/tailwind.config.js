@@ -80,5 +80,8 @@ module.exports = {
     },
   },
   plugins: [],
-  content: ["./src/**/*.vue"],
+  content: {
+    relative: true,
+    files: ["./src/**/*.{vue,js,ts}"],
+  },
 };

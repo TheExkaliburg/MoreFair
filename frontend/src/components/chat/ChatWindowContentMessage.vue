@@ -10,7 +10,7 @@
     >
       <div class="rounded-tl bg-background pl-1 pt-0.5">
         <div class="flex flex-row text-sm justify-between pr-3">
-          <span class="text-text-light truncate basis-5/8">
+          <span class="text-text-light truncate basis-[62.5%]">
             <span class="cursor-pointer" @click="mention">
               <span v-tippy="{ content: message.chatType }">{{
                 message.getChatTypeIdentifier()
@@ -28,7 +28,7 @@
               </sub></span
             >
           </span>
-          <span class="text-text-light basis-1/8 flex-auto">
+          <span class="text-text-light basis-[12.5%] flex-auto">
             <strong>{{ message.tag }}</strong
             ><sub
               v-if="optionsStore.state.general.showAssholePoints.value"

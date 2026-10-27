@@ -6,7 +6,7 @@
     <div class="select-none overflow-hidden">{{ formattedName }}:</div>
     <Listbox v-model="selectedValue">
       <ListboxButton
-        class="border-1 border-dashed border-button-border px-2 min-w-fit w-32 text-text-dark"
+        class="border border-dashed border-button-border px-2 min-w-fit w-32 text-text-dark"
         >{{ option.value }}
       </ListboxButton>
       <transition
@@ -15,7 +15,7 @@
         leave-to-class="opacity-0"
       >
         <ListboxOptions
-          class="absolute min-w-fit w-32 top-2 right-0 bg-background max-h-32 overflow-auto z-1 border-1 border-button-border rounded-md pl-0"
+          class="absolute min-w-fit w-32 top-2 right-0 bg-background max-h-32 overflow-auto z-[1] border border-button-border rounded-md pl-0"
         >
           <ListboxOption
             v-for="entry in options"

@@ -3,6 +3,7 @@ import { defineNuxtConfig } from "nuxt/config";
 export default defineNuxtConfig({
   compatibilityDate: "2024-04-03",
   css: [
+    "~/assets/css/tailwind.css",
     "~/assets/scss/styles.scss",
     "@fortawesome/fontawesome-svg-core/styles.css",
     "vue-virtual-scroller/dist/vue-virtual-scroller.css",
@@ -11,13 +12,17 @@ export default defineNuxtConfig({
     "tippy.js/dist/tippy.css",
   ],
   modules: [
-    "nuxt-windicss",
     "@pinia/nuxt",
     "@vueuse/nuxt",
     "@nuxt/content",
     "@nuxtjs/i18n",
     "@nuxt/test-utils/module",
   ],
+  postcss: {
+    plugins: {
+      tailwindcss: {},
+    },
+  },
   // TODO (low priority): Evaluate adopting Nuxt's default app/ structure
   // to reduce path configuration, separately from dependency modernization.
   srcDir: "src/",

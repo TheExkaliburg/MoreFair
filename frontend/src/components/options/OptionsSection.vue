@@ -1,5 +1,5 @@
 <template>
-  <div class="border-button-border border-1 p-1 flex flex-col space-y-0.25">
+  <div class="border-button-border border p-1 flex flex-col space-y-px">
     <div class="text-2xl text-center text-text-light">{{ formattedName }}</div>
     <template v-for="entry in currentOptionsArray" :key="entry.key">
       <OptionsBoolean

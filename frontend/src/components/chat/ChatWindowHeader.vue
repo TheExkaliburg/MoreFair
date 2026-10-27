@@ -4,7 +4,7 @@
       :current="chatStore.state.number"
       :max="maxChat"
       :prefix="'Chad'"
-      class="h-8 w-42 self-end bg-background z-2"
+      class="h-8 w-[10.5rem] self-end bg-background z-[2]"
       @change="(number) => chatStore.actions.changeChat(number)"
     /-->
     <!--ChatWindowHeaderSelector class="z-20 h-8 w-32 self-end bg-background" /-->

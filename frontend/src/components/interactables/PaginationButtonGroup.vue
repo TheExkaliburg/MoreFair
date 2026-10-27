@@ -56,7 +56,7 @@
         leave-to-class="opacity-0"
       >
         <ListboxOptions
-          class="absolute top-5 bg-background max-h-32 w-full overflow-auto z-1 border-1 border-button-border rounded-md pl-0"
+          class="absolute top-5 bg-background max-h-32 w-full overflow-auto z-[1] border border-button-border rounded-md pl-0"
         >
           <ListboxOption v-for="number in max" :key="number" as="template">
             <li class="w-full flex flex-row">

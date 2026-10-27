@@ -3,7 +3,7 @@
     <TheBrandedNavBarWithOffCanvas />
     <TheSidebar class="restOfVerticalScreen">
       <div
-        class="restOfHorizontalScreen -sm:w-screen"
+        class="restOfHorizontalScreen max-[640px]:w-screen"
         @click="uiStore.state.sidebarExpanded = false"
       >
         <slot />

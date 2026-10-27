@@ -1,6 +1,9 @@
 <template>
   <div class="flex flex-row">
-    <div :class="classesForSize" class="-sm:hidden bg-navbar-bg shrink-0">
+    <div
+      :class="classesForSize"
+      class="max-[640px]:hidden bg-navbar-bg shrink-0"
+    >
       <div
         :class="classesForSize"
         class="flex flex-col justify-between fixed left-0 inset-y-0 pt-10 justify-between shrink-0 bg-navbar-bg"

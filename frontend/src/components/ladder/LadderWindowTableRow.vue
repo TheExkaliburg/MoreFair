@@ -4,7 +4,7 @@
     :class="{
       'bg-ladder-bg-promoted text-ladder-text-promoted': !ranker.growing,
       'bg-ladder-bg-you text-ladder-text-you ranker-you': isYou,
-      'sticky z-1 top-0 ranker-1': isFirst,
+      'sticky z-[1] top-0 ranker-1': isFirst,
       'bg-ladder-bg': isFirst && !isYou && ranker.growing,
     }"
     :style="tableSpaceStyles.total"

@@ -3,7 +3,7 @@
     class="flex flex-col justify-center items-center w-screen h-screen bg-background"
   >
     <div
-      class="flex flex-col justify-center items-center h-content py-16 w-full bg-navbar-bg relative border-text-dark border-y-1"
+      class="flex flex-col justify-center items-center h-content py-16 w-full bg-navbar-bg relative border-text-dark border-y"
     >
       <img
         alt="FairGame"

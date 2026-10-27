@@ -24,7 +24,7 @@
       leave-to-class="opacity-0"
     >
       <ListboxOptions
-        class="z-1 border-1 absolute left-0 bottom-5 max-h-32 w-full overflow-auto rounded-md border-button-border bg-background pl-0 min-w-min"
+        class="z-[1] border absolute left-0 bottom-5 max-h-32 w-full overflow-auto rounded-md border-button-border bg-background pl-0 min-w-min"
       >
         <ListboxOption v-for="type in chatTypes" :key="type" as="template">
           <li

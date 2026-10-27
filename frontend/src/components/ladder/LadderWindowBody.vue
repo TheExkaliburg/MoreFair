@@ -34,7 +34,7 @@
         {{ multiButtonLabel }}
       </FairButton>
       <FairButton
-        :class="{ 'border-l-1': isMultiButtonDisabled }"
+        :class="{ 'border-l': isMultiButtonDisabled }"
         :disabled="isBiasButtonDisabled"
         class="w-full rounded-l-none border-l-0 whitespace-nowrap"
         data-tutorial="bias"
@@ -80,7 +80,7 @@
       </FairButton>
       <FairButton
         v-if="yourRanker.rank !== 1"
-        :class="{ 'border-l-1': isAutoPromoteButtonDisabled }"
+        :class="{ 'border-l': isAutoPromoteButtonDisabled }"
         :disabled="isVinegarButtonDisabled"
         class="w-full rounded-l-none border-l-0 whitespace-nowrap"
         data-tutorial="throwVinegar"
@@ -90,7 +90,7 @@
       </FairButton>
       <FairButton
         v-else
-        :class="{ 'border-l-1': isAutoPromoteButtonDisabled }"
+        :class="{ 'border-l': isAutoPromoteButtonDisabled }"
         :disabled="isPromoteButtonDisabled"
         class="w-full rounded-l-none border-l-0 whitespace-nowrap"
         @click="promote"

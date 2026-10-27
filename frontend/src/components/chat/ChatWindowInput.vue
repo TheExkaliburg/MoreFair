@@ -4,16 +4,16 @@
       class="flex flex-row relative justify-center items-center w-full bg-background z-10"
     >
       <ChatWindowChannelSelector
-        class="z-20 w-8 h-8 pl-2 px-0 overflow-visible whitespace-nowrap border-button-border border-1 border-r-0 rounded-l-md"
+        class="z-20 w-8 h-8 pl-2 px-0 overflow-visible whitespace-nowrap border-button-border border border-r-0 rounded-l-md"
       />
       <EditorContent
         :editor="editor"
-        class="justify-center items-center w-full border-1 border-l-0 h-8 border-button-border p-1 w-full max-w-full outline-0 overflow-x-hidden text-text caret-text whitespace-nowrap overflow-y-hidden"
+        class="justify-center items-center w-full border border-l-0 h-8 border-button-border p-1 w-full max-w-full outline-0 overflow-x-hidden text-text caret-text whitespace-nowrap overflow-y-hidden"
         spellcheck="false"
         @keydown.enter="sendMessage"
       ></EditorContent>
       <button
-        class="w-1/4 max-w-xs rounded-r-md h-8 border-l-0 border-1 border-button-border py-1 text-button-text hover:text-button-text-hover hover:bg-button-bg-hover"
+        class="w-1/4 max-w-xs rounded-r-md h-8 border-l-0 border border-button-border py-1 text-button-text hover:text-button-text-hover hover:bg-button-bg-hover"
         @click="sendMessage"
       >
         Send

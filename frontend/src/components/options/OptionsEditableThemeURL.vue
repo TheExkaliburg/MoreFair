@@ -5,13 +5,13 @@
   >
     <div class="select-none overflow-hidden">{{ formattedName }}:</div>
     <div
-      class="flex flex-col border-1 border-button-border w-fit items-center py-1 space-y-0.5"
+      class="flex flex-col border border-button-border w-fit items-center py-1 space-y-0.5"
     >
       <div class="flex flex-row">
         <input
           v-model="input"
           :disabled="!isActive"
-          class="bg-transparent border-button-border border-r-0 border-1 border-dashed w-32 px-1"
+          class="bg-transparent border-button-border border-r-0 border border-dashed w-32 px-1"
           @keydown.enter="add"
         />
         <button
@@ -20,7 +20,7 @@
             'pointer-events-none': !isActive,
           }"
           :disabled="!isActive"
-          class="border-1 border-button-border rounded-l-none rounded-sm px-1 w-16"
+          class="border border-button-border rounded-l-none rounded-sm px-1 w-16"
           @click="add"
         >
           Add
@@ -35,7 +35,7 @@
         }"
       >
         <div
-          class="w-64 overflow-hidden whitespace-nowrap border-button-border border-1 border-r-0 pl-1 text-text-dark select-all"
+          class="w-64 overflow-hidden whitespace-nowrap border-button-border border border-r-0 pl-1 text-text-dark select-all"
         >
           {{ entry }}
         </div>
@@ -45,7 +45,7 @@
             'hover:bg-button-bg-hover hover:text-button-text-hover': isActive,
             'pointer-events-none': !isActive,
           }"
-          class="border-1 border-button-border rounded-l-none rounded-sm px-1 w-16"
+          class="border border-button-border rounded-l-none rounded-sm px-1 w-16"
           @click="remove(index)"
         >
           X

@@ -21,7 +21,7 @@
           :key="index"
           :vin-throw="vinThrow"
           class="border-text"
-          :class="{ 'border-b-1': index < shownThrows.length - 1 }"
+          :class="{ 'border-b': index < shownThrows.length - 1 }"
         />
       </tbody>
     </table>

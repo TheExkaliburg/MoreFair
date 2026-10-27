@@ -3,17 +3,16 @@
     <LadderWindow
       v-if="uiStore.state.ladderEnabled"
       :class="
-        uiStore.state.chatEnabled ? 'h-2/3 lg:w-7/10' : 'h-full lg:w-full'
+        uiStore.state.chatEnabled ? 'h-2/3 lg:w-[70%]' : 'h-full lg:w-full'
       "
       class="w-full lg:h-full shrink-0"
     />
     <ChatWindow
       v-if="uiStore.state.chatEnabled"
       :class="[
-        uiStore.state.ladderEnabled ? 'h-1/3 lg:w-3/10' : 'h-full lg:w-full',
+        uiStore.state.ladderEnabled ? 'h-1/3 lg:w-[30%]' : 'h-full lg:w-full',
         {
-          'border-t-1':
-            uiStore.state.ladderEnabled && uiStore.state.chatEnabled,
+          'border-t': uiStore.state.ladderEnabled && uiStore.state.chatEnabled,
         },
       ]"
       class="w-full lg:h-full border-button-border lg:border-t-0 shrink-0"

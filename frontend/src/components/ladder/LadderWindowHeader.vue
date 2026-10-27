@@ -59,7 +59,7 @@
             }}
           </div>
         </div>
-        <div class="flex flex-col -sm:hidden">
+        <div class="flex flex-col max-[640px]:hidden">
           <div class="whitespace-nowrap">
             Round {{ roundStore.state.number }}:
             <TypeInformation
@@ -75,7 +75,7 @@
             />
           </div>
         </div>
-        <div class="flex flex-col -xl:hidden">
+        <div class="flex flex-col max-[1280px]:hidden">
           <div class="whitespace-nowrap">
             Base Points for Promotion: {{ formattedRoundPointsForPromotion }}
           </div>
@@ -91,7 +91,7 @@
       :max="accountStore.state.highestCurrentLadder"
       :prefix="'Ladder'"
       :show-last="isAssholeLadderOpen"
-      class="h-8 w-42 self-end bg-background z-2 text-base"
+      class="h-8 w-[10.5rem] self-end bg-background z-[2] text-base"
       @change="(number) => ladderStore.actions.changeLadder(number)"
     />
   </div>

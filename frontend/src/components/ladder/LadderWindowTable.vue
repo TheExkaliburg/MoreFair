@@ -8,7 +8,7 @@
   >
     <div
       ref="header"
-      class="grid gap-1 px-1 text-sm md:text-base font-bold text-text-light top-0 bg-background z-1"
+      class="grid gap-1 px-1 text-sm md:text-base font-bold text-text-light top-0 bg-background z-[1]"
       :style="tableSpaceClasses.total"
     >
       <div class="whitespace-nowrap" :style="tableSpaceClasses.rank">#</div>
@@ -57,8 +57,8 @@
       <div
         v-if="firstRanker"
         ref="firstRow"
-        class="sticky z-1 top-0"
-        :class="{ 'border-button-border border-b-1': isScrolled }"
+        class="sticky z-[1] top-0"
+        :class="{ 'border-button-border border-b': isScrolled }"
       >
         <LadderWindowTableRow
           :key="firstRanker.accountId"

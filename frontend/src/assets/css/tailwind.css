@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Markdown previously kept browser defaults outside Windi's template scan. */
+  .md-content :where(h1, h2, h3, h4, h5, h6, blockquote, dl, dd, pre) {
+    margin: revert;
+    font-size: revert;
+    font-weight: revert;
+  }
+
+  .md-content :where(ol, ul) {
+    margin: revert;
+    padding: revert;
+    list-style: revert;
+  }
+
+  .md-content :where(code, kbd, samp, pre) {
+    font-family: revert;
+    font-size: revert;
+  }
+}
