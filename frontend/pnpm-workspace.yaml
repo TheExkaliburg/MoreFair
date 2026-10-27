@@ -14,3 +14,6 @@ allowBuilds:
   esbuild: true
   unrs-resolver: true
   vue-demi: true
+# Replace deprecated Nuxt Kit loaders until nuxt-windicss includes the fix.
+patchedDependencies:
+  nuxt-windicss@3.0.1: patches/nuxt-windicss@3.0.1.patch

@@ -1,0 +1,37 @@
+diff --git a/dist/module.mjs b/dist/module.mjs
+index 5589460477b9ca984a3af174dbb4c125a6853f32..2e9605863c7b35632bb90bfef9a2668458128673 100644
+--- a/dist/module.mjs
++++ b/dist/module.mjs
+@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
+ import { ensureDirSync } from 'fs-extra';
+ import { join, dirname, resolve, relative } from 'pathe';
+ import { createUtils } from '@windicss/plugin-utils';
+-import { resolveModule, defineNuxtModule, isNuxt3, isNuxt2, tryRequireModule, requireModule, extendWebpackConfig, extendViteConfig, createResolver } from '@nuxt/kit';
++import { resolveModule, defineNuxtModule, isNuxt3, isNuxt2, tryImportModule, importModule, extendWebpackConfig, extendViteConfig, createResolver } from '@nuxt/kit';
+ import { loadConfiguration } from '@windicss/config';
+ import VitePluginWindicss from 'vite-plugin-windicss';
+ import defu, { defu as defu$1 } from 'defu';
+@@ -209,10 +209,10 @@ const module = defineNuxtModule({
+       const nuxtPostcss = nuxt.options.postcss || nuxt.options.build.postcss.postcssOptions || nuxt.options.build.postcss;
+       if (!nuxtPostcss)
+         return;
+-      const hasPostCSSImport = tryRequireModule("postcss-import");
++      const hasPostCSSImport = await tryImportModule("postcss-import");
+       if (!hasPostCSSImport)
+         return;
+-      const readCache = requireModule("read-cache");
++      const readCache = await importModule("read-cache");
+       const updatedPostcssImport = {
+         async load(filename) {
+           await ensureInit;
+@@ -226,8 +226,8 @@ const module = defineNuxtModule({
+         ...updatedPostcssImport
+       };
+     });
+-    extendWebpackConfig((config) => {
+-      const WindiCSSWebpackPlugin = requireModule("windicss-webpack-plugin");
++    extendWebpackConfig(async (config) => {
++      const WindiCSSWebpackPlugin = await importModule("windicss-webpack-plugin");
+       const plugin = new WindiCSSWebpackPlugin({ ...options, utils });
+       config.plugins = config.plugins || [];
+       config.plugins.push(plugin);

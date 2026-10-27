@@ -167,6 +167,9 @@ overrides:
   loader-utils@>=2.0.0 <2.0.3: '>=2.0.3'
   loader-utils@>=2.0.0 <2.0.4: '>=2.0.4'
 
+patchedDependencies:
+  nuxt-windicss@3.0.1: 889a1b88e35d86db46644224de24c0c5c61fce404accfe61e019bc46886ea04f
+
 importers:
 
   .:
@@ -326,7 +329,7 @@ importers:
         version: 4.6.2(accdd7cad14414766248d2a79ac909a9)
       nuxt-windicss:
         specifier: ^3.0.1
-        version: 3.0.1(@parcel/watcher@2.6.0)(magicast@0.5.5)(srvx@1.0.6)(supports-color@10.2.2)(vite@8.3.5(@types/node@22.20.5)(esbuild@0.28.2)(jiti@1.21.7)(sass@1.106.0)(terser@5.51.2)(yaml@2.9.1))
+        version: 3.0.1(patch_hash=889a1b88e35d86db46644224de24c0c5c61fce404accfe61e019bc46886ea04f)(@parcel/watcher@2.6.0)(magicast@0.5.5)(srvx@1.0.6)(supports-color@10.2.2)(vite@8.3.5(@types/node@22.20.5)(esbuild@0.28.2)(jiti@1.21.7)(sass@1.106.0)(terser@5.51.2)(yaml@2.9.1))
       pinia:
         specifier: ^4.1.0
         version: 4.1.0(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3))
@@ -14227,7 +14230,7 @@ snapshots:
 
   nuxt-define@1.0.0: {}
 
-  nuxt-windicss@3.0.1(@parcel/watcher@2.6.0)(magicast@0.5.5)(srvx@1.0.6)(supports-color@10.2.2)(vite@8.3.5(@types/node@22.20.5)(esbuild@0.28.2)(jiti@1.21.7)(sass@1.106.0)(terser@5.51.2)(yaml@2.9.1)):
+  nuxt-windicss@3.0.1(patch_hash=889a1b88e35d86db46644224de24c0c5c61fce404accfe61e019bc46886ea04f)(@parcel/watcher@2.6.0)(magicast@0.5.5)(srvx@1.0.6)(supports-color@10.2.2)(vite@8.3.5(@types/node@22.20.5)(esbuild@0.28.2)(jiti@1.21.7)(sass@1.106.0)(terser@5.51.2)(yaml@2.9.1)):
     dependencies:
       '@nuxt/kit': 3.21.11(magicast@0.5.5)
       '@windicss/config': 1.9.4(supports-color@10.2.2)
