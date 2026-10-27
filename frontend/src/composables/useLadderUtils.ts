@@ -248,6 +248,7 @@ export const useLadderUtils = () => {
     getMinimumPeopleForPromote,
     getVinegarThrowCost,
     canThrowVinegar,
+    isLadderUnlocked,
     isLadderPromotable,
     getYourPointsNeededToPromote,
     canPromote,

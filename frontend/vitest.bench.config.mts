@@ -7,7 +7,7 @@ export default defineConfig({
   },
   test: {
     environment: "node",
-    include: ["src/test/performance/**/*.test.ts"],
+    include: ["test/performance/**/*.test.ts"],
     fileParallelism: false,
     testTimeout: 0,
     hookTimeout: 0,

@@ -44,9 +44,18 @@ export default defineNuxtConfig({
   ssr: false,
   typescript: {
     nodeTsConfig: {
-      include: ["../test/**/*.ts", "../vitest*.mts", "../content.config.ts"],
+      include: [
+        "../test/e2e.test.ts",
+        "../vitest*.mts",
+        "../content.config.ts",
+      ],
     },
     tsConfig: {
+      include: [
+        "../test/unit/**/*.ts",
+        "../test/helpers/**/*.ts",
+        "../test/performance/**/*.ts",
+      ],
       compilerOptions: {
         verbatimModuleSyntax: false,
       },

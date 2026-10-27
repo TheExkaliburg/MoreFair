@@ -49,7 +49,7 @@ jobs:
       - name: Run ESLint
         run: |
           set +e
-          pnpm exec eslint src/ \
+          pnpm exec eslint src/ test/ \
             --format @microsoft/eslint-formatter-sarif \
             --output-file eslint-results.sarif
           status=$?

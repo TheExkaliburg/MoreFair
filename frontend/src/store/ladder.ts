@@ -218,6 +218,44 @@ export const useLadderStore = defineStore("ladder", () => {
           ranker.points.add(ranker.power.mul(delta).floor()),
         );
 
+        // Match the server: resources are calculated before overtakes.
+        if (ranker === yourRanker) {
+          if (ranker.rank !== 1) {
+            const vinegarAdded = ranker.grapes
+              .mul(accountStore.state.settings.vinegarSplit)
+              .div(100)
+              .floor();
+
+            ranker.vinegar = Object.freeze(
+              ranker.vinegar.add(vinegarAdded.mul(delta)),
+            );
+
+            const wineAdded = ranker.grapes
+              .mul(100 - accountStore.state.settings.vinegarSplit)
+              .mul(3)
+              .div(100)
+              .floor();
+            ranker.wine = Object.freeze(ranker.wine.add(wineAdded.mul(delta)));
+          }
+          if (
+            ranker.rank === 1 &&
+            ladderUtils.isLadderUnlocked.value &&
+            ranker.points.cmp(ladderUtils.getMinimumPointsForPromote.value) >= 0
+          ) {
+            ranker.vinegar = Object.freeze(
+              ranker.vinegar
+                .mul(new Decimal(Math.pow(0.9975, deltaSeconds)))
+                .floor(),
+            );
+
+            ranker.wine = Object.freeze(
+              ranker.wine
+                .mul(new Decimal(Math.pow(0.9975, deltaSeconds)))
+                .floor(),
+            );
+          }
+        }
+
         for (let j = i - 1; j >= 0; j--) {
           const currentRanker = rankers[j + 1]!;
           const previousRanker = rankers[j]!;
@@ -251,45 +289,12 @@ export const useLadderStore = defineStore("ladder", () => {
 
     state.rankers = rankers;
 
-    if (yourRanker?.growing) {
-      if (yourRanker.rank !== 1) {
-        const vinegarAdded = yourRanker.grapes
-          .mul(accountStore.state.settings.vinegarSplit)
-          .div(100);
-
-        yourRanker.vinegar = Object.freeze(
-          yourRanker.vinegar.add(vinegarAdded.mul(deltaSeconds).floor()),
-        );
-
-        const wineAdded = yourRanker.grapes
-          .mul(100 - accountStore.state.settings.vinegarSplit)
-          .mul(3)
-          .div(100);
-        yourRanker.wine = Object.freeze(
-          yourRanker.wine.add(wineAdded.mul(deltaSeconds).floor()),
-        );
-      }
-      if (yourRanker.rank === 1 && ladderUtils.isLadderPromotable.value) {
-        yourRanker.vinegar = Object.freeze(
-          yourRanker.vinegar
-            .mul(new Decimal(Math.pow(0.9975, deltaSeconds)))
-            .floor(),
-        );
-
-        yourRanker.wine = Object.freeze(
-          yourRanker.wine
-            .mul(new Decimal(Math.pow(0.9975, deltaSeconds)))
-            .floor(),
-        );
-      }
-
-      if (yourRanker.rank === rankers.length && rankers.length >= 1) {
-        yourRanker.grapes = Object.freeze(
-          yourRanker.grapes
-            .add(new Decimal(ladderUtils.getBottomGrapes()))
-            .max(0),
-        );
-      }
+    if (yourRanker?.growing && yourRanker.rank === rankers.length) {
+      yourRanker.grapes = Object.freeze(
+        yourRanker.grapes
+          .add(new Decimal(ladderUtils.getBottomGrapes()).mul(delta))
+          .max(0),
+      );
     }
 
     /* console.log(

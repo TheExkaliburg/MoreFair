@@ -54,7 +54,7 @@ export default createConfigForNuxt({
     },
   },
   {
-    files: ["src/**/*.vue", "src/**/*.ts", "src/**/*.js"],
+    files: ["src/**/*.vue", "src/**/*.ts", "src/**/*.js", "test/**/*.ts"],
     rules: {
       "no-console": ["warn", { allow: ["warn", "error", "info"] }],
     },

@@ -1,53 +1,20 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { Session } from "node:inspector/promises";
 import { join } from "node:path";
-import { createPinia, disposePinia, setActivePinia } from "pinia";
 import Decimal from "break_infinity.js";
-import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
-import { Ranker } from "~/store/entities/ranker";
-import { useLadderStore, type LadderData } from "~/store/ladder";
-import { LadderType } from "~/store/entities/ladderType";
+import { afterAll, describe, expect, test, vi } from "vitest";
+import { ladderSnapshot, setupLadderTest } from "../helpers/ladder";
 import { useEta } from "~/composables/useEta";
 import { useLadderUtils } from "~/composables/useLadderUtils";
 import { useFormatter, useTimeFormatter } from "~/composables/useFormatter";
 
-const { ticks, getLadder, account } = await vi.hoisted(async () => {
+await vi.hoisted(async () => {
   const { ref, computed } = await import("vue");
   vi.stubGlobal("ref", ref);
   vi.stubGlobal("computed", computed);
   vi.stubGlobal("navigator", { language: "en-US" });
-  return {
-    ticks: new Map<string, (body: { delta: number }) => void>(),
-    getLadder: vi.fn<() => Promise<{ data: LadderData }>>(),
-    account: {
-      state: {
-        accountId: 0,
-        highestCurrentLadder: 1,
-        settings: { vinegarSplit: 50 },
-      },
-    },
-  };
 });
 
-vi.mock("~/composables/useAPI", () => ({
-  useAPI: () => ({ ladder: { getLadder } }),
-}));
-vi.mock("~/composables/useStomp", () => ({
-  useStomp: () => ({
-    callbacks: { onTick: "tick", onLadderEvent: "event" },
-    addCallback: (
-      type: string,
-      id: string,
-      callback: (body: { delta: number }) => void,
-    ) => {
-      if (type === "tick") ticks.set(id, callback);
-    },
-  }),
-}));
-vi.mock("~/store/account", () => ({ useAccountStore: () => account }));
-vi.mock("~/store/options", () => ({ useOptionsStore: () => ({}) }));
-vi.mock("~/store/chat", () => ({ useChatStore: () => ({}) }));
-vi.mock("~/store/grapes", () => ({ VinegarSuccessType: {} }));
 vi.mock("~/store/round", async (importOriginal) => {
   const module = await importOriginal<typeof import("~/store/round")>();
   const { RoundSettings } = await import("~/store/entities/roundSettings");
@@ -59,65 +26,28 @@ vi.mock("~/store/round", async (importOriginal) => {
   };
   return { ...module, useRoundStore: () => round };
 });
-vi.mock("~/composables/useToasts", () => ({ useToasts: vi.fn() }));
-vi.mock("~/composables/useSound", () => ({
-  SOUNDS: {},
-  useSound: vi.fn(),
-}));
-vi.mock("~/composables/useTour", () => {
-  const tour = {
-    flags: {
-      value: {
-        shownStartup: true,
-        shownAutoPromote: true,
-        shownMultied: true,
-        shownVinegar: true,
-      },
-    },
-  };
-  return {
-    useAutoPromoteTour: () => tour,
-    useBiasedTour: () => tour,
-    useMultiedTour: () => tour,
-    usePromoteTour: () => tour,
-    useStartupTour: () => tour,
-    useVinegarTour: () => tour,
-  };
-});
 
-const pinia = createPinia();
-beforeAll(() => setActivePinia(pinia));
-afterAll(() => {
-  disposePinia(pinia);
-  vi.unstubAllGlobals();
-});
+const harness = setupLadderTest();
+const { ticks, account } = harness;
+afterAll(() => vi.unstubAllGlobals());
 
 describe("Ladder calculation and ETA derivatives", () => {
   test.each([100, 1000, 10000])("%i rankers", async (size) => {
     account.state.accountId = Math.floor(size / 2);
-    getLadder.mockResolvedValue({
-      data: {
-        rankers: Array.from(
-          { length: size },
-          (_, i) =>
-            new Ranker({
-              accountId: i + 1,
-              rank: i + 1,
-              points: new Decimal("1e14").mul(size - i),
-              power: new Decimal(1e6).mul(1 + (i % 5)),
-              bias: 20 + (i % 6),
-              multi: 10 + (i % 5),
-            }),
-        ),
-        number: 1,
-        scaling: 5,
-        types: [LadderType.DEFAULT],
-        basePointsToPromote: new Decimal("1e14").mul(size * 0.75).toString(),
-      },
-    });
-    const ladder = useLadderStore();
-    ladder.actions.reset();
-    await Promise.resolve();
+    const ladder = await harness.loadLadder(
+      ladderSnapshot(
+        Array.from({ length: size }, (_, i) => ({
+          points: new Decimal("1e14").mul(size - i),
+          power: new Decimal(1e6).mul(1 + (i % 5)),
+          bias: 20 + (i % 6),
+          multi: 10 + (i % 5),
+        })),
+        {
+          scaling: 5,
+          basePointsToPromote: new Decimal("1e14").mul(size * 0.75).toString(),
+        },
+      ),
+    );
     expect(ladder.state.rankers).toHaveLength(size);
     expect(ticks.has("fair_ladder_calculateTick")).toBe(true);
     expect(ticks.has("fair_eta_cache_reset")).toBe(true);
