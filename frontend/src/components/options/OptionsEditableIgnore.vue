@@ -5,13 +5,13 @@
   >
     <div class="select-none overflow-hidden">{{ formattedName }}:</div>
     <div
-      class="flex flex-col border border-button-border w-fit items-center py-1 space-y-0.5"
+      class="flex flex-col border border-button-border w-full items-center py-1 space-y-0.5"
     >
       <div class="flex flex-row">
         <input
           v-model="input"
           :disabled="!isActive"
-          class="bg-transparent border-button-border border-r-0 border border-dashed w-32 px-1"
+          class="bg-transparent border-button-border border-r-0 border border-dashed w-32 px-1 outline-none"
           @keydown.enter="add"
         />
         <button

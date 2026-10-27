@@ -1,7 +1,7 @@
 <template>
   <input
     :value="modelValue"
-    class="w-full rounded-md border placeholder:text-text-placeholder h-8 border-button-border p-1 outline-0 text-text caret-text whitespace-nowrap overflow-x-auto overflow-y-hidden bg-background disabled:bg-opacity-50"
+    class="fair-input"
     spellcheck="false"
     @input="$emit('update:modelValue', getInputTarget($event).value)"
   />

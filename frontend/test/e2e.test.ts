@@ -107,7 +107,7 @@ async function expectContent(page: Page, path: string) {
   expect((await visible.innerText()).length).toBeGreaterThan(30);
 }
 
-async function openChatPage() {
+async function openChatPage(message = "") {
   const page = await openPage();
   const errors: string[] = [];
   const sent: { destination: string; body: string }[] = [];
@@ -152,7 +152,19 @@ async function openChatPage() {
         json = {
           type: url.pathname.split("/").at(-1)!.toUpperCase(),
           number: 1,
-          messages: [],
+          messages:
+            message && url.pathname === "/api/chat/global"
+              ? [
+                  {
+                    accountId: 123,
+                    username: "Example",
+                    message,
+                    metadata: "[]",
+                    timestamp: Date.now() - 60000,
+                    chatType: "GLOBAL",
+                  },
+                ]
+              : [],
         };
         break;
       case "/api/ladder":
@@ -208,6 +220,150 @@ async function openChatPage() {
 }
 
 describe("Chat editor against generated static files and mocked transports", () => {
+  test("keeps pagination uniform, icon buttons circular, and disabled button dividers visible", async () => {
+    const { page } = await openChatPage();
+    try {
+      for (const width of [375, 1280]) {
+        await page.setViewportSize({ width, height: 900 });
+        const pagination = page
+          .getByRole("button", { name: "dropdown-menu", exact: true })
+          .first()
+          .locator("..");
+        const widths = await pagination
+          .locator(":scope > button")
+          .evaluateAll((buttons) =>
+            buttons.map((button) => button.getBoundingClientRect().width),
+          );
+        expect(widths).toHaveLength(6);
+        for (const width of widths) expect(width).toBeCloseTo(28, 0);
+
+        for (const name of ["help", "vinegarSettings"]) {
+          const button = page.locator(`[data-tutorial="${name}"]`);
+          const geometry = await button.evaluate((element) => {
+            const box = element.getBoundingClientRect();
+            const style = getComputedStyle(element);
+            return {
+              width: box.width,
+              height: box.height,
+              radius: parseFloat(style.borderRadius),
+              padding: style.padding,
+            };
+          });
+          expect(geometry.width).toBe(32);
+          expect(geometry.height).toBe(32);
+          expect(geometry.radius).toBeGreaterThanOrEqual(16);
+          expect(geometry.padding).toBe("0px");
+        }
+        const tutorialIcon = await page
+          .locator('[data-tutorial="help"] svg')
+          .boundingBox();
+        expect(tutorialIcon?.width).toBe(30);
+        expect(tutorialIcon?.height).toBe(30);
+
+        for (const name of ["multi", "autoPromote"]) {
+          const left = page.locator(`[data-tutorial="${name}"]`);
+          expect(await left.isDisabled()).toBe(true);
+          const borders = await left.locator("..").evaluate((element) =>
+            [...element.children].map((button) => {
+              const style = getComputedStyle(button);
+              return {
+                left: style.borderLeftWidth,
+                right: style.borderRightWidth,
+              };
+            }),
+          );
+          expect(borders[0]!.right).toBe("0px");
+          expect(borders[1]!.left).toBe("1px");
+        }
+      }
+    } finally {
+      await page.close();
+    }
+  });
+
+  test("avoids a mobile chat spacer and native focus rings on text editors", async () => {
+    const { page } = await openChatPage("Oldest test message");
+    try {
+      await page.setViewportSize({ width: 375, height: 812 });
+      const messages = page.locator(
+        '[class~="overflow-y-auto"][class~="z-[1]"]',
+      );
+      const firstMessage = messages
+        .locator(":scope > div")
+        .filter({ hasText: "Oldest test message" });
+      await firstMessage.waitFor();
+      const container = await messages.boundingBox();
+      const first = await firstMessage.boundingBox();
+      const padding = await messages.evaluate((element) =>
+        parseFloat(getComputedStyle(element).paddingTop),
+      );
+      if (!container || !first) throw new Error("Missing chat messages");
+      expect(first.y - container.y).toBeCloseTo(padding, 0);
+
+      const editor = page.locator(".ProseMirror");
+      await editor.focus();
+      expect(
+        await editor.evaluate(
+          (element) => getComputedStyle(element).outlineStyle,
+        ),
+      ).not.toBe("auto");
+      await editor.pressSequentially("Still editable");
+      expect(await editor.innerText()).toBe("Still editable");
+
+      await page.goto(`${origin}/account`);
+      await page
+        .getByRole("button", { name: "Edit", exact: true })
+        .first()
+        .click();
+      const input = page.locator("input").first();
+      await input.focus();
+      expect(
+        await input.evaluate(
+          (element) => getComputedStyle(element).outlineStyle,
+        ),
+      ).not.toBe("auto");
+    } finally {
+      await page.close();
+    }
+  });
+
+  test("centers editable option lists and suppresses their native text input focus ring", async () => {
+    const { page } = await openChatPage();
+    try {
+      await page.goto(`${origin}/options`);
+      for (const width of [375, 1280]) {
+        await page.setViewportSize({ width, height: 900 });
+        for (const name of [
+          "Subscribed mentions:",
+          "Ignored rankers (by ranker id):",
+          "Upload Custom Theme:",
+        ]) {
+          const label = page.getByText(name, { exact: true });
+          await label.waitFor();
+          const list = label.locator("..").locator(":scope > div").nth(1);
+          const offsets = await list.evaluate((element) => {
+            const parent = element.parentElement!.getBoundingClientRect();
+            return [...element.children].map((row) => {
+              const box = row.getBoundingClientRect();
+              return box.x + box.width / 2 - (parent.x + parent.width / 2);
+            });
+          });
+          for (const offset of offsets)
+            expect(Math.abs(offset)).toBeLessThan(1);
+          const input = list.locator("input");
+          await input.focus();
+          expect(
+            await input.evaluate(
+              (element) => getComputedStyle(element).outlineStyle,
+            ),
+          ).not.toBe("auto");
+        }
+      }
+    } finally {
+      await page.close();
+    }
+  });
+
   test("preserves responsive game proportions and sidebar visibility", async () => {
     const { page, errors, unexpectedRequests } = await openChatPage();
     try {
@@ -424,8 +580,7 @@ describe("Frontend end-to-end smoke tests against generated files", () => {
       }
       const styles = await page.evaluate(() => {
         const button = document.createElement("button");
-        button.className =
-          "border border-solid h-8 bg-button-bg text-button-text";
+        button.className = "fair-button";
         document.body.appendChild(button);
         const style = getComputedStyle(button);
         return {

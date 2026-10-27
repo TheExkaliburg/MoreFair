@@ -8,7 +8,7 @@
       />
       <EditorContent
         :editor="editor"
-        class="justify-center items-center w-full border border-l-0 h-8 border-button-border p-1 w-full max-w-full outline-0 overflow-x-hidden text-text caret-text whitespace-nowrap overflow-y-hidden"
+        class="justify-center items-center w-full border border-l-0 h-8 border-button-border p-1 w-full max-w-full overflow-x-hidden text-text caret-text whitespace-nowrap overflow-y-hidden"
         spellcheck="false"
         @keydown.enter="sendMessage"
       ></EditorContent>
@@ -122,6 +122,11 @@ const editor = useEditor({
       },
     }),
   ],
+  editorProps: {
+    attributes: {
+      class: "outline-none",
+    },
+  },
   onUpdate: ({ editor }) => {
     chatStore.state.input = editor.getJSON();
   },

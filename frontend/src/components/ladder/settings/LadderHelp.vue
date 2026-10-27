@@ -1,6 +1,6 @@
 <template>
   <LadderSettingsWithIcon data-tutorial="help" @click="open">
-    <QuestionMarkCircleIcon />
+    <QuestionMarkCircleIcon class="h-full w-full" />
   </LadderSettingsWithIcon>
   <FairDialog :open="isOpen" :title="lang('tutorials')" @close="isOpen = false">
     <div class="flex flex-col text-xl text-link-text select-none">

@@ -14,7 +14,7 @@
     </div>
     <input
       v-model="input"
-      class="border border-dashed border-button-border px-1 min-w-fit w-32 text-text-dark bg-background text-right"
+      class="border border-dashed border-button-border px-1 min-w-fit w-32 text-text-dark bg-background text-right outline-none"
       :disabled="!isActive"
       type="number"
     />

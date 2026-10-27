@@ -45,7 +45,7 @@
         as="template"
       >
         <PaginationButtonGroupButton
-          class="w-1/6 border-l-0 rounded-r-md w-full flex justify-center items-center"
+          class="w-1/6 border-l-0 rounded-r-md flex justify-center items-center"
         >
           <ChevronDownIcon class="h-4 w-4 text-button-text" />
         </PaginationButtonGroupButton>

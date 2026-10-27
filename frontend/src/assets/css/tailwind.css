@@ -21,3 +21,13 @@
     font-size: revert;
   }
 }
+
+@layer components {
+  .fair-button {
+    @apply h-8 rounded-md border border-solid border-button-border bg-button-bg px-2 text-button-text disabled:pointer-events-none disabled:select-none disabled:opacity-50 disabled:grayscale hover:bg-button-bg-hover hover:text-button-text-hover;
+  }
+
+  .fair-input {
+    @apply h-8 w-full whitespace-nowrap overflow-x-auto overflow-y-hidden rounded-md border border-button-border bg-background p-1 text-text caret-text outline-none placeholder:text-text-placeholder disabled:bg-opacity-50;
+  }
+}
