@@ -41,8 +41,8 @@ public class SecurityUtils {
       return null;
     }
     Object principal = authentication.getPrincipal();
-    if (principal instanceof UserDetailsWithUuid) {
-      return ((UserDetailsWithUuid) principal).getUuid();
+    if (principal instanceof UserDetailsWithUuid userDetails) {
+      return userDetails.getUuid();
     }
     return null;
   }

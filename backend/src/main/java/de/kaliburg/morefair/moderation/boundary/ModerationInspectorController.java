@@ -7,9 +7,12 @@ import de.kaliburg.morefair.chat.services.MessageService;
 import de.kaliburg.morefair.moderation.events.services.NameChangeService;
 import de.kaliburg.morefair.moderation.events.services.UserEventService;
 import de.kaliburg.morefair.moderation.model.dto.InspectorUserOverview;
+import de.kaliburg.morefair.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Log4j2
 @RequestMapping("/api/moderation/inspector/{accountId}")
 @RequiredArgsConstructor
-public class ModerationInspector {
+public class ModerationInspectorController {
 
   private final AccountService accountService;
   private final MessageService messageService;
@@ -28,7 +31,13 @@ public class ModerationInspector {
 
   @GetMapping
   public ResponseEntity<InspectorUserOverview> getInspectorUserOverview(
-      @PathVariable Long accountId) {
+      @PathVariable Long accountId, Authentication authentication) {
+    AccountEntity moderatorAccount = accountService.findByUuid(
+        SecurityUtils.getUuid(authentication)).orElseThrow();
+
+    if (!moderatorAccount.isMod()) {
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
 
     AccountEntity accountEntity = accountService.findById(accountId).orElseThrow();
 
