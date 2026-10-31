@@ -27,4 +27,6 @@ public interface AccountService extends UserDetailsService {
   List<AccountEntity> saveAll(List<AccountEntity> accounts);
 
   List<AccountEntity> findAllActive();
+
+  Long countAllByLastIp(Integer lastIp);
 }

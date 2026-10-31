@@ -1,5 +1,4 @@
 import { config, library } from "@fortawesome/fontawesome-svg-core";
-// eslint-disable-next-line import/named
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { defineNuxtPlugin } from "nuxt/app";

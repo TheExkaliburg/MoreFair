@@ -1,10 +1,11 @@
-package de.kaliburg.morefair.api;
+package de.kaliburg.morefair.moderation.boundary;
 
 import de.kaliburg.morefair.account.model.AccountEntity;
 import de.kaliburg.morefair.account.model.dto.UserListResponse;
 import de.kaliburg.morefair.account.model.types.AccountAccessType;
 import de.kaliburg.morefair.account.services.AccountService;
 import de.kaliburg.morefair.account.services.mapper.AccountMapper;
+import de.kaliburg.morefair.api.AccountController;
 import de.kaliburg.morefair.api.utils.HttpUtils;
 import de.kaliburg.morefair.api.utils.WsUtils;
 import de.kaliburg.morefair.api.websockets.messages.WsMessage;

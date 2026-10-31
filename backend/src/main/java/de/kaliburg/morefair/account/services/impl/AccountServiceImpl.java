@@ -205,6 +205,11 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
+  public Long countAllByLastIp(Integer lastIp) {
+    return accountRepository.countAllByLastIp(lastIp);
+  }
+
+  @Override
   public AccountEntity save(AccountEntity account) {
     try (var ignored = semaphore.enter()) {
       account = accountRepository.save(account);

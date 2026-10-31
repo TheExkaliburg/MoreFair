@@ -26,4 +26,6 @@ public interface MessageService {
   List<MessageEntity> findNewestMessagesByChatType(List<ChatType> chatTypes);
 
   void deleteMessagesOfAccount(AccountEntity account);
+
+  Long countAllByAccountId(Long accountId);
 }

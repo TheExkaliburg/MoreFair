@@ -10,4 +10,6 @@ public interface NameChangeService {
   List<NameChangeEntity> listAllNameChangesFrom(String displayName);
 
   List<NameChangeEntity> listAllNameChangesOf(Long accountId);
+
+  Long countAllByAccountId(Long accountId);
 }

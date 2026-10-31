@@ -70,6 +70,11 @@ public class UserEventServiceImpl implements UserEventService {
     }
   }
 
+  @Override
+  public Long countByAccountId(Long accountId) {
+    return userEventRepository.countByAccountId(accountId);
+  }
+
   private UserEventEntity buildEvent(Long accountId, Enum<?> eventType,
       UserEventMetadata metadata) {
     OffsetDateTime createdOn = OffsetDateTime.now(ZoneOffset.UTC);

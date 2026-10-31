@@ -31,10 +31,10 @@ const props = defineProps({
   modelValue: { type: Boolean, required: false, default: null },
 });
 
-const isToggleSwitch = computed<Boolean>(() => props.modelValue !== null);
+const isToggleSwitch = computed<boolean>(() => props.modelValue !== null);
 
 const emit = defineEmits<{
-  (e: "update:modelValue", value: Boolean): void;
+  (e: "update:modelValue", value: boolean): void;
 }>();
 </script>
 

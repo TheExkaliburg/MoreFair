@@ -118,6 +118,11 @@ public class MessageServiceImpl implements MessageService {
     }
   }
 
+  @Override
+  public Long countAllByAccountId(Long accountId) {
+    return messageRepository.countAllByAccountId(accountId);
+  }
+
   private MessageEntity save(MessageEntity message) {
     MessageEntity result = messageRepository.save(message);
     ChatEntity chat = chatService.find(result.getChatId());
@@ -138,6 +143,5 @@ public class MessageServiceImpl implements MessageService {
     messagesChatIdCache.put(chat.getId(), chatMessages);
 
     return result;
-
   }
 }

@@ -14,4 +14,6 @@ public interface UserEventService {
    */
   void recordAsync(Long accountId, Enum<?> eventType, UserEventMetadata metadata);
 
+  Long countByAccountId(Long accountId);
+
 }

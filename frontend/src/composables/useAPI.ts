@@ -193,6 +193,9 @@ const API = {
         params,
       });
     },
+    getInspectorInformation(accountId: number) {
+      return axiosInstance.get(`/api/moderation/inspector/${accountId}`);
+    },
   },
   grapes: {
     getVinegarRecords: () => {

@@ -35,4 +35,6 @@ public interface AccountRepository extends JpaRepository<AccountEntity, Long> {
       @Param("lastIp") Integer lastIp);
 
 
+  @Query("select count(a) from AccountEntity a where a.lastIp = :lastIp")
+  Long countAllByLastIp(Integer lastIp);
 }

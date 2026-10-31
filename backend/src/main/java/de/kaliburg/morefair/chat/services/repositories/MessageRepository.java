@@ -48,5 +48,6 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long> {
   void setDeletedOnForAccount(@Param("account") Long accountId,
       @Param("deletedOn") OffsetDateTime deletedOn);
 
-
+  @Query(value = "SELECT COUNT(*) FROM MessageEntity m WHERE m.accountId = :id")
+  Long countAllByAccountId(Long id);
 }

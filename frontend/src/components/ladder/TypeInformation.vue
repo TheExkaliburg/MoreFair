@@ -27,8 +27,7 @@ const typeArray = computed<LadderType[] | RoundType[]>(() => {
   }
 
   return Array.from<LadderType | RoundType>(props.types) as
-    | LadderType[]
-    | RoundType[];
+    LadderType[] | RoundType[];
 });
 </script>
 

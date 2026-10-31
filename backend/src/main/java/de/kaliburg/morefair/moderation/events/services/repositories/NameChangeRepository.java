@@ -32,4 +32,7 @@ public interface NameChangeRepository extends JpaRepository<NameChangeEntity, Lo
   default List<NameChangeEntity> findWithName(String displayName) {
     return findWithName(displayName, Pageable.ofSize(NAME_CHANGES_PER_PAGE));
   }
+
+  @Query("SELECT count(nc) FROM NameChangeEntity nc WHERE nc.accountId = :accountId")
+  Long countAllByAccountId(Long accountId);
 }

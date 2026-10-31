@@ -45,4 +45,9 @@ public class NameChangeServiceImpl implements NameChangeService {
   public List<NameChangeEntity> listAllNameChangesOf(Long accountId) {
     return nameChangeRepository.findByAccount(accountId);
   }
+
+  @Override
+  public Long countAllByAccountId(Long accountId) {
+    return nameChangeRepository.countAllByAccountId(accountId);
+  }
 }

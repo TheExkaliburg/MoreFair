@@ -39,7 +39,13 @@
           <span class="basis-1/4">
             {{ message.getTimestampString() }}
           </span>
-          <span v-if="false" class="text-end flex-none">...</span>
+          <button
+            v-if="accountStore.getters.isMod"
+            class="text-end text-text-light"
+            @click="modViewStore.actions.open(message.accountId)"
+          >
+            ...
+          </button>
         </div>
         <ChatWindowContentMessageBody :message="message" />
       </div>
@@ -52,9 +58,13 @@ import ChatWindowContentMessageBody from "../../components/chat/ChatWindowConten
 import type { MessageView } from "~/store/entities/message";
 import { useOptionsStore } from "~/store/options";
 import { ChatType, useChatStore } from "~/store/chat";
+import { useAccountStore } from "~/store/account.ts";
+import { useModViewStore } from "~/store/modView.store.ts";
 
 const optionsStore = useOptionsStore();
 const chatStore = useChatStore();
+const accountStore = useAccountStore();
+const modViewStore = useModViewStore();
 
 const props = defineProps<{ message: MessageView; index: number }>();
 
