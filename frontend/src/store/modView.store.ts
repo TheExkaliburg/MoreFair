@@ -58,6 +58,12 @@ export const useModViewStore = defineStore("modView", () => {
     state.selectedPlayerId = null;
   }
 
+  function reload() {
+    if (state.currentView === ModViewTabType.Overview) {
+      fetchOverviewInformation();
+    }
+  }
+
   function changeView(type: ModViewTabType) {
     state.currentView = type;
   }
@@ -80,6 +86,7 @@ export const useModViewStore = defineStore("modView", () => {
     actions: {
       open,
       close,
+      reload,
       changeView,
     },
   };

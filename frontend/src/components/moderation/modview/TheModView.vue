@@ -5,13 +5,12 @@
       'w-0 min-w-0 max-w-0': !modViewStore.getters.isOpen,
       'w-full min-w-96 sm:w-1/4  border-l-2': modViewStore.getters.isOpen,
     }"
-    @keydown.esc="close()"
   >
     <div class="h-full flex flex-col py-4 mx-4 overflow-hidden">
-      <div class="flex flex-col">
+      <div class="flex flex-col pb-2">
         <div class="flex flex-row justify-between">
           <span class="text-text-light pl-4 font-semibold">Mod View</span>
-          <button>🔃</button>
+          <button @click="modViewStore.actions.reload()">🔃</button>
           <button class="m-1 p-1 px-2 text-xl rotate-180" @click="close()">
             x
           </button>
@@ -26,12 +25,13 @@
             >#{{ modViewStore.state.selectedPlayerId ?? 0 }}</span
           >
         </div>
-        <div class="mt-1 grid grid-cols-5 gap-1">
-          <FairButton class="rounded-t-none" disabled>Rename</FairButton>
-          <FairButton class="rounded-t-none" disabled>Audit</FairButton>
-          <FairButton class="rounded-t-none" disabled>Mute</FairButton>
-          <FairButton class="rounded-t-none" disabled>Ban</FairButton>
-          <FairButton class="rounded-t-none" disabled>Free</FairButton>
+        <div class="mt-1 grid grid-cols-4 gap-1">
+          <FairButton class="rounded-t-none" @click="rename()"
+            >Rename</FairButton
+          >
+          <FairButton class="rounded-t-none" @click="mute()">Mute</FairButton>
+          <FairButton class="rounded-t-none" @click="ban()">Ban</FairButton>
+          <FairButton class="rounded-t-none" @click="free()">Free</FairButton>
         </div>
       </div>
       <div
@@ -93,10 +93,15 @@ import ModViewEventLog from "~/components/moderation/modview/ModViewEventLog.vue
 import ModViewAuditLog from "~/components/moderation/modview/ModViewAuditLog.vue";
 import ModViewNameHistory from "~/components/moderation/modview/ModViewNameHistory.vue";
 import ModViewAltAccounts from "~/components/moderation/modview/ModViewAltAccounts.vue";
+import { useModerationStore } from "~/store/moderation.ts";
 
+const moderationStore = useModerationStore();
 const modViewStore = useModViewStore();
 const currentView = computed<ModViewTabType>(
   () => modViewStore.state.currentView,
+);
+const selectedPlayerId = computed<number | null>(
+  () => modViewStore.state.selectedPlayerId,
 );
 const overviewInformation = computed<InspectorOverviewInformation | null>(
   () => modViewStore.state.overviewInformation,
@@ -107,6 +112,59 @@ function close() {
     modViewStore.actions.close();
   } else {
     modViewStore.state.currentView = ModViewTabType.Overview;
+  }
+}
+
+function rename() {
+  const username = prompt(
+    "Please enter the new username:",
+    overviewInformation.value?.displayName ?? "",
+  );
+  if (username && selectedPlayerId.value) {
+    moderationStore.actions.rename(selectedPlayerId.value, username);
+    modViewStore.actions.reload();
+  }
+}
+
+function ban() {
+  if (!selectedPlayerId.value) {
+    return;
+  }
+
+  const confirmed = confirm(
+    `Are you sure you want to BAN ${overviewInformation.value?.displayName ?? ""} #${selectedPlayerId.value}?`,
+  );
+  if (confirmed) {
+    moderationStore.actions.ban(selectedPlayerId.value);
+    modViewStore.actions.reload();
+  }
+}
+
+function mute() {
+  if (!selectedPlayerId.value) {
+    return;
+  }
+
+  const confirmed = confirm(
+    `Are you sure you want to MUTE ${overviewInformation.value?.displayName ?? ""} #${selectedPlayerId.value}?`,
+  );
+  if (confirmed) {
+    moderationStore.actions.mute(selectedPlayerId.value);
+    modViewStore.actions.reload();
+  }
+}
+
+function free() {
+  if (!selectedPlayerId.value) {
+    return;
+  }
+
+  const confirmed = confirm(
+    `Are you sure you want to FREE ${overviewInformation.value?.displayName ?? ""} #${selectedPlayerId.value}?`,
+  );
+  if (confirmed) {
+    moderationStore.actions.free(selectedPlayerId.value);
+    modViewStore.actions.reload();
   }
 }
 </script>
