@@ -27,10 +27,7 @@
       />
       <div class="flex flex-row w-full pt-1 justify-between">
         <div class="flex flex-row gap-2">
-          <label
-            class="cursor-pointer select-none"
-            for="rememberMe"
-            @click="rememberMe = !rememberMe"
+          <label class="cursor-pointer select-none" for="rememberMe"
             >{{ lang("login.rememberMe") }}:</label
           >
           <FairCheckboxInput

@@ -1,4 +1,5 @@
 import axios, { AxiosError } from "axios";
+import type { AxiosResponse } from "axios";
 import Cookies from "js-cookie";
 import { useToasts } from "~/composables/useToasts";
 import { ChatType } from "~/store/chat";
@@ -7,6 +8,8 @@ import { SearchType } from "~/store/moderation";
 
 const isDevMode = process.env.NODE_ENV !== "production";
 let lastXsrfToken = Cookies.get("XSRF-TOKEN");
+let sessionInitialized = false;
+let authenticationStatusRequest: Promise<AxiosResponse<boolean>> | undefined;
 
 export const axiosInstance = axios.create({
   baseURL: isDevMode ? "http://localhost:8080" : "",
@@ -14,8 +17,33 @@ export const axiosInstance = axios.create({
 
 axiosInstance.defaults.withCredentials = true;
 
+function getAuthenticationStatus() {
+  if (!authenticationStatusRequest) {
+    const request = () =>
+      axiosInstance.get<boolean>("/api/auth", { timeout: 10000 });
+    // Remember-me tokens rotate on use, so tabs must restore the session in turn.
+    authenticationStatusRequest = (
+      navigator.locks
+        ? navigator.locks.request("fair-session-initialization", request)
+        : request()
+    )
+      .then((response) => {
+        sessionInitialized = true;
+        return response;
+      })
+      .finally(() => {
+        authenticationStatusRequest = undefined;
+      });
+  }
+  return authenticationStatusRequest;
+}
+
 axiosInstance.interceptors.request.use(
-  function (config) {
+  async function (config) {
+    if (config.url !== "/api/auth" && !sessionInitialized) {
+      await getAuthenticationStatus();
+    }
+
     if (isDevMode) {
       config.baseURL = "http://localhost:8080";
     }
@@ -129,9 +157,7 @@ const API = {
     logout: () => {
       return axiosInstance.post("/api/auth/logout");
     },
-    authenticationStatus: () => {
-      return axiosInstance.get("/api/auth");
-    },
+    authenticationStatus: getAuthenticationStatus,
   },
   account: {
     changeDisplayName: (displayName: string) => {
@@ -211,14 +237,6 @@ const API = {
     },
   },
 };
-
-let isInitialized = false;
-if (!isInitialized) {
-  // TODO: Why do we need to double call authenticationStatus ? @see store/auth.ts
-  API.auth.authenticationStatus().then((_) => {
-    isInitialized = true;
-  });
-}
 
 export const useAPI = () => {
   return API;

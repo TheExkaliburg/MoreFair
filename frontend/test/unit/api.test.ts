@@ -40,7 +40,7 @@ describe("Axios API compatibility", () => {
     const module = await import("~/composables/useAPI");
     client = module.axiosInstance;
     api = module.useAPI();
-    await vi.waitFor(() => expect(adapter).toHaveBeenCalled());
+    await api.auth.authenticationStatus();
   });
 
   afterAll(() => {
